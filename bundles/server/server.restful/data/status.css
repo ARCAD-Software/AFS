@@ -1,0 +1,5 @@
+h2{color:red;}
+a{color:white;}
+a:hover{color:red;}
+body{background-color:black; color:white;}
+pre{background-color:gray; font-family: monospace; white-space:pre-wrap; margin:12px;}

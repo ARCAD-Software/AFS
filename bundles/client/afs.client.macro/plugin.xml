@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.arcadsoftware.afs.client.macro.ui.editors.MacroLogItemEditorPart"
+            contributorClass="com.arcadsoftware.afs.client.macro.ui.editors.MacroLogItemEditorContributor"
+            default="false"
+            icon="platform:/plugin/com.arcadsoftware.afs.client.brands/icons/macro_log.png"
+            id="com.arcadsoftware.afs.client.macro.ui.editors.MacroLogItemEditor"
+            name="%macroLogItem.editor.name">
+      </editor>
+      <editor
+            class="com.arcadsoftware.afs.client.macro.ui.editors.CsvEditorPart"
+            default="false"
+            icon="platform:/plugin/com.arcadsoftware.afs.client.brands/icons/list.png"
+            id="com.arcadsoftware.afs.client.macro.ui.editors.CsvEditor"
+            name="%csv.editor.name">
+      </editor>      
+   </extension>
+   <extension
+         point="com.arcadsoftware.afs.framework.userMessage">
+      <userMessage
+            filename="/list.messages">
+      </userMessage>
+   </extension>
+
+</plugin>

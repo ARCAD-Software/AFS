@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="com.arcadsoftware.afs.framework.userMessage">
+      <userMessage
+            filename="/help.messages">
+      </userMessage>
+   </extension>
+   <extension
+         point="com.arcadsoftware.afs.framework.dynamicHelp">
+      <dynamicHelp
+            class="com.arcadsoftware.afs.framework.help.dynamicHelp.DynamicHelpServiceInit"
+            start="true">
+      </dynamicHelp>
+   </extension>
+
+</plugin>

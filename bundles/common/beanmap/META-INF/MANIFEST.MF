@@ -1,0 +1,42 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: AFS BeanMap Management
+Bundle-SymbolicName: com.arcadsoftware.beanmap
+Bundle-Version: 1.3.0.qualifier
+Bundle-Vendor: ARCAD Software
+Bundle-License: https://www.eclipse.org/legal/epl-2.0
+Bundle-License-Name: Eclipse Public License Version 2.0
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Import-Package: com.arcadsoftware.osgi;version="[1.1.1,2.0.0)",
+ com.arcadsoftware.rest;version="[3.0.0,4.0.0)",
+ com.arcadsoftware.rest.connection;version="[2.0.0,3.0.0)",
+ com.thoughtworks.xstream;version="[1.4.201,1.5.0)",
+ com.thoughtworks.xstream.converters;version="[1.4.201,1.5.0)",
+ com.thoughtworks.xstream.converters.basic;version="[1.4.201,1.5.0)",
+ com.thoughtworks.xstream.converters.collections;version="[1.4.201,1.5.0)",
+ com.thoughtworks.xstream.converters.enums;version="[1.4.201,1.5.0)",
+ com.thoughtworks.xstream.converters.extended;version="[1.4.201,1.5.0)",
+ com.thoughtworks.xstream.converters.javabean;version="[1.4.201,1.5.0)",
+ com.thoughtworks.xstream.converters.reflection;version="[1.4.201,1.5.0)",
+ com.thoughtworks.xstream.converters.time;version="[1.4.201,1.5.0)",
+ com.thoughtworks.xstream.core;version="[1.4.201,1.5.0)",
+ com.thoughtworks.xstream.io;version="[1.4.201,1.5.0)",
+ com.thoughtworks.xstream.io.binary;version="[1.4.201,1.5.0)",
+ com.thoughtworks.xstream.io.copy;version="[1.4.201,1.5.0)",
+ com.thoughtworks.xstream.io.json;version="[1.4.201,1.5.0)",
+ com.thoughtworks.xstream.io.naming;version="[1.4.201,1.5.0)",
+ com.thoughtworks.xstream.io.path;version="[1.4.201,1.5.0)",
+ com.thoughtworks.xstream.io.xml;version="[1.4.201,1.5.0)",
+ com.thoughtworks.xstream.io.xml.xppdom;version="[1.4.201,1.5.0)",
+ com.thoughtworks.xstream.mapper;version="[1.4.201,1.5.0)",
+ org.eclipse.core.runtime;common=split;version="[3.4.0,4.0.0)",
+ org.restlet;version="[2.4.3,3.0.0)",
+ org.restlet.data;version="[2.4.3,3.0.0)",
+ org.restlet.representation;version="[2.4.3,3.0.0)",
+ org.restlet.resource;version="[2.4.3,3.0.0)",
+ org.restlet.routing;version="[2.4.3,3.0.0)",
+ org.restlet.util;version="[2.4.3,3.0.0)"
+Export-Package: com.arcadsoftware.beanmap;version="2.1.0",
+ com.arcadsoftware.beanmap.rest;version="2.1.0",
+ com.arcadsoftware.beanmap.xml;version="2.1.0"
+Automatic-Module-Name: com.arcadsoftware.beanmap

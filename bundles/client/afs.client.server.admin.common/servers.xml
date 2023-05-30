@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE servers>
+
+<servers>
+  <server name="LOCAL" url="http://localhost:5252" login="admin@quadra" pwd="quadra" retain="true"/>
+</servers>

@@ -1,0 +1,26 @@
+SRV-COR-E000000$1=An exception occurred
+SRV-COR-E000000$2=An exception occurred
+
+SRV-HTTP-E000000$1=Unknown Error
+SRV-HTTP-E000000$2=An unknown Error occurred (http=%1$d title=%2$s message=%3$s) 
+
+SRV-HTTP-E000401$1=Invalid User
+SRV-HTTP-E000401$2=Invalid User
+
+SRV-HTTP-E000403$1=Forbidden Access 
+SRV-HTTP-E000403$2=%1$s
+
+SRV-HTTP-E000404$1=Server Not Ready
+SRV-HTTP-E000404$2=Server Not Ready
+
+SRV-HTTP-E000412$1=%1$s
+SRV-HTTP-E000412$2=%1$s
+
+SRV-HTTP-E000500$1=Fatal Error
+SRV-HTTP-E000500$2=Fatal Error
+
+SRV-HTTP-E000503$1=The server is in maintenance
+SRV-HTTP-E000503$2=The server is in maintenance
+
+SRV-HTTP-E001001$1=The server is not responding
+SRV-HTTP-E001001$2=The server is not responding

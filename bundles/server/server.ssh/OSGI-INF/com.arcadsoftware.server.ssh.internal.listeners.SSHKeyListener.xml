@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="com.arcadsoftware.server.ssh.internal.listeners.SSHKeyListener">
+   <property name="type" value="sshKey"/>
+   <service>
+      <provide interface="com.arcadsoftware.metadata.IMetaDataDeleteListener"/>
+   </service>
+   <reference bind="bindLog" interface="org.osgi.service.log.LogService" name="Log"/>
+   <reference bind="bindSSHService" interface="com.arcadsoftware.server.ssh.services.SSHService" name="SSHService"/>
+   <implementation class="com.arcadsoftware.server.ssh.internal.listeners.SSHKeyListener"/>
+</scr:component>

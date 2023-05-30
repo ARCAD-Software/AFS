@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services>
+
+	<service id="anyRuleList" 
+	         class="com.arcadsoftware.tools.anonymizer.services.common.RuleListService"/>
+	<service id="anyEngineList" 
+	         class="com.arcadsoftware.tools.anonymizer.services.common.EngineListService"/>
+	<service id="anyInstanceList" 
+	         class="com.arcadsoftware.tools.anonymizer.services.common.InstanceListService"/>
+	<service id="anyCommand" 
+	         class="com.arcadsoftware.tools.anonymizer.services.common.CommandService"/>
+
+	<service id="anyAnonymizeFile" 
+	         class="com.arcadsoftware.tools.anonymizer.services.ibmi.impl.AnonymizeFile400Service"/>
+	<service id="anyAnonymizeXmlList" 
+	         class="com.arcadsoftware.tools.anonymizer.services.ibmi.impl.AnonymizeXmlListService"/>
+	<service id="anyAnonymizeArcadList" 
+	         class="com.arcadsoftware.tools.anonymizer.services.ibmi.impl.AnonymizeARCADListService"/>
+	
+	<service id="anyAnonymizeTable" 
+	         class="com.arcadsoftware.tools.anonymizer.services.jdbc.impl.AnonymizeTableService"/>	         
+	<service id="anyAnonymizeTableList" 
+	         class="com.arcadsoftware.tools.anonymizer.services.jdbc.impl.AnonymizeTableFromXmlListService"/>
+	         
+	<service id="anyAnonymizeTest" 
+	         class="com.arcadsoftware.tools.anonymizer.services.common.TestAnonymizationService"/>
+
+	<service id="anyLicence" 
+	         class="com.arcadsoftware.tools.anonymizer.services.common.LicenceService"/>	         
+			 
+	<service id="anyAnonymizeXmlFile" 
+	         class="com.arcadsoftware.tools.anonymizer.services.file.AnyAnonymizeXmlFile"/>	         
+	<service id="anyAnonymizeCsvlFile" 
+	         class="com.arcadsoftware.tools.anonymizer.services.file.AnyAnonymizeCsvFile"/>
+	<service id="anyAnonymizeProject" 
+	         class="com.arcadsoftware.tools.anonymizer.services.common.ProjetAnonymizationService"/>
+			 
+</services>

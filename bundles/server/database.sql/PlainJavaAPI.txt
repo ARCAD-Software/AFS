@@ -1,0 +1,17 @@
+
+La partie "dbutils de ce bundle peut être exécuté comme une librairie Java classique.
+
+
+Modules requis dans le classpath :
+
+- Apache Commons DBUtils.
+
+Pour la construction uniquement (à cause de la partie non utilisable en Plain Java): 
+
+- H2.
+- com.arcadsoftware.osgi.
+- org.eclipse.osgi.
+- org.eclipse.osgi.services.
+- Apache Commons DBCP.
+
+

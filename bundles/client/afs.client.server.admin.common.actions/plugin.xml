@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension point="com.arcadsoftware.client.server.admin.common.copytoclipboard">
+      <copy class="com.arcadsoftware.afs.client.server.admin.common.actions.CopyToClipboardAction">
+      </copy>
+   </extension>
+</plugin>

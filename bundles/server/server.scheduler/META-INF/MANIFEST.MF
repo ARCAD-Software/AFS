@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: ARCAD Task Sheduler
+Bundle-SymbolicName: com.arcadsoftware.server.scheduler;singleton:=true
+Bundle-Version: 1.2.3.qualifier
+Bundle-Vendor: ARCAD Software
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Export-Package: com.arcadsoftware.server.scheduler;version="1.1.1"
+Import-Package: com.arcadsoftware.beanmap;version="[2.0.0,3.0.0)"
+Automatic-Module-Name: com.arcadsoftware.server.scheduler

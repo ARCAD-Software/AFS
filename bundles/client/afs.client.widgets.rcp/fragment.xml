@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<fragment>
+   <extension
+         point="com.arcadsoftware.client.editor.swt">
+      <input
+            class="com.arcadsoftware.client.editors.swtwidgets.inputs.DownloadSWTProvider"
+            name="download"
+            type="string">
+         <parameter
+               name="label"
+               use="optional">
+         </parameter>
+         <parameter
+               default="false"
+               name="mandatory"
+               use="optional">
+         </parameter>
+      </input>
+      <input
+            class="com.arcadsoftware.client.editors.swtwidgets.inputs.BrowseSWTProvider"
+            name="browse"
+            type="string">
+         <parameter
+               name="label"
+               use="optional">
+         </parameter>
+         <parameter
+               default="false"
+               name="mandatory"
+               use="optional">
+         </parameter>
+         <parameter
+               default="true"
+               name="getFilePath"
+               use="optional">
+         </parameter>
+      </input>
+      <input
+            class="com.arcadsoftware.client.editors.swtwidgets.inputs.GroovyScriptSWTProvider"
+            name="groovy"
+            type="string">
+         <parameter
+               name="label"
+               use="optional">
+         </parameter>
+         <parameter
+               default="false"
+               name="mandatory"
+               use="optional">
+         </parameter>
+         <parameter
+               default="false"
+               name="default"
+               use="optional">
+         </parameter>
+        
+         <parameter
+               default="Ctrl+Space"
+               description="The key shortcut that will be used to open the completion popup."
+               name="completionKey"
+               use="optional">
+         </parameter>
+                   <parameter
+                         description="This parameter list the function names that will be used to propose a completion of functions names."
+                         name="api"
+                         use="optional">
+                      </parameter>
+              <parameter
+               default="-1"
+               name="height"
+               use="optional">
+         </parameter>
+      </input>
+   </extension>
+
+</fragment>

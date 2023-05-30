@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE form SYSTEM "../layout.dtd">
+<editor>
+	<param id="background-color-swt" value="22" />
+	<composite fillBoth="true" withMargin="true" border="false">
+		<input attribute="name" mandatory="true" />
+		<comboFixedValue attribute="keytype" readOnly="true">
+			<item index="0" value="EdDSA" />
+			<item index="1" value="RSA" />			
+		</comboFixedValue>
+		<input attribute="passphrase" isPassword="true" />
+		<input attribute="keycomment" />
+	</composite>
+	<messages file="layout/sshKey"/>
+</editor>

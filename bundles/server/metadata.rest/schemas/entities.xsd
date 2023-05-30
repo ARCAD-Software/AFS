@@ -1,0 +1,1343 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://xml.arcadsoftware.com/1.0.0/entities.xsd"
+	xmlns="http://xml.arcadsoftware.com/1.0.0/entities.xsd"
+	elementFormDefault="qualified">
+
+	<!-- Extraction from searchcriteria.xsd -->
+	<xsd:group name="criterion">
+		<xsd:choice>
+			<xsd:element name="true">
+				<xsd:annotation>
+					<xsd:documentation>Valeur booléenne constante Vrai.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+
+			<xsd:element name="false">
+				<xsd:annotation>
+					<xsd:documentation>Valeur booléenne constante Faux.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+
+			<xsd:element name="constant" type="xsd:boolean">
+				<xsd:annotation>
+					<xsd:documentation>Définie une valeur booléenne. La valeur de ce tag est "false" ou "true".</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+
+			<xsd:element name="or">
+				<xsd:annotation>
+					<xsd:documentation>
+						Définie une conjonction.
+						<p>La valeur de cette condition est vrai si au moins l'une des sous-condition est vrai. L'évaluation s'arrête
+							généralement à la première condition qui dont la valeur est vrai.'</p>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:choice>
+						<xsd:group ref="criteria"></xsd:group>
+					</xsd:choice>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="and">
+				<xsd:annotation>
+					<xsd:documentation>Définie une disjonction.
+						La valeur de cette condition
+						est vrai si toutes les sous-condition
+						le sont
+						aussi. L'évaluation
+						s'arrête généralement à la première
+						condition dont la valeur est
+						fausse.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:choice>
+						<xsd:group ref="criteria"></xsd:group>
+					</xsd:choice>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="not">
+				<xsd:annotation>
+					<xsd:documentation>Définie une négation.
+						La valeur de cette condition est
+						l'inverse de la sous-condition.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:choice>
+						<xsd:group ref="criterion"></xsd:group>
+					</xsd:choice>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="equals">
+				<xsd:annotation>
+					<xsd:documentation>Teste l'égalité d'un attribut à une valeur donnée.
+						L'attribut peut être une ligne de références,
+						une
+						liste de codes
+						séparés par des points. le premier code de
+						la ligne doit être un
+						attribut de l'entité d'origine et
+						tous
+						les codes
+						suivant doivent
+						suivre les références du code précédent.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence minOccurs="0" maxOccurs="1">
+						<xsd:element name="intval" type="xsd:integer" />
+					</xsd:sequence>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>L'attribut peut être une ligne de références, une
+								liste de codes séparés par des points. le
+								premier
+								code de la ligne
+								doit être un attribut de l'entité d'origine et tous les codes
+								suivant doivent suivre les
+								références
+								du code précédent.
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="value" type="xsd:string" use="optional" />
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="isnull">
+				<xsd:annotation>
+					<xsd:documentation>Teste l'égalité d'un attribut nulle.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>L'attribut peut être une ligne de références, une
+								liste de codes séparés par des points. le
+								premier
+								code de la ligne
+								doit être un attribut de l'entité d'origine et tous les codes
+								suivant doivent suivre les
+								références
+								du code précédent.
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="lowerthan">
+				<xsd:annotation>
+					<xsd:documentation>Teste
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>L'attribut peut être une ligne de références, une
+								liste de codes séparés par des points. le
+								premier
+								code de la ligne
+								doit être un attribut de l'entité d'origine et tous les codes
+								suivant doivent suivre les
+								références
+								du code précédent.
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="value" type="xsd:string" use="required" />
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="greaterthan">
+				<xsd:annotation>
+					<xsd:documentation>Teste
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>L'attribut peut être une ligne de références, une
+								liste de codes séparés par des points. le
+								premier
+								code de la ligne
+								doit être un attribut de l'entité d'origine et tous les codes
+								suivant doivent suivre les
+								références
+								du code précédent.
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="value" type="xsd:string" use="required" />
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="lowerstrict">
+				<xsd:annotation>
+					<xsd:documentation>Teste
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>L'attribut peut être une ligne de références, une
+								liste de codes séparés par des points. le
+								premier
+								code de la ligne
+								doit être un attribut de l'entité d'origine et tous les codes
+								suivant doivent suivre les
+								références
+								du code précédent.
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="value" type="xsd:string" use="required" />
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="greaterstrict">
+				<xsd:annotation>
+					<xsd:documentation>Teste
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>L'attribut peut être une ligne de références, une
+								liste de codes séparés par des points. le
+								premier
+								code de la ligne
+								doit être un attribut de l'entité d'origine et tous les codes
+								suivant doivent suivre les
+								références
+								du code précédent.
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="value" type="xsd:string" use="required" />
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="linkto">
+				<xsd:annotation>
+					<xsd:documentation>Teste
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="linkCode" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>Le code peut être une ligne de références, une liste
+								de codes séparés par des points. le
+								premier code
+								de la ligne doit
+								être un attribut de l'entité d'origine et tous les codes suivant
+								doivent suivre les
+								références du
+								code précédent.
+								Dans tous les cas le dernier code de la ligne doit être le code d'une
+								association
+								(link).
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="id" type="xsd:integer" use="required" />
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="starts">
+				<xsd:annotation>
+					<xsd:documentation>Teste
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence maxOccurs="1" minOccurs="1">
+						<xsd:element name="value" type="xsd:string"></xsd:element>
+					</xsd:sequence>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>L'attribut peut être une ligne de références, une
+								liste de codes séparés par des points. le
+								premier
+								code de la ligne
+								doit être un attribut de l'entité d'origine et tous les codes
+								suivant doivent suivre les
+								références
+								du code précédent.
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="case" type="xsd:boolean" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Définie si le test doit être sensible à la casse
+								(différence entre majuscules et minuscules).
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="ends">
+				<xsd:annotation>
+					<xsd:documentation>Teste
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence maxOccurs="1" minOccurs="1">
+						<xsd:element name="value" type="xsd:string"></xsd:element>
+					</xsd:sequence>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>L'attribut peut être une ligne de références, une
+								liste de codes séparés par des points. le premier code de la ligne
+								doit être un attribut de l'entité d'origine et tous les codes
+								suivant doivent suivre les références du code précédent.
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="case" type="xsd:boolean" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Définie si le test doit être sensible à la casse
+								(différence entre majuscules et minuscules).
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="contains">
+				<xsd:annotation>
+					<xsd:documentation>Teste
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence maxOccurs="1" minOccurs="1">
+						<xsd:element name="value" type="xsd:string"></xsd:element>
+					</xsd:sequence>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>L'attribut peut être une ligne de références, une
+								liste de codes séparés par des points. le premier code de la ligne
+								doit être un attribut de l'entité d'origine et tous les codes
+								suivant doivent suivre les références du code précédent.
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="case" type="xsd:boolean" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Définie si le test doit être sensible à la casse
+								(différence entre majuscules et minuscules).
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="ingroup">
+				<xsd:annotation>
+					<xsd:documentation>
+						<p>Teste que l'objet désigné par "item" appartient bien au groupe
+						désigné par "group". La sémantique exacte du test varie
+						en fonction des valeurs des attributs de cette condition.</p>
+						<p>Par exemple:
+							<br />
+							(item="contact",group="maingroup") test that the select values
+							possess an attribute value "contact" that belong to
+							the group value
+							of the attribute "maingroup").
+							<br />
+							(group="owner.membergroup") test that the currently selected value
+							is a member of the specified
+							"owner.membergroups"
+							group.
+							<br />
+							(group=12,type="usersgroup") test that the currently selected value
+							is a member of the 12st "usersgroup".
+							<br />
+							(item=1,group="associatedgroup") test that group specified by the
+							attribute "associatedgroup" contains the item id
+							1.</p>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="type" type="xsd:string" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Désigne le type de l'entité définissant le groupe.
+								Utile uniquement si l'attribut "group" est
+								un
+								entier désignant un
+								groupe particulier.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="item" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation></xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="group" type="xsd:string" use="optional">
+						<xsd:annotation>
+							<xsd:documentation></xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="before">
+				<xsd:annotation>
+					<xsd:documentation>Teste
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>L'attribut peut être une ligne de références, une
+								liste de codes séparés par des points. le
+								premier
+								code de la ligne
+								doit être un attribut de l'entité d'origine et tous les codes
+								suivant doivent suivre les
+								références
+								du code précédent.
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="value" type="xsd:date" use="optional" />
+					<xsd:attribute name="trunc" type="xsd:boolean" default="false" />
+					<xsd:attribute name="years" type="xsd:integer" use="optional" />
+					<xsd:attribute name="months" type="xsd:integer" use="optional" />
+					<xsd:attribute name="days" type="xsd:integer" use="optional" />
+					<xsd:attribute name="hours" type="xsd:integer" use="optional" />
+					<xsd:attribute name="minuts" type="xsd:integer" use="optional" />
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="after">
+				<xsd:annotation>
+					<xsd:documentation>Teste
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>L'attribut peut être une ligne de références, une
+								liste de codes séparés par des points. le
+								premier
+								code de la ligne
+								doit être un attribut de l'entité d'origine et tous les codes
+								suivant doivent suivre les
+								références
+								du code précédent.
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="value" type="xsd:date" use="optional" />
+					<xsd:attribute name="trunc" type="xsd:boolean" default="false" />
+					<xsd:attribute name="years" type="xsd:integer" use="optional" />
+					<xsd:attribute name="months" type="xsd:integer" use="optional" />
+					<xsd:attribute name="days" type="xsd:integer" use="optional" />
+					<xsd:attribute name="hours" type="xsd:integer" use="optional" />
+					<xsd:attribute name="minuts" type="xsd:integer" use="optional" />
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="between">
+				<xsd:annotation>
+					<xsd:documentation>Teste
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>L'attribut peut être une ligne de références, une
+								liste de codes séparés par des points. le
+								premier
+								code de la ligne
+								doit être un attribut de l'entité d'origine et tous les codes
+								suivant doivent suivre les
+								références
+								du code précédent.
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="before" type="xsd:date" use="optional" />
+					<xsd:attribute name="after" type="xsd:date" use="optional" />
+					<xsd:attribute name="trunc" type="xsd:boolean" default="false" />
+					<xsd:attribute name="afteryears" type="xsd:integer" use="optional" />
+					<xsd:attribute name="aftermonths" type="xsd:integer" use="optional" />
+					<xsd:attribute name="afterdays" type="xsd:integer" use="optional" />
+					<xsd:attribute name="afterhours" type="xsd:integer" use="optional" />
+					<xsd:attribute name="afterminuts" type="xsd:integer" use="optional" />
+					<xsd:attribute name="beforeyears" type="xsd:integer" use="optional" />
+					<xsd:attribute name="beforemonths" type="xsd:integer" use="optional" />
+					<xsd:attribute name="beforedays" type="xsd:integer" use="optional" />
+					<xsd:attribute name="beforehours" type="xsd:integer" use="optional" />
+					<xsd:attribute name="beforeminuts" type="xsd:integer" use="optional" />
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="istrue">
+				<xsd:annotation>
+					<xsd:documentation>Teste si la valeur de l'attribut est une valeur
+						booléenne dont la valeur est Vrai.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>L'attribut peut être une ligne de références, une
+								liste de codes séparés par des points. le
+								premier
+								code de la ligne
+								doit être un attribut de l'entité d'origine et tous les codes
+								suivant doivent suivre les
+								références
+								du code précédent.
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="subst">
+				<xsd:annotation>
+					<xsd:documentation>Critère particulier qui peut être utilisé dans
+						certains cas pour remplacer tout ou partie d'une
+						condition par une
+						valeur externe désigné par le "code" de remplacement.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="code" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>Définie le code de substitution qui sera utilisé
+								pour remplacer le présent critère lors de
+								l'évaluation de la
+								condition.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="idequal">
+				<xsd:annotation>
+					<xsd:documentation>Teste que la valeur courant possède bien le même ID
+						interne que celui spécifié par ce critère.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="id" type="xsd:positiveInteger" use="required">
+						<xsd:annotation>
+							<xsd:documentation>Désigne un identifiant interne, une valeur numérique
+								supérieure à zéro.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="linkequals">
+				<xsd:annotation>
+					<xsd:documentation>Teste
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="reference" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>Désigne l'attribut dont la valeur est utilisée comme
+								origine de l'association. Cet attribut
+								peut être
+								une ligne de
+								références, une liste de codes séparés par des points. le premier
+								code de la ligne doit être
+								un
+								attribut de l'entité d'origine et
+								tous les codes suivant doivent suivre les références du code
+								précédent.
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="linkCode" type="xsd:string" use="required" />
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>L'attribut peut être une ligne de références, une
+								liste de codes séparés par des points. le
+								premier
+								code de la ligne
+								doit être un attribut de l'entité ciblée par l'association (link)
+								et tous les codes
+								suivant doivent
+								suivre les références du code
+								précédent.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="value" type="xsd:string" use="required" />
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="equalsic">
+				<xsd:annotation>
+					<xsd:documentation>Teste l'égalité d'une chaîne de caractère à la valeur
+						de l'attribut désigné sans tenir compte de la casse (différence
+						entre majuscules et minuscules).
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>L'attribut peut être une ligne de références, une
+								liste de codes séparés par des points. le premier code de la ligne
+								doit être un attribut de l'entité d'origine et tous les codes
+								suivant doivent suivre les
+								références
+								du code précédent.
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="value" type="xsd:string" use="required" />
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="hasright">
+				<xsd:annotation>
+					<xsd:documentation>Teste
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="attribute" type="xsd:string">
+						<xsd:annotation>
+							<xsd:documentation>L'attribut peut être une ligne de références, une
+								liste de codes séparés par des points. le premier code de la ligne
+								doit être un attribut de l'entité d'origine et tous les codes
+								suivant doivent suivre les références du code précédent.
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="right" type="xsd:int" />
+					<xsd:attribute name="param" type="xsd:int" />
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="currentuser">
+				<xsd:annotation>
+					<xsd:documentation>Compare la valeur d'un attribut de l'élément à sélectionner à la valeur d'un attribut de
+						l'utilisateur courant, ou, à défaut, à l'ID de l'utilisateur courant.
+						Employé lorsque l'utilsiateur courant n'est pas accessible ce critère renvois faux.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="userAttribute" type="xsd:string" use="optional">
+						<xsd:annotation>
+							<xsd:documentation><p>Ce paramètre optionel définie quel attribut de l'utilisateur sera
+								comparé à l'attribut à tester. Si aucun attribut (USER) n'est spécifié alors c'est
+								identifiant de l'utilisateur courant qui sera comparé.</p>
+								<p>Cet attribut peut aussi définit une chaîne de références partant de l'entité USER.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>L'attribut peut être une ligne de références, une
+								liste de codes séparés par des points. le premier code de la ligne
+								doit être un attribut de l'entité d'origine et tous les codes
+								suivant doivent suivre les références du code précédent.
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="pregen" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>
+						Containte prégénére spécifique au mapper ciblé.
+						<strong>Attention, ce type de condition n'est pas portable et ne
+							devrait être utilisé que localement, pour des usages
+							spécifiques.</strong>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:choice>
+	</xsd:group>
+
+	<xsd:group name="criteria">
+		<xsd:sequence>
+			<xsd:group ref="criterion" />
+		</xsd:sequence>
+	</xsd:group>
+
+	<xsd:element name="list">
+		<xsd:complexType>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:element ref="entity" />
+				<xsd:element ref="update-entity" />
+			</xsd:choice>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="entities">
+		<xsd:complexType>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:element ref="entity" />
+				<xsd:element ref="update-entity" />
+			</xsd:choice>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="entity" type="entityType" />
+
+	<xsd:element name="update-entity" type="entityType" />
+
+	<xsd:complexType name="entityType">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="attribute" minOccurs="0" maxOccurs="1" type="attributeType" />
+			<xsd:element name="link" minOccurs="0" maxOccurs="1" type="linkType" />
+			<xsd:element name="test" minOccurs="0" maxOccurs="1" type="testType" />
+			<xsd:element name="attributes" minOccurs="0" maxOccurs="1">
+				<xsd:complexType>
+					<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+						<xsd:element name="attribute" type="attributeType" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="links" minOccurs="0" maxOccurs="1">
+				<xsd:complexType>
+					<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+						<xsd:element name="link" type="linkType" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="tests" minOccurs="0" maxOccurs="1">
+				<xsd:complexType>
+					<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+						<xsd:element name="test" type="testType" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="rights" minOccurs="0" maxOccurs="1">
+				<xsd:complexType>
+					<xsd:sequence minOccurs="1" maxOccurs="1">
+						<xsd:element name="create" minOccurs="0" maxOccurs="1">
+							<xsd:annotation>
+								<xsd:documentation>
+									<p>Définit le test à exécuter pour valider si l'utilisateur courant possède les droits de création sur l'entité consernée.</p>
+								</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:choice>
+									<xsd:group ref="criteria" />
+								</xsd:choice>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="delete" minOccurs="0" maxOccurs="1">
+							<xsd:annotation>
+								<xsd:documentation>
+									<p>Définit le test à exécuter pour valider si l'utilisateur courant possède les droits de suppression sur l'entité consernée.</p>
+								</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:choice>
+									<xsd:group ref="criteria" />
+								</xsd:choice>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="update" minOccurs="0" maxOccurs="1">
+							<xsd:annotation>
+								<xsd:documentation>
+									<p>Définit le test à exécuter pour valider si l'utilisateur courant possède les droits de modification sur l'entité consernée.</p>
+								</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:choice>
+									<xsd:group ref="criteria" />
+								</xsd:choice>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="read" minOccurs="0" maxOccurs="1">
+							<xsd:annotation>
+								<xsd:documentation>
+									<p>Définit le test à exécuter pour valider si l'utilisateur courant possède les droits de lecture d'un élément sur l'entité consernée.</p>
+								</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:choice>
+									<xsd:group ref="criteria" />
+								</xsd:choice>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="list" minOccurs="0" maxOccurs="1">
+							<xsd:annotation>
+								<xsd:documentation>
+									<p>Définit le test à exécuter pour valider si l'utilisateur courant possède les droits de recherche sur l'entité consernée.</p>
+								</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:choice>
+									<xsd:group ref="criteria" />
+								</xsd:choice>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="metadata">
+				<xsd:annotation>
+					<xsd:documentation>
+						<p>Les metadata sont des données spécifiques aux services implémentées sur le serveur.</p>
+						<p>Le contenu de ce tag est donc directement dépendant des fonctionnalités offertes sur le serveur. La liste des
+							valeurs possibles présentée ici n'est donc qu'un échantillon des valeurs possibles.</p>
+						<p>Toutes valeur utilisée ne correspondant à aucun service du serveur sera ignorée tant que le service
+							correspondant ne sera pas démarré.</p>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:choice minOccurs="0" maxOccurs="unbounded">
+						<!-- Ajouter ici les metadata applicable aux entités... -->
+						<xsd:element name="reverseLink" type="xsd:string" maxOccurs="1" minOccurs="0" fixed="true">
+							<xsd:annotation>
+								<xsd:documentation>Indique que l'entité est automatiquement enrichie d'une association pointant sur toute entité qui
+									la référence. En d'autres terme tout attribut dont le type est le type de l'entité courante génèrera une
+									association dans la présente entité à destination de sa propre entité. On appelle ce type d'association des
+									"références inversées" ou "reverse link".</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="autoLink" type="xsd:string" maxOccurs="1" minOccurs="0" fixed="true">
+							<xsd:annotation>
+								<xsd:documentation>Indique que toute association déclarée comme référençant l'entité courante génèrera une
+									association inverse dans cette entité. Cette association sera taguée comme "autoLink".</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="eventOnSelection" type="xsd:string" maxOccurs="1" minOccurs="0" fixed="true">
+							<xsd:annotation>
+								<xsd:documentation>Indique que les sélections à partir du web-service /data/{type} génèrent un évènement de type
+									com/arcadsoftware/beanmap/selected. Pour des raisons performance les évènements de se type ne sont déclenchés
+									par défaut.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="eventOnRead" type="xsd:string" maxOccurs="1" minOccurs="0" fixed="true">
+							<xsd:annotation>
+								<xsd:documentation>Indique que les sélections à partir du web-service /data/{type}/{id}+ génèrent un évènement de
+									type com/arcadsoftware/beanmap/read. Pour des raisons performance les évènements de se type ne sont déclenchés
+									par défaut.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="table" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Utilisé par les mapper SQL pour désigner la table SQL utilisé pour le stockage des données.
+								</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="idCol" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Utilisé par les mapper SQL pour désigner la colonne de l'identifiant interne (primary key) de la
+									table utilisée pour stocker les données.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="deleteCol" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Utilisé par les mapper SQL pour désigner la colonne utilisé pour stocker l'information de
+									suppression logique. Cette colonne doit être de type booléen ou integer suivant de dialecte SQL utilisé. Cette
+									donnée est optionnelle, auquel cas le mapper utilisera une suppression complète même si l'utilisateur demande
+									une suppression logique de l'élément.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="updateCol" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Utilisé par les mapper SQL pour désigner la colonne enregistrant la date de la dernière
+									modification. Cette colonne doit être de type TIMESTAMP ou DATE en fonction du dialecte SQL utilisé, en cas
+									d'omission les dates modifications ne seront pas enregistrées. Cette information est utilisé pour cacher les
+									élément coté client et évite le rechargement, elle est donc spécialement utile pour les données volumineuses,
+									contenant plusieurs VARCHAR par exemple.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="lockCol" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Utilisé par les mapper SQL pour désigner la colonne déclarant le vérouillage de l'élément pour un
+									usage exclusif. La valeur de cette colonne doit être un Integer, il désigne l'utilisateur, ou le groupe
+									d'utilisateurs a qui le verrou est affecté. Cette données est facultative.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="lockDateCol" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Utilisé conjointement avec le tag "lockCol", elle permet d'implémenter des verrous à date limite
+									de validité, a défaut les verrous possède une validité illimité. La colonne désigné par ce tag doit être de
+									type TIMESTAMP ou DATE en fonction du dialecte SQL utilisé, elle contient la data limite de validité du verrou.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="colPrefix" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Utilisé par les mapper SQL, il désigne un préfixe qui peut être employé pour la génération
+									automatique de nouvelles colonnes. Ce code est généralement composé de trois lettre et du caractère underscore.</xsd:documentation>
+							</xsd:annotation>
+							<xsd:simpleType>
+								<xsd:restriction base="xsd:string">
+									<xsd:pattern value="[A-Z][A-Z,0-9][A-Z,0-9]_" />
+								</xsd:restriction>
+							</xsd:simpleType>
+						</xsd:element>
+						<xsd:element name="groupTable" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Utilisé par les mapper SQL, uniquement dans le cadre d'une entité représentant un groupe (voir
+									l'attribut "group"), ce tag désigne la table d'enregistrement du contenu des groupe (implémentation
+									intervalaire des groupes).</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="groupMinCol" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Utilisé conjointement au tag "groupTable", désigne la colonne contenant la borne minimale de la
+									contenance du groupe.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="groupMaxCol" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Utilisé conjointement au tag "groupTable", désigne la colonne contenant la borne maximale de la
+									contenance du groupe.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="binary" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Indique que l'entité est associée à un fichier binaire. La valeur de ce tag indiqu la catégorie 
+									du fichier binaire pour son stockage par le service de téléchargement.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:any namespace="##other" />
+					</xsd:choice>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:choice>
+		<xsd:attribute name="type" use="required">
+			<xsd:annotation>
+				<xsd:documentation>
+					<p>Définie le type de l'entité. Le type est une clé unique qui permet de l'identifier sur la globalité de la patte-forme.</p>
+				</xsd:documentation>
+			</xsd:annotation>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<!-- Les types de longueur 1 sont réservé à un usage interne. 40 caractères est une limite raisonnable. -->
+					<xsd:minLength value="2" fixed="true" />
+					<xsd:maxLength value="40" fixed="true" />
+					<xsd:pattern value="[a-z][a-zA-Z0-9]*" />
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="domain" use="required">
+			<xsd:annotation>
+				<xsd:documentation>Définie le domaine de l'entité. Le domaine est une clé identifiant les entités qui relève du même
+					domaine applicatif. A chaque domaine est associé un mapper (un service OSGi qui assure l'accès aux données liées à
+					l'entité). Ainsi le domaine définie aussi la nature des données liées à l''entité, bien que cette nature soit
+					relative au mapper qui sera utilisé sur la plate-forme.</xsd:documentation>
+			</xsd:annotation>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<!-- Les domaines de longueur 1 sont réservé à un usage interne. 40 caractères est une limite raisonnable. -->
+					<xsd:minLength value="2" fixed="true" />
+					<xsd:maxLength value="40" fixed="true" />
+					<xsd:pattern value="[a-z][:a-zA-Z0-9]*" />
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="version" type="xsd:positiveInteger" use="required">
+			<xsd:annotation>
+				<xsd:documentation>Définie le niveau de version de la déclaration.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="readonly" type="xsd:boolean" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Détermine si l'entité ne sera accessible qu'en lecture.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="lockable" type="xsd:boolean" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Indique si l'entité supporte les verrous (Dépendant de l'implémentation du mapper).</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="groupType" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Indique que cette entité est un groupe et spécifie le type des entités membres.</xsd:documentation>
+			</xsd:annotation>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<!-- Les types de longueur 1 sont réservé à un usage interne. 40 caractères est une limite raisonnable. -->
+					<xsd:minLength value="2" fixed="true" />
+					<xsd:maxLength value="40" fixed="true" />
+					<xsd:pattern value="[a-z][a-zA-Z0-9]*" />
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="date" type="xsd:date" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Définie la date de la dernière modification de l'entité. A défaut cette date sera déduite de la date
+					de dernière modification du fichier, ou du bundle contenant ce fichier.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:complexType name="attributeType">
+		<xsd:sequence minOccurs="0" maxOccurs="1">
+			<xsd:element name="rights" minOccurs="0" maxOccurs="1">
+				<xsd:complexType>
+					<xsd:sequence minOccurs="1" maxOccurs="1">
+						<xsd:element name="update" minOccurs="0" maxOccurs="1">
+							<xsd:complexType>
+								<xsd:choice>
+									<xsd:group ref="criteria" />
+								</xsd:choice>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="read" minOccurs="0" maxOccurs="1">
+							<xsd:complexType>
+								<xsd:choice>
+									<xsd:group ref="criteria" />
+								</xsd:choice>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="metadata" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						<p>Les metadata sont des données spécifiques aux services implémentées sur le serveur.</p>
+						<p>Le contenu de ce tag est donc directement dépendant des fonctionnalités offertes sur le serveur. La liste
+							des valeurs possibles présentée ici n'est donc qu'un échantillon des valeurs possibles.</p>
+						<p>Toutes valeur utilisée ne correspondant à aucun service du serveur sera ignorée tant que le service
+							correspondant ne sera pas démarré.</p>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:choice minOccurs="0" maxOccurs="unbounded">
+						<!-- Ajouter ici les metadata applicable aux attributs... -->
+						<xsd:element name="col" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Désigne la colonne de la zone de stockage pour les mapper colonnées (notamment les mapper
+									SQL).</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="colrank" type="xsd:integer" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Désigne le rang de la colonne lors de la présentation de la donnée dans une table.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="colsize" type="xsd:integer" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Désigne la taille de la colonne (en pixel) lors de la présentation de la donnée dans une table.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="reverseLink" type="xsd:string" maxOccurs="1" minOccurs="0" fixed="true">
+							<xsd:annotation>
+								<xsd:documentation>Indique que l'attribut sera utilisé pour générer automatiquement une association à partir
+									de l'entité référencée (en direction de la présente entité). On appelle de type d'association des
+									"références inversées" ou "Reverse link".</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="crypt" type="xsd:string" maxOccurs="1" minOccurs="0" fixed="true">
+							<xsd:annotation>
+								<xsd:documentation>Indique que la valeur de l'attribut sera cryptée (string) par le mapper avant d'être enregistré dans la zone de stockage.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="visible" type="xsd:boolean" maxOccurs="1" minOccurs="0" fixed="true">
+							<xsd:annotation>
+								<xsd:documentation>Indique que si l'attribut est "listable" alors il sera par défaut caché dans la liste.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="hidden" type="xsd:boolean" maxOccurs="1" minOccurs="0" fixed="true">
+							<xsd:annotation>
+								<xsd:documentation>Indique que si l'attribut renvoyé au Client par les web-services, ou pas (hidden).</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="generator" type="xsd:boolean" maxOccurs="1" minOccurs="0" fixed="true">
+							<xsd:annotation>
+								<xsd:documentation>Indique que la valeur de cet attribut est généré automatiquement, l'identifiant du service de génération est fournit an valeur.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:any namespace="##other" />
+					</xsd:choice>
+					<xsd:attribute name="colrank" type="xsd:integer" />
+					<xsd:attribute name="colsize" type="xsd:integer" />
+					<xsd:attribute name="visible" type="xsd:boolean" />
+					<xsd:anyAttribute />
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="code" use="required">
+			<xsd:annotation>
+				<xsd:documentation>Le code identifie de manière unique au sein d'une entité un attribut. Le code
+					ne peut contenir que des caractères alphabétique, en minuscule (les autres caractères pouvant être réservés pour un usage interne au moteur de gestion).</xsd:documentation>
+			</xsd:annotation>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<!-- Les codes de longueur 1 sont réservé à un usage interne. 40 caractères est une limite raisonnable. -->
+					<xsd:minLength value="2" fixed="true" />
+					<xsd:maxLength value="40" fixed="true" />
+					<xsd:pattern value="[a-z][a-zA-Z0-9]*" />
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="type" use="required">
+			<xsd:annotation>
+				<xsd:documentation>
+					<p>Définie le type de l'attribut.</p>
+					<p>Il existe deux catégorie d'attributs, les attributs de type atomique et les références. Les références possède un
+						type qui est un type d'entité. Les attributs atomique sont, par opposition définis comme ceux dont le type n'est
+						pas celui d'une entité.</p>
+					<p>Certains types atomique possède de plus une sémantique particulière.</p>
+				</xsd:documentation>
+			</xsd:annotation>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<!-- Les types de longueur 1 sont réservé à un usage interne. 40 caractères est une limite raisonnable. -->
+					<xsd:minLength value="2" fixed="true" />
+					<xsd:maxLength value="40" fixed="true" />
+					<xsd:pattern value="[a-z][a-zA-Z0-9]*" />
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="readonly" type="xsd:boolean" use="optional" default="false">
+			<xsd:annotation>
+				<xsd:documentation>Détermine si l'attribut ne sera accessible qu'en lecture.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="test" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Contient le code groovy d'un test qui sera exécuté à la modification de l'attribut (pour en
+					vérifier la cohérence).</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="length" type="xsd:integer" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>
+					Inutile si le type est de l'attribut est une référence. La sémantique de ce paramètre varie en fonction du type
+					atomique de l'attribut:
+					<ul>
+						<li>
+							<strong>integer</strong>
+							: spécifie la valeur maximale acceptée (toute valeur supérieure sera ramenée à cette limite).
+						</li>
+						<li>
+							<strong>string</strong>
+							: spécifie la longueur maximale de la chaîne (toute chaîne supérieure sera tronquée par le serveur).
+						</li>
+						<li>
+							<strong>range</strong>
+							: spécifie la valeur maximale acceptée (toute valeur supérieure sera ramenée à cette limite).
+						</li>
+						<li>
+							<strong>float</strong>
+							: spécifie la valeur maximale acceptée (toute valeur supérieure sera ramenée à cette limite).
+						</li>
+					</ul>
+					<p>Tout autre type autre que les types atomique standard et ceux cité ci-dessus est traité comme un type
+						"xsd:string" si la valeur de length est supérieure à zéro.</p>
+					<p>Toute contrainte plus évoluée doit être implémentée par un "test".</p>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="precision" type="xsd:integer" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>
+					Inutile si le type est de l'attribut est une référence. La sémantique de ce paramètre vaire en fonction du type
+					atomique de l'attribut:
+					<ul>
+						<li>
+							<strong>range</strong>
+							: spécifie la valeur minimale acceptée (toute valeur inférieure sera ramenée à cette limite).
+						</li>
+						<li>
+							<strong>float</strong>
+							: spécifie le nombre de décimales après la virgule maximum (toute valeur ayant une précision supérieur sera
+							ramenée à cette précision).
+						</li>
+					</ul>
+					<p>Tout autre type autre que les types atomique standard et ceux cité ci-dessus est traité comme un type "range"
+						si la valeur de précision est supérieure à zéro.</p>
+					<p>Toute contrainte plus évoluée doit être implémentée par un "test".</p>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="mandatory" type="xsd:boolean" use="optional" default="false">
+			<xsd:annotation>
+				<xsd:documentation>Détermine si la saisie de cet attribut est requise lors de la création d'une donnée.
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="listable" type="xsd:boolean" use="optional" default="true">
+			<xsd:annotation>
+				<xsd:documentation>Détermine si cet attribut doit être retourné lorsqu'une liste d'éléments est demandée au serveur.
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:complexType name="linkType">
+		<xsd:sequence minOccurs="0" maxOccurs="1">
+			<xsd:element name="rights" minOccurs="0" maxOccurs="1">
+				<xsd:complexType>
+					<xsd:sequence minOccurs="1" maxOccurs="1">
+						<xsd:element name="create" minOccurs="0" maxOccurs="1">
+							<xsd:complexType>
+								<xsd:choice>
+									<xsd:group ref="criteria" />
+								</xsd:choice>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="list" minOccurs="0" maxOccurs="1">
+							<xsd:complexType>
+								<xsd:choice>
+									<xsd:group ref="criteria" />
+								</xsd:choice>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="metadata" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						<p>Les metadata sont des données spécifiques aux services implémentées sur le serveur.</p>
+						<p>Le contenu de ce tag est donc directement dépendant des fonctionnalités offertes sur le serveur. La liste
+							des valeurs possibles présentée ici n'est donc qu'un échantillon des valeurs possibles.</p>
+						<p>Toutes valeur utilisée ne correspondant à aucun service du serveur sera ignorée tant que le service
+							correspondant ne sera pas démarré.</p>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:choice minOccurs="0" maxOccurs="unbounded">
+						<!-- Ajouter ici les metadata applicable aux associations... -->
+						<xsd:element name="reverseLink" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Indique que l'association est en réalité une association de type "référence inversé". La
+									valeur du tag désigne un attribut de l'entité référencée par l'association. Cet attribut doit posséder
+									comme type l'entité courante. L'assocation sera automatiquement bâtie en sélectionnant les éléments
+									référençant la donné courante. Aucune information de stockage n'est nécessaire pour ce type
+									d'association.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="autoLink" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Indique que l'association est en réalité une association inversé. La valeur de ce tag
+									désigne le code de l'association correspondante dans l'entité référencée. Cette association ne peut pas
+									être elle aussi un "autoLink" ni une "reverseLink".</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="table" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Utilisé par les mapper SQL pour désigner la table SQL utilisé pour le stockage des données
+									relative à l'association. Cette information n'est inutile pour les association "reverseLink".
+								</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="sourceCol" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Utilisé par les mapper SQL pour désigner la colonne désignant l'identifiant de la source,
+									correspondant à la donnée de l'entité définissant l'association.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="destCol" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Utilisé par les mapper SQL pour désigner la colonne désignant l'identifiant de la
+									destination, correspondant à la donnée de l'entité référencé par l'association.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="deleteCol" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Utilisé par les mapper SQL pour désigner la colonne utilisé pour stocker l'information de
+									suppression logique. Cette colonne doit être de type booléen ou integer suivant de dialecte SQL utilisé.
+									Cette
+									donnée est optionnelle, auquel cas le mapper utilisera une suppression complète même si l'utilisateur demande
+									une suppression logique de l'élément.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:any namespace="##other" />
+					</xsd:choice>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="code" use="required">
+			<xsd:annotation>
+				<xsd:documentation>Le code identifie de manière unique au sein d'une entité une association. Le code
+					ne peut contenir que des caractères alphabétique, en minuscule.</xsd:documentation>
+			</xsd:annotation>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<!-- Les codes de longueur 1 sont réservé à un usage interne. 40 caractères est une limite raisonnable. -->
+					<xsd:minLength value="2" fixed="true" />
+					<xsd:maxLength value="40" fixed="true" />
+					<xsd:pattern value="[a-z][a-zA-Z0-9]*" />
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="type" use="required">
+			<xsd:annotation>
+				<xsd:documentation>
+					<p>Définie le type de l'entité ciblée par l'association.</p>
+				</xsd:documentation>
+			</xsd:annotation>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<!-- Les types de longueur 1 sont réservé à un usage interne. 40 caractères est une limite raisonnable. -->
+					<xsd:minLength value="2" fixed="true" />
+					<xsd:maxLength value="40" fixed="true" />
+					<xsd:pattern value="[a-z][a-zA-Z0-9]*" />
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="readonly" type="xsd:boolean" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Détermine si l'association ne sera accessible qu'en lecture.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="test" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Contient le code groovy d'un test qui sera exécuté à l'ajout d'un nouvel élément à l'association
+					(pour en vérifier la cohérence).</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	
+	<xsd:complexType name="testType">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string">
+				<xsd:attribute name="code" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Le code identifie un test de manière unique au sein d'une entité. Le code
+							ne peut contenir que des caractères alphabétique, en minuscule.</xsd:documentation>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<!-- Les codes de longueur 1 sont réservé à un usage interne. 40 caractères est une limite raisonnable. -->
+							<xsd:minLength value="2" fixed="true" />
+							<xsd:maxLength value="40" fixed="true" />
+							<xsd:pattern value="[a-z][a-zA-Z0-9]*" />
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+				<xsd:attribute name="event" use="required">
+					<xsd:annotation>
+						<xsd:documentation>
+							<p>Définie la liste des évènements qui déclencheront le test. Chaque évènement est séparé par un espace. La
+							liste des évènement possible dépend de l'entité mais voici une liste d'évènements standards :</p>
+							<ul>
+								<li>beforeCreate</li>
+								<li>afterCreate</li>
+								<li>beforeUpdate</li>
+								<li>afterUpdate</li>
+								<li>beforeDelete</li>
+								<li>afterDelete</li>
+								<li>list</li>
+								<li>read</li>
+								<li>beforeUndelete</li>
+								<li>afterUndelete</li>
+							</ul>
+						</xsd:documentation>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:pattern value="[a-z][a-zA-Z]*( [a-z][a-zA-Z]*)*" />
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:simpleContent>	
+	</xsd:complexType>
+	
+</xsd:schema>

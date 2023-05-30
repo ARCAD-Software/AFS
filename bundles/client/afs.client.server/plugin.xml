@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+  <extension-point 
+        id="com.arcadsoftware.afs.client.server.main.container" 
+        name="Main Container" 
+        schema="schema/com.arcadsoftware.afs.client.server.main.container.exsd"/>
+  <extension-point id="com.arcadsoftware.afs.client.branding.splashscreen" name="Spalsh Screen Branding" schema="schema/com.arcadsoftware.afs.client.branding.splashscreen.exsd"/>
+  <extension-point id="com.arcadsoftware.afs.client.server.version.provider" name="Server Version Provider" schema="schema/com.arcadsoftware.afs.client.server.version.provider.exsd"/>
+  <extension-point id="com.arcadsoftware.afs.client.server.getlogfile.provider" name="Server Log File Download Provider" schema="schema/com.arcadsoftware.afs.client.server.getlogfile.provider.exsd"/>
+  <extension-point id="com.arcadsoftware.afs.client.server.action" name="Server Item Action" schema="schema/com.arcadsoftware.afs.client.server.action.exsd"/>  
+   <extension
+         point="com.arcadsoftware.afs.framework.userMessage">
+      <userMessage
+            filename="/server.messages">
+      </userMessage>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
+      <propertyContributor
+            contributorId="com.arcadsoftware.afs.client.server.view.navigation.propertyId">
+         <propertyCategory
+               category="Mon Test">
+         </propertyCategory>
+      </propertyContributor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+      <propertyTabs
+            contributorId="com.arcadsoftware.afs.client.server.view.navigation.propertyId">
+         <propertyTab
+               category="Mon Test"
+               id="com.arcadsoftware.afs.client.core.server.connection"
+               indented="true"
+               label="Connection">
+         </propertyTab>
+         <propertyTab
+               afterTab="com.arcadsoftware.afs.client.core.server.connection"
+               category="Mon Test"
+               id="com.arcadsoftware.afs.client.core.server.proxy"
+               indented="true"
+               label="Proxy Parameters">
+         </propertyTab>
+      </propertyTabs>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views.properties.tabbed.propertySections">
+      <propertySections
+            contributorId="com.arcadsoftware.afs.client.server.view.navigation.propertyId">
+         <propertySection
+               class="com.arcadsoftware.afs.client.server.ui.propertysection.ServerConnectionPropertySection"
+               id="com.arcadsoftware.afs.client.core.server.connection"
+               tab="com.arcadsoftware.afs.client.core.server.connection">
+               <input type="com.arcadsoftware.afs.client.server.ui.containers.ServerItem"/>
+         </propertySection>
+      </propertySections>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="false"
+            class="com.arcadsoftware.afs.client.server.ui.views.SectionView"
+            icon="platform:/plugin/com.arcadsoftware.afs.client.brands/icons/server.png"
+            id="com.arcadsoftware.afs.client.server.ui.views.SectionView"
+            name="%view.section.name"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="com.arcadsoftware.afs.client.core.userAuthentication">
+      <userAtuthentication
+            class="com.arcadsoftware.afs.client.server.connection.UserAuthentication">
+      </userAtuthentication>
+   </extension>
+
+</plugin>

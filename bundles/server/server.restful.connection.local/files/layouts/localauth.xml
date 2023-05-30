@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  This layout page is used into the User Editor for Local Auth infos 
+ -->
+<editor xmlns="http://xml.arcadsoftware.com/1.0.0/layouts.xsd" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://xml.arcadsoftware.com/1.0.0/layouts.xsd http://xml.arcadsoftware.com/1.0.0/layouts.xsd">
+	<virtual code="islocked" type="boolean"/>
+	<composite fillBoth="true" withMargin="false" border="false">			
+		<input attribute="login" />
+		<date attribute="pwdupdate" />
+		<passwordWidget attribute="password" isPassword="true" generator="true" confirm="true" />
+		<!--  Check button to manage lock Integer value : Not Checked if locked attr value is between 0 and Max lockCount, locked if strictly greater than max lock Count -->
+		<intToBoolean attribute="locked" offMin="0" offMax="config:/config/com.arcadsoftware.server.restful.connection.local/lockcount" onMin="-1" onMax="-1" />
+	</composite>
+	
+	<messages file="layout/localauth"/>
+</editor>

@@ -1,0 +1,37 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: ARCAD-Foundation Services - Framework UI
+Bundle-SymbolicName: com.arcadsoftware.afs.framework.ui;singleton:=true
+Bundle-Version: 1.3.2.qualifier
+Bundle-Activator: com.arcadsoftware.afs.framework.ui.internal.Activator
+Bundle-Vendor: ARCAD Software
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui;resolution:=optional,
+ org.eclipse.rap.ui;resolution:=optional,
+ com.arcadsoftware.aev.core;bundle-version="11.0.0",
+ com.arcadsoftware.aev.core.ui;bundle-version="11.0.0",
+ com.arcadsoftware.osgi;bundle-version="1.3.0",
+ com.arcadsoftware.beanmap,
+ com.arcadsoftware.metadata,
+ com.arcadsoftware.afs.framework,
+ org.restlet.base;bundle-version="2.4.3",
+ com.arcadsoftware.afs.client.brands;bundle-version="23.2.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
+Export-Package: com.arcadsoftware.afs.framework.ui,
+ com.arcadsoftware.afs.framework.ui.beanmap.actions,
+ com.arcadsoftware.afs.framework.ui.beanmap.composites,
+ com.arcadsoftware.afs.framework.ui.composites,
+ com.arcadsoftware.afs.framework.ui.containers,
+ com.arcadsoftware.afs.framework.ui.containers.viewer,
+ com.arcadsoftware.afs.framework.ui.dialogs,
+ com.arcadsoftware.afs.framework.ui.editors,
+ com.arcadsoftware.afs.framework.ui.help,
+ com.arcadsoftware.afs.framework.ui.images,
+ com.arcadsoftware.afs.framework.ui.messages,
+ com.arcadsoftware.afs.framework.ui.plugins,
+ com.arcadsoftware.afs.framework.ui.propertypage,
+ com.arcadsoftware.afs.framework.ui.viewers,
+ com.arcadsoftware.afs.framework.ui.views
+Bundle-ClassPath: afs.framework.ui.jar
+Automatic-Module-Name: com.arcadsoftware.afs.framework.ui

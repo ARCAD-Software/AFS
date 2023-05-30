@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE form SYSTEM "../layout.dtd">
+<editor>
+	<virtual code="imported" type="string" />
+	<param id="background-color-swt" value="22" />
+	<composite fillBoth="true" withMargin="true" border="false">
+		<input attribute="name" mandatory="true" />
+		<browse attribute="imported" mandatory="true" label="label.key.selection" />
+		<input attribute="passphrase" isPassword="true" />
+	</composite>
+	<messages file="layout/sshKey"/>
+</editor>

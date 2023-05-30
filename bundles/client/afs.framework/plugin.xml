@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="com.arcadsoftware.afs.framework.userMessage" 
+   	name="%ext-user.message.extension" 
+   	schema="schema/com.arcadsoftware.afs.framework.userMessage.exsd"/>
+   <extension-point id="com.arcadsoftware.afs.framework.dynamicHelp" 
+    name="com.arcadsoftware.afs.framework.dynamicHelp" 
+    schema="schema/com.arcadsoftware.afs.framework.dynamicHelp.exsd"/>
+</plugin>

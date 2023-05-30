@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: DROPS - Branding Bundle
+Bundle-SymbolicName: com.arcadsoftware.afs.client.brands;singleton:=true
+Bundle-Version: 23.2.0.qualifier
+Eclipse-BundleShape: dir
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Import-Package: org.eclipse.jface.resource,
+ org.eclipse.jface.viewers,
+ org.eclipse.swt.graphics,
+ org.eclipse.swt.widgets,
+ org.osgi.framework
+Bundle-ClassPath: .
+Bundle-Vendor: ARCAD Software
+Automatic-Module-Name: com.arcadsoftware.afs.client.brands
+Export-Package: com.arcadsoftware.afs.client.brands
+

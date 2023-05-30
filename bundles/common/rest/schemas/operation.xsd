@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://xml.arcadsoftware.com/1.0.0/%1$s/%1$s.xsd" xmlns="http://xml.arcadsoftware.com/1.0.0/%1$s/%1$s.xsd" elementFormDefault="unqualified">
+	<xsd:element name="%1$s">
+		<xsd:annotation>
+			<xsd:documentation>
+				<p>Represent a long term operation state. This information is not persistent, once completed it may be destroyed after a certain delay.</p>
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence maxOccurs="unbounded" minOccurs="0">
+				<xsd:element name="task" type="xsd:string">
+					<xsd:annotation>
+						<xsd:documentation>
+							<p>Each task is a step in the completion of the running operation, depending on the configuration only the current task may be presented. The content of this element is the actual task label, it may be empty.</p>
+						</xsd:documentation>
+					</xsd:annotation>
+					<xsd:complexType>
+						<xsd:simpleContent>
+							<xsd:extension base="xsd:string">
+	      						<xsd:attribute name="percent" use="required" type="xsd:integer">
+									<xsd:annotation>
+										<xsd:documentation>The global operation percentage completion when this task were started.</xsd:documentation>
+									</xsd:annotation>
+								</xsd:attribute>
+								<xsd:attribute name="startdate" use="required" type="xsd:date">
+									<xsd:annotation>
+										<xsd:documentation>The start date of this task, note that the end date of a task is always the start date of the next task, or the end date of the global operation for the last one.</xsd:documentation>
+									</xsd:annotation>
+								</xsd:attribute>
+							</xsd:extension>
+						</xsd:simpleContent>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+			<xsd:attribute name="id" use="required" type="xsd:integer">
+				<xsd:annotation>
+					<xsd:documentation>This attribute is the unique identifier of this operation.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="percent" use="required" type="xsd:integer">
+				<xsd:annotation>
+					<xsd:documentation>Define the current progression witha value between 0 and 100.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="cancelled" use="required" type="xsd:boolean">
+				<xsd:annotation>
+					<xsd:documentation>This attribute is true if and only if the operation has been cancelled.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="startdate" use="optional" type="xsd:date">
+				<xsd:annotation>
+					<xsd:documentation>Is specified the start date of the operation, in ISO GMT format. If not included, then the operation has not started yet.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="enddate" use="optional" type="xsd:date">
+				<xsd:annotation>
+					<xsd:documentation>If the operation is running, this date is an estimation of the end date, if this operation is terminated then this is the actual end date.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="ended" use="optional" type="xsd:boolean">
+				<xsd:annotation>
+					<xsd:documentation>Only if the operation has started, indicate if it is terminated or not.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+    	</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="%2$s">
+		<xsd:complexType>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:element ref="%1$s" />
+			</xsd:choice>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

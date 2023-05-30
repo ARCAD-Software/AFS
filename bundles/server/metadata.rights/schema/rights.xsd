@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+	targetNamespace="http://xml.arcadsoftware.com/1.0.0/rights.xsd"
+	xmlns="http://xml.arcadsoftware.com/1.0.0/rights.xsd" 
+	elementFormDefault="qualified">
+
+	<xsd:element name="list">
+		<xsd:annotation><xsd:documentation><p>Liste de droits atomique et/ou de catégories de droits.</p>
+		<p>Les droits sont identifiés par un id numérique et unique. La redéfinition d'un droit ne pose pas de problème tant que la sémantique est conservé. Cette sémantique doit être définie par un document externe. On s'arrange généralement pour réserver des plages d'identifiant à des usages spécifiques.</p>
+		<p>Les catégories de droits ne sont que des informations organisationnelle utilisé pour améliorer la présentation des droits à l'utilisateur. Leur utilisation est facultative, dans certains cas les droits qui ne sont pas rattaché à une catégorie ne seront pas présentés à l'utilisateur.</p></xsd:documentation></xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence maxOccurs="unbounded" minOccurs="0">
+				<xsd:element name="right" minOccurs="0" maxOccurs="1">
+					<xsd:complexType>
+						<xsd:attribute name="id" type="xsd:positiveInteger" use="required">
+						<xsd:annotation><xsd:documentation>Identifiant unique déterminant la valeur de ce droit. C'est cet ID qui sera utilisé pour manipuler le droit.</xsd:documentation></xsd:annotation>
+						</xsd:attribute>
+						<xsd:attribute name="code" type="xsd:string" use="required">
+						<xsd:annotation><xsd:documentation>Le code définit un identifiant "fonctionnel" visible par l'utilisateur mais <strong>non traduisible</strong> assurant ainsi une cohérence dans la désignation des éléments quelque soit la langue de l'utilisateur.</xsd:documentation></xsd:annotation>
+						</xsd:attribute>
+						<xsd:attribute name="category" type="xsd:positiveInteger" use="optional">
+						<xsd:annotation><xsd:documentation>Désigne la catégorie à laquelle le droit est rattaché.</xsd:documentation></xsd:annotation>
+						</xsd:attribute>
+						<xsd:attribute name="date" type="xsd:date" use="optional">
+						<xsd:annotation><xsd:documentation>Désigne la date de dernière modification de l'élémnent.</xsd:documentation></xsd:annotation>
+						</xsd:attribute>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="rightcategory" minOccurs="0" maxOccurs="1">
+					<xsd:complexType>
+						<xsd:attribute name="id" type="xsd:positiveInteger" use="required">
+						<xsd:annotation><xsd:documentation>Identifie a catégorie. C'est cette valeur qui sera utilisé en référence dans les droits. Comme pour ces dernier l'ID est unique et doit être réservé d'une manière globale.</xsd:documentation></xsd:annotation>
+						</xsd:attribute>
+						<xsd:attribute name="code" type="xsd:string" use="required">
+						<xsd:annotation><xsd:documentation>Le code définit un identifiant "fonctionnel" visible par l'utilisateur mais <strong>non traduisible</strong> assurant ainsi une cohérence dans la désignation des éléments quelque soit la langue de l'utilisateur.</xsd:documentation></xsd:annotation>
+						</xsd:attribute>
+						<xsd:attribute name="date" type="xsd:date" use="optional">
+						<xsd:annotation><xsd:documentation>Désigne la date de dernière modification de l'élémnent.</xsd:documentation></xsd:annotation>
+						</xsd:attribute>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

@@ -1,0 +1,36 @@
+<entities xmlns="http://xml.arcadsoftware.com/1.0.0/entities.xsd"
+	xmlns:criteria="http://xml.arcadsoftware.com/1.0.0/searchcriteria.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xml.arcadsoftware.com/1.0.0/entities.xsd http://xml.arcadsoftware.com/1.0.0/entities.xsd">
+	
+	<entity domain="mem:rights" version="1" date="2013-04-22T08:36:55" type="right" readonly="true">
+		<metadata/>
+		<attribute type="list/rightcategory" code="category" readonly="false" listable="true" mandatory="false">
+			<metadata/>
+		</attribute>
+		<attribute type="translate" code="name" readonly="false" listable="true" mandatory="false">
+			<metadata colsize="400"/>
+		</attribute>
+		<attribute type="string" code="code" readonly="false" listable="true" mandatory="false">
+			<metadata/>
+		</attribute>
+		<attribute type="string" code="paramType" readonly="false" listable="true" mandatory="false" length="40">
+			<metadata/>
+		</attribute>
+	</entity>
+
+	<entity domain="mem:rights" version="1" date="2013-04-22T08:36:55" type="list/rightcategory" group="" readonly="true" lock="true">
+		<metadata/>
+		<attribute type="translate" code="name" readonly="false" listable="true" mandatory="false">
+			<metadata/>
+		</attribute>
+		<attribute type="string" code="code" listable="true">
+			<metadata/>
+		</attribute>
+		<link type="right" code="rights">
+			<metadata>
+				<reverseLink>category</reverseLink>
+			</metadata>
+		</link>
+	</entity>
+</entities>

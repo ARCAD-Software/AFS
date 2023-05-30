@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services>
+	<service id="jiraListProject" 
+	         class="com.arcadsoftware.jira.client.cli.services.impl.ListProjectService"/>
+</services>

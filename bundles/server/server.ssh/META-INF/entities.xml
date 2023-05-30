@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entities xmlns="http://xml.arcadsoftware.com/1.0.0/entities.xsd"
+	xmlns:criteria="http://xml.arcadsoftware.com/1.0.0/searchcriteria.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xml.arcadsoftware.com/1.0.0/entities.xsd http://xml.arcadsoftware.com/1.0.0/entities.xsd">
+<entity domain="generic" version="2" date="2019-01-03T15:14:36Z" type="sshKey">
+  <metadata>
+    <idCol>SHK_ID</idCol>
+    <updateCol>SHK_UPDATE</updateCol>
+    <colPrefix>SHK_</colPrefix>
+    <table>SSH_KEYS</table>
+    <attributeCode>name</attributeCode>
+  </metadata>
+  <attribute type="integer" code="keylength" readonly="false" listable="true" mandatory="false">
+    <metadata colrank="1" colsize="55">
+      <col>SHK_LENGTH</col>
+      <visible>true</visible>
+    </metadata>
+  </attribute>
+  <attribute type="string" code="keycomment" readonly="false" listable="true" mandatory="false" length="500">
+    <metadata colrank="1" colsize="200">
+      <col>SHK_COMMENT</col>
+      <visible>true</visible>
+    </metadata>
+  </attribute>
+  <attribute type="string" code="fingerprint" readonly="false" listable="true" mandatory="false" length="70">
+    <metadata colrank="1" colsize="260">
+      <col>SHK_FINGERPRINT</col>
+      <visible>true</visible>
+    </metadata>
+  </attribute>
+  <attribute type="string" code="name" readonly="false" listable="true" mandatory="false" length="1000">
+    <metadata colrank="1" colsize="150">
+      <col>SHK_NAME</col>
+      <visible>true</visible>
+      <unique>true</unique>
+    </metadata>
+  </attribute>
+  <attribute type="string" code="keytype" readonly="false" listable="true" mandatory="false" length="10">
+    <metadata colrank="1" colsize="45">
+      <col>SHK_TYPE</col>
+      <visible>true</visible>
+    </metadata>
+  </attribute>
+  <attribute type="string" code="passphrase" readonly="false" listable="true" mandatory="false" length="5000">
+    <metadata colrank="1" colsize="1">
+      <col>SHK_PASSPHRASE</col>
+      <visible>false</visible>
+    </metadata>
+  </attribute>
+</entity>
+</entities>

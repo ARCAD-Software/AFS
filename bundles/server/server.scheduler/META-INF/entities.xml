@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entities xmlns="http://xml.arcadsoftware.com/1.0.0/entities.xsd"
+	xmlns:criteria="http://xml.arcadsoftware.com/1.0.0/searchcriteria.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xml.arcadsoftware.com/1.0.0/entities.xsd http://xml.arcadsoftware.com/1.0.0/entities.xsd">
+<entity domain="userdb" version="1" date="2013-06-03T12:43:13,0000Z" type="scheduleditem">
+  <metadata/>
+  <attribute type="long" code="occurencetime" readonly="false" listable="true" mandatory="false">
+    <metadata/>
+  </attribute>
+  <attribute type="string" code="type" readonly="false" listable="true" mandatory="false" length="1">
+    <metadata colrank="2">
+      <visible>true</visible>
+    </metadata>
+  </attribute>
+</entity>
+</entities>

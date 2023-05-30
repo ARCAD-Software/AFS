@@ -1,0 +1,37 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Properties files serving
+Bundle-SymbolicName: com.arcadsoftware.server.properties;singleton:=true
+Bundle-Version: 1.1.10.qualifier
+Bundle-Activator: com.arcadsoftware.server.properties.internal.Activator
+Bundle-Vendor: ARCAD Software
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Import-Package: com.arcadsoftware.osgi;version="[1.0.1,2.0.0)",
+ com.arcadsoftware.rest;version="[3.0.0,4.0.0)",
+ com.arcadsoftware.rest.connection;version="[2.0.0,3.0.0)",
+ com.thoughtworks.xstream;version="[1.4.200,1.5.0)",
+ com.thoughtworks.xstream.converters;version="[1.4.200,1.5.0)",
+ com.thoughtworks.xstream.converters.basic;version="[1.4.200,1.5.0)",
+ com.thoughtworks.xstream.converters.collections;version="[1.4.200,1.5.0)",
+ com.thoughtworks.xstream.converters.extended;version="[1.4.200,1.5.0)",
+ com.thoughtworks.xstream.core;version="[1.4.200,1.5.0)",
+ com.thoughtworks.xstream.io;version="[1.4.200,1.5.0)",
+ com.thoughtworks.xstream.io.json;version="[1.4.200,1.5.0)",
+ com.thoughtworks.xstream.io.xml;version="[1.4.200,1.5.0)",
+ com.thoughtworks.xstream.mapper;version="[1.4.200,1.5.0)",
+ javax.servlet;version="[3.1.0,4.0.0)",
+ org.apache.commons.fileupload;version="[1.4.0,2.0.0)",
+ org.apache.commons.fileupload.disk;version="[1.4.0,2.0.0)",
+ org.eclipse.core.runtime;common=split;version="[3.5.0,4.0.0)",
+ org.eclipse.osgi.framework.console;version="[1.1.0,2.0.0)",
+ org.eclipse.osgi.util;version="[1.1.0,2.0.0)",
+ org.osgi.framework;version="[1.8.0,2.0.0)",
+ org.restlet;version="[2.4.3,3.0.0)",
+ org.restlet.data;version="[2.4.3,3.0.0)",
+ org.restlet.ext.fileupload;version="[2.4.3,3.0.0)",
+ org.restlet.representation;version="[2.4.3,3.0.0)",
+ org.restlet.resource;version="[2.4.3,3.0.0)",
+ org.restlet.routing;version="[2.4.3,3.0.0)",
+ org.restlet.util;version="[2.4.3,3.0.0)"
+Automatic-Module-Name: com.arcadsoftware.server.properties
+Arcad-PropertiesDomain: data

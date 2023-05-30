@@ -1,0 +1,66 @@
+#Server Communication
+ERR-COR-EXCEPTION$1=An unknown communication error occurred.
+ERR-COR-EXCEPTION$2=An unknown communication error occurred.
+
+ERR-HTTP-UKN$1=An unknown HTTP communication error occurred.
+ERR-HTTP-UKN$1=An unknown HTTP communication error occurred
+
+ERR-HTTP-401$1=A HTTP Error 401 occurred.
+ERR-HTTP-401$2=A HTTP Error 401 occurred.
+
+ERR-HTTP-403$1=%1$s
+ERR-HTTP-403$2=A HTTP Error 403 occurred.
+
+ERR-HTTP-404$1=A HTTP Error 404 occurred.
+ERR-HTTP-404$2=The description is %1$s
+
+ERR-HTTP-412$1=A HTTP Error 412 occurred.
+ERR-HTTP-412$2=%1$s
+
+ERR-HTTP-423$1=%1$s
+ERR-HTTP-423$2=A HTTP Error 423 occurred.
+
+ERR-HTTP-500$1=%1$s
+ERR-HTTP-500$2=A HTTP Error 500 occurred.
+
+ERR-HTTP-503$1=A HTTP Error 503 occurred.
+ERR-HTTP-503$2=The description is %1$s
+
+ERR-HTTP-1000$1=%1$s
+ERR-HTTP-1000$2=A HTTP Error 1000 occurred.
+
+ERR-HTTP-1001$1=%1$s
+ERR-HTTP-1001$2=A HTTP Error 1001 occurred.
+
+ERR-HTTP-X$1=%2$s %3$s
+ERR-HTTP-X$2=A HTTP Error %1$s occurred.
+
+
+COR-SRH-E000001$1=The connection is missing
+COR-SRH-E000001$2=A server connection is needed to make the search view correctly work.
+
+COR-SRH-E000002$1=An unknown error occurred during retrieving data.
+COR-SRH-E000002$2=An unknown error occurred during retrieving data.
+
+
+#Dynamic Container Creation using extension Point
+
+COR-CTC-E000000$1=An unknown error occurred during the creation of a container
+COR-CTC-E000000$2=Please look at the exception thrown to get the detail of this error
+
+COR-CTC-E000001$1=Invalid Right: %1$s
+COR-CTC-E000001$2=The right defined into the container %1$s definition is not a valid integer.
+
+COR-CTC-E000002$1=Invalid URL %1$s
+COR-CTC-E000002$2=The connection URL is malformed
+
+
+COR-CTC-E000003$1=No Truststore Provider found
+COR-CTC-E000003$2=The Truststore Provider has been found to secured the connection
+
+
+
+
+COR-ACT-E000000$1=Forbidden Action
+COR-ACT-E000000$2=User has no right to run this operation.
+

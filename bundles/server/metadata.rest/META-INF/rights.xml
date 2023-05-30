@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list xmlns="http://xml.arcadsoftware.com/1.0.0/rights.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xml.arcadsoftware.com/1.0.0/rights.xsd http://xml.arcadsoftware.com/1.0.0/rights.xsd ">
+	<right id="150" category="11" code="entity.create"/>
+	<right id="151" category="11" code="entity.edit"/>
+	<rightcategory id="11" code="admin"/>
+</list>

@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: ARCAD-Foundation Services - Framework
+Bundle-SymbolicName: com.arcadsoftware.afs.framework;singleton:=true
+Bundle-Version: 1.1.2.qualifier
+Bundle-Activator: com.arcadsoftware.afs.framework.internals.Activator
+Bundle-Vendor: ARCAD Software
+Require-Bundle: org.eclipse.core.runtime,
+ com.arcadsoftware.beanmap;bundle-version="1.1.7",
+ com.arcadsoftware.metadata;bundle-version="1.1.7",
+ com.arcadsoftware.rest;bundle-version="2.4.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
+Export-Package: com.arcadsoftware.afs.framework.listeners,
+ com.arcadsoftware.afs.framework.messages,
+ com.arcadsoftware.afs.framework.plugins,
+ com.arcadsoftware.afs.framework.services
+Bundle-ClassPath: .
+Automatic-Module-Name: com.arcadsoftware.afs.framework

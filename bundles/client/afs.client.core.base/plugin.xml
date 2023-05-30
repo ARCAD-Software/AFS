@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="com.arcadsoftware.afs.client.core.serverLoader" name="Servers connection Loader" schema="schema/com.arcadsoftware.afs.client.core.serverLoader.exsd"/>
+   <extension-point id="com.arcadsoftware.afs.client.core.rightmanager" name="Server Right Manager" schema="schema/com.arcadsoftware.afs.client.core.rightmanager.exsd"/>   
+   <extension-point id="com.arcadsoftware.afs.client.truststore.provider" name="Truststore Provider" schema="schema/com.arcadsoftware.afs.client.truststore.provider.exsd"/>
+   <extension-point id="com.arcadsoftware.afs.client.core.userAuthentication" name="User Authentication" schema="schema/com.arcadsoftware.afs.client.core.userAuthentication.exsd"/>  
+   <extension
+         point="com.arcadsoftware.afs.framework.userMessage">
+      <userMessage
+            filename="/base.core.messages">
+      </userMessage>
+   </extension>
+
+</plugin>

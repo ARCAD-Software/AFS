@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="com.arcadsoftware.client.server.admin.common.copytoclipboard" name="Copy To Clipboard Action" schema="schema/com.arcadsoftware.client.server.admin.common.copytoclipboard.exsd"/>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.arcadsoftware.afs.client.server.admin.common.ui.settings.editors.SectionSettingEditor"
+            default="false"
+            icon="platform:/plugin/com.arcadsoftware.afs.client.brands/icons/server.png"
+            id="com.arcadsoftware.afs.client.server.admin.common.ui.settings.editors.ServerSettingEditor"
+            name="name">
+      </editor>
+   </extension>
+
+</plugin>

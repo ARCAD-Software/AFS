@@ -1,0 +1,24 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: ARCAD Tack Scheduler CRON Implementation
+Bundle-SymbolicName: com.arcadsoftware.server.scheduler.impl;singleton:=true
+Bundle-Version: 1.2.6.qualifier
+Bundle-Activator: com.arcadsoftware.server.scheduler.internal.Activator
+Bundle-Vendor: ARCAD Software
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Import-Package: com.arcadsoftware.beanmap;version="[2.0.0,3.0.0)",
+ com.arcadsoftware.beanmap.rest;version="[2.0.0,3.0.0)",
+ com.arcadsoftware.metadata;version="[1.0.0,2.0.0)",
+ com.arcadsoftware.metadata.criteria;version="[1.0.1,2.0.0)",
+ com.arcadsoftware.metadata.sql;version="[1.0.0,2.0.0)",
+ com.arcadsoftware.osgi;version="[1.0.2,2.0.0)",
+ com.arcadsoftware.rest;version="[3.0.0,4.0.0)",
+ com.arcadsoftware.server.scheduler;version="[1.1.0,2.0.0)",
+ it.sauronsoftware.cron4j;version="[2.2.5,3.0.0)",
+ org.osgi.framework;version="[1.6.0,2.0.0)",
+ org.restlet;version="[2.4.3,3.0.0)",
+ org.restlet.data;version="[2.4.3,3.0.0)",
+ org.restlet.resource;version="[2.4.3,3.0.0)",
+ org.restlet.routing;version="[2.4.3,3.0.0)"
+Bundle-ClassPath: .
+Automatic-Module-Name: com.arcadsoftware.server.scheduler.impl

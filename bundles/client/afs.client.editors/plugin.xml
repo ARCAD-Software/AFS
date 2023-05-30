@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension-point id="com.arcadsoftware.client.editor" name="%extension-point.com.arcadsoftware.client.editor.name" schema="schema/com.arcadsoftware.editor.exsd"/>
+   <extension-point id="com.arcadsoftware.client.editor.swt" name="%extension-point.com.arcadsoftware.client.editor.swt.name" schema="schema/com.arcadsoftware.editor.swt.exsd"/>
+   <extension-point id="com.arcadsoftware.client.editor.ajax" name="%extension-point.com.arcadsoftware.client.editor.ajax.name" schema="schema/com.arcadsoftware.editor.ajax.exsd"/>
+   <extension-point id="com.arcadsoftware.client.editor.action" name="%extension-point.com.arcadsoftware.client.editor.action.name" schema="schema/com.arcadsoftware.client.editor.action.exsd"/>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.arcadsoftware.editor.swt.DynamicEditorPart"
+            contributorClass="com.arcadsoftware.editor.swt.DynamicEditorActionBarContributor"
+            default="false"
+            id="com.arcadsoftware.editor.swt.DynamicEditorPart"
+            matchingStrategy="com.arcadsoftware.editor.swt.DynamicEditorMatchingStrategy"
+            name="%editor.com.arcadsoftware.editor.swt.DynamicEditorPart.name">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.elementFactories">
+      <factory
+            class="com.arcadsoftware.editor.swt.ElementFactory"
+            id="com.arcadsoftware.editor.ElementFactory">
+      </factory>
+   </extension>
+</plugin>

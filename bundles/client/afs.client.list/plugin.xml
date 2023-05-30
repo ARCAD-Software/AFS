@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.arcadsoftware.afs.client.list.ui.editors.XmlListEditorPart"
+            default="false"
+            icon="platform:/plugin/com.arcadsoftware.afs.client.brands/icons/list.png"
+            id="com.arcadsoftware.afs.client.list.ui.editors.XmlListEditor"
+            name="%xmllist.editor.name">
+      </editor>
+   </extension>
+   <extension
+         point="com.arcadsoftware.afs.framework.userMessage">
+      <userMessage
+            filename="/list.messages">
+      </userMessage>
+   </extension>
+
+</plugin>

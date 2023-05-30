@@ -1,0 +1,200 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="com.arcadsoftware.afs.client.core" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="com.arcadsoftware.afs.client.core" id="com.arcadsoftware.afs.client.core.container" name="com.arcadsoftware.afs.client.core.container"/>
+      </appinfo>
+      <documentation>
+         This extension point allows to dynamically add a container to an existing one.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <choice minOccurs="1" maxOccurs="unbounded">
+            <element ref="container"/>
+            <element ref="containerProvider" minOccurs="1" maxOccurs="unbounded"/>
+         </choice>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="container">
+      <complexType>
+         <attribute name="class" type="string">
+            <annotation>
+               <documentation>
+                  Indicates the class that must be instantiated to create the related container.
+This class must extend com.arcadsoftware.afs.client.core.ui.containers.AbstractConnectedContainer
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn="com.arcadsoftware.afs.client.core.ui.containers.AbstractConnectedContainer:"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Identifier of the container that will be created.
+This identifier can be used as a parentId of another containerProvider
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="parentId" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Identifier of the parent containerProvider.
+Note that only an Identifier of a Container Provider can be used. If you use the identifier of a Container (or an child class), an error will occur.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="parentViewid" type="string">
+            <annotation>
+               <documentation>
+                  This is the name of the view that contains the parent explorer.
+If this value is empty, this contaier will be added everywhere where the parentId has been found.
+If not, it will appear only on the navigator attached to the parent View.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="rightId" type="string">
+            <annotation>
+               <documentation>
+                  The identifier of the required right (an integer) that the user needs to have to display this node.
+If this value is empty, this container will always be displayed.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="order" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="containerProvider">
+      <complexType>
+         <attribute name="class" type="string">
+            <annotation>
+               <documentation>
+                  Indicates the class that must be instantiated to create the related containerProvider.
+This class must extend com.arcadsoftware.afs.client.core.ui.containers.AbstractConnectedContainerProvider
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn="com.arcadsoftware.afs.client.core.ui.containers.AbstractConnectedContainerProvider:"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Identifier of the containerProvider that will be created.
+This identifier can be used as a parentId of another container.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="parentId" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Id of the parent container.
+Note that only an identifier of a Container can be used. If you use the identifier of a ContainerProvider (or an child class), an error will occur.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="parentViewid" type="string">
+            <annotation>
+               <documentation>
+                  This is the name of the view that contains the parent explorer.
+If this value is empty, this contaier will be added everywhere where the parentId has been found.
+If not, it will appear only on the navigator attached to the parent View.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="rightId" type="string">
+            <annotation>
+               <documentation>
+                  The identifier of the required right (an integer) that the user needs to have to display this node.
+If this value is empty, this container will always be displayed.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="order" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         [Enter the first release in which this extension point appears.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         [Enter extension point usage example here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="apiinfo"/>
+      </appinfo>
+      <documentation>
+         [Enter API information here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="implementation"/>
+      </appinfo>
+      <documentation>
+         [Enter information about supplied implementation of this extension point.]
+      </documentation>
+   </annotation>
+
+
+</schema>

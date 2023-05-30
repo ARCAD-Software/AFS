@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            class="com.arcadsoftware.afs.client.ssh.internal.ui.views.SSHKeyListView"
+            icon="platform:/plugin/com.arcadsoftware.afs.client.brands/icons/sshkey.png"
+            id="com.arcadsoftware.afs.client.ssh.ui.views.SSHKeyListView"
+            name="%afs.client.ssh.view.name"
+            restorable="true">
+      </view>      
+           
+   </extension>
+   <extension
+         point="com.arcadsoftware.client.editor.action">
+      <action
+            class="com.arcadsoftware.afs.client.ssh.internal.actions.EditorSaveAction"
+            id="ssh.client.core.action.editor.save">
+      </action>
+   </extension>
+</plugin>

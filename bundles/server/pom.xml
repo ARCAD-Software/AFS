@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.arcadsoftware</groupId>
+		<artifactId>com.arcadsoftware.afs.bundles</artifactId>
+		<version>2023.7.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>com.arcadsoftware.afs.server</artifactId>
+	<packaging>pom</packaging>
+
+	<modules>
+		<module>database.sql</module>
+		<module>database.sql.h2</module>
+		<module>database.sql.postgresql</module>
+		<module>metadata.binary</module>
+		<module>metadata.rest</module>
+		<module>metadata.rights</module>
+		<module>metadata.mapper.sql</module>
+		<module>metadata.mapper.sql.postgresql</module>
+		<module>metadata.server.user</module>
+		<module>metadata.registry.xml</module>
+		<module>server.binaries</module>
+		<module>server.client.core.connection</module>
+		<module>server.messages</module>
+		<module>server.properties</module>
+		<module>server.restful</module>
+		<module>server.restful.connection</module>
+		<module>server.restful.connection.config</module>
+		<module>server.restful.connection.ldap</module>
+		<module>server.restful.connection.local</module>
+		<module>server.restful.console</module>
+		<module>server.restful.layouts</module>
+		<module>server.scheduler</module>
+		<module>server.scheduler.impl</module>
+		<module>server.ssh</module>
+		<module>server.web</module>
+	</modules>
+</project>

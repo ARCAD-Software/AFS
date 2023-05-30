@@ -1,0 +1,14 @@
+
+Ce bundle peut être exécuté comme une librairie Java classique.
+
+
+Modules requis dans le classpath (pour la construction du module) :
+
+- Restlet.
+- XStream.
+- com.arcadsoftware.rest.
+- org.eclipse.equinox.common
+    (uniquement pour l'interface IAdaptable).
+- com.arcadsoftware.osgi
+    (uniquement pour l'interface ILoggedPlugin).
+

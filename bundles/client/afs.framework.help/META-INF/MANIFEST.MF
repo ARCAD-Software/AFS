@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: ARCAD-Foundation Services - Framework - Help
+Bundle-SymbolicName: com.arcadsoftware.afs.framework.help;singleton:=true
+Bundle-Version: 1.1.2.qualifier
+Bundle-Activator: com.arcadsoftware.afs.framework.help.internal.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.help,
+ org.eclipse.ui;resolution:=optional,
+ org.eclipse.rap.ui;resolution:=optional,
+ com.arcadsoftware.afs.framework;bundle-version="1.0.0",
+ com.arcadsoftware.afs.framework.ui;bundle-version="1.0.0",
+ com.arcadsoftware.osgi;bundle-version="1.3.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ClassPath: .
+Bundle-Vendor: ARCAD Software
+Automatic-Module-Name: com.arcadsoftware.afs.framework.help
+

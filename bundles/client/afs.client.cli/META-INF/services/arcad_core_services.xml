@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services>
+
+	<service id="arcExecuteMacrocommand" 
+	         class="com.arcadsoftware.arcad.client.cli.services.impl.ExecuteMacroCommandService"/>
+	<service id="mrCreate" 
+	         class="com.arcadsoftware.arcad.client.cli.services.impl.mr.MReportCreateService"/>	         
+	<service id="mrList" 
+	         class="com.arcadsoftware.arcad.client.cli.services.impl.mr.MReportListService"/>	 			 
+</services>

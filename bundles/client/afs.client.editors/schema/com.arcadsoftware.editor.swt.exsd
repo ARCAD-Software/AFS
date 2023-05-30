@@ -1,0 +1,412 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="com.arcadsoftware.client.editor" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="com.arcadsoftware.client.editor" id="com.arcadsoftware.client.editor.swt" name="Widget for Custom Editors"/>
+      </appinfo>
+      <documentation>
+         This extension allow you to create specifics widget embeddable into custom editors.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <choice minOccurs="0" maxOccurs="unbounded">
+            <element ref="container"/>
+            <element ref="decorator"/>
+            <element ref="input"/>
+            <element ref="scriptAction"/>
+         </choice>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="input">
+      <annotation>
+         <documentation>
+            Defie a Widget Provider that will be used to generate an Input part of the editor. This can be a value (IBeanMap Attribute) editor or just a formatter.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="unbounded">
+            <element ref="parameter"/>
+            <element ref="elementParameter"/>
+         </sequence>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The name of the widget, widget can be seleted bay type plus by name if multiples widgets match the same type.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="type" type="string" use="default" value="*">
+            <annotation>
+               <documentation>
+                  Define the type of this widget. 
+
+The type define attribute type that can be associated with this widget.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string">
+            <annotation>
+               <documentation>
+                  Implement a SWT widget provider that will be serialized (and seserialized) from xml stream.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":com.arcadsoftware.editor.swt.IInputSWTProvider"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="description" type="string">
+            <annotation>
+               <documentation>
+                  Description of the item.
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="regex" type="boolean" use="default" value="false">
+            <annotation>
+               <documentation>
+                  Use the type as a regular expression.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="container">
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="unbounded">
+            <element ref="parameter"/>
+         </sequence>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":com.arcadsoftware.editor.swt.IContainerSWTProvider"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The name of the container.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="description" type="string">
+            <annotation>
+               <documentation>
+                  Description of the item.
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="decorator">
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="unbounded">
+            <element ref="parameter"/>
+         </sequence>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The decorator name.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":com.arcadsoftware.editor.swt.IDecoratorSWTProvider"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="description" type="string">
+            <annotation>
+               <documentation>
+                  Description of the item.
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="parameter">
+      <annotation>
+         <documentation>
+            You can use theses attributes definition to specify to the XStream parser which properties of the implementation class must be serialized as XML attributes.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Define the name of the parameter to retraive into the xml layout definition.
+
+This identifier should be a short name without xml reserved characters.
+
+By convention, the parameter name should be in lower case.
+
+The parameter name can not be any of the following word :
+
+&lt;ul&gt;
+&lt;li&gt; name
+&lt;li&gt;* type
+&lt;li&gt; attribute
+&lt;/ul&gt;
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="default" type="string">
+            <annotation>
+               <documentation>
+                  Define the parameter default value.
+
+A required parameter do not need the define a default value.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="use" use="default" value="optional">
+            <annotation>
+               <documentation>
+                  Define the usage of this parameter :
+
+&lt;ul&gt;
+&lt;li&gt; &lt;b&gt;required&lt;/b&gt;: means that, if this parameter is not provided then this widget provider will not be selected.
+&lt;li&gt; &lt;b&gt;text&lt;/b&gt;: means that his parameter will used as containt retreiver of the xml stream, a widget provider can have only one text parameter (multiple texts parameter should be ignorred).
+&lt;li&gt; &lt;b&gt;optional&lt;/b&gt; : optional parameter are parameter not required. 
+&lt;/ul&gt;
+
+Only optional and the text parameter should provide a default value.
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="optional">
+                  </enumeration>
+                  <enumeration value="required">
+                  </enumeration>
+                  <enumeration value="text">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+         <attribute name="description" type="string">
+            <annotation>
+               <documentation>
+                  Description of the item.
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="elementParameter">
+      <annotation>
+         <documentation>
+            You can use theses attributes definition to specify to the XStream parser which properties of the implementation class must be serialized as XML attributes.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence minOccurs="1" maxOccurs="unbounded">
+            <element ref="parameter"/>
+         </sequence>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Define the name of the parameter to retraive into the xml layout definition.
+
+This identifier should be a short name without xml reserved characters.
+
+By convention, the parameter name should be in lower case.
+
+The parameter name can not be any of the following word :
+
+&lt;ul&gt;
+&lt;li&gt; name
+&lt;li&gt;* type
+&lt;li&gt; attribute
+&lt;/ul&gt;
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="use" use="default" value="optional">
+            <annotation>
+               <documentation>
+                  Define the usage of this parameter :
+
+&lt;ul&gt;
+&lt;li&gt; &lt;b&gt;required&lt;/b&gt;: means that, if this parameter is not provided then this widget provider will not be selected.
+&lt;li&gt; &lt;b&gt;text&lt;/b&gt;: means that his parameter will used as containt retreiver of the xml stream, a widget provider can have only one text parameter (multiple texts parameter should be ignorred).
+&lt;li&gt; &lt;b&gt;optional&lt;/b&gt; : optional parameter are parameter not required. 
+&lt;/ul&gt;
+
+Only optional and the text parameter should provide a default value.
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="optional">
+                  </enumeration>
+                  <enumeration value="required">
+                  </enumeration>
+                  <enumeration value="text">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+         <attribute name="description" type="string">
+            <annotation>
+               <documentation>
+                  Description of the item.
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="scriptAction">
+      <annotation>
+         <documentation>
+            The ScriptAction is an action that is callable from a JavaScript executed into the Dynamic Editor context.
+
+Theses actions must conform to the Sripting bundle capacities, this imply no dependance upon specific classes that should be not accessible to the scripting bundle classloader.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The action object name in the script context.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string">
+            <annotation>
+               <documentation>
+                  The Action program.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":com.arcadsoftware.script.IScriptAction"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         [Enter the first release in which this extension point appears.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         [Enter extension point usage example here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="apiinfo"/>
+      </appinfo>
+      <documentation>
+         [Enter API information here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="implementation"/>
+      </appinfo>
+      <documentation>
+         [Enter information about supplied implementation of this extension point.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="copyright"/>
+      </appinfo>
+      <documentation>
+         2008 ARCAD-Software.
+      </documentation>
+   </annotation>
+
+</schema>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry exported="true" kind="lib" path="libs/org.restlet.ext.fileupload.jar" sourcepath="/org.restlet.base.source"/>
+	<classpathentry exported="true" kind="lib" path="libs/org.restlet.ext.xml.jar" sourcepath="/org.restlet.base.source"/>
+	<classpathentry exported="true" kind="lib" path="libs/org.restlet.jar" sourcepath="/org.restlet.base.source"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

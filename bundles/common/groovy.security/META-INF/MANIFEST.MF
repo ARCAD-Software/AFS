@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Grovye Script Security
+Bundle-SymbolicName: com.arcadsoftware.groovy.security
+Bundle-Version: 1.0.4.qualifier
+Bundle-Vendor: ARCAD Software
+Automatic-Module-Name: com.arcadsoftware.groovy.security
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Import-Package: groovy.lang;version="[3.0.8,4.0.0)",
+ groovy.util;version="[3.0.8,4.0.0)",
+ org.codehaus.groovy.ast;version="[3.0.8,4.0.0)",
+ org.codehaus.groovy.ast.expr;version="[3.0.8,4.0.0)",
+ org.codehaus.groovy.ast.stmt;version="[3.0.8,4.0.0)",
+ org.codehaus.groovy.classgen;version="[3.0.8,4.0.0)",
+ org.codehaus.groovy.control;version="[3.0.8,4.0.0)",
+ org.codehaus.groovy.control.customizers;version="[3.0.8,4.0.0)",
+ org.codehaus.groovy.control.customizers.builder;version="[3.0.8,4.0.0)"
+Export-Package: com.arcadsoftware.groovy.security;version="1.0.0";uses:="org.codehaus.groovy.control.customizers,org.codehaus.groovy.control"

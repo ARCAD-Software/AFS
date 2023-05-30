@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="com.arcadsoftware.afs.framework.application.menuFactory">
+      <menuFactory
+            class="com.arcadsoftware.afs.framework.application.conf.internal.BasicMenuFactory">
+      </menuFactory>
+   </extension>
+
+</plugin>

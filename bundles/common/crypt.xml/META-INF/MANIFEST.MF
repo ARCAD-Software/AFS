@@ -1,0 +1,26 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Cryptography for XML
+Bundle-SymbolicName: com.arcadsoftware.crypt.xml
+Bundle-Version: 1.0.5.qualifier
+Bundle-Vendor: ARCAD Software
+Automatic-Module-Name: com.arcadsoftware.crypt.xml
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Export-Package: com.arcadsoftware.crypt.sign.xml;version="1.0.2"
+Import-Package: javax.crypto,
+ javax.crypto.interfaces,
+ javax.crypto.spec,
+ javax.net.ssl,
+ javax.xml.crypto,
+ javax.xml.crypto.dom,
+ javax.xml.crypto.dsig,
+ javax.xml.crypto.dsig.dom,
+ javax.xml.crypto.dsig.keyinfo,
+ javax.xml.crypto.dsig.spec,
+ javax.xml.parsers,
+ javax.xml.transform,
+ javax.xml.transform.dom,
+ javax.xml.transform.stream,
+ org.apache.jcp.xml.dsig.internal.dom;version="[2.2.3,3.0.0)",
+ org.w3c.dom,
+ org.xml.sax

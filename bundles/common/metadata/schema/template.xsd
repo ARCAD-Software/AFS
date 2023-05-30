@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://xml.arcadsoftware.com/1.0.0/template.xsd"
+	xmlns="http://xml.arcadsoftware.com/1.0.0/template.xsd"
+	elementFormDefault="qualified">
+
+	<xsd:import schemaLocation="./searchcriteria.xsd" />
+
+	<xsd:element name="template" type="TemplateType">
+		<xsd:annotation>
+			<xsd:documentation>
+				Le Template représente un document quelconque, c'est à dire sans orientation fonctionnelle précise,
+				qui peut être associé à un type d'entité et qui peut contenir des mots clés qui seront remplacés par
+				les valeurs de la donnée lors de l'instanciation du template.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+
+	<xsd:element name="notification">
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="ConditionalTemplateType">
+					<xsd:sequence>
+						<xsd:element name="to" type="StringList" maxOccurs="1" minOccurs="0" />
+						<xsd:element name="cc" type="StringList" maxOccurs="1" minOccurs="0" />
+						<xsd:element name="bcc" type="StringList" maxOccurs="1" minOccurs="0" />
+						<!-- Autres implémentations : 
+						- SMS: <element name="phones" type="template:StringList" maxOccurs="1" minOccurs="0" /> 
+						- MircoBloggage: Twitter/Facebook/Flickr/Digg 
+						- Messagerie instantanée: XMPP(Jabber)/MSN/ICQ/SIP
+						 -->
+					</xsd:sequence>
+					<xsd:attribute name="activated" type="xsd:boolean" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Indique si cette notification est active ou pas. Les notification inactives restent accessibles
+								mais ne seront pas utilisé pour déclencher des messages.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="periodic" type="xsd:boolean" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Indique si cette notification doit être testé périodiquement. Dans ce cas les valeurs du "script"
+								et de "event" n'entre pas en ligne de compte. Cependant les évènements et le script pruvent être utilisé en
+								parallèle pour un même template.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="category" use="optional" default="email">
+						<xsd:annotation>
+							<xsd:documentation>Détermine le vecteur d'expédition de la notification.</xsd:documentation>
+						</xsd:annotation>
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:enumeration value="email" />
+								<xsd:enumeration value="sms" />
+								<xsd:enumeration value="all" />
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:attribute>
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:complexType name="TemplateType">
+		<xsd:sequence>
+			<xsd:element name="subject" type="xsd:string" maxOccurs="1" minOccurs="0" />
+			<xsd:element name="text" type="xsd:string" minOccurs="1" maxOccurs="1" />
+		</xsd:sequence>
+		<xsd:attribute name="primaryType" type="xsd:string" use="required" />
+		<xsd:attribute name="secondaryType" type="xsd:string" use="optional" />
+	</xsd:complexType>
+
+	<xsd:complexType name="ConditionalTemplateType">
+		<xsd:complexContent>
+			<xsd:extension base="TemplateType">
+				<xsd:sequence>
+					<xsd:element name="primaryCondition" maxOccurs="1" minOccurs="0">
+						<xsd:complexType>
+							<xsd:choice>
+								<xsd:group ref="criteria" />
+							</xsd:choice>
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="secondaryCondition" maxOccurs="1" minOccurs="0">
+						<xsd:complexType>
+							<xsd:choice>
+								<xsd:group ref="criteria" />
+							</xsd:choice>
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="script" type="xsd:string" maxOccurs="1" minOccurs="0" />
+				</xsd:sequence>
+				<xsd:attribute name="event" type="xsd:string" use="optional" />
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="StringList">
+		<xsd:sequence maxOccurs="unbounded" minOccurs="0">
+			<xsd:element name="string" type="xsd:string" />
+		</xsd:sequence>
+		<xsd:attribute name="list" type="xsd:integer" use="optional" />
+	</xsd:complexType>
+</xsd:schema>

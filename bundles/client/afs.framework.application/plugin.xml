@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="com.arcadsoftware.afs.framework.application.configurationManager" name="Configuration Manager Extension" schema="schema/com.arcadsoftware.afs.framework.application.configurationManager.exsd"/>
+   <extension-point id="com.arcadsoftware.afs.framework.application.menuFactory" name="Application Menu Factory" schema="schema/com.arcadsoftware.afs.framework.application.menuFactory.exsd"/>
+   <extension
+         id="com.arcadsoftware.afs.rcp.application.id"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            cardinality="singleton-global"
+            thread="main"
+            visible="true">
+         <run
+               class="com.arcadsoftware.afs.framework.application.internal.Application">
+         </run>
+      </application>
+   </extension>
+	
+	
+</plugin>

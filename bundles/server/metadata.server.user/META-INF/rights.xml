@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list xmlns="http://xml.arcadsoftware.com/1.0.0/rights.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xml.arcadsoftware.com/1.0.0/rights.xsd http://xml.arcadsoftware.com/1.0.0/rights.xsd ">
+
+	<right id="30" category="3" code="user.read"/>
+	<right id="31" category="3" code="user.add"/>
+	<right id="32" category="3" code="user.edit"/>
+	<right id="37" category="3" code="user.profiles"/>
+	<right id="51" category="50" code="profile.add"/>
+	<right id="52" category="50" code="profile.edit"/>
+
+	<rightcategory id="3" code="user"/>
+	<rightcategory id="50" code="profile"/>
+	
+</list>

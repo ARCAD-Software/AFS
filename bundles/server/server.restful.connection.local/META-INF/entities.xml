@@ -1,0 +1,72 @@
+<entities xmlns="http://xml.arcadsoftware.com/1.0.0/entities.xsd"
+	xmlns:criteria="http://xml.arcadsoftware.com/1.0.0/searchcriteria.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xml.arcadsoftware.com/1.0.0/entities.xsd http://xml.arcadsoftware.com/1.0.0/entities.xsd">
+	<entity domain="userdb" version="1" date="2013-04-25T15:29:58"
+		type="localauth">
+		<rights>
+			<create>
+				<hasright attribute="." right="38"/>
+			</create>
+			<read>
+				<or>
+					<hasright attribute="." right="30" />
+					<currentuser attribute="user" />
+				</or>
+			</read>
+			<list>
+				<or>
+					<hasright attribute="." right="30" />
+					<currentuser attribute="user" />
+				</or>
+			</list>
+		</rights>
+		<metadata>
+			<idCol>LAU_ID</idCol>
+			<updateCol>LAU_UPDATE</updateCol>
+			<table>LOCALAUTH</table>
+			<logCreate>Creation of a login stored in database (%login%)</logCreate>
+			<logUpdate>Update of a login stored in database (%login%)</logUpdate>
+			<logDelete>Deletion of a login stored in database (%login%)</logDelete>
+		</metadata>
+		<attribute type="string" code="login" listable="true"
+			mandatory="true" length="255">
+			<metadata>
+				<col>LAU_LOGIN</col>
+			</metadata>
+		</attribute>
+		<attribute type="string" code="password"
+			listable="false">
+			<metadata>
+				<col>LAU_PASSWORD</col>
+				<generator>localauth/</generator>
+				<hidden>true</hidden>
+				<visible>false</visible>
+			</metadata>
+		</attribute>
+		<attribute type="date" code="pwdupdate" listable="true">
+			<metadata>
+				<col>LAU_PWDUPDATE</col>
+			</metadata>
+		</attribute>
+		<attribute type="integer" code="locked" listable="true">
+			<metadata>
+				<col>LAU_LOCKED</col>
+			</metadata>
+		</attribute>
+		<attribute type="user" code="user" listable="true">
+			<metadata>
+				<col>LAU_USER</col>
+				<reverseLink>localauths</reverseLink>
+			</metadata>
+		</attribute>
+	</entity>
+	
+	<update-entity version="2" type="user" domain="userdb">
+		<link type="localauth" code="localauths">
+			<metadata>
+				<reverseLink>user</reverseLink>
+			</metadata>
+		</link>
+	</update-entity>
+</entities>

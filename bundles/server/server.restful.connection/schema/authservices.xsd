@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://xml.arcadsoftware.com/1.0.0/authservices.xsd"
+	xmlns:tns="http://xml.arcadsoftware.com/1.0.0/authservices.xsd" elementFormDefault="unqualified">
+
+	<annotation>
+		<documentation>
+			This XML file define the current list of Authentification services available into the server.
+
+			Each service provide 2 web resources, where SERVICENAME is the service name specified into this list :
+
+			/SERVICENAME/{login} = return a code 201 if the given login already exist into this authentification mapping (return 404 if this login is free).
+			
+			/user/{id}/SERVICENAME = return the parameters of this authentification schema, for a given user from the application.
+
+			The authentification service parameter are declared by a BeanMap entity named SERVICENAME.
+		</documentation>
+	</annotation>
+
+	<element name="list">
+		<annotation>
+			<documentation>
+				This list can be empty if none authentification are currently declared on this server.
+			</documentation>
+		</annotation>
+		<complexType>
+			<sequence maxOccurs="unbounded" minOccurs="0">
+				<element name="string" type="string">
+					<annotation>
+						<documentation>
+							A Authentification service name.
+						</documentation>
+					</annotation>
+				</element>
+			</sequence>
+		</complexType>
+	</element>
+</schema>

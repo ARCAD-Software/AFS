@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<jardesc>
+    <jar path="afs.connected.core/distrib/afs-client-connected-core.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/afs.connected.core/afs-client-connected-core.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <javaElement handleIdentifier="=afs.connected.core/src&lt;com.arcadsoftware.afs.client.core.tools"/>
+        <javaElement handleIdentifier="=osgi/src"/>
+        <javaElement handleIdentifier="=afs.connected.core/src&lt;com.arcadsoftware.afs.client.core.servers.model"/>
+        <javaElement handleIdentifier="=metadata/src"/>
+        <javaElement handleIdentifier="=crypto/src"/>
+        <javaElement handleIdentifier="=beanmap/src"/>
+        <javaElement handleIdentifier="=rest/src"/>
+        <folder path="/rest/files"/>
+        <folder path="/rest/META-INF"/>
+        <javaElement handleIdentifier="=afs.framework/src&lt;com.arcadsoftware.afs.framework.messages"/>
+        <javaElement handleIdentifier="=aev.core/src&lt;com.arcadsoftware.aev.core.model{ArcadListenerList.java"/>
+        <javaElement handleIdentifier="=afs.connected.core/src&lt;com.arcadsoftware.afs.client.core.model"/>
+        <javaElement handleIdentifier="=afs.connected.core/src&lt;com.arcadsoftware.afs.client.core.connection"/>
+        <javaElement handleIdentifier="=aev.core/src&lt;com.arcadsoftware.aev.core.model{ArcadEntity.java"/>
+    </selectedElements>
+</jardesc>
