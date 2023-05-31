@@ -12,7 +12,6 @@
 	<modules>
 		<module>client.cli</module>
 		<module>client.rcp</module>
-		<module>client.rap</module>
 		<module>server.osgi</module>
 	</modules>
 </project>
