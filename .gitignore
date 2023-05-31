@@ -1,0 +1,22 @@
+# Compiled class file
+*.class
+
+# ignore all bin folders
+
+/bundles/.*
+/bundles/*/*/bin
+/bundles/*/*/target
+/bundles/*/.project
+/bundles/*/.settings
+/bundles/*/target
+/bundles/.project
+/bundles/.settings
+/features/.*
+/features/*/*/bin
+/features/*/*/target
+/features/*/target
+/features/*/target
+/releng/.*
+/releng/*/.*
+/releng/*/target
+
