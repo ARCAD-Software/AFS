@@ -13,6 +13,7 @@
 		<module>beanmap</module>
 		<module>cleanup</module>
 		<module>cm.simple</module>
+		<module>crypt</module>
 		<module>crypt.xml</module>
 		<module>email</module>
 		<module>groovy.security</module>
