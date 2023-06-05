@@ -37,24 +37,6 @@ import com.arcadsoftware.osgi.ILoggedPlugin;
  */
 public class NegotiateAuthenticationHelper {
 	
-	/* Notes Configuration :
-	 * 
-	 * Info claires: http://spnego.sourceforge.net/pre_flight.html
-	 * 
-	 * DOS:
-	 *  setspn -a HTTP/<serverhostname> mlafon
-	 * 
-	 * où serverhostname est le nom DNS Utilisé pour se connecter sur le serveur. 
-	 * 
-	 * résultat:
-	   C:\Users\myid.NTDOMAIN>setspn -a HTTP/hostname myid
-       Inscription des ServicePrincipalNames pour CN=My Name,OU=OrgUnit,DC=domain,DC=net
-               HTTP/hostname:5252
-       Objet mis à jour
-	 * 
-	 * conf registry: ? http://hc.apache.org/httpcomponents-client-ga/tutorial/html/authentication.html
-	 */
-
 	/**
 	 * OID for Kerberos 5 authentication
 	 */
@@ -66,14 +48,9 @@ public class NegotiateAuthenticationHelper {
 	public static final ChallengeScheme SPNEGO = new ChallengeScheme("HTTP_Negotiate", "Negotiate"); //$NON-NLS-1$ //$NON-NLS-2$
 
 	static {
-		// Kerberos initialization:
-    	//System.setProperty("java.security.auth.login.config", "./jaas_client.conf"); //$NON-NLS-1$ //$NON-NLS-2$
-    	// Obligatoire pour SSO Windows:
+    	// Mandatory to perform SSO in MS Windows:
         System.setProperty("javax.security.auth.useSubjectCredsOnly", "false"); //$NON-NLS-1$ //$NON-NLS-2$
-        // Optionel:
-        //System.setProperty("java.security.krb5.conf", "./krb5.conf");
-        // contenu: http://web.mit.edu/kerberos/krb5-1.4/krb5-1.4.1/doc/krb5-admin/krb5.conf.html
-        // En debug:
+        // Debug mode:
         if ("true".equalsIgnoreCase(System.getProperty("com.arcadsoftware.trace"))) { //$NON-NLS-1$ //$NON-NLS-2$
         	System.setProperty("sun.security.krb5.debug", "true"); //$NON-NLS-1$ //$NON-NLS-2$
         	System.setProperty("sun.security.spnego.debug", "true"); //$NON-NLS-1$ //$NON-NLS-2$

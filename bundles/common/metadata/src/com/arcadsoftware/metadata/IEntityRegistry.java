@@ -29,6 +29,9 @@ public interface IEntityRegistry {
 	 */
 	public static final String clazz = IEntityRegistry.class.getName();
 	
+	/**
+	 * OSGi Service property identify this Entity Registry.
+	 */
 	public static final String PROP_REGISTRYNAME = "registry.name"; //$NON-NLS-1$
 	
 	/**

@@ -151,7 +151,7 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 	public static final String METADATA_UPDATABLE = "updatable"; //$NON-NLS-1$
 
 	/**
-	 * Used within an entity this tag define the bineary file transfert category associated
+	 * Used within an entity this tag define the binary file transfert category associated
 	 * with this Entity.
 	 * 
 	 *  <p>

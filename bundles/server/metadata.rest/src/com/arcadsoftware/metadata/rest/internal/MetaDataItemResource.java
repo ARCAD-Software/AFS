@@ -196,7 +196,7 @@ public class MetaDataItemResource extends DataItemResource {
 	private void switchEntity(MetaDataEntity e) {
 		BeanMapList list = new BeanMapList();
 		String code = attLine.getCode();
-		for(BeanMap bean:getItems()) {
+		for (BeanMap bean:getItems()) {
 			int id = bean.getInt(code);
 			if (id > 0) {
 				list.addUnique(e.getMapper().selection(e, id, (String)null, false));
@@ -766,7 +766,7 @@ public class MetaDataItemResource extends DataItemResource {
 			// select when needed. (fusion of results).
 			if ((page < count) && (limit != 0)) {
 				// If we are starting to load the result list, we set the rank.
-				if (result.size() == 0) { 
+				if (result.size() == 0) {
 					result.setRank(result.getTotal() - count + page);
 				}
 				// Select...

@@ -281,19 +281,19 @@ public class ConsoleCommandProvider implements CommandProvider {
 		}
 		Restlet r = route.getNext();
 		if (r instanceof Application) {
-			r = ((Application)r).getInboundRoot();
+			r = ((Application) r).getInboundRoot();
 		}
 		if (r instanceof Filter) {
 			if (r instanceof Authenticator) {
 				ci.println(Messages.getString("ConsoleCommandProvider.BranchesSecurized")); //$NON-NLS-1$
 			}
-			r = ((Filter)r).getNext();
+			r = ((Filter) r).getNext();
 		}
 		if (r instanceof Router) {
-			for(Route rt : ((Router)r).getRoutes()) {
+			for(Route rt : ((Router) r).getRoutes()) {
 				printRoute(ci, rt, tab);
 			}
-			printRoute(ci, ((Router)r).getDefaultRoute(), tab);
+			printRoute(ci, ((Router) r).getDefaultRoute(), tab);
 		}
 	}
 
