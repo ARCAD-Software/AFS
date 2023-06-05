@@ -27,6 +27,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 
+import com.arcadsoftware.beanmap.BeanMapList;
 import com.arcadsoftware.metadata.IEntityRegistry;
 import com.arcadsoftware.metadata.MetaDataAttribute;
 import com.arcadsoftware.metadata.MetaDataEntity;
@@ -103,6 +104,8 @@ public class XmlRegistry implements IEntityRegistry {
 		if ((declarations == null) || (declarations.size() == 0)) {
 			return;
 		}
+		declarations = preprocessDeclarations(declarations);
+		containersDeclarations.put(name, declarations);
 		List<String> typesToRegenerate = new ArrayList<String>();
 		for (MetaDataEntity declaration: declarations) {
 			String type = declaration.getType();
@@ -124,6 +127,58 @@ public class XmlRegistry implements IEntityRegistry {
 		return;
 	}
 	
+	private List<MetaDataEntity> preprocessDeclarations(List<MetaDataEntity> declarations) {
+		ArrayList<MetaDataEntity> result = new ArrayList<MetaDataEntity>(declarations.size());
+		for (MetaDataEntity e: declarations) {
+			result.add(e);
+			// If this entity is autoLink=true then add update from all other links targeting this entity.
+			if (e.getMetadata().contains(MetaDataEntity.METADATA_AUTOLINK)) {
+				for (MetaDataEntity ee: entities.values()) {
+					for (MetaDataLink l: ee.getLinks().values()) {
+						if (e.getType().equals(l.getType())) {
+							result.add(createUpdateLink(e.getType(), e.getVersion(), BeanMapList.getListTag(ee.getType()), ee.getType(), MetaDataEntity.METADATA_AUTOLINK, l.getCode()));
+							break;
+						}
+					}
+				}				
+			}
+			// For all Entities with reverseLink = true
+			if (e.getMetadata().contains(MetaDataEntity.METADATA_REVERSELINK)) {
+				for (MetaDataEntity ee: entities.values()) {
+					for (MetaDataAttribute a: ee.getAttributesFromType(e.getType())) {
+						result.add(createUpdateLink(e.getType(), e.getVersion(), BeanMapList.getListTag(a.getCode()), ee.getType(), MetaDataEntity.METADATA_REVERSELINK, a.getCode()));
+					}
+				}
+			}
+			// For all attributes reverseLink = true, Create an Update for the target entity.
+			for (MetaDataAttribute a: e.getAttributes().values()) {
+				if (a.getMetadata().contains(MetaDataEntity.METADATA_REVERSELINK)) {
+					result.add(createUpdateLink(a.getType(), Integer.MAX_VALUE, BeanMapList.getListTag(e.getType()), e.getType(), MetaDataEntity.METADATA_REVERSELINK, a.getCode()));
+				}
+			}
+			// For all Entities with autolink = true linked to this entity...
+			for (MetaDataLink l: e.getLinks().values()) {
+				MetaDataEntity ee = entities.get(l.getType());
+				if ((ee != null) && e.getMetadata().contains(MetaDataEntity.METADATA_AUTOLINK)) {
+					String code = BeanMapList.getListTag(e.getType());
+					if (ee.getLink(code) == null) {
+						result.add(createUpdateLink(ee.getType(), ee.getVersion(), code, e.getType(), MetaDataEntity.METADATA_AUTOLINK, l.getCode()));
+					}
+				}
+			}
+		}
+		return result;
+	}
+
+	private UpdateMetaDataEntity createUpdateLink(String type, int version, String linkCode, String linkType, String metadata, String value) {
+		UpdateMetaDataEntity e = new UpdateMetaDataEntity(type, version);
+		MetaDataLink l = new MetaDataLink(e, linkType);
+		l.setCode(linkCode);
+		l.getMetadata().put(metadata, value);
+		e.addLink(l);
+		return e;
+	}
+
 	public void unloadContainer(String name) {
 		List<MetaDataEntity> declarations = containersDeclarations.remove(name);
 		if ((declarations == null) || (declarations.size() == 0)) {
@@ -215,7 +270,7 @@ public class XmlRegistry implements IEntityRegistry {
 				}
 			}
 		}
-		for (String type:typesToRegenerate) {
+		for (String type: typesToRegenerate) {
 			generate(type);
 		}
 	}
@@ -231,14 +286,14 @@ public class XmlRegistry implements IEntityRegistry {
 			}
 			activator.error(Messages.XMLRegistry_ErrorDuringLoadingProcess + file.getAbsolutePath() + Messages.XmlRegistry_NoEntitiesDeclared, null);
 			return null;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			activator.error(Messages.XMLRegistry_ErrorDuringLoadingProcess + file.getAbsolutePath(), e);
 			return null;
 		} finally {
 			if (fis != null) {
 				try {
 					fis.close();
-				} catch (Throwable e) {
+				} catch (Exception e) {
 					activator.debug(e);
 				}
 			}
@@ -264,11 +319,11 @@ public class XmlRegistry implements IEntityRegistry {
 		Object res = xs.fromXML(s);
 		if (res instanceof MetaDataEntity) {
 			ArrayList<MetaDataEntity> result = new ArrayList<MetaDataEntity>();
-			result.add((MetaDataEntity)res);
+			result.add((MetaDataEntity) res);
 			return result;
 		} 
 		if (res instanceof List<?>) {
-			return (List<MetaDataEntity>)res;
+			return (List<MetaDataEntity>) res;
 		}
 		return null;
 	}
@@ -292,7 +347,7 @@ public class XmlRegistry implements IEntityRegistry {
 		// Max des déclarations d'entity
 		entity = null;
 		boolean fusion = false;
-		for(MetaDataEntity e:declarations) {
+		for (MetaDataEntity e: declarations) {
 			if (!(e instanceof UpdateMetaDataEntity)) {
 				if ((entity == null) || (e.getVersion() > entity.getVersion())) {
 					entity = e;
@@ -305,9 +360,9 @@ public class XmlRegistry implements IEntityRegistry {
 		if (entity == null) {
 			entity = new MetaDataEntity(type, 1);
 		} else if (fusion) {
-			entity = new MetaDataEntity(type,entity.getVersion());
+			entity = new MetaDataEntity(type, entity.getVersion());
 			// Fusion des déclaration d'entités de même version.
-			for(MetaDataEntity e:declarations) {
+			for (MetaDataEntity e: declarations) {
 				if ((!(e instanceof UpdateMetaDataEntity)) &&
 						(e.getVersion() == entity.getVersion())) {
 					entity.inject(e, false);
@@ -319,19 +374,19 @@ public class XmlRegistry implements IEntityRegistry {
 		// Ajout de tout les update de version supérieure à la version courante.
 		// Ajout des patch dans l'ordre croissant des numéro de version.
 		ArrayList<UpdateMetaDataEntity> patchs = new ArrayList<UpdateMetaDataEntity>(declarations.size());
-		for(MetaDataEntity e:declarations) {
+		for (MetaDataEntity e: declarations) {
 			if (e instanceof UpdateMetaDataEntity) {
 				if (e.getVersion() >= entity.getVersion()) {
 					boolean notAdded = true;
-					for(int i = patchs.size() - 1; i >= 0; i--) {
+					for (int i = patchs.size() - 1; i >= 0; i--) {
 						if (e.getVersion() > patchs.get(i).getVersion()) {
-							patchs.add(i+1,(UpdateMetaDataEntity)e);
+							patchs.add(i+1,(UpdateMetaDataEntity) e);
 							notAdded = false;
 							break;
 						}
 					}
 					if (notAdded) {
-						patchs.add(0, (UpdateMetaDataEntity)e);
+						patchs.add(0, (UpdateMetaDataEntity) e);
 					}
 				}
 			}
@@ -344,7 +399,7 @@ public class XmlRegistry implements IEntityRegistry {
 		// Si entité déjà en cache...
 		MetaDataEntity e = entities.get(type);
 		if (e != null) {
-			updateEntity(e,entity,true);
+			updateEntity(e, entity, true);
 		} else {
 			entities.put(type, entity);
 			fireEvent(MetaDataEventHandler.TOPIC_ENTITY_CREATED, entity);
