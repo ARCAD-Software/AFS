@@ -21,12 +21,10 @@
 		<module>metadata.server.user</module>
 		<module>metadata.registry.xml</module>
 		<module>server.binaries</module>
-		<module>server.client.core.connection</module>
 		<module>server.messages</module>
 		<module>server.properties</module>
 		<module>server.restful</module>
 		<module>server.restful.connection</module>
-		<module>server.restful.connection.config</module>
 		<module>server.restful.connection.ldap</module>
 		<module>server.restful.connection.local</module>
 		<module>server.restful.console</module>
