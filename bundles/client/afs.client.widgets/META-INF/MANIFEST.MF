@@ -19,7 +19,6 @@ Require-Bundle: org.eclipse.core.runtime,
  com.arcadsoftware.beanmap;bundle-version="1.1.7",
  com.arcadsoftware.metadata;bundle-version="1.1.7",
  com.arcadsoftware.osgi;bundle-version="1.3.0",
- com.arcadsoftware.asteroids.google.re2;bundle-version="3.2.6",
  org.restlet.base;bundle-version="2.4.3",
  com.arcadsoftware.afs.client.brands;bundle-version="23.2.0"
 Bundle-ActivationPolicy: lazy

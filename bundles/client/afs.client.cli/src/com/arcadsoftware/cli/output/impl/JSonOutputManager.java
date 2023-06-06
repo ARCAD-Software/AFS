@@ -21,8 +21,9 @@ import java.nio.charset.StandardCharsets;
 
 import com.arcadsoftware.cli.core.services.AbstractService;
 import com.arcadsoftware.cli.output.AbstractOutputManager;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.core.ClassLoaderReference;
+import com.thoughtworks.xstream.io.json.JsonHierarchicalStreamDriver;
 
 public class JSonOutputManager extends AbstractOutputManager  {
 	
@@ -41,11 +42,10 @@ public class JSonOutputManager extends AbstractOutputManager  {
 		if (!outputFile.exists()) {
 			outputFile.getParentFile().mkdirs();
 		}
-		GsonBuilder builder = new GsonBuilder(); 
-		builder.setPrettyPrinting();
-		Gson gson = builder.create(); 
-		try (Writer writer = new OutputStreamWriter(new FileOutputStream(outputFilename) , StandardCharsets.UTF_8)){						
-			writer.write(gson.toJson(root));
+		// [ML) The JSON format may have changed here (v2023.7.0). Add aliases if required...
+		XStream xs = new XStream(null, new JsonHierarchicalStreamDriver(), new ClassLoaderReference(JSonOutputManager.class.getClassLoader()));
+		try (Writer writer = new OutputStreamWriter(new FileOutputStream(outputFilename) , StandardCharsets.UTF_8)) {						
+			writer.write(xs.toXML(root));
 		}
 		catch (Exception e) {}
 	}

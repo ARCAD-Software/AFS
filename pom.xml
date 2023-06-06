@@ -24,13 +24,6 @@
 		    <version>2.9.2</version>
 		</dependency>
 
-		<!-- AFS Client CLI -->
-		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-			<version>2.8.9</version>
-		</dependency>
-
 		<!-- Cryptography libraries -->
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
@@ -85,10 +78,15 @@
 			<artifactId>javax.mail</artifactId>
 			<version>1.6.2</version>
 		</dependency>
+		<dependency>
+		    <groupId>javax.activation</groupId>
+		    <artifactId>activation</artifactId>
+		    <version>1.1</version>
+		</dependency>
 		<!-- Scheduler Implementation -->
 		<dependency>
 			<groupId>it.sauronsoftware.cron4j</groupId>
-			<artifactId>it.sauronsoftware.cron4j</artifactId>
+			<artifactId>cron4j</artifactId>
 			<version>2.2.5</version>
 		</dependency>
 		
@@ -150,6 +148,7 @@
 			<artifactId>commons-lang3</artifactId>
 			<version>3.11</version>
 		</dependency>
+		
 	</dependencies>
 
 	<build>
@@ -177,6 +176,7 @@
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>target-platform-configuration</artifactId>
+				<version>${tycho.version}</version>
 				<configuration>
 					<target>
 						<artifact>
@@ -188,143 +188,6 @@
 					<executionEnvironment>JavaSE-1.8</executionEnvironment>
 					<pomDependencies>consider</pomDependencies>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-source-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>plugin-source</id>
-						<goals>
-							<goal>plugin-source</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.eclipse.tycho.extras</groupId>
-				<artifactId>tycho-source-feature-plugin</artifactId>
-				<executions>
-					<execution>
-						<goals>
-							<goal>source-feature</goal>
-						</goals>
-						<configuration>
-							<excludes>
-								<feature id="com.arcadsoftware.aev.core.features" />
-								<feature id="com.arcadsoftware.aev.list.features" />
-								<feature id="com.arcadsoftware.aev.rap.features" />
-								<feature id="com.arcadsoftware.aev.rcp.features" />
-								<feature id="com.arcadsoftware.asteroids.commons.feature" />
-								<feature id="com.arcadsoftware.asteroids.jdbc.feature" />
-								<feature id="com.arcadsoftware.quadra.services.ibmi.feature" />
-								<plugin id="bcmail" />
-								<plugin id="bcpg" />
-								<plugin id="bcpkix" />
-								<plugin id="bcprov" />
-								<plugin id="bcutil" />
-								<plugin id="com.h2database" />
-								<plugin id="com.ibm.db2.jcc" />
-								<plugin id="com.github.ben-manes.caffeine" />
-								<plugin id="com.microsoft.sqlserver" />
-								<plugin id="com.mysql.jdbc" />
-								<plugin id="com.mysql.cj" />
-								<plugin id="com.unboundid.ldap.sdk" />
-								<plugin id="com.nimbusds.nimbus-jose-jwt" />
-								<plugin id="com.nimbusds.oauth2-oidc-sdk" />
-								<plugin id="com.oracle.database.jdbc" />
-								<plugin id="com.sun.jna" />
-								<plugin id="com.sun.jna.platform" />
-								<plugin id="com.sun.mail.javax.mail" />
-								<plugin id="derbyclient" />
-								<plugin id="it.sauronsoftware.cron4j" />
-								<plugin id="groovy" />
-								<plugin id="javax.enterprise.cdi-api" />
-								<plugin id="javax.interceptor-api" />
-								<plugin id="javax.resource-api" />
-								<plugin id="javax.servlet" />
-								<plugin id="javax.transaction-api" />
-								<plugin id="javax.xml" />
-								<plugin id="jcifs" />
-								<plugin id="lang-tag" />
-								<plugin id="net.jcip.annotations" />
-								<plugin id="net.minidev.json" />
-								<plugin id="net.minidev.json-smart" />
-								<plugin id="org.apache.commons.commons-beanutils" />
-								<plugin id="org.apache.commons.collections" />
-								<plugin id="org.apache.commons.commons-codec" />
-								<plugin id="org.apache.commons.commons-fileupload" />
-								<plugin id="org.apache.commons.commons-io" />
-								<plugin id="org.apache.commons.dbcp" />
-								<plugin id="org.apache.commons.dbcp2" />
-								<plugin id="org.apache.commons.dbutils" />
-								<plugin id="org.apache.commons.fileupload" />
-								<plugin id="org.apache.commons.lang3" />
-								<plugin id="org.apache.commons.pool" />
-								<plugin id="org.apache.commons.pool2" />
-								<plugin id="org.apache.felix.gogo.command" />
-								<plugin id="org.apache.felix.gogo.runtime" />
-								<plugin id="org.apache.felix.gogo.shell" />
-								<plugin id="org.apache.http.core" />
-								<plugin id="org.apache.mina.core" />
-								<plugin id="org.apache.santuario" />
-								<plugin id="org.apache.santuario.xmlsec" />
-								<plugin id="org.apache.servicemix.bundles.jcip-annotations" />
-								<plugin id="org.apache.servicemix.bundles.commons-digester" />
-								<plugin id="org.apache.servicemix.bundles.jt400" />
-								<plugin id="org.apache.servicemix.bundles.jzlib" />
-								<plugin id="org.apache.servicemix.bundles.lucene" />
-								<plugin id="org.apache.servicemix.bundles.xmlpull" />
-								<plugin id="org.apache.servicemix.bundles.xpp3" />
-								<plugin id="org.apache.servicemix.bundles.xstream" />
-								<plugin id="org.apache.sshd.osgi" />
-								<plugin id="org.bitbucket.b_c.jose4j" />
-								<plugin id="org.codehaus.groovy" />
-								<plugin id="org.eclipse.equinox.console.jaas.fragment" />
-								<plugin id="org.eclipse.jetty.client" />
-								<plugin id="org.eclipse.jetty.http" />
-								<plugin id="org.eclipse.jetty.io" />
-								<plugin id="org.eclipse.jetty.server" />
-								<plugin id="org.eclipse.jetty.util" />
-								<plugin id="org.eclipse.core.runtime" />
-								<plugin id="org.eclipse.equinox.cm" />
-								<plugin id="org.eclipse.equinox.simpleconfigurator" />
-								<plugin id="org.everit.osgi.bundles.net.sourceforge.jtds" />
-								<plugin id="org.firebirdsql" />
-								<plugin id="org.ops4j.pax.logging.pax-logging-api" />
-								<plugin id="org.ops4j.pax.logging.pax-logging-log4j2" />
-								<plugin id="org.postgresql.jdbc42" />
-								<plugin id="org.shredzone.acme4j" />
-								<plugin id="waffle" />
-								<plugin id="org.restlet.base" />
-								<plugin id="org.restlet.base.source" />
-								<plugin id="org.restlet.server" />
-								<plugin id="xstream" />
-								<plugin id="xstream.source" />
-								<plugin id="com.arcadsoftware.asteroids.google.re2" />
-								<plugin id="com.arcadsoftware.documentation.icons" />
-								<plugin id="com.arcadsoftware.documentation.brands" />
-								<plugin id="com.microsoft.sqlserver.mssql-jdbc" />
-								<plugin id="org.osgi.service.jdbc" />
-								<plugin id="com.nimbusds.content-type" />
-								<plugin id="net.minidev.accessors-smart" />
-								<plugin id="oauth2-oidc-sdk" />
-								<plugin id="javax.el-api" />
-								<plugin id="org.glassfish.hk2.external.javax.inject" />
-								<plugin id="org.postgresql.jdbc" />
-								<plugin id="org.objectweb.asm" />
-								<plugin id="javax.resource-api" />
-								<plugin id="javax.json-api" />
-								<plugin id="com.zaxxer.HikariCP" />
-								<plugin id="com.google.gson" />
-								<plugin id="net.sf.jmimemagic" />
-								<plugin id="org.apache.servicemix.bundles.hsqldb" />
-								<plugin id="net.i2p.crypto" />
-								<plugin id="net.i2p.crypto.eddsa" />
-							</excludes>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>

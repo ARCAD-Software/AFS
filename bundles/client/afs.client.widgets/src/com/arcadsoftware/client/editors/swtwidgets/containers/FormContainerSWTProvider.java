@@ -16,7 +16,6 @@ package com.arcadsoftware.client.editors.swtwidgets.containers;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Optional;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -46,97 +45,12 @@ import com.arcadsoftware.editor.ILayoutParameters;
 import com.arcadsoftware.editor.swt.IContainerSWTProvider;
 import com.arcadsoftware.editor.swt.ISWTRenderer;
 import com.arcadsoftware.metadata.MetaDataEntity;
-import com.google.re2j.Matcher;
-import com.google.re2j.Pattern;
 
 /**
  * This class implement a Form Container SWT Widget provider for the dynamic
  * editors.
  */
 public class FormContainerSWTProvider implements IContainerSWTProvider {
-
-	private static final  Pattern CODE_VALUE_PATTERN = Pattern.compile("^.*%(.+)%.*$");
-	
-	private ManagedForm managedForm;
-
-	public void create(ISWTRenderer renderer, ILayoutParameters params, boolean isEmpty, MetaDataEntity structure) {
-		String icon = params.getParameter(IConstants.ICON);
-		ImageDescriptor id = null;
-		if ((icon != null) && (icon.length() > 0)) {
-			id =  renderer.getImageDescriptor(icon);
-		}
-		int cols = params.getParameterInteger(IConstants.COLS, 0);
-		Layout layout;
-		if (cols == 0) {
-			layout = new ColumnLayout();
-		} else {
-			layout = createGridLayout(cols);
-		}
-		if (params.getParameterBoolean(IConstants.SCROLL)) {
-			ScrolledForm form = renderer.getToolkit().createScrolledForm(renderer.getParent());
-			managedForm = new ManagedForm(renderer.getToolkit(), form);
-			form.getForm().addMessageHyperlinkListener(new MessageHyperlinkAdapter(renderer.getToolkit()));
-			form.getBody().setLayout(layout);
-			form.setText(getFormattedLabel(params.getParameter(IConstants.LABEL), renderer));
-			if (id != null) {
-				form.setImage(id.createImage());
-			}
-			renderer.getToolkit().decorateFormHeading(form.getForm());
-			renderer.setFormToolBar(form.getToolBarManager());
-			final ArrayList<IAction> actions = new ArrayList<>();
-			// Il faut rattacher le ManagedForm au renderer pour gÃ©rer les sous
-			// bindings et les bindings de tests
-			renderer.createSubContainer(this, managedForm.getMessageManager(), params, form.getBody(), actions);
-			for (IAction action:actions) {
-				form.getToolBarManager().add(action);
-			}
-			form.layout(true, true);
-		} else {
-			Form form = renderer.getToolkit().createForm(renderer.getParent());
-			form.getBody().setLayout(layout);
-			form.setText(getFormattedLabel(params.getParameter(IConstants.LABEL), renderer));
-			
-			if (id != null) {
-				form.setImage(id.createImage());
-			}
-			renderer.getToolkit().decorateFormHeading(form);
-			renderer.setFormToolBar(form.getToolBarManager());
-			ArrayList<IAction> actions = new ArrayList<>();
-			renderer.createSubContainer(this, null, params, form.getBody(),actions);
-			for (IAction action:actions) {
-				form.getToolBarManager().add(action);
-			}
-			form.layout(true, true);
-		}
-	}
-
-	private String getFormattedLabel(final String labelKey, ISWTRenderer renderer) {
-		String label = renderer.getLocalizedMessage(labelKey);
-		if(label != null && !label.isEmpty()) {
-			Matcher matcher =  CODE_VALUE_PATTERN.matcher(label);
-			while(matcher.matches()){
-				final String code = matcher.group(1);
-				final String value = //
-					Optional.ofNullable(renderer.getVirtualValue(code)) //
-							.map(Object::toString)
-							.orElse(renderer.getCurrentBean().getString(code, ""));
-				label = label.replace("%" + code + "%", value);
-				matcher = CODE_VALUE_PATTERN.matcher(label);
-			}			
-		}
-		return label;
-	}
-	
-	private GridLayout createGridLayout(int cols) {
-		GridLayout gridLayout = new GridLayout(cols, false);
-		gridLayout.marginBottom = 0;
-		gridLayout.marginHeight = 0;
-		gridLayout.marginLeft = 0;
-		gridLayout.marginRight = 0;
-		gridLayout.marginTop = 0;
-		gridLayout.marginWidth = 0;
-		return gridLayout;
-	}
 
 	private class MessageHyperlinkAdapter extends HyperlinkAdapter {
 
@@ -235,6 +149,103 @@ public class FormContainerSWTProvider implements IContainerSWTProvider {
 				return null;
 			}			
 		}
+	}
+
+	private ManagedForm managedForm;
+
+	public void create(ISWTRenderer renderer, ILayoutParameters params, boolean isEmpty, MetaDataEntity structure) {
+		String icon = params.getParameter(IConstants.ICON);
+		ImageDescriptor id = null;
+		if ((icon != null) && (icon.length() > 0)) {
+			id =  renderer.getImageDescriptor(icon);
+		}
+		int cols = params.getParameterInteger(IConstants.COLS, 0);
+		Layout layout;
+		if (cols == 0) {
+			layout = new ColumnLayout();
+		} else {
+			layout = createGridLayout(cols);
+		}
+		if (params.getParameterBoolean(IConstants.SCROLL)) {
+			ScrolledForm form = renderer.getToolkit().createScrolledForm(renderer.getParent());
+			managedForm = new ManagedForm(renderer.getToolkit(), form);
+			form.getForm().addMessageHyperlinkListener(new MessageHyperlinkAdapter(renderer.getToolkit()));
+			form.getBody().setLayout(layout);
+			form.setText(getFormattedLabel(params.getParameter(IConstants.LABEL), renderer));
+			if (id != null) {
+				form.setImage(id.createImage());
+			}
+			renderer.getToolkit().decorateFormHeading(form.getForm());
+			renderer.setFormToolBar(form.getToolBarManager());
+			final ArrayList<IAction> actions = new ArrayList<>();
+			// Il faut rattacher le ManagedForm au renderer pour gérer les sous
+			// bindings et les bindings de tests
+			renderer.createSubContainer(this, managedForm.getMessageManager(), params, form.getBody(), actions);
+			for (IAction action:actions) {
+				form.getToolBarManager().add(action);
+			}
+			form.layout(true, true);
+		} else {
+			Form form = renderer.getToolkit().createForm(renderer.getParent());
+			form.getBody().setLayout(layout);
+			form.setText(getFormattedLabel(params.getParameter(IConstants.LABEL), renderer));
+			
+			if (id != null) {
+				form.setImage(id.createImage());
+			}
+			renderer.getToolkit().decorateFormHeading(form);
+			renderer.setFormToolBar(form.getToolBarManager());
+			ArrayList<IAction> actions = new ArrayList<>();
+			renderer.createSubContainer(this, null, params, form.getBody(),actions);
+			for (IAction action:actions) {
+				form.getToolBarManager().add(action);
+			}
+			form.layout(true, true);
+		}
+	}
+
+	private String getFormattedLabel(final String labelKey, ISWTRenderer renderer) {
+		String label = renderer.getLocalizedMessage(labelKey);
+		if(label != null && !label.isEmpty()) {
+			StringBuilder result = new StringBuilder(label.length());
+			StringBuilder tagName = null;
+			for (char c: label.toCharArray()) {
+				if (tagName != null) {
+					if (c == '%') {
+						if ((tagName == null) || (tagName.length() == 0)) {
+							result.append('%');
+						} else {
+							String code = tagName.toString();
+							Object value = renderer.getVirtualValue(code);
+							if (value != null) {
+								result.append(value.toString());
+							} else {
+								result.append(renderer.getCurrentBean().getString(code, "")); //$NON-NLS-1$
+							}
+						}
+						tagName = null;
+					} else {
+						tagName.append(c);
+					}
+				} else if (c == '%') {
+					tagName = new StringBuilder();
+				} else {
+					result.append(c);
+				}
+			}
+		}
+		return label;
+	}
+	
+	private GridLayout createGridLayout(int cols) {
+		GridLayout gridLayout = new GridLayout(cols, false);
+		gridLayout.marginBottom = 0;
+		gridLayout.marginHeight = 0;
+		gridLayout.marginLeft = 0;
+		gridLayout.marginRight = 0;
+		gridLayout.marginTop = 0;
+		gridLayout.marginWidth = 0;
+		return gridLayout;
 	}
 
 	public void dispose() {

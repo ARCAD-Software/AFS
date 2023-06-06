@@ -7,7 +7,7 @@ Bundle-Activator: com.arcadsoftware.logger.bridge.Activator
 Bundle-Vendor: ARCAD Software
 Require-Bundle: com.arcadsoftware.aev.core.services;bundle-version="11.0.4",
  com.arcadsoftware.afs.client.core.base;bundle-version="1.4.3",
- com.google.gson;bundle-version="2.8.5"
+ xstream;bundle-version="1.4.201"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Automatic-Module-Name: com.arcadsoftware.afs.logger.bridge
