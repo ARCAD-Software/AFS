@@ -14,11 +14,11 @@ Import-Package: com.arcadsoftware.beanmap;version="[2.0.0,3.0.0)",
  com.arcadsoftware.osgi;version="[1.0.2,2.0.0)",
  com.arcadsoftware.rest;version="[3.0.0,4.0.0)",
  com.arcadsoftware.server.scheduler;version="[1.1.0,2.0.0)",
- it.sauronsoftware.cron4j;version="[2.2.5,3.0.0)",
  org.osgi.framework;version="[1.6.0,2.0.0)",
  org.restlet;version="[2.4.3,3.0.0)",
  org.restlet.data;version="[2.4.3,3.0.0)",
  org.restlet.resource;version="[2.4.3,3.0.0)",
  org.restlet.routing;version="[2.4.3,3.0.0)"
-Bundle-ClassPath: .
+Bundle-ClassPath: .,
+ libs/cron4j-2.2.5.jar
 Automatic-Module-Name: com.arcadsoftware.server.scheduler.impl
