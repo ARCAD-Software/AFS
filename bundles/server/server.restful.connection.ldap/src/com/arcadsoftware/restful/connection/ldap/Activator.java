@@ -42,6 +42,7 @@ import com.arcadsoftware.metadata.criteria.NotCriteria;
 import com.arcadsoftware.osgi.AbstractConfiguredActivator;
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
+import com.arcadsoftware.crypt.ConfiguredSSLContext;
 import com.arcadsoftware.crypt.ConfiguredSSLContextException;
 import com.arcadsoftware.crypt.Crypto;
 
@@ -194,9 +195,25 @@ public class Activator extends AbstractConfiguredActivator {
 				}
 				changed = true;
 			}
+			// Force encryption of non encrypted passwords...
 			o = properties.get(LdapAuthentificationService.PROP_SEARCHPWD);
 			if ((o != null) && !Crypto.isCryptSecure(o.toString().trim())) {
 				properties.put(LdapAuthentificationService.PROP_SEARCHPWD, Crypto.encrypt(Crypto.decrypt(o.toString().trim())));
+				changed = true;
+			}
+			o = properties.get(ConfiguredSSLContext.PROP_KEYSTORE_KEYPWD);
+			if ((o != null) && !Crypto.isCryptSecure(o.toString().trim())) {
+				properties.put(ConfiguredSSLContext.PROP_KEYSTORE_KEYPWD, Crypto.encrypt(Crypto.decrypt(o.toString().trim())));
+				changed = true;
+			}
+			o = properties.get(ConfiguredSSLContext.PROP_KEYSTORE_PWD);
+			if ((o != null) && !Crypto.isCryptSecure(o.toString().trim())) {
+				properties.put(ConfiguredSSLContext.PROP_KEYSTORE_PWD, Crypto.encrypt(Crypto.decrypt(o.toString().trim())));
+				changed = true;
+			}
+			o = properties.get(ConfiguredSSLContext.PROP_TRUSTSTORE_PWD);
+			if ((o != null) && !Crypto.isCryptSecure(o.toString().trim())) {
+				properties.put(ConfiguredSSLContext.PROP_TRUSTSTORE_PWD, Crypto.encrypt(Crypto.decrypt(o.toString().trim())));
 				changed = true;
 			}
 		}

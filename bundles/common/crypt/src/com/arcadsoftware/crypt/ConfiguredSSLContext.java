@@ -331,7 +331,7 @@ public class ConfiguredSSLContext {
 		protocolsDisabled = new ArrayList<String>();
 		SSLContext ctx = null;
 		if (isActive(props)) {
-			String provider = getProp(props, PROP_SSL_PROVIDER, null);
+			String provider = getProp(props, PROP_SSL_PROVIDER);
 			String protocol = getProp(props, PROP_SSL_PREFEREDPROTOCOL, "TLSv1.3"); //$NON-NLS-1$
 			try {
 				if (provider == null) {
@@ -378,7 +378,7 @@ public class ConfiguredSSLContext {
 
 	private KeyManager[] getKeyManagers(Dictionary<String, Object> props, String provider)
 			throws ConfiguredSSLContextException {
-		String ksFileName = getProp(props, PROP_KEYSTORE_PATH, null);
+		String ksFileName = getProp(props, PROP_KEYSTORE_PATH);
 		if (ksFileName == null) {
 			return null;
 		}
@@ -386,7 +386,7 @@ public class ConfiguredSSLContext {
 		if (!ksFile.isFile()) {
 			throw new ConfiguredSSLContextException("Keys Store file not found: " + ksFile.getAbsolutePath());
 		}
-		String ksPwd = getProp(props, PROP_KEYSTORE_PWD, null);
+		char[] ksPwd = getProp(props, PROP_KEYSTORE_PWD, (char[]) null);
 		if (ksPwd == null) {
 			throw new ConfiguredSSLContextException("No password configured for Keys Store, using unprotected Keys Store is not allowed.");
 		}
@@ -398,15 +398,15 @@ public class ConfiguredSSLContext {
 				ks = KeyStore.getInstance(getProp(props, PROP_KEYSTORE_TYPE, "JKS"), provider); //$NON-NLS-1$
 			}
 			try (FileInputStream fis = new FileInputStream(ksFile)) {
-				ks.load(fis, ksPwd.toCharArray());
+				ks.load(fis, ksPwd);
 			} catch (IOException e) {
 				throw new ConfiguredSSLContextException("Keys Store file not accessible: " + ksFile.getAbsolutePath(), e);
 			} catch (NoSuchAlgorithmException | CertificateException e) {
 				throw new ConfiguredSSLContextException("Error during initialization of Keys Store file: " + ksFile.getAbsolutePath(), e);
 			}
 			KeyManagerFactory kmf = KeyManagerFactory
-					.getInstance(getProp(props, PROP_KEYSTORE_TYPE, KeyManagerFactory.getDefaultAlgorithm()));
-			kmf.init(ks, getProp(props, PROP_KEYSTORE_KEYPWD, ksPwd).toCharArray());
+					.getInstance(getProp(props, PROP_KEYSTORE_ALGO, KeyManagerFactory.getDefaultAlgorithm()));
+			kmf.init(ks, getProp(props, PROP_KEYSTORE_KEYPWD, ksPwd));
 			return kmf.getKeyManagers();
 		} catch (KeyStoreException | NoSuchProviderException | NoSuchAlgorithmException e) {
 			throw new ConfiguredSSLContextException(e);
@@ -417,7 +417,7 @@ public class ConfiguredSSLContext {
 
 	private TrustManager[] getTrustManagers(Dictionary<String, Object> props, String provider)
 			throws ConfiguredSSLContextException {
-		String tsFileName = getProp(props, PROP_TRUSTSTORE_PATH, null);
+		String tsFileName = getProp(props, PROP_TRUSTSTORE_PATH);
 		if (tsFileName == null) {
 			return null;
 		}
@@ -426,7 +426,7 @@ public class ConfiguredSSLContext {
 			throw new ConfiguredSSLContextException(
 					"Trusted certificates Store file not found: " + tsFile.getAbsolutePath());
 		}
-		String tsPwd = getProp(props, PROP_TRUSTSTORE_PWD, null);
+		char[] tsPwd = getProp(props, PROP_TRUSTSTORE_PWD, (char[]) null);
 		if (tsPwd == null) {
 			throw new ConfiguredSSLContextException(
 					"No password configured for Trusted certificates Store, using unprotected Keys Store is not allowed.");
@@ -439,7 +439,7 @@ public class ConfiguredSSLContext {
 				ts = KeyStore.getInstance(getProp(props, PROP_TRUSTSTORE_TYPE, "JKS"), provider); //$NON-NLS-1$
 			}
 			try (FileInputStream fis = new FileInputStream(tsFile)) {
-				ts.load(fis, tsPwd.toCharArray());
+				ts.load(fis, tsPwd);
 			} catch (IOException e) {
 				throw new ConfiguredSSLContextException(
 						"Trusted certificates Store file not accessible: " + tsFile.getAbsolutePath(), e);
@@ -447,9 +447,11 @@ public class ConfiguredSSLContext {
 				throw new ConfiguredSSLContextException(
 						"Error during initialization of Trusted certificates Store file: " + tsFile.getAbsolutePath(),
 						e);
+			} finally {
+				Crypto.clear(tsPwd);
 			}
 			TrustManagerFactory tmf = TrustManagerFactory
-					.getInstance(getProp(props, PROP_TRUSTSTORE_TYPE, TrustManagerFactory.getDefaultAlgorithm()));
+					.getInstance(getProp(props, PROP_TRUSTSTORE_ALGO, TrustManagerFactory.getDefaultAlgorithm()));
 			tmf.init(ts);
 			return tmf.getTrustManagers();
 		} catch (KeyStoreException | NoSuchProviderException | NoSuchAlgorithmException e) {
@@ -459,7 +461,7 @@ public class ConfiguredSSLContext {
 
 	private SecureRandom getSecureRandom(Dictionary<String, Object> props, String provider)
 			throws ConfiguredSSLContextException {
-		String random = getProp(props, PROP_SECURERANDOM, null);
+		String random = getProp(props, PROP_SECURERANDOM);
 		if (random == null) {
 			return null;
 		}
@@ -475,7 +477,7 @@ public class ConfiguredSSLContext {
 
 	private boolean isActive(Dictionary<String, Object> props) {
 		// Test that the required props are not null AND not empty
-		return (getProp(props, PROP_TRUSTSTORE_PATH, null) != null) || (getProp(props, PROP_KEYSTORE_PATH, null) != null);
+		return (getProp(props, PROP_TRUSTSTORE_PATH) != null) || (getProp(props, PROP_KEYSTORE_PATH) != null);
 	}
 
 	/**
@@ -492,6 +494,21 @@ public class ConfiguredSSLContext {
 			String s = o.toString().trim();
 			if (!s.isEmpty()) {
 				return s;
+			}
+		}
+		return defValue;
+	}
+
+	private String getProp(Dictionary<String, Object> props, String name) {
+		return getProp(props, name, (String) null);
+	}
+
+	private char[] getProp(Dictionary<String, Object> props, String name, char[] defValue) {
+		Object o = props.get(name);
+		if (o != null) {
+			String s = o.toString().trim();
+			if (!s.isEmpty()) {
+				return Crypto.decrypt(s);
 			}
 		}
 		return defValue;
