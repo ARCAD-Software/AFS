@@ -10,7 +10,6 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>client.cli</module>
 		<module>client.rcp</module>
 		<module>server.osgi</module>
 	</modules>
