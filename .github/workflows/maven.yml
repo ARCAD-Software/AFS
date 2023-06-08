@@ -33,11 +33,9 @@ jobs:
         mvn-toolchain-id: |
           JavaSE-1.8
           JavaSE-17
-    - run: cat /home/runner/.m2/toolchains.xml
-    - run: cat /usr/share/apache-maven-3.8.8/conf/toolchains.xml
            
     - name: Build with Maven
-      run: mvn -B package -Pflat-repo -X -e
+      run: mvn -B package -Pflat-repo
       
     - name: Upload flat p2 update site
       if: github.ref == 'refs/heads/main'
@@ -48,7 +46,7 @@ jobs:
         prerelease: true
         title: "Development Build"
         files: |
-          releng/aev.update/target/flat-repository/*
+          releng/update/target/flat-repository/*
 
 #    - name: Release
 #      uses: softprops/action-gh-release@v1
