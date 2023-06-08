@@ -19,9 +19,9 @@
 	<!-- Add explicit dependencies not available on P2 repository -->
 	<dependencies>
 		<dependency> <!-- https://mvnrepository.com/artifact/org.apache.sshd/sshd-osgi -->
-		    <groupId>org.apache.sshd</groupId>
-		    <artifactId>sshd-osgi</artifactId>
-		    <version>2.9.2</version>
+			<groupId>org.apache.sshd</groupId>
+			<artifactId>sshd-osgi</artifactId>
+			<version>2.9.2</version>
 		</dependency>
 
 		<!-- Cryptography libraries -->
@@ -78,11 +78,6 @@
 			<artifactId>javax.mail</artifactId>
 			<version>1.6.2</version>
 		</dependency>
-		<dependency>
-		    <groupId>javax.activation</groupId>
-		    <artifactId>activation</artifactId>
-		    <version>1.1</version>
-		</dependency>
 		
 		<!-- JDBC and Databases -->
 		<dependency> <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
@@ -136,13 +131,6 @@
 			<artifactId>pax-logging-log4j2</artifactId>
 			<version>1.12.4</version>
 		</dependency>
-		<!-- AFS client direct dependencies -->
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>3.11</version>
-		</dependency>
-		
 	</dependencies>
 
 	<build>
@@ -154,36 +142,56 @@
 				<extensions>true</extensions>
 			</plugin>
 			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-p2-plugin</artifactId>
-				<version>${tycho.version}</version>
-				<executions>
-					<execution>
-						<id>attach-p2-metadata</id>
-						<phase>package</phase>
-						<goals>
-							<goal>p2-metadata</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>target-platform-configuration</artifactId>
-				<version>${tycho.version}</version>
-				<configuration>
-					<target>
-						<artifact>
-							<groupId>com.arcadsoftware</groupId>
-							<artifactId>com.arcadsoftware.afs.platform</artifactId>
-							<version>2023.7.0-SNAPSHOT</version>
-						</artifact>
-					</target>
-					<executionEnvironment>JavaSE-1.8</executionEnvironment>
-					<pomDependencies>consider</pomDependencies>
-				</configuration>
-			</plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-p2-plugin</artifactId>
+					<version>${tycho.version}</version>
+					<executions>
+						<execution>
+							<id>attach-p2-metadata</id>
+							<phase>package</phase>
+							<goals>
+								<goal>p2-metadata</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
 		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-compiler-plugin</artifactId>
+					<version>${tycho.version}</version>
+					<configuration>
+					<!-- 
+					Force usage of JDK as defined in the Bundle-RequiredExecutionEnvironment (BREE) in the manifest of the bundle 
+					Here Maven runs on Java 17 but we need to compile using Java 8. A matching toolchain designating a corresponding JVM needs to be defined.
+					The deriveReleaseCompilerArgumentFromTargetLevel argument is a workaround for a regression in Tycho regarding the
+					compilation of Java 8 code. Note : Java 8 compilation is not maintained in Tycho from version 3.0.
+					For more information : https://github.com/eclipse-tycho/tycho/wiki/Compiling-code-for-older-java-releases
+					-->
+						<useJDK>BREE</useJDK>
+						<deriveReleaseCompilerArgumentFromTargetLevel>false</deriveReleaseCompilerArgumentFromTargetLevel>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>target-platform-configuration</artifactId>
+					<version>${tycho.version}</version>
+					<configuration>
+						<target>
+							<artifact>
+								<groupId>com.arcadsoftware</groupId>
+								<artifactId>com.arcadsoftware.afs.platform</artifactId>
+								<version>2023.7.0-SNAPSHOT</version>
+							</artifact>
+						</target>
+						<executionEnvironment>JavaSE-1.8</executionEnvironment>
+						<pomDependencies>consider</pomDependencies>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 
 	<modules>
