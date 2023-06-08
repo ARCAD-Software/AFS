@@ -32,7 +32,7 @@ jobs:
         mvn-toolchain-id: |
           JavaSE-1.8
           JavaSE-17
-        distribution: '<distribution>'
+        distribution: 'temurin'
         cache: maven
            
     - name: Build with Maven
