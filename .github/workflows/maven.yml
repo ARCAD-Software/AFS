@@ -32,9 +32,10 @@ jobs:
     - uses: cactuslab/maven-toolchains-xml-action@v1
       with:
         toolchains: |
-          [
-            {"jdkVersion": "8", "jdkHome": "${{steps.setupJava.outputs.path}}"}
-          ]
+          [{
+            "provides": {"id": "JavaSE-1.8", "version": "1.8"}, 
+            "jdkHome": "${{steps.setupJava.outputs.path}}"
+            }]
 
     
     - name: Set up JDK 17
