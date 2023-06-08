@@ -37,7 +37,7 @@ jobs:
     - run: cat /usr/share/apache-maven-3.8.8/conf/toolchains.xml
            
     - name: Build with Maven
-      run: mvn -B package --file pom.xml -Pflat-repo -X -e
+      run: mvn -B package -Pflat-repo -X -e
       
     - name: Upload flat p2 update site
       if: github.ref == 'refs/heads/main'
