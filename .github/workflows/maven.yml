@@ -22,29 +22,19 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    
-    - name: Set up Maven Toolchain for build with JDK 8
-      id: setupJava
+       
+    - name: Set up JDK 17 and 8
       uses: actions/setup-java@v3
       with:
-        java-version: '8'
-        distribution: 'temurin'
-    - uses: cactuslab/maven-toolchains-xml-action@v1
-      with:
-        toolchains: |
-          [{
-            "provides": {"id": "JavaSE-1.8", "version": "1.8"}, 
-            "jdkHome": "${{steps.setupJava.outputs.path}}"
-            }]
-
-    
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
+        java-version: |
+          8
+          17
+        mvn-toolchain-id: |
+          JavaSE-1.8
+          JavaSE-17
         distribution: 'temurin'
         cache: maven
-        
+           
     - name: Build with Maven
       run: mvn -B package --file pom.xml -Pflat-repo
       
