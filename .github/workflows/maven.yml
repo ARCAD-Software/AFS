@@ -58,4 +58,4 @@ jobs:
         name: "latest"
         append_body: "The generated P2 repository is available at the following URL : https://github.com/ARCAD-Software/AFS/releases/download/${{ github.ref_name }}/"
         files: |
-          releng/aev.update/target/flat-repository/*
+          releng/update/target/flat-repository/*
