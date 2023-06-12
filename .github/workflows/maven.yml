@@ -37,20 +37,25 @@ jobs:
     - name: Build with Maven
       run: mvn -B package -Pflat-repo
       
-    - name: Upload flat p2 update site
-      if: github.ref == 'refs/heads/main'
-      uses: marvinpinto/action-automatic-releases@latest
-      with:
-        repo_token: "${{secrets.GITHUB_TOKEN}}"
-        automatic_release_tag: "latest"
-        prerelease: true
-        title: "Development Build"
-        files: |
-          releng/update/target/flat-repository/*
-
-#    - name: Release
-#      uses: softprops/action-gh-release@v1
-#      if: startsWith(github.ref, 'refs/tags/')
+#    - name: Upload flat p2 update site
+#      if: github.ref == 'refs/heads/main'
+#      uses: marvinpinto/action-automatic-releases@latest
 #      with:
+#        repo_token: "${{secrets.GITHUB_TOKEN}}"
+#        automatic_release_tag: "latest"
+#        prerelease: true
+#        title: "Development Build"
 #        files: |
-#          releng/aev.update/target/flat-repository/*
+#          releng/update/target/flat-repository/*
+
+    - name: Release
+      uses: softprops/action-gh-release@v1
+#      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        prerelease: true
+        draft: true
+        tag_name: "latest"
+        name: "latest"
+        append_body: "The generated P2 repository is available at the following URL : https://github.com/ARCAD-Software/AFS/releases/download/${{ github.ref_name }}/"
+        files: |
+          releng/aev.update/target/flat-repository/*
