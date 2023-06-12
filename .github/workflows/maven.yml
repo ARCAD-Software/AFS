@@ -57,6 +57,5 @@ jobs:
         tag_name: "latest_bis"
         body: "The generated P2 repository is available at the following URL : https://github.com/ARCAD-Software/AFS/releases/download/${{ github.ref_name }}/"
         generate_release_notes: true
-        append_body: true
         files: |
           releng/update/target/flat-repository/*
