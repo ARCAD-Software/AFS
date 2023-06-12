@@ -53,8 +53,8 @@ jobs:
 #      if: startsWith(github.ref, 'refs/tags/')
       with:
         prerelease: true
-        tag_name: "latest"
-        name: "latest"
+        tag_name: "latest_bis"
+        name: "latest_bis"
         append_body: "The generated P2 repository is available at the following URL : https://github.com/ARCAD-Software/AFS/releases/download/${{ github.ref_name }}/"
         files: |
           releng/update/target/flat-repository/*
