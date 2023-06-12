@@ -471,27 +471,6 @@ version(s), and exceptions or additional permissions here}.&quot;
          version="0.0.0"/>
 
    <plugin
-         id="bcpkix"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="bcprov"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="bcutil"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="com.arcadsoftware.afs.client.brands"
          download-size="0"
          install-size="0"
