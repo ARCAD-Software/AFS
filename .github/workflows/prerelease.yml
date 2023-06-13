@@ -11,7 +11,7 @@ name: Prerelease + build P2 repository
 on: 
   push:
     branches:
-      - "*.*"
+      - '*.*'
 
 jobs:
   build:

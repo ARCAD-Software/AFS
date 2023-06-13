@@ -11,7 +11,7 @@ name: Release + build P2 repository
 on: 
   push:
     tags:
-      - "*.*.*"
+      - '*.*.*'
 
 jobs:
   build:
