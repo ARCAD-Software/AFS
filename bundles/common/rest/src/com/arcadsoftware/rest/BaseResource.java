@@ -102,7 +102,6 @@ public abstract class BaseResource extends ServerResource {
 	 * <li>text/xml
 	 * <li>application/xml
 	 * <li>application/json
-	 * <li>application/vnd.sun.wadl+xml
 	 * <li>application/x-xsd+xml
 	 * </ul>
 	 */
@@ -110,7 +109,6 @@ public abstract class BaseResource extends ServerResource {
 		MediaType.TEXT_XML,
 		MediaType.APPLICATION_JSON,
 		MediaType.APPLICATION_XML,
-		MediaType.APPLICATION_WADL,
 		MediaType.APPLICATION_W3C_SCHEMA
 	};
 
@@ -125,7 +123,6 @@ public abstract class BaseResource extends ServerResource {
 	 * <li>application/xml
 	 * <li>application/json
 	 * <li>application/x-xsd+xml
-	 * <li>application/vnd.sun.wadl+xml
 	 * <li>application/xhtml+xml
 	 * <li>application/xml-dtd
 	 * </ul>
@@ -134,7 +131,6 @@ public abstract class BaseResource extends ServerResource {
 		MediaType.TEXT_XML,
 		MediaType.APPLICATION_JSON,
 		MediaType.APPLICATION_XML,
-		MediaType.APPLICATION_WADL,
 		MediaType.APPLICATION_W3C_SCHEMA,
 		MediaType.APPLICATION_XHTML,
 		MediaType.APPLICATION_XML_DTD,
@@ -157,7 +153,6 @@ public abstract class BaseResource extends ServerResource {
 	 */
 	protected static final MediaType[] MEDIATYPES_BASESUP = new MediaType[] {
 		MediaType.TEXT_XML,
-		MediaType.APPLICATION_WADL,
 		MediaType.APPLICATION_W3C_SCHEMA,
 		MediaType.APPLICATION_XHTML,
 		MediaType.APPLICATION_XML_DTD,

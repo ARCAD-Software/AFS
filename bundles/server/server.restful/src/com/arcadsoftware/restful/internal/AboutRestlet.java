@@ -63,7 +63,6 @@ public class AboutRestlet extends Restlet {
 	@Override
 	public void handle(Request request, Response response) {
 		response.getAllowedMethods().add(Method.GET);
-		response.getAllowedMethods().add(Method.OPTIONS);
 		response.getAllowedMethods().add(Method.HEAD);
 		if (!Method.GET.equals(request.getMethod())) {
 			response.setStatus(Status.SUCCESS_NO_CONTENT);
@@ -126,15 +125,11 @@ public class AboutRestlet extends Restlet {
 				res.append(escapeXML(applicationEmail));
 				res.append("</contact><usage>"); //$NON-NLS-1$
 				res.append(escapeXML(applicationUsage));
-				res.append("</usage><license"); //$NON-NLS-1$
-				if ((applicationlic_URL != null) && !applicationlic_URL.trim().isEmpty()) {
-					res.append(" href=\""); //$NON-NLS-1$
-					res.append(escapeXML(applicationlic_URL));
-					res.append('"');
-				}
-				res.append(">"); //$NON-NLS-1$
+				res.append("</usage><license>"); //$NON-NLS-1$
 				res.append(escapeXML(applicationlic_name));
-				res.append("</license><docummentation>"); //$NON-NLS-1$
+				res.append("</license></licenseUrl>"); //$NON-NLS-1$
+				res.append(escapeXML(applicationlic_URL));
+				res.append("</licenseUrl><docummentation>"); //$NON-NLS-1$
 				res.append(escapeXML(applicationURL));
 				res.append("</docummentation><sysparam>"); //$NON-NLS-1$
 				res.append(escapeXML(sysparam));
