@@ -1,0 +1,180 @@
+openapi: 3.1.0 #Documentation Fragment
+# This description is the fisrt static element which is always included into documentation.
+# It contain some reusable components which are managed through the Restlet framework for the whole API.
+components:
+  schemas:
+    ErrorMessage:
+      xml:
+        name: 'message'
+      type: object
+      description: This document describe an HTTP Error Message.
+      properties:
+        name:
+          type: string
+          description: The Error message.
+          xml:
+            attribute: true
+        code:
+          type: integer
+          description: The HTTP Error code.
+          xml:
+            attribute: true
+        href:
+          type: string
+          format: uri
+          description: And URL od the documentation relative to this HTTP Error.
+          xml:
+            attribute: true
+        description:
+          type: string
+          description: The human readable description of the HTTP error. (Note that in XML format the description is the inline value of the "message" tag.)
+    About:
+      type: object
+      properties:
+        about:
+          type: object
+          properties:
+            application:
+              type: object
+              description: a Set of information relative to this application.
+              properties:
+                name:
+                  type: string
+                  description: This application name.
+                version:
+                  type: string
+                  description: The current application version.
+                author:
+                  type: string
+                  description: The legal author of this application.
+                owner:
+                  type: string
+                  description: The current owner of this application, relative to the license acreditation.
+                contact:
+                  type: string
+                  format: email
+                  description: A contact email relative to the administration of this application. 
+                license:
+                  type: string
+                  description: The legal license relative to the usage of this application.
+                licenseurl:
+                  type: string
+                  format: uri
+                  description: An URL to a web-site exposing the licensing material.
+                usage:
+                  type: string
+                  description: A copyright notice.
+                url:
+                  type: string
+                  format: uri
+                  description: A documentation web-site relative to the usage of this application.
+                  xml:
+                    name: 'lisenceUrl'
+                sysparam:
+                  type: string
+                  description: The system parameter as they may be required to generate licenses key.
+            framework:
+              type: object
+              description: Describe the technical information of this installation. 
+              properties:
+                vendor:
+                  type: string
+                  description: The name of the framework implementation hosting this API.
+                version:
+                  type: string
+                  description: The version of the framework implementation.
+                webstart:
+                  type: string
+                  format: date
+                  description: The execution start date of this API.
+                start:
+                  type: string
+                  format: date
+                  description: The execution start date of application server.
+  responses:
+    NotFound:
+      description: The specified resource was not found, or it is not ready.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+        application/xhtml+xml:
+          schema:
+            type: string
+        text/xml:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+        text/html:
+          schema:
+            type: string
+    UnexpectedError:
+      description: An unexpected error occurs, this may be a storage (database error) or a program malfuncion. The error message will explain the axact cause of the problem.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+        application/xhtml+xml:
+          schema:
+            type: string
+        text/xml:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+        text/html:
+          schema:
+            type: string
+    Unauthorized:
+      description: Unauthorized authentication to this resource. Wrong user or password, or blocked connection.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+        application/xhtml+xml:
+          schema:
+            type: string
+        text/xml:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+        text/html:
+          schema:
+            type: string
+paths:
+  /about:
+    description: This service offer some information about this API including versionning and up-time.
+    get:
+      summary: Information About this API. 
+      description: Return the general information about this API. If this resource return a 404 error message you are assured that the server is not able to process any other call. 
+      responses:
+        "200":
+          description: The information about this API. 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/About'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/About'
+            application/xhtml+xml:
+              schema:
+                type: string
+            text/xml:
+              schema:
+                $ref: '#/components/schemas/About'
+            text/html:
+              schema:
+                type: string
+            text/plain:
+              schema:
+                type: string
+        "404":
+          $ref: '#/components/responses/NotFound' 
+        default:
+          description: An unexpected error occurs.
