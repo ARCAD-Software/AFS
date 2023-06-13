@@ -150,7 +150,7 @@ public class MultiLocaleMessages {
 	 * 
      * @param key the key for the desired string array
      * @param locale the desired language
-	 * @param args
+	 * @param args the format arguments
 	 * @return The formatted String.
 	 * @see String#format(Locale, String, Object...)
 	 */

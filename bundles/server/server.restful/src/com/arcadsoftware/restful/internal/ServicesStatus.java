@@ -114,7 +114,7 @@ public class ServicesStatus extends StatusService {
 				sb.append("\"}"); //$NON-NLS-1$
 				return new StringRepresentation(sb,MediaType.APPLICATION_JSON,Language.ENGLISH_US,CharacterSet.UTF_8);
 			}
-			if (MediaType.APPLICATION_XML.equals(mediaType, true)) {
+			if (MediaType.APPLICATION_XML.equals(mediaType, true) || MediaType.TEXT_XML.equals(mediaType, true)) {
 				return new XMLRepresentation(XS.toXML(status), mediaType);
 			}
 		}

@@ -207,6 +207,7 @@ public class MetaDataParentResource extends DataParentResource {
 		Language language = getClientPreferedLanguage();
 		Form form;
 		if ((representation != null) && representation.isAvailable() && !(representation instanceof EmptyRepresentation)) {
+			// TODO Add support of JSON...
 			form = new Form(representation);
 			if ("none".equals(form.getFirstValue("_empty_"))) { //$NON-NLS-1$ //$NON-NLS-2$
 				form = getRequest().getResourceRef().getQueryAsForm();
@@ -317,7 +318,11 @@ public class MetaDataParentResource extends DataParentResource {
 			Activator.getInstance().fireSelectionEvent(getEntity(),result,getUser());
 		}
 		// Add a parameter "links" to insert all links into the results list...
-		String links = getColumns(form, "attributes"); //$NON-NLS-1$ 
+		String links = getColumns(form, "links"); //$NON-NLS-1$
+		if ((links == null) || links.isEmpty()) {
+			// legacy:
+			links = getColumns(form, "attributes"); //$NON-NLS-1$
+		}
 		if ((links != null) && !links.isEmpty()) {
 			for (String l: links.split(" ")) { //$NON-NLS-1$
 				MetaDataLink link = getEntity().getLink(l);
@@ -326,7 +331,7 @@ public class MetaDataParentResource extends DataParentResource {
 				}
 			}
 		}
-		// mise en forme du résultat.
+		// Format the resulting response.
 		return getRepresentation(variant, form, result, language);
 	}
 
