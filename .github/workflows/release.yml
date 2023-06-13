@@ -37,7 +37,7 @@ jobs:
     - name: Build with Maven
       run: mvn -B package -Pflat-repo
 
-    - name: Release
+    - name: Release and upload flat P2 website
       uses: softprops/action-gh-release@v1
       with:
         name: "Release ${{ github.ref_name }}"
