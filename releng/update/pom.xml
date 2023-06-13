@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.arcadsoftware</groupId>
 		<artifactId>com.arcadsoftware.afs.releng</artifactId>
-		<version>2023.7.0</version>
+		<version>2023.7.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>com.arcadsoftware.afs.update</artifactId>
@@ -21,7 +21,7 @@
 					<plugin>
 						<groupId>dev.jbang</groupId>
 						<artifactId>jbang-maven-plugin</artifactId>
-						<version>0.0.7</version>
+						<version>0.0.7-SNAPSHOT</version>
 						<executions>
 							<execution>
 								<id>run</id>

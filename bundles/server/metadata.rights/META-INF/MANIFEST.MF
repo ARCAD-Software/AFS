@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Metadata Entities Access Rights
 Bundle-SymbolicName: com.arcadsoftware.metadata.rights;singleton:=true
-Bundle-Version: 1.2.7
+Bundle-Version: 1.2.7.qualifier
 Bundle-Activator: com.arcadsoftware.metadata.rights.Activator
 Bundle-Vendor: ARCAD Software
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
