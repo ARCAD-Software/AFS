@@ -6,14 +6,12 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Build P2 repository
+name: Prerelease + build P2 repository
 
 on: 
   push:
     branches:
-      - main
-    tags:
-      - "*.*.*"
+      - "*.*"
 
 jobs:
   build:
@@ -30,6 +28,8 @@ jobs:
         java-version: |
           8
           17
+        # Below option needs to match the ID of the manifest BREE in order to pick the correct Java version for the build
+        # Check pom.xml for more information about toolchains
         mvn-toolchain-id: |
           JavaSE-1.8
           JavaSE-17
@@ -42,18 +42,8 @@ jobs:
       uses: marvinpinto/action-automatic-releases@latest
       with:
         repo_token: "${{secrets.GITHUB_TOKEN}}"
-        automatic_release_tag: "latest"
+        automatic_release_tag: "${{ github.ref_name }}"
         prerelease: true
-        title: "Development Build"
-        files: |
-          releng/update/target/flat-repository/*
-
-    - name: Release
-      uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/')
-      with:
-        name: "Release ${{ github.ref_name }}"
-        body: "The generated P2 repository is available at the following URL : https://github.com/ARCAD-Software/AFS/releases/download/${{ github.ref_name }}/"
-        generate_release_notes: true
+        title: "Development Build ${{ github.ref_name }}"
         files: |
           releng/update/target/flat-repository/*
