@@ -46,3 +46,11 @@ jobs:
         title: "Development Build ${{ github.ref_name }}"
         files: |
           releng/update/target/flat-repository/*
+          
+    - name: Edit Release
+      uses: irongut/EditRelease@v1.2.0
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        id: ${{ github.event.release.id }}
+        body: "The generated P2 repository is available at the following URL : https://github.com/ARCAD-Software/AFS/releases/download/${{ github.ref_name }}/"
+        replacebody: false
