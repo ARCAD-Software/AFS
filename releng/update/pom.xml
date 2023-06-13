@@ -21,7 +21,7 @@
 					<plugin>
 						<groupId>dev.jbang</groupId>
 						<artifactId>jbang-maven-plugin</artifactId>
-						<version>0.0.7-SNAPSHOT</version>
+						<version>0.0.7</version>
 						<executions>
 							<execution>
 								<id>run</id>
