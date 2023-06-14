@@ -1,0 +1,48 @@
+# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
+
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Prerelease + build P2 repository
+
+on: 
+  push:
+    branches:
+      - '*.*'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+       
+    - name: Set up JDK 17 and 8
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: |
+          8
+          17
+        # Below option needs to match the ID of the manifest BREE in order to pick the correct Java version for the build
+        # Check pom.xml for more information about toolchains
+        mvn-toolchain-id: |
+          JavaSE-1.8
+          JavaSE-17
+           
+    - name: Build with Maven
+      run: mvn -B package -Pflat-repo
+      
+    - name: Prerelease and upload flat p2 update site
+      uses: marvinpinto/action-automatic-releases@latest
+      with:
+        repo_token: "${{secrets.GITHUB_TOKEN}}"
+        automatic_release_tag: "${{ github.ref_name }}"
+        prerelease: true
+        title: "Development Build ${{ github.ref_name }}"
+        files: |
+          releng/update/target/flat-repository/*
