@@ -541,4 +541,19 @@ version(s), and exceptions or additional permissions here}.&quot;
          version="0.0.0"
          unpack="false"/>
 
+   <plugin
+         id="com.arcadsoftware.database.sql.postgresql"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.arcadsoftware.metadata.mapper.sql.postgresql"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
 </feature>
