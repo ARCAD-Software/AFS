@@ -27,7 +27,7 @@ import org.restlet.representation.StringRepresentation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
 
-import com.arcadsoftware.rest.JsonStreamCompact;
+import com.arcadsoftware.rest.JSONFriendlyList;
 import com.arcadsoftware.rest.UserLinkedResource;
 import com.arcadsoftware.rest.XMLRepresentation;
 import com.arcadsoftware.rest.XStreamCompact;
@@ -55,9 +55,7 @@ public class AuthServicesResource extends UserLinkedResource {
 			return new XMLRepresentation(x.toXML(getAuthList()), variant.getMediaType());
 		}
 		if (isJSON(variant)) {
-			JsonStreamCompact x = new JsonStreamCompact(AuthServicesResource.class.getClassLoader(), true, false, false);
-			x.alias("list", JSONFriendlyList.class); //$NON-NLS-1$
-			return new StringRepresentation(x.toXML(new JSONFriendlyList(getAuthList())), MediaType.APPLICATION_JSON, Language.ENGLISH, CharacterSet.UTF_8);
+			return new StringRepresentation(new JSONFriendlyList<>(getAuthList()).toJson(), MediaType.APPLICATION_JSON, Language.ENGLISH, CharacterSet.UTF_8);
 		}
 		if (isXSD(variant)) {
 			File file = Activator.getInstance().getSchema("/schema/authservices.xsd"); //$NON-NLS-1$
