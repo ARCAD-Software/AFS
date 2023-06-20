@@ -123,7 +123,6 @@ public class RestConnectionParameters implements Cloneable, Serializable {
 			parameters.put("truststoreType", storeType); //$NON-NLS-1$
 			if (isIBMJVM()) {
 				parameters.put("certAlgorithm", System.getProperty("ssl.KeyManagerFactory.algorithm", "PKIX")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				parameters.put("keyManagerAlgorithm", System.getProperty("ssl.KeyManagerFactory.algorithm", "PKIX")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				parameters.put("trustManagerAlgorithm", System.getProperty("ssl.TrustManagerFactory.algorithm", "PKIX")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 			parameters.put("sslContextFactory", "org.restlet.engine.ssl.DefaultSslContextFactory"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -178,7 +177,6 @@ public class RestConnectionParameters implements Cloneable, Serializable {
 			if (isIBMJVM()) {
 				parameters.put("certAlgorithm", System.getProperty("ssl.KeyManagerFactory.algorithm", "PKIX")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				parameters.put("keyManagerAlgorithm", System.getProperty("ssl.KeyManagerFactory.algorithm", "PKIX")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				parameters.put("trustManagerAlgorithm", System.getProperty("ssl.TrustManagerFactory.algorithm", "PKIX")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 			parameters.put("sslContextFactory", "org.restlet.engine.ssl.DefaultSslContextFactory"); //$NON-NLS-1$ //$NON-NLS-2$
 		} else {
