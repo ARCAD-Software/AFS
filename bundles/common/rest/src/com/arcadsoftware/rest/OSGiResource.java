@@ -58,7 +58,7 @@ import com.arcadsoftware.rest.internal.WebForwardServiceAccess;
  */
 public abstract class OSGiResource extends BaseResource {
 
-	private Date lastModification = null;
+	private Date lastModification;
 	
 	/**
 	 * Return the bundle Context of the application.
@@ -335,14 +335,14 @@ public abstract class OSGiResource extends BaseResource {
 			// test the last modification date.
 			Date date = getRequest().getConditions().getModifiedSince();
 			if (date != null) {
-				if (DateUtils.before(lastModification,date)) {
+				if (DateUtils.before(lastModification, date)) {
 					getResponse().setStatus(Status.SUCCESS_OK);
 				} else {
 					getResponse().setStatus(Status.REDIRECTION_NOT_MODIFIED);
 				}
 			} else {
 				date = getRequest().getConditions().getUnmodifiedSince();
-				if ((date != null) && DateUtils.before(lastModification,date)) {
+				if ((date != null) && DateUtils.before(lastModification, date)) {
 					getResponse().setStatus(Status.CLIENT_ERROR_PRECONDITION_FAILED);
 				} else {
 					getResponse().setStatus(Status.SUCCESS_OK);

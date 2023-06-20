@@ -147,11 +147,11 @@ public class MetaDataItemResource extends DataItemResource {
 			}
 			if ((lids != null) && (lids.length() > 0)) {
 				linkeds = new ArrayList<BeanMap>();
-				for(String lid:lids.split("\\+")) { //$NON-NLS-1$
+				for (String lid: lids.split("\\+")) { //$NON-NLS-1$
 					if (lid.length() > 0) {
 						BeanMap bean = null;
 						try {
-							bean = linkEntity.getMapper().selection(linkEntity, Integer.parseInt(lid), (List<ReferenceLine>)null, true);
+							bean = linkEntity.getMapper().selection(linkEntity, Integer.parseInt(lid), (List<ReferenceLine>) null, true);
 						} catch (NumberFormatException e) {}
 						if ((bean == null) && (refline != null)) {
 							bean = linkEntity.getMapper().selectionFirst(linkEntity, null, true, refline, Reference.decode(lid));
@@ -196,7 +196,7 @@ public class MetaDataItemResource extends DataItemResource {
 	private void switchEntity(MetaDataEntity e) {
 		BeanMapList list = new BeanMapList();
 		String code = attLine.getCode();
-		for (BeanMap bean:getItems()) {
+		for (BeanMap bean: getItems()) {
 			int id = bean.getInt(code);
 			if (id > 0) {
 				list.addUnique(e.getMapper().selection(e, id, (String)null, false));
@@ -450,7 +450,7 @@ public class MetaDataItemResource extends DataItemResource {
 			// Générer un message d'erreur uniquement si l'on est SUR que le résultat est vide 
 			// parce que le test du droit d'accès à échoué !
 			// (la liste pourrait être vide parce que la table est vide...) 
-			if (nocriteria && (getItems().size() == 1)) {
+			if (nocriteria && (getItems().size() >= 1)) {
 				if (entity.dataHasRightRead(getItems().get(0).getId(), getUser())) { 
 					setStatus(Status.CLIENT_ERROR_NOT_FOUND, Activator.getMessage("info.deleted", language)); //$NON-NLS-1$
 				} else {
@@ -881,7 +881,7 @@ public class MetaDataItemResource extends DataItemResource {
 			return null;
 		}
 		ArrayList<BeanMap> result = new ArrayList<BeanMap>(ids.length);
-		for(String id:ids) {
+		for (String id: ids) {
 			if (id.length() > 0) {
 				BeanMap bean = null;
 				try {

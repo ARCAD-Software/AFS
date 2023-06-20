@@ -68,16 +68,15 @@ public class DataItemResource extends UserLinkedResource {
 			}
 		}
 		// Prise en charge multi-id ! 
-		String id = (String)getRequest().getAttributes().get(KEY_ID);
+		String id = (String) getRequest().getAttributes().get(KEY_ID);
 		if (id != null) {
 			String[] ids = id.split("\\+"); //$NON-NLS-1$
 			items = new BeanMapList(ids.length);
-			
 			List<ReferenceLine> attrs = getPreloadedAttributes();
 			if (attrs == null) {
 				attrs = getSelectedAttributes(entity, false);
 			}
-			for(String value: ids) {
+			for (String value: ids) {
 				if (value.length() > 0) {
 					BeanMap bean = null;
 					try {
@@ -88,7 +87,6 @@ public class DataItemResource extends UserLinkedResource {
 						items.add(bean);
 					} else {
 						items.addAll(findBeanListFromCode(Reference.decode(value)));
-
 					}
 				}
 			}
@@ -269,7 +267,7 @@ public class DataItemResource extends UserLinkedResource {
 			return new BeanMapList();
 		}
 		String code = entity.getMetadata().getString(MetaDataEntity.METADATA_CODE, ATTRIBUTE_CODE);
-		if ((code == null) || (code.length() == 0)) {
+		if ((code == null) || (code.length() == 0) || (entity.getAttribute(code) == null)) {
 			return new BeanMapList();
 		}
 		return entity.getMapper().selection(entity, null, true, code, value);
