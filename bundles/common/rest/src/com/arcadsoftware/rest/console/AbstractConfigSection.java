@@ -225,12 +225,12 @@ public abstract class AbstractConfigSection implements IRestConsoleSection {
 					}
 					form.add(new ConsoleProperty(p.fid,messages.get(p.id, language),
 							ConsoleProperty.ICON_NONE, val, ps, vals, vals != null, // enums are "readonly".
-							false, messages.get(p.id+".help",language,null))); //$NON-NLS-1$
+							false, messages.get(p.id+".help", language, (String) null))); //$NON-NLS-1$
 				}
 			}
 		}
 		form.add(new ConsoleAction(ACTION_SAVE, null, messages.get("console.save", language, "Save"), //$NON-NLS-1$ //$NON-NLS-2$ 
-				ConsoleField.ICON_DISK, false, messages.get("console.save.help", language, null))); //$NON-NLS-1$
+				ConsoleField.ICON_DISK, false, messages.get("console.save.help", language, (String) null))); //$NON-NLS-1$
 		addActions(form,language);
 		return form;
 	}
@@ -271,7 +271,7 @@ public abstract class AbstractConfigSection implements IRestConsoleSection {
 				}
 			}
 			updateConfiguration(props);
-			String result = messages.get("console.saved", language, null); //$NON-NLS-1$
+			String result = messages.get("console.saved", language, (String) null); //$NON-NLS-1$
 			if (result != null) {
 				ArrayList<ConsoleField> form = new ArrayList<ConsoleField>();
 				form.add(new ConsoleText(result, ConsoleText.ICON_NONE, null)); //$NON-NLS-1$

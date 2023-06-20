@@ -128,7 +128,6 @@ public class MultiLanguageMessages extends MultiLocaleMessages {
 
     /**
      * Gets a string for the given key from this resource bundle or one of its parents.
-     * Calling this method is equivalent to calling
      *
      * @param key the key for the desired string
      * @param language the desired language
@@ -139,9 +138,21 @@ public class MultiLanguageMessages extends MultiLocaleMessages {
 		return get(key, toLocale(language), defaultValue);
 	}
 	
+	/**
+	 * Get the result of a format string in the given language.
+	 * 
+     * @param key the key for the desired string array
+     * @param locale the desired language
+	 * @param args the format arguments.
+	 * @return The formatted String.
+	 * @see String#format(Locale, String, Object...)
+	 */
+	public String get(String key, Language language, Object... values) {
+		return get(key, toLocale(language), values);
+	}
+	
     /**
      * Gets a string array for the given key from this resource bundle or one of its parents.
-     * Calling this method is equivalent to calling
      *
      * @param key the key for the desired string array
      * @param language the desired language
