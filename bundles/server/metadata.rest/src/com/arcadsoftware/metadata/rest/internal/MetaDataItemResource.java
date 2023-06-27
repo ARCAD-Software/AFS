@@ -428,7 +428,7 @@ public class MetaDataItemResource extends DataItemResource {
 				}
 			}
 		}
-		// Ececution de la sélection proprement dite.
+		// Execution de la sélection proprement dite.
 		BeanMapList result = entity.dataSelection(attributes, deleted, criteria, distincts, orders, getUser(), first, number);
 		if (translate) {
 			for(ReferenceLine rl: attributes) {
