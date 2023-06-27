@@ -7,24 +7,24 @@
          point="org.eclipse.core.runtime.applications">
       <application>
          <run
-               class="test.rcp2.Application">
+               class="test.rcp.Application">
          </run>
       </application>
    </extension>
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            class="test.rcp2.Perspective"
+            class="test.rcp.Perspective"
             name="Perspective"
-            id="test.rcp2.perspective">
+            id="test.rcp.perspective">
       </perspective>
    </extension>
    <extension
          point="org.eclipse.ui.views">
       <view
-            class="test.rcp2.View"
+            class="test.rcp.View"
             name="View"
-            id="test.rcp2.view"
+            id="test.rcp.view"
             inject="true">
       </view>
    </extension>
@@ -33,7 +33,7 @@
       <perspectiveExtension
             targetID="*">
          <view
-               id="test.rcp2.view"
+               id="test.rcp.view"
                minimized="false"
                relationship="left"
                relative="org.eclipse.ui.editorss"
@@ -43,7 +43,7 @@
                id="org.eclipse.pde.runtime.LogView"
                minimized="false"
                relationship="stack"
-               relative="test.rcp2.view"
+               relative="test.rcp.view"
                visible="true">
          </view>
       </perspectiveExtension>
@@ -72,12 +72,12 @@
          <menu
                label="Divers">
             <command
-                  commandId="test.rcp2.command.connect"
+                  commandId="test.rcp.command.connect"
                   label="Connect..."
                   style="push">
             </command>
             <command
-                  commandId="test.rcp2.command.action"
+                  commandId="test.rcp.command.action"
                   label="Action a tester"
                   style="push">
             </command>
@@ -89,7 +89,7 @@
          name="rcp"
          point="org.eclipse.core.runtime.products">
       <product
-            application="test.rcp2.application"
+            application="test.rcp.application"
             description="This RCP is a test platform..."
             name="AFS Studio (Test Application)">
          <property
@@ -101,30 +101,31 @@
    <extension
          point="org.eclipse.ui.commands">
       <command
-            defaultHandler="test.rcp2.ConnectHandler"
-            id="test.rcp2.command.connect"
+            defaultHandler="test.rcp.ConnectHandler"
+            id="test.rcp.command.connect"
             name="Connect">
       </command>
       <command
-            defaultHandler="test.rcp2.handler.action"
-            id="test.rcp2.command.action"
+            defaultHandler="test.rcp.ActionHandler"
+            id="test.rcp.command.action"
             name="Action à Tester">
       </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="test.rcp2.ConnectHandler"
-            commandId="test.rcp2.handler.connect">
+            class="test.rcp.ConnectHandler"
+            commandId="test.rcp.handler.connect">
       </handler>
       <handler
-            commandId="test.rcp2.handler.action">
+            class="test.rcp.ActionHandler"
+            commandId="test.rcp.handler.action">
       </handler>
    </extension>
    <extension
          point="com.arcadsoftware.afs.client.truststore.provider">
       <provider
-            class="test.rcp2.TrustStoreProvider">
+            class="test.rcp.TrustStoreProvider">
       </provider>
    </extension>
 

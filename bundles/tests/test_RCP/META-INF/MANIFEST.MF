@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Rcp2
-Bundle-SymbolicName: test_RCP;singleton:=true
+Bundle-SymbolicName: test.rcp;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: test.rcp2.Activator
+Bundle-Activator: test.rcp.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.equinox.event,

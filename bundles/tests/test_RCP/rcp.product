@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="AFS Studio (Test Application)" uid="test.rcp2" id="test.rcp2.product" application="test.rcp2.application" version="1.0.0" useFeatures="false" includeLaunchers="true" autoIncludeRequirements="false">
+<product name="AFS Studio (Test Application)" uid="test.rcp" id="test.rcp.product" application="test.rcp.application" version="1.0.0" useFeatures="false" includeLaunchers="true" autoIncludeRequirements="false">
 
    <configIni use="default">
    </configIni>
@@ -151,6 +151,7 @@
       <plugin id="org.eclipse.ui.forms"/>
       <plugin id="org.eclipse.ui.ide"/>
       <plugin id="org.eclipse.ui.themes"/>
+      <plugin id="org.eclipse.ui.trace"/>
       <plugin id="org.eclipse.ui.views"/>
       <plugin id="org.eclipse.ui.views.log"/>
       <plugin id="org.eclipse.ui.workbench"/>
@@ -162,7 +163,7 @@
       <plugin id="org.w3c.dom.events"/>
       <plugin id="org.w3c.dom.smil"/>
       <plugin id="org.w3c.dom.svg"/>
-      <plugin id="test.rcp2"/>
+      <plugin id="test.rcp"/>
       <plugin id="wrapped.com.google.re2j.re2j"/>
       <plugin id="wrapped.net.sf.jmimemagic.jmimemagic"/>
       <plugin id="xstream"/>

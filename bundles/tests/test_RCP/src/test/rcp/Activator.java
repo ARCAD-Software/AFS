@@ -1,4 +1,4 @@
-package test.rcp2;
+package test.rcp;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -11,7 +11,7 @@ import com.arcadsoftware.afs.client.core.servers.model.Server;
 public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "test.rcp2"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "test.rcp"; //$NON-NLS-1$
 
 	// The shared instance
 	private static Activator plugin;
