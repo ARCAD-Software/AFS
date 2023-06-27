@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.8.0_171"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/crypt"/>
+	<classpathentry kind="lib" path="/mnt/stockage/boulot/Packaging/repository/gnu.crypto.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
+	<classpathentry kind="lib" path="/mnt/stockage/boulot/Packaging/repository/org.eclipse.osgi.jar"/>
+	<classpathentry kind="lib" path="/mnt/stockage/boulot/Packaging/repository2021/bcmail-jdk15to18-172.jar"/>
+	<classpathentry kind="lib" path="/mnt/stockage/boulot/Packaging/repository2021/bcpg-jdk15to18-172.3.jar"/>
+	<classpathentry kind="lib" path="/mnt/stockage/boulot/Packaging/repository2021/bcpkix-jdk15to18-172.jar"/>
+	<classpathentry kind="lib" path="/mnt/stockage/boulot/Packaging/repository2021/bcprov-jdk15to18-172.jar"/>
+	<classpathentry kind="lib" path="/mnt/stockage/boulot/Packaging/repository2021/bcutil-jdk15to18-172.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
