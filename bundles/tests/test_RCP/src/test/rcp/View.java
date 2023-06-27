@@ -1,4 +1,4 @@
-package test.rcp2;
+package test.rcp;
 
 import java.util.*;
 
@@ -29,7 +29,7 @@ import org.eclipse.ui.part.ViewPart;
 
 public class View extends ViewPart {
 
-	public static final String ID = "test.rcp2.view";
+	public static final String ID = "test.rcp.view";
 
 	@Inject IWorkbench workbench;
 	

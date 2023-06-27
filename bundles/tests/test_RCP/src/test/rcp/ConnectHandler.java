@@ -1,4 +1,4 @@
-package test.rcp2;
+package test.rcp;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -18,12 +18,12 @@ public class ConnectHandler extends AbstractHandler {
 		Activator.server.setDescription("Le serveur de la mort !");
 		Activator.server.setLastLogin("admin@quadra");
 		Activator.server.setLastPassword("quadra");
-		//Activator.server.setUrl("http://localhost:5252/");
-		Activator.server.setUrl("https://192.168.2.101:5253/");
+		Activator.server.setUrl("http://localhost:5252/");
+		//Activator.server.setUrl("https://192.168.2.101:5253/");
 		
 		ServerConnection sc = ConnectionManager.getInstance().connect(Activator.server, true);
 		if (sc == null) {
-			MessageDialog.openInformation(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Error NULL Connection", "Connection error");
+			MessageDialog.openInformation(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Error NULL Connection", "Connection error or cancel...");
 			
 		} else if (sc.isConnected()) {
 			MessageDialog.openInformation(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Connection OK", "Successful connection");

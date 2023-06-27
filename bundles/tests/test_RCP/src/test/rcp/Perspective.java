@@ -1,4 +1,4 @@
-package test.rcp2;
+package test.rcp;
 
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;

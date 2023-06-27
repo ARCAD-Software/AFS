@@ -1,4 +1,4 @@
-package test.rcp2;
+package test.rcp;
 
 import com.arcadsoftware.afs.client.core.connection.ITrustStoreProvider;
 
