@@ -146,6 +146,24 @@ components:
         text/html:
           schema:
             type: string
+    Unsupported:
+      description: The mediatype used in the request body is unsupported.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+        application/xhtml+xml:
+          schema:
+            type: string
+        text/xml:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+        text/html:
+          schema:
+            type: string
 paths:
   /about:
     description: This service offer some information about this API including versionning and up-time.
