@@ -2,5 +2,15 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension-point id="com.arcadsoftware.afs.framework.ui.container.manager" name="%extension-point.container.manager" schema="schema/com.arcadsoftware.afs.framework.ui.container.manager.exsd"/>
+   <extension
+         point="org.eclipse.ui.trace.traceComponents">
+      <component
+            id="com.arcadsoftware.afs.trace"
+            label="ARCAD Components">
+         <bundle
+               name="com.arcadsoftware.afs.framework.ui">
+         </bundle>
+      </component>
+   </extension>
 
 </plugin>
