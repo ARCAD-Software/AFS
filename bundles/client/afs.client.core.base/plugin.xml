@@ -11,5 +11,15 @@
             filename="/base.core.messages">
       </userMessage>
    </extension>
+   <extension
+         point="org.eclipse.ui.trace.traceComponents">
+      <component
+            id="com.arcadsoftware.afs.trace"
+            label="ARCAD Components">
+         <bundle
+               name="com.arcadsoftware.afs.client.core.base">
+         </bundle>
+      </component>
+   </extension>
 
 </plugin>
