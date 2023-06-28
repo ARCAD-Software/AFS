@@ -13,11 +13,17 @@
  *******************************************************************************/
 package com.arcadsoftware.rest;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map.Entry;
 
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+import org.restlet.Request;
 import org.restlet.data.ClientInfo;
 import org.restlet.data.Form;
 import org.restlet.data.Language;
@@ -26,7 +32,7 @@ import org.restlet.data.Metadata;
 import org.restlet.data.Method;
 import org.restlet.data.Parameter;
 import org.restlet.data.Preference;
-import org.restlet.Request;
+import org.restlet.data.Status;
 import org.restlet.representation.EmptyRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.representation.Variant;
@@ -46,7 +52,7 @@ import org.restlet.resource.ServerResource;
  * Descendant of this class can not use java annotations to declare Restlet methods.
  */
 public abstract class BaseResource extends ServerResource {
-	
+
 	/**
 	 * This request attribute indicate that the real Request Method is not the HTTP method that should be proceed
 	 * by the resource. 
@@ -64,7 +70,7 @@ public abstract class BaseResource extends ServerResource {
 	 * The getMethod() return the correct proceed HTTP Method for this Resource call.
 	 */
 	public static final String QUERY_METHODPROXIED = "http_method_proxy"; //$NON-NLS-1$
-	
+
 	/**
 	 * This is the basics MediaTypes list supported into Arcad Applications.
 	 * 
@@ -76,8 +82,8 @@ public abstract class BaseResource extends ServerResource {
 	 * </ul>
 	 */
 	protected static final MediaType[] MEDIATYPES_BASE_XMLJSON = new MediaType[] {
-		MediaType.APPLICATION_JSON,
-		MediaType.APPLICATION_XML
+			MediaType.APPLICATION_JSON,
+			MediaType.APPLICATION_XML
 	};
 
 	/**
@@ -89,9 +95,9 @@ public abstract class BaseResource extends ServerResource {
 	 * </ul>
 	 */
 	protected static final MediaType[] MEDIATYPES_BASE_XMLJSONXSD = new MediaType[] {
-		MediaType.APPLICATION_JSON,
-		MediaType.APPLICATION_XML,
-		MediaType.APPLICATION_W3C_SCHEMA
+			MediaType.APPLICATION_JSON,
+			MediaType.APPLICATION_XML,
+			MediaType.APPLICATION_W3C_SCHEMA
 	};
 
 
@@ -106,10 +112,10 @@ public abstract class BaseResource extends ServerResource {
 	 * </ul>
 	 */
 	protected static final MediaType[] MEDIATYPES_BASE_XMLJSONXSD2 = new MediaType[] {
-		MediaType.TEXT_XML,
-		MediaType.APPLICATION_JSON,
-		MediaType.APPLICATION_XML,
-		MediaType.APPLICATION_W3C_SCHEMA
+			MediaType.TEXT_XML,
+			MediaType.APPLICATION_JSON,
+			MediaType.APPLICATION_XML,
+			MediaType.APPLICATION_W3C_SCHEMA
 	};
 
 	/**
@@ -128,13 +134,13 @@ public abstract class BaseResource extends ServerResource {
 	 * </ul>
 	 */
 	protected static final MediaType[] MEDIATYPES_BASE = new MediaType[] {
-		MediaType.TEXT_XML,
-		MediaType.APPLICATION_JSON,
-		MediaType.APPLICATION_XML,
-		MediaType.APPLICATION_W3C_SCHEMA,
-		MediaType.APPLICATION_XHTML,
-		MediaType.APPLICATION_XML_DTD,
-		MediaType.TEXT_HTML
+			MediaType.TEXT_XML,
+			MediaType.APPLICATION_JSON,
+			MediaType.APPLICATION_XML,
+			MediaType.APPLICATION_W3C_SCHEMA,
+			MediaType.APPLICATION_XHTML,
+			MediaType.APPLICATION_XML_DTD,
+			MediaType.TEXT_HTML
 	};
 
 	/**
@@ -152,11 +158,11 @@ public abstract class BaseResource extends ServerResource {
 	 * </ul>
 	 */
 	protected static final MediaType[] MEDIATYPES_BASESUP = new MediaType[] {
-		MediaType.TEXT_XML,
-		MediaType.APPLICATION_W3C_SCHEMA,
-		MediaType.APPLICATION_XHTML,
-		MediaType.APPLICATION_XML_DTD,
-		MediaType.TEXT_HTML
+			MediaType.TEXT_XML,
+			MediaType.APPLICATION_W3C_SCHEMA,
+			MediaType.APPLICATION_XHTML,
+			MediaType.APPLICATION_XML_DTD,
+			MediaType.TEXT_HTML
 	};
 
 	private Method method;
@@ -177,29 +183,29 @@ public abstract class BaseResource extends ServerResource {
 			return defaultValue;
 		}
 	}
-	
-    /**
+
+	/**
      * Returns a modifiable list of exposed variants for the current request
      * method. You can declare variants manually by updating the result list,
      * by overriding this method. By default, the variants provided are XML
      * and JSON.
-     * 
-     * @return The modifiable list of variants.
-     */
+	 * 
+	 * @return The modifiable list of variants.
+	 */
 	@Override
 	public final List<Variant> getVariants() {
 		return super.getVariants();
 	}
 
-    /**
+	/**
      * Returns a modifiable list of exposed variants for the given method. You
      * can declare variants manually by updating the result list , by overriding
      * this method. By default, the variants provided are XML and JSON.
-     * 
-     * @param method
-     *            The method.
-     * @return The modifiable list of variants.
-     */
+	 * 
+	 * @param method
+	 *            The method.
+	 * @return The modifiable list of variants.
+	 */
 	@Override
 	protected final List<Variant> getVariants(Method method) {
 		if (variants == null) {
@@ -238,7 +244,7 @@ public abstract class BaseResource extends ServerResource {
 		if (variants == null) {
 			setVariants(mediaTypes);
 		} else {
-			for (MediaType mt:mediaTypes) {
+			for (MediaType mt : mediaTypes) {
 				variants.add(new Variant(mt));
 			}
 		}
@@ -263,14 +269,14 @@ public abstract class BaseResource extends ServerResource {
 		if (variants == null) {
 			setVariants(mediaTypes, languages);
 		} else {
-			for (MediaType mt:mediaTypes) {
-				for (Language l:languages) {
-					variants.add(new Variant(mt,l));
+			for (MediaType mt : mediaTypes) {
+				for (Language l : languages) {
+					variants.add(new Variant(mt, l));
 				}
 			}
 		}
 	}
-	
+
 	/**
 	 * Return a list of Variants constructed from a set of MediaTypes.
 	 * You can use this method to build the resource provided Variant list.
@@ -281,7 +287,7 @@ public abstract class BaseResource extends ServerResource {
 	 */
 	public static final List<Variant> createVariants(MediaType... mediaTypes) {
 		ArrayList<Variant> result = new ArrayList<Variant>();
-		for (MediaType mt:mediaTypes) {
+		for (MediaType mt : mediaTypes) {
 			result.add(new Variant(mt));
 		}
 		return result;
@@ -298,34 +304,34 @@ public abstract class BaseResource extends ServerResource {
 	 */
 	public static final List<Variant> createVariants(MediaType[] mediaTypes, Language[] languages) {
 		ArrayList<Variant> result = new ArrayList<Variant>();
-		for (MediaType mt:mediaTypes) {
-			for (Language l:languages) {
-				result.add(new Variant(mt,l));
+		for (MediaType mt : mediaTypes) {
+			for (Language l : languages) {
+				result.add(new Variant(mt, l));
 			}
 		}
 		return result;
 	}
-	
-    /**
-     * Returns the method.
-     * 
-     * @return The method.
-     * @see Request#getMethod()
-     */
+
+	/**
+	 * Returns the method.
+	 * 
+	 * @return The method.
+	 * @see Request#getMethod()
+	 */
 	@Override
-    public Method getMethod() {
+	public Method getMethod() {
 		if (method != null) {
 			return method;
 		}
 		// Value not initialized...
-		Request request = getRequest(); 
+		Request request = getRequest();
 		if (request == null) {
 			return null;
 		}
 		// Use an attribute...
 		Object o = request.getAttributes().get(METHODPROXIED);
 		if (o instanceof Method) {
-			method = (Method)o;
+			method = (Method) o;
 			return method;
 		}
 		method = request.getMethod();
@@ -349,9 +355,9 @@ public abstract class BaseResource extends ServerResource {
 				}
 			}
 		}
-        return method;
-    }
-	
+		return method;
+	}
+
 	/**
 	 * Force the Resource proceeded HTTP Method to the given value.
 	 * 
@@ -360,14 +366,14 @@ public abstract class BaseResource extends ServerResource {
 	public void setMethod(Method method) {
 		this.method = method;
 	}
-	
-    /**
+
+	/**
      * Returns the preferred variant among the list of the resource supported variants. The
      * selection is based on the client preferences using the
      * {@link ClientInfo#getPreferredVariant} method.
-     * 
-     * @return The preferred variant.
-     */
+	 * 
+	 * @return The preferred variant.
+	 */
 	protected Variant getPreferredVariant() {
 		return getPreferredVariant(getVariants());
 	}
@@ -411,7 +417,7 @@ public abstract class BaseResource extends ServerResource {
 
 	/**
 	 * @param variant
-	 * @return true if the Variant has a HTML MediaType 
+	 * @return true if the Variant has a HTML MediaType
 	 */
 	protected final static boolean isHTML(Variant variant) {
 		return MediaType.APPLICATION_XHTML.equals(variant.getMediaType()) || MediaType.TEXT_HTML.equals(variant.getMediaType());
@@ -449,7 +455,7 @@ public abstract class BaseResource extends ServerResource {
 				result = availableLanguages.get(0);
 			}
 			for (Preference<Language> pref : getRequest().getClientInfo().getAcceptedLanguages()) {
-				if ((availableLanguages.indexOf(pref.getMetadata()) > -1) && 
+				if ((availableLanguages.indexOf(pref.getMetadata()) > -1) &&
 						(pref.getQuality() > quality)) {
 					quality = pref.getQuality();
 					result = pref.getMetadata();
@@ -458,7 +464,7 @@ public abstract class BaseResource extends ServerResource {
 		} catch (NullPointerException e) {/*Too many null test to track*/}
 		return result;
 	}
-	
+
 	/**
 	 * Return the client preferred Language from its Request.
 	 * @return
@@ -466,7 +472,7 @@ public abstract class BaseResource extends ServerResource {
 	protected final Language getClientPreferedLanguage() {
 		return getClientPreferedLanguage(getRequest());
 	}
-	
+
 	/**
 	 * Utility method to transform a Language to a Locale.
 	 * 
@@ -507,7 +513,7 @@ public abstract class BaseResource extends ServerResource {
 		}
 		return Language.ENGLISH_US;
 	}
-	
+
 	/**
 	 * Get a language code (2 char length string) corresponding to the given Language object.
 	 * @param language
@@ -533,14 +539,14 @@ public abstract class BaseResource extends ServerResource {
 		if (ci.getAcceptedMediaTypes().isEmpty()) {
 			return true;
 		}
-		for(Preference<MediaType> p:ci.getAcceptedMediaTypes()) {
+		for (Preference<MediaType> p : ci.getAcceptedMediaTypes()) {
 			if (MediaType.ALL.equals(p.getMetadata())) {
 				return p.getQuality() >= 1.0F;
 			}
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Get a parameters Form from the Request.
 	 * <p>
@@ -552,27 +558,94 @@ public abstract class BaseResource extends ServerResource {
 	 * 
 	 * <p>
 	 * This method is compatible with the "_empty_" entity trick used to send non empty entities into HTTP request.
-	 *  
+	 * 
 	 * @return Never return null.
 	 */
 	protected Form getRequestForm() {
 		if (requestForm == null) {
-			if (getRequest() == null) {
-				return new Form();
-			}
+			requestForm = new Form();
+		}
+		if (getRequest() != null) {
 			Representation entity = getRequest().getEntity();
 			if ((entity != null) && entity.isAvailable() && !(entity instanceof EmptyRepresentation)) {
-				requestForm = new Form(entity);
+
+				// Header possibly added by proxies when the body of a POST/PUT request is empty, uses the URL params
+				// instead
 				if ("none".equals(requestForm.getFirstValue("_empty_"))) { //$NON-NLS-1$ //$NON-NLS-2$
 					requestForm = getRequest().getResourceRef().getQueryAsForm();
 				}
+
+				// Build the form from the body of the request (entity)
+				if (entity.getMediaType().equals(MediaType.APPLICATION_JSON)) {
+					// JSON Content, parse body to instantiate the Form
+					// JSONObject obj = new JSONObject(entity.getText());
+
+					try {
+						// Usage of getText could be an issue for large bodies, can throw OutOfMemory error if the body is too large and cannot be processed
+						// Do we manage what is sent ? Do we need to find an alternative of is this sufficient ?
+						JSONObject o = new JSONObject(entity.getText());
+						for (Object e : o.toMap().entrySet()) {
+							if (e instanceof Entry) {
+								Entry en = (Entry) e;
+								// For Arrays, we instantiate Parameters with the same key and all the values present in the array
+								// { "list": ["element1","element2"] } will be transformed into { "list":"element1", "list":"element2" }
+								if (en.getValue() instanceof JSONArray) {
+									JSONArray a = (JSONArray) en.getValue();
+									for (int i = 0; i < a.length(); i++) {
+										requestForm.add(requestForm.createEntry(en.getKey().toString(), a.get(i).toString()));
+									}
+								} else {
+									// Every other type of value we 
+									requestForm.add(requestForm.createEntry(en.getKey().toString(), en.getValue().toString()));
+								}
+							}
+						}
+					} catch (IOException e) {
+						e.printStackTrace(); // return error to user
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+
+				} else if (entity.getMediaType().equals(MediaType.APPLICATION_WWW_FORM)
+						|| entity.getMediaType().equals(MediaType.MULTIPART_FORM_DATA)) {
+					// Form-URL-Encoded format for HTML forms
+
+					// "application/x-www-form-urlencoded", "Web form (URL encoded)" -> apparently format is
+					// param1=data1&param2=data2&param3=data3
+					// Goes in there with sample bullshit params, should be OK
+
+					requestForm = new Form(entity);
+				} else if (entity.getMediaType().equals(MediaType.APPLICATION_XML)) {
+					// If the content is XML, this code is for backward compatibility
+					requestForm = new Form(entity);
+				} else if (entity.getMediaType().equals(MediaType.APPLICATION_OCTET_STREAM)) {
+					// How to handle that ? Currently loads as a string the content of the file that is uploaded
+					// If file in body, params should be in url
+					requestForm = getRequest().getResourceRef().getQueryAsForm();
+				} else {
+					throw new ResourceException(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE);
+				}
+
+				// multipart/form-data ? Option form-data in postman
+				// Files ? BinResource
+
+				// Extract from entity depending on media type
+				// MediaType.APPLICATION_WWW_FORM (form-url-encoded) default format of post with html forms -> default
+				// form
+				// JSON
+				// Does not support XML, throw ressourceexception(code http)
+				
+				// File type application/octet-stream
+				
+
 			} else {
+				// The body is empty and the form content is in the URL
 				requestForm = getRequest().getResourceRef().getQueryAsForm();
 			}
 		}
 		return requestForm;
 	}
-	
+
 	/**
 	 * This method return true if the given preferences contains the given Metadata at least at the specified quality.
 	 * 
@@ -586,7 +659,7 @@ public abstract class BaseResource extends ServerResource {
 		if (metadata == null) {
 			return false;
 		}
-		for(Preference<T> p:preferences) {
+		for (Preference<T> p : preferences) {
 			if (metadata.equals(p.getMetadata()) && (p.getQuality() >= quality)) {
 				return true;
 			}
