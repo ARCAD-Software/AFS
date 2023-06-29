@@ -51,8 +51,8 @@ public abstract class PreferenceBasedTrustStoreProvider implements ITrustStorePr
 	}
 
 	@Override
-	public String getTrustStorePassword() {
-		return new String(Crypto.decrypt(store.getString(TRUSTSTORE_PASSWORD)));
+	public char[] getTrustStorePassword() {
+		return Crypto.decrypt(store.getString(TRUSTSTORE_PASSWORD));
 	}
 
 	@Override
@@ -61,8 +61,8 @@ public abstract class PreferenceBasedTrustStoreProvider implements ITrustStorePr
 	}
 
 	@Override
-	public String getKeyStorePassword() {
-		return new String(Crypto.decrypt(store.getString(KEYSTORE_PASSWORD)));
+	public char[] getKeyStorePassword() {
+		return Crypto.decrypt(store.getString(KEYSTORE_PASSWORD));
 	}
 
 	@Override
@@ -71,8 +71,9 @@ public abstract class PreferenceBasedTrustStoreProvider implements ITrustStorePr
 	}
 
 	@Override
-	public void setTrustStorePassword(String password) {
-		if(!password.isEmpty() && !password.equals(store.getString(TRUSTSTORE_PASSWORD))) {
+	public void setTrustStorePassword(char[] password) {
+		String pwd = new String(password);
+		if(pwd.length() > 0 && !pwd.equals(store.getString(TRUSTSTORE_PASSWORD))) {
 			final String cryptedPassword = Crypto.encrypt(password);			
 			store.setValue(TRUSTSTORE_PASSWORD, cryptedPassword);			
 		}
@@ -85,8 +86,9 @@ public abstract class PreferenceBasedTrustStoreProvider implements ITrustStorePr
 	}
 
 	@Override
-	public void setKeyStorePassword(String password) {		
-		if(!password.isEmpty() && !password.equals(store.getString(KEYSTORE_PASSWORD))) {
+	public void setKeyStorePassword(char[] password) {
+		String pwd = new String(password);
+		if(pwd.length() > 0 && !pwd.equals(store.getString(KEYSTORE_PASSWORD))) {
 			final String cryptedPassword = Crypto.encrypt(password);			
 			store.setValue(KEYSTORE_PASSWORD, cryptedPassword);			
 		}

@@ -96,7 +96,7 @@ public abstract class AbstractBasicService extends AbstractService{
 		final String jksPassword = getOptionValue(ICoreModifiers.CORE_JKS_CTP);
 		if ((jksPath!=null) && (jksPath!=jksPassword)) {
 			return new ITrustStoreProvider(){
-				public String getTrustStorePassword() {					
+				public char[] getTrustStorePassword() {					
 					byte[] passwordByte = Base64.getDecoder().decode(jksPassword);
 					String password = jksPassword;
 					if (passwordByte!=null) {
@@ -105,7 +105,7 @@ public abstract class AbstractBasicService extends AbstractService{
 					} else {
 						System.out.println("Warning : The Trust Store password has not been crypted");
 					}					
-					return password;
+					return password.toCharArray();
 				}
 
 				public String getTrustStorePath() {					
@@ -113,13 +113,13 @@ public abstract class AbstractBasicService extends AbstractService{
 				}
 
 				@Override
-				public String getKeyStorePassword() {
+				public char[] getKeyStorePassword() {
 					return getTrustStorePassword();
 				}
 
 				@Override
 				public String getKeyStorePath() {
-					return getTrustStorePassword() ;
+					return null;
 				}
 
 
@@ -131,7 +131,7 @@ public abstract class AbstractBasicService extends AbstractService{
 				}
 
 
-				public void setKeyStorePassword(String arg0) {
+				public void setKeyStorePassword(char[] arg0) {
 				}
 
 
@@ -139,11 +139,143 @@ public abstract class AbstractBasicService extends AbstractService{
 				}
 
 
-				public void setTrustStorePassword(String arg0) {
+				public void setTrustStorePassword(char[] arg0) {
 				}
 
 
 				public void setTrustStorePath(String arg0) {
+				}
+
+				@Override
+				public char[] getKeyPassword() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+
+				@Override
+				public void setKeyPassword(char[] password) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public String getKeyStoreType() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+
+				@Override
+				public void setKeyStoreType(String type) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public String getTrustStoreType() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+
+				@Override
+				public void setTrustStoreType(String type) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public String getKeyManagerAlgorithm() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+
+				@Override
+				public void setKeyManagerAlgorithm(String keyAlgorithm) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public String getTrustManagerAlgorithm() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+
+				@Override
+				public void setTrustManagerAlgorithm(String trustAlgorithm) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public String getDisabledCipherSuites() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+
+				@Override
+				public void setDisabledCipherSuites(String disabledCiphers) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public String getDisabledProtocols() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+
+				@Override
+				public void setDisabledProtocols(String disabledProtocols) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public String getEnabledCipherSuites() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+
+				@Override
+				public void setEnabledCipherSuites(String enabledCiphers) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public String getEnabledProtocols() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+
+				@Override
+				public void setEnabledProtocols(String enabledProtocols) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public String getProtocol() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+
+				@Override
+				public void setProtocol(String protocol) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public String getSecureRandomAlgorithm() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+
+				@Override
+				public void setSecureRandomAlgorithm(String randomAlgorithm) {
+					// TODO Auto-generated method stub
+					
 				}
 				
 			};	
