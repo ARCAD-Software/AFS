@@ -77,17 +77,26 @@ public class RestConnectionParameters implements Cloneable, Serializable {
 	}
 	
 	/**
-	 * Create an empty preconfigured parameter set.
+	 * Create an empty preconfigured parameter set with IBMi default parameters if an IBMi JVM is detected
 	 */
 	public RestConnectionParameters(ILoggedPlugin activator) {
 		super();
 		this.activator = activator;
 		parameters = new HashMap<String, String>();
+		if (isIBMJVM()) {
+			setDefaultIBMJVMParameters();
+		}
 	}
 
 	private boolean isIBMJVM() {
 		String vendor = System.getProperty("java.vendor"); //$NON-NLS-1$
 		return (vendor != null) && vendor.startsWith("IBM"); //$NON-NLS-1$
+	}
+	
+	private void setDefaultIBMJVMParameters() {
+		// Set mandatory hardcoded parameters for connection with a JVM in an IBMi environment
+		setKeyManagerAlgorithm(System.getProperty("ssl.KeyManagerFactory.algorithm", "PKIX")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		setTrustManagerAlgorithm(System.getProperty("ssl.TrustManagerFactory.algorithm", "PKIX"));
 	}
 
 	@Override
@@ -103,6 +112,119 @@ public class RestConnectionParameters implements Cloneable, Serializable {
 		}
 		return result;
 	}
+	
+	/**
+	 * Adds or replaces the disabled cipher suites in the Rest Connection parameters.
+	 * @param disabledCiphers the whitespace-separated list of disabled cipher suites
+	 */
+	public void setDisabledCipherSuites(String disabledCipherSuites) {
+		if (disabledCipherSuites != null && disabledCipherSuites.length() > 0) {
+			parameters.put("disabledCipherSuites", disabledCipherSuites);
+		}
+	}
+	
+	/**
+	 * Adds or replaces the disabled SSL/TLS protocol names in the Rest Connection parameters.
+	 * @param disabledProtocols the whitespace-separated list of disabled SSL protocols
+	 */
+	public void setDisabledProtocols(String disabledProtocols) {
+		if (disabledProtocols != null && disabledProtocols.length() > 0) {
+			parameters.put("disabledProtocols", disabledProtocols);
+		}
+	}
+	
+	/**
+	 * Adds or replaces the enabled cipher suites in the Rest Connection parameters.
+	 * @param enabledCiphers the whitespace-separated list of enabled cipher suites
+	 */
+	public void setEnabledCipherSuites(String enabledCipherSuites) {
+		if (enabledCipherSuites != null && enabledCipherSuites.length() > 0) {
+			parameters.put("enabledCipherSuites", enabledCipherSuites);
+		}
+	}
+	
+	/**
+	 * Adds or replaces the enabled SSL/TLS protocol names in the Rest Connection parameters.
+	 * @param enabledProtocols the whitespace-separated list of enabled SSL protocols
+	 */
+	public void setEnabledProtocols(String enabledProtocols) {
+		if (enabledProtocols != null && enabledProtocols.length() > 0) {
+			parameters.put("enabledProtocols", enabledProtocols);
+		}
+	}
+	
+	/**
+	 * Adds or replaces the secure socket protocol name in the Rest Connection parameters.
+	 * @param protocol the name of the secure socket protocol
+	 */
+	public void setProtocol(String protocol) {
+		if (protocol != null && protocol.length() > 0) {
+			parameters.put("protocol", protocol);
+		}
+	}
+	
+	/**
+	 * Adds or replaces the name of the SecureRandom algorithm in the Rest Connection parameters.
+	 * @param randomAlgorithm the name of the SecureRandom algorithm
+	 */
+	public void setSecureRandomAlgorithm(String randomAlgorithm) {
+		if (randomAlgorithm != null && randomAlgorithm.length() > 0) {
+			parameters.put("randomAlgorithm", randomAlgorithm);
+		}
+	}
+	
+	/**
+	 * Adds or replaces the certificate algorithm for the trust manager in the Rest Connection parameters.
+	 * @param trustManagerAlgorithm the trust manager algorithm
+	 */
+	public void setTrustManagerAlgorithm(String trustManagerAlgorithm) {
+		if (trustManagerAlgorithm != null && trustManagerAlgorithm.length() > 0) {
+			parameters.put("trustManagerAlgorithm", trustManagerAlgorithm);
+		}
+	}
+	
+	/**
+	 * Adds or replaces the certificate algorithm for the key manager in the Rest Connection parameters.
+	 * @param keyManagerAlgorithm the key manager algorithm
+	 */
+	public void setKeyManagerAlgorithm(String keyManagerAlgorithm) {
+		if (keyManagerAlgorithm != null && keyManagerAlgorithm.length() > 0) {
+			parameters.put("keyManagerAlgorithm", keyManagerAlgorithm);
+		}
+	}
+
+	/**
+	 * Set TLS Server parameters.
+	 * 
+	 * @param trustStore
+	 * @param trustStorePassword
+	 * @param storeType
+	 * @param trustManagerAlgorithm
+	 */
+	public void setTrustStore(File trustStore, char[] trustStorePassword, String storeType, String trustManagerAlgorithm) {
+		if ((trustStore != null) && trustStore.isFile()) {
+			parameters.put("truststorePath", trustStore.getAbsolutePath()); //$NON-NLS-1$
+			if (trustStorePassword != null) {
+				parameters.put("truststorePassword", new String(trustStorePassword)); //$NON-NLS-1$
+			}
+			if (storeType == null) {
+				storeType = KeyStore.getDefaultType();
+			}
+			if (trustManagerAlgorithm != null) {
+				setTrustManagerAlgorithm(trustManagerAlgorithm);
+			}
+			parameters.put("truststoreType", storeType); //$NON-NLS-1$
+			parameters.put("sslContextFactory", "org.restlet.engine.ssl.DefaultSslContextFactory"); //$NON-NLS-1$ //$NON-NLS-2$
+		} else {
+			parameters.remove("truststorePath"); //$NON-NLS-1$
+			parameters.remove("truststorePassword"); //$NON-NLS-1$
+			parameters.remove("truststoreType"); //$NON-NLS-1$
+			parameters.remove("trustManagerAlgorithm"); //$NON-NLS-1$
+			if (!parameters.containsKey("keystorePath")) { //$NON-NLS-1$
+				parameters.remove("sslContextFactory"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		}
+	}
 
 	/**
 	 * Set TLS Server parameters.
@@ -112,33 +234,9 @@ public class RestConnectionParameters implements Cloneable, Serializable {
 	 * @param storeType
 	 */
 	public void setTrustStore(File trustStore, char[] trustStorePassword, String storeType) {
-		if ((trustStore != null) && trustStore.isFile()) {
-			parameters.put("truststorePath", trustStore.getAbsolutePath()); //$NON-NLS-1$
-			if (trustStorePassword != null) {
-				parameters.put("truststorePassword", new String(trustStorePassword)); //$NON-NLS-1$
-			}
-			if (storeType == null) {
-				storeType = KeyStore.getDefaultType();
-			}
-			parameters.put("truststoreType", storeType); //$NON-NLS-1$
-			if (isIBMJVM()) {
-				parameters.put("certAlgorithm", System.getProperty("ssl.KeyManagerFactory.algorithm", "PKIX")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				parameters.put("trustManagerAlgorithm", System.getProperty("ssl.TrustManagerFactory.algorithm", "PKIX")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			}
-			parameters.put("sslContextFactory", "org.restlet.engine.ssl.DefaultSslContextFactory"); //$NON-NLS-1$ //$NON-NLS-2$
-		} else {
-			parameters.remove("truststorePath"); //$NON-NLS-1$
-			parameters.remove("truststorePassword"); //$NON-NLS-1$
-			parameters.remove("truststoreType"); //$NON-NLS-1$
-			if (!parameters.containsKey("keystorePath")) { //$NON-NLS-1$
-				parameters.remove("certAlgorithm"); //$NON-NLS-1$
-				parameters.remove("keyManagerAlgorithm"); //$NON-NLS-1$
-				parameters.remove("trustManagerAlgorithm"); //$NON-NLS-1$
-				parameters.remove("sslContextFactory"); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-		}
+		setTrustStore(trustStore, trustStorePassword, storeType, null);
 	}
-
+	
 	/**
 	 * Set TLS Server parameters.
 	 * 
@@ -150,14 +248,29 @@ public class RestConnectionParameters implements Cloneable, Serializable {
 	}
 	
 	/**
+	 * Set TLS Server parameters.
+	 * 
+	 * @param trustStorePath
+	 * @param trustStorePassword
+	 * @param storeType
+	 * @param trustManagerAlgorithm
+	 */
+	public void setTrustStore(String trustStorePath, char[] trustStorePassword, String storeType, String trustManagerAlgorithm) {
+		if (trustStorePath != null) {
+			setTrustStore(new File(trustStorePath), trustStorePassword, storeType, trustManagerAlgorithm);
+		}
+	}
+	
+	/**
 	 * Set TLS Client security parameters.
 	 * 
 	 * @param keyStore
 	 * @param keyStorePassword
 	 * @param keyPassword
 	 * @param storeType
+	 * @param keyManagerAlgorithm
 	 */
-	public void setKeyStore(File keyStore, char[] keyStorePassword, char[] keyPassword, String storeType) {
+	public void setKeyStore(File keyStore, char[] keyStorePassword, char[] keyPassword, String storeType, String keyManagerAlgorithm) {
 		if ((keyStore != null) && keyStore.isFile()) {
 			parameters.put("keystorePath", keyStore.getAbsolutePath()); //$NON-NLS-1$
 			if (keyStorePassword != null) {
@@ -172,27 +285,40 @@ public class RestConnectionParameters implements Cloneable, Serializable {
 			if (storeType == null) {
 				storeType = KeyStore.getDefaultType();
 			}
+			if (keyManagerAlgorithm != null) {
+				setKeyManagerAlgorithm(keyManagerAlgorithm);
+			}
 			parameters.put("keystoreType", storeType); //$NON-NLS-1$
 			parameters.put("needClientAuthentication", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-			if (isIBMJVM()) {
-				parameters.put("certAlgorithm", System.getProperty("ssl.KeyManagerFactory.algorithm", "PKIX")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				parameters.put("keyManagerAlgorithm", System.getProperty("ssl.KeyManagerFactory.algorithm", "PKIX")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			}
 			parameters.put("sslContextFactory", "org.restlet.engine.ssl.DefaultSslContextFactory"); //$NON-NLS-1$ //$NON-NLS-2$
 		} else {
 			parameters.remove("keystorePath"); //$NON-NLS-1$
 			parameters.remove("keystorePassword"); //$NON-NLS-1$
 			parameters.remove("keyPassword"); //$NON-NLS-1$
 			parameters.remove("keystoreType"); //$NON-NLS-1$
+			parameters.remove("keyManagerAlgorithm"); //$NON-NLS-1$
 			parameters.remove("needClientAuthentication"); //$NON-NLS-1$ //$NON-NLS-2$
 			if (!parameters.containsKey("truststorePath")) { //$NON-NLS-1$
-				parameters.remove("certAlgorithm"); //$NON-NLS-1$
-				parameters.remove("keyManagerAlgorithm"); //$NON-NLS-1$
-				parameters.remove("trustManagerAlgorithm"); //$NON-NLS-1$
 				parameters.remove("sslContextFactory"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 	}
+	
+	/**
+	 * Set TLS Client security parameters.
+	 * 
+	 * @param keyStorePath
+	 * @param keyStorePassword
+	 * @param keyPassword
+	 * @param storeType
+	 * @param trustManagerAlgorithm
+	 */
+	public void setKeyStore(String keyStorePath, char[] keyStorePassword, char[] keyPassword, String storeType, String keyManagerAlgorithm) {
+		if (keyStorePath != null) {
+			setKeyStore(new File(keyStorePath), keyStorePassword, keyPassword, storeType, keyManagerAlgorithm);
+		}
+	}
+
 
 	/**
 	 * Set TLS Client security parameters.
@@ -203,6 +329,18 @@ public class RestConnectionParameters implements Cloneable, Serializable {
 	 */
 	public void setKeyStore(File keyStore, char[] storePassword, char[] keyPassword) {
 		setKeyStore(keyStore, storePassword, keyPassword, null);
+	}
+	
+	/**
+	 * Set TLS Client security parameters.
+	 * 
+	 * @param keyStore
+	 * @param storePassword
+	 * @param keyPassword
+	 * @param storeType
+	 */
+	public void setKeyStore(File keyStore, char[] keyStorePassword, char[] keyPassword, String storeType) {
+		setKeyStore(keyStore, keyStorePassword, keyPassword, storeType, null);
 	}
 	
 	/**

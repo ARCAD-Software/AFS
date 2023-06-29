@@ -150,19 +150,19 @@ public class SSLSettingsDialog extends AbstractAFSDialog {
 				public void widgetSelected(SelectionEvent e) {
 					provider.resetToDefault();
 					trustStorePathText.setText(provider.getTrustStorePath());
-					trustStorePasswordText.setText(provider.getTrustStorePassword());
+					trustStorePasswordText.setText(new String(provider.getTrustStorePassword()));
 					
 					keyStorePathText.setText(provider.getKeyStorePath());					
-					keyStorePasswordText.setText(provider.getKeyStorePassword());					
+					keyStorePasswordText.setText(new String(provider.getKeyStorePassword()));					
 				}
 			}
 		);		
  
 		trustStorePathText.setText(provider.getTrustStorePath());		
-		trustStorePasswordText.setText(provider.getTrustStorePassword());
+		trustStorePasswordText.setText(new String(provider.getTrustStorePassword()));
 		
 		keyStorePathText.setText(provider.getKeyStorePath());		
-		keyStorePasswordText.setText(provider.getKeyStorePassword());
+		keyStorePasswordText.setText(new String(provider.getKeyStorePassword()));
 		
 		trustStoreFieldsModified(null);
 		
@@ -180,8 +180,8 @@ public class SSLSettingsDialog extends AbstractAFSDialog {
 	@Override
 	protected void okPressed() {	
 		provider.setKeyStorePath(keyStorePathText.getText());
-		provider.setKeyStorePassword(keyStorePasswordText.getText());
-		provider.setTrustStorePassword(trustStorePasswordText.getText());
+		provider.setKeyStorePassword(keyStorePasswordText.getText().toCharArray());
+		provider.setTrustStorePassword(trustStorePasswordText.getText().toCharArray());
 		provider.setTrustStorePath(trustStorePathText.getText());
 		if (provider.save()) {
 			super.okPressed();

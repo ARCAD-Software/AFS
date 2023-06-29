@@ -35,6 +35,7 @@ import com.arcadsoftware.afs.framework.messages.AbstractUserMessageManager;
 import com.arcadsoftware.afs.framework.messages.UserMessage;
 import com.arcadsoftware.beanmap.xml.XmlBeanMapStream;
 import com.arcadsoftware.metadata.client.DataAccess;
+import com.arcadsoftware.rest.RestConnectionParameters;
 import com.arcadsoftware.rest.ServerErrorException;
 import com.arcadsoftware.rest.WebServiceAccess;
 import com.arcadsoftware.rest.connection.ConnectionUserBean;
@@ -396,15 +397,27 @@ public class ServerConnection {
 	 * @return
 	 */
 	public boolean connectWithCertificats(String login, String password, boolean managerUser, boolean localtranslate) {
+		
 		if (server != null) {
 			final ITrustStoreProvider trustStoreProvider = getTrustStoreProvider();
 			if (trustStoreProvider != null) {
-				final WebServiceAccess webServiceAccess = new WebServiceAccess(BaseActivator.getDefault(), // 
-						trustStoreProvider.getTrustStorePath(), //
-						trustStoreProvider.getTrustStorePassword(), //
-						trustStoreProvider.getKeyStorePath(), //
-						trustStoreProvider.getKeyStorePassword());
-				// FIXME Login and Password are not set to the fields of this class !!!!!!
+				final String trustStorePath = trustStoreProvider.getTrustStorePath();
+				final char[] trustStorePassword = trustStoreProvider.getTrustStorePassword();
+				final String keyStorePath = trustStoreProvider.getKeyStorePath();
+				final char[] keyStorePassword = trustStoreProvider.getKeyStorePassword();
+				
+				RestConnectionParameters parameters = new RestConnectionParameters(BaseActivator.getDefault());
+				parameters.setTrustStore(trustStorePath, trustStorePassword, trustStoreProvider.getTrustStoreType(), trustStoreProvider.getTrustManagerAlgorithm());
+				parameters.setKeyStore(keyStorePath, keyStorePassword, trustStoreProvider.getKeyPassword(), trustStoreProvider.getKeyStoreType(), trustStoreProvider.getKeyManagerAlgorithm());
+				parameters.setDisabledCipherSuites(trustStoreProvider.getDisabledCipherSuites());
+				parameters.setDisabledProtocols(trustStoreProvider.getDisabledProtocols());
+				parameters.setEnabledCipherSuites(trustStoreProvider.getEnabledCipherSuites());
+				parameters.setEnabledProtocols(trustStoreProvider.getEnabledProtocols());
+				parameters.setProtocol(trustStoreProvider.getProtocol());
+				parameters.setSecureRandomAlgorithm(trustStoreProvider.getSecureRandomAlgorithm());				
+				
+				final WebServiceAccess webServiceAccess = new WebServiceAccess(BaseActivator.getDefault(), parameters);
+				// FIXME Login et Password ne sont pas affecté aux champ de cette classe !!!!!!
 				webServiceAccess.setLogin(login);
 				webServiceAccess.setPassword(password.toCharArray());
 				webServiceAccess.setDefaultServeraddress(server.getUrl());
