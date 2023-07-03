@@ -45,3 +45,8 @@ jobs:
         generate_release_notes: true
         files: |
           releng/update/target/flat-repository/*
+             
+    - name: Generate Release Notes
+      run: npx gren release --data-source=commits
+      env:
+        GREN_GITHUB_TOKEN: "${{secrets.GITHUB_TOKEN}}"
