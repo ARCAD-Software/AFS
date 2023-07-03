@@ -45,8 +45,15 @@ jobs:
         generate_release_notes: true
         files: |
           releng/update/target/flat-repository/*
-             
-    - name: Generate Release Notes
-      run: npx gren release --data-source=commits
+           
+         
+    - run: npm install github-release-notes -g
+      shell: bash
+    - run: |
+        sudo apt-get update -y
+        sudo apt-get install -y jq
+      shell: bash
+    - run: gren release --data-source=commits
       env:
-        GREN_GITHUB_TOKEN: "${{secrets.GITHUB_TOKEN}}"
+        GREN_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      shell: bash
