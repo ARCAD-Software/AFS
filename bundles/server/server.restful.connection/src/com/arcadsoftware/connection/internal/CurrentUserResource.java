@@ -21,7 +21,6 @@ import java.util.Hashtable;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.restlet.data.CharacterSet;
-import org.restlet.data.Form;
 import org.restlet.data.Language;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -52,6 +51,7 @@ public class CurrentUserResource extends BaseResource {
 
 	private ConnectionUserBean user = null;
 	private IConnectionCredential cc = null;
+	private String oldp;
 
 	@Override
 	protected void doInit() throws ResourceException {
@@ -59,14 +59,17 @@ public class CurrentUserResource extends BaseResource {
 		getAllowedMethods().add(Method.GET);
 		getAllowedMethods().add(Method.POST);
 		getAllowedMethods().add(Method.PUT);
-		getAllowedMethods().add(Method.OPTIONS);
 		// Retrieve the connected user information.
 		try {
 			user = (ConnectionUserBean) getRequest().getAttributes().get(ConnectionUserBean.CONNECTED_USER);
 			cc = (IConnectionCredential) getRequest().getAttributes().get(IConnectionCredential.CONNECTED_CREDENTIAL);
+			oldp = user.getPassword();
 			user = (ConnectionUserBean) user.clone();
 			if (cc instanceof IPatchUserCredential) {
 				((IPatchUserCredential) cc).patchUser(user);
+				if (user.getPassword() != null) {
+					oldp = user.getPassword();
+				}
 			}
 		} catch (Exception e) {
 			Activator.getInstance().debug(e.getLocalizedMessage());
@@ -126,14 +129,12 @@ public class CurrentUserResource extends BaseResource {
 		if (!(cc instanceof IUpdatableCredential)) {
 			throw new ResourceException(Status.SERVER_ERROR_NOT_IMPLEMENTED, Activator.getInstance().getMessage("cannotChangePWD", language)); //$NON-NLS-1$
 		}
-		Form form = getRequestForm();
-		String newp = form.getFirstValue("newpassword"); //$NON-NLS-1$
+		String newp = getRequestForm().getFirstValue("newpassword"); //$NON-NLS-1$
 		if ((newp == null) || (newp.length() == 0)) {
 			Activator.getInstance().debug(Messages.CurrentUserResource_Error_badparamters);
 			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
 					Activator.getInstance().getMessage("empty_new_pwd", language)); //$NON-NLS-1$
 		}
-		String oldp = form.getFirstValue("oldpassword"); //$NON-NLS-1$
 		if ((oldp == null) || (oldp.length() == 0)) {
 			Activator.getInstance().debug(Messages.CurrentUserResource_Debug_Empty_old_password);
 			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, Activator.getInstance().getMessage("empty_old_pwd", language)); //$NON-NLS-1$
