@@ -1,0 +1,396 @@
+openapi: 3.1.0 #Documentation Fragment
+# This description is the fisrt static element which is always included into documentation.
+# It contain some reusable components which are managed through the Restlet framework for the whole API.
+components:
+  schemas:
+    SimpleStringList:
+      xml:
+        name: 'message'
+      type: object
+      description: This document is a list of strings.
+      properties:
+        list:
+          type: object
+          description: The containted list.
+          properties:
+            count:
+              type: integer
+              description: The number of element in this list.
+              xml:
+                attribute: true
+            items:
+              type: array
+              description: The items of the list.
+              items:
+                type: string
+    CurrentUserDocument:
+      type: object
+      description: This document is a list of strings.
+      properties:
+        user:
+          type: object
+          description: The current user description and access rights.
+          properties:
+            id:
+              type: integer
+              description: The identifier number associated to this connection, a negative value indicate that no user stored in the application correspond to this connection credential.
+              xml:
+                attribute: true
+            principal:
+              type: integer
+              description: The identifier number corresponding to the current user principal, a null or negative value indicate that there is not principal description stored into application storage.
+              xml:
+                attribute: true
+            fullname:
+              type: string
+              description: The user full name as known by the application.
+              xml:
+                attribute: true
+                name: name
+            changePWD:
+              type: boolean
+              description: If true the current user have to change his/her password through this resource. All access to other resources will be forbidden.
+              xml:
+                attribute: true
+            canChangePWD:
+              type: boolean
+              description: If true the current user is allowed to change his/her password through this resource.
+              xml:
+                attribute: true
+            profile:
+              anyOf:
+                - type: object
+                  description: List all access rights of the current user.
+                  properties:
+                  rights:
+                    type: array
+                    xml:
+                      name: right
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        description: The access right number.
+                        xml:
+                          attribute: true
+                      param:
+                        type: integer
+                        description: The access right parameter value. Depends on the right semantic.
+                        xml:
+                          attribute: true
+                - type: object
+                  description: Define the access right scope from number 1 to specified limit granted to this user.
+                  properties:
+                    "@class": 
+                      xml:
+                        attribute: true
+                      name: class
+                      type: string
+                      enum: [autoprofile]
+                    limit:
+                      type: integer
+                      description: The positive maximal access right granted to this current user, all rights number from 1 to this limit, included are granted.
+                      xml:
+                        attribute: true
+                    rights:
+                      type: array
+                      items:
+                        type: string
+paths:
+  /currentuser:
+    description: This service offer some information about the user credentials and may allow him to change it (if the authentication provider authorize this operation).
+    get:
+      summary: Information About the current user. 
+      description: The known information about this user, this include some identification and the list of access rights relative to him. 
+      responses:
+        "200":
+          description: The information about the current user. 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentUserDocument'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/CurrentUserDocument'
+            application/xhtml+xml:
+              schema:
+                type: string
+            text/xml:
+              schema:
+                $ref: '#/components/schemas/CurrentUserDocument'
+            text/html:
+              schema:
+                type: string
+            text/plain:
+              schema:
+                type: string
+            application/x-xsd+xml:
+              schema:
+                type: string
+        "404":
+          $ref: '#/components/responses/NotFound' 
+        "406":
+          $ref: '#/components/responses/Unsupported' 
+        "410":
+          description: The XSD Schema is not available.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xhtml+xml:
+              schema:
+                type: string
+            text/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            text/html:
+              schema:
+                type: string
+        "500":
+          $ref: '#/components/responses/UnexpectedError' 
+        default:
+          description: An unexpected error occurs.
+    post:
+      summary: Password modification 
+      description: If the user user is allowed to (see the "canChangePWD" property of the GET response), he/her can change his/her password though this resource. Note that when the property "changePWD" is true he/her have to change it before to call any other web-service of this application.
+      paramters:
+        - in: query
+          name: newpassword
+          description: The new password proposal.
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                newpassword:
+                  description: The new password proposal.
+                  type: string
+          application/xml:
+            schema:
+              type: object
+              properties:
+                newpassword:
+                  description: The new password proposal.
+                  type: string
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                newpassword:
+                  description: The new password proposal.
+                  type: string
+      responses:
+        "204":
+          description: The password modification has been accepted the new password must be used in all following call to the application. 
+        "403":
+          description: The new password included in the query is not acceptable, equal to the old password, or missing. 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xhtml+xml:
+              schema:
+                type: string
+            text/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            text/html:
+              schema:
+                type: string
+        "404":
+          $ref: '#/components/responses/NotFound' 
+        "501":
+          description: Feature allowing to store the new password is not implemented for the current user credential (see the "canChangePWD" property).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xhtml+xml:
+              schema:
+                type: string
+            text/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            text/html:
+              schema:
+                type: string
+        "503":
+          description: Feature allowing to store the new password is not available in this application.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xhtml+xml:
+              schema:
+                type: string
+            text/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            text/html:
+              schema:
+                type: string
+        "500":
+          $ref: '#/components/responses/UnexpectedError' 
+        default:
+          description: An unexpected error occurs.
+    put:
+      summary: Password modification 
+      description: If the user user is allowed to (see the "canChangePWD" property of the GET response), he/her can change his/her password though this resource. Note that when the property "changePWD" is true he/her have to change it before to call any other web-service of this application.
+      paramters:
+        - in: query
+          name: newpassword
+          description: The new password proposal.
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                newpassword:
+                  description: The new password proposal.
+                  type: string
+          application/xml:
+            schema:
+              type: object
+              properties:
+                newpassword:
+                  description: The new password proposal.
+                  type: string
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                newpassword:
+                  description: The new password proposal.
+                  type: string
+      responses:
+        "204":
+          description: The password modification has been accepted the new password must be used in all following call to the application. 
+        "403":
+          description: The new password included in the query is not acceptable, equal to the old password, or missing. 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xhtml+xml:
+              schema:
+                type: string
+            text/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            text/html:
+              schema:
+                type: string
+        "404":
+          $ref: '#/components/responses/NotFound' 
+        "501":
+          description: Feature allowing to store the new password is not implemented for the current user credential (see the "canChangePWD" property).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xhtml+xml:
+              schema:
+                type: string
+            text/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            text/html:
+              schema:
+                type: string
+        "503":
+          description: Feature allowing to store the new password is not available in this application.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xhtml+xml:
+              schema:
+                type: string
+            text/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            text/html:
+              schema:
+                type: string
+        "500":
+          $ref: '#/components/responses/UnexpectedError' 
+        default:
+          description: An unexpected error occurs.
+  /authservices:
+    description: This resource list the different authentication modules currently active on this platform. To access to this resource no uthentication is required.
+    get:
+      summary: List of Authentication modules. 
+      description: Return the list of authentication modules currently active. 
+      responses:
+        "200":
+          description: The list of module identifier codes. 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleStringList'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/SimpleStringListXML'
+            application/xhtml+xml:
+              schema:
+                type: string
+            text/xml:
+              schema:
+                $ref: '#/components/schemas/SimpleStringListXML'
+            text/html:
+              schema:
+                type: string
+            text/plain:
+              schema:
+                type: string
+            application/x-xsd+xml:
+              schema:
+                type: string
+        "410":
+          description: The XSD Schema is not available.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xhtml+xml:
+              schema:
+                type: string
+            text/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            text/html:
+              schema:
+                type: string
+        default:
+          description: An unexpected error occurs.
