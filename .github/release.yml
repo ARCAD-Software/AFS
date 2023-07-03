@@ -1,13 +1,10 @@
 # .github/release.yml
 
 changelog:
-  categories:
-    - title: Features
-      labels:
-        - '*'
-      exclude:
-        labels:
-          - dependencies
-    - title: Dependencies
-      labels:
-        - dependencies
+  sections:
+    - title: Enhancements
+      labels: ["enhancement"]
+    - title: Bugs
+      labels: ["bug"]
+    - title: Security Vulnerabilities
+      labels: ["vulnerability"]
