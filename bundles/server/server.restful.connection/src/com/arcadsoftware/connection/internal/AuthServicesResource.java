@@ -41,10 +41,6 @@ public class AuthServicesResource extends UserLinkedResource {
 		getAllowedMethods().add(Method.GET);
 		addVariants(MEDIATYPES_BASESUP);
 		getVariants().add(new Variant(MediaType.TEXT_PLAIN));
-		getVariants().add(new Variant(MediaType.TEXT_XML));
-		getVariants().add(new Variant(MediaType.APPLICATION_W3C_SCHEMA));
-		getVariants().add(new Variant(MediaType.APPLICATION_XHTML));
-		getVariants().add(new Variant(MediaType.TEXT_HTML));
 	}
 	
 	@Override

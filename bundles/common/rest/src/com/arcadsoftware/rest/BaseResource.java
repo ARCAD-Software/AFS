@@ -152,7 +152,6 @@ public abstract class BaseResource extends ServerResource {
 	 * <li>text/xml
 	 * <li>text/html
 	 * <li>application/x-xsd+xml
-	 * <li>application/vnd.sun.wadl+xml
 	 * <li>application/xhtml+xml
 	 * <li>application/xml-dtd
 	 * </ul>
@@ -586,6 +585,7 @@ public abstract class BaseResource extends ServerResource {
 						JSONObject o = new JSONObject(entity.getText());
 						for (Object e : o.toMap().entrySet()) {
 							if (e instanceof Entry) {
+								@SuppressWarnings("rawtypes")
 								Entry en = (Entry) e;
 								// For Arrays, we instantiate Parameters with the same key and all the values present in the array
 								// { "list": ["element1","element2"] } will be transformed into { "list":"element1", "list":"element2" }
