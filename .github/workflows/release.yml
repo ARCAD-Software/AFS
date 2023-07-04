@@ -44,7 +44,7 @@ jobs:
       env: 
         KEY_PASSWORD: ${{ secrets.CODESIGN_KEY_PASSWORD }}
         KEYSTORE_PASSWORD: ${{ secrets.CODESIGN_KEYSTORE_PASSWORD }}
-        KEYSTORE: ${{ RUNNER_TEMP }}/codesign.p12
+        KEYSTORE: $RUNNER_TEMP/codesign.p12
          
     - run: npm install github-release-notes -g
       shell: bash
