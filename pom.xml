@@ -142,6 +142,25 @@
 				<extensions>true</extensions>
 			</plugin>
 			<plugin>
+				    <groupId>org.apache.maven.plugins</groupId>
+				    <artifactId>maven-jarsigner-plugin</artifactId>
+				    <version>1.2</version>
+				        <configuration>
+				            <keystore>${env.KEYSTORE}</keystore>
+			                <storepass>${env.KEYSTORE_PASSWORD}</storepass>
+			                <alias>key</alias>
+			                <keypass>${env.KEY_PASSWORD}</keypass>
+				        </configuration>
+				        <executions>
+				            <execution>
+				                <id>sign</id>
+				                <goals>
+				                    <goal>sign</goal>
+				                </goals>
+				            </execution>
+				         </executions>
+				</plugin>
+			<plugin>
 					<groupId>org.eclipse.tycho</groupId>
 					<artifactId>tycho-p2-plugin</artifactId>
 					<version>${tycho.version}</version>
