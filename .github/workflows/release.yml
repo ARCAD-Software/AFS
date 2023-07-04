@@ -24,7 +24,7 @@ jobs:
     - name: Set up JDK 17 and 8
       uses: actions/setup-java@v3
       with:
-        distribution: 'temurin'
+        distribution: 'oracle'
         java-version: |
           8
           17
@@ -35,17 +35,7 @@ jobs:
           JavaSE-17
            
     - name: Build with Maven
-      run: mvn -B package -Pflat-repo
-
-    - name: Release and upload flat P2 website
-      uses: softprops/action-gh-release@v1
-      with:
-        name: "Release ${{ github.ref_name }}"
-        body: "The generated P2 repository is available at the following URL : https://github.com/ARCAD-Software/AFS/releases/download/${{ github.ref_name }}/"
-        generate_release_notes: true
-        files: |
-          releng/update/target/flat-repository/*
-           
+      run: mvn -B package -Pflat-repo        
          
     - run: npm install github-release-notes -g
       shell: bash
@@ -53,7 +43,16 @@ jobs:
         sudo apt-get update -y
         sudo apt-get install -y jq
       shell: bash
-    - run: gren release --data-source=commits --override --tags=latest..2023.99.93
+    - run: gren release --data-source=commits --tags=latest..2023.99.92
       env:
         GREN_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
+      
+    - name: Release and upload flat P2 website
+      uses: softprops/action-gh-release@v1
+      with:
+        name: "Release ${{ github.ref_name }}"
+        body: "The generated P2 repository is available at the following URL : https://github.com/ARCAD-Software/AFS/releases/download/${{ github.ref_name }}/"
+        append_body: true
+        files: |
+          releng/update/target/flat-repository/*
