@@ -43,7 +43,7 @@ jobs:
         sudo apt-get update -y
         sudo apt-get install -y jq
       shell: bash
-    - run: gren release --data-source=issues --override --tags=latest..2023.99.91
+    - run: gren release --data-source=issues --override --tags=2023.99.90..latest
       env:
         GREN_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
