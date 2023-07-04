@@ -36,7 +36,7 @@ jobs:
     - name: Load keystore
       run: |
         echo "${{ secrets.CODESIGN_KEYSTORE }}" > codesign.p12.asc
-        gpg -d --passphrase ${{ secrets.CODESIGN_KEYSTORE_PASSPHRASE }} --batch codesign.p12.asc > $keystore
+        gpg -d --passphrase ${{ secrets.CODESIGN_KEYSTORE_PASSPHRASE }} --batch codesign.p12.asc > codesign.p12
            
     - name: Build with Maven
       run: mvn -B package -Pflat-repo 
