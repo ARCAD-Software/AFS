@@ -241,14 +241,14 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 			cors.getDefaultAllowedMethods().remove(Method.PATCH);
 			// Adding HEAD which is used !
 			cors.getDefaultAllowedMethods().add(Method.HEAD);
+			cors.setAllowingAllRequestedHeaders(true);
 			int i = Integer.getInteger("com.arcadsoftware.corsservice.maxage", -1); //$NON-NLS-1$
 			if ((i > 0) && (i <= 86400)) {
 				cors.setMaxAge(i);
 			}
 			// Skipping "OPTIONS" requests is not required to be able to add the CORS headers (this is how Restlet implement it !).
 			// (This disable the usage of OPTIONS methods in the whole server.)
-			// When the usage of OPTIONS will be not used anymore we will re set this option to true... 
-			cors.setSkippingResourceForCorsOptions(Boolean.getBoolean("com.arcadsoftware.corsservice.skip.options")); //$NON-NLS-1$
+			cors.setSkippingResourceForCorsOptions(true);
 			application.getServices().set(cors);
 		} else {
 			warn("CORS Service is disabled this may lead to a vulnerable server in production environments.");
