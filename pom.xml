@@ -14,6 +14,7 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<tycho.version>3.0.4</tycho.version>
+		<keystore></keystore>
 	</properties>
 
 	<!-- Add explicit dependencies not available on P2 repository -->
@@ -146,7 +147,7 @@
 				    <artifactId>maven-jarsigner-plugin</artifactId>
 				    <version>1.2</version>
 				        <configuration>
-				            <keystore>${env.KEYSTORE}</keystore>
+				        	<keystore>${keystore}</keystore>
 			                <storepass>${env.KEYSTORE_PASSWORD}</storepass>
 			                <alias>key</alias>
 			                <keypass>${env.KEY_PASSWORD}</keypass>
