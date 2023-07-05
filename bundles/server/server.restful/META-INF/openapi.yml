@@ -170,6 +170,8 @@ paths:
     get:
       summary: Information About this API. 
       description: Return the general information about this API. If this resource return a 404 error message you are assured that the server is not able to process any other call. 
+      tags:
+      - Framework
       responses:
         "200":
           description: The information about this API. 

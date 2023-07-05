@@ -76,7 +76,7 @@ public class EntityParentResource extends UserLinkedResource {
 		if ((types == null) || (types.length == 0)) {
 			return true;
 		}
-		for (String t:types) {
+		for (String t: types) {
 			if (type.matches(t)) {
 				return true;
 			}

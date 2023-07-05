@@ -424,8 +424,8 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 		} else {
 			setName(name);
 		}
-		typecode = typecode + '.';
-		String descCode = typecode + 'd'; 
+		typecode += '.';
+		String descCode = typecode + 'd';
 		String desc = Activator.getInstance().translate(Activator.TRANLATEDOMAIN_ENTITY, descCode, language);
 		if (!descCode.equals(desc)) {
 			setDescription(desc);
@@ -543,6 +543,7 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 		result.metadata.remove("logCreate"); //$NON-NLS-1$
 		result.metadata.remove("logUnlink"); //$NON-NLS-1$
 		result.metadata.remove("logLink"); //$NON-NLS-1$
+		result.metadata.remove("replace"); //$NON-NLS-1$
 		for (MetaDataAttribute a: result.attributes.values()) {
 			a.getMetadata().remove("col"); //$NON-NLS-1$
 			a.getMetadata().remove("ldap"); //$NON-NLS-1$
