@@ -1,0 +1,304 @@
+openapi: 3.1.0 #Documentation Fragment
+components:
+  schemas:
+    MetaDataEntities:
+      xml:
+        name: 'list'
+      type: array
+      description: List of entities definitions.
+      items:
+        shema:
+          $ref: '#/components/schemas/MetaDataEntity'
+    MetaDataEntity:
+      xml:
+        name: 'entity'
+      type: object
+      description: Entity definition.
+      properties:
+        domain:
+          type: string
+          description: The domain of the Entity. The domain determine the type of storage or the data component associated to the entity.
+          xml:
+            attribute: true
+        version:
+          type: integer
+          description: The version number of the current entity definition.
+          xml:
+            attribute: true
+        date:
+          type: string
+          format: date
+          description: The Last modification date of the entity definition.
+          xml:
+            attribute: true
+        type:
+          type: string
+          description: The entity type. The type is a unique code name in this application which identify the entity.
+          xml:
+            attribute: true 
+        name:
+          type: string
+          description: The entity name. A human readable, localized, representation of the entity name.
+          xml:
+            attribute: true
+        description:
+          type: string
+          description: The localized entity description.
+        readonly:
+          type: boolean
+          description: If true this entity data are not modifiable.
+          xml:
+            attribute: true
+        rights:
+          description: Define the access rights (CRUD) condition associated to this entity.
+          type: object
+          properties:
+            create:
+              description: The Creation right condition. Define the condition that a user must grant to be able to create a new data of this entity.
+              shema:
+                $ref: '#/components/schemas/MetaDataCriteria'
+            read:
+              description: The Read right condition. Define the condition that a user must grant to be able to get a data content of this entity.
+              shema:
+                $ref: '#/components/schemas/MetaDataCriteria'
+            update:
+              description: The Update right condition. Define the condition that a user must grant to be able to modify an existing data content of this entity.
+              shema:
+                $ref: '#/components/schemas/MetaDataCriteria'
+            delete:
+              description: The Delete right condition. Define the condition that a user must grant to be able to remove a data of this entity.
+              shema:
+                $ref: '#/components/schemas/MetaDataCriteria'
+            list:
+              description: The List right condition. Define the condition that a user must grant to be able to list some datas of this entity.
+              shema:
+                $ref: '#/components/schemas/MetaDataCriteria'
+        metadata:
+          description: Define the specific properties associated to this entity. The properties of this object depends on the application.
+          type: object
+        attribute:
+          description: Define the attributes (properties) of this entity.
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The attribute type, may be another entity type, of a basic type (i.e. string, integer, boolean...).
+                xml:
+                  attribute: true
+              code:
+                type: string
+                description: The attribute identifier.
+                xml:
+                  attribute: true
+              name:
+                type: string
+                description: The attribute name, in an human readable form, and localized.
+                xml:
+                  attribute: true
+              description:
+                type: string
+                description: The localized attribute description.
+              readonly:
+                type: boolean
+                description: If true this attribute value is not modifiable.
+                xml:
+                  attribute: true
+              listable:
+                type: boolean
+                description: If true this attribute value will be returned, by default, in the data lists if not specific attribute is requested.
+                xml:
+                  attribute: true
+              mandatory:
+                type: boolean
+                description: If true this attribute value required for the creation of a new data, and is not nullable.
+                xml:
+                  attribute: true
+              length:
+                type: integer
+                description: For attribute with type "string" the maximal length of the string, a negative value indicate an unlimited size.
+                xml:
+                  attribute: true
+              precision:
+                type: integer
+                description: For attribute with type "float" the decimal depth.
+                xml:
+                  attribute: true
+              metadata:
+                description: Define the specific properties associated to this attribute. The properties of this object depends on the application.
+                type: object
+              rights:
+                description: Define the access rights condition associated to this attribute.
+                type: object
+                properties:
+                  read:
+                    description: The Read right condition. Define the condition that a user must grant to be able to get this attribute value.
+                    shema:
+                      $ref: '#/components/schemas/MetaDataCriteria'
+                  update:
+                    description: The Update right condition. Define the condition that a user must grant to be able to modify this attribute value.
+                    shema:
+                      $ref: '#/components/schemas/MetaDataCriteria'
+        link:
+          description: Define the links which connect this entity with other entities of this application.
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The link type it is another (or the same) entity type.
+                xml:
+                  attribute: true
+              code:
+                type: string
+                description: The link identifier.
+                xml:
+                  attribute: true
+              name:
+                type: string
+                description: The link name, in an human readable form, and localized.
+                xml:
+                  attribute: true
+              description:
+                type: string
+                description: The localized attribute description.
+              readonly:
+                type: boolean
+                description: If true this link values are not modifiable.
+                xml:
+                  attribute: true
+              metadata:
+                description: Define the specific properties associated to this link. The properties of this object depends on the application.
+                type: object
+              rights:
+                description: Define the access rights condition associated to this attribute.
+                type: object
+                properties:
+                  list:
+                    description: The List right condition. Define the condition that a user must grant to be able to list the link values.
+                    shema:
+                      $ref: '#/components/schemas/MetaDataCriteria'
+                  create:
+                    description: The Update Create condition. Define the condition that a user must grant to be able to add a new link.
+                    shema:
+                      $ref: '#/components/schemas/MetaDataCriteria'
+    MetaDataCriteria:
+      type: object
+      description: A Selection condition. See XSD definition for details...
+paths:
+  /metadata:
+    description: This wbe-service allow the retriev the current list of all MetaData Entities declared into this application. Theses entities are associated to the /data/* web-services.
+    get:
+      summary: MetaData Entities definitions list. 
+      description: Return a list of Entities definitions. 
+      tags:
+      - Framework
+      parameters:
+        - in: query
+          name: domain
+          description: Define the entity domain name to retreive.
+          schema:
+            type: string
+        - in: query
+          name: type
+          style: form
+          description: Define the entities to list, allow to filter the list to a specified set of entities.
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                domain:
+                  description: Define the entity domain name to retreive.
+                  type: string
+                type:
+                  description: Define the entities to list, allow to filter the list to a specified set of entities.
+                  type: array
+                  items:
+                    type: string
+          application/xml:
+            schema:
+              type: object
+              properties:
+                domain:
+                  description: Define the entity domain name to retreive.
+                  type: string
+                type:
+                  description: Define the entities to list, allow to filter the list to a specified set of entities.
+                  type: array
+                  items:
+                    type: string
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                domain:
+                  description: Define the entity domain name to retreive.
+                  type: string
+                type:
+                  description: Define the entities to list, allow to filter the list to a specified set of entities.
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "200":
+          description: A list of entities definitions. 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetaDataEntities'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/MetaDataEntities'
+            text/xml:
+              schema:
+                $ref: '#/components/schemas/MetaDataEntities'
+            application/x-xsd+xml:
+              description: The XML definition of entities declarations.
+              schema:
+                type: string
+        "404":
+          $ref: '#/components/responses/NotFound' 
+        default:
+          description: An unexpected error occurs.
+  /metadata/{entity}:
+    description: This web-service allow the retrieve the definition of a MetaData Entity declared into this application. Theses entities are associated to the /data/* web-services.
+    get:
+      summary: MetaData Entity definition. 
+      description: Return an Entity definition, 404 if this entity does not exists in this application. 
+      parameters:
+        - in: path
+          name: entity
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: The requested entity type.
+      tags:
+      - Framework
+      responses:
+        "200":
+          description: The requested Entity definition.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetaDataEntity'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/MetaDataEntity'
+            text/xml:
+              schema:
+                $ref: '#/components/schemas/MetaDataEntity'
+            application/x-xsd+xml:
+              description: The XML definition of entities declarations.
+              schema:
+                type: string
+        "404":
+          $ref: '#/components/responses/NotFound' 
+        default:
+          description: An unexpected error occurs.

@@ -1,6 +1,4 @@
 openapi: 3.1.0 #Documentation Fragment
-# This description is the fisrt static element which is always included into documentation.
-# It contain some reusable components which are managed through the Restlet framework for the whole API.
 components:
   schemas:
     SimpleStringList:
@@ -103,6 +101,8 @@ paths:
     get:
       summary: Information About the current user. 
       description: The known information about this user, this include some identification and the list of access rights relative to him. 
+      tags:
+      - Framework
       responses:
         "200":
           description: The information about the current user. 
@@ -157,12 +157,15 @@ paths:
     post:
       summary: Password modification 
       description: If the user user is allowed to (see the "canChangePWD" property of the GET response), he/her can change his/her password though this resource. Note that when the property "changePWD" is true he/her have to change it before to call any other web-service of this application.
-      paramters:
+      tags:
+      - Framework
+      parameters:
         - in: query
           name: newpassword
           description: The new password proposal.
           schema:
             type: string
+            format: password
       requestBody:
         content:
           application/json:
@@ -172,6 +175,7 @@ paths:
                 newpassword:
                   description: The new password proposal.
                   type: string
+                  format: password
           application/xml:
             schema:
               type: object
@@ -179,6 +183,7 @@ paths:
                 newpassword:
                   description: The new password proposal.
                   type: string
+                  format: password
           application/x-www-form-urlencoded:
             schema:
               type: object
@@ -186,6 +191,7 @@ paths:
                 newpassword:
                   description: The new password proposal.
                   type: string
+                  format: password
       responses:
         "204":
           description: The password modification has been accepted the new password must be used in all following call to the application. 
@@ -252,7 +258,9 @@ paths:
     put:
       summary: Password modification 
       description: If the user user is allowed to (see the "canChangePWD" property of the GET response), he/her can change his/her password though this resource. Note that when the property "changePWD" is true he/her have to change it before to call any other web-service of this application.
-      paramters:
+      tags:
+      - Framework
+      parameters:
         - in: query
           name: newpassword
           description: The new password proposal.
@@ -349,6 +357,8 @@ paths:
     get:
       summary: List of Authentication modules. 
       description: Return the list of authentication modules currently active. 
+      tags:
+      - Framework
       responses:
         "200":
           description: The list of module identifier codes. 
