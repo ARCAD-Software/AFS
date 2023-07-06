@@ -1,7 +1,7 @@
 # .github/release.yml
 
 changelog:
-  categories:
+  sections:
     - title: Enhancements
       labels: ["enhancement"]
     - title: Bugs

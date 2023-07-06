@@ -15,9 +15,8 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
+    
     steps:
     - uses: actions/checkout@v3
        
@@ -33,20 +32,35 @@ jobs:
         mvn-toolchain-id: |
           JavaSE-1.8
           JavaSE-17
+          
+    - name: Load keystore
+      run: |
+        echo "${{ secrets.CODESIGN_KEYSTORE }}" > $RUNNER_TEMP/codesign.p12.asc
+        gpg -d --passphrase ${{ secrets.CODESIGN_KEYSTORE_PASSPHRASE }} --batch $RUNNER_TEMP/codesign.p12.asc > $RUNNER_TEMP/codesign.p12
            
     - name: Build with Maven
-      run: mvn -B package -Pflat-repo
-
+      run: mvn -B package -Pflat-repo -Dkeystore=$RUNNER_TEMP/codesign.p12
+      env: 
+        KEY_PASSWORD: ${{ secrets.CODESIGN_KEY_PASSWORD }}
+        KEYSTORE_PASSWORD: ${{ secrets.CODESIGN_KEYSTORE_PASSWORD }}
+         
+    - run: npm install github-release-notes -g
+      shell: bash
+    - run: |
+        sudo apt-get update -y
+        sudo apt-get install -y jq
+      shell: bash
+    - name: Generate release notes with gren
+      run: gren release --data-source=issues -B -t ${{ github.ref_name }} -o
+      env:
+        GREN_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      shell: bash
+      
     - name: Release and upload flat P2 website
       uses: softprops/action-gh-release@v1
       with:
         name: "Release ${{ github.ref_name }}"
         body: "The generated P2 repository is available at the following URL : https://github.com/ARCAD-Software/AFS/releases/download/${{ github.ref_name }}/"
-        generate_release_notes: true
+        append_body: true
         files: |
           releng/update/target/flat-repository/*
-       
-    - name: Generate Release Notes
-      run: npx gren release --data-source=commits
-      env:
-        GREN_GITHUB_TOKEN: "${{secrets.GITHUB_TOKEN}}"
