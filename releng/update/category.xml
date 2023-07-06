@@ -6,6 +6,7 @@
    <feature id="com.arcadsoftware.afs.server.osgi" version="0.0.0">
       <category name="base"/>
    </feature>
+   <bundle id="com.arcadsoftware.tool.cli"/>
    <category-def name="base" label="ARCAD Foundation Services features">
       <description>
          These features are the different modules of ARCAD Foundation Services (Server, CLI, RCP).

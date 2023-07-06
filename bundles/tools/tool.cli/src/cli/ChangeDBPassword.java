@@ -1,0 +1,136 @@
+/*******************************************************************************
+ * Copyright (c) 2023 ARCAD Software.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License 2.0
+ * which accompanies this distribution, and is available at
+ * https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *     ARCAD Software - initial API and implementation
+ *******************************************************************************/
+package cli;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
+
+import com.arcadsoftware.crypt.Crypto;
+import com.arcadsoftware.crypt.RandomGenerator;
+import com.arcadsoftware.tool.cli.DataSourceCommand;
+
+public final class ChangeDBPassword extends DataSourceCommand {
+
+	public static void main(String[] args) {
+		new ChangeDBPassword(args).exec();
+	}
+
+	private final HashMap<String, Object> confChanged = new HashMap<String, Object>();
+	private char[] newPwd;
+	
+	public ChangeDBPassword() {
+		super();
+	}
+	
+	public ChangeDBPassword(String[] args) {
+		super(args);
+	}
+
+	@Override
+	protected String getVersion() {
+		return "1.0.0"; //$NON-NLS-1$
+	}
+
+	@Override
+	protected String getCommandFullName() {
+		return "dbpwd"; //$NON-NLS-1$
+	}
+
+	@Override
+	protected String getCommandDescription() {
+		return "This command allow to change the password required to access to the database. It use the current password to connect to the database dans change it.";
+	}
+
+	@Override
+	protected Map<String, String> getArgumentsDescription() {
+		Map<String, String> result = super.getArgumentsDescription();
+		result.put("[-pwd|-password <password>]", //$NON-NLS-1$
+				"Specify the new password used to replace tu current one. If no -ds argument is used and the application define multiple data source the same password will be used for all of them. If not specified the password will be asked to the prompt command.");
+		result.put("[-gen|-generate]", //$NON-NLS-1$
+				"If used this parameter will generate a random password for the data sources connection, ignoring any provided password and disabling any prompt."); //$NON-NLS-1$
+		return result;
+	}
+
+	@Override
+	protected int run() {
+		newPwd = getArgumentValue(new String[] {"-pwd", "-npwd", "-new.password", "-password"}, (char[]) null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		try {
+			return super.run();
+		} finally {
+			if (!confChanged.isEmpty()) {
+				Hashtable<String, Object> properties = getOSGiConfiguration("com.arcadsoftware.database.sql"); //$NON-NLS-1$ 
+				for (Entry<String, Object> e: confChanged.entrySet()) {
+					properties.put(e.getKey(), e.getValue());
+				}
+				saveOSGiConfiguration();
+				println("Application server configuration updated with new password.");
+			}
+		}
+	}
+
+	@Override
+	protected int runDataSourceCommand(String dataSourceID, String dataSourceType, Connection connection, String url, Properties connectionProperties) {
+		println("Connected to the data source: %s [%S].", dataSourceID, dataSourceType);
+		String login = (String) connectionProperties.get("user"); //$NON-NLS-1$
+		String pwd;
+		if (isArgument("-gen", "-generate")) {
+			pwd = new String(RandomGenerator.complexRandonPassword());
+		} else if (newPwd == null) {
+			char[] pwdc = readSecret("Enter the new password used for the Data Source \"" + dataSourceID + "\": ");
+			if (pwdc == null) {
+				printError("ERROR: no password provided !");
+				return ERROR_MISSING_PARAMETER;
+			}
+			char[] pwd2 = readSecret("Confirm this new password: ");
+			if (!Arrays.equals(pwdc, pwd2)) {
+				printError("The given passwords do not matches."); 
+				return ERROR_WRONG_PARAMETER;
+			}
+			pwd = new String(pwdc);
+		} else {
+			pwd = new String(newPwd);
+		}
+		if (dataSourceType.startsWith("h2")) { //$NON-NLS-1$
+			try (PreparedStatement ps = connection.prepareStatement("ALTER USER \"" + login + "\" SET PASSWORD ?")) { //$NON-NLS-1$ //$NON-NLS-2$
+				ps.setString(1, pwd);
+				ps.executeUpdate();
+			} catch (SQLException e) {
+				printError("ERROR Unable to change H2 database password: " + e.getLocalizedMessage());
+				return ERROR_DATABASE_CORRUPTED;
+			}
+		} else if ("postgresql".equalsIgnoreCase(dataSourceType)) { //$NON-NLS-1$
+			try (PreparedStatement ps = connection.prepareStatement("ALTER USER \"" + login + "\" WITH PASSWORD ?")) { //$NON-NLS-1$ //$NON-NLS-2$
+				ps.setString(1, pwd);
+				ps.executeUpdate();
+			} catch (SQLException e) {
+				printError("ERROR Unable to change PostGreSQL database password: " + e.getLocalizedMessage());
+				return ERROR_DATABASE_CORRUPTED;
+			}
+		} else {
+			printError("WARNING Unsupported Data Source type: " + dataSourceType);
+			return ERROR_INTERNAL_ERROR;
+		}
+		println("Data source Password changed.");
+		confChanged.put(dataSourceID + KEY_DATABASEPWD, Crypto.encrypt(pwd.toCharArray()));
+		// TODO Tester une reconnection !?!??
+		return 0;
+	}
+}
