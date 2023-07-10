@@ -6,7 +6,7 @@
 
 	<groupId>com.arcadsoftware</groupId>
 	<artifactId>com.arcadsoftware.afs</artifactId>
-	<version>2023.7.1-SNAPSHOT</version>
+	<version>2023.10.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<properties>
@@ -14,6 +14,7 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<tycho.version>3.0.4</tycho.version>
+		<keystore></keystore>
 	</properties>
 
 	<!-- Add explicit dependencies not available on P2 repository -->
@@ -142,6 +143,25 @@
 				<extensions>true</extensions>
 			</plugin>
 			<plugin>
+				    <groupId>org.apache.maven.plugins</groupId>
+				    <artifactId>maven-jarsigner-plugin</artifactId>
+				    <version>1.2</version>
+				        <configuration>
+				        	<keystore>${keystore}</keystore>
+			                <storepass>${env.KEYSTORE_PASSWORD}</storepass>
+			                <alias>key</alias>
+			                <keypass>${env.KEY_PASSWORD}</keypass>
+				        </configuration>
+				        <executions>
+				            <execution>
+				                <id>sign</id>
+				                <goals>
+				                    <goal>sign</goal>
+				                </goals>
+				            </execution>
+				         </executions>
+				</plugin>
+			<plugin>
 					<groupId>org.eclipse.tycho</groupId>
 					<artifactId>tycho-p2-plugin</artifactId>
 					<version>${tycho.version}</version>
@@ -183,7 +203,7 @@
 							<artifact>
 								<groupId>com.arcadsoftware</groupId>
 								<artifactId>com.arcadsoftware.afs.platform</artifactId>
-								<version>2023.7.1-SNAPSHOT</version>
+								<version>2023.10.0-SNAPSHOT</version>
 							</artifact>
 						</target>
 						<executionEnvironment>JavaSE-1.8</executionEnvironment>
