@@ -15,9 +15,7 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
        
@@ -33,7 +31,7 @@ jobs:
         mvn-toolchain-id: |
           JavaSE-1.8
           JavaSE-17
-          
+
      - name: Load keystore
       run: |
         echo "${{ secrets.CODESIGN_KEYSTORE }}" > $RUNNER_TEMP/codesign.p12.asc
