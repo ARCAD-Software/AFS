@@ -21,6 +21,7 @@ import java.util.Hashtable;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.restlet.data.CharacterSet;
+import org.restlet.data.Form;
 import org.restlet.data.Language;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -129,22 +130,33 @@ public class CurrentUserResource extends BaseResource {
 		if (!(cc instanceof IUpdatableCredential)) {
 			throw new ResourceException(Status.SERVER_ERROR_NOT_IMPLEMENTED, Activator.getInstance().getMessage("cannotChangePWD", language)); //$NON-NLS-1$
 		}
-		String newp = getRequestForm().getFirstValue("newpassword"); //$NON-NLS-1$
-		if ((newp == null) || (newp.length() == 0)) {
+		Form form = getRequestForm();
+		String newp = form.getFirstValue("newpassword"); //$NON-NLS-1$
+		if ((newp == null) || newp.isEmpty()) {
 			Activator.getInstance().debug(Messages.CurrentUserResource_Error_badparamters);
 			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
 					Activator.getInstance().getMessage("empty_new_pwd", language)); //$NON-NLS-1$
 		}
-		if ((oldp == null) || (oldp.length() == 0)) {
+		String op = form.getFirstValue("oldpassword"); //$NON-NLS-1$
+		if ((op != null) && !op.isEmpty()) {
+			if ((oldp != null) && !oldp.isEmpty()) {
+				if (!oldp.equals(op)) {
+					throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, Activator.getInstance().getMessage("invalid_old_pwd", language)); //$NON-NLS-1$
+				}
+			}
+		} else {
+			op = oldp;
+		}
+		if ((op == null) || op.isEmpty()) {
 			Activator.getInstance().debug(Messages.CurrentUserResource_Debug_Empty_old_password);
 			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, Activator.getInstance().getMessage("empty_old_pwd", language)); //$NON-NLS-1$
 		}
-		if (newp.equals(oldp)) {
+		if (newp.equals(op)) {
 			if (user.isChangePWD()) {
 				throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, Activator.getInstance().getMessage("same_pwd", language)); //$NON-NLS-1$
 			}
 		} else {
-			final char[] oldpc = oldp.toCharArray();
+			final char[] oldpc = op.toCharArray();
 			final char[] newpc = newp.toCharArray();
 			String result = null;
 			try {
