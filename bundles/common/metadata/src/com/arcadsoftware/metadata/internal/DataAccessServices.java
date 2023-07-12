@@ -712,11 +712,11 @@ public class DataAccessServices implements IMapperService, IEntityRegistry {
 	}
 
 	@Override
-	public boolean test(MetaDataEntity entity, int itemId, ISearchCriteria criteria, IConnectionUserBean currentUser) {
+	public boolean test(MetaDataEntity entity, int itemId, ISearchCriteria criteria, boolean deleted, IConnectionUserBean currentUser) {
 		try {
 			// TODO DataAccess can not count items.
 			// TODO Support user substitution (if real current user possess the associated right).
-			BeanMapList list = dao.getList(entity.getType(),"",AndCriteria.and(criteria,new IdEqualCriteria(itemId)),null,0,1,false); //$NON-NLS-1$
+			BeanMapList list = dao.getList(entity.getType(), "", AndCriteria.and(criteria, new IdEqualCriteria(itemId)), null, 0, 1, deleted); //$NON-NLS-1$
 			return (list != null) && (list.size() > 0);
 		} catch (ServerErrorException e) {
 			logError(e);
@@ -725,6 +725,11 @@ public class DataAccessServices implements IMapperService, IEntityRegistry {
 			logError(e);
 			return false;
 		}
+	}
+
+	@Override
+	public boolean test(MetaDataEntity entity, int itemId, ISearchCriteria criteria, IConnectionUserBean currentUser) {
+		return test(entity, itemId, criteria, false, currentUser);
 	}
 
 	@Override

@@ -2010,7 +2010,7 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 				if (value == null) {
 					value = ""; //$NON-NLS-1$
 				}
-				if (MetaDataAttribute.TYPE_BOOLEAN.equals(att.getType())) { 
+				if (MetaDataAttribute.TYPE_BOOLEAN.equals(att.getType())) {
 					if ("true".equalsIgnoreCase(value) || //$NON-NLS-1$
 							"yes".equalsIgnoreCase(value) || //$NON-NLS-1$
 							"1".equalsIgnoreCase(value)) { //$NON-NLS-1$
@@ -2020,7 +2020,7 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 					}
 					continue;
 				}
-				if (MetaDataAttribute.TYPE_DATE.equals(att.getType())) { 
+				if (MetaDataAttribute.TYPE_DATE.equals(att.getType())) {
 					if (value.length() == 0) {
 						// Support null dates.
 						result.put(code, null);

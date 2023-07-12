@@ -42,6 +42,8 @@ import com.arcadsoftware.metadata.MetaDataLink;
 import com.arcadsoftware.metadata.MetaDataLinkFormater;
 import com.arcadsoftware.metadata.MetaDataTest;
 import com.arcadsoftware.metadata.ReferenceLine;
+import com.arcadsoftware.metadata.criteria.ConstantCriteria;
+import com.arcadsoftware.metadata.criteria.ISearchCriteria;
 import com.arcadsoftware.metadata.rest.internal.Activator;
 import com.arcadsoftware.rest.UserLinkedIdentifiedResource;
 import com.arcadsoftware.rest.UserLinkedResource;
@@ -81,7 +83,7 @@ public class DataItemResource extends UserLinkedResource {
 					BeanMap bean = null;
 					try {
 						int i = Integer.parseInt(value);
-						bean = getMapper().selection(getEntity(), i, attrs, true);
+						bean = getMapper().selection(entity, i, attrs, true);
 					} catch (NumberFormatException e) {}
 					if (bean != null) {
 						items.add(bean);
@@ -328,15 +330,34 @@ public class DataItemResource extends UserLinkedResource {
 	}
 
 	/**
-	 * Test the Update right for an unique item. 
-	 * @param entity
-	 * @param item
-	 * @param language
+	 * Test the Update right for an unique item.
+	 * 
+	 * @param entity The entity of the tested data.
+	 * @param item The data item ID to test.
+	 * @param language The current user language.
 	 * @return
 	 */
 	protected boolean hasRightUpdate(MetaDataEntity entity, BeanMap item, Language language) {
-		return entity.getMapper().test(entity, item.getId(), entity.getRightUpdate(), getUser());
-		// Le test du code Groovy ne s'effectue pas à ce niveau mais en fonction des attributs modifiés.
+		return hasRightUpdate(entity, item, false, false, language);
+	}
+
+	/**
+	 * Test the Update right for an unique item.
+	 * 
+	 * @param entity The entity of the tested data.
+	 * @param item The data item ID to test.
+	 * @param deleted true if the operation may be executed on a deleted item !
+	 * @param exists is true if we already know that this data exists and a check is not required.
+	 * @param language The current user language.
+	 * @return
+	 */
+	protected boolean hasRightUpdate(MetaDataEntity entity, BeanMap item, boolean deleted, boolean exists, Language language) {
+		final ISearchCriteria right = entity.getRightUpdate();
+		if (exists && ((right == null) || ConstantCriteria.TRUE.equals(right))) {
+			return true;
+		}
+		return entity.getMapper().test(entity, item.getId(), right, deleted, getUser());
+		// There is no Entity test (groovy) to perform here. It will be done on the updated attributes' values.
 	}
 
 	/**
@@ -344,9 +365,9 @@ public class DataItemResource extends UserLinkedResource {
 	 * 
 	 * <p>
 	 * This method do not test Attributes read rights.
-	 * @param entity
-	 * @param item
-	 * @param language
+	 * @param entity The entity of the tested data.
+	 * @param item The data item ID to test.
+	 * @param language The current user language.
 	 * @return
 	 */
 	protected boolean hasRightRead(MetaDataEntity entity, BeanMap item, Language language) {

@@ -1602,7 +1602,7 @@ public class MapperSQLService extends AbstractMapperService {
 		where.append(e.idCol);
 		where.append(fg.paramequal);
 		generateDeleteTest(e, deleted, cols, where);
-		return completeForeignAttributes(attributes,query(String.format(fg.select, cols.toString(), joins.toString(), where.toString()), entity.getType(), new Object[]{itemId}));
+		return completeForeignAttributes(attributes, query(String.format(fg.select, cols.toString(), joins.toString(), where.toString()), entity.getType(), new Object[] {itemId}));
 	}
 
 	@Override

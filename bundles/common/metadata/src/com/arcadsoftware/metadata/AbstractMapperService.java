@@ -1392,7 +1392,8 @@ public abstract class AbstractMapperService implements IMapperService {
 		return doCount(false, criteria, false, context) > 0;
 	}
 
-	public final boolean test(MetaDataEntity entity, int itemId, ISearchCriteria criteria, IConnectionUserBean currentUser) {
+	@Override
+	public boolean test(MetaDataEntity entity, int itemId, ISearchCriteria criteria, boolean deleted, IConnectionUserBean currentUser) {
 		ICriteriaContext context = getContext(entity, currentUser);
 		if (criteria == null) {
 			criteria = new IdEqualCriteria(itemId);
@@ -1409,7 +1410,11 @@ public abstract class AbstractMapperService implements IMapperService {
 				criteria = new AndCriteria(criteria, new IdEqualCriteria(itemId));
 			}
 		}
-		return doCount(false, criteria, false, context) > 0;
+		return doCount(deleted, criteria, false, context) > 0;
+	}
+
+	public final boolean test(MetaDataEntity entity, int itemId, ISearchCriteria criteria, IConnectionUserBean currentUser) {
+		return test(entity, itemId, criteria, false, currentUser);
 	}
 
 	public final BeanMapList selection(List<ReferenceLine> attributes, boolean deleted, ReferenceLine attributeTest,
