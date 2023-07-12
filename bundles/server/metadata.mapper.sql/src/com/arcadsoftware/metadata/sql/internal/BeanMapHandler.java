@@ -32,9 +32,9 @@ import com.arcadsoftware.dbutils.AliasesBeanProcessor;
 public class BeanMapHandler implements ResultSetHandler<Object> {
 
 	private BeanMap bean;
-	private String prefix = null;
-	private String startwith = null;
-	private int startwithlen = 0;
+	private String prefix;
+	private String startwith;
+	private int startwithlen;
 	private final boolean returnBeanMap;
 
 	public BeanMapHandler() {
@@ -75,8 +75,7 @@ public class BeanMapHandler implements ResultSetHandler<Object> {
 	public Object handle(ResultSet rs) throws SQLException {
 		if (rs.next()) {
 			ResultSetMetaData rsmd = rs.getMetaData();
-			processBeanMap(bean, rs, rsmd.getColumnCount(), rsmd);
-			return bean;
+			return processBeanMap(bean, rs, rsmd.getColumnCount(), rsmd);
 		}
 		if (returnBeanMap) {
 			return bean;
@@ -105,6 +104,8 @@ public class BeanMapHandler implements ResultSetHandler<Object> {
 			}
 			if ("id".equals(name) && notid) { //$NON-NLS-1$
 				bean.forceId(rs.getInt(i));
+			} else if ("deleted".equals(name)) { //$NON-NLS-1$
+				bean.setDeleted(rs.getInt(i) != 0);
 			} else if ("date".equals(name)) { //$NON-NLS-1$
 				Timestamp t = rs.getTimestamp(i);
 				if (t != null) {

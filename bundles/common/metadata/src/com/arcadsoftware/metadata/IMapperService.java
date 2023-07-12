@@ -990,6 +990,23 @@ public interface IMapperService {
 	public boolean test(MetaDataEntity entity, int itemId, ISearchCriteria criteria, IConnectionUserBean currentUser);
 
 	/**
+	 * Test a complex condition against a specific item and return true if it succeed.
+	 * 
+	 * @param entity
+	 *            the entity to count.
+	 * @param itemId
+	 *            The item ID to test.
+	 * @param criteria
+	 *            The complex condition to be tested.
+	 * @param deleted
+	 *            The test must be performed on a deleted element
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return true if the condition is applicable to the given item.
+	 */
+	public boolean test(MetaDataEntity entity, int itemId, ISearchCriteria criteria, boolean deleted, IConnectionUserBean currentUser);
+
+	/**
 	 * Return the first result of the selection.
 	 * 
 	 * <p>
