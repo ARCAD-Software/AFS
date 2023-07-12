@@ -38,7 +38,7 @@ jobs:
         gpg -d --passphrase ${{ secrets.CODESIGN_KEYSTORE_PASSPHRASE }} --batch $RUNNER_TEMP/codesign.p12.asc > $RUNNER_TEMP/codesign.p12
            
     - name: Build with Maven
-      run: mvn -B package -Pflat-repo -Dkeystore=$RUNNER_TEMP/codesign.p12
+      run: mvn -B package -X -e -Pflat-repo -Dkeystore=$RUNNER_TEMP/codesign.p12
       env: 
         KEY_PASSWORD: ${{ secrets.CODESIGN_KEY_PASSWORD }}
         KEYSTORE_PASSWORD: ${{ secrets.CODESIGN_KEYSTORE_PASSWORD }}
