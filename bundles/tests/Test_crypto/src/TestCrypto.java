@@ -110,6 +110,8 @@ class TestCrypto {
 
 	@Test
 	void testHash() {
+		// BC 1.72 introduced a bug... a Yield is required before any usage of the hash method !
+		//Thread.yield();
 		long t = System.currentTimeMillis();
 		String h1 = Crypto.hash("monmotdepasseilestcool".toCharArray());
 		String h2 = Crypto.hash("monmotdepasseilestcoul");
