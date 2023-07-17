@@ -1,7 +1,21 @@
 <extensions>
 	<extension>
+		<groupId>org.eclipse.tycho</groupId>
+		<artifactId>tycho-build</artifactId>
+		<version>3.0.4</version>
+	</extension>
+<!-- 
+	<extension>
 		<groupId>org.eclipse.tycho.extras</groupId>
 		<artifactId>tycho-pomless</artifactId>
 		<version>3.0.4</version>
 	</extension>
+Warning:  org.eclipse.tycho.extras:tycho-pomless build extension will be replaced in a future version of Tycho by the new org.eclipse.tycho:tycho-build extension.
+Warning:  You can simply change your .mvn/extensions.xml to reference the new extension right now:
+Warning:  <extension>
+Warning:     <groupId>org.eclipse.tycho</groupId>
+Warning:     <artifactId>tycho-build</artifactId>
+Warning:     <version>3.0.4</version>
+Warning:  </extension>
+ -->
 </extensions>
