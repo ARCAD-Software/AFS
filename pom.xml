@@ -171,10 +171,10 @@
 	                <storepass>${env.KEYSTORE_PASSWORD}</storepass>
 	                <alias>key</alias>
 	                <keypass>${env.KEY_PASSWORD}</keypass>
-	                <arguments>
+	                <!-- <arguments>
 	                	<argument>-sigalg</argument>
 	                	<argument>NONEwithRSA</argument>
-	                </arguments>
+	                </arguments> -->
 		        </configuration>
 		        <executions>
 		            <execution>
