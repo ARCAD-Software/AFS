@@ -151,6 +151,10 @@
 	                <storepass>${env.KEYSTORE_PASSWORD}</storepass>
 	                <alias>key</alias>
 	                <keypass>${env.KEY_PASSWORD}</keypass>
+	                <arguments>
+	                	<argument>-sigalg</argument>
+	                	<argument>NONEWithRSA</argument>
+	                </arguments>
 		        </configuration>
 		        <executions>
 		            <execution>
