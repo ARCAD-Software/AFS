@@ -153,7 +153,7 @@
 	                <keypass>${env.KEY_PASSWORD}</keypass>
 	                <arguments>
 	                	<argument>-sigalg</argument>
-	                	<argument>NONEWithRSA</argument>
+	                	<argument>NONEwithRSA</argument>
 	                </arguments>
 		        </configuration>
 		        <executions>
@@ -217,7 +217,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-toolchains-plugin</artifactId>
-					<version>1.1</version>
+					<version>3.0.0</version>
 					<executions>
 						<execution>
 							<goals>
@@ -228,7 +228,7 @@
 					<configuration>
 						<toolchains>
 							<jdk>
-								<version>1.8</version>
+								<version>8</version>
 							</jdk>
 						</toolchains>
 					</configuration>
