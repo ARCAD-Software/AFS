@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.arcadsoftware</groupId>
 		<artifactId>com.arcadsoftware.afs.releng</artifactId>
-		<version>2023.7.2</version>
+		<version>2023.7.3-SNAPSHOT</version>
 	</parent>
 	<artifactId>com.arcadsoftware.afs.platform</artifactId>
 	<packaging>eclipse-target-definition</packaging>
