@@ -6,7 +6,7 @@
 
 	<groupId>com.arcadsoftware</groupId>
 	<artifactId>com.arcadsoftware.afs</artifactId>
-	<version>2023.7.4-SNAPSHOT</version>
+	<version>2023.7.4</version>
 	<packaging>pom</packaging>
 
 	<properties>
@@ -217,7 +217,7 @@
 				<plugin>
 					<groupId>org.eclipse.tycho</groupId>
 					<artifactId>target-platform-configuration</artifactId>
-					<version>2023.7.4-SNAPSHOT</version>
+					<version>2023.7.4</version>
 					<configuration>
 						<target>
 							<artifact>
