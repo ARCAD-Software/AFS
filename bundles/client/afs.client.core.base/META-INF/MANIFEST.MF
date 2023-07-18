@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: ARCAD-Foundation Services - Client Core Base
 Bundle-SymbolicName: com.arcadsoftware.afs.client.core.base;singleton:=true
-Bundle-Version: 1.5.3.qualifier
+Bundle-Version: 1.6.0
 Bundle-Activator: com.arcadsoftware.afs.client.core.internal.BaseActivator
 Require-Bundle: org.eclipse.core.runtime,
  com.arcadsoftware.afs.framework;bundle-version="1.0.0";visibility:=reexport,
