@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %MANIFEST.Bundle-Name
 Bundle-SymbolicName: com.arcadsoftware.afs.framework.application;singleton:=true
-Bundle-Version: 1.2.1.qualifier
+Bundle-Version: 1.2.1
 Bundle-Activator: com.arcadsoftware.afs.framework.application.internal.Activator
 Bundle-Vendor: %MANIFEST.Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
