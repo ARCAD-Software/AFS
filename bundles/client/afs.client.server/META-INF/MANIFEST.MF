@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: ARCAD-Foundation Services - Server Management
+Bundle-Name: AFS - Server Management
 Bundle-SymbolicName: com.arcadsoftware.afs.client.server;singleton:=true
 Bundle-Version: 1.5.0.qualifier
 Bundle-Activator: com.arcadsoftware.afs.client.server.internals.Activator
-Bundle-Vendor: ARCAD-Software
+Bundle-Vendor: ARCAD Software
 Require-Bundle: org.eclipse.core.runtime,
  com.arcadsoftware.afs.framework;bundle-version="1.0.0";visibility:=reexport,
  com.arcadsoftware.afs.framework.ui;bundle-version="1.0.0",
@@ -27,7 +27,7 @@ Require-Bundle: org.eclipse.core.runtime,
  com.arcadsoftware.rest;bundle-version="2.5.0",
  org.apache.commons.lang3;bundle-version="3.9.0",
  org.restlet.base;bundle-version="2.4.3",
- com.arcadsoftware.afs.client.brands;bundle-version="23.2.0"
+ com.arcadsoftware.afs.client.brands;bundle-version="[1.0.0,2.0.0)"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Export-Package: com.arcadsoftware.afs.client.server,

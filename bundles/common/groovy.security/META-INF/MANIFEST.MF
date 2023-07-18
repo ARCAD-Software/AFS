@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Grovye Script Security
+Bundle-Name: AFS Groovy Script Security
 Bundle-SymbolicName: com.arcadsoftware.groovy.security
-Bundle-Version: 1.0.4.qualifier
+Bundle-Version: 1.1.0.qualifier
 Bundle-Vendor: ARCAD Software
 Automatic-Module-Name: com.arcadsoftware.groovy.security
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8

@@ -1,8 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: ARCAD-Foundation Services - Client List
+Bundle-Name: AFS - Client List
 Bundle-SymbolicName: com.arcadsoftware.afs.client.list;singleton:=true
-Bundle-Version: 1.2.1.qualifier
+Bundle-Vendor: ARCAD Software
+Bundle-Version: 1.3.0.qualifier
 Bundle-Activator: com.arcadsoftware.afs.client.list.internal.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui;resolution:=optional,
@@ -12,7 +13,7 @@ Require-Bundle: org.eclipse.core.runtime,
  com.arcadsoftware.aev.core.ui;bundle-version="11.0.0",
  com.arcadsoftware.aev.list.manager;bundle-version="11.0.0",
  com.arcadsoftware.afs.framework.ui;bundle-version="1.0.0",
- com.arcadsoftware.afs.client.brands;bundle-version="23.2.0"
+ com.arcadsoftware.afs.client.brands;bundle-version="[1.0.0,2.0.0)"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: com.arcadsoftware.afs.client.list,

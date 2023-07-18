@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: AFS Common - SSH
+Bundle-Name: AFS SSH Connections Management
 Bundle-SymbolicName: com.arcadsoftware.ssh
 Bundle-Version: 1.1.4.qualifier
 Bundle-Vendor: ARCAD Software

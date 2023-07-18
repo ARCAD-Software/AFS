@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Rest services interfaces
+Bundle-Name: AFS Rest services interfaces
 Bundle-SymbolicName: com.arcadsoftware.rest
 Bundle-Version: 3.0.1.qualifier
 Bundle-Vendor: ARCAD Software

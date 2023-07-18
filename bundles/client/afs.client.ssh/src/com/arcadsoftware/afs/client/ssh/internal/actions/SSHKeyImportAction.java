@@ -14,11 +14,11 @@
 package com.arcadsoftware.afs.client.ssh.internal.actions;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.osgi.framework.Bundle;
 
@@ -117,11 +117,10 @@ public class SSHKeyImportAction extends AbstractConnectedWizardedAddAction {
 				privateKey = imported;	
 			}
 			keyUpload.setPrivateKey(privateKey);	
-			
-			if(StringUtils.isNotEmpty(keyUpload.getPassphrase())) {
-				keyUpload.setPassphrase(Crypto.fog(keyUpload.getPassphrase()));				
+			final String s = keyUpload.getPassphrase();
+			if((s != null) && !s.isEmpty()) {
+				keyUpload.setPassphrase(Crypto.fog(s.toCharArray(), StandardCharsets.UTF_8));				
 			}
-			
 			final BeanMap uploadResult = helper.getConnection().getDataAccess().post(SSHRoutes.IMPORT_KEY, keyUpload.getBeanmap());
 			if (uploadResult == null) {
 				Activator.getDefault()

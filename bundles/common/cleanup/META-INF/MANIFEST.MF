@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Cleanup module
+Bundle-Name: AFS Clean-up Management
 Bundle-SymbolicName: com.arcadsoftware.cleanup;singleton:=true
 Bundle-Version: 1.3.0.qualifier
 Bundle-Activator: com.arcadsoftware.cleanup.internal.Activator

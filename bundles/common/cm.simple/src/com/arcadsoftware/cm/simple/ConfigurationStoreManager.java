@@ -26,7 +26,7 @@ import java.util.List;
 import com.arcadsoftware.cm.simple.internal.AbstractConfigurationStorage;
 
 /**
- * This class allow to load and save a bunch os configuration files. 
+ * This class allow to load and save a bunch of configuration files. 
  * 
  * <p>
  * It use in order of priority:

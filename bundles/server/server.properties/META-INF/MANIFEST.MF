@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Properties files serving
+Bundle-Name: Properties Files Service
 Bundle-SymbolicName: com.arcadsoftware.server.properties;singleton:=true
-Bundle-Version: 1.1.10.qualifier
+Bundle-Version: 1.2.0.qualifier
 Bundle-Activator: com.arcadsoftware.server.properties.internal.Activator
 Bundle-Vendor: ARCAD Software
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
