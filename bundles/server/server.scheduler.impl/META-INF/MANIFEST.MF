@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: ARCAD Tack Scheduler CRON Implementation
 Bundle-SymbolicName: com.arcadsoftware.server.scheduler.impl;singleton:=true
-Bundle-Version: 1.2.6
+Bundle-Version: 1.2.6.qualifier
 Bundle-Activator: com.arcadsoftware.server.scheduler.internal.Activator
 Bundle-Vendor: ARCAD Software
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
