@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: DROPS - Branding Bundle
+Bundle-Name: AFS - Branding Bundle
 Bundle-SymbolicName: com.arcadsoftware.afs.client.brands;singleton:=true
-Bundle-Version: 23.2.0.qualifier
+Bundle-Version: 1.0.0.qualifier
 Eclipse-BundleShape: dir
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8

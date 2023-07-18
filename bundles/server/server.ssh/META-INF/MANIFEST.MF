@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: AFS Server - SSH
+Bundle-Name: SSH Connection Management
 Bundle-SymbolicName: com.arcadsoftware.server.ssh
-Bundle-Version: 2.2.7.qualifier
+Bundle-Version: 2.3.0.qualifier
 Bundle-Vendor: ARCAD Software
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: com.arcadsoftware.beanmap;version="[2.1.0,3.0.0)",

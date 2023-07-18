@@ -13,6 +13,7 @@
  *******************************************************************************/
 package com.arcadsoftware.afs.client.ssh.internal.actions;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
@@ -109,7 +110,7 @@ public class SSHKeyAddAction extends AbstractConnectedWizardedAddAction {
 		}
 
 		if (sshKey.isEncrypted()) {
-			sshKey.setPassphrase(Crypto.fog(sshKey.getPassphrase()));
+			sshKey.setPassphrase(Crypto.fog(sshKey.getPassphrase().toCharArray(), StandardCharsets.UTF_8));
 		}
 		return helper.put(SSHRoutes.GENERATE_KEY, sshKey.getBeanMap());
 	}

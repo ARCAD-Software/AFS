@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Metadata Entities SQL Mapper for PostgreSQL Boolean
+Bundle-Name: Metadata Entities SQL Mapper for PostgreSQL
 Bundle-SymbolicName: com.arcadsoftware.metadata.mapper.sql.postgresql
-Bundle-Version: 1.0.1.qualifier
-Bundle-Vendor: ARCAD Sosftware
+Bundle-Version: 1.1.0.qualifier
+Bundle-Vendor: ARCAD Software
 Fragment-Host: com.arcadsoftware.metadata.mapper.sql;bundle-version="[1.0.6,2.0.0)"
 Automatic-Module-Name: com.arcadsoftware.metadata.mapper.sql.postgresql
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
