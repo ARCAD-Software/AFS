@@ -1819,7 +1819,9 @@ public class MapperSQLService extends AbstractMapperService {
 			generateDeleteTest(e, deleted, cols, where);
 		}
 		String query;
+		boolean softPagination = false;
 		if (((page == 0) && (limit <= 0)) || (fg.partial == null) || (fg.partial.length() == 0) || (e == null)) {
+			softPagination = (fg.partial == null) || (fg.partial.length() == 0);
 			// Pas de pagination (pas nécessaire ou non supporté par le SGDB).
 			if (where.length() == 0) {
 				if (orderCols.length() == 0) {
@@ -1865,10 +1867,10 @@ public class MapperSQLService extends AbstractMapperService {
 		} else {
 			result = new BeanMapPartialList(limit);
 		}
-		if (((page == 0) && (limit <= 0)) || (fg.partial == null) || (fg.partial.length() == 0) || (e == null)) {
-			result = query(query, context.getEntity().getType(), result, new Object[] {sourceId});
-		} else {
+		if (softPagination) {
 			result = query(query, context.getEntity().getType(), result, new Object[] {sourceId}, page, limit);
+		} else {
+			result = query(query, context.getEntity().getType(), result, new Object[] {sourceId});
 		}
 		if (e != null) {
 			// Result list completed, add the foreigns attributes...
