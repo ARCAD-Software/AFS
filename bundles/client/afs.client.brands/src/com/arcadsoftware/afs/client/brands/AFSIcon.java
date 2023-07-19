@@ -21,6 +21,10 @@ import org.eclipse.swt.widgets.Display;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
+/**
+ * 
+ * @author ARCAD Software
+ */
 public enum AFSIcon {
 	
 	ARCAD("icons/arcad.png"),
@@ -72,17 +76,33 @@ public enum AFSIcon {
 		this.path = path;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public String path() {
 		return this.path;
 	}
 
+	/**
+	 * Get the Icon image.
+	 * 
+	 * @return
+	 */
 	public Image image() {
 		if (image == null) {
 			load();
 		}
 		return image;
+		// FIXME The contract with the caller is not clear who must dispose the Image ?
+		// FIXME a resource leak is possible here.
 	}
 
+	/**
+	 * Get the Image descriptor.
+	 * 
+	 * @return
+	 */
 	public ImageDescriptor imageDescriptor() {
 		if (imageDescriptor == null) {
 			load();
@@ -100,6 +120,12 @@ public enum AFSIcon {
 		image = imageDescriptor.createImage(true, Display.getDefault());
 	}
 
+	/**
+	 * Get an image from registry.
+	 * 
+	 * @param key
+	 * @return
+	 */
 	public static Image getImage(String key) {
 		for (AFSIcon icon : values()) {
 			if (icon.path.equalsIgnoreCase(key)) {
@@ -110,7 +136,7 @@ public enum AFSIcon {
 	}
 
 	/**
-	 * add top right overlay Image on Base Image
+	 * Add top right overlay Image on Base Image.
 	 * 
 	 * @param baseImage
 	 * @param overlayImage
@@ -122,7 +148,7 @@ public enum AFSIcon {
 	}
 
 	/**
-	 * add overlay Image on Base Image
+	 * Add overlay Image on Base Image.
 	 * 
 	 * @param baseImage
 	 * @param overlayImage
