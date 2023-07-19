@@ -6,7 +6,7 @@
 
 	<groupId>com.arcadsoftware</groupId>
 	<artifactId>com.arcadsoftware.afs</artifactId>
-	<version>2023.7.6-SNAPSHOT</version>
+	<version>2023.7.7</version>
 	<packaging>pom</packaging>
 
 	<properties>
@@ -223,7 +223,7 @@
 							<artifact>
 								<groupId>com.arcadsoftware</groupId>
 								<artifactId>com.arcadsoftware.afs.platform</artifactId>
-								<version>2023.7.6-SNAPSHOT</version>
+								<version>2023.7.7</version>
 							</artifact>
 						</target>
 						<executionEnvironment>JavaSE-1.8</executionEnvironment>

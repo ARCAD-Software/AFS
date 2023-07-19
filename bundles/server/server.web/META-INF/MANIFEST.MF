@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Web container into REST HTTP Server
 Bundle-SymbolicName: com.arcadsoftware.server.web;singleton:=true
-Bundle-Version: 1.2.0.qualifier
+Bundle-Version: 1.2.0
 Bundle-Activator: com.arcadsoftware.server.web.internal.Activator
 Bundle-Vendor: ARCAD Software
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
