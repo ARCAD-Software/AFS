@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AFS Cryptographic Utilities
 Bundle-SymbolicName: com.arcadsoftware.crypt
-Bundle-Version: 1.8.0
+Bundle-Version: 1.8.0.qualifier
 Bundle-Vendor: ARCAD Software
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: javax.crypto,
