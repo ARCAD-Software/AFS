@@ -309,11 +309,9 @@ public class DataItemResource extends UserLinkedResource {
 	 * @return
 	 */
 	protected boolean isParameter(Form form,String key) {
-		String s = form.getFirstValue(key);
-		if (s == null) {
-			return getAttribute(key) != null;
-		}
-		return true;
+		return ((form != null) && (form.getFirstValue(key) != null)) || //
+				(getRequest().getResourceRef().getQueryAsForm().getFirstValue(key) != null) || //
+				(getAttribute(key) != null);
 	}
 
 	/**
