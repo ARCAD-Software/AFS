@@ -668,7 +668,7 @@ public final class Crypto {
 	 * </ol>
 	 * @param text the clear text to encrypt, the caller is responsible to delete this information after encryption.
 	 * @param masterkey The master key in clear text, the caller is responsible to delete this information after encryption.
-	 * @param algorithm The algorithn version number to use, currently suport only version 1.
+	 * @param algorithm The algorithm version number to use, currently support only version 1 or 2, version 1 is not secured.
 	 * @return a non null Base64 encrypted buffer.
 	 * @throws NoSuchAlgorithmException
 	 * @throws InvalidKeyException
@@ -906,6 +906,12 @@ public final class Crypto {
 		}
 	}
 	
+	/**
+	 * Test if the given text is encrypted with an algorithm currently considered as secure enough.
+	 * 
+	 * @param text
+	 * @return False if this test should be re-encrypted.
+	 */
 	public static boolean isCryptSecure(String text) {
 		if (text == null) {
 			return true;
@@ -922,7 +928,7 @@ public final class Crypto {
 			int saltsize = getIntByte(buffer, 4);
 			int ivsize = getIntByte(buffer, 8);
 			int iterations = getIntByte(buffer, 12);
-			return (algorithm >= 1) && (algorithm < 3) && (saltsize >= 1) && (ivsize >= 1) && (iterations >= 1);  
+			return (algorithm > 1) && (algorithm < 3) && (saltsize >= 1) && (ivsize >= 1) && (iterations >= 1);  
 		} catch (IllegalArgumentException e) {
 			return false;
 		}
