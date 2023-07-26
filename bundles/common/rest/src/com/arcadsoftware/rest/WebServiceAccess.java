@@ -43,6 +43,7 @@ import org.restlet.data.Preference;
 import org.restlet.data.Protocol;
 import org.restlet.data.Reference;
 import org.restlet.data.Status;
+import org.restlet.representation.FileRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 
@@ -1672,8 +1673,14 @@ public class WebServiceAccess {
 		if (calendar != null) {
 			request.getConditions().setModifiedSince(calendar.getTime());
 		}
+		File file = null;
 		if (body != null) {
 			request.setEntity(body);
+			if (body instanceof FileRepresentation) {
+				// We have to store the file in case of redirection to reset the FileRepresentation properly.
+				// After it has been exhausted during the first call.
+				file = ((FileRepresentation) body).getFile();
+			}
 		} else if ((!ALLOWEMPTYPOSTS) && (Method.POST.equals(method) || Method.PUT.equals(method) || Method.DELETE.equals(method) || Method.OPTIONS.equals(method))) {
 			request.setEntity(EMPTYPARAM);
 		}
@@ -1734,6 +1741,11 @@ public class WebServiceAccess {
 							representation.exhaust();
 							representation.release();
 						}
+					}
+					if (file != null) {
+						final String dispositionType = body.getDisposition().getType();
+						body = new FileRepresentation(file, body.getMediaType());
+						body.getDisposition().setType(dispositionType);
 					}
 					return handle(method, ref, body, calendar, retries, secure, raw, true, mediaType);
 				}
