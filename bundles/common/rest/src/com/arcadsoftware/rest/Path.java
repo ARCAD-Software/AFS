@@ -20,7 +20,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Used by the {@link RouteListBuilder} to define the URLs of an attached {@link Resource}.
+ * Used by the {@link RouteListBuilder} to define the path of an attached {@link Resource}.
  *
  */
 @Retention(RUNTIME)
