@@ -13,8 +13,6 @@
  *******************************************************************************/
 package com.arcadsoftware.rest;
 
-import java.util.stream.Stream;
-
 import org.restlet.resource.ServerResource;
 import org.restlet.routing.Router;
 
@@ -45,12 +43,34 @@ public class RouteListBuilder {
 		this.router = router;
 	}
 
+	/**
+	 * Attach the given resource to this branch.
+	 * 
+	 * <p>
+	 * This resource must use the Path annotation.
+	 * 
+	 * @param resource
+	 * @return
+	 * @see Path
+	 */
 	public RouteListBuilder attach(final Class<? extends ServerResource> resource) {
 		final Path annotation = resource.getAnnotation(Path.class);
-		Stream.of(annotation.value()).forEach(url -> result.add(router.attach(url, resource)));
+		if (annotation != null) {
+			final String[] value = annotation.value();
+			if (value != null) {
+				for (String path: value) {
+					result.add(router.attach(path, resource));
+				}
+			}
+		}
 		return this;
 	}
 
+	/**
+	 * Get the generated RouteList.
+	 *  
+	 * @return never return a null value.
+	 */
 	public RouteList toRouteList() {
 		return result;
 	}
