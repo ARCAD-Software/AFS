@@ -27,6 +27,7 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.restlet.ext.fileupload.RestletFileUpload;
+import org.restlet.representation.EmptyRepresentation;
 import org.restlet.representation.FileRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
@@ -57,7 +58,7 @@ public class BinResource extends OSGiResource {
 					getAllowedMethods().add(Method.OPTIONS);
 					getAllowedMethods().add(Method.HEAD);
 					getAllowedMethods().add(Method.GET);
-					addVariants(MediaType.APPLICATION_OCTET_STREAM, MediaType.MULTIPART_FORM_DATA, MediaType.ALL);
+					setVariants(MediaType.APPLICATION_OCTET_STREAM, MediaType.MULTIPART_FORM_DATA, MediaType.ALL);
 					if (!key.isReadOnly()) {
 						getAllowedMethods().add(Method.PUT);
 						getAllowedMethods().add(Method.POST);
@@ -73,15 +74,18 @@ public class BinResource extends OSGiResource {
 	}
 
 	/**
-	 * Accepts and processes a representation posted to the resource. As
-	 * response, the content of the uploaded file is sent back the client.
+	 * Accepts and processes a representation posted to the resource.
 	 */
 	@Override
 	public Representation post(Representation entity, Variant variant) {
+		if (!getAllowedMethods().contains(Method.POST)) {
+			setStatus(Status.CLIENT_ERROR_METHOD_NOT_ALLOWED);
+			return null;
+		}
 		Activator.getInstance().test(category, id);
-		if (entity == null) {
+		if ((entity == null) || (entity instanceof EmptyRepresentation)) {
 			// POST request with no entity.
-			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+			setStatus(Status.CLIENT_ERROR_BAD_REQUEST, "The server has retreived an empty body. Creating null binaries files is not allowed.");
 			return null;
 		}
 		if (MediaType.APPLICATION_OCTET_STREAM.equals(entity.getMediaType(), true)) {
@@ -114,41 +118,45 @@ public class BinResource extends OSGiResource {
 			try {
 				long size = entity.getSize();
 				ReadableByteChannel in = entity.getChannel();
-				try {
-					FileOutputStream fos = new FileOutputStream(file);
+				if (in == null) {
+					setStatus(Status.CLIENT_ERROR_UNPROCESSABLE_ENTITY, "The Request body is empty or can not reach the /bin resource.");
+				} else {
 					try {
-						FileChannel out = fos.getChannel();
+						FileOutputStream fos = new FileOutputStream(file);
 						try {
-							if (size == -1) {
-								ByteBuffer buffer = ByteBuffer.allocateDirect(16 * 1024);
-								while (in.read(buffer) != -1) {
-									// prepare the buffer to be drained
+							FileChannel out = fos.getChannel();
+							try {
+								if (size == -1) {
+									ByteBuffer buffer = ByteBuffer.allocateDirect(16 * 1024);
+									while (in.read(buffer) != -1) {
+										// prepare the buffer to be drained
+										buffer.flip();
+										// write to the channel, may block
+										out.write(buffer);
+										// If partial transfer, shift remainder down
+										// If buffer is empty, same as doing clear()
+										buffer.compact();
+									}
+									// EOF will leave buffer in fill state
 									buffer.flip();
-									// write to the channel, may block
-									out.write(buffer);
-									// If partial transfer, shift remainder down
-									// If buffer is empty, same as doing clear()
-									buffer.compact();
+									// make sure the buffer is fully drained.
+									while (buffer.hasRemaining()) {
+										out.write(buffer);
+									}
+								} else {
+									out.transferFrom(in, 0, size);
 								}
-								// EOF will leave buffer in fill state
-								buffer.flip();
-								// make sure the buffer is fully drained.
-								while (buffer.hasRemaining()) {
-									out.write(buffer);
-								}
-							} else {
-								out.transferFrom(in, 0, size);
+							} finally {
+								out.close();
 							}
 						} finally {
-							out.close();
+							fos.close();
 						}
 					} finally {
-						fos.close();
+						in.close();
 					}
-				} finally {
-					in.close();
+					setStatus(Status.SUCCESS_CREATED);
 				}
-				setStatus(Status.SUCCESS_CREATED);
 			} catch (IOException e) {
 				Activator.getInstance().error(Messages.BinResource_Error_file_upload, e);
 				setStatus(Status.SERVER_ERROR_INTERNAL);
@@ -220,6 +228,10 @@ public class BinResource extends OSGiResource {
 
 	@Override
 	public Representation delete(Variant variant) throws ResourceException {
+		if (!getAllowedMethods().contains(Method.DELETE)) {
+			setStatus(Status.CLIENT_ERROR_METHOD_NOT_ALLOWED);
+			return null;
+		}
 		Activator.getInstance().removeFiles(category, id);
 		setStatus(Status.SUCCESS_NO_CONTENT);
 		return null;
