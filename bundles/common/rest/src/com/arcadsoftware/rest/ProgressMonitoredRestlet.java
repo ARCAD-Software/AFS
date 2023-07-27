@@ -22,11 +22,13 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.IllegalFormatException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONObject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.osgi.framework.Bundle;
 import org.restlet.Context;
@@ -123,7 +125,7 @@ public abstract class ProgressMonitoredRestlet extends Restlet implements Closea
 	public ProgressMonitoredRestlet(final ILoggedPlugin activator, final Context context, final long cacheduration, final boolean keepTaskTrace) {
 		super(context);
 		threads = new ThreadGroup("Rest Operation manager");
-		threads.setDaemon(true);
+		threads.setDaemon(false);
 		lastId = new AtomicInteger(0);
 		this.activator = activator;
 		this.keepTaskTrace = keepTaskTrace;
@@ -145,7 +147,7 @@ public abstract class ProgressMonitoredRestlet extends Restlet implements Closea
 	 * 
 	 * @return a positive integer.
 	 */
-	protected int getNewId() {
+	protected final int getNewId() {
 		int id = lastId.incrementAndGet();
 		if (id < 0) {
 			synchronized (this) {
@@ -158,7 +160,7 @@ public abstract class ProgressMonitoredRestlet extends Restlet implements Closea
 		return id;
 	}
 	
-	private synchronized void cleanCache() {
+	private final synchronized void cleanCache() {
 		long cd = getCacheduration();
 		if (cd > 0) {
 			long t = System.currentTimeMillis() - cd;
@@ -198,7 +200,7 @@ public abstract class ProgressMonitoredRestlet extends Restlet implements Closea
 	 * 
 	 * @return
 	 */
-	protected ILoggedPlugin getActivator() {
+	protected final ILoggedPlugin getActivator() {
 		return activator;
 	}
 
@@ -207,9 +209,21 @@ public abstract class ProgressMonitoredRestlet extends Restlet implements Closea
 	 * 
 	 * @param e
 	 */
-	protected void logError(Exception e) {
+	protected final void logError(Exception e) {
 		if (activator != null) {
 			activator.error(e.getLocalizedMessage(), e);
+		}
+	}
+
+	/**
+	 * log an warning message.
+	 * 
+	 * @param message the warning message.
+	 * @param e may be null.
+	 */
+	protected final void logWarning(String message, Exception e) {
+		if (activator != null) {
+			activator.error(message, e);
 		}
 	}
 
@@ -218,7 +232,7 @@ public abstract class ProgressMonitoredRestlet extends Restlet implements Closea
 	 * 
 	 * @param e
 	 */
-	protected void logDebug(Exception e) {
+	protected final void logDebug(Exception e) {
 		if (activator != null) {
 			activator.debug(e);
 		}
@@ -229,7 +243,7 @@ public abstract class ProgressMonitoredRestlet extends Restlet implements Closea
 	 * 
 	 * @param message
 	 */
-	protected void logDebug(String message) {
+	protected final void logDebug(String message) {
 		if (activator != null) {
 			activator.debug(message);
 		}
@@ -324,7 +338,7 @@ public abstract class ProgressMonitoredRestlet extends Restlet implements Closea
 						response.setStatus(Status.SUCCESS_OK);
 					}
 				} else {
-					ArrayList<RestProgressMonitor> result = new ArrayList<RestProgressMonitor>();
+					ArrayList<IProgressMonitor> result = new ArrayList<IProgressMonitor>();
 					for (String id: ids) {
 						int i = getID(id);
 						if (i > 0) {
@@ -337,8 +351,9 @@ public abstract class ProgressMonitoredRestlet extends Restlet implements Closea
 					if (result.isEmpty()) {
 						response.setStatus(Status.SUCCESS_NO_CONTENT);
 					} else if (result.size() == 1) {
-						if (onRead(result.get(0).getID(), result.get(0).getUserId(), user)) {
-							response.setEntity(getMonitorRepresentation(media, result.get(0)));
+						final RestProgressMonitor monitor = (RestProgressMonitor) result.get(0); 
+						if (onRead(monitor.getID(), monitor.getUserId(), user)) {
+							response.setEntity(getMonitorRepresentation(media, monitor));
 							response.setStatus(Status.SUCCESS_OK);
 						} else {
 							response.setStatus(Status.CLIENT_ERROR_FORBIDDEN);
@@ -349,7 +364,7 @@ public abstract class ProgressMonitoredRestlet extends Restlet implements Closea
 					}
 				}
 			} else if (Method.DELETE.equals(request.getMethod())) {
-				ArrayList<RestProgressMonitor> result = new ArrayList<RestProgressMonitor>();
+				ArrayList<IProgressMonitor> result = new ArrayList<IProgressMonitor>();
 				for (String id: ids) {
 					int i = getID(id);
 					if (i > 0) {
@@ -367,8 +382,9 @@ public abstract class ProgressMonitoredRestlet extends Restlet implements Closea
 				if (result.isEmpty()) {
 					response.setStatus(Status.SUCCESS_NO_CONTENT);
 				} else if (result.size() == 1) {
-					if (onRead(result.get(0).getID(), result.get(0).getUserId(), user)) {
-						response.setEntity(getMonitorRepresentation(media, result.get(0)));
+					RestProgressMonitor monitor = (RestProgressMonitor) result.get(0);
+					if (onRead(monitor.getID(), monitor.getUserId(), user)) {
+						response.setEntity(getMonitorRepresentation(media, monitor));
 						response.setStatus(Status.SUCCESS_OK);
 					} else {
 						response.setStatus(Status.SUCCESS_NO_CONTENT);
@@ -385,7 +401,7 @@ public abstract class ProgressMonitoredRestlet extends Restlet implements Closea
 
 	private String getXSDText() {
 		if (activator instanceof AbstractActivator) {
-			Bundle bundle = ((AbstractActivator) activator).findBundle("com.arcadsoftware.rest");
+			Bundle bundle = ((AbstractActivator) activator).findBundle("com.arcadsoftware.rest"); //$NON-NLS-1$
 			if (bundle != null) {
 				File file = ((AbstractActivator) activator).getBundleFile(bundle, "schemas/operation.xsd"); //$NON-NLS-1$
 				if (file != null) {
@@ -443,8 +459,28 @@ public abstract class ProgressMonitoredRestlet extends Restlet implements Closea
 		return cache.get(id);
 	}
 
-	protected synchronized ArrayList<RestProgressMonitor> getMonitors() {
-		ArrayList<RestProgressMonitor> result = new ArrayList<RestProgressMonitor>(cache.size());
+	/**
+	 * Get the JSON representation of the requested monitor.
+	 * 
+	 * @param id The monitor id has returned by startOperation method.
+	 * @param ascendingTasks Define if the Task name list is returned in historical order, oldest first (true) or with the latest on top (false). 
+	 * @return null if this monitor is not present in the cache.
+	 */
+	public JSONObject getMonitor(int id, boolean ascendingTasks) {
+		final RestProgressMonitor monitor = getMonitor(id);
+		if (monitor == null) {
+			return null;
+		}
+		return monitor.getJSON(ascendingTasks);
+	}
+	
+	/**
+	 * Get the list of all the monitor currently in cache.
+	 * 
+	 * @return
+	 */
+	protected synchronized List<IProgressMonitor> getMonitors() {
+		ArrayList<IProgressMonitor> result = new ArrayList<IProgressMonitor>(cache.size());
 		result.addAll(cache.values());
 		return result;
 	}
@@ -482,10 +518,11 @@ public abstract class ProgressMonitoredRestlet extends Restlet implements Closea
 		return new XMLRepresentation(monitor.getXML(getOperationXMLTag(), isSortTasksAscending()));
 	}
 
-	private Representation getMonitorsRepresentation(MediaType media, IConnectionUserBean user, ArrayList<RestProgressMonitor> monitors) {
+	private Representation getMonitorsRepresentation(MediaType media, IConnectionUserBean user, List<IProgressMonitor> monitors) {
 		if (MediaType.APPLICATION_JSON.equals(media)) {
 			JSONArray result = new JSONArray(monitors.size());
-			for (RestProgressMonitor monitor: monitors) {
+			for (IProgressMonitor m: monitors) {
+				RestProgressMonitor monitor = (RestProgressMonitor) m;
 				if (onRead(monitor.getID(), monitor.getUserId(), user)) {
 					result.put(monitor.getJSON(isSortTasksAscending()));
 				}
@@ -496,8 +533,8 @@ public abstract class ProgressMonitoredRestlet extends Restlet implements Closea
 		result.append(" size=\""); //$NON-NLS-1$
 		result.append(monitors.size());
 		result.append("\">"); //$NON-NLS-1$
-		for (RestProgressMonitor monitor: monitors) {
-			result.append(monitor.getXML(getOperationXMLTag(), isSortTasksAscending()));
+		for (IProgressMonitor monitor: monitors) {
+			result.append(((RestProgressMonitor) monitor).getXML(getOperationXMLTag(), isSortTasksAscending()));
 		}
 		result.append("</"); //$NON-NLS-1$
 		result.append(getOperationListXMLTag());
@@ -506,8 +543,13 @@ public abstract class ProgressMonitoredRestlet extends Restlet implements Closea
 	}
 
 	private synchronized void cacheMonitor(RestProgressMonitor monitor) {
-		// TODO check if there is not another monitor with same ID...
-		cache.put(monitor.getID(), monitor);
+		if (monitor != null) {
+			// Check if there is not another monitor with same ID...
+			if (cache.containsKey(monitor.getID())) {
+				logWarning("The ProgressMonitor cache of " + this.getClass().getCanonicalName() + " already contains a monitor identified by: " + monitor.getID(), null);
+			}
+			cache.put(monitor.getID(), monitor);
+		}
 	}
 
 	/**
@@ -529,18 +571,38 @@ public abstract class ProgressMonitoredRestlet extends Restlet implements Closea
 	protected final void delayedRun(final Runnable runnable, final IProgressMonitor monitor) {
 		if (runnable != null) {
 			if (usedMultiThreadDelayedRun()) {
-				new Thread(threads, runnable).start();
+				new Thread(threads, new Runnable() {
+					@Override
+					public void run() {
+						try {
+							Thread.sleep(50);
+							runnable.run();
+							if ((monitor != null) && !monitor.isCanceled()) {
+								monitor.done();
+							}
+						} catch (Exception e) {
+							logError(e);
+						} finally {
+							if (monitor instanceof RestProgressMonitor) {
+								((RestProgressMonitor) monitor).terminate();
+							}
+						}
+					}
+				}).start();
 			} else {
 				cleaner.schedule(new TimerTask() {
 					@Override
 					public void run() {
 						try {
 							runnable.run();
+							if ((monitor != null) && !monitor.isCanceled()) {
+								monitor.done();
+							}
 						} catch (Exception e) {
 							logError(e);
 						} finally {
-							if (monitor != null) {
-								monitor.done();
+							if (monitor instanceof RestProgressMonitor) {
+								((RestProgressMonitor) monitor).terminate();
 							}
 						}
 					}

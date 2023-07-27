@@ -78,6 +78,7 @@ public class RestProgressMonitor implements IProgressMonitor {
 	
 	private transient final boolean keepTaskTrace;
 	private transient final int userId;
+	private final ArrayList<TaskTrace> taskTrace;
 	private int id;
 	private double totalWork;
 	private double currentWork;
@@ -87,7 +88,7 @@ public class RestProgressMonitor implements IProgressMonitor {
 	private long prevDate;
 	private long nextDate;
 	private boolean cancelled;
-	private final ArrayList<TaskTrace> taskTrace;
+	private boolean done;
 	
 	public RestProgressMonitor(int userId, boolean keepTaskTrace) {
 		super();
@@ -118,6 +119,11 @@ public class RestProgressMonitor implements IProgressMonitor {
 
 	@Override
 	public synchronized void done() {
+		done = true;
+		terminate();
+	}
+
+	public synchronized void terminate() {
 		if (endDate == 0) {
 			prevInc = totalWork - currentWork;
 			prevDate = nextDate;
@@ -126,14 +132,14 @@ public class RestProgressMonitor implements IProgressMonitor {
 			endDate = System.currentTimeMillis();
 		}
 	}
-
+	
 	@Override
 	public synchronized void internalWorked(double work) {
 		currentWork = work;
 		prevInc = totalWork - currentWork;
 		prevDate = nextDate;
 		nextDate = System.currentTimeMillis();
-		if (currentWork >= totalWork) {
+		if (endDate > 0) {
 			endDate = System.currentTimeMillis();
 		}
 	}
@@ -164,7 +170,7 @@ public class RestProgressMonitor implements IProgressMonitor {
 		prevDate = nextDate;
 		nextDate = System.currentTimeMillis();
 		currentWork += work;
-		if (currentWork >= totalWork) {
+		if (endDate > 0) {
 			endDate = System.currentTimeMillis();
 		}
 	}
@@ -174,6 +180,7 @@ public class RestProgressMonitor implements IProgressMonitor {
 	}
 
 	public synchronized boolean isDone() {
+		// Return true in the work is terminated (not specifically done !
 		return endDate != 0;
 	}
 
@@ -225,13 +232,14 @@ public class RestProgressMonitor implements IProgressMonitor {
 			result.put("id", id); //$NON-NLS-1$
 			result.put("percent", getPercent()); //$NON-NLS-1$
 			result.put("cancelled", cancelled); //$NON-NLS-1$
+			result.put("completed", done && !cancelled); //$NON-NLS-1$
 			if (startDate != 0) {
 				result.put("startdate", ISODateFormater.toString(startDate)); //$NON-NLS-1$
 				if (endDate != 0) {
 					result.put("enddate", ISODateFormater.toString(endDate)); //$NON-NLS-1$
 					result.put("ended", true); //$NON-NLS-1$
 				} else {
-					result.put("enddate", ISODateFormater.toString(getEstimation())); //$NON-NLS-1$
+					result.put("estinationdate", ISODateFormater.toString(getEstimation())); //$NON-NLS-1$
 					result.put("ended", false); //$NON-NLS-1$
 				}
 			}
@@ -260,15 +268,18 @@ public class RestProgressMonitor implements IProgressMonitor {
 		sb.append(getPercent());
 		sb.append("\" cancelled=\""); //$NON-NLS-1$
 		sb.append(cancelled);
+		sb.append("\" completed=\""); //$NON-NLS-1$
+		sb.append(done && !cancelled);
 		if (startDate != 0) {
 			sb.append("\" startdate=\""); //$NON-NLS-1$
 			sb.append(ISODateFormater.toString(startDate));
-			sb.append("\" enddate=\""); //$NON-NLS-1$
 			if (endDate != 0) {
+				sb.append("\" enddate=\""); //$NON-NLS-1$
 				sb.append(ISODateFormater.toString(endDate));
 				sb.append("\" ended=\""); //$NON-NLS-1$
 				sb.append(true);
-			} else if (startDate != 0) {
+			} else {
+				sb.append("\" estimationdate=\""); //$NON-NLS-1$
 				sb.append(ISODateFormater.toString(getEstimation()));
 				sb.append("\" ended=\""); //$NON-NLS-1$
 				sb.append(false);
