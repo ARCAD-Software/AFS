@@ -47,6 +47,11 @@
 					<xsd:documentation>This attribute is true if and only if the operation has been cancelled.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:attribute>
+			<xsd:attribute name="completed" use="required" type="xsd:boolean">
+				<xsd:annotation>
+					<xsd:documentation>This attribute is true if and only if the operation has been terminated in the right way (not cancelled or generated an error).</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
 			<xsd:attribute name="startdate" use="optional" type="xsd:date">
 				<xsd:annotation>
 					<xsd:documentation>Is specified the start date of the operation, in ISO GMT format. If not included, then the operation has not started yet.</xsd:documentation>
@@ -54,7 +59,12 @@
 			</xsd:attribute>
 			<xsd:attribute name="enddate" use="optional" type="xsd:date">
 				<xsd:annotation>
-					<xsd:documentation>If the operation is running, this date is an estimation of the end date, if this operation is terminated then this is the actual end date.</xsd:documentation>
+					<xsd:documentation>If the operation is ended then this is the actual end date.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="estimationdate" use="optional" type="xsd:date">
+				<xsd:annotation>
+					<xsd:documentation>If the operation is running, this date is an estimation of the end date.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:attribute>
 			<xsd:attribute name="ended" use="optional" type="xsd:boolean">
