@@ -1,4 +1,7 @@
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -212,10 +215,15 @@ class TestCrypto {
 				'e', 'a', 'l', 'r', '0', 'j', 'W', 'Q', '\\', 'O', 'S', '1', '5', 'L', '%', 'D', 'K', 'n', 'E', 'r',
 				's', 'J', 'Ă', 'O', 'r', ' ', 'w', 'a', 'E', 'v', ':', '_', 'F', '1', '1', 'T', 'd',
 				'=', 'M', 'P' };
-		String c = Crypto.encrypt(p.toCharArray(), masterkey, 1);
-		System.out.println("Encrypt with specific Master key = " + c);
-		assertEquals(true, Crypto.isCryptSecure(c));
-		assertEquals(p, new String(Crypto.decrypt(c, masterkey)));
+		String c1 = Crypto.encrypt(p.toCharArray(), masterkey, 1);
+		System.out.println("Encrypt with specific Master key, algorithm 1 = " + c1);
+		String c2 = Crypto.encrypt(p.toCharArray(), masterkey, 2);
+		System.out.println("Encrypt with specific Master key, algorithm 2 = " + c2);
+		
+		assertEquals(false, Crypto.isCryptSecure(c1));
+		assertEquals(p, new String(Crypto.decrypt(c1, masterkey)));
+		assertEquals(true, Crypto.isCryptSecure(c2));
+		assertEquals(p, new String(Crypto.decrypt(c2, masterkey)));
 	}
 
 	@Test
@@ -238,7 +246,7 @@ class TestCrypto {
 	@Test
 	void testFog() {
 		String p = "quadra";
-		System.out.println("FOG de " + p + " = " + Crypto.fog(p));
+		System.out.println("FOG de " + p + " = " + Crypto.fog(p.toCharArray()));
 	}
 	
 	@Test
@@ -377,18 +385,9 @@ class TestCrypto {
 		String a = "toto";
 		String b = "";
 		String c = RANDOMSTRING1 + RANDOMSTRING2 + RANDOMSTRING3 + RANDOMSTRING4 + RANDOMSTRING5 + RANDOMSTRING6 + RANDOMSTRING7 + RANDOMSTRING1 + "azertyuiopmljhgfdssqqwxcxcvvbbnnMLKHGFDSQAAZZERTYUIOPJFDDCVVGGF";;
-		assertEquals(a, Crypto.unFog(Crypto.fog(a)));
-		assertEquals(b, Crypto.unFog(Crypto.fog(b)));
-		assertEquals(c, Crypto.unFog(Crypto.fog(c)));
-		assertEquals(a, Crypto.unFog(Crypto.fog(a.toCharArray(), StandardCharsets.UTF_8), StandardCharsets.UTF_8));
-		assertEquals(b, Crypto.unFog(Crypto.fog(b.toCharArray(), StandardCharsets.UTF_8), StandardCharsets.UTF_8));
-		assertEquals(c, Crypto.unFog(Crypto.fog(c.toCharArray(), StandardCharsets.UTF_8), StandardCharsets.UTF_8));
-		assertEquals(a, new String(Crypto.unFogChar(Crypto.fog(a, StandardCharsets.UTF_8), StandardCharsets.UTF_8)));
-		assertEquals(b, new String(Crypto.unFogChar(Crypto.fog(b, StandardCharsets.UTF_8), StandardCharsets.UTF_8)));
-		assertEquals(c, new String(Crypto.unFogChar(Crypto.fog(c, StandardCharsets.UTF_8), StandardCharsets.UTF_8)));
-		assertEquals(a, new String(Crypto.unFogChar(Crypto.fog(a.toCharArray(), StandardCharsets.UTF_8), StandardCharsets.UTF_8)));
-		assertEquals(b, new String(Crypto.unFogChar(Crypto.fog(b.toCharArray(), StandardCharsets.UTF_8), StandardCharsets.UTF_8)));
-		assertEquals(c, new String(Crypto.unFogChar(Crypto.fog(c.toCharArray(), StandardCharsets.UTF_8), StandardCharsets.UTF_8)));
+		assertEquals(a, new String(Crypto.unFog(Crypto.fog(a.toCharArray()))));
+		assertEquals(b, new String(Crypto.unFog(Crypto.fog(b.toCharArray()))));
+		assertEquals(c, new String(Crypto.unFog(Crypto.fog(c.toCharArray()))));
 	}
 	
 	@Test
@@ -409,5 +408,20 @@ class TestCrypto {
 	void testHex() {
 		assertArrayEquals(Crypto.hexStringToByteArray("ab32"), new byte[] {(byte) 0xAB, 0x32});
 		assertArrayEquals(Crypto.hexStringToByteArray("b32"), new byte[] {0xB, 0x32});
+	}
+	
+	@Test
+	void testNewFog() {
+		String txt = "quadra";
+		String encrypted = Crypto.fog(txt.toCharArray());
+		System.out.println(encrypted);
+
+		assertEquals(txt, new String(Crypto.unFog(encrypted)));
+	}
+	
+	@Test
+	void testOldUnFog() {
+		String txt = "1627461657174717A517F6A46587646647B454D626F415A61646163726A474E65496449717F4";
+		assertEquals("quadra", new String(Crypto.unFog(txt)));
 	}
 }

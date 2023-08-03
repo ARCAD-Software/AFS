@@ -13,12 +13,8 @@
  *******************************************************************************/
 package com.arcadsoftware.rest.console.internal.sections;
 
-import groovy.lang.Binding;
-import groovy.lang.GroovyShell;
-
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -47,6 +43,9 @@ import com.arcadsoftware.rest.console.ConsoleProperty;
 import com.arcadsoftware.rest.console.ConsoleSet;
 import com.arcadsoftware.rest.console.ConsoleText;
 import com.arcadsoftware.rest.console.IConsoleActionService;
+
+import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
 
 public class ScriptSection extends Section {
 
@@ -118,11 +117,11 @@ public class ScriptSection extends Section {
 		}
 		
 		public String fog(String value) {
-			return Crypto.fog(value, StandardCharsets.UTF_8);
+			return Crypto.fog(value.toCharArray());
 		}
 		
 		public String unfog(String value) {
-			return Crypto.unFog(value, StandardCharsets.UTF_8);
+			return new String(Crypto.unFog(value));
 		}
 		
 		public String md5(char[] value) {

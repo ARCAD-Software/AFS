@@ -150,6 +150,7 @@ public final class Crypto {
 	private static final char[] DEFAULTMASTERK;
 	private static final SecureRandom SECURERANDOM;
 	private static int srcount = 0;
+	private static final String FOG_PREFIX = "Z_";
 	
 	static {
 		// Register the BouncyCastle provider.
@@ -250,7 +251,7 @@ public final class Crypto {
 		if (dmk == null) {
 			dmk = System.getProperty("com.arcadsoftware.masterkey.fog"); //$NON-NLS-1$
 			if (dmk != null) {
-				dmkc = unFogChar(dmk, StandardCharsets.UTF_8);
+				dmkc = unFog(dmk);
 			} else {
 				dmk = System.getProperty("com.arcadsoftware.masterkey"); //$NON-NLS-1$
 				if (dmk != null) {
@@ -806,9 +807,8 @@ public final class Crypto {
 		if (text.isEmpty()) {
 			return new char[0];
 		}
-		if (isHexString(text)) {
-			// New algorithm use BASE64 with starting byte that can not be taken for an HexString... so this passord is a fog one
-			return unFog(text).toCharArray();
+		if (isFoggedString(text)) {
+			return unFog(text);
 		}
 		byte[] iv = null;
 		byte[] salt = null;
@@ -916,7 +916,7 @@ public final class Crypto {
 		if (text == null) {
 			return true;
 		}
-		if (isHexString(text) || (text.length() < 34)) { // 34 = Base64 of at least 25 bytes.
+		if (isFoggedString(text) || (text.length() < 34)) { // 34 = Base64 of at least 25 bytes.
 			return false;
 		}
 		try {
@@ -1058,148 +1058,85 @@ public final class Crypto {
 	}
 	
 	/**
-	 * Transform a String into an encoded string.
-	 * 
-	 * <p>
-	 * The "cryptographic" algorithm is very simple but ensure that the string is not, at least visually, recognizable. 
-	 * 
-	 * <p>
-	 * The returned string is approximatively x2 more longer than the original (more precisely = 32 + length[in bytes] x 2).
-	 * 
-	 * <p>
-	 * Benchmark test report, depending on the computer and JVM version, to encode+decode a string:
-	 * <ul>
-	 * <li> fog/unfog = <1ms.
-	 * <li> encode/decode = ...ms.
-	 * </ul>
-	 * 
-	 * @param string
-	 * @return
-	 * @see #decode(String)
-	 * @deprecated This method use the Local charset. Use {@link #fogChar(char[], Charset) instead only in new implementations.}
-	 */
-	public static String fog(String string) {
-		if (string == null) {
-			return null;
-		}
-		string = RandomGenerator.randomString(RANDON_ENCODED_STRING) + string;
-		return reverse(byteArrayToHexString(string.getBytes()));
-	}
-
-	/**
-	 * Transform a String into an encoded string.
-	 * 
-	 * <p>
-	 * The "cryptographic" algorithm is very simple but ensure that the string is not, at least visually, recognizable. 
-	 * 
-	 * <p>
-	 * The returned string is approximatively x2 more longer than the original (more precisely = 32 + length[in bytes] x 2).
-	 * 
-	 * <p>
-	 * Benchmark test report, depending on the computer and JVM version, to encode+decode a string:
-	 * <ul>
-	 * <li> fog/unfog = <1ms.
-	 * <li> encode/decode = ...ms.
-	 * </ul>
-	 * 
-	 * @param string
-	 * @param charset if null the UTF8 charset is used.
-	 * @return
-	 */
-	public static String fog(String string, Charset charset) {
-		if (string == null) {
-			return null;
-		}
-		if (charset == null) {
-			charset = StandardCharsets.UTF_8;
-		}
-		string = RandomGenerator.randomString(RANDON_ENCODED_STRING) + string;
-		return reverse(byteArrayToHexString(string.getBytes(charset)));
-	}
-	
-	/**
-	 * Transform a Char array into an encoded string using a specific Charset.
-	 * 
-	 * <p>
-	 * The "cryptographic" algorithm is very simple but ensure that the char array is not, at least visually, recognizable. 
-	 * 
-	 * <p>
-	 * The returned string is approximatively x2 more longer than the original (more precisely = 32 + length[in bytes] x 2).
-	 * 
+	 * Transform a Char array into an encoded string.
+	 * This method is not robust cryptographically, its use is only to obfuscate sensitive data when they cannot be encrypted. 
 	 * <p>
 	 * The caller is responsible to clear the char array content after the call of this method.
 	 * 
 	 * @param string
-	 * @param charset
-	 * @return
+	 * @return the encoded string 
 	 */
-	public static String fog(char[] string, Charset charset) {
+	public static String fog(char[] string) {
 		if (string == null) {
 			return null;
 		}
-		char[] c = new char[string.length + RANDON_ENCODED_STRING];
+		
+		char[] key = (Crypto.class.getCanonicalName() + RandomGenerator.class.getCanonicalName()).toCharArray();
+		String encrypted = "";
 		try {
-			System.arraycopy(RandomGenerator.randomString(RANDON_ENCODED_STRING).toCharArray(), 0, c, 0, RANDON_ENCODED_STRING);
-			System.arraycopy(string, 0, c, RANDON_ENCODED_STRING, string.length);
-			CharBuffer cb = CharBuffer.wrap(c);
-			ByteBuffer bb = charset.encode(cb);
-			byte[] b = new byte[bb.remaining()];
-			bb.get(b);
-			clear(bb.array());
-			clear(cb.array());
-			return reverse(byteArrayToHexString(b));
+			encrypted = FOG_PREFIX + Crypto.encrypt(string, key, 2);
+		} catch (InvalidKeyException | NoSuchAlgorithmException | InvalidAlgorithmParameterException
+				| IllegalBlockSizeException | InvalidKeySpecException e) {
+			throw new EncryptionError(e);
 		} finally {
-			clear(c);
+			clear(key);
 		}
+		return encrypted;
 	}
 	
 	/**
-	 * Decode a string encoded with the <code>fog</code> method.
+	 * Decode a string encoded with the <code>fog</code> method. Returns the resulting string as a character array
+	 * This signature is only useful to decode strings that were encoded using the previous fog algorithm and a custom charset. 
 	 * 
-	 * @param string
-	 * @return
-	 * @see #fog(String)
-	 * @deprecated This method use the Local charset. consider to use {@link #unFog(String, Charset)} in the new developments.
-	 */
-	public static String unFog(String string) {
-		if ((string == null) || (string.length() == 0) || (string.length() == MINIMAL_ENCODED_STRING_LENGHT)) {
-			return ""; //$NON-NLS-1$
-		}
-		if (string.length() < MINIMAL_ENCODED_STRING_LENGHT) {
-			return string;
-		}
-		string = new String(hexStringToByteArray(reverse(string)));
-		return string.substring(RANDON_ENCODED_STRING);
-	}
-	
-	/**
-	 * Decode a string encoded with the <code>fog</code> method.
-	 * 
-	 * @param string
-	 * @param charset the same charset that the one used when the key was encrypted.
-	 * @return
-	 * @see #fog(String)
-	 */
-	public static String unFog(String string, Charset charset) {
-		if ((string == null) || (string.length() == 0) || (string.length() == MINIMAL_ENCODED_STRING_LENGHT)) {
-			return ""; //$NON-NLS-1$
-		}
-		if (string.length() < MINIMAL_ENCODED_STRING_LENGHT) {
-			return string;
-		}
-		string = new String(hexStringToByteArray(reverse(string)), charset);
-		return string.substring(RANDON_ENCODED_STRING);
-	}
-	
-	/**
-	 * Decode a string encoded with the <code>fog</code> method.
-	 * 
-	 * @param string hex-string
+	 * @param string encoded
 	 * @param charset if null use UTF8.
-	 * @return
+	 * @return the decoded string
 	 * @see #fog(String)
+	 * @see #unFog(String)
 	 */
-	public static char[] unFogChar(String string, Charset charset) {
+	public static char[] unFog(String string, Charset charset) {
+		if ((string == null) || (string.length() == 0)) {
+			return new char[0]; //$NON-NLS-1$
+		}
+
+		if (isHexString(string)) {
+			// The string is in old format, use old unfog algorithm. Null as Charset will use the default UTF-8
+			return unFogOldAsChar(string, charset);
+		}
+		if (string.startsWith(FOG_PREFIX)) {
+			// The string is fogged with the current algorithm
+			char[] key = (Crypto.class.getCanonicalName() + RandomGenerator.class.getCanonicalName()).toCharArray();
+			try {
+				return Crypto.decrypt(string.substring(FOG_PREFIX.length()), key);
+			} catch (InvalidKeyException | NoSuchAlgorithmException | IllegalBlockSizeException
+					| InvalidKeySpecException | InvalidAlgorithmParameterException e) {
+				// the message was a clear text message (or is corrupted) !
+				e.printStackTrace();
+				return string.toCharArray();
+			} finally {
+				clear(key);
+			}
+		}
+		return new char[0];
+	}
+	
+	/**
+	 * Decode a string encoded with the <code>fog</code> method. Returns the resulting string as a character array
+	 * This method can also decode strings encoded using the previous fog algorithm with the default charset UTF-8.
+	 * For specific charsets, use the other signature of the unFog method. 
+	 * 
+	 * @param string encoded
+	 * @return the decoded string
+	 * @see #unFog(String, Charset)
+	 */
+	public static char[] unFog(String string) {
+		return unFog(string, null);
+	}
+	
+	/*
+	 * Previous implementation of the fog algorithm. The unfog is kept for retro-compatibility purposes.
+	 */
+	private static char[] unFogOldAsChar(String string, Charset charset) {
 		if ((string == null) || (string.length() == 0) || (string.length() == MINIMAL_ENCODED_STRING_LENGHT)) {
 			return new char[0];
 		}
@@ -1207,7 +1144,7 @@ public final class Crypto {
 			return string.toCharArray();
 		}
 		if (charset == null) {
-			charset  = StandardCharsets.UTF_8;
+			charset = StandardCharsets.UTF_8;
 		}
 		byte[] b = hexStringToByteArray(reverse(string));
 		try {
@@ -1749,6 +1686,25 @@ public final class Crypto {
 			sb.append(Integer.toHexString(v));
 		}
 		return sb.toString().toUpperCase();
+	}
+	
+	/**
+	 * Tests the given string was previously fogged by the first fog algorithm or the current fog algorithm.
+	 * 
+	 * @param text the string to test
+	 * @return true if the fog algorithm was applied onto the string text, false otherwise
+	 */
+	public static boolean isFoggedString(String text) {
+		if (text == null || text.length() == 0) {
+			return false;
+		} else if (isHexString(text)) {
+			// if the string is in hexadecimal format, it was fogged with the first version of the fog algorithm
+			return true;
+		} else if (text.substring(0,2).equals(FOG_PREFIX)) {
+			// the string starts with the prefix identifying the fog algorithm, it is fogged then
+			return true;
+		}
+		return false;
 	}
 
 	/**

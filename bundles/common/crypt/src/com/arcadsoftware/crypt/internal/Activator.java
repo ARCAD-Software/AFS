@@ -18,7 +18,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 import org.osgi.framework.BundleActivator;
@@ -72,7 +71,7 @@ public class Activator implements BundleActivator {
 							}
 							if (!p.containsKey("com.arcadsoftware.masterkey.fog") && //$NON-NLS-1$
 									!p.containsKey("com.arcadsoftware.masterkey")) { //$NON-NLS-1$
-								p.put("com.arcadsoftware.masterkey.fog", Crypto.fog(temp, StandardCharsets.UTF_8)); //$NON-NLS-1$
+								p.put("com.arcadsoftware.masterkey.fog", Crypto.fog(temp)); //$NON-NLS-1$
 							}
 							if (!p.containsKey("com.arcadsoftware.salt.min.size")) { //$NON-NLS-1$
 								p.put("com.arcadsoftware.salt.min.size", Crypto.SALTMINSIZE); //$NON-NLS-1$

@@ -20,7 +20,6 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -97,7 +96,7 @@ public class ConnectionHelper {
 			}
 		}
 		hn += '/' + System.currentTimeMillis();
-		oAuthKey = Crypto.fog(hn.toCharArray(), StandardCharsets.UTF_8);
+		oAuthKey = Crypto.fog(hn.toCharArray());
 	}
 
 	/**
