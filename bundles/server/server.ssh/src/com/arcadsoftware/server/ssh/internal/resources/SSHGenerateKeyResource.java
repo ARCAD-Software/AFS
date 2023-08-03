@@ -55,7 +55,7 @@ public class SSHGenerateKeyResource extends BeanMapItemResource {
 		final SSHKey tempSSHKey = new SSHKey(bean);
 		// Passphrase may have been fogged
 		if (tempSSHKey.isEncrypted()) {
-			tempSSHKey.setPassphrase(Crypto.unFog(tempSSHKey.getPassphrase(), StandardCharsets.UTF_8));
+			tempSSHKey.setPassphrase(new String(Crypto.unFog(tempSSHKey.getPassphrase())));
 		}
 		try {
 			final SSHKey sshKey = getOSGiService(SSHService.class).create(tempSSHKey.getBeanMap());

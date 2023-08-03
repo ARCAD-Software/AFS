@@ -55,7 +55,7 @@ public class SSHImportKeyResource extends UserLinkedResource {
 		// Passphrase may have been fogged
 		String pf = sshKeyUpload.getPassphrase();
 		if ((pf != null) && !pf.isEmpty()) {
-			sshKeyUpload.setPassphrase(Crypto.unFog(pf, StandardCharsets.UTF_8));
+			sshKeyUpload.setPassphrase(new String(Crypto.unFog(pf)));
 		}
 		final SSHKeyUpload upload = new SSHKeyUpload();
 		try {
