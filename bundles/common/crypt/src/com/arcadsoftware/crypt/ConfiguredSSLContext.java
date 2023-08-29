@@ -380,6 +380,7 @@ public class ConfiguredSSLContext {
 			throws ConfiguredSSLContextException {
 		String ksFileName = getProp(props, PROP_KEYSTORE_PATH);
 		if (ksFileName == null) {
+			// TODO add a property to use the default keystores of the JVM...
 			return null;
 		}
 		File ksFile = new File(ksFileName);
@@ -407,6 +408,7 @@ public class ConfiguredSSLContext {
 			KeyManagerFactory kmf = KeyManagerFactory
 					.getInstance(getProp(props, PROP_KEYSTORE_ALGO, KeyManagerFactory.getDefaultAlgorithm()));
 			kmf.init(ks, getProp(props, PROP_KEYSTORE_KEYPWD, ksPwd));
+			// TODO Add a proprty to merge the Curent keystore to the default one...
 			return kmf.getKeyManagers();
 		} catch (KeyStoreException | NoSuchProviderException | NoSuchAlgorithmException e) {
 			throw new ConfiguredSSLContextException(e);
@@ -419,6 +421,7 @@ public class ConfiguredSSLContext {
 			throws ConfiguredSSLContextException {
 		String tsFileName = getProp(props, PROP_TRUSTSTORE_PATH);
 		if (tsFileName == null) {
+			// TODO add a property to use the default truststores of the JVM...
 			return null;
 		}
 		File tsFile = new File(tsFileName);
@@ -453,6 +456,7 @@ public class ConfiguredSSLContext {
 			TrustManagerFactory tmf = TrustManagerFactory
 					.getInstance(getProp(props, PROP_TRUSTSTORE_ALGO, TrustManagerFactory.getDefaultAlgorithm()));
 			tmf.init(ts);
+			// TODO Add a property to merge the Curent truststore to the default one...
 			return tmf.getTrustManagers();
 		} catch (KeyStoreException | NoSuchProviderException | NoSuchAlgorithmException e) {
 			throw new ConfiguredSSLContextException(e);
@@ -686,7 +690,7 @@ public class ConfiguredSSLContext {
 	 */
 	public HostnameVerifier getHostnameVerifier() {
 		if (verifyHostname) {
-			// FIXME This rely on the default JVM implementation, which may be override !
+			// FIXME This rely on the default JVM implementation, which may be overridden !
 			return HttpsURLConnection.getDefaultHostnameVerifier();
 		}
 		return new HostnameVerifier() {
