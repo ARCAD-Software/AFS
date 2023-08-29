@@ -25,6 +25,7 @@
 		<module>server.properties</module>
 		<module>server.restful</module>
 		<module>server.restful.connection</module>
+		<module>server.restful.connection.config</module>
 		<module>server.restful.connection.ldap</module>
 		<module>server.restful.connection.local</module>
 		<module>server.restful.console</module>
