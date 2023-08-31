@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: AFS - Client Macro
 Bundle-SymbolicName: com.arcadsoftware.afs.client.macro;singleton:=true
 Bundle-Vendor: ARCAD Software
-Bundle-Version: 1.2.1
+Bundle-Version: 1.2.1.qualifier
 Bundle-Activator: com.arcadsoftware.afs.client.macro.internal.Activator
 Require-Bundle: org.eclipse.ui;resolution:=optional,
  org.eclipse.core.runtime,
