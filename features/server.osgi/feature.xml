@@ -556,4 +556,11 @@ version(s), and exceptions or additional permissions here}.&quot;
          fragment="true"
          unpack="false"/>
 
+   <plugin
+         id="com.arcadsoftware.server.restful.connection.config"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
 </feature>
