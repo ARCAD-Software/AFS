@@ -404,13 +404,7 @@ public class SendMail implements ISendMail {
 				// FIXME set mail.smtps.ssl.socketFactory with a locally configured socket factory !
 				// Always trust the server hostname...
 				Object host = serverprops.get(PROP_SMTPSHOSTNAME);
-				if (host == null) {
-					host = serverprops.get(PROP_SMTPHOSTNAME);
-				}
 				if (host != null) {
-					if (!serverprops.contains("mail.smtp.ssl.trust")) { //$NON-NLS-1$
-						serverprops.put("mail.smtp.ssl.trust", host); //$NON-NLS-1$
-					}
 					if (!serverprops.contains("mail.smtps.ssl.trust")) { //$NON-NLS-1$
 						serverprops.put("mail.smtps.ssl.trust", host); //$NON-NLS-1$
 					}
@@ -419,7 +413,12 @@ public class SendMail implements ISendMail {
 				// FIXME only if starttls is set to true...
 				serverprops.put("mail.smtp.ssl.checkserveridentity", "true"); //$NON-NLS-1$ //$NON-NLS-1$
 				// FIXME set mail.smtp.ssl.socketFactory with a locally configured socket factory !
-				
+				Object host = serverprops.get(PROP_SMTPHOSTNAME);
+				if (host != null) {
+					if (!serverprops.contains("mail.smtp.ssl.trust")) { //$NON-NLS-1$
+						serverprops.put("mail.smtp.ssl.trust", host); //$NON-NLS-1$
+					}
+				}
 			}
 			// Attaching to default Session, or we could start a new one
 			Session session = Session.getInstance(serverprops);
