@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AFS SSH Connections Management
 Bundle-SymbolicName: com.arcadsoftware.ssh
-Bundle-Version: 1.2.0.qualifier
+Bundle-Version: 1.2.1
 Bundle-Vendor: ARCAD Software
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: com.arcadsoftware.ssh.model;version="1.0.0"
