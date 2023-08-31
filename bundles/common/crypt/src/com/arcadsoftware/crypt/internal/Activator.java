@@ -100,6 +100,10 @@ public class Activator implements BundleActivator {
 							try (FileOutputStream fos = new FileOutputStream(l)) {
 								p.store(fos, "Server Configuration File"); //$NON-NLS-1$
 							} catch (Exception e) {
+								// Undo the backup !
+								if (ltemp.isFile()) {
+									ltemp.renameTo(l);
+								}
 							}
 						}
 					}
