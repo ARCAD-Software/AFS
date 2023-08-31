@@ -67,6 +67,8 @@ public class Activator implements BundleActivator {
 							try (FileInputStream fis = new FileInputStream(l)) {
 								p.load(fis);
 							} catch (Exception e) {
+								// There is no log available when this activator is called...
+								e.printStackTrace();
 								return;
 							}
 							if (!p.containsKey("com.arcadsoftware.masterkey.fog") && //$NON-NLS-1$
@@ -74,16 +76,16 @@ public class Activator implements BundleActivator {
 								p.put("com.arcadsoftware.masterkey.fog", Crypto.fog(temp)); //$NON-NLS-1$
 							}
 							if (!p.containsKey("com.arcadsoftware.salt.min.size")) { //$NON-NLS-1$
-								p.put("com.arcadsoftware.salt.min.size", Crypto.SALTMINSIZE); //$NON-NLS-1$
+								p.put("com.arcadsoftware.salt.min.size", Integer.toString(Crypto.SALTMINSIZE)); //$NON-NLS-1$
 							}
 							if (!p.containsKey("com.arcadsoftware.iv.min.size")) { //$NON-NLS-1$
-								p.put("com.arcadsoftware.iv.min.size", Crypto.IVMINSIZE); //$NON-NLS-1$
+								p.put("com.arcadsoftware.iv.min.size", Integer.toString(Crypto.IVMINSIZE)); //$NON-NLS-1$
 							}
 							if (!p.containsKey("com.arcadsoftware.hash.min.iterations")) { //$NON-NLS-1$
-								p.put("com.arcadsoftware.hash.min.iterations", Crypto.HASHMINITERATIONS); //$NON-NLS-1$
+								p.put("com.arcadsoftware.hash.min.iterations", Integer.toString(Crypto.HASHMINITERATIONS)); //$NON-NLS-1$
 							}
 							if (!p.containsKey("com.arcadsoftware.cypher.min.iterations")) { //$NON-NLS-1$
-								p.put("com.arcadsoftware.cypher.min.iterations", Crypto.CIPHERMINITERATIONS); //$NON-NLS-1$
+								p.put("com.arcadsoftware.cypher.min.iterations", Integer.toString(Crypto.CIPHERMINITERATIONS)); //$NON-NLS-1$
 							}
 							File ltemp = new File(l.getParentFile(), "config.bak"); //$NON-NLS-1$
 							if (ltemp.isFile()) {
@@ -100,6 +102,8 @@ public class Activator implements BundleActivator {
 							try (FileOutputStream fos = new FileOutputStream(l)) {
 								p.store(fos, "Server Configuration File"); //$NON-NLS-1$
 							} catch (Exception e) {
+								// There is no log available when this activator is called...
+								e.printStackTrace();
 								// Undo the backup !
 								if (ltemp.isFile()) {
 									ltemp.renameTo(l);
