@@ -1985,7 +1985,7 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 	 * @param form
 	 *            an Request form.
 	 * @param attributes
-	 *            the list to store the attributes used into tyhe given form.
+	 *            the list to store the attributes used into the given form.
 	 * @return a BeanMap containing the attributes converted values and the other properties that do not correspond to
 	 *         attributes.
 	 */
@@ -1996,8 +1996,8 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 			String value = form.getFirstValue(code);
 			if (att == null) {
 				// We insert parameter that are not attributes into the beanmap.
-				// This allow futher procedure to get some additionnal parameter that will
-				// not be taken into account of insertion (based on ther returned MetaData).
+				// This allow further procedure to get some additional parameter that will
+				// not be taken into account of insertion (based on the returned MetaData).
 				result.put(code, value);
 			} else if ((!att.isReadonly()) && //
 					(code.indexOf('.') == -1) && //
@@ -2007,6 +2007,7 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 				if (attributes != null) {
 					attributes.add(att);
 				}
+				// FIXME As the Form may come from a JSON object conversion "null" values should be supported...
 				if (value == null) {
 					value = ""; //$NON-NLS-1$
 				}
@@ -2021,7 +2022,7 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 					continue;
 				}
 				if (MetaDataAttribute.TYPE_DATE.equals(att.getType())) {
-					if (value.length() == 0) {
+					if (value.isEmpty()) {
 						// Support null dates.
 						result.put(code, null);
 						continue;
@@ -2102,7 +2103,7 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 					continue;
 				}
 				if (MetaDataAttribute.TYPE_BIGINTEGER.equals(att.getType())) {
-					BigInteger bi = new BigInteger(new byte[]{0});
+					BigInteger bi = new BigInteger(new byte[] {0});
 					try {
 						bi = new BigInteger(value);
 					} catch (NumberFormatException e) {}

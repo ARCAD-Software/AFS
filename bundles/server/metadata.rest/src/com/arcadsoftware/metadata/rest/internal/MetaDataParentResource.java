@@ -507,7 +507,7 @@ public class MetaDataParentResource extends DataParentResource {
 	}
 
 	private void removeHiddenAttributes(BeanMap result) {
-		for(MetaDataAttribute att: getEntity().getAttributes().values()) {
+		for (MetaDataAttribute att: getEntity().getAttributes().values()) {
 			if (!att.isPublic()) {
 				result.remove(att.getCode());
 			}
@@ -541,7 +541,7 @@ public class MetaDataParentResource extends DataParentResource {
 	private void doPostCreateTreatment(List<IMetaDataModifyListener> listeners, BeanMap result, ArrayList<MetaDataAttribute> list, Language language) throws Exception {
 		// Translate ? (en théorie les attributs translate ne sont pas modifiés ici !)
 		MetaDataEntity entity = getEntity();
-		for(IMetaDataModifyListener listener: listeners) {
+		for (IMetaDataModifyListener listener: listeners) {
 			listener.postModification(entity, null, result, list, getUser(), language);
 		}
 		Activator.getInstance().test(MetaDataTest.EVENTCODE_AFTERCREATE, entity, result, list, getUser(), language);
