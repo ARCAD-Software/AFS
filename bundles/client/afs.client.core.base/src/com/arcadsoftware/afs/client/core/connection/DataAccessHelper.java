@@ -32,6 +32,12 @@ import com.arcadsoftware.metadata.client.DataAccess;
 import com.arcadsoftware.metadata.criteria.ISearchCriteria;
 import com.arcadsoftware.rest.ServerErrorException;
 
+/**
+ * 
+ * 
+ * @author ARCAD Software
+ * @deprecated This class does not return the actual error avoiding to present the error message to the end user which is a bad practice. Use the DataAccess class instead of this one.
+ */
 public class DataAccessHelper {
 
 	private static final String CONFIG_TYPE = "config";
@@ -330,11 +336,17 @@ public class DataAccessHelper {
 		return getLinkList(master.getType(),master.getId(),associationKey,linkedType,null);			
 	}
 	
-	public boolean create(BeanMap beanmap){
+	/**
+	 * 
+	 * @param beanmap
+	 * @return
+	 */
+	public boolean create(BeanMap beanmap) {
 		try {
 			BeanMap b = dataAccess.post(beanmap);
-			if (b!=null) {
+			if (b != null) {
 				beanmap.setId(b.getId());
+				// FIXME the values of the original beanmap are not correctly cleared !
 				beanmap.addAll(b);
 				return true;
 			}			
