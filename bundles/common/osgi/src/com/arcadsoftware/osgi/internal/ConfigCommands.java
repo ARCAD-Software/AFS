@@ -54,7 +54,7 @@ public class ConfigCommands implements CommandProvider {
 	 * @param ci
 	 * @throws Exception
 	 */
-	public void _config(CommandInterpreter ci) throws Exception {
+	public void _conf(CommandInterpreter ci) throws Exception {
 		String action = ci.nextArgument();
 		if (action == null) {
 			ci.println(Messages.getString("osgi.ConfigUsage")); //$NON-NLS-1$
@@ -300,23 +300,6 @@ public class ConfigCommands implements CommandProvider {
 		} catch (IOException e) {
 			ci.printStackTrace(e);
 		}
-	}
-
-	/**
-	 * List all configurations, console command.
-	 * @param ci
-	 * @throws Exception
-	 */
-	@Deprecated
-	public void _configList(CommandInterpreter ci) throws Exception {
-		// Get the configuration administration service.
-		ServiceReference<?> ref = context.getServiceReference(ConfigurationAdmin.class.getName());
-		if (ref == null) {
-			ci.println(Messages.getString("osgi.NoConfigAdminService")); //$NON-NLS-1$
-			return;
-		}
-		ConfigurationAdmin configAdmin = (ConfigurationAdmin) context.getService(ref);
-		listConfigs(ci, configAdmin);
 	}
 
 	/**

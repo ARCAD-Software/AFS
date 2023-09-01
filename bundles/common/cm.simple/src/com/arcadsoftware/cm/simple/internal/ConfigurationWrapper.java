@@ -15,6 +15,8 @@ package com.arcadsoftware.cm.simple.internal;
 
 import java.io.IOException;
 import java.util.Dictionary;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
@@ -99,9 +101,6 @@ public class ConfigurationWrapper implements Configuration {
 		return false;
 	}
 	
-	/* Ready for next version of OSGi ! 
-	   (Do not remove this code !)
-	 
 	@Override
 	public void addAttributes(ConfigurationAttribute... attrs) throws IOException {
 		for (ConfigurationAttribute a: attrs) {
@@ -131,5 +130,5 @@ public class ConfigurationWrapper implements Configuration {
 				throw new IOException("The given Configuration attribute can not be persisted.");
 			}
 		}
-	}/**/
+	}
 }
