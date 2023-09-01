@@ -42,8 +42,9 @@ public class ConfiguredProxy {
 	
 	public ConfiguredProxy(Type type, Dictionary<String, Object> props) {
 		super();
-		if (type != Type.DIRECT) {
-			proxy = new Proxy(type, getAddress(props));
+		SocketAddress a = getAddress(props);
+		if ((type != Type.DIRECT) && (a != null)) {
+			proxy = new Proxy(type, a);
 		} else {
 			proxy = null;
 		}
