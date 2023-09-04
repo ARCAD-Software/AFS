@@ -15,7 +15,7 @@
 		<unit id="org.apache.felix.gogo.command" version="0.0.0"/>
 		<unit id="org.apache.felix.gogo.runtime" version="0.0.0"/>
 		<unit id="org.apache.felix.gogo.shell" version="0.0.0"/>
-		<unit id="org.apache.felix.src" version="0.0.0"/>
+		<unit id="org.apache.felix.scr" version="0.0.0"/>
 		<unit id="org.eclipse.equinox.console.jaas.fragment" version="0.0.0"/>
 		<unit id="org.eclipse.equinox.console.ssh" version="0.0.0"/>
 		<unit id="org.eclipse.equinox.console" version="0.0.0"/>
