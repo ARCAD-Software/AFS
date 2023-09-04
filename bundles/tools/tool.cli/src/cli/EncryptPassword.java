@@ -13,7 +13,6 @@
  *******************************************************************************/
 package cli;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -129,7 +128,7 @@ public class EncryptPassword extends Command {
 		}
 		String npwd;
 		if (isArgument("-fog", "-f")) { //$NON-NLS-1$ //$NON-NLS-2$
-			npwd = Crypto.fog(new String(pwd), StandardCharsets.UTF_8);
+			npwd = Crypto.fog(pwd);
 		} else {
 			npwd = Crypto.encrypt(pwd);
 		}

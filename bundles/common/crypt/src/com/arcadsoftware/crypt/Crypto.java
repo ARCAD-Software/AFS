@@ -1056,7 +1056,7 @@ public final class Crypto {
 		}
 		return sdata;
 	}
-	
+
 	/**
 	 * Transform a Char array into an encoded string.
 	 * This method is not robust cryptographically, its use is only to obfuscate sensitive data when they cannot be encrypted. 
