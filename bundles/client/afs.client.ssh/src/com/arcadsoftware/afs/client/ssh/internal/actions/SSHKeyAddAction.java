@@ -110,7 +110,7 @@ public class SSHKeyAddAction extends AbstractConnectedWizardedAddAction {
 		}
 
 		if (sshKey.isEncrypted()) {
-			sshKey.setPassphrase(Crypto.fog(sshKey.getPassphrase().toCharArray(), StandardCharsets.UTF_8));
+			sshKey.setPassphrase(Crypto.fog(sshKey.getPassphrase().toCharArray()));
 		}
 		return helper.put(SSHRoutes.GENERATE_KEY, sshKey.getBeanMap());
 	}
