@@ -56,7 +56,7 @@ jobs:
       uses: irongut/EditRelease@v1.2.0
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        id: ${{ steps.getByTag.outputs.id }}
+        id: ${{ steps.getReleaseByTag.outputs.id }}
         body: "The generated P2 repository is available at the following URL : https://github.com/ARCAD-Software/AFS/releases/download/${{ inputs.tags }}/"
         replacebody: false
     
