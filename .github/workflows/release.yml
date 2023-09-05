@@ -44,14 +44,14 @@ jobs:
         KEY_PASSWORD: ${{ secrets.CODESIGN_KEY_PASSWORD }}
         KEYSTORE_PASSWORD: ${{ secrets.CODESIGN_KEYSTORE_PASSWORD }}
          
-    - run: npm install github-release-notes -g
+    - run: npm install @cjbarth/github-release-notes -g
       shell: bash
     - run: |
         sudo apt-get update -y
         sudo apt-get install -y jq
       shell: bash
     - name: Generate release notes with gren
-      run: gren release --data-source=issues -B -t ${{ github.ref_name }} -o
+      run: gren release --data-source=issues -B -t ${{ github.ref_name }} -o -g label
       env:
         GREN_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
