@@ -36,7 +36,7 @@ jobs:
         sudo apt-get install -y jq
       shell: bash
     - name: Generate release notes with gren
-      run: gren release --data-source=issues -B -t ${{ inputs.tags }}..${{ vars.RELEASE_REF_TAG }} -o -g bug
+      run: gren release --data-source=issues -B -t ${{ inputs.tags }} -o
       env:
         GREN_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
