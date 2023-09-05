@@ -40,3 +40,7 @@ jobs:
       env:
         GREN_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
+
+    - name: Delete tag
+      shell: bash
+      run: echo git push --delete origin :refs/tags/${{ github.ref_name }}
