@@ -44,3 +44,19 @@ jobs:
     - name: Delete tag
       shell: bash
       run: git push origin :refs/tags/${{ github.ref_name }}
+
+    - uses: cardinalby/git-get-release-action@v1
+      id: getReleaseByTag
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        tag: ${{ inputs.tags }}
+
+    - name: Add P2 URL to release description
+      uses: irongut/EditRelease@v1.2.0
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        id: ${{ steps.getByTag.outputs.id }}
+        body: "The generated P2 repository is available at the following URL : https://github.com/ARCAD-Software/AFS/releases/download/${{ inputs.tags }}/"
+        replacebody: false
+    
