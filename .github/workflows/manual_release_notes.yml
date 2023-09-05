@@ -9,7 +9,12 @@
 name: Manual Release Notes
 
 on: 
-  workflow_dispatch
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: 'Generate RN for tag (/!\ will override current RN)'
+        required: true
+        type: string
 
 jobs:
   build:
@@ -31,7 +36,7 @@ jobs:
         sudo apt-get install -y jq
       shell: bash
     - name: Generate release notes with gren
-      run: gren release --data-source=issues -B -t ${{ github.ref_name }}..${{ vars.RELEASE_REF_TAG }} -o
+      run: gren release --data-source=issues -B -t ${{ inputs.tags }}..${{ vars.RELEASE_REF_TAG }} -o
       env:
         GREN_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
