@@ -6,6 +6,8 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
+# ----------------- This workflow is documented internally on Confluence -----------------
+
 name: Prerelease + build P2 repository
 
 on: 
