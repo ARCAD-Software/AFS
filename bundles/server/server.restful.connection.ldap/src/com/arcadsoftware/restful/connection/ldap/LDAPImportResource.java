@@ -37,7 +37,7 @@ import com.arcadsoftware.rest.XMLRepresentation;
 import com.unboundid.ldap.sdk.LDAPConnection;
 import com.unboundid.ldap.sdk.LDAPException;
 
-/* Process to Import of new Users from LDAP :
+/* Process to mannually import of new Users from LDAP :
  * GET = always return the list of import-ready users. Object returned are virtuals User object like they should be imported.
  * PUT/POST = import given users :
  * 
@@ -143,6 +143,9 @@ public class LDAPImportResource extends LDAPUserLinkedResource {
 				} catch (NumberFormatException e) {}
 			}
 		}
+		if (!profiles.isEmpty() && !hasRight(37)) {
+			throw new ResourceException(Status.CLIENT_ERROR_FORBIDDEN, "You do not own the suffisent access right to link users to specifics profiles, retry without assignating any profile to the imported user or contact an administrator.");
+		}
 		BeanMap userModel = new BeanMap(Activator.TYPE_USER, form);
 		userModel.remove("profiles"); //$NON-NLS-1$
 		userModel.remove("search"); //$NON-NLS-1$
@@ -155,7 +158,7 @@ public class LDAPImportResource extends LDAPUserLinkedResource {
 		StringBuilder errors = new StringBuilder();
 		boolean added = false;
 		final String searchPattern = form.getFirstValue("search"); //$NON-NLS-1$
-		if (searchPattern!=null) {
+		if (searchPattern != null) {
 			BeanMapList users = selectableLDAPUsers();
 			if ((users == null) || (users.size() == 0)) {
 				return null;
@@ -218,7 +221,6 @@ public class LDAPImportResource extends LDAPUserLinkedResource {
 				errors.append(String.format(Messages.LDAPImportResource_ERROR_UserIdError, login));
 			}
 		}
-
 		if (errors.length() > 0) {
 			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, errors.toString());
 		}
