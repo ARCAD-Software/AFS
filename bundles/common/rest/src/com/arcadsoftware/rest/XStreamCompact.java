@@ -150,7 +150,7 @@ public class XStreamCompact extends XStream {
 	 */
 	protected void InitializeBase() {
 		// Convert date to ISO format by default... (but accept other format as well).
-		registerConverter(new DateConverter("yyyy-MM-dd'T'HH:mm:ss", new String[] { //$NON-NLS-1$ 
+		registerConverter(new DateConverter("yyyy-MM-dd'T'HH:mm:ss.S", new String[] { //$NON-NLS-1$ 
 				"yyyy-MM-dd HH:mm:ss.S z", //$NON-NLS-1$
 				"yyyy-MM-dd HH:mm:ss.S a", //$NON-NLS-1$
 				"yyyy-MM-dd HH:mm:ssz", //$NON-NLS-1$ 
