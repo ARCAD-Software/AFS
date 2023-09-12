@@ -353,6 +353,9 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 					https = true;
 					Server server = new Server(component.getServers().getContext().createChildContext(), //
 							Arrays.asList(Protocol.HTTPS), null, serverProps.getPortssl(), component.getServers().getNext(), HttpsServerHelper.class.getName()); 
+					if (!server.isAvailable()) {
+						throw new ServerConfigurationException("The HTTPS Server connector is not available. Please check the server configuration, some bundles may be absent or not started, correct the error and refresh this bundle.");
+					}
 					component.getServers().add(server);
 					Series<Parameter> parameters = server.getContext().getParameters();
 					parameters.add("sslContextFactory", "org.restlet.engine.ssl.DefaultSslContextFactory"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -406,6 +409,9 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 				if (serverProps.getPort() > 0) {
 					Server server = new Server(component.getServers().getContext().createChildContext(), //
 							Arrays.asList(Protocol.HTTP), null, serverProps.getPort(), component.getServers().getNext(), HttpServerHelper.class.getName());
+					if (!server.isAvailable()) {
+						throw new ServerConfigurationException("The HTTP Server connector is not available. Please check the server configuration, some bundles may be absent or not started, correct the error and refresh this bundle.");
+					}
 					component.getServers().add(server);
 					// Add other parameters specification
 					Series<Parameter> parameters = server.getContext().getParameters();
@@ -428,6 +434,8 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 				// Now, let's start the component!
 		        // Note that the HTTP server connector is also automatically started.
 				component.start();
+				// TODO Test if the servers are available...
+				
 				// Start the root branches tracker.
 				if (rootTracker != null) {
 					rootTracker.open();
