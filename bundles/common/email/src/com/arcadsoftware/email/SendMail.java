@@ -27,6 +27,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Dictionary;
 import java.util.List;
 import java.util.Properties;
 
@@ -63,6 +64,7 @@ import org.bouncycastle.mail.smime.SMIMEException;
 import org.bouncycastle.mail.smime.SMIMESignedGenerator;
 import org.bouncycastle.operator.OperatorCreationException;
 
+import com.arcadsoftware.crypt.ConfiguredSSLContext;
 import com.arcadsoftware.email.internal.Messages;
 import com.arcadsoftware.mail.Attachment;
 import com.arcadsoftware.mail.FileAttachment;
@@ -111,6 +113,7 @@ public class SendMail implements ISendMail {
 	private char[] signPassword;
 	private String cryptAlias;
 	private String decryptAlias;
+	private ConfiguredSSLContext context;
 
 	/**
 	 * Use specific parameters to create a SendMail object.
@@ -198,9 +201,9 @@ public class SendMail implements ISendMail {
 	public void setServerParams(String host, int port, boolean auth, boolean ssl) {
 		if (port == 0) {
 			if (ssl) {
-				port = 25;
-			} else {
 				port = 465;
+			} else {
+				port = 25;
 			}
 		}
 		if (ssl) {
@@ -388,6 +391,7 @@ public class SendMail implements ISendMail {
 			if ((charset == null) || (charset.length() == 0)) {
 				charset = this.charset;
 			}
+			
 			// Propagate SMTP options to SMTPS Transport implementation...
 			if (serverprops.get(PROP_CONNECTIONTIMEOUT) != null) {
 				serverprops.put(PROP_SMTPS_CONNECTIONTIMEOUT, serverprops.get(PROP_CONNECTIONTIMEOUT));
@@ -401,22 +405,29 @@ public class SendMail implements ISendMail {
 			// Force the verification of the SMTP server host name.
 			if (TRANSPORT_SMTPS.equals(transport)) {
 				serverprops.put("mail.smtps.ssl.checkserveridentity", "true"); //$NON-NLS-1$ //$NON-NLS-1$
-				// FIXME set mail.smtps.ssl.socketFactory with a locally configured socket factory !
-				// Always trust the server hostname...
-				Object host = serverprops.get(PROP_SMTPSHOSTNAME);
-				if (host != null) {
-					if (!serverprops.contains("mail.smtps.ssl.trust")) { //$NON-NLS-1$
-						serverprops.put("mail.smtps.ssl.trust", host); //$NON-NLS-1$
-					}
+				
+				Dictionary<String, Object> props = (Dictionary) serverprops;
+				context = new ConfiguredSSLContext(props);
+				if (context != null) {
+					serverprops.put("mail.smtps.ssl.socketFactory", context.getSocketFactory());
+				}
+				
+				if (serverprops.get("mail.smtps.socketFactory.fallback") == null) {
+					// Set the fallback to false if it was not already defined.
+					// Does not default to the Java default Socket if the context above fails to be created.
+					serverprops.put("mail.smtps.socketFactory.fallback", "false");
 				}
 			} else {
-				// FIXME only if starttls is set to true...
-				serverprops.put("mail.smtp.ssl.checkserveridentity", "true"); //$NON-NLS-1$ //$NON-NLS-1$
-				// FIXME set mail.smtp.ssl.socketFactory with a locally configured socket factory !
-				Object host = serverprops.get(PROP_SMTPHOSTNAME);
-				if (host != null) {
-					if (!serverprops.contains("mail.smtp.ssl.trust")) { //$NON-NLS-1$
-						serverprops.put("mail.smtp.ssl.trust", host); //$NON-NLS-1$
+				String startTls = serverprops.getProperty(PROP_STARTTLS);
+				
+				if (startTls != null && startTls.equals("true")) {
+					// If start TLS is activated, setup the socket factory
+					serverprops.put("mail.smtp.ssl.checkserveridentity", "true"); //$NON-NLS-1$ //$NON-NLS-1$
+					
+					Dictionary<String, Object> props = (Dictionary) serverprops;
+					context = new ConfiguredSSLContext(props);
+					if (context != null) {
+						serverprops.put("mail.smtp.ssl.socketFactory", context.getSocketFactory());
 					}
 				}
 			}

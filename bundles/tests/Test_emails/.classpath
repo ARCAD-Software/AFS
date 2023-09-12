@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
+	<classpathentry kind="lib" path="C:/Users/mhenrioux/p2_temp/org.eclipse.osgi_3.16.300.v20210525-1715.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/email"/>
+	<classpathentry kind="lib" path="C:/Users/mhenrioux/p2_temp/javax.mail.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/osgi"/>
+	<classpathentry kind="lib" path="C:/Users/mhenrioux/Desktop/TARGET/plugins/bcmail_1.75.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/mhenrioux/Desktop/TARGET/plugins/bcpg_1.75.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/mhenrioux/Desktop/TARGET/plugins/bcpkix_1.75.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/mhenrioux/Desktop/TARGET/plugins/bcprov_1.75.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/mhenrioux/Desktop/TARGET/plugins/bcutil_1.75.0.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
