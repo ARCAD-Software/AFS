@@ -27,7 +27,9 @@ public class LdapAuthLoginResource extends LDAPUserLinkedResource {
 	@Override
 	protected void doInit() throws ResourceException {
 		super.doInit();
-		getAllowedMethods().add(Method.GET);
+		if (hasRight(38)) {
+			getAllowedMethods().add(Method.GET);
+		}
 	}
 
 	@Override
