@@ -254,7 +254,7 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 				try {
 					int i = 100;
 					for (Integer uid : adminUIDs) {
-						recordUserUnlockProcess(uid, 5000 + i);
+						recordUserUnlockProcess(uid, 8000 + i);
 						i += 100;
 					}
 				} catch (Exception e) {
@@ -536,6 +536,6 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 			public void run() {
 				unlockUser(uid, true);
 			}
-		}, 10000);
+		}, 15000);
 	}
 }
