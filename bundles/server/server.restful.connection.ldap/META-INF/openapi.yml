@@ -1,0 +1,810 @@
+openapi: 3.1.0 #Documentation Fragment
+paths:
+  /ldapauth/{login}:
+    description: This service allow to test the availability of a login into the LDAP, the response indicate that the login is already used in the application (409), not found into the LDAP (404) or found in the LDAP an available (204) 
+    get:
+      summary: Get availability information about a login 
+      description: Test if the given login is an already used one or available in the LDAP. 
+      tags:
+      - Framework
+      parameters:
+        - in: path
+          name: login
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: The login to test.
+      responses:
+        "204":
+          description: The given login exist into the LDAP tree and is not already used in the application. 
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "409":
+          description: The given login is already used in this application.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xhtml+xml:
+              schema:
+                type: string
+            text/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            text/html:
+              schema:
+                type: string
+        "405":
+          $ref: '#/components/responses/Forbidden'
+        default:
+          description: An unexpected error occurs.
+  /ldapauth/{login}/{oldpassword}:
+    description: This service is not currently implemented. 
+    get:
+      description: Placeholder method... 
+      tags:
+      - Framework
+      parameters:
+        - in: path
+          name: login
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: The login to test.
+        - in: path
+          name: oldpassword
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: The current password to test.
+      responses:
+        "204":
+          description: The given login exist into the LDAP tree and is not already used in the application. 
+    put:
+      description: Placeholder method... 
+      tags:
+      - Framework
+      parameters:
+        - in: path
+          name: login
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: The login to test.
+        - in: path
+          name: oldpassword
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: The current password to test.
+      responses:
+        "204":
+          description: The given login exist into the LDAP tree and is not already used in the application. 
+    post:
+      description: Placeholder method... 
+      tags:
+      - Framework
+      parameters:
+        - in: path
+          name: login
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: The login to test.
+        - in: path
+          name: oldpassword
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: The current password to test.
+      responses:
+        "204":
+          description: The given login exist into the LDAP tree and is not already used in the application. 
+    delete:
+      description: Placeholder method... 
+      tags:
+      - Framework
+      parameters:
+        - in: path
+          name: login
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: The login to test.
+        - in: path
+          name: oldpassword
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: The current password to test.
+      responses:
+        "204":
+          description: The given login exist into the LDAP tree and is not already used in the application. 
+  /ldapauth/{login}/{oldpassword}/{newpassword}:
+    description: This service is not currently implemented. 
+    get:
+      description: Placeholder method... 
+      tags:
+      - Framework
+      parameters:
+        - in: path
+          name: login
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: The login to test.
+        - in: path
+          name: oldpassword
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: The current password.
+        - in: path
+          name: newpassword
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: The new password value.
+      responses:
+        "204":
+          description: The given login exist into the LDAP tree and is not already used in the application. 
+    put:
+      description: Placeholder method... 
+      tags:
+      - Framework
+      parameters:
+        - in: path
+          name: login
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: The login to test.
+        - in: path
+          name: oldpassword
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: The current password to test.
+      responses:
+        "204":
+          description: The given login exist into the LDAP tree and is not already used in the application. 
+    post:
+      description: Placeholder method... 
+      tags:
+      - Framework
+      parameters:
+        - in: path
+          name: login
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: The login to test.
+        - in: path
+          name: oldpassword
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: The current password to test.
+      responses:
+        "204":
+          description: The given login exist into the LDAP tree and is not already used in the application. 
+    delete:
+      description: Placeholder method... 
+      tags:
+      - Framework
+      parameters:
+        - in: path
+          name: login
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: The login to test.
+        - in: path
+          name: oldpassword
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: The current password to test.
+      responses:
+        "204":
+          description: The given login exist into the LDAP tree and is not already used in the application. 
+  /admin/ldap/import/isenabled:
+    description: This service allow the inform a client application that the Import facilities are enabled.
+    get:
+      summary: Import facilities activation 
+      description: Get the state of the LDAP import facilities. 
+      tags:
+      - Framework
+      responses:
+        "200":
+          description: Get the state of the import facilities in a plain text, "true" if the service is enabled, "false" if not. 
+          content:
+            text/plain:
+              schema:
+                type: string
+        "403":
+          description: The application server is not ready to access to the LDAP server. 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xhtml+xml:
+              schema:
+                type: string
+            text/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            text/html:
+              schema:
+                type: string
+        "405":
+          $ref: '#/components/responses/Forbidden'
+        default:
+          description: An unexpected error occurs.
+  /admin/ldap/import:
+    description: This service
+    get:
+      summary: List import candidates 
+      description: Return a list of potential new user which can be imported from the LDAP server. 
+      tags:
+      - Framework
+      parameters:
+        - in: query
+          name: search
+          description: Define LDAP filter to apply to the configured base to select the user to import.
+          schema:
+            type: string
+        - in: query
+          name: limit.count
+          description: Set the maximum number of entries to return from the LDAP server. The default value, or a zero value indicates that there should be no limit set by the LDAP client, LDAP server always add a time limit to any connection.
+          schema:
+            type: integer
+        - in: query
+          name: limit.time
+          description: Set a time out for the LDAP request, defined in seconds. The default value, or a zero value indicates that there should be no limit set by the LDAP client, LDAP server always add a time limit to any connection.
+          schema:
+            type: integer
+        - in: query
+          name: map.
+          description: Any parameter named map.<code> where the code is the name of an attribute associated to the User MetaDataEntity and with value a list of LDAP attributes names, separated with spaces, will define a new mapping for this import operation.
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                search:
+                  description: Define LDAP filter to apply to the configured base to select the user to import.
+                  type: string
+                "limit.count":
+                  description: Set the maximum number of entries to return from the LDAP server. The default value, or a zero value indicates that there should be no limit set by the LDAP client, LDAP server always add a time limit to any connection.
+                  type: integer
+                "limit.time":
+                  description: Set a time out for the LDAP request, defined in seconds. The default value, or a zero value indicates that there should be no limit set by the LDAP client, LDAP server always add a time limit to any connection.
+                  type: integer
+                "map.":
+                  description: Any parameter named map.<code> where the code is the name of an attribute associated to the User MetaDataEntity and with value a list of LDAP attributes names, separated with spaces, will define a new mapping for this import operation.
+                  type: string
+          application/xml:
+            schema:
+              type: object
+              properties:
+                search:
+                  description: Define LDAP filter to apply to the configured base to select the user to import.
+                  type: string
+                "limit_count":
+                  description: Set the maximum number of entries to return from the LDAP server. The default value, or a zero value indicates that there should be no limit set by the LDAP client, LDAP server always add a time limit to any connection.
+                  type: integer
+                "limit_time":
+                  description: Set a time out for the LDAP request, defined in seconds. The default value, or a zero value indicates that there should be no limit set by the LDAP client, LDAP server always add a time limit to any connection.
+                  type: integer
+                "map_":
+                  description: Any parameter named map_<code> where the code is the name of an attribute associated to the User MetaDataEntity and with value a list of LDAP attributes names, separated with spaces, will define a new mapping for this import operation.
+                  type: string
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                search:
+                  description: Define LDAP filter to apply to the configured base to select the user to import.
+                  type: string
+                "limit_count":
+                  description: Set the maximum number of entries to return from the LDAP server. The default value, or a zero value indicates that there should be no limit set by the LDAP client, LDAP server always add a time limit to any connection.
+                  type: integer
+                "limit_time":
+                  description: Set a time out for the LDAP request, defined in seconds. The default value, or a zero value indicates that there should be no limit set by the LDAP client, LDAP server always add a time limit to any connection.
+                  type: integer
+                "map_":
+                  description: Any parameter named map_<code> where the code is the name of an attribute associated to the User MetaDataEntity and with value a list of LDAP attributes names, separated with spaces, will define a new mapping for this import operation.
+                  type: string
+      responses:
+        "200":
+          description: A list of user candidates. The User attributes will be completed with a pseudo reference attribute, named ldapauth_login, containing the corresponding user login value obtained from the LDAP server. 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfUser'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ListOfUser'
+            text/xml:
+              schema:
+                $ref: '#/components/schemas/ListOfUser'
+            application/x-xsd+xml:
+              description: The XML definition of entities declarations.
+              schema:
+                type: string
+        "403":
+          description: The application server is not ready to access to the LDAP server. 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xhtml+xml:
+              schema:
+                type: string
+            text/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            text/html:
+              schema:
+                type: string
+        default:
+          description: An unexpected error occurs.
+    put:
+      summary: Import users candidates 
+      description: This operation allow to import a single candidate, the candidate is identified by the ldapauth_login property included in the request body.
+      tags:
+      - Framework
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ldapauth_login:
+                  description: The login value corresponding to the user to import.
+                  type: string
+                profiles:
+                  description: A list of profiles id (can be obtained from GET / data/profile) to link the imported user.
+                  type: integer
+                other:
+                  description: Any other parameter corresponding to the user attributes will be set as specified into the User data.
+                  type: string
+          application/xml:
+            schema:
+              type: object
+              properties:
+                ldapauth_login:
+                  description: The login value corresponding to the user to import.
+                  type: string
+                profiles:
+                  description: A list of profiles id (can be obtained from GET / data/profile) to link the imported user.
+                  type: integer
+                other:
+                  description: Any other parameter corresponding to the user attributes will be set as specified into the User data.
+                  type: string
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                ldapauth_login:
+                  description: The login value corresponding to the user to import.
+                  type: string
+                profiles:
+                  description: A list of profiles id (can be obtained from GET / data/profile) to link the imported user.
+                  type: integer
+                other:
+                  description: Any other parameter corresponding to the user attributes will be set as specified into the User data.
+                  type: string
+      responses:
+        "204":
+          description: The user has been imported.. 
+        "400":
+          description: The user import fail due to internal conflict or invalid attributes or mapping value. The error message should given some details about the reason of this error. 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xhtml+xml:
+              schema:
+                type: string
+            text/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            text/html:
+              schema:
+                type: string
+        "403":
+          description: The application server is not ready to access to the LDAP server, or the current user does not own the required access rights to perform this operation. 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xhtml+xml:
+              schema:
+                type: string
+            text/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            text/html:
+              schema:
+                type: string
+        "404":
+          $ref: '#/components/responses/NotFound' 
+        default:
+          description: An unexpected error occurs.
+    post:
+      summary: Import users candidates 
+      description: This operation allow to import a single candidate, the candidate is identified by the ldapauth_login property included in the request body.
+      tags:
+      - Framework
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ldapauth_login:
+                  description: The login value corresponding to the user to import.
+                  type: string
+                profiles:
+                  description: A list of profiles id (can be obtained from GET / data/profile) to link the imported user.
+                  type: integer
+                other:
+                  description: Any other parameter corresponding to the user attributes will be set as specified into the User data.
+                  type: string
+          application/xml:
+            schema:
+              type: object
+              properties:
+                ldapauth_login:
+                  description: The login value corresponding to the user to import.
+                  type: string
+                profiles:
+                  description: A list of profiles id (can be obtained from GET / data/profile) to link the imported user.
+                  type: integer
+                other:
+                  description: Any other parameter corresponding to the user attributes will be set as specified into the User data.
+                  type: string
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                ldapauth_login:
+                  description: The login value corresponding to the user to import.
+                  type: string
+                profiles:
+                  description: A list of profiles id (can be obtained from GET / data/profile) to link the imported user.
+                  type: integer
+                other:
+                  description: Any other parameter corresponding to the user attributes will be set as specified into the User data.
+                  type: string
+      responses:
+        "204":
+          description: The user has been imported.. 
+        "400":
+          description: The user import fail due to internal conflict or invalid attributes or mapping value. The error message should given some details about the reason of this error. 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xhtml+xml:
+              schema:
+                type: string
+            text/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            text/html:
+              schema:
+                type: string
+        "403":
+          description: The application server is not ready to access to the LDAP server, or the current user does not own the required access rights to perform this operation. 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xhtml+xml:
+              schema:
+                type: string
+            text/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            text/html:
+              schema:
+                type: string
+        "404":
+          $ref: '#/components/responses/NotFound' 
+        default:
+          description: An unexpected error occurs.
+  /admin/ldap/import/{id}:
+    description: This service allow to import multiple users in one call. 
+    post:
+      summary: Import users candidates 
+      description: This operation allow to import a single candidate, the candidate is identified by the ldapauth_login property included in the request body.
+      tags:
+      - Framework
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: Contain one or a list of previously listed user candidates ID, or ldapauth_login values. each value separated with a plus (+) symbol.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                search:
+                  description: Define LDAP filter to apply to the configured base to select the user to import. If you have used ID in the url this filter must ne the same as the one used to generated the initial list of user candidates.
+                  type: string
+                "limit_count":
+                  description: Set the maximum number of entries to return from the LDAP server. The default value, or a zero value indicates that there should be no limit set by the LDAP client, LDAP server always add a time limit to any connection.
+                  type: integer
+                "limit_time":
+                  description: Set a time out for the LDAP request, defined in seconds. The default value, or a zero value indicates that there should be no limit set by the LDAP client, LDAP server always add a time limit to any connection.
+                  type: integer
+                ldapauth_login:
+                  description: The login value corresponding to the user to import. The value will be added to the list passed in the URL. It can also be an array value.
+                  type: string
+                profiles:
+                  description: A list of profiles id (can be obtained from GET / data/profile) to link the imported user.
+                  type: integer
+                "map_":
+                  description: Any parameter named map_<code> where the code is the name of an attribute associated to the User MetaDataEntity and with value a list of LDAP attributes names, separated with spaces, will define a new mapping for this import operation.
+                  type: string
+          application/xml:
+            schema:
+              type: object
+              properties:
+                search:
+                  description: Define LDAP filter to apply to the configured base to select the user to import. If you have used ID in the url this filter must ne the same as the one used to generated the initial list of user candidates.
+                  type: string
+                "limit_count":
+                  description: Set the maximum number of entries to return from the LDAP server. The default value, or a zero value indicates that there should be no limit set by the LDAP client, LDAP server always add a time limit to any connection.
+                  type: integer
+                "limit_time":
+                  description: Set a time out for the LDAP request, defined in seconds. The default value, or a zero value indicates that there should be no limit set by the LDAP client, LDAP server always add a time limit to any connection.
+                  type: integer
+                ldapauth_login:
+                  description: The login value corresponding to the user to import. The value will be added to the list passed in the URL. It can also be an array value.
+                  type: string
+                profiles:
+                  description: A list of profiles id (can be obtained from GET / data/profile) to link the imported user.
+                  type: integer
+                "map_":
+                  description: Any parameter named map_<code> where the code is the name of an attribute associated to the User MetaDataEntity and with value a list of LDAP attributes names, separated with spaces, will define a new mapping for this import operation.
+                  type: string
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                search:
+                  description: Define LDAP filter to apply to the configured base to select the user to import. If you have used ID in the url this filter must ne the same as the one used to generated the initial list of user candidates.
+                  type: string
+                "limit_count":
+                  description: Set the maximum number of entries to return from the LDAP server. The default value, or a zero value indicates that there should be no limit set by the LDAP client, LDAP server always add a time limit to any connection.
+                  type: integer
+                "limit_time":
+                  description: Set a time out for the LDAP request, defined in seconds. The default value, or a zero value indicates that there should be no limit set by the LDAP client, LDAP server always add a time limit to any connection.
+                  type: integer
+                ldapauth_login:
+                  description: The login value corresponding to the user to import. The value will be added to the list passed in the URL. It can also be an array value.
+                  type: string
+                profiles:
+                  description: A list of profiles id (can be obtained from GET / data/profile) to link the imported user.
+                  type: integer
+                "map_":
+                  description: Any parameter named map_<code> where the code is the name of an attribute associated to the User MetaDataEntity and with value a list of LDAP attributes names, separated with spaces, will define a new mapping for this import operation.
+                  type: string
+      responses:
+        "204":
+          description: The users have been imported.. 
+        "400":
+          description: The user import fail due to internal conflict or invalid attributes or mapping value. The error message should given some details about the reason of this error. 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xhtml+xml:
+              schema:
+                type: string
+            text/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            text/html:
+              schema:
+                type: string
+        "403":
+          description: The application server is not ready to access to the LDAP server, or the current user does not own the required access rights to perform this operation. 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xhtml+xml:
+              schema:
+                type: string
+            text/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            text/html:
+              schema:
+                type: string
+        "404":
+          $ref: '#/components/responses/NotFound' 
+        default:
+          description: An unexpected error occurs.
+    put:
+      summary: Import users candidates 
+      description: This operation allow to import a single candidate, the candidate is identified by the ldapauth_login property included in the request body.
+      tags:
+      - Framework
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: Contain one or a list of previously listed user candidates ID, or ldapauth_login values. each value separated with a plus (+) symbol.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                search:
+                  description: Define LDAP filter to apply to the configured base to select the user to import. If you have used ID in the url this filter must ne the same as the one used to generated the initial list of user candidates.
+                  type: string
+                "limit_count":
+                  description: Set the maximum number of entries to return from the LDAP server. The default value, or a zero value indicates that there should be no limit set by the LDAP client, LDAP server always add a time limit to any connection.
+                  type: integer
+                "limit_time":
+                  description: Set a time out for the LDAP request, defined in seconds. The default value, or a zero value indicates that there should be no limit set by the LDAP client, LDAP server always add a time limit to any connection.
+                  type: integer
+                ldapauth_login:
+                  description: The login value corresponding to the user to import. The value will be added to the list passed in the URL. It can also be an array value.
+                  type: string
+                profiles:
+                  description: A list of profiles id (can be obtained from GET / data/profile) to link the imported user.
+                  type: integer
+                "map_":
+                  description: Any parameter named map_<code> where the code is the name of an attribute associated to the User MetaDataEntity and with value a list of LDAP attributes names, separated with spaces, will define a new mapping for this import operation.
+                  type: string
+          application/xml:
+            schema:
+              type: object
+              properties:
+                search:
+                  description: Define LDAP filter to apply to the configured base to select the user to import. If you have used ID in the url this filter must ne the same as the one used to generated the initial list of user candidates.
+                  type: string
+                "limit_count":
+                  description: Set the maximum number of entries to return from the LDAP server. The default value, or a zero value indicates that there should be no limit set by the LDAP client, LDAP server always add a time limit to any connection.
+                  type: integer
+                "limit_time":
+                  description: Set a time out for the LDAP request, defined in seconds. The default value, or a zero value indicates that there should be no limit set by the LDAP client, LDAP server always add a time limit to any connection.
+                  type: integer
+                ldapauth_login:
+                  description: The login value corresponding to the user to import. The value will be added to the list passed in the URL. It can also be an array value.
+                  type: string
+                profiles:
+                  description: A list of profiles id (can be obtained from GET / data/profile) to link the imported user.
+                  type: integer
+                "map_":
+                  description: Any parameter named map_<code> where the code is the name of an attribute associated to the User MetaDataEntity and with value a list of LDAP attributes names, separated with spaces, will define a new mapping for this import operation.
+                  type: string
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                search:
+                  description: Define LDAP filter to apply to the configured base to select the user to import. If you have used ID in the url this filter must ne the same as the one used to generated the initial list of user candidates.
+                  type: string
+                "limit_count":
+                  description: Set the maximum number of entries to return from the LDAP server. The default value, or a zero value indicates that there should be no limit set by the LDAP client, LDAP server always add a time limit to any connection.
+                  type: integer
+                "limit_time":
+                  description: Set a time out for the LDAP request, defined in seconds. The default value, or a zero value indicates that there should be no limit set by the LDAP client, LDAP server always add a time limit to any connection.
+                  type: integer
+                ldapauth_login:
+                  description: The login value corresponding to the user to import. The value will be added to the list passed in the URL. It can also be an array value.
+                  type: string
+                profiles:
+                  description: A list of profiles id (can be obtained from GET / data/profile) to link the imported user.
+                  type: integer
+                "map_":
+                  description: Any parameter named map_<code> where the code is the name of an attribute associated to the User MetaDataEntity and with value a list of LDAP attributes names, separated with spaces, will define a new mapping for this import operation.
+                  type: string
+      responses:
+        "204":
+          description: The users have been imported.. 
+        "400":
+          description: The user import fail due to internal conflict or invalid attributes or mapping value. The error message should given some details about the reason of this error. 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xhtml+xml:
+              schema:
+                type: string
+            text/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            text/html:
+              schema:
+                type: string
+        "403":
+          description: The application server is not ready to access to the LDAP server, or the current user does not own the required access rights to perform this operation. 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            application/xhtml+xml:
+              schema:
+                type: string
+            text/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+            text/html:
+              schema:
+                type: string
+        "404":
+          $ref: '#/components/responses/NotFound' 
+        default:
+          description: An unexpected error occurs.
