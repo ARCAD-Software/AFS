@@ -45,3 +45,8 @@ Service-Component: OSGI-INF/com.arcadsoftware.server.ssh.internal.listeners.SSHK
  OSGI-INF/com.arcadsoftware.server.ssh.services.SSHService.xml
 Export-Package: com.arcadsoftware.server.ssh.services
 Bundle-ActivationPolicy: lazy
+Bundle-License: https://www.eclipse.org/legal/epl-2.0
+Bundle-License-Name: Eclipse Public License Version 2.0
+Bundle-DocURL: https://github.com/ARCAD-Software/AFS/wiki
+Bundle-ContactAddress: contact@arcadsoftware.com
+Bundle-Copyright: This API is reusable in the terms of the license EPL 2.0.

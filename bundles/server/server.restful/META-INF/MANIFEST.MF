@@ -5,7 +5,7 @@ Bundle-Description: REST API of ARCAD Foundation server.
 Bundle-ContactAddress: contact@arcadsoftware.com
 Bundle-License: https://www.eclipse.org/legal/epl-2.0
 Bundle-License-Name: Eclipse Public License Version 2.0
-Bundle-DocURL: https://github.com/ARCAD-Software/AFS
+Bundle-DocURL: https://github.com/ARCAD-Software/AFS/wiki
 Bundle-Copyright: This API is reusable in the terms of the license EPL 2.0.
 Bundle-SymbolicName: com.arcadsoftware.server.restful;singleton:=true
 Bundle-Version: 3.1.1.qualifier

@@ -22,3 +22,8 @@ Import-Package: com.arcadsoftware.beanmap;version="[2.0.0,3.0.0)",
 Bundle-ClassPath: .,
  libs/cron4j-2.2.5.jar
 Automatic-Module-Name: com.arcadsoftware.server.scheduler.impl
+Bundle-License: https://www.eclipse.org/legal/epl-2.0
+Bundle-License-Name: Eclipse Public License Version 2.0
+Bundle-DocURL: https://github.com/ARCAD-Software/AFS/wiki
+Bundle-ContactAddress: contact@arcadsoftware.com
+Bundle-Copyright: This API is reusable in the terms of the license EPL 2.0.
