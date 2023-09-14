@@ -31,14 +31,14 @@ jobs:
         distribution: 'temurin'
         java-version: 17
          
-    - run: npm install @cjbarth/github-release-notes -g
+    - run: npm install @cjbarth/github-release-notes@4.1.0 -g
       shell: bash
     - run: |
         sudo apt-get update -y
         sudo apt-get install -y jq
       shell: bash
     - name: Generate release notes with gren
-      run: gren release --data-source=issues -B -t ${{ inputs.tags }} -o -g label
+      run: gren release --data-source=issues -B -t ${{ inputs.tags }} -o -g label -i prerelease
       env:
         GREN_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
