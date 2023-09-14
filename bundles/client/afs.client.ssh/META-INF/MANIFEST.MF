@@ -25,3 +25,8 @@ Bundle-ClassPath: .
 Export-Package: com.arcadsoftware.afs.client.ssh.containers,
  com.arcadsoftware.afs.client.ssh.ui.dialogs
 Automatic-Module-Name: com.arcadsoftware.afs.client.ssh
+Bundle-License: https://www.eclipse.org/legal/epl-2.0
+Bundle-License-Name: Eclipse Public License Version 2.0
+Bundle-DocURL: https://github.com/ARCAD-Software/AFS/wiki
+Bundle-ContactAddress: contact@arcadsoftware.com
+Bundle-Copyright: This API is reusable in the terms of the license EPL 2.0.

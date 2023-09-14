@@ -43,3 +43,8 @@ Export-Package: com.arcadsoftware.afs.client.core;version="1.4.2",
  com.arcadsoftware.afs.client.core.servers.model;version="1.4.2";uses:="com.arcadsoftware.aev.core.model,com.arcadsoftware.aev.core.contentproviders",
  com.arcadsoftware.afs.client.core.singletons;version="1.4.2",
  com.arcadsoftware.afs.client.core.tools;version="1.4.2";uses:="com.arcadsoftware.afs.client.core.connection,com.arcadsoftware.metadata"
+Bundle-License: https://www.eclipse.org/legal/epl-2.0
+Bundle-License-Name: Eclipse Public License Version 2.0
+Bundle-DocURL: https://github.com/ARCAD-Software/AFS/wiki
+Bundle-ContactAddress: contact@arcadsoftware.com
+Bundle-Copyright: This API is reusable in the terms of the license EPL 2.0.

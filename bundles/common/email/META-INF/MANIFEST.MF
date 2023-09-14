@@ -43,3 +43,8 @@ Import-Package: com.arcadsoftware.crypt;version="1.3.1",
 Export-Package: com.arcadsoftware.email;version="2.1.0";uses:="com.arcadsoftware.mail,javax.mail"
 Automatic-Module-Name: com.arcadsoftware.email
 Bundle-ActivationPolicy: lazy
+Bundle-License: https://www.eclipse.org/legal/epl-2.0
+Bundle-License-Name: Eclipse Public License Version 2.0
+Bundle-DocURL: https://github.com/ARCAD-Software/AFS/wiki
+Bundle-ContactAddress: contact@arcadsoftware.com
+Bundle-Copyright: This API is reusable in the terms of the license EPL 2.0.

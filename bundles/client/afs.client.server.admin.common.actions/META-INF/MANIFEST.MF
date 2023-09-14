@@ -9,3 +9,8 @@ Require-Bundle: org.eclipse.ui;resolution:=optional,
  org.eclipse.core.runtime,
  com.arcadsoftware.afs.client.server.admin.common;bundle-version="1.0.0"
 Automatic-Module-Name: com.arcadsoftware.afs.client.server.admin.common.actions
+Bundle-License: https://www.eclipse.org/legal/epl-2.0
+Bundle-License-Name: Eclipse Public License Version 2.0
+Bundle-DocURL: https://github.com/ARCAD-Software/AFS/wiki
+Bundle-ContactAddress: contact@arcadsoftware.com
+Bundle-Copyright: This API is reusable in the terms of the license EPL 2.0.

@@ -24,3 +24,8 @@ Import-Package: javax.crypto,
  org.apache.jcp.xml.dsig.internal.dom;version="[2.2.3,3.0.0)",
  org.w3c.dom,
  org.xml.sax
+Bundle-License: https://www.eclipse.org/legal/epl-2.0
+Bundle-License-Name: Eclipse Public License Version 2.0
+Bundle-DocURL: https://github.com/ARCAD-Software/AFS/wiki
+Bundle-ContactAddress: contact@arcadsoftware.com
+Bundle-Copyright: This API is reusable in the terms of the license EPL 2.0.

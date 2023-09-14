@@ -61,3 +61,8 @@ Import-Package: com.arcadsoftware.crypt;version="[1.0.0,2.0.0)",
  org.restlet.util;version="[2.4.3,3.0.0)"
 Arcad-PropertiesDomain: data
 Automatic-Module-Name: com.arcadsoftware.server.restful.console
+Bundle-License: https://www.eclipse.org/legal/epl-2.0
+Bundle-License-Name: Eclipse Public License Version 2.0
+Bundle-DocURL: https://github.com/ARCAD-Software/AFS/wiki
+Bundle-ContactAddress: contact@arcadsoftware.com
+Bundle-Copyright: This API is reusable in the terms of the license EPL 2.0.

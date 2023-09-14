@@ -40,3 +40,7 @@ Export-Package: com.arcadsoftware.beanmap;version="2.1.0",
  com.arcadsoftware.beanmap.rest;version="2.1.0",
  com.arcadsoftware.beanmap.xml;version="2.1.0"
 Automatic-Module-Name: com.arcadsoftware.beanmap
+Bundle-DocURL: https://github.com/ARCAD-Software/AFS/wiki
+Eclipse-BundleShape: jar
+Bundle-ContactAddress: contact@arcadsoftware.com
+Bundle-Copyright: This API is reusable in the terms of the license EPL 2.0.
