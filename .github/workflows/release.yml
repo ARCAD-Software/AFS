@@ -54,6 +54,7 @@ jobs:
       shell: bash
     - name: Generate release notes with gren
       run: gren release --data-source=issues -B -t ${{ github.ref_name }} -o -g label
+      continue-on-error: true
       env:
         GREN_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
