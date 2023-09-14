@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Restlet Framework for Client
 Bundle-SymbolicName: org.restlet.base;singleton:=true
-Bundle-Version: 2.4.300
+Bundle-Version: 2.4.300.qualifier
 Automatic-Module-Name: org.restlet
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.restlet.engine.internal.Activator
