@@ -12,7 +12,7 @@ Require-Bundle: org.eclipse.core.runtime,
  com.arcadsoftware.afs.framework.ui;bundle-version="1.0.0",
  com.arcadsoftware.osgi;bundle-version="1.3.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ClassPath: .
 Bundle-Vendor: ARCAD Software
 Automatic-Module-Name: com.arcadsoftware.afs.framework.help

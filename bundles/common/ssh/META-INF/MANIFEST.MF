@@ -4,7 +4,7 @@ Bundle-Name: AFS SSH Connections Management
 Bundle-SymbolicName: com.arcadsoftware.ssh
 Bundle-Version: 1.2.0.qualifier
 Bundle-Vendor: ARCAD Software
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Export-Package: com.arcadsoftware.ssh.model;version="1.0.0"
 Bundle-ClassPath: .
 Automatic-Module-Name: com.arcadsoftware.ssh

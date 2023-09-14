@@ -5,7 +5,7 @@ Bundle-SymbolicName: com.arcadsoftware.server.restful.console;singleton:=true
 Bundle-Version: 1.4.0.qualifier
 Bundle-Activator: com.arcadsoftware.rest.console.internal.Activator
 Bundle-Vendor: ARCAD Software
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Import-Package: com.arcadsoftware.crypt;version="[1.0.0,2.0.0)",
  com.arcadsoftware.database;version="[1.0.2,2.0.0)",
  com.arcadsoftware.groovy.security;version="1.0.0",

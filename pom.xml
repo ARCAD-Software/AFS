@@ -79,6 +79,12 @@
 			<artifactId>javax.mail</artifactId>
 			<version>1.6.2</version>
 		</dependency>
+		<dependency>
+		    <groupId>jakarta.activation</groupId>
+		    <artifactId>jakarta.activation-api</artifactId>
+		    <version>1.2.2</version>
+		</dependency>
+		
 		
 		<!-- JDBC and Databases -->
 		<dependency> <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->

@@ -155,4 +155,4 @@ Import-Package: javax.activation;resolution:=optional,
  org.w3c.dom,
  org.xml.sax;resolution:=optional,
  org.xml.sax.helpers;resolution:=optional
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11

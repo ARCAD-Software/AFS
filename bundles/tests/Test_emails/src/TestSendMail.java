@@ -57,34 +57,34 @@ class TestSendMail {
 	
 	private SendMail sendMail;
 	
-	//@Test
+	@Test
 	public void sendEmailWithSMTPS() {
 		String transport = SendMail.TRANSPORT_SMTPS;
 		Properties serverProps = new Properties();
 		// SMTPS Configuration
-		serverProps.put(PROP_SMTPSHOSTNAME, "TO FILL");
+		serverProps.put(PROP_SMTPSHOSTNAME, "mail.gmx.com");
 		serverProps.put(PROP_SMTPSPORT, "465");
 		serverProps.put(PROP_SMTPSAUTH, "true");
 		serverProps.put(PROP_SMTPS_CONNECTIONTIMEOUT, "120000");
 		serverProps.put(PROP_SMTPS_TIMEOUT, "120000");
 		
 		// Option to force fallback to true, check sendMail for more details
-		//serverProps.put("mail.smtps.socketFactory.fallback", "true");
+		serverProps.put("mail.smtps.socketFactory.fallback", "true");
 		
 		// TLS Configuration like in cfg file
 		// /!\ CONFIGURE TRUSTSTORE FOR TEST
-		serverProps.put(TRUSTSTORE_PATH, "TO FILL");
-		serverProps.put(TRUSTSTORE_PWD, "TO FILL");
-		serverProps.put(TRUSTSTORE_TYPE, "jks");
+		//serverProps.put(TRUSTSTORE_PATH, "./truststore.p12");
+		//serverProps.put(TRUSTSTORE_PWD, "QUADRA");
+		//serverProps.put(TRUSTSTORE_TYPE, "jks");
 		
 		// /!\ CONFIGURE EMAIL SENDER FOR TEST
-		String login = "TO FILL";
-		String password = "TO FILL";
-		String fromEmail = "TO FILL";
+		String login = "mhxarcad@gmx.com";
+		String password = "Quadra74!";
+		String fromEmail = "mhxarcad@gmx.com";
 		String charset = "utf-8";
 		
 		sendMail = new SendMail(transport, serverProps, login, password, fromEmail, charset);
-		sendMail.sendEmail("TO FILL", "AFS - TEST - SMTPS", "This is a test");
+		sendMail.sendEmail("mhenrioux@arcadsoftware.com", "AFS - TEST - SMTPS", "This is a test");
 
 	}
 	

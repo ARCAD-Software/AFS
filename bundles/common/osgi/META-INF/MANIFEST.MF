@@ -5,7 +5,7 @@ Bundle-SymbolicName: com.arcadsoftware.osgi
 Bundle-Version: 1.10.0.qualifier
 Bundle-Activator: com.arcadsoftware.osgi.internal.Activator
 Bundle-Vendor: ARCAD Software
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Import-Package: javax.crypto,
  javax.net.ssl,
  javax.sql,

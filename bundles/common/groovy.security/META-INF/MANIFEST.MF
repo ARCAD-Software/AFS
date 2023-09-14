@@ -5,7 +5,7 @@ Bundle-SymbolicName: com.arcadsoftware.groovy.security
 Bundle-Version: 1.1.0.qualifier
 Bundle-Vendor: ARCAD Software
 Automatic-Module-Name: com.arcadsoftware.groovy.security
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Import-Package: groovy.lang;version="[3.0.8,4.0.0)",
  groovy.util;version="[3.0.8,4.0.0)",
  org.codehaus.groovy.ast;version="[3.0.8,4.0.0)",

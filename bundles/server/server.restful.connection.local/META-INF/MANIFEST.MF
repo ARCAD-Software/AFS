@@ -5,7 +5,7 @@ Bundle-SymbolicName: com.arcadsoftware.server.restful.connection.local;singleton
 Bundle-Version: 1.5.0.qualifier
 Bundle-Activator: com.arcadsoftware.restful.connection.local.Activator
 Bundle-Vendor: ARCAD Software
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Import-Package: com.arcadsoftware.beanmap;version="[2.0.0,3.0.0)",
  com.arcadsoftware.crypt;version="[1.0.0,2.0.0)",
  com.arcadsoftware.metadata;version="[1.0.0,2.0.0)",

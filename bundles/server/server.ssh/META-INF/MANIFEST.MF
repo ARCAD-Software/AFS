@@ -4,7 +4,7 @@ Bundle-Name: SSH Connection Management
 Bundle-SymbolicName: com.arcadsoftware.server.ssh
 Bundle-Version: 2.3.0.qualifier
 Bundle-Vendor: ARCAD Software
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Import-Package: com.arcadsoftware.beanmap;version="[2.1.0,3.0.0)",
  com.arcadsoftware.beanmap.rest;version="[2.0.1,3.0.0)",
  com.arcadsoftware.beanmap.xml;version="[2.1.0,3.0.0)",

@@ -33,7 +33,7 @@ Require-Bundle: org.eclipse.core.runtime,
  com.arcadsoftware.afs.client.widgets;bundle-version="1.0.0";visibility:=reexport,
  com.arcadsoftware.afs.client.core.base;visibility:=reexport
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Export-Package: com.arcadsoftware.afs.client.core;version="1.3.2",
  com.arcadsoftware.afs.client.core.internal;version="1.3.2";x-internal:=true,
  com.arcadsoftware.afs.client.core.security;version="1.3.2";uses:="com.arcadsoftware.afs.client.core.connection,org.eclipse.jface.preference",
