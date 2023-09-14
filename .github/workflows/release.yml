@@ -46,24 +46,9 @@ jobs:
         KEY_PASSWORD: ${{ secrets.CODESIGN_KEY_PASSWORD }}
         KEYSTORE_PASSWORD: ${{ secrets.CODESIGN_KEYSTORE_PASSWORD }}
          
-    - run: npm install @cjbarth/github-release-notes -g
-      shell: bash
-    - run: |
-        sudo apt-get update -y
-        sudo apt-get install -y jq
-      shell: bash
-    - name: Generate release notes with gren
-      run: gren release --data-source=issues -B -t ${{ github.ref_name }} -o -g label
-      continue-on-error: true
-      env:
-        GREN_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      shell: bash
-      
     - name: Release and upload flat P2 website
       uses: softprops/action-gh-release@v1
       with:
         name: "Release ${{ github.ref_name }}"
-        body: "The generated P2 repository is available at the following URL : https://github.com/ARCAD-Software/AFS/releases/download/${{ github.ref_name }}/"
-        append_body: true
         files: |
           releng/update/target/flat-repository/*
