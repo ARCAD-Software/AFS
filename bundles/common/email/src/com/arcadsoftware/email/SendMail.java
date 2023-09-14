@@ -408,7 +408,7 @@ public class SendMail implements ISendMail {
 				
 				Dictionary<String, Object> props = (Dictionary) serverprops;
 				context = new ConfiguredSSLContext(props);
-				if (context != null) {
+				if (context != null && context.getSocketFactory() != null) {
 					serverprops.put("mail.smtps.ssl.socketFactory", context.getSocketFactory());
 				}
 				
