@@ -1,8 +1,8 @@
-# AFS-OS release version 2023.7.9.
+# AFS-OS release version 2023.7.10.
 
-Release date Thu Sep 14 15:47:16 CEST 2023.
+Release date Thu Sep 14 17:00:16 CEST 2023.
 
-Link to the update site of [Version 2023.7.9](https://github.com/ARCAD-Software/AFS/releases/download/2023.7.9/).
+Link to the update site of [Version 2023.7.10](https://github.com/ARCAD-Software/AFS/releases/download/2023.7.10/).
 
 58 Bundles modified in this release.
 
