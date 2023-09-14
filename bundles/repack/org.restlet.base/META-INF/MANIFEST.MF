@@ -4,6 +4,7 @@ Bundle-Name: Restlet Framework for Client
 Bundle-SymbolicName: org.restlet.base;singleton:=true
 Bundle-Version: 2.4.300.qualifier
 Automatic-Module-Name: org.restlet
+Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.restlet.engine.internal.Activator
 Eclipse-BundleShape: jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
