@@ -84,9 +84,9 @@ public class ConfigAdminUser extends DataSourceCommand {
 		}
 		String sql;
 		if (login.isEmpty()) {
-			sql = "update LOCALAUTH set LAU_PASSWORD = ? where LAU_USER = ?"; //$NON-NLS-1$
+			sql = "update LOCALAUTH set LAU_PASSWORD = ? , LAU_LOCKED = 0 where LAU_USER = ?"; //$NON-NLS-1$
 		} else {
-			sql = "update LOCALAUTH set LAU_PASSWORD = ? where LAU_LOGIN = ?"; //$NON-NLS-1$
+			sql = "update LOCALAUTH set LAU_PASSWORD = ? , LAU_LOCKED = 0 where LAU_LOGIN = ?"; //$NON-NLS-1$
 		}
 		try (PreparedStatement ps = connection.prepareStatement(sql)) {
 			ps.setString(1, Crypto.hash(pwd));
