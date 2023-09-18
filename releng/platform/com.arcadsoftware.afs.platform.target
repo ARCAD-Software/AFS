@@ -25,8 +25,8 @@
 		<unit id="org.eclipse.osgi" version="0.0.0"/>
 		<unit id="org.eclipse.osgi.services" version="0.0.0"/>
 		<unit id="org.eclipse.osgi.util" version="0.0.0"/>
-		<unit id="com.sun.jna" version="0.0.0"/>
-		<unit id="com.sun.jna.platform" version="0.0.0"/>
+		<unit id="com.sun.jna" version="4.5.1.v20190425-1842"/>
+		<unit id="com.sun.jna.platform" version="4.5.1.v20190425-1842"/>
 	</location>
 	<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="false" type="InstallableUnit">
 		<repository location="https://download.eclipse.org/releases/neon/201705151400/"/>
