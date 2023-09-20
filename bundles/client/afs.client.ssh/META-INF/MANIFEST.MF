@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: ARCAD-AFS - Client - SSH Management
 Bundle-SymbolicName: com.arcadsoftware.afs.client.ssh;singleton:=true
-Bundle-Version: 2.2.2.qualifier
+Bundle-Version: 2.2.2
 Bundle-Activator: com.arcadsoftware.afs.client.ssh.internal.Activator
 Require-Bundle: org.eclipse.ui;resolution:=optional,
  org.eclipse.core.runtime,
