@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AFS Rest services interfaces
 Bundle-SymbolicName: com.arcadsoftware.rest
-Bundle-Version: 3.0.4
+Bundle-Version: 3.0.4.qualifier
 Bundle-Vendor: ARCAD Software
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: com.arcadsoftware.crypt;version="[1.0.0,2.0.0)",
