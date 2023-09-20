@@ -561,9 +561,10 @@ public abstract class BaseResource extends ServerResource {
 	 * @return Never return null.
 	 */
 	protected Form getRequestForm() {
-		if (requestForm == null) {
-			requestForm = new Form();
+		if (requestForm != null) {
+			return requestForm;
 		}
+		requestForm = new Form();
 		if (getRequest() != null) {
 			Representation entity = getRequest().getEntity();
 			if ((entity != null) && entity.isAvailable() && !(entity instanceof EmptyRepresentation)) {
