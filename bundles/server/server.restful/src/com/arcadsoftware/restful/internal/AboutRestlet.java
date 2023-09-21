@@ -127,7 +127,7 @@ public class AboutRestlet extends Restlet {
 				res.append(escapeXML(applicationUsage));
 				res.append("</usage><license>"); //$NON-NLS-1$
 				res.append(escapeXML(applicationlic_name));
-				res.append("</license></licenseUrl>"); //$NON-NLS-1$
+				res.append("</license><licenseUrl>"); //$NON-NLS-1$
 				res.append(escapeXML(applicationlic_URL));
 				res.append("</licenseUrl><docummentation>"); //$NON-NLS-1$
 				res.append(escapeXML(applicationURL));
