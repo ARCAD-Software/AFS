@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.restlet.data.MediaType;
+import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.data.Status;
 import org.restlet.representation.EmptyRepresentation;
@@ -1566,7 +1567,7 @@ public class DataAccess {
 	public void delete(BeanMapList list) throws ServerErrorException {
 		// TODO (Optionisation) utiliser un appel multiple.
 		if (list != null) {
-			for(BeanMap b: list) {
+			for (BeanMap b: list) {
 				delete(b);
 			}
 		}
@@ -1928,6 +1929,22 @@ public class DataAccess {
 		return (String) result.getContent();
 	}
 
+
+	/**
+	 * Return a url that is return by a proxy service.
+	 * 
+	 * @param path
+	 * @return
+	 * @throws ServerErrorException
+	 *             if the server return an error. This error can be due to a client mal formed request, connection
+	 *             problem or a server internal error. It should be logged into User accessible journal and show to him
+	 *             if it stop the current process.
+	 * @deprecated use {@link #getRedirection(Method, String)}
+	 */
+	public String getRedirection(String path) throws ServerErrorException {
+		return getRedirection(Method.GET, path);
+	}
+	
 	/**
 	 * Return a url that is return by a proxy service.
 	 * 
@@ -1938,8 +1955,8 @@ public class DataAccess {
 	 *             problem or a server internal error. It should be logged into User accessible journal and show to him
 	 *             if it stop the current process.
 	 */
-	public String getRedirection(String path) throws ServerErrorException {
-		Reference ref = wsa.getRedirection(path);
+	public String getRedirection(Method method, String path) throws ServerErrorException {
+		Reference ref = wsa.getRedirection(method, path);
 		if (ref != null) {
 			return ref.toString();
 		}
@@ -2229,7 +2246,7 @@ public class DataAccess {
 	 *             if it stop the current process.
 	 */
 	public Representation getBeanStream(String type, int id) throws ServerErrorException {
-		Reference ref = wsa.getRedirection(PATH_DATA + type + '/' + id + PATH_BINEXT);
+		Reference ref = wsa.getRedirection(Method.GET, PATH_DATA + type + '/' + id + PATH_BINEXT);
 		if (ref != null) {
 			return wsa.getRaw(ref, null);
 		}
@@ -2263,7 +2280,7 @@ public class DataAccess {
 		if ((binaryKey == null) || (binaryKey.length() == 0)) {
 			return getBeanStream(type, id);
 		}
-		Reference ref = wsa.getRedirection(PATH_DATA + type + '/' + id + PATH_BINEXT + '/' + lastFragment(binaryKey));
+		Reference ref = wsa.getRedirection(Method.GET, PATH_DATA + type + '/' + id + PATH_BINEXT + '/' + lastFragment(binaryKey));
 		if (ref != null) {
 			return wsa.getRaw(ref, null);
 		}
@@ -2286,7 +2303,7 @@ public class DataAccess {
 	 *             if it stop the current process.
 	 */
 	public void deleteBeanStream(String type, int id) throws ServerErrorException {
-		Reference ref = wsa.getRedirection(PATH_DATA + type + '/' + id + PATH_BINEXT);
+		Reference ref = wsa.getRedirection(Method.DELETE, PATH_DATA + type + '/' + id + PATH_BINEXT);
 		if (ref == null) {
 			throw new ServerErrorException(-1, new ErrorMessageBean(Messages.DataAccess_Error_FileDownload));
 		}
@@ -2315,7 +2332,7 @@ public class DataAccess {
 		if ((binaryKey == null) || (binaryKey.length() == 0)) {
 			deleteBeanStream(type, id);
 		}
-		Reference ref = wsa.getRedirection(PATH_DATA + type + '/' + id + PATH_BINEXT + '/' + lastFragment(binaryKey));
+		Reference ref = wsa.getRedirection(Method.DELETE, PATH_DATA + type + '/' + id + PATH_BINEXT + '/' + lastFragment(binaryKey));
 		if (ref == null) {
 			throw new ServerErrorException(-1, new ErrorMessageBean(Messages.DataAccess_Error_FileDownload));
 		}
@@ -2342,7 +2359,7 @@ public class DataAccess {
 	 *             if it stop the current process.
 	 */
 	public void uploadBeanStream(String type, int id, File file) throws ServerErrorException {
-		Reference ref = wsa.getRedirection(PATH_DATA + type + '/' + id + PATH_BINEXT);
+		Reference ref = wsa.getRedirection(Method.POST, PATH_DATA + type + '/' + id + PATH_BINEXT);
 		if (ref == null) {
 			throw new ServerErrorException(-1, new ErrorMessageBean(Messages.DataAccess_Error_FileUpload));
 		}
@@ -2374,7 +2391,7 @@ public class DataAccess {
 	 *             if it stop the current process.
 	 */
 	public void uploadBeanStream(String type, int id, final InputStream stream) throws ServerErrorException {
-		Reference ref = wsa.getRedirection(PATH_DATA + type + '/' + id + PATH_BINEXT);
+		Reference ref = wsa.getRedirection(Method.POST, PATH_DATA + type + '/' + id + PATH_BINEXT);
 		if (ref == null) {
 			throw new ServerErrorException(-1, new ErrorMessageBean(Messages.DataAccess_Error_FileUpload));
 		}
@@ -2426,7 +2443,7 @@ public class DataAccess {
 			uploadBeanStream(type, id, file);
 			return;
 		}
-		Reference ref = wsa.getRedirection(PATH_DATA + type + '/' + id + PATH_BINEXT + '/' + lastFragment(binaryKey));
+		Reference ref = wsa.getRedirection(Method.POST, PATH_DATA + type + '/' + id + PATH_BINEXT + '/' + lastFragment(binaryKey));
 		if (ref == null) {
 			throw new ServerErrorException(-1, new ErrorMessageBean(Messages.DataAccess_Error_FileUpload));
 		}
@@ -2453,9 +2470,31 @@ public class DataAccess {
 	 *             problem or a server internal error. It should be logged into User accessible journal and show to him
 	 *             if it stop the current process.
 	 * @see #uploadBeanStream
+	 * @deprecated use {@link #getUploadRedirection(Method, String, int)}
 	 */
 	public String getUploadRedirection(String type, int id) throws ServerErrorException {
-		Reference ref = wsa.getRedirection(PATH_DATA + type + '/' + id + PATH_BINEXT);
+		return getUploadRedirection(Method.POST, type, id);
+	}
+
+	/**
+	 * Return the Binary service redirection address.
+	 * <p>
+	 * This URL is a temporary address hat should not be persisted.
+	 * 
+	 * @param method the HTTP Method of the destination call.
+	 * @param type
+	 *            An entity Type.
+	 * @param id
+	 *            An entity data id.
+	 * @return An URL to the temporary (unsecured) binary file transfert service.
+	 * @throws ServerErrorException
+	 *             if the server return an error. This error can be due to a client mal formed request, connection
+	 *             problem or a server internal error. It should be logged into User accessible journal and show to him
+	 *             if it stop the current process.
+	 * @see #uploadBeanStream
+	 */
+	public String getUploadRedirection(Method method, String type, int id) throws ServerErrorException {
+		Reference ref = wsa.getRedirection(method, PATH_DATA + type + '/' + id + PATH_BINEXT);
 		if (ref != null) {
 			return ref.toString();
 		}
@@ -2480,12 +2519,35 @@ public class DataAccess {
 	 *             problem or a server internal error. It should be logged into User accessible journal and show to him
 	 *             if it stop the current process.
 	 * @see #uploadBeanStream
+	 * @deprecated use {@link #getUploadRedirection(Method, String, int, String)}
 	 */
 	public String getUploadRedirection(String type, int id, String binaryKey) throws ServerErrorException {
+		return getUploadRedirection(Method.POST, type, id, binaryKey);
+	}
+	/**
+	 * Return the Binary service redirection address.
+	 * <p>
+	 * This URL is a temporary address hat should not be persisted.
+	 * 
+	 * @param type
+	 *            An entity Type.
+	 * @param id
+	 *            An entity data id.
+	 * @param binaryKey
+	 *            The bineay metadata key. If this key use a multi-level name (i.e. with slash "/") then only the last
+	 *            level is determinent for this call.
+	 * @return An URL to the temporary (unsecured) binary file transfert service.
+	 * @throws ServerErrorException
+	 *             if the server return an error. This error can be due to a client mal formed request, connection
+	 *             problem or a server internal error. It should be logged into User accessible journal and show to him
+	 *             if it stop the current process.
+	 * @see #uploadBeanStream
+	 */
+	public String getUploadRedirection(Method method, String type, int id, String binaryKey) throws ServerErrorException {
 		if ((binaryKey == null) || (binaryKey.length() == 0)) {
 			return getUploadRedirection(type, id);
 		}
-		Reference ref = wsa.getRedirection(PATH_DATA + type + '/' + id + PATH_BINEXT + '/' + lastFragment(binaryKey));
+		Reference ref = wsa.getRedirection(method, PATH_DATA + type + '/' + id + PATH_BINEXT + '/' + lastFragment(binaryKey));
 		if (ref != null) {
 			return ref.toString();
 		}
@@ -2504,7 +2566,7 @@ public class DataAccess {
 	 *             if it stop the current process.
 	 */
 	public void uploadImage(String type, int id, File file) throws ServerErrorException {
-		Reference ref = wsa.getRedirection(PATH_BINREDIRECT + type.replace('/', '_') + '/' + id);
+		Reference ref = wsa.getRedirection(Method.POST, PATH_BINREDIRECT + type.replace('/', '_') + '/' + id);
 		if (ref == null) {
 			throw new ServerErrorException(-1, new ErrorMessageBean(Messages.DataAccess_Error_FileUpload));
 		}
