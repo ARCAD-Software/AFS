@@ -296,12 +296,14 @@ public class Activator extends AbstractConfiguredActivator {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private Event newEvent(String type, String category, int id, File file) {
 		Properties props = new Properties();
-		props.put(FILE_EVENT_TYPE,type);
-		props.put(FILE_EVENT_FILENAME,file.getAbsolutePath());
-		props.put(FILE_EVENT_FILE,file);
-		props.put(FILE_EVENT_CATEGORY,category);
-		props.put(FILE_EVENT_ID,id);
-		return new Event(FILE_EVENT_TOPIC,(Dictionary)props);
+		props.put(FILE_EVENT_TYPE, type);
+		if (file != null) {
+			props.put(FILE_EVENT_FILENAME, file.getAbsolutePath());
+			props.put(FILE_EVENT_FILE, file);
+		}
+		props.put(FILE_EVENT_CATEGORY, category);
+		props.put(FILE_EVENT_ID, id);
+		return new Event(FILE_EVENT_TOPIC, (Dictionary) props);
 	}
 	
 	/**
@@ -338,20 +340,26 @@ public class Activator extends AbstractConfiguredActivator {
 		return null;
 	}
 
-	public void removeFiles(String category, int id) {
+	public boolean removeFiles(String category, int id) {
 		final String sid = Integer.toString(id) + '_';
+		boolean deleted = false;
 		File parent = new File(getDirName(category) + getSubDir(id));
 		if ((parent != null) && parent.isDirectory()) {
-			for(File file: parent.listFiles(new FilenameFilter() {
+			for (File file: parent.listFiles(new FilenameFilter() {
 				public boolean accept(File dir, String name) {
 					return name.startsWith(sid);
 				}
 			})) {
-				if (file.isFile() && !file.delete()) {
-					debug("Unable to delete file: " + file.getAbsolutePath());
+				if (file.isFile()) {
+					if (file.delete()) {
+						deleted = true;
+					} else {
+						debug("Unable to delete file: " + file.getAbsolutePath());
+					}
 				}
 			}
 		}		
+		return deleted;
 	}
 
 	private String getSubDir(int id) {
