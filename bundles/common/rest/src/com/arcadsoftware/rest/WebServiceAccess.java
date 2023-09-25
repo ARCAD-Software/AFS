@@ -1427,9 +1427,25 @@ public class WebServiceAccess {
 	 * @throws ServerErrorException
 	 *             if the server return an error. This error can be due to a client malformed request, connection
 	 *             problem or a server internal error.
+	 * @deprecated use {@link #getRedirection(Method, String)}
 	 */
 	public Reference getRedirection(String path) throws ServerErrorException {
-		Response response = handle(Method.GET, getServerReference(path), null, null, retry, true, true, false, null);
+		return getRedirection(Method.GET, path);
+	}
+
+	/**
+	 * Call a proxy service, a redirection to another service, and return this redirection reference.
+	 * 
+	 * @param method the HTTP method used to get the redirection.
+	 * @param path
+	 *            the redirection service URL.
+	 * @return null if this service is not a redirection service.
+	 * @throws ServerErrorException
+	 *             if the server return an error. This error can be due to a client malformed request, connection
+	 *             problem or a server internal error.
+	 */
+	public Reference getRedirection(Method method, String path) throws ServerErrorException {
+		Response response = handle(method, getServerReference(path), null, null, retry, true, true, false, null);
 		if (response.getStatus().isRedirection()) {
 			Reference ref = response.getLocationRef();
 			if (ref.isRelative()) {

@@ -9,7 +9,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: com.arcadsoftware.beanmap;version="[2.0.0,3.0.0)",
  com.arcadsoftware.beanmap.xml;version="[2.1.0,3.0.0)",
  com.arcadsoftware.osgi;version="[1.2.1,2.0.0)",
- com.arcadsoftware.rest;version="[3.0.0,4.0.0)",
+ com.arcadsoftware.rest;version="[3.0.1,4.0.0)",
  com.arcadsoftware.rest.connection;version="[2.0.0,3.0.0)",
  com.arcadsoftware.rest.console;version="[2.0.0,3.0.0)",
  com.thoughtworks.xstream;version="[1.4.200,1.5.0)",
