@@ -16,11 +16,13 @@ package com.arcadsoftware.afs.client.core.tools;
 public class FormatUtils {
 	
 	public static String sizeToString(long bytes) {
-	    int unit = 1024;
-	    if (bytes < unit) return bytes + " B";
-	    int exp = (int) (Math.log(bytes) / Math.log(unit));
-	    char pre = "KMGTPE".charAt(exp-1);
-	    return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);					
+	    final int unit = 1024;
+	    if (bytes < unit) {
+	    	return bytes + " B"; //$NON-NLS-N$
+	    }
+	    final int exp = (int) (Math.log(bytes) / Math.log(unit));
+	    final char pre = "KMGTPE".charAt(exp - 1); //$NON-NLS-1$
+	    return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre); //$NON-NLS-1$					
 	}
 	
 }

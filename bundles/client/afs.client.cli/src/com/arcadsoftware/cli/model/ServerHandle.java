@@ -20,43 +20,35 @@ import com.arcadsoftware.afs.client.core.servers.model.BasicServer;
 import com.arcadsoftware.afs.client.core.servers.model.IServer;
 
 /**
- * This class represents a <i>handle</i> to an ARCAD-Anonymizer - Server
- * <p>
- * After defining the connection property, you have to use the {@link #connect()} method
- * the physically connect to the server.
- * </p>
- *  <p>
- *  You can get the connection status using the {@link #isConnected() } method
- *  </p>
- *  <p>
- *  This class also provides a {@link DataAccessHelper} helper Object to execute
- *  data manipulation on the server.
- *  </p>
- 
-   @since 1.0
- 	
- 
- * @author ARCAD Software
+ * This class represents a <i>handle</i> to a Server
  *
+ * <p>After defining the pseudo-connection property, you have to use the {@link #connect()} method
+ * the physically activate the connection to the server.
+ * 
+ * <p>You can get the connection status using the {@link #isConnected() } method
+ * 
+ * <p>This class also provides a {@link DataAccessHelper} helper Object to execute
+ * data manipulation on the server.
+ *
+ * @since 1.0
+ * @author ARCAD Software
  */
 public class ServerHandle {
 	
-	private String url = "";
-	private String login = "";
-	private String password = "";
-	
-	
+	private String url;
+	private String login;
+	private String password;
 	private ServerConnection connection;
 	private DataAccessHelper helper; 
-	private boolean connected = false;	
-	
-	private ITrustStoreProvider trustStoreProvider = null;
+	private boolean connected ;	
+	private ITrustStoreProvider trustStoreProvider;
 	
 	/**
 	 * Constructs a new <code>ServerHandle</code> object using the
-	 * given connection properties
-	 * @param url The URL of the ARCAD-Anonymizer - Server including port number
-	 * @param login A valid ARCAD-Anonymizer - Server login
+	 * given connection properties.
+	 * 
+	 * @param url The URL of the Server including port number
+	 * @param login A valid Server login
 	 * @param password A related password
 	 */
 	public ServerHandle(String url, String login, String password) {
@@ -66,16 +58,16 @@ public class ServerHandle {
 	}
 	
 	/**
-	 * Returns the URL of the related ARCAD-Anonymizer - Server
-	 * @return the URL of the related ARCAD-Anonymizer - Server
+	 * Returns the URL of the related Server
+	 * @return the URL of the related erver
 	 */
 	public String getUrl() {
 		return url;
 	}
 	
 	/**
-	 * Sets the URL of the related ARCAD-Anonymizer - Server you want to reach
-	 * @param url  Sets the URL of the related ARCAD-Anonymizer - Server 
+	 * Sets the URL of the related Server you want to reach
+	 * @param url  Sets the URL of the related Server 
 	 */
 	public void setUrl(String url) {
 		this.url = url;
@@ -91,7 +83,7 @@ public class ServerHandle {
 	
 	/**
 	 * Sets the login used to connect the server
-	 * @param login - A valid ARCAD-Anonymizer - Server login
+	 * @param login - A valid Server login
 	 */
 	public void setLogin(String login) {
 		this.login = login;
@@ -113,13 +105,12 @@ public class ServerHandle {
 		this.password = password;
 	}
 	
-    private boolean afsConnect(){
+    private boolean afsConnect() {
 		IServer server = new BasicServer();
 		server.setUrl(url);		
 		connection = new ServerConnection(server);
 		connection.setTrustStoreprovider(trustStoreProvider);
-		boolean connected = connection.connect(login, password, true);
-		if (connected) {
+		if (connection.connect(login, password, true)) {
 			helper = new DataAccessHelper(connection);
 			return true;
 		}
@@ -127,38 +118,55 @@ public class ServerHandle {
     }
 
 	/**
-	 * Connects to the AFS Server.
-	 * <p></p>
+	 * "Connects" to the AFS Server.
+	 * 
+	 * This connection is in fact a test of the user credential.
+	 * 
 	 * @return True if connection succeeds, false otherwise
 	 */
-	public boolean connect() { 
-		connected =  afsConnect();
+	public boolean connect() {
+		connected = afsConnect();
 		return connected;
 	}
 	
 	/**
 	 * Returns the connection status
+	 * 
 	 * @return - true if the server is connected, false otherwise.
 	 */
 	public boolean isConnected() {
 		return connected;
 	}
 	
+	/**
+	 * 
+	 * @return may return null if the ServerHandle is not "connected".
+	 */
 	public DataAccessHelper getHelper() {
 		return helper;
 	}
+	
 	/**
 	 * Return the server connection
+	 * 
 	 * @returnThe related server Connection
 	 */
 	public ServerConnection getConnection() {
 		return connection;
 	}
 	
+	/**
+	 * 
+	 * @param trustStoreProvider
+	 */
 	public void setTrustStoreProvider(ITrustStoreProvider trustStoreProvider) {
 		this.trustStoreProvider = trustStoreProvider;
 	}
 	
+	/**
+	 * 
+	 * @return may return null.
+	 */
 	public ITrustStoreProvider getTrustStoreProvider() {
 		return trustStoreProvider;
 	}
