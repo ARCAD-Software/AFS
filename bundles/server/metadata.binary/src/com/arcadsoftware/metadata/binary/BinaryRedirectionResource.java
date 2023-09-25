@@ -14,7 +14,6 @@
 package com.arcadsoftware.metadata.binary;
 
 import org.osgi.framework.ServiceReference;
-import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
@@ -28,6 +27,7 @@ public class BinaryRedirectionResource extends DataItemResource {
 
 	private String uri;
 	private String category;
+	private boolean isReadOnly;
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
@@ -77,7 +77,9 @@ public class BinaryRedirectionResource extends DataItemResource {
 		}
 		IBinariesTranferService service = (IBinariesTranferService) Activator.getBundleContext().getService(ref);
 		if (service != null) {
-			uri = service.generateKey(category, getItems().get(0).getId(), Method.GET.equals(getMethod()));
+			// Test the user Access right to set the read-only flag.
+			isReadOnly = !hasRightUpdate(getEntity(), getItems().get(0), getClientPreferedLanguage());
+			uri = service.generateKey(category, getItems().get(0).getId(), isReadOnly);
 			if (uri == null) {
 				setExisting(false);
 			}
@@ -111,7 +113,8 @@ public class BinaryRedirectionResource extends DataItemResource {
 
 	@Override
 	protected Representation delete(Variant variant) throws ResourceException {
-		if (!hasRightDelete(getEntity(), getItems().get(0), getClientPreferedLanguage())) {
+		// Deleting an attachment is associated to a modification of the data, not a deletion.
+		if (isReadOnly) {
 			throw new ResourceException(Status.CLIENT_ERROR_FORBIDDEN);
 		}
 		redirect();
@@ -134,7 +137,7 @@ public class BinaryRedirectionResource extends DataItemResource {
 
 	@Override
 	protected Representation put(Representation representation, Variant variant) throws ResourceException {
-		if (!hasRightUpdate(getEntity(), getItems().get(0), getClientPreferedLanguage())) {
+		if (isReadOnly) {
 			throw new ResourceException(Status.CLIENT_ERROR_FORBIDDEN);
 		}
 		redirect();
