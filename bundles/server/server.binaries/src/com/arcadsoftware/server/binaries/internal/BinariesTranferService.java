@@ -230,22 +230,25 @@ public class BinariesTranferService implements IBinariesTranferService {
 	 * @see com.arcadsoftware.server.binaries.IBinariesTranferService#newFile(java.lang.String, int, java.io.File)
 	 */
 	public boolean newFile(String category, int id, File file) {
-		activator.test(category, id);
-		if (file.isFile()) {
-			File target = new File(activator.getFileNamePrefix(category, id) + file.getName());
-			
-			// Ensure that parent exists
-			File parent = target.getParentFile();
-			if (parent != null && !parent.exists()){
-				parent.mkdirs();
-				if (!parent.exists()) {
-					Activator.getInstance().log(Activator.LOG_ERROR, parent.getAbsolutePath() + " could not be created");
-				}
+		if ((category != null) && (file != null) && file.isFile()) {
+			if (activator.removeFiles(category, id)) {
+				activator.fileEventDel(category, id, null);
 			}
-			
-			if (copy(file, target)) {
-				activator.fileEventNew(category, id, target);
-				return true;
+			activator.test(category, id);
+			if (file.isFile()) {
+				File target = new File(activator.getFileNamePrefix(category, id) + file.getName());
+				// Ensure that parent exists
+				File parent = target.getParentFile();
+				if ((parent != null) && !parent.exists()) {
+					parent.mkdirs();
+					if (!parent.exists()) {
+						Activator.getInstance().log(Activator.LOG_ERROR, parent.getAbsolutePath() + " could not be created");
+					}
+				}
+				if (copy(file, target)) {
+					activator.fileEventNew(category, id, target);
+					return true;
+				}
 			}
 		}
 		return false;
@@ -258,36 +261,41 @@ public class BinariesTranferService implements IBinariesTranferService {
 	 * java.io.InputStream, java.lang.String)
 	 */
 	public boolean newFile(String category, int id, InputStream stream, String filename) {
-		activator.test(category, id);
-		File target = new File(activator.getFileNamePrefix(category, id) + filename);
-		try {
-			if (!target.getParentFile().exists()) {
-				target.getParentFile().mkdirs();
+		if ((category != null) && (stream != null) && (filename != null)) {
+			if (activator.removeFiles(category, id)) {
+				activator.fileEventDel(category, id, null);
 			}
-			FileOutputStream out = new FileOutputStream(target);
+			activator.test(category, id);
 			try {
-				BufferedInputStream bin = new BufferedInputStream(stream);
-				BufferedOutputStream bout = new BufferedOutputStream(out);
-				try {
-					while (true) {
-						int datum = bin.read();
-						if (datum == -1)
-							break;
-						bout.write(datum);
-					}
-					bout.flush();
-				} finally {
-					bout.close();
+				File target = new File(activator.getFileNamePrefix(category, id) + filename);
+				if (!target.getParentFile().exists()) {
+					target.getParentFile().mkdirs();
 				}
-			} finally {
-				out.close();
+				FileOutputStream out = new FileOutputStream(target);
+				try {
+					BufferedInputStream bin = new BufferedInputStream(stream);
+					BufferedOutputStream bout = new BufferedOutputStream(out);
+					try {
+						while (true) {
+							int datum = bin.read();
+							if (datum == -1)
+								break;
+							bout.write(datum);
+						}
+						bout.flush();
+					} finally {
+						bout.close();
+					}
+				} finally {
+					out.close();
+				}
+				activator.fileEventNew(category, id, target);
+				return true;
+			} catch (Throwable e) {
+				Activator.getInstance().error(Messages.BinariesTranferService_Error_copy, e);
 			}
-			activator.fileEventNew(category, id, target);
-			return true;
-		} catch (Throwable e) {
-			Activator.getInstance().error(Messages.BinariesTranferService_Error_copy, e);
-			return false;
 		}
+		return false;
 	}
 	
 	/*
