@@ -19,7 +19,6 @@ import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -131,7 +130,7 @@ public class Activator extends AbstractConfiguredActivator {
 		for(ServiceRegistration<DataSource> serviceRegistration: currentDataSources) {
 			ServiceReference<DataSource> r = serviceRegistration.getReference();
 			DataSource ds = context.getService(r);
-			fireDSChangeEvent(IDataSourceEvent.TOPIC_REMOVE,
+			fireSyncDSChangeEvent(IDataSourceEvent.TOPIC_REMOVE,
 					(String) r.getProperty(DatabaseTracker.DatabaseID),
 					(String) r.getProperty(DatabaseTracker.DatabaseType),
 					(String) r.getProperty(DatabaseTracker.DatabaseURL),
@@ -329,12 +328,11 @@ public class Activator extends AbstractConfiguredActivator {
 		}
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void fireDSChangeEvent(String topic, String databaseID, String databaseType, String databaseURL, String dialect, DataSource ds) {
 		if (eventtracker != null) {
 			EventAdmin ea = (EventAdmin) eventtracker.getService();
 			if (ea != null) {
-				Dictionary<Object, Object> properties = new Properties();
+				Dictionary<String, Object> properties = new Hashtable<String, Object>();
 				if (ds != null) {
 					properties.put(IDataSourceEvent.PROP_DS, ds);
 				}
@@ -352,7 +350,36 @@ public class Activator extends AbstractConfiguredActivator {
 				} else {
 					properties.put(IDataSourceEvent.PROP_DSDIALECT, DataSourceInformations.BDDIALECTS_SHORT[DataSourceInformations.getDialectFromType(databaseType)]);
 				}
-				ea.postEvent(new Event(topic, (Dictionary) properties));
+				ea.postEvent(new Event(topic, properties));
+			} else {
+				warn(Messages.Activator_NoEventServiceAvailable);
+			}
+		}
+	}
+
+	private void fireSyncDSChangeEvent(String topic, String databaseID, String databaseType, String databaseURL, String dialect, DataSource ds) {
+		if (eventtracker != null) {
+			EventAdmin ea = (EventAdmin) eventtracker.getService();
+			if (ea != null) {
+				Dictionary<String, Object> properties = new Hashtable<String, Object>();
+				if (ds != null) {
+					properties.put(IDataSourceEvent.PROP_DS, ds);
+				}
+				if (databaseID != null) {
+					properties.put(IDataSourceEvent.PROP_DSID, databaseID);
+				}
+				if (databaseType != null) {
+					properties.put(IDataSourceEvent.PROP_DSTYPE, databaseType);
+				}
+				if (databaseURL != null) {
+					properties.put(IDataSourceEvent.PROP_DSURL, databaseURL);
+				}
+				if (dialect != null) {
+					properties.put(IDataSourceEvent.PROP_DSDIALECT, dialect);
+				} else {
+					properties.put(IDataSourceEvent.PROP_DSDIALECT, DataSourceInformations.BDDIALECTS_SHORT[DataSourceInformations.getDialectFromType(databaseType)]);
+				}
+				ea.sendEvent(new Event(topic, properties));
 			} else {
 				warn(Messages.Activator_NoEventServiceAvailable);
 			}
