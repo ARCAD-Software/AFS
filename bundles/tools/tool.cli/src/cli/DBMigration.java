@@ -21,6 +21,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
@@ -253,17 +254,32 @@ public final class DBMigration extends DataSourceCommand {
 			try (PreparedStatement pstmtTruncate = postgresqlConnection.prepareStatement(sqlTruncate);
 					PreparedStatement pstmtInsert = postgresqlConnection.prepareStatement(sqlInsert)) {
 				pstmtTruncate.execute();
+				int nbRead = 0;
 				while (rsQuery.next()) {
 					for (int i = 1; i <= columnCount; i++) {
 						pstmtInsert.setObject(i, rsQuery.getObject(i));
 						// TODO Manage NULL value (Cast to the right type (VARCHAR does not work on Oracle !)
 					}
 					pstmtInsert.addBatch();
+					nbRead++;
 				}
 				int nbInsert = 0;
 				int[] rowsInsert = pstmtInsert.executeBatch();
+				int nbErr = 0;
 				for (int i: rowsInsert) {
-					nbInsert += i;
+					if (i > 0) {
+						nbInsert += i;
+					} else if (i == Statement.EXECUTE_FAILED) {
+						nbErr++;
+					}
+				}
+				if (isArgument("-debug")) { //$NON-NLS-1$
+					if (nbRead != nbInsert) {
+						println("ERROR: Migrated line count do not match for table \"%s\", %d lines read, %d lines inserted.", tableName, nbRead, nbInsert);
+					}
+					if (nbErr > 0) {
+						println("ERROR: %d execution error with SQL instruction: %s", nbErr, sqlInsert);
+					}
 				}
 				return nbInsert;
 			}
@@ -273,11 +289,11 @@ public final class DBMigration extends DataSourceCommand {
 	private void migrate(Connection h2Connection, Connection postgresqlConnection) throws Exception {
 		String catalog = postgresqlConnection.getCatalog();
 		if (catalog == null) {
-			throw new Exception("Catalog of the PostgreSQL must be set.");
+			throw new Exception("The catalog name of the PostgreSQL database must be set.");
 		}
 		String schema = postgresqlConnection.getSchema();
 		if (schema == null) {
-			throw new Exception("Schema must be set");
+			throw new Exception("The schema name of the PostgreSQL database must be set.");
 		}
 		DatabaseMetaData dbMeta = postgresqlConnection.getMetaData();
 		try (ResultSet rs = dbMeta.getTables(catalog, schema, null, new String[] { "TABLE" })) { //$NON-NLS-1$
