@@ -75,7 +75,7 @@ public class MultiLanguageMessages extends MultiLocaleMessages {
 		if (langname.length() < 2) {
 			return "en"; //$NON-NLS-1$
 		}
-		return langname.substring(0,2);
+		return langname.substring(0, 2);
 	}
 	
 	/**
@@ -92,7 +92,7 @@ public class MultiLanguageMessages extends MultiLocaleMessages {
 		if (langname.length() < 5) {
 			return null;
 		}
-		return langname.substring(3,5);
+		return langname.substring(3, 5);
 	}
 	
 	/**

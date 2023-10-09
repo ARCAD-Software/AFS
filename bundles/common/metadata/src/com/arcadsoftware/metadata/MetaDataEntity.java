@@ -443,7 +443,7 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 			code = code + ".d"; //$NON-NLS-1$
 			desc = Activator.getInstance().translate(Activator.TRANLATEDOMAIN_ENTITY, code, language);
 			if (!code.equals(desc)) {
-				a.setDescription(name);
+				a.setDescription(desc);
 			}
 		}
 		for(MetaDataLink l:links.values()) {
@@ -459,7 +459,7 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 			code = code + ".d"; //$NON-NLS-1$
 			desc = Activator.getInstance().translate(Activator.TRANLATEDOMAIN_ENTITY, code, language);
 			if (!code.equals(desc)) {
-				l.setDescription(name);
+				l.setDescription(desc);
 			}
 		}
 	}
