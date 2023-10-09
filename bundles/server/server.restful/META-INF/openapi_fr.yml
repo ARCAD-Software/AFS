@@ -7,27 +7,27 @@ components:
       xml:
         name: 'message'
       type: object
-      description: This document describe an HTTP Error Message.
+      description: Ce document décrit un message d'erreur HTTP.'
       properties:
         name:
           type: string
-          description: The Error message.
+          description: Le message d'erreur.
           xml:
             attribute: true
         code:
           type: integer
-          description: The HTTP Error code.
+          description: Le code HTTP de l'erreur.
           xml:
             attribute: true
         href:
           type: string
           format: uri
-          description: An URL of the documentation relative to this HTTP Error.
+          description: L'URL de la documentation de cette erreur HTTP.
           xml:
             attribute: true
         description:
           type: string
-          description: The human readable description of the HTTP error. (Note that in XML format the description is the inline value of the "message" tag.)
+          description: Une description lisible par un être humain de la cause de l'erreur (Notez que dans un document XML la description est la valeur contenue dans le tag "message".)
     About:
       type: object
       properties:
@@ -36,64 +36,64 @@ components:
           properties:
             application:
               type: object
-              description: a Set of information relative to this application.
+              description: Regroupe un ensemble d'information relatives à cette application.
               properties:
                 name:
                   type: string
-                  description: This application name.
+                  description: Le nom de cette application.
                 version:
                   type: string
-                  description: The current application version.
+                  description: La version courante de cette application.
                 author:
                   type: string
-                  description: The legal author of this application.
+                  description: Le propriétaire légal de cette application.
                 owner:
                   type: string
-                  description: The current owner of this application, relative to the license acreditation.
+                  description: Le propriétaire actuel de l'application, relativement à la licence d'utilisation.
                 contact:
                   type: string
                   format: email
-                  description: A contact email relative to the administration of this application. 
+                  description: Une adresse email de contact relative à l'administration de cette application. 
                 license:
                   type: string
-                  description: The legal license relative to the usage of this application.
+                  description: La licence d'utilisation relative à cette application.
                 licenseurl:
                   type: string
                   format: uri
-                  description: An URL to a web-site exposing the licensing material.
+                  description: L'URL d'un site web exposant le texte de la licence d'utilisation de cette application.
                 usage:
                   type: string
-                  description: A copyright notice.
+                  description: Une note de copyright.
                 url:
                   type: string
                   format: uri
-                  description: A documentation web-site relative to the usage of this application.
+                  description: L'URL d'un site web contenant la documentation relative à l'usage de cette application.
                   xml:
                     name: 'lisenceUrl'
                 sysparam:
                   type: string
-                  description: The system parameter as they may be required to generate licenses key.
+                  description: Les paramètres systèmes permettant de générer une clé de licence pour cette installation.
             framework:
               type: object
-              description: Describe the technical information of this installation. 
+              description: Ensemble d'information techniques sur cette installation. 
               properties:
                 vendor:
                   type: string
-                  description: The name of the framework implementation hosting this API.
+                  description: Nom de l'implementation du framework hébergeant cette API REST.
                 version:
                   type: string
-                  description: The version of the framework implementation.
+                  description: Version courante de l'implémentation du framework.
                 webstart:
                   type: string
                   format: date
-                  description: The execution start date of this API.
+                  description: Date de démarrage de cette API REST.
                 start:
                   type: string
                   format: date
-                  description: The execution start date of application server.
+                  description: Date de démarrage du serveur d'application.
   responses:
     NotFound:
-      description: The specified resource was not found, or it is not ready.
+      description: La resource spécifiée n'a pas été trouvée, ou n'est pas en état de fonctionner.
       content:
         application/json:
           schema:
@@ -111,7 +111,7 @@ components:
           schema:
             type: string
     UnexpectedError:
-      description: An unexpected error occurs, this may be a storage (database error) or a program malfuncion. The error message will explain the exact cause of the problem.
+      description: Une erreur inatendue c'est produite, elle peut être due à un problème de stockage (lié à la base de données) ou une malfonction du programme. Le message lié à l'erreur détaillera la cause exacte du problème.
       content:
         application/json:
           schema:
@@ -129,7 +129,7 @@ components:
           schema:
             type: string
     Unauthorized:
-      description: Unauthorized authentication to this resource. Wrong user or password, or blocked connection.
+      description: L'authentification de l'utilisateur a échoué sur cette ressource. Due à un mauvais login ou mot de passe, ou la connection est verrouillée.
       content:
         application/json:
           schema:
@@ -147,7 +147,7 @@ components:
           schema:
             type: string
     Unsupported:
-      description: The mediatype used in the request body is unsupported.
+      description: Le mediatype utilisé dans le corps de la requête n'est pas supporté.
       content:
         application/json:
           schema:
@@ -165,7 +165,7 @@ components:
           schema:
             type: string
     Forbidden:
-      description: The current user do not own the required access right to perform the operation.
+      description: L'utilisateur authentifié ne possède pas les droits nécessaire pour réaliser cette opération.
       content:
         application/json:
           schema:
@@ -184,15 +184,15 @@ components:
             type: string
 paths:
   /about:
-    description: This service offer some information about this API including versionning and up-time.
+    description: Ce service fourni des informations sur l'API REST, incluant son numéro de version et la date du dernier démarrage.
     get:
-      summary: Information About this API. 
-      description: Return the general information about this API. If this resource return a 404 error message you are assured that the server is not able to process any other call. 
+      summary: Information au sujet de l'API REST. 
+      description: Renvois les informations générales sur cette API REST. Si cette ressource renvois une erreur 404 alors le serveur ne sera pas en état de répondre à tout autre requête. 
       tags:
       - Framework
       responses:
         "200":
-          description: The information about this API. 
+          description: Les informations au sujet de cette API REST. 
           content:
             application/json:
               schema:
@@ -217,4 +217,4 @@ paths:
         "500":
           $ref: '#/components/responses/UnexpectedError' 
         default:
-          description: An unexpected error occurs.
+          description: Une erreur inatentu est survenue.
