@@ -32,6 +32,13 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
  * be a reference and the linkcode is then relative to the attribute type.
  * 
  * <p>This criteria can provide multiples identical results.
+ * 
+ * <p>
+ * <b>Note that the negation of this criteria</b> is not the common meaning of "Not linked to" it does not 
+ * return all the data not linked to the given element, but the data linked to other elements, this
+ * include any data which may be linked with the designated element but which is also linked to another one, and 
+ * exclude any data with no link at all.
+ * 
  */
 public class LinkCriteria extends AbstractSearchCriteria implements Cloneable, IAttributeCriteria {
 
@@ -62,8 +69,7 @@ public class LinkCriteria extends AbstractSearchCriteria implements Cloneable, I
 	@Override
 	public ISearchCriteria reduce(ICriteriaContext context) {
 		if (id > 0) {
-			if ((attribute == null) || 
-					(attribute.length() == 0)) {
+			if ((attribute == null) || (attribute.length() == 0)) {
 				MetaDataLink link = context.getEntity().getLink(linkCode);
 				if (link != null) {
 					context.useLinkReference(link, null);
@@ -90,19 +96,26 @@ public class LinkCriteria extends AbstractSearchCriteria implements Cloneable, I
 	@Override
 	public boolean equals(Object obj) {
 		return (obj instanceof LinkCriteria) && // 
-			(id == ((LinkCriteria)obj).id) && //
-			nullsOrEquals(linkCode, ((LinkCriteria)obj).linkCode) && //
-			nullsOrEquals(attribute, ((LinkCriteria)obj).attribute);
+			(id == ((LinkCriteria) obj).id) && //
+			nullsOrEquals(linkCode, ((LinkCriteria) obj).linkCode) && //
+			nullsOrEquals(attribute, ((LinkCriteria) obj).attribute);
 	}
 
 	@SuppressWarnings("rawtypes")
 
 	public boolean test(BeanMap bean, IConnectionUserBean currentUser) {
-		Object o = bean.get(attribute);
-		if (o instanceof List) {
-			for(Object x:((List)o)) {
-				if ((x instanceof IIdentifiedBean) && (((IIdentifiedBean)x).getId() == id)) {
-					return true;
+		if (id > 0) {
+			Object o;
+			if ((attribute == null) || (attribute.length() == 0)) {
+				o = bean.get(linkCode);
+			} else {
+				o = bean.get(attribute);
+			}
+			if (o instanceof List) {
+				for(Object x:((List) o)) {
+					if ((x instanceof IIdentifiedBean) && (((IIdentifiedBean)x).getId() == id)) {
+						return true;
+					}
 				}
 			}
 		}

@@ -80,7 +80,6 @@ public class Fragments {
 	public String not;
 	public String or;
 	public String startwith;
-	public String into;
 	public String tablealias;
 	public String orderdesc;
 	public String orderasc;
@@ -100,6 +99,7 @@ public class Fragments {
 	public String count_distinct;
 	public String update_join;
 	public String delete_val;
+	public String notintoselect;
 	
 	public Fragments(String name) {
 		// Reset this class...
