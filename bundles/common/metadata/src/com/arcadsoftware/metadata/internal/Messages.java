@@ -103,6 +103,8 @@ public class Messages extends NLS {
 	public static String ProgressState_1;
 	public static String ProgressState_2;
 	public static String ProgressState_3;
+	public static String Criteria_UnLinkedThrough;
+	public static String Criteria_Any;
 
 	static {
 		// initialize resource bundle

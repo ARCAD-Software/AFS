@@ -80,6 +80,7 @@ import com.arcadsoftware.metadata.criteria.OrCriteria;
 import com.arcadsoftware.metadata.criteria.PreGeneratedCriteria;
 import com.arcadsoftware.metadata.criteria.StartCriteria;
 import com.arcadsoftware.metadata.criteria.SubstCriteria;
+import com.arcadsoftware.metadata.criteria.UnlinkCriteria;
 import com.arcadsoftware.metadata.sql.internal.Activator;
 import com.arcadsoftware.metadata.sql.internal.BeanMapHandler;
 import com.arcadsoftware.metadata.sql.internal.BeanMapListHandler;
@@ -645,7 +646,7 @@ public class MapperSQLService extends AbstractMapperService {
 					String.format(fg.datefunction, sdf.format(((BetweenCriteria) criteria).getBeforeCalendar().getTime()))));
 			result.append(fg.parout);
 		} else if (criteria instanceof ConstantCriteria) {
-			if (((ConstantCriteria)criteria).isValue()) {
+			if (((ConstantCriteria) criteria).isValue()) {
 				result.append(fg.true_cond);
 			} else {
 				result.append(fg.false_cond);
@@ -835,7 +836,6 @@ public class MapperSQLService extends AbstractMapperService {
 			String lc = ((LinkCriteria) criteria).getLinkCode();
 			LinkInfo l;
 			String alias;
-			// FIXME [ML] J'ai l'impression qu'on ne supporte pas les refLine ici (code.code !)
 			String attcn = colNames.get(((LinkCriteria) criteria).getAttribute());
 			if (attcn == null) {
 				alias = getAlias(lc, null, "_a"); //$NON-NLS-1$
@@ -866,6 +866,31 @@ public class MapperSQLService extends AbstractMapperService {
 				result.append(fg.equaldelfalse);
 				result.append(fg.parout);
 			}
+		} else if (criteria instanceof UnlinkCriteria) {
+			String attcn = colNames.get(((UnlinkCriteria) criteria).getAttribute());
+			LinkInfo l;
+			if (attcn == null) {
+				attcn = entityInfo.idCol;
+				l = entityInfo.links.get(((UnlinkCriteria) criteria).getLinkCode());
+			} else {
+				l = getEntityInfo(context.getReference(((UnlinkCriteria) criteria).getAttribute()).getLastAttribute().getRefEntity()).links.get(((UnlinkCriteria) criteria).getLinkCode());
+			}
+			StringBuilder condition = new StringBuilder();
+			int id = ((UnlinkCriteria) criteria).getId();
+			if (id > 0) {
+				condition.append(String.format(fg.equal, l.destCol, Integer.toString(id)));
+			}
+			if (l.deleteCol != null) {
+				if (id > 0) {
+					condition.append(fg.and);
+				}
+				condition.append(l.deleteCol);
+				condition.append(fg.equaldelfalse);
+			}
+			if (condition.length() == 0) {
+				condition.append(fg.true_cond);
+			}
+			result.append(String.format(fg.notintoselect, attcn, l.sourceCol, l.table, condition.toString()));
 		} else if (criteria instanceof LinkEqualCriteria) {
 			// On construit une jointure vers l'entité cible, au travers de la table d'association.
 			// Puis on suit les jointures des attributs jusqu'à l'attribut à tester.
@@ -884,7 +909,7 @@ public class MapperSQLService extends AbstractMapperService {
 			} else {
 				alias = getAlias(((LinkEqualCriteria) criteria).getReference(), lc, "_a"); //$NON-NLS-1$
 				MetaDataEntity refEntity = context.getReference(((LinkEqualCriteria) criteria).getReference()).getLastAttribute().getRefEntity();
-				link = (MetaDataLink)refEntity.getLink(lc);
+				link = (MetaDataLink) refEntity.getLink(lc);
 				l = getEntityInfo(refEntity).links.get(lc);
 				if (joinMap.doNotExists(alias)) {
 					joinMap.add(alias, String.format(fg.join, l.table, alias, l.sourceCol, refcn));
@@ -900,7 +925,7 @@ public class MapperSQLService extends AbstractMapperService {
 				result.append(fg.parin);
 			}
 			String attcn = buildAttributeColName(ei, context.getReference(link, ((LinkEqualCriteria) criteria).getAttribute()), joinMap, refalias);
-			if (context.getReference(((LinkEqualCriteria) criteria).getAttribute()).isNumericType()) {
+			if (link.getRefEntity().getAttribute(((LinkEqualCriteria) criteria).getAttribute()).isNumeric()) {
 				try {
 					Integer.parseInt(((LinkEqualCriteria) criteria).getValue());
 					result.append(String.format(fg.equal,

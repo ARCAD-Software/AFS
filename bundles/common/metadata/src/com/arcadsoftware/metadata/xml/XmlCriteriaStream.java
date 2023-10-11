@@ -45,6 +45,7 @@ import com.arcadsoftware.metadata.criteria.OrCriteria;
 import com.arcadsoftware.metadata.criteria.PreGeneratedCriteria;
 import com.arcadsoftware.metadata.criteria.StartCriteria;
 import com.arcadsoftware.metadata.criteria.SubstCriteria;
+import com.arcadsoftware.metadata.criteria.UnlinkCriteria;
 import com.arcadsoftware.metadata.internal.xml.ConstantCriteriaConverter;
 import com.arcadsoftware.metadata.internal.xml.IdInListCriteriaConverter;
 import com.arcadsoftware.metadata.internal.xml.NotCriteriaConverter;
@@ -96,6 +97,7 @@ public class XmlCriteriaStream extends XStreamCompact {
 		xs.useAttributeFor(EndCriteria.class, "attribute"); //$NON-NLS-1$
 		xs.aliasAttribute(EndCriteria.class, "casesensitive", "case"); //$NON-NLS-1$ //$NON-NLS-2$
 		xs.alias("linkto", LinkCriteria.class); //$NON-NLS-1$ // Changed from "link" to "linkto" in version 2.0.0
+		xs.useAttributeFor(LinkCriteria.class, "attribute"); //$NON-NLS-1$
 		xs.useAttributeFor(LinkCriteria.class, "linkCode"); //$NON-NLS-1$
 		xs.useAttributeFor(LinkCriteria.class, "id"); //$NON-NLS-1$
 		xs.alias("ingroup",InGroupCriteria.class); //$NON-NLS-1$
@@ -199,6 +201,11 @@ public class XmlCriteriaStream extends XStreamCompact {
 		// New criteria of version 1.0.2
 		xs.alias("isIn", IdInListCriteria.class); //$NON-NLS-1$
 		xs.registerConverter(new IdInListCriteriaConverter());
+		// New criteria of version 1.0.3
+		xs.alias("unlinkto", UnlinkCriteria.class); //$NON-NLS-1$ // Changed from "link" to "linkto" in version 2.0.0
+		xs.useAttributeFor(UnlinkCriteria.class, "attribute"); //$NON-NLS-1$
+		xs.useAttributeFor(UnlinkCriteria.class, "linkCode"); //$NON-NLS-1$
+		xs.useAttributeFor(UnlinkCriteria.class, "id"); //$NON-NLS-1$
 		return xs;
 	}
 	
