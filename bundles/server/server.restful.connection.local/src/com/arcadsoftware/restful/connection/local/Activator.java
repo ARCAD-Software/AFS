@@ -81,7 +81,7 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 	// CETTE VALEUR DOIT RESTER A 5 PAR DEFAUT PARCE QUE LES BROWSERS FONT 
 	// SYSTEMATIQUEMENT UNE TENTATIVE AVANT D'OUVRIR LA DIALOGUE DE CONNECTION
 	// ET TELECHARGENT DIVERS OBJETS EN PARALELLE.
-	// De plus ce paramètre étant dans configuration il n'y a AUCUNE raison de le modifier ici.
+	// De plus ce paramètre étant dans laconfiguration il n'y a AUCUNE raison de le modifier ici.
 
 	private final ConcurrentHashMap<Integer, Timer> unlockTimers = new ConcurrentHashMap<Integer, Timer>();
 	private int pwdDuration = PWD_DURATION;

@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?pde version="3.8"?>
+<target includeMode="feature" name="AFS Platform" sequenceNumber="1">
+<locations>
+	<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="false" type="InstallableUnit">
+		<repository location="https://download.eclipse.org/egit/updates/"/>
+		<unit id="net.i2p.crypto.eddsa" version="0.0.0"/>
+	</location>
+	<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="false" type="InstallableUnit">
+		<repository location="https://download.eclipse.org/eclipse/updates/4.19/"/>
+		<unit id="org.eclipse.equinox.common" version="0.0.0"/>
+	</location>
+	<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="false" type="InstallableUnit">
+		<repository location="https://download.eclipse.org/eclipse/updates/4.20/"/>
+		<unit id="org.apache.felix.gogo.command" version="0.0.0"/>
+		<unit id="org.apache.felix.gogo.runtime" version="0.0.0"/>
+		<unit id="org.apache.felix.gogo.shell" version="0.0.0"/>
+		<unit id="org.apache.felix.scr" version="0.0.0"/>
+		<unit id="org.eclipse.equinox.console.jaas.fragment" version="0.0.0"/>
+		<unit id="org.eclipse.equinox.console.ssh" version="0.0.0"/>
+		<unit id="org.eclipse.equinox.console" version="0.0.0"/>
+		<unit id="org.eclipse.equinox.event" version="0.0.0"/>
+		<unit id="org.eclipse.equinox.simpleconfigurator" version="0.0.0"/>
+		<unit id="org.eclipse.equinox.simpleconfigurator.manipulator" version="0.0.0"/>
+		<unit id="org.eclipse.osgi" version="0.0.0"/>
+		<unit id="org.eclipse.osgi.services" version="0.0.0"/>
+		<unit id="org.eclipse.osgi.util" version="0.0.0"/>
+		<unit id="com.sun.jna" version="4.5.1.v20190425-1842"/>
+		<unit id="com.sun.jna.platform" version="4.5.1.v20190425-1842"/>
+	</location>
+	<location includeDependencyDepth="infinite" includeDependencyScopes="import" includeSource="true" missingManifest="generate" type="Maven">
+		<dependencies>
+			<dependency> <!-- https://mvnrepository.com/artifact/org.apache.sshd/sshd-osgi -->
+				<groupId>org.apache.sshd</groupId>
+				<artifactId>sshd-osgi</artifactId>
+				<version>2.10.0</version>
+			</dependency>
+	
+			<!-- Cryptography libraries -->
+			<dependency>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bcmail-jdk15to18</artifactId>
+				<version>1.76</version>
+			</dependency>
+			<dependency>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bcpg-jdk15to18</artifactId>
+				<version>1.76</version>
+			</dependency>
+			<dependency>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bcpkix-jdk15to18</artifactId>
+				<version>1.76</version>
+			</dependency>
+			<dependency>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bcprov-jdk15to18</artifactId>
+				<version>1.76</version>
+			</dependency>
+			<dependency>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bcutil-jdk15to18</artifactId>
+				<version>1.76</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.santuario</groupId>
+				<artifactId>xmlsec</artifactId>
+				<version>2.3.0</version>
+			</dependency>
+			<!-- Restlet -->
+			<dependency>
+				<groupId>commons-fileupload</groupId>
+				<artifactId>commons-fileupload</artifactId>
+				<version>1.5</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>2.13.0</version>
+			</dependency>
+			<!-- LDAP Connection -->
+			<dependency> <!-- https://mvnrepository.com/artifact/com.unboundid/unboundid-ldapsdk -->
+				<groupId>com.unboundid</groupId>
+				<artifactId>unboundid-ldapsdk</artifactId>
+				<version>6.0.5</version>
+			</dependency>
+			<!-- Java Mail -->
+			<!-- https://mvnrepository.com/artifact/com.sun.activation/javax.activation -->
+			<dependency>
+			    <groupId>com.sun.activation</groupId>
+			    <artifactId>javax.activation</artifactId>
+			    <version>1.2.0</version>
+			</dependency>
+			<dependency>
+				<groupId>com.sun.mail</groupId>
+				<artifactId>javax.mail</artifactId>
+				<version>1.6.2</version>
+			</dependency>
+			
+			<!-- JDBC and Databases -->
+			<dependency> <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
+				<groupId>com.zaxxer</groupId>
+				<artifactId>HikariCP</artifactId>
+				<version>4.0.3</version>
+			</dependency>
+	
+			<dependency> <!-- https://mvnrepository.com/artifact/javax.json/javax.json-api -->
+				<groupId>javax.json</groupId>
+				<artifactId>javax.json-api</artifactId>
+				<version>1.1.4</version>
+			</dependency>
+	
+			<dependency> <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
+				<groupId>org.postgresql</groupId>
+				<artifactId>postgresql</artifactId>
+				<version>42.5.1</version>
+			</dependency>
+	
+			<dependency>
+				<groupId>com.h2database</groupId>
+				<artifactId>h2</artifactId>
+				<version>1.4.199</version>
+			</dependency>
+	
+			<dependency>
+				<groupId>commons-codec</groupId>
+				<artifactId>commons-codec</artifactId>
+				<version>1.15</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-dbutils</groupId>
+				<artifactId>commons-dbutils</artifactId>
+				<version>1.6</version>
+			</dependency>
+			<!-- Groovy -->
+			<dependency>
+				<groupId>org.codehaus.groovy</groupId>
+				<artifactId>groovy</artifactId>
+				<version>3.0.8</version>
+			</dependency>
+			<!-- Logger -->
+			<dependency>
+				<groupId>org.ops4j.pax.logging</groupId>
+				<artifactId>pax-logging-api</artifactId>
+				<version>1.12.5</version>
+			</dependency>
+			<dependency>
+				<groupId>org.ops4j.pax.logging</groupId>
+				<artifactId>pax-logging-log4j2</artifactId>
+				<version>1.12.5</version>
+			</dependency>
+		</dependencies>
+	</location>
+</locations>
+</target>

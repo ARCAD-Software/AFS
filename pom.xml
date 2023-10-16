@@ -76,6 +76,12 @@
 			<version>6.0.5</version>
 		</dependency>
 		<!-- Java Mail -->
+		<!-- https://mvnrepository.com/artifact/com.sun.activation/javax.activation -->
+		<dependency>
+		    <groupId>com.sun.activation</groupId>
+		    <artifactId>javax.activation</artifactId>
+		    <version>1.2.0</version>
+		</dependency>
 		<dependency>
 			<groupId>com.sun.mail</groupId>
 			<artifactId>javax.mail</artifactId>
