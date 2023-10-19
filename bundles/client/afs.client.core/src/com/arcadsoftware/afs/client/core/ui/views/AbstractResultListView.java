@@ -27,15 +27,11 @@ import com.arcadsoftware.metadata.MetaDataEntity;
 
 public abstract class AbstractResultListView extends AbstractSecuredView{
 
-
 	private Composite parentComposite;
 	protected Composite mainComposite;
 	private IToolBarManager toolbarManager;
-	
-	
 	protected AbstractResultComposite listComposite;
-	private MetaDataEntity entity = null;
-
+	private MetaDataEntity entity;
 
 	public AbstractResultListView() {
 		super();
@@ -44,18 +40,18 @@ public abstract class AbstractResultListView extends AbstractSecuredView{
 	@Override
 	protected void connectionChanged(ServerConnection connection) {
 		super.connectionChanged(connection);
-		entity= helper.getEntity(getType());
+		entity= getHelper().getEntity(getType());
 		createContent(parentComposite);
 		parentComposite.layout();
-		if (toolbarManager!=null) { // It could be the case if not allowed to search
+		if (toolbarManager != null) { // It could be the case if not allowed to search
 			toolbarManager.removeAll();
 			fillToolbar(toolbarManager);
 			toolbarManager.update(true);
 		}
 	}
 
-	private void createContent(Composite parent){
-		if (mainComposite!=null) {
+	private void createContent(Composite parent) {
+		if (mainComposite != null) {
 			mainComposite.dispose();
 		}
 		mainComposite = AFSFormatTools.createComposite(parent,1,false);
@@ -68,10 +64,9 @@ public abstract class AbstractResultListView extends AbstractSecuredView{
 		GridLayout gd = (GridLayout)mainComposite.getLayout();
 		gd.marginLeft = gd.marginTop = gd.marginRight = gd.marginBottom = 1;
 		gd.marginHeight = gd.marginWidth = 0;
-		
 		if (isAllowed()) {
 			if (entity != null) {
-				listComposite = createListComposite(mainComposite, getType(),connection);
+				listComposite = createListComposite(mainComposite, getType(), getConnection());
 				GridData gridData = new GridData(GridData.FILL_BOTH);
 				gridData.grabExcessHorizontalSpace = true;
 				gridData.grabExcessVerticalSpace = true;
@@ -84,7 +79,6 @@ public abstract class AbstractResultListView extends AbstractSecuredView{
 		}		
 	}
 	
-	
 	@Override
 	public void createPartControl(Composite parent) {
 		parentComposite =parent;
@@ -96,16 +90,12 @@ public abstract class AbstractResultListView extends AbstractSecuredView{
 		super.defineLocalToolbar(manager);
 		this.toolbarManager = manager;
 	}	
-	
-
 
 	public MetaDataEntity getStructure() {
 		return entity;
 	}
 
-	protected void fillToolbar(IToolBarManager manager) {
-		
-	}
+	protected void fillToolbar(IToolBarManager manager) {}
 		
 	/**
 	 * Redefine this method in the inherited classes to return a string which represents the bean identifier you want to
@@ -117,10 +107,5 @@ public abstract class AbstractResultListView extends AbstractSecuredView{
 
 	protected abstract void readStructureError();
 
-	protected abstract AbstractResultComposite createListComposite(
-			Composite parent, 
-			String entity,
-			ServerConnection connection);
-		
-	
+	protected abstract AbstractResultComposite createListComposite(Composite parent, String entity, ServerConnection connection);
 }

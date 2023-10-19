@@ -22,7 +22,7 @@ import com.arcadsoftware.afs.client.users.internal.Activator;
 
 public abstract class RefreshListAction extends AbstractConnectedBeanMapAction {
 
-	public RefreshListAction(ServerConnection connection){
+	public RefreshListAction(ServerConnection connection) {
 		super(connection);
 	}
 
@@ -40,7 +40,7 @@ public abstract class RefreshListAction extends AbstractConnectedBeanMapAction {
 	@Override
 	protected abstract boolean execute();
 	
-	protected TableViewer getViewer(){
+	protected TableViewer getViewer() {
 		return null;
 	}
 

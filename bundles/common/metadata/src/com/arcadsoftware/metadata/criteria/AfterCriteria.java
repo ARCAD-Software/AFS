@@ -152,14 +152,14 @@ public class AfterCriteria extends AbstractSearchCriteria implements Cloneable, 
 	@Override
 	public boolean equals(Object obj) {
 		return (obj instanceof AfterCriteria) &&
-		nullsOrEquals(attribute, ((AfterCriteria) obj).attribute) &&
-		nullsOrEquals(value, ((AfterCriteria) obj).value) &&
-		(trunc == ((AfterCriteria) obj).trunc) &&
-		(minuts == ((AfterCriteria) obj).minuts) &&
-		(hours == ((AfterCriteria) obj).hours) &&
-		(days == ((AfterCriteria) obj).days) &&
-		(months == ((AfterCriteria) obj).months) &&
-		(years == ((AfterCriteria) obj).years);
+				nullsOrEquals(attribute, ((AfterCriteria) obj).attribute) &&
+				nullsOrEquals(value, ((AfterCriteria) obj).value) &&
+				(trunc == ((AfterCriteria) obj).trunc) &&
+				(minuts == ((AfterCriteria) obj).minuts) &&
+				(hours == ((AfterCriteria) obj).hours) &&
+				(days == ((AfterCriteria) obj).days) &&
+				(months == ((AfterCriteria) obj).months) &&
+				(years == ((AfterCriteria) obj).years);
 	}
 
 	public Calendar getCalendar() {

@@ -21,24 +21,26 @@ import com.arcadsoftware.afs.client.core.connection.ServerConnection;
 public abstract class AbstractServerProperties {
 	
 	private Properties serverProperties;
-
 	
 	protected AbstractServerProperties() {
-
+		super();
 	}
 	
-	public String resString(ServerConnection connection,String key) {
-		if (key == null)
+	public String resString(final ServerConnection connection, final String key) {
+		if ((connection == null) || (key == null)) {
 			return "";
+		}
 		if (serverProperties == null) {
-			DataAccessHelper helper = new DataAccessHelper(connection);
-			serverProperties = helper.getProperties(getResourceFilename());
+			serverProperties = new DataAccessHelper(connection).getProperties(getResourceFilename());
 			if (serverProperties == null) {
 				return key;
 			}
 		}
 		String value = serverProperties.getProperty(key, key);
-		return (value.startsWith("!")) ? resString(connection,value.substring(1, value.length())) : value;	
+		if ((value != null) && (value.startsWith("!"))) {
+			return resString(connection, value.substring(1, value.length()));
+		}
+		return value;
 	}		
 	
 	public abstract String getResourceFilename(); 

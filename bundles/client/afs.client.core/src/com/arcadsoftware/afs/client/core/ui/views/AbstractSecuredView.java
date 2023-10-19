@@ -19,23 +19,26 @@ import com.arcadsoftware.afs.client.core.ui.actions.ISecuredAction;
 import com.arcadsoftware.afs.framework.messages.UserMessageManager;
 import com.arcadsoftware.afs.framework.ui.plugins.LogUITools;
 
-public abstract class AbstractSecuredView extends AbstractConnectedView 
-implements ISecuredAction{
+public abstract class AbstractSecuredView extends AbstractConnectedView implements ISecuredAction {
 
-	private boolean allowedToSearch = false; 
+	private boolean allowedToSearch;
 	
 	public boolean isAllowed() {
-		if (connection!=null)
-			allowedToSearch = connection.isAllowed(getExpectedRigths()); 
-		else {
+		if (getConnection() != null) {
+			allowedToSearch = getConnection().isAllowed(getExpectedRigths()); 
+		} else {
 			allowedToSearch = false;
-			LogUITools.logError(Activator.getDefault().getBundle(), 
-					UserMessageManager.getInstance().getMessage(IACCMessages.ERR_SRH_CONNECTIONMISSING));
+			LogUITools.logError(Activator.getDefault().getBundle(), UserMessageManager.getInstance().getMessage(IACCMessages.ERR_SRH_CONNECTIONMISSING));
 		}
 		return allowedToSearch;
 	}
-	
 
+	/**
+	 * FIXME this value is undefined if isAllowed() is not called before !!!
+	 * 
+	 * @return
+	 * @deprecated use {@link #isAllowed()}
+	 */
 	public boolean isAllowedToSearch() {
 		return allowedToSearch;
 	}
