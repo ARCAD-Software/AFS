@@ -15,10 +15,9 @@ package com.arcadsoftware.afs.client.users.ui.views;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.xml.XMLConstants;
 import javax.xml.stream.XMLInputFactory;
@@ -42,9 +41,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
-import org.osgi.service.log.LogService;
 
-import com.arcadsoftware.aev.core.osgi.ServiceRegistry;
 import com.arcadsoftware.aev.core.ui.tools.GuiFormatTools;
 import com.arcadsoftware.afs.client.core.connection.ServerConnection;
 import com.arcadsoftware.afs.client.core.ui.views.AbstractSecuredView;
@@ -61,19 +58,17 @@ import com.arcadsoftware.beanmap.BeanMapList;
 public abstract class AbstractUsersImportView extends AbstractSecuredView {
 
 	protected Button bImport;
-	private ImportCandidatesCheckViewer candidates = null;
 	protected Text filterNameText;
 	protected AbstractImportAction importAction;
 	protected Composite parentComposite;
-
 	protected RefreshListAction refreshAction;
-
+	private ImportCandidatesCheckViewer candidates;
 	private AuthType selectedAuth;
-	private List<AuthType> types;
-	private boolean defaultSelected = true;
+	private boolean defaultSelected;
 
 	public AbstractUsersImportView() {
 		super();
+		defaultSelected = true;
 	}
 
 	/**
@@ -81,9 +76,7 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 	 * 
 	 * @param user
 	 */
-	protected void completeUserForImport(final BeanMap user) {
-
-	}
+	protected void completeUserForImport(final BeanMap user) {}
 
 	@Override
 	protected void connectionChanged(final ServerConnection connection) {
@@ -95,24 +88,38 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 		final Composite optionsComposite = new Composite(parent, SWT.NONE);
 		optionsComposite.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).span(3, 1).create());
 		optionsComposite.setLayout(new GridLayout(2, false));
-		final List<AuthType> list = list();
-		if(list != null) {
-			final List<AuthType> possibleImports = //
-					list.stream() //
-							.filter(AuthType::importAllowed) //
-							.collect(Collectors.toList());
-			final Group sourceGroup = GuiFormatTools.createGroup(optionsComposite,
-					Activator.resString("user.action.import.source.group.label"), possibleImports.size());
-			sourceGroup.setLayoutData(GridDataFactory.fillDefaults().grab(false, false).create());
-			possibleImports.forEach(auth -> createAuthButton(sourceGroup, auth));	
+		final List<AuthType> possibleImports = new ArrayList<AuthType>();
+		try {
+			final String xml = getConnection().getDataAccess().getWebServicesAccess().get("authservices");
+			final XMLInputFactory factory = XMLInputFactory.newFactory();
+			factory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, ""); // Compliant
+			factory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");  // compliant
+			final XMLStreamReader reader = factory.createXMLStreamReader(new StringReader(xml));
+			while (reader.hasNext()) {
+				if ((reader.next() == XMLStreamConstants.START_ELEMENT) && reader.getName().getLocalPart().equals("string")) {
+					String text = reader.getElementText();
+					if (text != null) {
+						AuthType at = AuthType.fromCode(text);
+						if ((at != null) && at.importAllowed()) {
+							possibleImports.add(at);
+						}
+					}
+				}
+			}
+		} catch (final Exception e) {
+			Activator.getDefault().error("Error during loading of Authentication mode available for user import: " + e.getMessage(), e);
+		}
+		final Group sourceGroup = GuiFormatTools.createGroup(optionsComposite, Activator.resString("user.action.import.source.group.label"), possibleImports.size());
+		sourceGroup.setLayoutData(GridDataFactory.fillDefaults().grab(false, false).create());
+		for (AuthType auth: possibleImports) {
+			createAuthButton(sourceGroup, auth);
 		}
 		extendOptionsComposite(optionsComposite);
 	}
 
-	protected void extendOptionsComposite(final Composite optionsComposite) {
-		
-	}
+	protected void extendOptionsComposite(final Composite optionsComposite) {}
 	
+	@SuppressWarnings("incomplete-switch")
 	private void createAuthButton(final Group sourceGroup, final AuthType auth) {
 		final Button result = new Button(sourceGroup, SWT.RADIO);
 		switch (auth) {
@@ -122,8 +129,6 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 		case LDAP:
 			result.setText(Activator.resString("user.action.import.type.ldap"));
 			break;
-		default:
-			break;
 		}
 		result.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -131,7 +136,6 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 				AbstractUsersImportView.this.selectedAuth = auth;
 			}
 		});
-
 		if (defaultSelected) {
 			result.setSelection(true);
 			this.selectedAuth = auth;
@@ -164,7 +168,6 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 		final GridLayout layout = new GridLayout(3, false);
 		parent.setLayout(layout);
 		createBeforeContent(parent);
-
 		filterNameText = GuiFormatTools.createLabelledTextWithButton(parent,
 				Activator.resString("users.import.filter.label"), "", false,
 				Activator.resString("users.import.search.button.label"));
@@ -176,7 +179,6 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 				importUsers();
 			}
 		});
-
 		final ImportCandidatesCheckViewer viewer = ImportCandidatesCheckViewer.newCheckList(parent);
 		viewer.setLabelProvider(createSpecificLabelProvider());
 		viewer.setContentProvider(createSpecificContentProvider());
@@ -184,7 +186,6 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 		data.grabExcessVerticalSpace = true;
 		data.horizontalSpan = 3;
 		viewer.getControl().setLayoutData(data);
-
 		return viewer;
 	}
 
@@ -217,6 +218,7 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 
 	protected IContentProvider createSpecificContentProvider() {
 		return new IStructuredContentProvider() {
+			
 			@Override
 			public void dispose() {
 				// Do nothing
@@ -252,9 +254,7 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 		};
 	}
 
-	protected void doAfterImport() {
-		
-	}
+	protected void doAfterImport() {}
 	
 	public abstract List<Integer> getExpectedImportRights();
 
@@ -287,7 +287,6 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 				if (user.contains(IUsersConsts.PROP_USER_EMAIL)) {
 					userDef.append("[" + user.getString(IUsersConsts.PROP_USER_EMAIL) + "]");
 				}
-		
 				return userDef.toString();
 			default:
 				return "";
@@ -315,7 +314,8 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 	 */
 	protected void initActions() {
 		if (importAction == null) {
-			importAction = new AbstractImportAction(connection) {
+			importAction = new AbstractImportAction(getConnection()) {
+				
 				@Override
 				protected void completeUserBeanMap(final BeanMap user) {
 					completeUserForImport(user);
@@ -357,7 +357,7 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 			};
 		}
 		if (refreshAction == null) {
-			refreshAction = new RefreshListAction(connection) {
+			refreshAction = new RefreshListAction(getConnection()) {
 				@Override
 				protected void doBeforeRun() {
 					candidates.clearAllCheckedElements();
@@ -382,7 +382,7 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 				protected boolean execute() {
 					importUsers();
 					return true;
-					}
+				}
 			};
 		}
 	}
@@ -405,24 +405,22 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 	private void loadIBMiProfiles() {
 		try {			
 			final String filter = filterNameText.getText().toUpperCase();
-			final Set<String> existingProfiles = 
-					connection.getDataAccess().getList(AuthType.IBMI.code())
-						.stream()
-						.map(b -> b.getString("login"))
-						.collect(Collectors.toSet());
-			
-			final BeanMapList list = 
-				connection //
-						.getDataAccess() //
-						.getList(String.format("/admin/%s/import", AuthType.IBMI.resourceSuffix()), IUsersConsts.ENTITY_USER)
-						.stream()
-						.filter(u -> u.getString(IUsersConsts.IBMI_IMPORT_LOGIN).toUpperCase().contains(filter))
-						.filter(u -> !existingProfiles.contains(u.getString(IUsersConsts.IBMI_IMPORT_LOGIN)))
-						.collect(Collectors.toCollection(BeanMapList::new));
-			
-			getViewer().setInput(list);
-		}
-		catch (Exception e) {			
+			final Set<String> existingProfiles = new HashSet<String>();
+			for (BeanMap b: getConnection().getDataAccess().getList(AuthType.IBMI.code())) {
+				existingProfiles.add(b.getString("login"));
+			}			
+			final BeanMapList totalList = getConnection().getDataAccess().getList(String.format("/admin/%s/import", AuthType.IBMI.resourceSuffix()), IUsersConsts.ENTITY_USER);
+			if (totalList != null) {
+				final BeanMapList list = new BeanMapList(totalList.size()); 
+				for (BeanMap b: totalList) {
+					final String login = b.getString(IUsersConsts.IBMI_IMPORT_LOGIN);
+					if ((login != null) && (login.toUpperCase().contains(filter)) && existingProfiles.contains(login)) {
+						list.add(b);
+					}
+				}
+				getViewer().setInput(list);
+			}
+		} catch (Exception e) {			
 			Activator.getDefault().error("AbstractUsersImportView::loadIBMiProfiles", e);
 		}		
 	}
@@ -430,7 +428,7 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 	
 	private void loadLDAPUsers() {
 		// call server
-		final LDAPAccessHelper ldapHelper = new LDAPAccessHelper(connection);
+		final LDAPAccessHelper ldapHelper = new LDAPAccessHelper(getConnection());
 		String filter = null;
 		if (filterNameText.getText().length() > 0) {
 			filter = filterNameText.getText();
@@ -439,34 +437,6 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 	}
 
 	@Override
-	public void setFocus() {
-	}
+	public void setFocus() {}
 	
-	private List<AuthType> list() {
-		if (types == null) {
-			try {
-				final String xml = connection.getDataAccess().getWebServicesAccess().get("authservices");
-				final XMLInputFactory factory = XMLInputFactory.newFactory();
-				factory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, ""); // Compliant
-				factory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");  // compliant
-				
-				final XMLStreamReader reader = factory.createXMLStreamReader(new StringReader(xml));
-				final List<String> strings = new ArrayList<>();
-				while (reader.hasNext()) {
-					int current = reader.next();
-					if (current == XMLStreamConstants.START_ELEMENT
-							&& reader.getName().getLocalPart().equals("string")) {
-						strings.add(reader.getElementText());
-					}
-				}
-
-				types = strings.stream().map(AuthType::fromCode).filter(Objects::nonNull).collect(Collectors.toList());
-			} catch (final Exception e) {
-				ServiceRegistry.lookup(LogService.class)
-						.ifPresent(l -> l.log(LogService.LOG_ERROR, "AuthTypePage::list : " + e.getMessage(), e));
-			}
-		}
-		return types;
-
-	}
 }

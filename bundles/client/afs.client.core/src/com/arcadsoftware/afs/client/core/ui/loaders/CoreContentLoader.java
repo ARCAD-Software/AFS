@@ -44,10 +44,10 @@ import com.arcadsoftware.metadata.criteria.OrCriteria;
 
 public class CoreContentLoader implements ISWTDataLoader {
 
-	private Hashtable<ServerConnection, DataAccessHelper> helpers;
+	private final Hashtable<ServerConnection, DataAccessHelper> helpers;
 	private ServerConnection connection;
 	private Display parentDisplay;
-	private boolean useUIJob = true;
+	private boolean useUIJob;
 
 	private abstract class UIJobWrapper {
 
@@ -94,8 +94,7 @@ public class CoreContentLoader implements ISWTDataLoader {
 	}
 
 	public CoreContentLoader() {
-		// useUIJob = Activator.getInstance().useUIJob();
-		useUIJob = false;
+		super();
 		helpers = new Hashtable<>();
 	}
 
@@ -440,11 +439,8 @@ public class CoreContentLoader implements ISWTDataLoader {
 	@Override
 	public BeanMap loadContent(String url, String type) {
 		final BeanMap result = new BeanMap(type);
-		if ((url != null) && (url.length() > 0)) {
-			if (connection != null) {
-				final DataAccessHelper helper = getHelper(connection);
-				helper.get(url, result);
-			}
+		if ((url != null) && (url.length() > 0) && (connection != null)) {
+			getHelper(connection).get(url, result);
 		}
 		return result;
 	}

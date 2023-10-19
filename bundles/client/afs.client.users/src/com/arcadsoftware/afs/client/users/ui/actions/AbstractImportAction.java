@@ -15,12 +15,9 @@ package com.arcadsoftware.afs.client.users.ui.actions;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.osgi.service.log.LogService;
 
-import com.arcadsoftware.aev.core.osgi.ServiceRegistry;
 import com.arcadsoftware.afs.client.brands.AFSIcon;
 import com.arcadsoftware.afs.client.core.IACCMessages;
 import com.arcadsoftware.afs.client.core.connection.DataAccessHelper;
@@ -36,7 +33,12 @@ import com.arcadsoftware.beanmap.BeanMap;
 
 public abstract class AbstractImportAction extends AbstractConnectedBeanMapAction {
 
-	public AbstractImportAction(ServerConnection connection){
+	protected abstract AuthType getSelectedAuthType();
+	protected abstract Object[] getSelectedItems();
+	protected abstract void completeUserBeanMap(BeanMap user);	
+	protected abstract int[] getProfiles(BeanMap user);
+
+	public AbstractImportAction(ServerConnection connection) {
 		super(connection);
 	}
 
@@ -46,51 +48,42 @@ public abstract class AbstractImportAction extends AbstractConnectedBeanMapActio
 		setToolTipText(Activator.resString("users.import.action.tooltip")); //$NON-NLS-1$
 		setImageDescriptor(AFSIcon.USER_GROUP_IMPORT.imageDescriptor());
 	}
-
-	protected abstract AuthType getSelectedAuthType();
-	protected abstract Object[] getSelectedItems();
-	protected abstract void completeUserBeanMap(BeanMap user);	
-	protected abstract int[] getProfiles(BeanMap user);
 	
 	@Override
 	protected boolean canExecute() {
 		Object[] items = getSelectedItems();
-		boolean result = (items != null && items.length > 0);
-		if (result) {
-			result = isAllowed();
-			if (! result){
-				LogUITools.logError(Activator.getDefault().getBundle(), 
-						UserMessageManager.getInstance().getMessage(IACCMessages.ERR_ACTION_NO_RIGHT));
-				MessageDialog.openError(Activator.getDefault().getPluginShell(), 
-						getText(),
-						Activator.resString("msg.error.right.missing")); //$NON-NLS-1$
-			}
+		if ((items == null) || (items.length == 0)) {
+			return false;
 		}
-		return result;
+		if (!isAllowed()) {
+			LogUITools.logError(Activator.getDefault().getBundle(), UserMessageManager.getInstance().getMessage(IACCMessages.ERR_ACTION_NO_RIGHT));
+			MessageDialog.openError(Activator.getDefault().getPluginShell(), getText(), Activator.resString("msg.error.right.missing")); //$NON-NLS-1$
+			return false;
+		}
+		return true;
 	}
 	
+	@SuppressWarnings("incomplete-switch")
 	@Override
 	protected boolean execute() {
 		final Object[] items = getSelectedItems();
-		if(items != null && items.length > 0) {
+		if((items != null) && (items.length > 0)) {
 			switch(getSelectedAuthType()) {
 				case IBMI:
 					return importFromIBMi(items);
 				case LDAP:
 					return importFromLDAP(items);
-				default:
-					return false;
 			}
 		}
 		return false;
 	}
 	
 	private boolean importFromIBMi(final Object[] items) {
-		Stream.of(items) //
-			.filter(BeanMap.class::isInstance) //
-			.map(BeanMap.class::cast) //
-			.forEach(this::createIBMiUser);
-		
+		for (Object o: items) {
+			if (o instanceof BeanMap) {
+				createIBMiUser((BeanMap) o);
+			}
+		}
 		return true;
 	}
 	
@@ -112,29 +105,26 @@ public abstract class AbstractImportAction extends AbstractConnectedBeanMapActio
 				ibmiAuth.put("login", user.getString("ibmiauth.login"));
 				revert = !helper.create(ibmiAuth);
 			}
-		}
-		catch(final Exception e) {
+		} catch(final Exception e) {
+			Activator.getDefault().error("Unable to import the IBMi user \"" + 
+					user.getString("ibmiauth.login", "-unknown-") + //$NON-NLS-1$ 
+					": " + e.getLocalizedMessage(), e); //$NON-NLS-1$
 			revert = true;
-			ServiceRegistry.lookup(LogService.class)
-				.ifPresent(l -> l.log(LogService.LOG_ERROR, "createIBMiUser: " + e.getMessage(), e));
 		}
-		
-		if(revert) {
+		if (revert) {
 			helper.delete(user);
 		}
 	}
-	
+
 	private boolean importFromLDAP(final Object[] items) {
 		BeanMap user = null;
 		LDAPAccessHelper ldapHelper = new LDAPAccessHelper(connection);
-		
 		for (Object item : items) {
-			if (item instanceof BeanMap){
-				user = (BeanMap)item;
-				if (IUsersConsts.ENTITY_USER.equals(user.getType())){
+			if (item instanceof BeanMap) {
+				user = (BeanMap) item;
+				if (IUsersConsts.ENTITY_USER.equals(user.getType())) {
 					// complete user beanMap
 					completeUserBeanMap(user);
-					
 					// add LDAP auth
 					ldapHelper.importUser(user, getProfiles(user));
 				}
@@ -147,6 +137,4 @@ public abstract class AbstractImportAction extends AbstractConnectedBeanMapActio
 	public List<Integer> getExpectedRigths() {
 		return Collections.emptyList();
 	}
-	
-	
 }

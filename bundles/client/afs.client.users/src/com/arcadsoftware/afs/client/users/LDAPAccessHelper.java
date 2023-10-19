@@ -107,7 +107,7 @@ public class LDAPAccessHelper {
 			if ((profiles != null) && (profiles.length > 0)) {
 				userModel = new BeanMap(userModel);
 				StringBuilder pr = new StringBuilder();
-				for(int p : profiles) {
+				for (int p: profiles) {
 					if (pr.length() > 0) {
 						pr.append(' ');
 					}
@@ -116,7 +116,7 @@ public class LDAPAccessHelper {
 				userModel.put("profiles", pr.toString()); //$NON-NLS-1$
 			}
 			StringBuilder l = new StringBuilder();
-			for(String login : logins) {
+			for (String login: logins) {
 				if (l.length() > 0) {
 					l.append('+');
 				}

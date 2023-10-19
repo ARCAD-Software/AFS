@@ -51,16 +51,13 @@ public class ReportView extends AbstractConnectedView {
 	public static final String XMLNODE_URL = "url"; //$NON-NLS-1$
 	public static final String XMLNODE_VERSION = "version"; //$NON-NLS-1$
 
-	ReportGenerateAsPdfAction generatePDFAction;
-	ReportHeaders headers;
-
+	private ReportGenerateAsPdfAction generatePDFAction;
+	private ReportHeaders headers;
 	private Composite mainComposite;
 	private Composite parentComposite;
-
-	ReportGenerateAsHTMLAction previewAction;
-
-	Action refreshAction;
-	ReportHeaderViewer viewer;
+	private ReportGenerateAsHTMLAction previewAction;
+	private Action refreshAction;
+	private ReportHeaderViewer viewer;
 
 	public ReportView() {
 		super();
@@ -91,13 +88,8 @@ public class ReportView extends AbstractConnectedView {
 			mainComposite.setLayoutData(gridData);
 		}
 		final GridLayout gd = (GridLayout) mainComposite.getLayout();
-		gd.marginLeft = 1;
-		gd.marginTop = 1;
-		gd.marginRight = 1;
-		gd.marginBottom = 1;
-		gd.marginHeight = 0;
-		gd.marginWidth = 0;
-
+		gd.marginLeft = gd.marginTop = gd.marginRight = gd.marginBottom = 1;
+		gd.marginHeight = gd.marginWidth = 0;
 		if (isAllowed()) {
 			viewer = new ReportHeaderViewer(mainComposite, SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL) {
 				@Override
@@ -147,7 +139,6 @@ public class ReportView extends AbstractConnectedView {
 				return (Element) child;
 			}
 		}
-
 		return null;
 	}
 
@@ -175,7 +166,7 @@ public class ReportView extends AbstractConnectedView {
 	}
 
 	private String loadData() {
-		final String xml = helper.getXml(Activator.XMLLIST_URL);
+		final String xml = getHelper().getXml(Activator.XMLLIST_URL);
 		return xml;
 	}
 
@@ -188,18 +179,41 @@ public class ReportView extends AbstractConnectedView {
 				final NodeList reportNodes = doc.getElementsByTagName(XMLNODE_REPORT);
 				for (int i = 0; i < reportNodes.getLength(); i++) {
 					final Element instElement = (Element) reportNodes.item(i);
+					final String name;
+					final String url;
+					final String description;
+					final String category;
+					final String version;
 					final Element nameElement = getElement(instElement, XMLNODE_NAME);
+					if (nameElement == null) {
+						name = ""; //$NON-NLS-1$
+					} else {
+						name = nameElement.getTextContent();
+					}
 					final Element urlElement = getElement(instElement, XMLNODE_URL);
+					if (urlElement == null) {
+						url = ""; //$NON-NLS-1$
+					} else {
+						url = urlElement.getTextContent();
+					}
 					final Element descriptionElement = getElement(instElement, XMLNODE_DESCRIPTION);
+					if (descriptionElement == null) {
+						description = ""; //$NON-NLS-1$
+					} else {
+						description = descriptionElement.getTextContent(); //$NON-NLS-1$
+					}
 					final Element categoryElement = getElement(instElement, XMLNODE_CATEGORY);
+					if (categoryElement == null) {
+						category = ""; //$NON-NLS-1$
+					} else {
+						category = categoryElement.getTextContent();
+					}
 					final Element versionElement = getElement(instElement, XMLNODE_VERSION);
-
-					final String name = nameElement == null ? "" : nameElement.getTextContent(); //$NON-NLS-1$
-					final String url = urlElement == null ? "" : urlElement.getTextContent(); //$NON-NLS-1$
-					final String description = descriptionElement == null ? "" : descriptionElement.getTextContent(); //$NON-NLS-1$
-					final String category = categoryElement == null ? "" : categoryElement.getTextContent(); //$NON-NLS-1$
-					final String version = (nameElement == null || versionElement == null ? "" //$NON-NLS-1$
-							: versionElement.getTextContent());
+					if ((nameElement == null) || (versionElement == null)) {
+						version = ""; //$NON-NLS-1$
+					} else {
+						version = versionElement.getTextContent();
+					}
 					final ReportHeader header = new ReportHeader(url, name, description, category, version);
 					headers.add(header);
 				}
@@ -209,12 +223,11 @@ public class ReportView extends AbstractConnectedView {
 				MessageManager.addException(e, MessageManager.LEVEL_PRODUCTION);
 			}
 		}
-
 	}
 
 	private void makeActions() {
 		if (previewAction == null) {
-			previewAction = new ReportGenerateAsHTMLAction(connection) {
+			previewAction = new ReportGenerateAsHTMLAction(getConnection()) {
 				@Override
 				public List<Integer> getExpectedRigths() {
 					return getExecutionRights();
@@ -224,13 +237,10 @@ public class ReportView extends AbstractConnectedView {
 				protected ReportHeader getReport() {
 					return getSelectedReportHeader();
 				}
-
 			};
-
 		}
-
 		if (generatePDFAction == null) {
-			generatePDFAction = new ReportGenerateAsPdfAction(connection) {
+			generatePDFAction = new ReportGenerateAsPdfAction(getConnection()) {
 				@Override
 				public List<Integer> getExpectedRigths() {
 					return getExecutionRights();
@@ -242,7 +252,6 @@ public class ReportView extends AbstractConnectedView {
 				}
 			};
 		}
-
 		if (refreshAction == null) {
 			refreshAction = new Action() {
 				@Override

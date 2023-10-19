@@ -48,8 +48,8 @@ public enum AuthType {
 		this.resourceSuffix = resourceSuffix;
 		this.createAllowed = createAllowed;
 		this.importAllowed = importAllowed;
-		loginResourceSuffix = resourceSuffix + ".login";
-		resourceAddress = "/data/" + code;
+		loginResourceSuffix = resourceSuffix + ".login"; //$NON-NLS-1$
+		resourceAddress = "/data/" + code; //$NON-NLS-1$
 	}
 
 	public String code() {

@@ -23,7 +23,6 @@ import org.eclipse.swt.widgets.Composite;
 import com.arcadsoftware.afs.client.core.connection.ServerConnection;
 import com.arcadsoftware.afs.client.core.ui.AFSFormatTools;
 import com.arcadsoftware.afs.client.core.ui.composites.BasicResultNotAllowedComposite;
-import com.arcadsoftware.afs.client.core.ui.views.AbstractSecuredView;
 import com.arcadsoftware.afs.framework.ui.help.DynamicHelp;
 
 public abstract class AbstractBasicConnectedView extends AbstractSecuredView {
@@ -35,7 +34,6 @@ public abstract class AbstractBasicConnectedView extends AbstractSecuredView {
 	public List<Integer> getExpectedRigths() {
 		return null;
 	}
-
 	
 	@Override
 	protected void connectionChanged(ServerConnection connection) {
@@ -80,18 +78,11 @@ public abstract class AbstractBasicConnectedView extends AbstractSecuredView {
 		}		
 	}
 	
+	public void extended_HeaderControl(Composite parent) {}
 	
-	public void extended_HeaderControl(Composite parent) {
-		
-	}
-	
-	public void extended_FooterControl(Composite parent) {
-		
-	}
+	public void extended_FooterControl(Composite parent) {}
 	
 	public abstract Composite createContentComposite(Composite parent);
-	
-	
 	
 	@Override
 	public void createPartControl(Composite parent) {
@@ -105,8 +96,5 @@ public abstract class AbstractBasicConnectedView extends AbstractSecuredView {
 		this.toolbarManager = manager;
 	}	
 
-	protected void fillToolbar(IToolBarManager manager) {
-		
-	}
-
+	protected void fillToolbar(IToolBarManager manager) {}
 }

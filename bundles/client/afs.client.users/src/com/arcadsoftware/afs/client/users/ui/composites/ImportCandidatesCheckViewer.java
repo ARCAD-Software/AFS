@@ -28,14 +28,12 @@ public class ImportCandidatesCheckViewer extends CheckboxTableViewer {
 	}
 	
     public static ImportCandidatesCheckViewer newCheckList(Composite parent) {
-        Table table = new Table(parent, SWT.CHECK | SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
-        return new ImportCandidatesCheckViewer(table);
+        return new ImportCandidatesCheckViewer(new Table(parent, SWT.CHECK | SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION));
     }
     
 	public BeanMapList getCheckedList(){
 		BeanMapList list = new BeanMapList();
-		Object[] items = getCheckedElements();
-		for (Object object : items) {
+		for (Object object : getCheckedElements()) {
 			if (object instanceof BeanMap){
 				list.add((BeanMap)object);
 			}
