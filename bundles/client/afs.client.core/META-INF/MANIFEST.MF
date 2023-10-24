@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AFS - Client Core
 Bundle-SymbolicName: com.arcadsoftware.afs.client.core;singleton:=true
-Bundle-Version: 1.4.2.qualifier
+Bundle-Version: 1.4.3
 Bundle-Activator: com.arcadsoftware.afs.client.core.internal.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources;bundle-version="3.6.1",
