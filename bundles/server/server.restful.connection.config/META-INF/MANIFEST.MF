@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Configuration based authentication
 Bundle-SymbolicName: com.arcadsoftware.server.restful.connection.config;singleton:=true
-Bundle-Version: 1.3.1
+Bundle-Version: 1.3.1.qualifier
 Bundle-Activator: com.arcadsoftware.restful.connection.config.internal.Activator
 Bundle-Vendor: ARCAD Software
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
