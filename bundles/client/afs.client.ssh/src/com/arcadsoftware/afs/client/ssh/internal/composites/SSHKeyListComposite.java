@@ -40,13 +40,8 @@ import com.arcadsoftware.metadata.MetaDataEntity;
 import com.arcadsoftware.ssh.model.SSHKey;
 
 public class SSHKeyListComposite extends AbstractSearchListComposite {
-
-	SSHKeyAddAction addAction;
-	SSHKeyDeleteAction deleteAction;
-	SSHKeyEditAction editAction;
-	SSHKeyImportAction importAction;
-	SSHKeyOpenPublicKeyAction openPublicKeyAction;
-	SSHKeyRefreshAction refreshAction;
+	private SSHKeyEditAction editAction;
+	private SSHKeyRefreshAction refreshAction;
 
 	public SSHKeyListComposite(final Composite parent, final MetaDataEntity entityStructure,
 			final ServerConnection connection) {
@@ -77,7 +72,7 @@ public class SSHKeyListComposite extends AbstractSearchListComposite {
 	public List<Action> getActions() {
 		final List<Action> result = new ArrayList<>();
 
-		addAction = new SSHKeyAddAction(getConnection()) {
+		final SSHKeyAddAction addAction = new SSHKeyAddAction(getConnection()) {
 			@Override
 			protected void doAfterRun() {
 				refreshAction.run();
@@ -91,7 +86,7 @@ public class SSHKeyListComposite extends AbstractSearchListComposite {
 			}
 		};
 
-		openPublicKeyAction = new SSHKeyOpenPublicKeyAction(getConnection()) {
+		final SSHKeyOpenPublicKeyAction openPublicKeyAction = new SSHKeyOpenPublicKeyAction(getConnection()) {
 			@Override
 			protected BeanMapList getBeanMapListToManage() {
 				return getSelectedBeanMap();
@@ -105,7 +100,7 @@ public class SSHKeyListComposite extends AbstractSearchListComposite {
 			}
 		};
 
-		deleteAction = new SSHKeyDeleteAction(getConnection()) {
+		final SSHKeyDeleteAction deleteAction = new SSHKeyDeleteAction(getConnection()) {
 			@Override
 			protected void doAfterRun() {
 				refreshAction.run();
@@ -117,7 +112,7 @@ public class SSHKeyListComposite extends AbstractSearchListComposite {
 			}
 		};
 
-		importAction = new SSHKeyImportAction(getConnection()) {
+		final SSHKeyImportAction importAction = new SSHKeyImportAction(getConnection()) {
 			@Override
 			protected void doAfterRun() {
 				refreshAction.run();
@@ -125,14 +120,14 @@ public class SSHKeyListComposite extends AbstractSearchListComposite {
 		};
 
 		result.add(addAction);
-		result.add(importAction);
 		result.add(null);
 		result.add(editAction);
+		result.add(null);
+		result.add(importAction);
 		result.add(openPublicKeyAction);
+		result.add(refreshAction);
 		result.add(null);
 		result.add(deleteAction);
-		result.add(null);
-		result.add(refreshAction);
 
 		return result;
 	}
