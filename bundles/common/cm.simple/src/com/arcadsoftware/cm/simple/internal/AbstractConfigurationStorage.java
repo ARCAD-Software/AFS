@@ -747,7 +747,6 @@ public abstract class AbstractConfigurationStorage {
 		} else {
 			sb.append("com.arcadsoftware"); //$NON-NLS-1$
 		}
-		
 		for (String s: section.split(" ")) { //$NON-NLS-1$
 			sb.append('.');
 			if (!s.isEmpty()) {

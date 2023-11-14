@@ -100,7 +100,6 @@ public class DynamicEditorPart extends EditorPart implements IPersistableEditor,
 			throw new PartInitException("Input not supported or not initialized."); //$NON-NLS-1$
 		}
 		// Create the renderer.
-
 		final Display display = Display.getCurrent();
 		renderer = new SWTRenderer(display,getEditorRealm(), type,false) {
 			@Override
@@ -123,19 +122,14 @@ public class DynamicEditorPart extends EditorPart implements IPersistableEditor,
 		renderer.addChangeListener(this);
 		renderer.addTitleChangeListener(this);
 		renderer.setReadOnly(((IBeanMapEditorInput) input).isReadOnly());
-
 		// Load the BeanMap !
 		if (!renderer.load(id)) {
 			throw new PartInitException("Error during loading Data (possible that no connection was available)."); //$NON-NLS-1$
 		}
 		Map<String, Object> virtualValues = getVirtualValues();
 		if (virtualValues != null) {
-			Set<String> keySet = virtualValues.keySet();
-			Iterator<String> keys = keySet.iterator();
-			while (keys.hasNext()) {
-				String key = keys.next();
-				Object value = virtualValues.get(key);
-				renderer.putVirtualValue(key, value);
+			for (String key: virtualValues.keySet()) {
+				renderer.putVirtualValue(key, virtualValues.get(key));
 			}
 		}
 		setFixedValues(renderer);

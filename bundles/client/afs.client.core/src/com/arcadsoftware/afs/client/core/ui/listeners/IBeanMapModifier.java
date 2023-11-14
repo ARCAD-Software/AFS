@@ -16,5 +16,6 @@ package com.arcadsoftware.afs.client.core.ui.listeners;
 import com.arcadsoftware.beanmap.BeanMap;
 
 public interface IBeanMapModifier {
+	
 	public void modify(BeanMap beanmap);
 }

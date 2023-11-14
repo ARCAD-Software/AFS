@@ -14,9 +14,7 @@
 package com.arcadsoftware.afs.client.core.ui.editors;
 
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
@@ -37,7 +35,9 @@ import com.arcadsoftware.editor.swt.DynamicEditorPart;
 public class ConnectedDynamicEditor extends DynamicEditorPart {
 
 	private static final String EDITOR_ID = "com.arcadsoftware.afs.client.core.ui.editors.ConnectedDynamicEditor"; //$NON-NLS-1$
-	boolean readOnly = false;
+	
+	boolean readOnly;
+	
 	@Override
 	protected void initializeDataLoader(SWTRenderer renderer) {
 		Object inputObject = getEditorInput();
@@ -79,18 +79,13 @@ public class ConnectedDynamicEditor extends DynamicEditorPart {
 	protected void setFixedValues(SWTRenderer renderer) {
 		Object inputObject = getEditorInput();
 		if (inputObject instanceof ConnectedBeanMapInput) {
-			ConnectedBeanMapInput ci = (ConnectedBeanMapInput)inputObject;
-			if (ci.getModifier()!=null) {
+			IBeanMapModifier modifier = ((ConnectedBeanMapInput) inputObject).getModifier();
+			if (modifier != null) {
 				BeanMap b = new BeanMap(renderer.getCurrentBean().getType());				
-				ci.getModifier().modify(b);
-				Set<String> keySet = b.keySet();
-				Iterator<String> keys = keySet.iterator();
-				while (keys.hasNext()) {
-					String key = keys.next();
-					Object value = b.get(key);
-					renderer.put(key, value);
-				}				
-				
+				modifier.modify(b);
+				for (String key: b.keySet()) {
+					renderer.put(key, b.get(key));
+				}
 			}
 		}		
 	}

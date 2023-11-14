@@ -16,16 +16,14 @@ package com.arcadsoftware.afs.client.core.ui.actions;
 import java.util.List;
 
 import com.arcadsoftware.afs.client.core.connection.ServerConnection;
-import com.arcadsoftware.afs.client.core.ui.editors.ConnectedDynamicEditor;
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
 
 public class BasicConnectedBeanMapEditAction extends AbstractConnectedBeanMapEditAction  {
 
-	protected ConnectedDynamicEditor editor;
 	private BeanMap edited;
 	
-	public BasicConnectedBeanMapEditAction(ServerConnection connection,BeanMap edited) {
+	public BasicConnectedBeanMapEditAction(ServerConnection connection, BeanMap edited) {
 		super(connection);
 		this.edited = edited;
 	}
