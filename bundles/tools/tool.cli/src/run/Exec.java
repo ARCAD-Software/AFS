@@ -29,7 +29,11 @@ import java.util.List;
  */
 public class Exec {
 
-	private static String[] CP_BASE = new String[] {
+	public static final String H2 = "com.h2database_1.4"; //$NON-NLS-1$
+	public static final String PGSQL = "org.postgresql.jdbc_"; //$NON-NLS-1$
+	public static final String LDAP = "com.unboundid.ldap.sdk_"; //$NON-NLS-1$
+	
+	private static final String[] CP_BASE = new String[] {
 			"javax.servlet_", //$NON-NLS-1$
 			"org.eclipse.osgi_", //$NON-NLS-1$
 			"org.eclipse.osgi.services_", //$NON-NLS-1$
@@ -46,58 +50,58 @@ public class Exec {
 	static {
 		CP_SPE.put("cli.ChangeDBPassword", new String[] {
 				"org.ops4j.pax.logging.pax-logging-api_", //$NON-NLS-1$
-				"com.h2database_1.4", //$NON-NLS-1$
+				H2,
 				"com.sun.jna_", //$NON-NLS-1$
 				"com.sun.jna.platform_", //$NON-NLS-1$
 				"waffle_", //$NON-NLS-1$
-				"org.postgresql.jdbc_" //$NON-NLS-1$
+				PGSQL
 		});
 		CP_SPE.put("cli.ConfigAdminUser", new String[] {
 				"org.ops4j.pax.logging.pax-logging-api_", //$NON-NLS-1$
-				"com.h2database_1.4", //$NON-NLS-1$
+				H2,
 				"com.sun.jna_", //$NON-NLS-1$
 				"com.sun.jna.platform_", //$NON-NLS-1$
 				"waffle_", //$NON-NLS-1$
-				"org.postgresql.jdbc_" //$NON-NLS-1$
+				PGSQL
 		});
 		CP_SPE.put("cli.DBH2Backup", new String[] {
 				"org.ops4j.pax.logging.pax-logging-api_", //$NON-NLS-1$
-				"com.h2database_1.4" //$NON-NLS-1$
+				H2
 		});
 		CP_SPE.put("cli.DBH2Restore", new String[] {
 				"org.ops4j.pax.logging.pax-logging-api_", //$NON-NLS-1$
-				"com.h2database_1.4" //$NON-NLS-1$
+				H2
 		});
 		CP_SPE.put("cli.DBMigration", new String[] {
 				"org.ops4j.pax.logging.pax-logging-api_", //$NON-NLS-1$
-				"com.h2database_1.4", //$NON-NLS-1$
+				H2,
 				"com.sun.jna_", //$NON-NLS-1$
 				"com.sun.jna.platform_", //$NON-NLS-1$
 				"waffle_", //$NON-NLS-1$
-				"org.postgresql.jdbc_" //$NON-NLS-1$
+				PGSQL
 		});
 		CP_SPE.put("cli.DBUpdate", new String[] {
 				"org.ops4j.pax.logging.pax-logging-api_", //$NON-NLS-1$
-				"com.h2database_1.4", //$NON-NLS-1$
+				H2,
 				"com.sun.jna_", //$NON-NLS-1$
 				"com.sun.jna.platform_", //$NON-NLS-1$
 				"waffle_", //$NON-NLS-1$
-				"org.postgresql.jdbc_" //$NON-NLS-1$
+				PGSQL
 		});
 		CP_SPE.put("cli.TestDB", new String[] {
 				"org.ops4j.pax.logging.pax-logging-api_", //$NON-NLS-1$
-				"com.h2database_1.4", //$NON-NLS-1$
+				H2,
 				"com.sun.jna_", //$NON-NLS-1$
 				"com.sun.jna.platform_", //$NON-NLS-1$
 				"waffle_", //$NON-NLS-1$
-				"org.postgresql.jdbc_" //$NON-NLS-1$
+				PGSQL
 		});
 		CP_SPE.put("cli.TestLDAP", new String[] {
-				"com.unboundid.ldap.sdk_" //$NON-NLS-1$
+				LDAP
 		});
 		CP_SPE.put("org.h2.tools.Console", new String[] {
 				"org.ops4j.pax.logging.pax-logging-api_", //$NON-NLS-1$
-				"com.h2database_1.4" //$NON-NLS-1$
+				H2
 		});
 	}
 	

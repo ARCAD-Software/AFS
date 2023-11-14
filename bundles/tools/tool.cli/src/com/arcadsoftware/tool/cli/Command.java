@@ -59,6 +59,7 @@ public abstract class Command {
 	protected static final int ERROR_INVALID_CONFIGURATION = 35;
 	protected static final int ERROR_MISSING_PARAMETER = 40;
 	protected static final int ERROR_WRONG_PARAMETER = 41;
+	protected static final int ERROR_MISSING_FILE = 42;
 	protected static final int ERROR_DATABASE_CORRUPTED = 50;
 	protected static final int ERROR_FILESYSTEM_ACCESS = 51;
 	protected static final int ERROR_CANCELLED = 60;
