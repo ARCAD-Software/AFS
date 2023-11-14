@@ -90,7 +90,7 @@ public class LdapConnectionCredential implements IConnectionCredential, IUpdatab
 					locked = true;
 				}
 			} else {
-				parent.getActivator().error(e);
+				parent.getActivator().error("Unexpected LDAP Binding error: " + ee.getLocalizedMessage());
 			}
 		} finally {
 			parent.closeConnection(cn, e);
