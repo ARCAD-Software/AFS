@@ -528,15 +528,16 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 
 	public String getUserDN(LDAPConnection cn, String login) throws LDAPException {
 		if (alreadybinded && (loginAttribute != null) && ((loginPattern == null) || loginPattern.isEmpty())) {
-			// Use the permanent connection to find the real user DN.
-			// |ML] why if loginpatter= "%s" use ONE as scope ???
+			// Try to use the permanent connection to find the real user DN.
+			// |ML] why if loginpattern= "%s" use ONE as scope ???
+			// FIXME We must be sure that the current connection is currently binded with the default "admin" user !
 			SearchResult sr = cn.search(new SearchRequest(null, base, SearchScope.SUB, DereferencePolicy.ALWAYS, 3, 0, false, 
 					Filter.create('(' + loginAttribute + '=' + login + ')'), SearchRequest.ALL_USER_ATTRIBUTES));
 			if (sr.getEntryCount() == 0) {
 				return null;
 			}
 			if (sr.getEntryCount() > 1) {
-				activator.warn("Binding of user authenticated by \"" + login + "\" returned multiple results onto the LDAP server.");
+				activator.warn("LDAP Search of user authenticated by \"" + login + "\" returned multiple results onto the LDAP server.");
 			}
 			return sr.getSearchEntries().get(0).getDN();
 		}
