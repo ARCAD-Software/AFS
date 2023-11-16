@@ -23,8 +23,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleEvent;
-import org.osgi.framework.BundleListener;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
@@ -79,44 +77,51 @@ public class ServerConfiguration implements ManagedService {
 		return sv.equalsIgnoreCase("true") || sv.equalsIgnoreCase("yes") || sv.equals("1"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 	
-	private Bundle getBrandingBundle(final Dictionary<String, ?> properties) {
-		final String brandingBundleName = getProperty(properties, PROP_BRANDING_BUNDLE, null);
-		if (brandingBundleName != null) {
-			for(Bundle b: activator.getContext().getBundles()) {
-				if (brandingBundleName.equalsIgnoreCase(b.getSymbolicName())) {
-					return b;
-				}
-			}
-			// The Branding bundle may not be installed yet ! (A restart of the server may be require to correct this !)
-			activator.addBundleListener(new BundleListener() {
-				@Override
-				public void bundleChanged(BundleEvent event) {
-					if (((event.getType() == BundleEvent.INSTALLED) || (event.getType() == BundleEvent.RESOLVED)) && //
-							brandingBundleName.equals(event.getBundle().getSymbolicName())) {
-						activator.info("Late definition of branding bundle...");
-						activator.propertiesChange(new ServerProperties( //
-								activator.getConfiguration(activator.getContext().getBundle().getSymbolicName()), //
-								event.getBundle(), //
-								activator.getContext().getBundle()));
-					}
-				}
-			});
-		}
-		return null;
-	}
-	
 	@Override
-	public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+	public void updated(final Dictionary<String, ?> properties) throws ConfigurationException {
 		if ((properties == null) || initConfiguration(properties)) {
 			return;
 		}
-		final ServerProperties sp = new ServerProperties(properties, getBrandingBundle(properties), activator.getContext().getBundle());
-		// Call the synchronized update method from the Activator.
+		final String brandingBundleName = getProperty(properties, PROP_BRANDING_BUNDLE, null);
+		final Bundle brandingBundle;
+		if (brandingBundleName != null) {
+			Bundle bb = null;
+			for (Bundle b: activator.getContext().getBundles()) {
+				if (brandingBundleName.equalsIgnoreCase(b.getSymbolicName())) {
+					bb = b;
+					break;
+				}
+			}
+			brandingBundle = bb;
+		} else {
+			brandingBundle = null;
+		}
+		// Call the synchronized update method from the Activator...
 		final Timer timer = new Timer("Delayed REST Server Properties changes"); //$NON-NLS-1$
 		timer.schedule(new TimerTask() {
 			public void run() {
 				timer.cancel();
-				activator.propertiesChange(sp);
+				Bundle bb = brandingBundle;
+				if ((brandingBundleName != null) && (bb == null)) {
+					// Delayed installation of the branding bundle...
+					for (int i = 0; (i < 10) && (bb == null); i++) {
+						for (Bundle b: activator.getContext().getBundles()) {
+							if (brandingBundleName.equalsIgnoreCase(b.getSymbolicName())) {
+								bb = b;
+								break;
+							}
+						}
+						// Wait a little more...
+						if ((bb == null) && (i < 10)) {
+							try {
+								Thread.sleep(500);
+							} catch (InterruptedException e) {
+								break;
+							}
+						}
+					}
+				}
+				activator.propertiesChange(new ServerProperties(properties, bb, activator.getContext().getBundle()));
 			}
 		}, 500);
 	}
