@@ -29,35 +29,22 @@ public class Activator extends AbstractAFSUIPlugin implements ILocalizationProvi
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.arcadsoftware.rm4os.client.list"; //$NON-NLS-1$
-	public static final String BUNDLE_ID = PLUGIN_ID+".resources"; //$NON-NLS-1$
-	public static final String TITLE = ""; //$NON-NLS-1$	
-	
+	public static final String BUNDLE_ID = PLUGIN_ID + ".resources"; //$NON-NLS-1$
+	public static final String TITLE = ""; //$NON-NLS-1$
 
 	// The shared instance
 	private static Activator plugin;
-	
-	/**
-	 * The constructor
-	 */
-	public Activator() {
-	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-	 */
+	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-	 */
+	@Override
 	public void stop(BundleContext context) throws Exception {
-		plugin = null;
 		super.stop(context);
+		plugin = null;
 	}
 
 	/**
@@ -74,26 +61,20 @@ public class Activator extends AbstractAFSUIPlugin implements ILocalizationProvi
 		return BUNDLE_ID;
 	}
 
-
 	public static String resString(String key) {
 		return plugin.getResourceString(key);
 	}
 
 	@Override
-	protected ResourceBundle loadResourceBundle(String bundleName, Locale local)
-			throws MissingResourceException {
+	protected ResourceBundle loadResourceBundle(String bundleName, Locale local) throws MissingResourceException {
 		return ResourceBundle.getBundle(bundleName, Locale.getDefault());
 	}
 
 	@Override
-	protected void fillImageRegistry() {
-		
-	}
-
+	protected void fillImageRegistry() {}
 
 	@Override
 	protected String getApplicationTitle() {
 		return TITLE;
-	}		
-	
+	}
 }
