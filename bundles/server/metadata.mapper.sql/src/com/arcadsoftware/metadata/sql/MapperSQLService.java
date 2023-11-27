@@ -1523,8 +1523,9 @@ public class MapperSQLService extends AbstractMapperService {
 				colNames.put(code, col);
 			}
 		}
+		// joins map is not used here (the criteria reduction does not own any joins... it is only used to avoid NPE.
 		return update(String.format(fg.updateex, e.table, lcols, //
-				generateCriteria(e, criteria, context, colNames, new JoinsMap(null), new StringBuilder()).toString()),//
+				generateCriteria(e, criteria, context, colNames, joins, new StringBuilder()).toString()),//
 				values.toArray(new Object[values.size()])) > 0;
 	}
 

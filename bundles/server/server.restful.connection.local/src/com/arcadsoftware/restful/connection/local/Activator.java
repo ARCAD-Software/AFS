@@ -254,7 +254,7 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 				try {
 					int i = 100;
 					for (Integer uid : adminUIDs) {
-						recordUserUnlockProcess(uid, 8000 + i);
+						recordUserUnlockProcess(uid, 12000 + i);
 						i += 100;
 					}
 				} catch (Exception e) {
@@ -523,13 +523,13 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 			}
 		} catch (Exception e) {
 			if (secondTry) {
-				error(e);
+				error("Unrecoverable error wuring local user (" + uid + ") unclock: " + e.getLocalizedMessage(), e);
 				return;
 			}
-			info(e);
+			info("There was an error while trying to unlock a local User (another try will be run: " + e.getLocalizedMessage());
 			// if there is an error, we assume that this error is recoverable in a next attempt...
 		}
-		Timer t = new Timer("User Lock management"); //$NON-NLS-1$
+		Timer t = new Timer("User Lock management (retry)"); //$NON-NLS-1$
 		unlockTimers.put(uid, t);
 		t.schedule(new TimerTask() {
 			@Override
