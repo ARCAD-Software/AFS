@@ -126,7 +126,8 @@ public class MetaDataItemResource extends DataItemResource {
 			if (s.length > 0) {
 				code = s[0];
 				if (s.length > 1) {
-					lids = s[1];
+					// Legacy: The first level space by be + between identifiers. 
+					lids = s[1].replace(' ', '+');
 					for (int i = 2;i < s.length; i++) {
 						lids = lids + '+' + s[i];
 					}
