@@ -13,6 +13,8 @@
  *******************************************************************************/
 package com.arcadsoftware.server.ssh.internal.resources;
 
+import java.nio.charset.StandardCharsets;
+
 import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
