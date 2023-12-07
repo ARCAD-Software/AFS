@@ -24,9 +24,12 @@ import com.arcadsoftware.rest.SimpleBranch;
 
 @Component(service = IBranch.class, property = { IBranch.URI + "=" + IBranch.SECUREDBRANCH })
 public class SSHBranch extends SimpleBranch {
+	
 	@Override
 	protected RouteList createAttachedResources(final Context context, final Router router) {
-		return new RouteListBuilder(router).attach(SSHGenerateKeyResource.class).attach(SSHGetPublicKeyResource.class)
-				.attach(SSHImportKeyResource.class).toRouteList();
+		return new RouteListBuilder(router).attach(SSHGenerateKeyResource.class) //
+				.attach(SSHGetPublicKeyResource.class) //
+				.attach(SSHImportKeyResource.class) //
+				.toRouteList();
 	}
 }

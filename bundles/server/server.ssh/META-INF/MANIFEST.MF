@@ -43,7 +43,7 @@ Automatic-Module-Name: com.arcadsoftware.server.ssh
 Service-Component: OSGI-INF/com.arcadsoftware.server.ssh.internal.listeners.SSHKeyListener.xml,
  OSGI-INF/com.arcadsoftware.server.ssh.internal.resources.SSHBranch.xml,
  OSGI-INF/com.arcadsoftware.server.ssh.services.SSHService.xml
-Export-Package: com.arcadsoftware.server.ssh.services
+Export-Package: com.arcadsoftware.server.ssh.services;version="1.0.1"
 Bundle-ActivationPolicy: lazy
 Bundle-License: https://www.eclipse.org/legal/epl-2.0
 Bundle-License-Name: Eclipse Public License Version 2.0

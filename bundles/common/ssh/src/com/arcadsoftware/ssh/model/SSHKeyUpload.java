@@ -16,21 +16,28 @@ package com.arcadsoftware.ssh.model;
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.IIdentifiedBean;
 
+/**
+ * This class is just a tricky facade to a BeanMap container.
+ * 
+ * @author ARCAD Software
+ */
 public class SSHKeyUpload implements IIdentifiedBean {
 
-	public static final String ENTITY = "sshUpload";
-
+	public static final String ENTITY = "sshUpload"; //$NON-NLS-1$
 	public static final String NAME = SSHKey.NAME;
 	public static final String PASSPHRASE = SSHKey.PASSPHRASE;	
-	public static final String PRIVATE_KEY = "privatekey";
-	
-	public static final String SUCCESSFUL = "successful";
-	public static final String MESSAGE = "message";
+	public static final String PRIVATE_KEY = "privatekey"; //$NON-NLS-1$
+	public static final String SUCCESSFUL = "successful"; //$NON-NLS-1$
+	public static final String MESSAGE = "message"; //$NON-NLS-1$
 
 	private final BeanMap beanmap;
 
 	public SSHKeyUpload() {
-		this(new BeanMap());
+		this(new BeanMap(ENTITY));
+	}
+
+	public SSHKeyUpload(final String type) {
+		this(new BeanMap(type));
 	}
 
 	public SSHKeyUpload(final BeanMap beanmap) {

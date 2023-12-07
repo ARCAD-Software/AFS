@@ -13,9 +13,6 @@
  *******************************************************************************/
 package com.arcadsoftware.server.ssh.internal.resources;
 
-import java.nio.charset.StandardCharsets;
-
-import org.osgi.service.log.LogService;
 import org.restlet.data.Method;
 import org.restlet.representation.Representation;
 import org.restlet.representation.Variant;
@@ -57,15 +54,15 @@ public class SSHImportKeyResource extends UserLinkedResource {
 		if ((pf != null) && !pf.isEmpty()) {
 			sshKeyUpload.setPassphrase(new String(Crypto.unFog(pf)));
 		}
-		final SSHKeyUpload upload = new SSHKeyUpload();
+		final SSHKeyUpload upload = new SSHKeyUpload(SSHKey.ENTITY);
 		try {
-			getOSGiService(SSHService.class).importKey(sshKeyUpload);
-			upload.setSuccessful(true);
-		} catch (SSHException e) {
-			LogService log = getOSGiService(LogService.class);
-			if (log != null) {
-				log.log(LogService.LOG_ERROR, e.getLocalizedMessage(), e);
+			SSHService ssh = getOSGiService(SSHService.class);
+			if (ssh != null) {
+				ssh.importKey(sshKeyUpload);
+				upload.setSuccessful(true);
 			}
+		} catch (SSHException e) {
+			getLoggedPlugin().error(e.getLocalizedMessage(), e);
 			upload.setSuccessful(false);
 			final StringBuilder causes = new StringBuilder();
 			Throwable t = e;
@@ -77,8 +74,8 @@ public class SSHImportKeyResource extends UserLinkedResource {
 			upload.setMessage(causes.toString().trim());
 		}
 		if (isJSON(variant)) {
-			return new JSONRepresentation(new JSonBeanMapStream().toXML(upload.getBeanmap()), getLanguage(variant));
+			return new JSONRepresentation(new JSonBeanMapStream().toXML(upload.getBeanmap()), getClientPreferedLanguage());
 		}
-		return new XMLRepresentation(new XmlBeanMapStream().toXML(upload.getBeanmap()), getLanguage(variant));
+		return new XMLRepresentation(new XmlBeanMapStream().toXML(upload.getBeanmap()), getClientPreferedLanguage());
 	}
 }

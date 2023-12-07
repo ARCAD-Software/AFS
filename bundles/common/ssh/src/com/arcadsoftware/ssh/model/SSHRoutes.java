@@ -14,12 +14,10 @@
 package com.arcadsoftware.ssh.model;
 
 public class SSHRoutes {
-	public static final String GENERATE_KEY = "/sshgeneratekey";
+	
+	public static final String GENERATE_KEY = "/sshgeneratekey"; //$NON-NLS-1$
+	public static final String IMPORT_KEY = "/importsshkey"; //$NON-NLS-1$
+	public static final String PUBLIC_KEY = "/sshpublickey/{id}"; //$NON-NLS-1$
 
-	public static final String IMPORT_KEY = "/importsshkey";
-	public static final String PUBLIC_KEY = "/sshpublickey/{id}";
-
-	private SSHRoutes() {
-
-	}
+	private SSHRoutes() {}
 }

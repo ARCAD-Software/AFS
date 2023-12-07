@@ -14,6 +14,7 @@
 package com.arcadsoftware.ssh.model;
 
 public class SSHException extends Exception {
+	
 	private static final long serialVersionUID = -3386197559157866233L;
 
 	public SSHException(final String message) {

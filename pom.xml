@@ -21,6 +21,13 @@
 
 	<!-- Add explicit dependencies not available on P2 repository -->
 	<dependencies>
+		<!-- SSH Key management bundle requirement -->
+		<!-- https://mvnrepository.com/artifact/org.eclipse.orbit.bundles/net.i2p.crypto.eddsa -->
+		<dependency>
+		    <groupId>org.eclipse.orbit.bundles</groupId>
+		    <artifactId>net.i2p.crypto.eddsa</artifactId>
+		    <version>0.3.0.v20220506-1020</version>
+		</dependency>
 		<dependency> <!-- https://mvnrepository.com/artifact/org.apache.sshd/sshd-osgi -->
 			<groupId>org.apache.sshd</groupId>
 			<artifactId>sshd-osgi</artifactId>

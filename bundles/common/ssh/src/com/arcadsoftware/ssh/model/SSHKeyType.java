@@ -13,21 +13,26 @@
  *******************************************************************************/
 package com.arcadsoftware.ssh.model;
 
-import java.util.stream.Stream;
-
 public enum SSHKeyType {
-	UNKNOWN("", 0, "", ""),
-	RSA("RSA", 4096, "id_rsa", "id_rsa.pub"),
-	EDDSA("EdDSA", 0, "id_ed25519", "id_ed25519.pub");
+	
+	UNKNOWN("", 0, "", ""), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	RSA("RSA", 4096, "id_rsa", "id_rsa.pub"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	EDDSA("EdDSA", 0, "id_ed25519", "id_ed25519.pub"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 	public static SSHKeyType fromAlgorithm(final String algo) {
-		return Stream.of(SSHKeyType.values()).filter(t -> t.getAlgorithm().equalsIgnoreCase(algo)).findFirst().orElse(UNKNOWN);
+		if ((algo != null) && ! algo.isEmpty()) {
+			for (SSHKeyType skt : SSHKeyType.values()) {
+				if (skt.getAlgorithm().equalsIgnoreCase(algo)) {
+					return skt;
+				}
+			}
+		}
+		return UNKNOWN;
 	}
 	
 	private final String algorithm;
 	private final int length;
 	private final String privateKeyName;
-
 	private final String publicKeyName;
 
 	SSHKeyType(final String algorithm, final int length, final String privateKeyName, final String publicKeyName) {
