@@ -131,9 +131,12 @@ public class JSonBeanMapStream extends JsonStreamCompact {
 	 */
 	public String toXML(BeanMap object) {
 		// theses aliases are not thread-safe if the object class can have different representations in XML.
-		String type = object.getType().replace(BeanMapList.SLASH_TYPE, BeanMapList.SLASH_TAG);
-		alias(type, object.getClass());
-		alias(BeanMapList.getListTag(type), BeanMapList.class);
+		String type = object.getType();
+		if (type != null) {
+			type = type.replace(BeanMapList.SLASH_TYPE, BeanMapList.SLASH_TAG);
+			alias(type, object.getClass());
+			alias(BeanMapList.getListTag(type), BeanMapList.class);
+		}
 		return toXML((Object) object);
 	}
 
