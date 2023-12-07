@@ -52,7 +52,9 @@ public class SSHKeyListener implements IMetaDataDeleteListener {
 		try {
 			sshService.deleteKeyFiles(new SSHKey(originalItem));
 		} catch (final IOException e) {
-			log.log(LogService.LOG_ERROR, "SSHKey postDeletion failed", e);
+			if (log != null) {
+				log.log(LogService.LOG_ERROR, "SSHKey postDeletion failed", e);
+			}
 			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
 		}
 	}

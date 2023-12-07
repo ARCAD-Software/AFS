@@ -13,8 +13,6 @@
  *******************************************************************************/
 package com.arcadsoftware.server.ssh.internal.resources;
 
-import java.nio.charset.StandardCharsets;
-
 import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
@@ -30,6 +28,7 @@ import com.arcadsoftware.ssh.model.SSHRoutes;
 
 @Path(SSHRoutes.GENERATE_KEY)
 public class SSHGenerateKeyResource extends BeanMapItemResource {
+	
 	@Override
 	protected void delete(final BeanMap bean) {
 		throw new ResourceException(Status.CLIENT_ERROR_METHOD_NOT_ALLOWED);
@@ -66,5 +65,4 @@ public class SSHGenerateKeyResource extends BeanMapItemResource {
 			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, e);
 		}
 	}
-
 }

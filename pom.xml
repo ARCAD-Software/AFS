@@ -21,6 +21,7 @@
 
 	<!-- Add explicit dependencies not available on P2 repository -->
 	<dependencies>
+		<!-- SSH Key management bundle requirement -->
 		<dependency> <!-- https://mvnrepository.com/artifact/org.apache.sshd/sshd-osgi -->
 			<groupId>org.apache.sshd</groupId>
 			<artifactId>sshd-osgi</artifactId>

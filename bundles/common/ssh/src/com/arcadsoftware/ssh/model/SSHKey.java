@@ -18,19 +18,22 @@ import com.arcadsoftware.beanmap.IIdentifiedBean;
 
 public class SSHKey implements IIdentifiedBean {
 
-	public static final String ENTITY = "sshKey";
-
-	public static final String NAME = "name";
-	public static final String FINGERPRINT = "fingerprint";
-	public static final String TYPE = "keytype";
-	public static final String LENGTH = "keylength";
-	public static final String COMMENT = "keycomment";
-	public static final String PASSPHRASE = "passphrase";
+	public static final String ENTITY = "sshKey"; //$NON-NLS-1$
+	public static final String NAME = "name"; //$NON-NLS-1$
+	public static final String FINGERPRINT = "fingerprint"; //$NON-NLS-1$
+	public static final String TYPE = "keytype"; //$NON-NLS-1$
+	public static final String LENGTH = "keylength"; //$NON-NLS-1$
+	public static final String COMMENT = "keycomment"; //$NON-NLS-1$
+	public static final String PASSPHRASE = "passphrase"; //$NON-NLS-1$
 
 	private final BeanMap beanmap;
 
 	public SSHKey() {
-		this(new BeanMap());
+		this(new BeanMap(ENTITY));
+	}
+
+	public SSHKey(String type) {
+		this(new BeanMap(type));
 	}
 
 	public SSHKey(final BeanMap beanmap) {
@@ -79,7 +82,7 @@ public class SSHKey implements IIdentifiedBean {
 	}
 
 	public boolean isEncrypted() {
-		return getPassphrase() != null && !getPassphrase().isEmpty();
+		return (getPassphrase() != null) && !getPassphrase().isEmpty();
 	}
 
 	public void setComment(final String comment) {

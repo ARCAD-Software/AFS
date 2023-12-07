@@ -15,7 +15,6 @@ package com.arcadsoftware.server.ssh.internal.resources;
 
 import java.nio.charset.StandardCharsets;
 
-import org.osgi.service.log.LogService;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
@@ -48,11 +47,14 @@ public class SSHGetPublicKeyResource extends UserLinkedResource {
 		if (sshKeyId > 0) {
 			try {
 				final SSHService sshService = getOSGiService(SSHService.class);
+				if (sshService == null) {
+					throw new ResourceException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE, "The SSH Service is not running on the Server. This service is disable for the moment.");
+				}
 				final SSHKey sshKey = sshService.get(sshKeyId);
 				final byte[] publicKey = sshService.getPublicKey(sshKey);
 				return new StringRepresentation(new String(publicKey, StandardCharsets.UTF_8));
 			} catch (final Exception e) {
-				getOSGiService(LogService.class).log(LogService.LOG_ERROR, e.getMessage(), e);
+				getLoggedPlugin().error(e.getLocalizedMessage(), e);
 				throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
 			}
 		} else {
