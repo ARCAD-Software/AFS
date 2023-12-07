@@ -102,6 +102,8 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 	private static final String PROP_BUSYRETRY = "busy.retry"; //$NON-NLS-1$
 	private static final String PROP_REALM = "realm"; //$NON-NLS-1$
 	private static final String PROP_KDCADDRESS = "kerberos.kdc"; //$NON-NLS-1$
+	private static final String PROP_USERAUTOIMPORT = "autoimport.enabled"; //$NON-NLS-1$
+	private static final String PROP_USERAUTOIMPORTPROFILE = "autoimport.profile"; //$NON-NLS-1$
 	private static final int BINDKIND_SIMPLE = 1;
 	private static final int BINDTYPE_CRAMMD5 = 2;
 	private static final int BINDTYPE_DIGESTMD5 = 3;
@@ -187,6 +189,7 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 	private final int busy;
 	private final String realm;
 	private final String kdc;
+	private final boolean autoImport;
 
 	public LdapAuthentificationService(Activator activator, Dictionary<String, Object> props)
 			throws ConfiguredSSLContextException, LDAPException {
@@ -217,6 +220,7 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 		loginAttribute = getProp(props, PROP_LOGINATTRIBUTE, null);
 		usePolicyHints = getProp(props, PROP_USEPOLICYHINTS, false);
 		canChangePWD = getProp(props, PROP_CANCHANGEPWD, false);
+		autoImport = getProp(props, PROP_USERAUTOIMPORT, false);
 		kdc = getProp(props, PROP_KDCADDRESS, (String) null);
 		realm = getProp(props, PROP_REALM, (String) null);
 		userImportEnabled = (getProp(props, PROP_USERIMPORT_ENABLED, false)) && (loginAttribute != null) && (base != null);
@@ -436,7 +440,9 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 		if (id > 0) {
 			return new LdapConnectionCredential(this, identifier, id);
 		}
-		if (ConnectionUserBean.STANDALONECONNECTIONS != null) {
+		if (autoImport) {
+			
+		} else if (ConnectionUserBean.STANDALONECONNECTIONS != null) {
 			return new LdapConnectionCredential(this, identifier, -1);
 		}
 		return null;
