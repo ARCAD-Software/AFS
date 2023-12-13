@@ -148,9 +148,12 @@ public class JSonBeanMapStream extends JsonStreamCompact {
 	@Override
 	public String toXML(Object object) {
 		if (object instanceof IBeanMap) {
-			String type = ((IBeanMap) object).getType().replace(BeanMapList.SLASH_TYPE, BeanMapList.SLASH_TAG);
-			alias(type, object.getClass());
-			alias(BeanMapList.getListTag(type), BeanMapList.class);
+			String type = ((IBeanMap) object).getType();
+			if (type != null) {
+				type = type.replace(BeanMapList.SLASH_TYPE, BeanMapList.SLASH_TAG);
+				alias(type, object.getClass());
+				alias(BeanMapList.getListTag(type), BeanMapList.class);
+			}
 		}
 		return super.toXML(object);
 	}

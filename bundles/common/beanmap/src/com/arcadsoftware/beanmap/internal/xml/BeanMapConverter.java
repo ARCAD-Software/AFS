@@ -171,10 +171,6 @@ public class BeanMapConverter implements Converter {
 				} else if (value instanceof Collection) {
 					if (useAttributes) {
 						writer.addAttribute(KEY_LIST, Integer.toString(((Collection) value).size()));
-					} else {
-						writer.startNode(KEY_LIST);
-						context.convertAnother(((Collection) value).size());
-						writer.endNode();
 					}
 					context.convertAnother(value);
 				} else {

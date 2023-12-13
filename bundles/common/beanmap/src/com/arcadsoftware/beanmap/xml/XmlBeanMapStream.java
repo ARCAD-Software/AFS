@@ -94,8 +94,8 @@ public class XmlBeanMapStream extends XStreamCompact {
 	 */
 	public XmlBeanMapStream(BeanMapList listToUpdate) {
 		super();
-		alias(TAG_LIST,listToUpdate.getClass());
-		alias(TAG_BEAN,BeanMap.class);
+		alias(TAG_LIST, listToUpdate.getClass());
+		alias(TAG_BEAN, BeanMap.class);
 		BeanMapConverter beanConverter = new BeanMapConverter(getMapper());
 		beanConverter.setListConverter(new BeanMapListConverter(getMapper()));
 		registerConverter(beanConverter);
