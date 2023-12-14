@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AFS - Client User Management Interface
 Bundle-SymbolicName: com.arcadsoftware.afs.client.users
-Bundle-Version: 1.4.3.qualifier
+Bundle-Version: 1.4.3
 Bundle-Activator: com.arcadsoftware.afs.client.users.internal.Activator
 Bundle-ClassPath: .
 Require-Bundle: org.eclipse.ui;resolution:=optional,
