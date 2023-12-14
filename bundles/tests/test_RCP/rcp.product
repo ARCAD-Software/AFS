@@ -62,7 +62,6 @@
       <plugin id="com.arcadsoftware.rest"/>
       <plugin id="com.arcadsoftware.ssh"/>
       <plugin id="com.ibm.icu"/>
-      <plugin id="javax.inject"/>
       <plugin id="javax.servlet"/>
       <plugin id="javax.xml"/>
       <plugin id="org.apache.batik.css"/>
@@ -155,7 +154,6 @@
       <plugin id="org.eclipse.ui.views"/>
       <plugin id="org.eclipse.ui.views.log"/>
       <plugin id="org.eclipse.ui.workbench"/>
-      <plugin id="org.glassfish.hk2.external.javax.inject"/>
       <plugin id="org.restlet.base"/>
       <plugin id="org.restlet.server" fragment="true"/>
       <plugin id="org.tukaani.xz"/>
