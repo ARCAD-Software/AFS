@@ -568,18 +568,13 @@ public abstract class BaseResource extends ServerResource {
 		if (getRequest() != null) {
 			Representation entity = getRequest().getEntity();
 			if ((entity != null) && entity.isAvailable() && !(entity instanceof EmptyRepresentation)) {
-
-				// Header possibly added by proxies when the body of a POST/PUT request is empty, uses the URL params
-				// instead
+				// Header possibly added by proxies when the body of a POST/PUT request is empty, uses the URL params instead
 				if ("none".equals(requestForm.getFirstValue("_empty_"))) { //$NON-NLS-1$ //$NON-NLS-2$
 					requestForm = getRequest().getResourceRef().getQueryAsForm();
 				}
-
 				// Build the form from the body of the request (entity)
 				if (entity.getMediaType().equals(MediaType.APPLICATION_JSON)) {
 					// JSON Content, parse body to instantiate the Form
-					// JSONObject obj = new JSONObject(entity.getText());
-
 					try {
 						// Usage of getText could be an issue for large bodies, can throw OutOfMemory error if the body is too large and cannot be processed
 						// Do we manage what is sent ? Do we need to find an alternative of is this sufficient ?
@@ -601,20 +596,12 @@ public abstract class BaseResource extends ServerResource {
 								}
 							}
 						}
-					} catch (IOException e) {
-						e.printStackTrace(); // return error to user
-					} catch (JSONException e) {
-						e.printStackTrace();
+					} catch (IOException | JSONException e) {
+						throw new ResourceException(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE, e.getLocalizedMessage());
 					}
-
 				} else if (entity.getMediaType().equals(MediaType.APPLICATION_WWW_FORM)
 						|| entity.getMediaType().equals(MediaType.MULTIPART_FORM_DATA)) {
 					// Form-URL-Encoded format for HTML forms
-
-					// "application/x-www-form-urlencoded", "Web form (URL encoded)" -> apparently format is
-					// param1=data1&param2=data2&param3=data3
-					// Goes in there with sample bullshit params, should be OK
-
 					requestForm = new Form(entity);
 				} else if (entity.getMediaType().equals(MediaType.APPLICATION_XML)) {
 					// If the content is XML, this code is for backward compatibility
@@ -626,19 +613,6 @@ public abstract class BaseResource extends ServerResource {
 				} else {
 					throw new ResourceException(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE);
 				}
-
-				// multipart/form-data ? Option form-data in postman
-				// Files ? BinResource
-
-				// Extract from entity depending on media type
-				// MediaType.APPLICATION_WWW_FORM (form-url-encoded) default format of post with html forms -> default
-				// form
-				// JSON
-				// Does not support XML, throw ressourceexception(code http)
-				
-				// File type application/octet-stream
-				
-
 			} else {
 				// The body is empty and the form content is in the URL
 				requestForm = getRequest().getResourceRef().getQueryAsForm();
