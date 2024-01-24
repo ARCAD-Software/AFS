@@ -241,7 +241,13 @@ public class FileResource extends UserLinkedResource {
 	 * This method record the file onto the file system.
 	 * 
 	 * <p>
-	 * Default implementation support a direct Octet stream format and a 
+	 * Default implementation support a direct Octet stream, XML and JSON format, along with Multipart Form data.
+	 * 
+	 * <p>
+	 * If an error occurs the response status is set to a value diferent from 201 (Status.SUCCESS_CREATED), if this
+	 * method is overrided this is the responsability of the overrider to check this status before to process
+	 * to post-operation.
+	 * 
 	 * @param entity
 	 * @param variant
 	 */
@@ -249,8 +255,13 @@ public class FileResource extends UserLinkedResource {
 		if (file == null) {
 			return;
 		}
+		if (entity == null) {
+			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+			return;
+		}
 		if (MediaType.APPLICATION_OCTET_STREAM.equals(variant.getMediaType(), true) ||
-			MediaType.APPLICATION_XML.equals(variant.getMediaType(), true) ||
+				MediaType.APPLICATION_XML.equals(variant.getMediaType(), true) ||
+				MediaType.APPLICATION_JSON.equals(variant.getMediaType(), true) ||
 			((gmt != null) && gmt.equals(variant.getMediaType(), true))) {
 			try {
 				// Delete any existing file.
@@ -310,19 +321,16 @@ public class FileResource extends UserLinkedResource {
 				setStatus(Status.SERVER_ERROR_INTERNAL);
 			}
 		} else if (MediaType.MULTIPART_FORM_DATA.equals(variant.getMediaType(), true)) {
-
 			// The Apache FileUpload project parses HTTP requests which
 			// conform to RFC 1867, "Form-based File Upload in HTML". That
 			// is, if an HTTP request is submitted using the POST method,
 			// and with a content type of "multipart/form-data", then
 			// FileUpload can parse that request, and get all uploaded files
 			// as FileItem.
-
 			// 1/ Create a factory for disk-based file items
 			DiskFileItemFactory factory = new DiskFileItemFactory();
 			factory.setSizeThreshold(1000240);
 			factory.setRepository(new File("_tempdir")); //$NON-NLS-1$
-
 			// 2/ Create a new file upload handler based on the Restlet
 			// FileUpload extension that will parse Restlet requests and
 			// generates FileItems.
@@ -371,9 +379,9 @@ public class FileResource extends UserLinkedResource {
 	 * to initialize its state according to the File state (Read access, type and modification date). 
 	 * 
 	 * <p>
-	 * Use this method carrefully, if <code>getPath()</code> and <code>getFile(String)</code> return 
+	 * Use this method carefully, if <code>getPath()</code> and <code>getFile(String)</code> return 
 	 * a viable file (as does the default implementation and that <code>setPath(String)</code> is not 
-	 * called into the <code>doInit()</code> method, then the Resource initialisation may be a mess.
+	 * called into the <code>doInit()</code> method, then the Resource initialization may be a mess.
 	 * 
 	 * @param file the new file to point to.
 	 * @see #getFile(String)
