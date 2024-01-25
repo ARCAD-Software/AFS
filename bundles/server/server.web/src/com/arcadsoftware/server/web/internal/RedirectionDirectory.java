@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Dictionary;
 import java.util.Enumeration;
 
 import org.restlet.Context;
@@ -35,9 +36,11 @@ public class RedirectionDirectory extends Directory {
 
 	final private String rootDirName;
 	final private Activator activator;
+	final private String path;
 
-	public RedirectionDirectory(Activator activator, Context context, String rootDirName, String rootUri) {
+	public RedirectionDirectory(Activator activator, Context context, String path, String rootDirName, String rootUri) {
 		super(context, rootUri);
+		this.path = path;
 		this.rootDirName = rootDirName;
 		this.activator = activator;
 	}
@@ -50,6 +53,20 @@ public class RedirectionDirectory extends Directory {
 		if ((err >= 300) && (err < 1000)) {
 			String baseName = "web/" + rootDirName + '/'; //$NON-NLS-1$
 			String name = Integer.toString(err);
+			// Configuration based redirection.
+			Dictionary<String, Object> conf = activator.getCurrentConfiguration();
+			if (conf != null) {
+				Object redirection = conf.get(rootDirName + '.' + name + ".redirect"); //$NON-NLS-1$
+				if (!(redirection instanceof String)) {
+					redirection = conf.get(rootDirName + ".default.redirect"); //$NON-NLS-1$
+				}
+				if (redirection instanceof String) {
+					response.setStatus(Status.REDIRECTION_TEMPORARY);
+					response.setLocationRef(path + (String) redirection);
+					return;
+				}
+			}
+			// Resource based redirection.
 			URL url = getEntry(baseName, name + ".htm"); //$NON-NLS-1$
 			if (url == null) {
 				url = getEntry(baseName, name + ".HTM"); //$NON-NLS-1$
