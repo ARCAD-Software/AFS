@@ -63,7 +63,7 @@ public class WebBranch implements IBranch {
 						if (defpath == null) {
 							defpath = element.getName();
 						}
-						rl.add(router.attach(path, new RedirectionDirectory(activator, context, element.getName(), element.toURI().toURL().toExternalForm())));
+						rl.add(router.attach(path, new RedirectionDirectory(activator, context, path, element.getName(), element.toURI().toURL().toExternalForm())));
 						activator.info("Attach a web container to local path: " + path);
 					}
 				} catch (IOException e) {
@@ -78,8 +78,10 @@ public class WebBranch implements IBranch {
 							File element = activator.toFile(urls.nextElement());
 							if (element != null) {
 								if (element.isDirectory()) {
-									rl.add(router.attach('/' + element.getName() + '/', new RedirectionDirectory(activator, context, defpath, element.toURI().toURL().toExternalForm())));
+									String path = '/' + element.getName() + '/';
+									rl.add(router.attach(path, new RedirectionDirectory(activator, context, path, defpath, element.toURI().toURL().toExternalForm())));
 								} else if (isNotErrorFile(element)) {
+									// FIXME this resource does not provide an error redirection mechanism...
 									rl.add(router.attach('/' + element.getName(), new FileRestlet(context, element)));
 								}
 							}
@@ -99,7 +101,7 @@ public class WebBranch implements IBranch {
 			return false;
 		}
 		String s = element.getName();
-		if ((s.lastIndexOf('.') == 3) && ('4' == s.charAt(0)) && Character.isDigit(s.charAt(1)) && Character.isDigit(s.charAt(2))) {
+		if ((s.lastIndexOf('.') == 3) && (('3' == s.charAt(0)) || ('4' == s.charAt(0)) || ('5' == s.charAt(0))) && Character.isDigit(s.charAt(1)) && Character.isDigit(s.charAt(2))) {
 			return false;
 		}
 		return true;
