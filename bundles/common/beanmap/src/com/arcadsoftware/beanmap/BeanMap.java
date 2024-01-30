@@ -1378,14 +1378,14 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 			if (value != null) {
 				if (ISODateFormater.mayIsoDate(value)) {
 					try {
-						put(key,ISODateFormater.toDate(value));
+						put(key, ISODateFormater.toDate(value));
 					} catch (ParseException e) {
-						put(key,value);
+						put(key, value);
 					}
 				} else if ("true".equalsIgnoreCase(value)) { //$NON-NLS-1$
-					put(key,Boolean.TRUE);
+					put(key, Boolean.TRUE);
 				} else if ("false".equalsIgnoreCase(value)) { //$NON-NLS-1$
-					put(key,Boolean.FALSE);
+					put(key, Boolean.FALSE);
 				} else {
 					if (value.startsWith("<long>") && value.endsWith("</long>")) { //$NON-NLS-1$ //$NON-NLS-2$
 						try {
@@ -1395,13 +1395,20 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 							// FIXME Journalizer l'erreur quand on est en debug !
 						}
 					}
-					try {
-						put(key,Integer.valueOf(value));
-					} catch (NumberFormatException e) {
+					// TODO a lot of "string" value which look like number shoulc not be converted in numbers...
+					String lkey = key.toLowerCase();
+					if (lkey.contains("version") || //$NON-NLS-1$
+							lkey.contains("phone")) { //$NON-NLS-1$
+						put(key, value);
+					} else {
 						try {
-							put(key,Float.valueOf(value));
-						} catch (NumberFormatException ee) {
-							put(key,value);
+							put(key, Integer.valueOf(value));
+						} catch (NumberFormatException e) {
+							try {
+								put(key, Float.valueOf(value));
+							} catch (NumberFormatException ee) {
+								put(key, value);
+							}
 						}
 					}
 				}
