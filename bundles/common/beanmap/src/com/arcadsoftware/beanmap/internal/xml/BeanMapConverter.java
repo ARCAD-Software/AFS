@@ -268,7 +268,10 @@ public class BeanMapConverter implements Converter {
 			} catch (ParseException e) {}
 		}
 		// Remove tag that looks like number but are not numbers.
-		if (!name.startsWith("phone")) { //$NON-NLS-1$
+		// TODO a lot of "string" value which look like number shoulc not be converted in numbers...
+		final String lname = name.toLowerCase();
+		if (!lname.contains("phone") && //$NON-NLS-1$
+				!lname.contains("version")) { //$NON-NLS-1$
 			// Tentative de détection d'un integer...
 			try {
 				return new Integer(value);

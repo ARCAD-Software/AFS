@@ -80,10 +80,6 @@ public abstract class BeanMapParentResource extends UserLinkedResource {
 		if (!getAllowedMethods().contains(getMethod())) {
 			throw new ResourceException(Status.CLIENT_ERROR_METHOD_NOT_ALLOWED);
 		}
-		/*if (entity instanceof EmptyRepresentation) {
-			setStatus(Status.SUCCESS_NO_CONTENT);
-			return null;
-		}*/
 		Form form = getRequestForm();
 		BeanMap result = post(getBeanMap(form));
 		if (result == null) {
