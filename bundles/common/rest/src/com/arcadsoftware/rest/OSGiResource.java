@@ -13,15 +13,20 @@
  *******************************************************************************/
 package com.arcadsoftware.rest;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.cm.Configuration;
+import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.restlet.data.MediaType;
@@ -85,6 +90,28 @@ public abstract class OSGiResource extends BaseResource {
 			return (OSGiApplication) getApplication();
 		}
 		return null;
+	}
+
+	/**
+	 * Get the OSGi configuration identified by the given PID.
+	 * 
+	 * @param pid The OSGi configuration PID.
+	 * @return null if this configuration does not exist.
+	 */
+	protected final Dictionary<String, Object> getOSGiConfiguration(String pid) {
+		ConfigurationAdmin ca = getOSGiService(ConfigurationAdmin.class);
+		if (ca == null) {
+			return null;
+		}
+		try {
+			Configuration c = ca.getConfiguration(pid, null);
+			if (c == null) {
+				return new Hashtable<String, Object>();
+			}
+			return c.getProperties();
+		} catch (IOException e) {
+			return null;
+		}
 	}
 	
 	/**
