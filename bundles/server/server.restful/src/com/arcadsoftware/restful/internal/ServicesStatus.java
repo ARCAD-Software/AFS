@@ -20,6 +20,8 @@ import org.restlet.data.CharacterSet;
 import org.restlet.data.Language;
 import org.restlet.data.MediaType;
 import org.restlet.data.Preference;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.Status;
@@ -38,7 +40,7 @@ public class ServicesStatus extends StatusService {
 
 	private static final List<MediaType> mediatypes = new ArrayList<MediaType>();
 	private static final XStreamCompact XS = new XStreamCompact(ServicesStatus.class.getClassLoader());
-	
+
 	static {
 		mediatypes.add(MediaType.TEXT_HTML);
 		mediatypes.add(MediaType.APPLICATION_XML);
@@ -48,9 +50,9 @@ public class ServicesStatus extends StatusService {
 		XS.alias("message", Status.class); //$NON-NLS-1$
 		XS.registerConverter(new StatusConvertor());
 	}
-	
+
 	private final Activator activator;
-	
+
 	public ServicesStatus(Activator activator) {
 		super();
 		this.activator = activator;
@@ -61,7 +63,8 @@ public class ServicesStatus extends StatusService {
 		MediaType mediaType = request.getClientInfo().getPreferredMediaType(mediatypes);
 		if (mediaType != null) {
 			if (MediaType.APPLICATION_XHTML.equals(mediaType, true) || MediaType.TEXT_HTML.equals(mediaType, true)) {
-				StringBuilder sb = new StringBuilder("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\"><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" /><link href=\"/css/service/status.css\" rel=\"stylesheet\" /><title>Error "); //$NON-NLS-1$
+				StringBuilder sb = new StringBuilder(
+						"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\"><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" /><link href=\"/css/service/status.css\" rel=\"stylesheet\" /><title>Error "); //$NON-NLS-1$
 				sb.append(status.getCode());
 				sb.append("</title></head><body><h2>"); //$NON-NLS-1$
 				sb.append(status.getReasonPhrase());
@@ -95,24 +98,25 @@ public class ServicesStatus extends StatusService {
 				}
 				sb.append("</p><p>&nbsp;</p>"); //$NON-NLS-1$
 				sb.append("</body></html>"); //$NON-NLS-1$
-				return new StringRepresentation(sb,MediaType.TEXT_HTML,Language.ENGLISH_US,CharacterSet.UTF_8);
+				return new StringRepresentation(sb, MediaType.TEXT_HTML, Language.ENGLISH_US, CharacterSet.UTF_8);
 			}
-			if (MediaType.APPLICATION_JSON.equals(mediaType, true) || hasJSON(request.getClientInfo().getAcceptedMediaTypes())) {
-				StringBuilder sb = new StringBuilder();
-				sb.append("{\"name\":\"") //$NON-NLS-1$
-					.append(status.getReasonPhrase().replace("\"", "\\\"")) //$NON-NLS-1$ //$NON-NLS-2$
-					.append("\",\"code\":\"") //$NON-NLS-1$
-					.append(status.getCode());
-				if (status.getUri() != null) {
-					sb.append("\",\"href\":\"") //$NON-NLS-1$
-						.append(status.getUri());
+			if (MediaType.APPLICATION_JSON.equals(mediaType, true)
+					|| hasJSON(request.getClientInfo().getAcceptedMediaTypes())) {
+				JSONObject o = new JSONObject();
+				try {
+					o.put("name", status.getReasonPhrase()); //$NON-NLS-1$
+					o.put("code", status.getCode()); //$NON-NLS-1$
+					if (status.getUri() != null) {
+						o.put("href", status.getUri()); //$NON-NLS-1$
+					}
+					if (status.getDescription() != null) {
+						o.put("description", status.getDescription());
+					}
+					return new StringRepresentation(o.toString(), MediaType.APPLICATION_JSON, Language.ENGLISH_US,
+							CharacterSet.UTF_8);
+				} catch (JSONException e) {
+					activator.error("Unable to generate the JSON representation of the error message: " + status.toString(), e);
 				}
-				if (status.getDescription() != null) {
-					sb.append("\",\"description\":\"") //$NON-NLS-1$
-						.append(status.getDescription().replace("\"", "\\\"")); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-				sb.append("\"}"); //$NON-NLS-1$
-				return new StringRepresentation(sb,MediaType.APPLICATION_JSON,Language.ENGLISH_US,CharacterSet.UTF_8);
 			}
 			if (MediaType.APPLICATION_XML.equals(mediaType, true)) {
 				return new XMLRepresentation(XS.toXML(status), mediaType);
@@ -122,8 +126,8 @@ public class ServicesStatus extends StatusService {
 	}
 
 	private boolean hasJSON(List<Preference<MediaType>> acceptedMediaTypes) {
-		// corrige un bug de JQuery...
-		for(Preference<MediaType> mtp:acceptedMediaTypes) {
+		// May go through an unqualified response, as long as JSON was acceptable, we return a JSON response...
+		for (Preference<MediaType> mtp : acceptedMediaTypes) {
 			if (MediaType.APPLICATION_JSON.equals(mtp.getMetadata(), true)) {
 				return true;
 			}
@@ -138,5 +142,5 @@ public class ServicesStatus extends StatusService {
 		}
 		return super.toStatus(throwable, request, response);
 	}
-	
+
 }
