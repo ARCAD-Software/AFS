@@ -30,6 +30,7 @@ import java.util.Properties;
 import javax.net.SocketFactory;
 
 import org.restlet.Request;
+import org.restlet.data.ChallengeResponse;
 
 import com.arcadsoftware.rest.connection.ConnectionUserBean;
 import com.arcadsoftware.rest.connection.IBasicAuthentificationService;
@@ -64,6 +65,7 @@ import com.unboundid.ldap.sdk.SearchResultEntry;
 import com.unboundid.ldap.sdk.SearchScope;
 import com.unboundid.ldap.sdk.SimpleBindRequest;
 import com.unboundid.ldap.sdk.StartTLSPostConnectProcessor;
+import com.unboundid.ldap.sdk.controls.PasswordExpiredControl;
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
 import com.arcadsoftware.crypt.ConfiguredSSLContext;
@@ -71,6 +73,10 @@ import com.arcadsoftware.crypt.ConfiguredSSLContextException;
 import com.arcadsoftware.crypt.Crypto;
 import com.arcadsoftware.metadata.MetaDataAttribute;
 import com.arcadsoftware.metadata.MetaDataEntity;
+import com.arcadsoftware.metadata.ReferenceLine;
+import com.arcadsoftware.metadata.criteria.EqualCriteria;
+import com.arcadsoftware.metadata.criteria.IdEqualCriteria;
+import com.arcadsoftware.metadata.criteria.OrCriteria;
 
 /* TODO identifier AD !  https://ldapwiki.com/wiki/Determine%20LDAP%20Server%20Vendor
  */
@@ -87,7 +93,7 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 	private static final String PROP_CONNECTIONMAXAGE = "connection.pool.max.age"; //$NON-NLS-1$
 	private static final String PROP_CONNECTIONFAILOVERMAXAGE = "connection.failover.max.age"; //$NON-NLS-1$
 	private static final String PROP_TIMEOUT = "timeout"; //$NON-NLS-1$
-	private static final String PROP_BINDTYPE = "bind.type";
+	private static final String PROP_BINDTYPE = "bind.type"; //$NON-NLS-1$
 	protected static final String PROP_PWDATTRIBUTE = "attribute.password"; //$NON-NLS-1$
 	protected static final String PROP_LOGINATTRIBUTE = "attribute.login"; //$NON-NLS-1$
 	protected static final String PROP_DNLOGIN = "dn.login.pattern"; //$NON-NLS-1$
@@ -115,6 +121,12 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 	private static final Control POLICYHINTSCONTROL = new Control("1.2.840.113556.1.4.2066", false, //$NON-NLS-1$
 			new ASN1OctetString(new byte[] { 48, (byte) 132, 0, 0, 0, 3, 2, 1, 1 }));
 
+	/**
+	 * Return true if the configuration contain the minimal set of option to work correctly.
+	 * 
+	 * @param props
+	 * @return
+	 */
 	public static boolean isConfigurationComplete(Dictionary<String, Object> props) {
 		return (!getProp(props, PROP_HOST, "").trim().isEmpty() || //$NON-NLS-1$
 				!getProp(props, PROP_SERVER, "").trim().isEmpty() || //$NON-NLS-1$
@@ -122,6 +134,20 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 				!getProp(props, PROP_DNBASE, "").trim().isEmpty() && //$NON-NLS-1$
 				(!getProp(props, PROP_LOGINATTRIBUTE, "").trim().isEmpty() || //$NON-NLS-1$
 				 !getProp(props, PROP_DNLOGIN, "").trim().isEmpty()); //$NON-NLS-1$
+	}
+
+	protected static String getADErrorCode(String detail) {
+		if ((detail != null) && !detail.isEmpty()) {
+			int i = detail.indexOf(", data "); //$NON-NLS-1$
+			if (i > 0) {
+				i += 7;
+				int j = detail.indexOf(',', i);
+				if (j > i) {
+					return detail.substring(i, j).trim();
+				}
+			}
+		}
+		return null;
 	}
 
 	private static String getProp(Dictionary<String, Object> props, String name, String defValue) {
@@ -190,6 +216,7 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 	private final String realm;
 	private final String kdc;
 	private final boolean autoImport;
+	private final OrCriteria autoImportProfiles;
 
 	public LdapAuthentificationService(Activator activator, Dictionary<String, Object> props)
 			throws ConfiguredSSLContextException, LDAPException {
@@ -224,6 +251,20 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 		kdc = getProp(props, PROP_KDCADDRESS, (String) null);
 		realm = getProp(props, PROP_REALM, (String) null);
 		userImportEnabled = (getProp(props, PROP_USERIMPORT_ENABLED, false)) && (loginAttribute != null) && (base != null);
+		autoImportProfiles = new OrCriteria();
+		for (String p: getProp(props, PROP_USERAUTOIMPORTPROFILE, "").split(" ")) { //$NON-NLS-1$ //$NON-NLS-2$
+			if ((p != null) && !p.isEmpty()) {
+				if ((p.charAt(0) == '"') && (p.charAt(p.length() - 1) == '"')) {
+					autoImportProfiles.add(new EqualCriteria("code", p.substring(1, p.length() - 1))); //$NON-NLS-1$
+				} else {
+					try {
+						autoImportProfiles.add(new IdEqualCriteria(Integer.parseInt(p)));
+					} catch (NumberFormatException e) {
+						autoImportProfiles.add(new EqualCriteria("code", p)); //$NON-NLS-1$
+					}
+				}
+			}
+		}
 		switch (getProp(props, PROP_BINDTYPE, "direct").toLowerCase()) { //$NON-NLS-1$
 		case "1": //$NON-NLS-1$
 		case "s": //$NON-NLS-1$
@@ -436,12 +477,15 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 
 	@Override
 	public IConnectionCredential generateCredential(Request request, String identifier) {
-		final int id = activator.getAuth(identifier);
+		int id = activator.getAuth(identifier);
 		if (id > 0) {
 			return new LdapConnectionCredential(this, identifier, id);
 		}
 		if (autoImport) {
-			
+			id = autoImportUser(identifier, request.getChallengeResponse());
+			if (id > 0) {
+				return new LdapConnectionCredential(this, identifier, id);
+			}
 		} else if (ConnectionUserBean.STANDALONECONNECTIONS != null) {
 			return new LdapConnectionCredential(this, identifier, -1);
 		}
@@ -697,35 +741,8 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 	}
 
 	protected BeanMapList listSelectableUsers(LDAPConnection cn, String searchPattern, int countLimit, int timeLimit, Map<String, String> specialUserMap) throws LDAPException {
-		MetaDataEntity user = MetaDataEntity.loadEntity(Activator.TYPE_USER);
-		if (user == null) {
-			return new BeanMapList();
-		}
 		// Load attributes mapping...
-		// Initialize with OSGi configuration...
-		HashMap<String, List<String>> map = new HashMap<String, List<String>>(userMaps);
-		// Patch with User entity declaration...
-		for (MetaDataAttribute a: user.getAttributes().values()) {
-			String ldapa = a.getMetadata().getString("ldap"); //$NON-NLS-1$
-			if (ldapa != null) {
-				addUserMap(map, a.getCode(), ldapa.trim());
-			}
-		}
-		// Patch with new configuration file...
-		File conf = getMapConfFile();
-		if (conf.isFile()) {
-			try (FileInputStream fis = new FileInputStream(conf)) {
-				Properties props = new Properties();
-				props.load(fis);
-				for(Entry<Object, Object> e: props.entrySet()) {
-					if ((e.getKey() != null) && (e.getValue() != null)) {
-						addUserMap(map, e.getKey().toString(), e.getValue().toString().trim());
-					}
-				}
-			} catch (IOException e) {
-				activator.error("Error while loading User Entity Maping file: " + e.getLocalizedMessage(), e);
-			}
-		}
+		HashMap<String, List<String>> map = getUserMapping();
 		// Add parameter map...
 		if (specialUserMap != null) {
 			for (Entry<String, String> e : specialUserMap.entrySet()) {
@@ -740,7 +757,8 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 		Filter filter = Filter.create(searchPattern);
 		// |ML] why if loginpatter= "%s" use ONE as scope ???
 		final SearchScope scope = SearchScope.SUB;
-		SearchResult sr = cn.search(new SearchRequest(null, base, scope, DereferencePolicy.ALWAYS, countLimit, timeLimit, false, filter, SearchRequest.ALL_USER_ATTRIBUTES));
+		SearchResult sr = cn.search(new SearchRequest(null, base, scope, DereferencePolicy.ALWAYS, //
+				countLimit, timeLimit, false, filter, SearchRequest.ALL_USER_ATTRIBUTES));
 		BeanMapList result = new BeanMapList(sr.getEntryCount());
 		int userID = 1;
 		for (SearchResultEntry entry: sr.getSearchEntries()) {
@@ -778,7 +796,165 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 		return result;
 	}
 
+	private HashMap<String, List<String>> getUserMapping() {
+		// Load attributes mapping...
+		// Initialize with OSGi configuration...
+		final HashMap<String, List<String>> map = new HashMap<String, List<String>>(userMaps);
+		// Patch with User entity declaration...
+		MetaDataEntity user = MetaDataEntity.loadEntity(Activator.TYPE_USER);
+		if (user == null) {
+			return map;
+		}
+		for (MetaDataAttribute a: user.getAttributes().values()) {
+			String ldapa = a.getMetadata().getString("ldap"); //$NON-NLS-1$
+			if (ldapa != null) {
+				addUserMap(map, a.getCode(), ldapa.trim());
+			}
+		}
+		// Patch with the new configuration file...
+		File conf = getMapConfFile();
+		if (conf.isFile()) {
+			try (FileInputStream fis = new FileInputStream(conf)) {
+				Properties props = new Properties();
+				props.load(fis);
+				for(Entry<Object, Object> e: props.entrySet()) {
+					if ((e.getKey() != null) && (e.getValue() != null)) {
+						addUserMap(map, e.getKey().toString(), e.getValue().toString().trim());
+					}
+				}
+			} catch (IOException e) {
+				activator.error("Error while loading User Entity Maping file: " + e.getLocalizedMessage(), e);
+			}
+		}
+		return map;
+	}
+
 	protected boolean isAlreadybinded() {
 		return alreadybinded;
+	}
+
+	private int autoImportUser(final String identifier, final ChallengeResponse challengeResponse) {
+		synchronized (this) {
+			if ((identifier == null) || (challengeResponse == null)) {
+				return 0;
+			}
+			final char[] secret = challengeResponse.getSecret();
+			LDAPConnection cn = getConnection();
+			LDAPException e = null;
+			try {
+				BindResult br = bind(cn, identifier, secret);
+				if (br == null) {
+					return 0;
+				}
+				// research the user information for importation.
+				String dn = br.getMatchedDN();
+				if (dn == null) {
+					dn = getUserDN(cn, identifier);
+					if (dn == null) {
+						activator.error("Unable to auto-import the user \"" + identifier + "\". The LDAP congifuration is unable to identify the LDAP user only from his \"login\"."); 
+						return 0;
+					}
+				}
+				SearchResultEntry entry = cn.getEntry(dn);
+				if (entry == null) {
+					activator.error("Unable to auto-import the user \"" + identifier + "\". The user may not have the permission to read this own entry."); 
+					return 0;
+				}
+				String login = entry.getAttributeValue(loginAttribute);
+				// Ignore login already used... this should not append except in a concurrent access...
+				if ((login == null) || (activator.getAuth(login) > 0)) {
+					activator.info("User auto-import cancelled due to concurent operation..."); 
+					return 0;
+				}
+				// Initialize User object.
+				BeanMap user = new BeanMap(Activator.TYPE_USER);
+				for (Entry<String, List<String>> m: getUserMapping().entrySet()) {
+					for (String att : m.getValue()) {
+						// Add constants values (String, boolean or integer).
+						if (att.charAt(0) == '"') { // Constant String Value
+							user.put(m.getKey(), att.substring(1, att.length() -1));
+							break;
+						}
+						if ("true".equalsIgnoreCase(att) || "false".equalsIgnoreCase(att)) { //$NON-NLS-1$ //$NON-NLS-2$
+							user.put(m.getKey(), "true".equalsIgnoreCase(att)); //$NON-NLS-1$
+							break;
+						}
+						try {
+							user.put(m.getKey(), Integer.parseInt(att));
+							break;
+						} catch (NumberFormatException ee) {}
+						String val = entry.getAttributeValue(att);
+						if (val != null) {
+							user.put(m.getKey(), val);
+							break;
+						}
+					}
+				}
+				if (user.isEmpty()) {
+					activator.warn("Unable to auto-import the user \"" + identifier + "\". No attribute mapping found for this entry."); 
+					return 0;
+				}
+				// Store the new user in the database...
+				MetaDataEntity entityUser = MetaDataEntity.loadEntity(Activator.TYPE_USER);
+				if (entityUser == null) {
+					activator.info("User auto-import cancelled due to unexistant USER entity int he database..."); 
+					return 0;
+				}
+				MetaDataEntity entityLdapauth = MetaDataEntity.loadEntity(Activator.LDAPAUTH);
+				if (entityLdapauth == null) {
+					activator.info("User auto-import cancelled due to unexistant LDAPAUTH entity int he database... Check your server configuration."); 
+					return 0;
+				}
+				user = entityUser.dataCreate(user);
+				// Associate the configured profiles...
+				MetaDataEntity entityProfile = MetaDataEntity.loadEntity("profile"); //$NON-NLS-1$
+				if ((entityProfile != null) && !autoImportProfiles.isEmpty()) {
+					BeanMapList profiles = entityProfile.dataSelection(new ArrayList<ReferenceLine>(), false, autoImportProfiles, true, null, null, 0, -1);
+					if ((profiles != null) && !profiles.isEmpty()) {
+						for (BeanMap profile: profiles) {
+							entityUser.dataLinkTo(user, "profiles", profile);
+							// TODO add a method dataLinkTo(BeanMap, linkCode, ISearchCriteria) to crate a multi-association in one operation.
+						}
+					}
+				}
+				// TODO Define a mapping between database profiles and LDAP groups and use the Entry linked groups to link the user to the corresponding profile.
+				// Store the LDAP identifier...
+				BeanMap auth =  new BeanMap(Activator.LDAPAUTH);
+				auth.put(Activator.LDAPAUTH_USERID, user.getId());
+				auth.put(Activator.LDAPAUTH_LOGIN, login);
+				entityLdapauth.dataCreate(auth);
+				// Update the cache...
+				activator.setAuth(auth, null, 0);
+				return user.getId();
+			} catch (LDAPException ee) {
+				e = ee;
+				boolean locked = false;
+				try {
+					if (PasswordExpiredControl.get(e.toLDAPResult()) != null) {
+						locked = true;
+					}
+				} catch (LDAPException e1) {
+					activator.info(e1);
+				}
+				ResultCode rc = e.getResultCode();
+				if (rc == ResultCode.INVALID_CREDENTIALS) {
+					// https://ldapwiki.com/wiki/Common%20Active%20Directory%20Bind%20Errors
+					String hex = getADErrorCode(e.getDiagnosticMessage());
+					if ("533".equals(hex) || "773".equals(hex) || "80090346".equals(hex) || //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							"701".equals(hex) ||  "530".equals(hex)) { //$NON-NLS-1$ //$NON-NLS-2$
+						locked = true;
+					}
+				}
+				if (locked) {
+					activator.info("LDAP User auto-import error, the user is locked: " + ee.getLocalizedMessage());
+					activator.debug(ee);
+				} else {
+					activator.error("LDAP User auto-import error, unexpected error: " + ee.getLocalizedMessage());
+				}
+				return 0;
+			} finally {
+				closeConnection(cn, e);
+			}
+		}
 	}
 }

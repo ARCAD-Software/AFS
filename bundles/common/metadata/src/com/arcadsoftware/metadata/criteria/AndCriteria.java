@@ -190,6 +190,13 @@ public class AndCriteria extends AbstractSearchCriteria implements Cloneable {
 		criterias.add(criteria);
 	}
 
+	/**
+	 * Return true if this conjunction is empty.
+	 * @return
+	 */
+	public boolean isEmpty() {
+		return (criterias == null) || criterias.isEmpty();
+	}
 	
 	public boolean test(BeanMap bean, IConnectionUserBean currentUser) {
 		for(ISearchCriteria ci:criterias) {

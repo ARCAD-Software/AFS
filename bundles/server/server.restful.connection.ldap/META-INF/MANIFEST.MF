@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: LDAP Connection
 Bundle-SymbolicName: com.arcadsoftware.server.restful.connection.ldap;singleton:=true
-Bundle-Version: 2.4.3.qualifier
+Bundle-Version: 2.4.4.qualifier
 Bundle-Activator: com.arcadsoftware.restful.connection.ldap.Activator
 Bundle-Vendor: ARCAD Software
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
@@ -10,7 +10,7 @@ Import-Package: com.arcadsoftware.beanmap;version="[2.0.0,3.0.0)",
  com.arcadsoftware.beanmap.xml;version="[2.0.0,3.0.0)",
  com.arcadsoftware.crypt;version="[1.0.0,2.0.0)",
  com.arcadsoftware.metadata;version="[1.0.0,2.0.0)",
- com.arcadsoftware.metadata.criteria;version="[1.0.0,2.0.0)",
+ com.arcadsoftware.metadata.criteria;version="[1.0.4,2.0.0)",
  com.arcadsoftware.osgi;version="[1.0.0,2.0.0)",
  com.arcadsoftware.rest;version="[3.0.0,4.0.0)",
  com.arcadsoftware.rest.connection;version="[2.0.0,3.0.0)",

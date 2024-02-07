@@ -84,7 +84,7 @@ public class LdapConnectionCredential implements IConnectionCredential, IUpdatab
 			ResultCode rc = e.getResultCode();
 			if (rc == ResultCode.INVALID_CREDENTIALS) {
 				// https://ldapwiki.com/wiki/Common%20Active%20Directory%20Bind%20Errors
-				String hex = getADErrorCode(e.getDiagnosticMessage());
+				String hex = LdapAuthentificationService.getADErrorCode(e.getDiagnosticMessage());
 				if ("533".equals(hex) || "773".equals(hex) || "80090346".equals(hex) || //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						"701".equals(hex) ||  "530".equals(hex)) { //$NON-NLS-1$ //$NON-NLS-2$
 					locked = true;
@@ -96,20 +96,6 @@ public class LdapConnectionCredential implements IConnectionCredential, IUpdatab
 			parent.closeConnection(cn, e);
 		}
 		return false;
-	}
-
-	private String getADErrorCode(String detail) {
-		if ((detail != null) && !detail.isEmpty()) {
-			int i = detail.indexOf(", data "); //$NON-NLS-1$
-			if (i > 0) {
-				i += 7;
-				int j = detail.indexOf(',', i);
-				if (j > i) {
-					return detail.substring(i, j).trim();
-				}
-			}
-		}
-		return null;
 	}
 	
 	@Override
@@ -166,7 +152,7 @@ public class LdapConnectionCredential implements IConnectionCredential, IUpdatab
 			if (dn == null) {
 				dn = parent.getUserDN(cn, login);
 				if (dn == null) {
-					return "The LDAP congifuration is unable to identify the LDAP user only with this \"login\"."; 
+					return "The LDAP congifuration is unable to identify the LDAP user only from his \"login\"."; 
 				}
 			}
 			String error = parent.changePWD(cn, dn, oldPassword, newPassword);

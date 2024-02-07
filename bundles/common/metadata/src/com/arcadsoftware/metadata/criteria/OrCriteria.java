@@ -149,6 +149,13 @@ public class OrCriteria extends AbstractSearchCriteria implements Cloneable {
 		return criterias;
 	}
 
+	/**
+	 * Return true if this dicjunction is empty.
+	 * @return
+	 */
+	public boolean isEmpty() {
+		return (criterias == null) || criterias.isEmpty();
+	}
 	
 	public boolean test(BeanMap bean, IConnectionUserBean currentUser) {
 		for(ISearchCriteria c:criterias) {
