@@ -2,11 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AFS Metadata services
 Bundle-SymbolicName: com.arcadsoftware.metadata
-<<<<<<< 2023.07
 Bundle-Version: 1.5.4.qualifier
-=======
-Bundle-Version: 1.5.1.qualifier
->>>>>>> a47d9b4 Add autoimport of LDAP user facility.
 Bundle-Activator: com.arcadsoftware.metadata.internal.Activator
 Bundle-Vendor: ARCAD Software
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
