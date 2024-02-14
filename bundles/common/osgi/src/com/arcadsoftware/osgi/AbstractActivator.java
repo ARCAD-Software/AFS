@@ -591,12 +591,15 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 	public void unregister(ServiceRegistration<?> serviceRegistration) {
 		if (serviceRegistration != null) {
 			serviceRegistrationList.remove(serviceRegistration);
-			Object service = getContext().getService(serviceRegistration.getReference());
-			if (service instanceof Closeable) {
-				try {
-					((Closeable) service).close();
-				} catch (Exception e) {
-					info("Error will terminating service: " + service.getClass().getCanonicalName(), e);
+			BundleContext ctx = context;
+			if (ctx != null) {
+				final Object service = ctx.getService(serviceRegistration.getReference());
+				if (service instanceof Closeable) {
+					try {
+						((Closeable) service).close();
+					} catch (Exception e) {
+						info("Error will terminating service: " + service.getClass().getCanonicalName(), e);
+					}
 				}
 			}
 			serviceRegistration.unregister();
