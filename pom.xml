@@ -31,27 +31,27 @@
 		<!-- Cryptography libraries -->
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcmail-jdk18</artifactId>
+			<artifactId>bcmail-jdk18on</artifactId>
 			<version>1.77</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcpg-jdk18</artifactId>
+			<artifactId>bcpg-jdk18on</artifactId>
 			<version>1.77</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcpkix-jdk18</artifactId>
+			<artifactId>bcpkix-jdk18on</artifactId>
 			<version>1.77</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcprov-jdk18</artifactId>
+			<artifactId>bcprov-jdk18on</artifactId>
 			<version>1.77</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcutil-jdk18</artifactId>
+			<artifactId>bcutil-jdk18on</artifactId>
 			<version>1.77</version>
 		</dependency>
 		<dependency>
