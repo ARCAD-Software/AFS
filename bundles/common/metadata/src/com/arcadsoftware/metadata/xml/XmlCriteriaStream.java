@@ -162,7 +162,6 @@ public class XmlCriteriaStream extends XStreamCompact {
 		xs.useAttributeFor(CurrentUserCriteria.class, "userAttribute"); //$NON-NLS-1$
 		xs.alias("pregen", PreGeneratedCriteria.class); //$NON-NLS-1$
 		xs.registerConverter(new PregeneratedCriteriaConverter());
-		// aliases <true/> and <false/>
 		xs.alias("subst", SubstCriteria.class); //$NON-NLS-1$
 		xs.useAttributeFor(SubstCriteria.class, "code"); //$NON-NLS-1$
 		xs.useAttributeFor(LinkEqualCriteria.class, "reference"); //$NON-NLS-1$
@@ -200,6 +199,7 @@ public class XmlCriteriaStream extends XStreamCompact {
 		xs.useAttributeFor(DeletedCriteria.class, "attribute"); //$NON-NLS-1$
 		// New criteria of version 1.0.2
 		xs.alias("isIn", IdInListCriteria.class); //$NON-NLS-1$
+		xs.alias("isin", IdInListCriteria.class); //$NON-NLS-1$
 		xs.registerConverter(new IdInListCriteriaConverter());
 		// New criteria of version 1.0.3
 		xs.alias("unlinkto", UnlinkCriteria.class); //$NON-NLS-1$ // Changed from "link" to "linkto" in version 2.0.0
