@@ -361,7 +361,7 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 		} else {
 			alreadybinded = false;
 		}
-		connectionPool = new LDAPConnectionPool(getServerSet(props, sslConf), bindRequest , initialConnections, maxConnections, startTLSProcessor, false);
+		connectionPool = new LDAPConnectionPool(getServerSet(props, sslConf, bindRequest), bindRequest , initialConnections, maxConnections, startTLSProcessor, false);
 		connectionPool.setConnectionPoolName("AFS: REST Web-service Authentication"); //$NON-NLS-1$
 		connectionPool.setMaxConnectionAgeMillis(getProp(props, PROP_CONNECTIONMAXAGE, 120000L));
 		connectionPool.setMaxDefunctReplacementConnectionAgeMillis(getProp(props, PROP_CONNECTIONFAILOVERMAXAGE, 60000L));
@@ -372,7 +372,7 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 		connectionPool.setCreateIfNecessary(true);
 	}
 
-	private FailoverServerSet getServerSet(final Dictionary<String, Object> props, final ConfiguredSSLContext sslConf) {
+	private FailoverServerSet getServerSet(final Dictionary<String, Object> props, final ConfiguredSSLContext sslConf, BindRequest bindRequest) {
 		SocketFactory sslSocketFactory = sslConf.getSocketFactory();
 		Integer defPort;
 		if ((sslSocketFactory != null) && !sslConf.isStartTLS()) {
@@ -438,7 +438,7 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 		// TODO FastestConnectServerSet
 		// TODO RoundRobinDNSServerSet
 		// TODO DNSSRVRecordServerSet (in that case the list of DNS/IP address become optional !)
-		FailoverServerSet serverSet = new FailoverServerSet(svrs, prts, sslSocketFactory, getConnectionOptions(props));
+		FailoverServerSet serverSet = new FailoverServerSet(svrs, prts, sslSocketFactory, getConnectionOptions(props), bindRequest, null);
 		serverSet.setReOrderOnFailover(getProp(props, PROP_REORDERFAILOVERLIST, false));
 		return serverSet;
 	}
@@ -576,11 +576,18 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 		}
 	}
 
+	/**
+	 * Get an acceptable Distinguished Name (DN) to be able to bind the given user login.
+	 * 
+	 * @param cn This connection must be already binded, Thi connection is used only if the "loginPattern" is not used and the "alreadybinded" flag is on. 
+	 * @param login A non null user login.
+	 * @return null if there is not DN corresponding to this user on the LDAP server.
+	 * @throws LDAPException
+	 */
 	public String getUserDN(LDAPConnection cn, String login) throws LDAPException {
 		if (alreadybinded && (loginAttribute != null) && ((loginPattern == null) || loginPattern.isEmpty())) {
 			// Try to use the permanent connection to find the real user DN.
-			// |ML] why if loginpattern= "%s" use ONE as scope ???
-			// FIXME We must be sure that the current connection is currently binded with the default "admin" user !
+			// We must be sure that the current connection is currently binded with the default "admin" user !
 			SearchResult sr = cn.search(new SearchRequest(null, base, SearchScope.SUB, DereferencePolicy.ALWAYS, 3, 0, false, 
 					Filter.create('(' + loginAttribute + '=' + login + ')'), SearchRequest.ALL_USER_ATTRIBUTES));
 			if (sr.getEntryCount() == 0) {
