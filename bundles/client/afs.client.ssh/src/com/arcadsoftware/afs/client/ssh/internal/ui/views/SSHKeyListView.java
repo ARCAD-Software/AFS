@@ -83,7 +83,7 @@ public class SSHKeyListView extends AbstractListView {
 	}
 
 	public void refreshKeys() {
-		if (isAllowedToSearch()) {
+		if (isAllowed()) {
 			sshKeyListComposite.search();
 		}
 	}
