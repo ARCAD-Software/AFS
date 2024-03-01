@@ -22,6 +22,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.osgi.framework.Bundle;
 
+import com.arcadsoftware.aev.core.ui.viewers.columned.AbstractColumnedViewer;
 import com.arcadsoftware.afs.client.brands.AFSIcon;
 import com.arcadsoftware.afs.client.core.connection.ServerConnection;
 import com.arcadsoftware.afs.client.core.ui.composites.AbstractSearchListComposite;
@@ -61,6 +62,13 @@ public class SSHKeyListComposite extends AbstractSearchListComposite {
 	@Override
 	protected String createSelectClause() {
 		return SSHKey.NAME + " " + SSHKey.TYPE + " " + SSHKey.LENGTH + " " + SSHKey.FINGERPRINT;
+	}
+
+	@Override
+	protected AbstractColumnedViewer createViewer(final Composite parent) {
+		final AbstractColumnedViewer abstractColumnedViewer = super.createViewer(parent);
+		abstractColumnedViewer.setHideDefaultActions(true);
+		return abstractColumnedViewer;
 	}
 
 	@Override
