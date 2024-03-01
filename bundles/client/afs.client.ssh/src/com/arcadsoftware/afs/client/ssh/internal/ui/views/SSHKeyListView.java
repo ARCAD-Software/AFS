@@ -26,7 +26,6 @@ import com.arcadsoftware.afs.client.core.ui.views.AbstractListView;
 import com.arcadsoftware.afs.client.ssh.internal.ISSHRights;
 import com.arcadsoftware.afs.client.ssh.internal.RightManager;
 import com.arcadsoftware.afs.client.ssh.internal.composites.SSHKeyListComposite;
-import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.metadata.MetaDataEntity;
 import com.arcadsoftware.ssh.model.SSHKey;
 
@@ -34,16 +33,12 @@ public class SSHKeyListView extends AbstractListView {
 
 	public static final String ID = "com.arcadsoftware.afs.client.ssh.ui.views.SSHKeyListView"; //$NON-NLS-1$
 
-	BeanMap client = null;
-	SSHKeyListComposite listComposite;
-
-	public SSHKeyListView() {
-	}
+	private SSHKeyListComposite sshKeyListComposite;
 
 	@Override
 	protected AbstractSearchListComposite createListComposite(final Composite parent, final MetaDataEntity entity,
 			final ServerConnection connection) {
-		listComposite = new SSHKeyListComposite(parent, entity, connection) {
+		sshKeyListComposite = new SSHKeyListComposite(parent, entity, connection) {
 
 			@Override
 			protected String createOrderClause() {
@@ -56,13 +51,13 @@ public class SSHKeyListView extends AbstractListView {
 			}
 
 		};
-		return listComposite;
+		return sshKeyListComposite;
 	}
 
 	@Override
 	protected void fillToolbar(final IToolBarManager manager) {
 		super.fillToolbar(manager);
-		final List<Action> actions = listComposite.getActions();
+		final List<Action> actions = sshKeyListComposite.getActions();
 		for (final Action action : actions) {
 			if (action != null) {
 				manager.add(action);
@@ -84,12 +79,12 @@ public class SSHKeyListView extends AbstractListView {
 
 	@Override
 	protected void readStructureError() {
-
+		// Nothing to do here
 	}
 
 	public void refreshKeys() {
 		if (isAllowedToSearch()) {
-			listComposite.search();
+			sshKeyListComposite.search();
 		}
 	}
 
