@@ -166,13 +166,17 @@ public class CleanupManager implements Runnable {
 				final Calendar calendar = Calendar.getInstance();
 				calendar.add(Calendar.DATE, -1 * retentionDays);
 				referenceDate = calendar.getTime();
-				try {
-					// Execute cleaning
-					if (isActive) {
-						logInfo("Cleaning entities older than %1$s", referenceDate);
-						writeCleanupLog(String.format("==> Cleanup started on %1$s%n", Calendar.getInstance().getTime()));
-						writeCleanupLog(String.format("==> Cleaning files older than %1$s%n", referenceDate));
-						writeCleanupLog(String.format("==> Executing %1$s cleaning operations%n%n", cleanOperations.size()));
+				// Execute cleaning
+				if (isActive) {
+					// TODO the log file should be opened just once during the operation... 
+					// TODO Better the log file should be the log file, this should avoid:
+					// 1. manual inaccurate file management
+					// 2. the requirement of a log agregator to get all the logs of the server.
+					logInfo("Cleaning entities older than %1$s", referenceDate);
+					writeCleanupLog(String.format("==> Cleanup started on %1$s%n", Calendar.getInstance().getTime()) +
+							String.format("==> Cleaning files older than %1$s%n", referenceDate) +
+							String.format("==> Executing %1$s cleaning operations%n%n", cleanOperations.size()));
+					try {
 						for (final Entry<String, AbstractCleanOperation> cleanOperation : cleanOperations.entrySet()) {
 							writeCleanupLog(String.format("Starting operation %1$s %n", cleanOperation));
 							try {
@@ -182,9 +186,9 @@ public class CleanupManager implements Runnable {
 							}
 						}
 						logInfo("Cleaning is done");
+					} catch (final Exception e) {
+						logException(e);
 					}
-				} catch (final Exception e) {
-					logException(e);
 				}
 			}
 		}
