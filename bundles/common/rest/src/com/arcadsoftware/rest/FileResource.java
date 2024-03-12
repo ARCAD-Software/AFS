@@ -342,6 +342,7 @@ public class FileResource extends UserLinkedResource {
 				for (FileItem fitem : upload.parseRequest(getRequest())) {
 					if (fitem.getFieldName().equals("file")) { //$NON-NLS-1$
 						fileItem = fitem;
+						break;
 					}
 				}
 				// Set the status of the response.
