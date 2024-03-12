@@ -504,6 +504,8 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 	protected void closeConnection(LDAPConnection connection, LDAPException error) {
 		if (error != null) {
 			connectionPool.releaseConnectionAfterException(connection, error);
+		} else if (alreadybinded) {
+			connectionPool.releaseAndReAuthenticateConnection(connection);
 		} else {
 			connectionPool.releaseConnection(connection);
 		}
