@@ -567,13 +567,13 @@ public abstract class BaseResource extends ServerResource {
 		requestForm = new Form();
 		if (getRequest() != null) {
 			Representation entity = getRequest().getEntity();
-			if ((entity != null) && entity.isAvailable() && !(entity instanceof EmptyRepresentation)) {
+			if ((entity != null) && entity.isAvailable() && !(entity instanceof EmptyRepresentation) && (entity.getMediaType() != null)) {
 				// Header possibly added by proxies when the body of a POST/PUT request is empty, uses the URL params instead
 				if ("none".equals(requestForm.getFirstValue("_empty_"))) { //$NON-NLS-1$ //$NON-NLS-2$
 					requestForm = getRequest().getResourceRef().getQueryAsForm();
 				}
 				// Build the form from the body of the request (entity)
-				if (entity.getMediaType().equals(MediaType.APPLICATION_JSON)) {
+				if (entity.getMediaType().equals(MediaType.APPLICATION_JSON, true)) {
 					// JSON Content, parse body to instantiate the Form
 					try {
 						// Usage of getText could be an issue for large bodies, can throw OutOfMemory error if the body is too large and cannot be processed
@@ -599,14 +599,17 @@ public abstract class BaseResource extends ServerResource {
 					} catch (IOException | JSONException e) {
 						throw new ResourceException(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE, e.getLocalizedMessage());
 					}
-				} else if (entity.getMediaType().equals(MediaType.APPLICATION_WWW_FORM)
-						|| entity.getMediaType().equals(MediaType.MULTIPART_FORM_DATA)) {
+				} else if (entity.getMediaType().equals(MediaType.APPLICATION_WWW_FORM, true)) {
 					// Form-URL-Encoded format for HTML forms
 					requestForm = new Form(entity);
-				} else if (entity.getMediaType().equals(MediaType.APPLICATION_XML)) {
+				} else if (entity.getMediaType().equals(MediaType.MULTIPART_FORM_DATA, true)) {
+					// Form-Data format for HTML forms.
+					requestForm = new Form(entity);
+					// TODO Read Files Items contained in the request...
+				} else if (entity.getMediaType().equals(MediaType.APPLICATION_XML, true)) {
 					// If the content is XML, this code is for backward compatibility
 					requestForm = new Form(entity);
-				} else if (entity.getMediaType().equals(MediaType.APPLICATION_OCTET_STREAM)) {
+				} else if (entity.getMediaType().equals(MediaType.APPLICATION_OCTET_STREAM, true)) {
 					// How to handle that ? Currently loads as a string the content of the file that is uploaded
 					// If file in body, params should be in url
 					requestForm = getRequest().getResourceRef().getQueryAsForm();

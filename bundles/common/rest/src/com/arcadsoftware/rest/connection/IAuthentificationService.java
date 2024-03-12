@@ -33,6 +33,11 @@ public interface IAuthentificationService {
 	public static final String ENTITYNAME = "entityname"; //$NON-NLS-1$
 
 	/**
+	 * OSGi Service property identify the authentification among other ones, specifiyng a list of Realm name that can be used to identify the service.
+	 */
+	public static final String REALM = "realm"; //$NON-NLS-1$
+
+	/**
 	 * If this Authentification Service maintain a connection cache then this method must purge it. 
 	 */
 	public void purgeConnectionCache();
