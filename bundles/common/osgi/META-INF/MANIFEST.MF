@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AFS OSGi Common utilities
 Bundle-SymbolicName: com.arcadsoftware.osgi
-Bundle-Version: 1.9.2.qualifier
+Bundle-Version: 1.9.3
 Bundle-Activator: com.arcadsoftware.osgi.internal.Activator
 Bundle-Vendor: ARCAD Software
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
