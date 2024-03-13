@@ -32,12 +32,12 @@ public abstract class AbstractConfigurationManager implements IConfigurationMana
 
 	private HashMap<String,String> visibleMenus;
 	private boolean perspectiveBarVisible = true;
-	private boolean statusLineVisible = false;
-	private boolean fastViewBarVisible = false;
-	private boolean coolBarVisible = false;
-	private boolean progressBarVisible = false;
+	private boolean statusLineVisible;
+	private boolean fastViewBarVisible;
+	private boolean coolBarVisible;
+	private boolean progressBarVisible;
 	
-	public AbstractConfigurationManager(){
+	public AbstractConfigurationManager() {
 		super();
 		visibleMenus = new HashMap<String,String>();
 		setVisibleMenus(visibleMenus);
@@ -83,7 +83,7 @@ public abstract class AbstractConfigurationManager implements IConfigurationMana
 	 * Defines if the Progress Bar is visible or not
 	 * @param progressBarVisible Indicates the visibility of the Progress Bar
 	 */		
-	public void setProgressBarVisible(boolean progressBarVisible){
+	public void setProgressBarVisible(boolean progressBarVisible) {
 		this.progressBarVisible = progressBarVisible;
 	}
 	
@@ -91,7 +91,7 @@ public abstract class AbstractConfigurationManager implements IConfigurationMana
 	 * Returns the visibility indicator of the Progress Bar
 	 * @return true if the Progress Bar must be displayed.
 	 */		
-	public boolean isProgressBarVisible(){
+	public boolean isProgressBarVisible() {
 		return progressBarVisible;
 	}		
 	
@@ -99,11 +99,11 @@ public abstract class AbstractConfigurationManager implements IConfigurationMana
 	 * Defines if the FastView Bar is visible or not.
 	 * @param fastViewBarVisible Indicates the visibility of the FastView Bar
 	 */	
-	public void setFastViewBarVisible(boolean fastViewBarVisible){
+	public void setFastViewBarVisible(boolean fastViewBarVisible) {
 		this.fastViewBarVisible = fastViewBarVisible;
 	}
 	
-	public boolean isFastViewBarVisible(){
+	public boolean isFastViewBarVisible() {
 		return fastViewBarVisible;
 	}	
 	
@@ -134,7 +134,7 @@ public abstract class AbstractConfigurationManager implements IConfigurationMana
 	 * @see IWorkbenchPreferenceConstants
 	 */
 	public void setPerspectiveBarLocation() {
-		if (isPerspectiveBarVisible()){
+		if (isPerspectiveBarVisible()) {
 			PlatformUI.getPreferenceStore().setValue(
 					IWorkbenchPreferenceConstants.DOCK_PERSPECTIVE_BAR,
 					getPerspectiveBarLocation());					
@@ -142,44 +142,39 @@ public abstract class AbstractConfigurationManager implements IConfigurationMana
 	}
 	
 	public void setPerspectiveBarStyle() {
-		if (isPerspectiveBarVisible()){
+		if (isPerspectiveBarVisible()) {
 			PlatformUI.getPreferenceStore().setValue(
 					IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS,
 					useTraditionalStyleTabs()); 							
 		}
 	}	
 	
-	public boolean isMenuVisible(String menuId){
-		String value = visibleMenus.get(menuId);
-		return (value!=null);
+	public boolean isMenuVisible(String menuId) {
+		return (visibleMenus.get(menuId) != null);
 	}
 	
 	public String getMenuLabel(String menuId){
 		String value = visibleMenus.get(menuId);
-		if (value!=null){
-			if (value.startsWith("!")) //$NON-NLS-1$
+		if (value != null) {
+			if (!value.isEmpty() && (value.charAt(0) == '!')) {
 				return Messages.resString(value.substring(1));
-			else
-				return value;			
+			}
+			return value;			
 		}
 		return Messages.resString(menuId);
 	}
 	
-	public void doAfterInitialization(IWorkbenchConfigurer configurer){
-	}
+	public void doAfterInitialization(IWorkbenchConfigurer configurer) {}
 	
-	public void postStartup() {
-	}
+	public void postStartup() {}
 	
-	public void preStartup() {
-	}
+	public void preStartup() {}
 	
 	public boolean preShutdown() {
 		return true;
 	}
 	
-	public  void postShutdown() {
-	}	
+	public  void postShutdown() {}	
 	
 	/**
 	 * Returns the default perspective Id of your application
@@ -212,31 +207,21 @@ public abstract class AbstractConfigurationManager implements IConfigurationMana
 	public void setVisibleMenus(HashMap<String,String> visibleMenus){
 		visibleMenus.put(IMENUConst.FILE,Messages.resString("menu.file")); //$NON-NLS-1$
 		visibleMenus.put(IMENUConst.FILE_QUIT,""); //$NON-NLS-1$
-		
 		visibleMenus.put(IMENUConst.EDIT,Messages.resString("menu.edit")); //$NON-NLS-1$
 		visibleMenus.put(IMENUConst.EDIT_COPY,""); //$NON-NLS-1$
 		visibleMenus.put(IMENUConst.EDIT_CUT,""); //$NON-NLS-1$
 		visibleMenus.put(IMENUConst.EDIT_PAST,""); //$NON-NLS-1$
-		
 		visibleMenus.put(IMENUConst.HELP,Messages.resString("menu.help")); //$NON-NLS-1$
 		visibleMenus.put(IMENUConst.HELP_CONTENTS,""); //$NON-NLS-1$
 		visibleMenus.put(IMENUConst.HELP_SEARCH,""); //$NON-NLS-1$
 		visibleMenus.put(IMENUConst.HELP_ABOUT,""); //$NON-NLS-1$
 	}
 
-	/**
-	 * 
-	 */
 	public int getShellStyle() {
 		return 0;
 	}
 	
-	/**
-	 * 
-	 */
-	public void adaptMainShell(Shell shell) {
-		
-	}
+	public void adaptMainShell(Shell shell) {}
 	
 	/**
 	 * Allow to define witch Action Set Extension will be used.
@@ -248,5 +233,4 @@ public abstract class AbstractConfigurationManager implements IConfigurationMana
 	public boolean isActionSetVisible(String actionSetId) {
 		return true;
 	}
-	
 }
