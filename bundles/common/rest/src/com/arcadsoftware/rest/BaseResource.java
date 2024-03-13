@@ -13,13 +13,18 @@
  *******************************************************************************/
 package com.arcadsoftware.rest;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -33,6 +38,7 @@ import org.restlet.data.Method;
 import org.restlet.data.Parameter;
 import org.restlet.data.Preference;
 import org.restlet.data.Status;
+import org.restlet.ext.fileupload.RestletFileUpload;
 import org.restlet.representation.EmptyRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.representation.Variant;
@@ -604,8 +610,32 @@ public abstract class BaseResource extends ServerResource {
 					requestForm = new Form(entity);
 				} else if (entity.getMediaType().equals(MediaType.MULTIPART_FORM_DATA, true)) {
 					// Form-Data format for HTML forms.
-					requestForm = new Form(entity);
-					// TODO Read Files Items contained in the request...
+					requestForm = new Form();
+					final String encoding;
+					if (entity.getCharacterSet() != null) {
+						encoding = entity.getCharacterSet().getName();
+					} else {
+						encoding = "UTF-8"; //$NON-NLS-1$
+					}
+					DiskFileItemFactory factory = new DiskFileItemFactory();
+					factory.setSizeThreshold(1000240);
+					factory.setRepository(new File("_tempdir")); //$NON-NLS-1$
+					RestletFileUpload upload = new RestletFileUpload(factory);
+					try {
+						for (FileItem item : upload.parseRequest(getRequest())) {
+							if (item.isFormField()) {
+								try {
+									requestForm.add(item.getFieldName(), item.getString(encoding));
+								} catch (UnsupportedEncodingException e) {
+									throw new ResourceException(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE, e.getLocalizedMessage());
+								}
+							} else {
+								requestForm.add(new FileItemParameter(item));
+							}
+						}
+					} catch (FileUploadException e) {
+						throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, e.getLocalizedMessage());
+					}
 				} else if (entity.getMediaType().equals(MediaType.APPLICATION_XML, true)) {
 					// If the content is XML, this code is for backward compatibility
 					requestForm = new Form(entity);
