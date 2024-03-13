@@ -93,7 +93,7 @@ public class Activator extends AbstractActivator implements EventHandler, Servic
 		map = new HashMap<String, ServiceRegistration>();
 		tracker = new ServiceTracker(bundleContext, DataSource.class.getName(), this);
 		tracker.open();
-		registerService(EventHandler.class.getName(), this, EventConstants.EVENT_TOPIC, //
+		registerService(EventHandler.class, this, EventConstants.EVENT_TOPIC, //
 				new String[] {IDataSourceEvent.TOPIC_ALL, MetaDataEventHandler.TOPIC_ENTITY_ALLEVENTS});
 	}
 
