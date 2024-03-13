@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AFS - Framework Application RCP Extension
 Bundle-SymbolicName: com.arcadsoftware.afs.framework.application.rcp;singleton:=true
-Bundle-Version: 1.3.3
+Bundle-Version: 1.3.3.qualifier
 Bundle-Activator: com.arcadsoftware.afs.framework.application.conf.internal.Activator
 Bundle-Vendor: ARCAD Software
 Require-Bundle: org.eclipse.core.runtime,
