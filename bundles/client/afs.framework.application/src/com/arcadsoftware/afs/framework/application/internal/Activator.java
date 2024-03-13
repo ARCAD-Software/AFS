@@ -34,7 +34,7 @@ public class Activator extends AbstractUIPlugin {
 	// The shared instance
 	private static Activator plugin;
 
-	private IConfigurationManager manager = null;
+	private volatile IConfigurationManager manager;
 	private ResourceBundle resourceBundle;
 	/**
 	 * The constructor
@@ -64,21 +64,21 @@ public class Activator extends AbstractUIPlugin {
 		return plugin;
 	}
 
-	public IConfigurationManager getConfigurationManager() {
-		if (manager==null) {
+	public synchronized IConfigurationManager getConfigurationManager() {
+		if (manager == null) {
 			IExtensionRegistry reg = Platform.getExtensionRegistry();
 			for (IConfigurationElement element : reg.getConfigurationElementsFor(IConfigurationManager.CONFIGURATION_MANAGER_EXTENSION)) {
 				try {
-					manager = (IConfigurationManager) element.createExecutableExtension("class");
-				} catch (CoreException e) {
-					
+					manager = (IConfigurationManager) element.createExecutableExtension("class"); //$NON-NLS-1$
+				} catch (Exception e) {
+					getLog().log(new Status(Status.ERROR, getBundle().getSymbolicName(), "Unable to Initialize the ConfiguratorManager extension named: " + element.getName(), e));
 				}
 			}			
 		}
 		return manager;
 	}
 	
-	public void setConfigurationManager(IConfigurationManager manager) {
+	public synchronized void setConfigurationManager(IConfigurationManager manager) {
 		this.manager = manager;
 	}	
 	/**
@@ -109,15 +109,15 @@ public class Activator extends AbstractUIPlugin {
 	}
 	
 	public void log(String message) {
-		getLog().log(new Status(Status.INFO,getBundle().getSymbolicName(), message));
+		getLog().log(new Status(Status.INFO, getBundle().getSymbolicName(), message));
 	}
 
 	public void log(String message,Throwable e) {
-		getLog().log(new Status(Status.ERROR,getBundle().getSymbolicName(), message, e));
+		getLog().log(new Status(Status.ERROR, getBundle().getSymbolicName(), message, e));
 	}
 
 	public void log(Throwable e) {
-		getLog().log(new Status(Status.ERROR,getBundle().getSymbolicName(), e.getLocalizedMessage(), e));
+		getLog().log(new Status(Status.ERROR, getBundle().getSymbolicName(), e.getLocalizedMessage(), e));
 	}
 	
 }
