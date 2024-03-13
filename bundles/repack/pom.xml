@@ -36,5 +36,6 @@
 		<module>xstream</module>
 		<module>org.restlet.base</module>
 		<module>org.restlet.server</module>
+		<module>org.restlet.server.jmx</module>
 	</modules>
 </project>
