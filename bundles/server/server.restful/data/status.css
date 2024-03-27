@@ -3,3 +3,5 @@ a{color:white;}
 a:hover{color:red;}
 body{background-color:black; color:white;}
 pre{background-color:gray; font-family: monospace; white-space:pre-wrap; margin:12px;}
+.tt .ttt{visibility:hidden; background-color:lightgrey; color:black; padding:2px 0; position:absolute; z-index:1;}
+.tt:hover .ttt {visibility: visible;}
