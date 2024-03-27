@@ -33,6 +33,7 @@ public class MetaDataAttribute extends Element {
 	public static final String TYPE_ICON = "icon"; //$NON-NLS-1$
 	public static final String TYPE_STRING = "string"; //$NON-NLS-1$
 	public static final String TYPE_BOOLEAN = "boolean"; //$NON-NLS-1$
+	public static final String TYPE_REALBOOLEAN = "realboolean"; //$NON-NLS-1$
 	public static final String TYPE_URL = "url"; //$NON-NLS-1$
 	public static final String TYPE_EMAIL = "email"; //$NON-NLS-1$
 	public static final String TYPE_BIGINTEGER = "biginteger"; //$NON-NLS-1$

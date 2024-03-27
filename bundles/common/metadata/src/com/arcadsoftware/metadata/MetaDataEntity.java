@@ -2020,6 +2020,16 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 					}
 					continue;
 				}
+				if (MetaDataAttribute.TYPE_REALBOOLEAN.equals(att.getType())) {
+					if ("true".equalsIgnoreCase(value) || //$NON-NLS-1$
+							"yes".equalsIgnoreCase(value) || //$NON-NLS-1$
+							"1".equalsIgnoreCase(value)) { //$NON-NLS-1$
+						result.put(code, true);
+					} else {
+						result.put(code, false);
+					}
+					continue;
+				}
 				if (MetaDataAttribute.TYPE_DATE.equals(att.getType())) {
 					if (value.length() == 0) {
 						// Support null dates.

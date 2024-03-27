@@ -619,7 +619,7 @@ public class MetaDataItemResource extends DataItemResource {
 			getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST, Activator.getMessage("error.missingattributes", language)); //$NON-NLS-1$
 			return null;
 		}
-		// Check "unique values constraints
+		// Check "unique" values constraints
 		if (!undelete) {
 			// Already done if undelete is true (see above !)
 			ISearchCriteria invariantCriteria = new NotCriteria(new IdEqualCriteria(item.getId()));
@@ -672,15 +672,19 @@ public class MetaDataItemResource extends DataItemResource {
 	private void doPostUpdateTreatment(List<IMetaDataModifyListener> listeners, BeanMap oldValue, BeanMap result, ArrayList<MetaDataAttribute> list, Language language) {
 		// TODO translate !?!??!! (en théorie les attributs translate ne sont pas modifiés !
 		MetaDataEntity entity = getEntity();
-		for(IMetaDataModifyListener listener:listeners) {
+		for (IMetaDataModifyListener listener:listeners) {
 			listener.postModification(entity, oldValue, result, list, getUser(), language);
 		}
 		Activator.getInstance().test(MetaDataTest.EVENTCODE_AFTERUPDATE, entity, oldValue, result, list, getUser(), language);
 		Activator.getInstance().fireUpdateEvent(entity, oldValue, result, getUser());
-		// Remove all hidden attributes before to return them to the client.
 		for (MetaDataAttribute att: entity.getAttributes().values()) {
+			// Remove all hidden attributes before to return them to the client.
 			if (!att.isPublic()) {
 				result.remove(att.getCode());
+			}
+			// FIX: Convert Boolean values back to true boolean value...
+			if (MetaDataAttribute.TYPE_BOOLEAN.equals(att.getType()) && result.contains(att.getCode())) {
+				result.put(att.getCode(), result.getBoolean(att.getCode()));
 			}
 		}
 	}
