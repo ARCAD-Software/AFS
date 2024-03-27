@@ -30,6 +30,7 @@
 		<module>server.restful.connection.local</module>
 		<module>server.restful.console</module>
 		<module>server.restful.layouts</module>
+		<module>server.restful.log</module>
 		<module>server.scheduler</module>
 		<module>server.scheduler.impl</module>
 		<module>server.ssh</module>
