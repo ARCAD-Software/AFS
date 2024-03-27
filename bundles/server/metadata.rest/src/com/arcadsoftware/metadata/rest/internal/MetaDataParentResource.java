@@ -453,7 +453,7 @@ public class MetaDataParentResource extends DataParentResource {
 		BeanMap result = getEntity().formToBean(form, list);
 		// Test des droits sur attributs.
 		Iterator<MetaDataAttribute> itt = list.iterator();
-		while(itt.hasNext()) {
+		while (itt.hasNext()) {
 			MetaDataAttribute att = itt.next();
 			if ((att.getRightUpdate(false) != null) && //
 					!getMapper().test(getEntity(), att.getRightUpdate(false), getUser())) {
@@ -476,7 +476,7 @@ public class MetaDataParentResource extends DataParentResource {
 			return null;
 		}
 		// B. Validation de l'unicité des valeurs.
-		for(MetaDataAttribute attribute: list) {
+		for (MetaDataAttribute attribute: list) {
 			if (attribute.getMetadata().getBoolean(MetaDataEntity.METADATA_UNIQUE)) {
 				Object value = result.get(attribute.getCode());
 				if ((value != null) && (value.toString().length() > 0) && // On ignore les affectation à null.
