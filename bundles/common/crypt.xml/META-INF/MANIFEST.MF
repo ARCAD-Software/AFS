@@ -21,7 +21,7 @@ Import-Package: javax.crypto,
  javax.xml.transform,
  javax.xml.transform.dom,
  javax.xml.transform.stream,
- org.apache.jcp.xml.dsig.internal.dom;version="[2.2.3,3.0.0)",
+ org.apache.jcp.xml.dsig.internal.dom;version="[2.3.4,3.0.0)",
  org.w3c.dom,
  org.xml.sax
 Bundle-License: https://www.eclipse.org/legal/epl-2.0
