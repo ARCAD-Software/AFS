@@ -1,10 +1,10 @@
-# AFS-OS release version 2023.7.20.
+# AFS-OS release version 2023.7.21.
 
-Release date Wed Apr 24 11:01:44 CEST 2024.
+Release date Tue May 07 13:55:04 CEST 2024.
 
-Link to the update site of [Version 2023.7.20](https://github.com/ARCAD-Software/AFS/releases/download/2023.7.20/).
+Link to the update site of [Version 2023.7.21](https://github.com/ARCAD-Software/AFS/releases/download/2023.7.21/).
 
-0 Bundles modified in this release.
+1 Bundles modified in this release.
 
 
 
@@ -44,7 +44,7 @@ Bundle Symbolic Name | Modification | Version
 [com.arcadsoftware.cleanup](bundles/common/cleanup) | Not changed | 1.4.2
 [com.arcadsoftware.cm.simple](bundles/common/cm.simple) | Not changed | 1.5.3
 [com.arcadsoftware.crypt](bundles/common/crypt) | Not changed | 1.8.5
-[com.arcadsoftware.crypt.xml](bundles/common/crypt.xml) | Not changed | 1.1.3
+[com.arcadsoftware.crypt.xml](bundles/common/crypt.xml) | **Upgraded** from version 1.1.3 | **1.1.4**
 [com.arcadsoftware.email](bundles/common/email) | Not changed | 1.4.3
 [com.arcadsoftware.groovy.security](bundles/common/groovy.security) | Not changed | 1.1.3
 [com.arcadsoftware.metadata](bundles/common/metadata) | Not changed | 1.5.7
