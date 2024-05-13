@@ -37,8 +37,17 @@
 	</location>
 	<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="false" type="InstallableUnit">
 		<repository location="https://github.com/ARCAD-Software/arcad-evolution/releases/download/latest/"/>
-		<unit id="com.arcadsoftware.aev.rcp.features.feature.group" version="0.0.0"/>
-		<unit id="com.arcadsoftware.aev.list.features.feature.group" version="0.0.0"/>
+		<unit id="com.arcadsoftware.aev.core.services" version="0.0.0"/>
+		<unit id="com.arcadsoftware.aev.core.ui.rcp" version="0.0.0"/>
+		<unit id="com.arcadsoftware.aev.core" version="0.0.0"/>
+		<unit id="com.arcadsoftware.aev.core.ui" version="0.0.0"/>
+		<unit id="com.arcadsoftware.aev.icons" version="0.0.0"/>
+		<unit id="com.arcadsoftware.aev.list.manager" version="0.0.0"/>
+		<unit id="org.apache.commons.commons-io" version="0.0.0"/>
+		<unit id="org.apache.commons.lang3" version="0.0.0"/>
+		<unit id="org.hsqldb.hsqldb" version="0.0.0"/>
+		<unit id="wrapped.com.google.re2j.re2j" version="0.0.0"/>
+		<unit id="wrapped.net.sf.jmimemagic.jmimemagic" version="0.0.0"/>
 	</location>
 </locations>
 </target>
