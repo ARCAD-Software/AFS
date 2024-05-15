@@ -2,7 +2,7 @@
 <feature
       id="com.arcadsoftware.afs.server.osgi"
       label="AFS Server for OSGi generic Feature"
-      version="2023.7.23"
+      version="2023.7.24.qualifier"
       plugin="com.arcadsoftware.runtime">
 
    <description url="http://www.example.com/description">
