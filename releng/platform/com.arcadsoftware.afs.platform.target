@@ -43,7 +43,6 @@
 		<unit id="com.arcadsoftware.aev.core.ui" version="0.0.0"/>
 		<unit id="com.arcadsoftware.aev.icons" version="0.0.0"/>
 		<unit id="com.arcadsoftware.aev.list.manager" version="0.0.0"/>
-		<unit id="org.apache.commons.commons-io" version="0.0.0"/>
 		<unit id="org.apache.commons.lang3" version="0.0.0"/>
 		<unit id="org.hsqldb.hsqldb" version="0.0.0"/>
 		<unit id="wrapped.com.google.re2j.re2j" version="0.0.0"/>
