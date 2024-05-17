@@ -2,17 +2,17 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AFS - Client Dynamic Editors
 Bundle-SymbolicName: com.arcadsoftware.afs.client.editors;singleton:=true
-Bundle-Version: 1.2.0.qualifier
+Bundle-Version: 1.2.3.qualifier
 Bundle-Vendor: ARCAD Software
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.databinding;bundle-version="[1.1.0,2.0.0)";visibility:=reexport,
  org.eclipse.jface.databinding;bundle-version="[1.2.0,2.0.0)";resolution:=optional;visibility:=reexport,
- org.eclipse.rap.jface.databinding;bundle-version="[1.4.0,3.0.0)";resolution:=optional,
+ org.eclipse.rap.jface.databinding;bundle-version="[3.6.0,4.0.0)";resolution:=optional,
  org.eclipse.ui;resolution:=optional,
- org.eclipse.rap.ui;bundle-version="[1.4.0,3.0.0)";resolution:=optional,
+ org.eclipse.rap.ui;bundle-version="[3.6.0,4.0.0)";resolution:=optional,
  org.eclipse.ui.forms;bundle-version="[3.6.0,4.0.0)";resolution:=optional;visibility:=reexport,
- org.eclipse.rap.ui.forms;bundle-version="[1.4.0,3.0.0)";resolution:=optional,
+ org.eclipse.rap.ui.forms;bundle-version="[3.6.0,4.0.0)";resolution:=optional,
  com.arcadsoftware.osgi;bundle-version="[1.8.0,2.0.0)",
  com.arcadsoftware.metadata;bundle-version="[1.5.0,2.0.0)",
  com.arcadsoftware.aev.core;bundle-version="[12.0.0,13.0.0)",
