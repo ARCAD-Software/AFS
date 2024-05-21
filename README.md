@@ -1,10 +1,10 @@
-# AFS-OS release version 2023.7.23.
+# AFS-OS release version 2023.7.24.
 
-Release date Wed May 15 17:22:28 CEST 2024.
+Release date Tue May 21 16:21:49 CEST 2024.
 
-Link to the update site of [Version 2023.7.23](https://github.com/ARCAD-Software/AFS/releases/download/2023.7.23/).
+Link to the update site of [Version 2023.7.24](https://github.com/ARCAD-Software/AFS/releases/download/2023.7.24/).
 
-0 Bundles modified in this release.
+4 Bundles modified in this release.
 
 
 
@@ -12,24 +12,24 @@ Link to the update site of [Version 2023.7.23](https://github.com/ARCAD-Software
 
 Bundle Symbolic Name | Modification | Version
 -------------------- | ------------ | -------
-[com.arcadsoftware.afs.client.brands](bundles/client/afs.client.brands) | Not changed | 1.0.2
+[com.arcadsoftware.afs.client.brands](bundles/client/afs.client.brands) | **Upgraded** from version 1.0.2 | **1.0.3**
 [com.arcadsoftware.afs.client.cli](bundles/client/afs.client.cli) | Not changed | 1.3.2
 [com.arcadsoftware.afs.client.core](bundles/client/afs.client.core) | Not changed | 1.4.3
 [com.arcadsoftware.afs.client.core.base](bundles/client/afs.client.core.base) | Not changed | 1.6.2
 [com.arcadsoftware.afs.client.core.rcp](bundles/client/afs.client.core.rcp) | Not changed | 1.3.2
-[com.arcadsoftware.afs.client.editors](bundles/client/afs.client.editors) | Not changed | 1.2.2
+[com.arcadsoftware.afs.client.editors](bundles/client/afs.client.editors) | **Upgraded** from version 1.2.2 | **1.2.3**
 [com.arcadsoftware.afs.client.list](bundles/client/afs.client.list) | Not changed | 1.3.2
 [com.arcadsoftware.afs.client.macro](bundles/client/afs.client.macro) | Not changed | 1.2.2
 [com.arcadsoftware.afs.client.reporting](bundles/client/afs.client.reporting) | Not changed | 1.5.3
 [com.arcadsoftware.afs.client.server](bundles/client/afs.client.server) | Not changed | 1.5.2
 [com.arcadsoftware.afs.client.server.admin.common](bundles/client/afs.client.server.admin.common) | Not changed | 1.3.2
 [com.arcadsoftware.afs.client.server.admin.common.actions](bundles/client/afs.client.server.admin.common.actions) | Not changed | 1.3.2
-[com.arcadsoftware.afs.client.ssh](bundles/client/afs.client.ssh) | Not changed | 2.2.3
+[com.arcadsoftware.afs.client.ssh](bundles/client/afs.client.ssh) | **Upgraded** from version 2.2.3 | **2.2.4**
 [com.arcadsoftware.afs.client.users](bundles/client/afs.client.users) | Not changed | 1.4.3
 [com.arcadsoftware.afs.client.widgets](bundles/client/afs.client.widgets) | Not changed | 1.2.2
 [com.arcadsoftware.afs.client.widgets.rcp](bundles/client/afs.client.widgets.rcp) | Not changed | 1.3.2
 [com.arcadsoftware.afs.framework](bundles/client/afs.framework) | Not changed | 1.2.2
-[com.arcadsoftware.afs.framework.application](bundles/client/afs.framework.application) | Not changed | 1.3.3
+[com.arcadsoftware.afs.framework.application](bundles/client/afs.framework.application) | **Upgraded** from version 1.3.3 | **1.3.4**
 [com.arcadsoftware.afs.framework.application.rcp](bundles/client/afs.framework.application.rcp) | Not changed | 1.3.3
 [com.arcadsoftware.afs.framework.help](bundles/client/afs.framework.help) | Not changed | 1.2.2
 [com.arcadsoftware.afs.framework.ui](bundles/client/afs.framework.ui) | Not changed | 1.4.2
