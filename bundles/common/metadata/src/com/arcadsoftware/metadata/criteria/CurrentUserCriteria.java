@@ -14,6 +14,7 @@
 package com.arcadsoftware.metadata.criteria;
 
 import com.arcadsoftware.beanmap.BeanMap;
+import com.arcadsoftware.beanmap.BeanMapList;
 import com.arcadsoftware.metadata.MetaDataEntity;
 import com.arcadsoftware.metadata.ReferenceLine;
 import com.arcadsoftware.metadata.internal.Messages;
@@ -28,6 +29,7 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
  */
 public class CurrentUserCriteria extends AbstractSearchCriteria implements Cloneable, IAttributeCriteria {
 
+	private String linkCode;
 	private String attribute;
 	private String userAttribute;
 
@@ -46,9 +48,16 @@ public class CurrentUserCriteria extends AbstractSearchCriteria implements Clone
 		this.userAttribute = userAttribute;
 	}
 
+	public CurrentUserCriteria(String attribute, String linkCode, String userAttribute) {
+		super();
+		this.attribute = attribute;
+		this.userAttribute = userAttribute;
+		this.linkCode = linkCode;
+	}
+
 	@Override
 	public Object clone() throws CloneNotSupportedException {
-		return new CurrentUserCriteria(attribute, userAttribute);
+		return new CurrentUserCriteria(attribute, linkCode, userAttribute);
 	}
 
 	@Override
@@ -56,27 +65,30 @@ public class CurrentUserCriteria extends AbstractSearchCriteria implements Clone
 		if (context.getCurrentUser() == null) {
 			return ConstantCriteria.TRUE;
 		}
-		ReferenceLine attributeRef = context.getEntity().getAttributeLine(attribute);
-		if (attributeRef != null) {
-			int i = 0;
-			if (userAttribute == null) {
-				i = context.getCurrentUser().getId();
-			} else if ("principal".equalsIgnoreCase(userAttribute)) { //$NON-NLS-1$
-				i = context.getCurrentUser().getPrincipal();
-			} else {
-				MetaDataEntity uentity = context.getEntity("user"); //$NON-NLS-1$
-				if (uentity != null) {
-					BeanMap ub = uentity.getMapper().selection(uentity, context.getCurrentUser().getId(),
-							userAttribute, false);
-					if (ub != null) {
-						i = ub.getInt(userAttribute);
-					}
+		int i = 0;
+		if (userAttribute == null) {
+			i = context.getCurrentUser().getId();
+		} else if ("principal".equalsIgnoreCase(userAttribute)) { //$NON-NLS-1$
+			i = context.getCurrentUser().getPrincipal();
+		} else {
+			MetaDataEntity uentity = context.getEntity("user"); //$NON-NLS-1$
+			if (uentity != null) {
+				BeanMap ub = uentity.getMapper().selection(uentity, context.getCurrentUser().getId(),
+						userAttribute, false);
+				if (ub != null) {
+					i = ub.getInt(userAttribute);
 				}
 			}
+		}
+		if (linkCode != null) {
+			return new LinkCriteria(i, linkCode, attribute);
+		}
+		if (isTestId()) {
+			return new IdEqualCriteria(i);
+		}
+		ReferenceLine attributeRef = context.getEntity().getAttributeLine(attribute);
+		if (attributeRef != null) {
 			context.useReference(attributeRef);
-			if (isTestId()) {
-				return new IdEqualCriteria(i);
-			}
 			return new EqualCriteria(attribute, i);
 		}
 		return ConstantCriteria.FALSE;
@@ -93,6 +105,17 @@ public class CurrentUserCriteria extends AbstractSearchCriteria implements Clone
 	public boolean test(BeanMap bean, IConnectionUserBean currentUser) {
 		if ((currentUser == null) || (bean == null)) {
 			return true;
+		}
+		if (linkCode != null) {
+			Object o = bean.get(linkCode);
+			if (o instanceof BeanMapList) {
+				for (BeanMap b: (BeanMapList) o) {
+					if (currentUser.getId() == b.getInt(attribute)) {
+						return true;
+					}
+				}
+			}
+			return false;
 		}
 		if (userAttribute == null) {
 			if (isTestId()) {
@@ -126,13 +149,27 @@ public class CurrentUserCriteria extends AbstractSearchCriteria implements Clone
 		this.userAttribute = userAttribute;
 	}
 
+	public String getLinkCode() {
+		return linkCode;
+	}
+
+	public void setLinkCode(String linkCode) {
+		this.linkCode = linkCode;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder(attribute);
-		if (userAttribute == null) {
+		if (linkCode != null) {
+			if (userAttribute == null) {
+				sb.append(String.format(" is linked with \"%s\" to current user", linkCode));
+			} else {
+				sb.append(String.format(" is linked with \"%s\" to current user's %s", linkCode, userAttribute));
+			}
+		} else if (userAttribute == null) {
 			sb.append(Messages.Criteria_IsCurrentUser);
 		} else {
-			sb.append(String.format(Messages.Criteria_IsCurrentUserAttribute,userAttribute));
+			sb.append(String.format(Messages.Criteria_IsCurrentUserAttribute, userAttribute));
 		}
 		return sb.toString();
 	}

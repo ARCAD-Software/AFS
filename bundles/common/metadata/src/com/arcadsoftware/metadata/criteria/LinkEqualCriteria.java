@@ -106,14 +106,14 @@ public class LinkEqualCriteria extends AbstractSearchCriteria implements Cloneab
 		if (reference != null) {
 			Object o = bean.get(reference);
 			if (o instanceof BeanMap) {
-				bean = (BeanMap)o;
+				bean = (BeanMap) o;
 			} else {
 				return false;
 			}
 		}
 		Object o = bean.get(linkCode);
 		if (o instanceof BeanMapList) {
-			for(BeanMap b:(BeanMapList)o) {
+			for (BeanMap b: (BeanMapList) o) {
 				if (value.equals(b.getString(attribute))) {
 					return true;
 				}
