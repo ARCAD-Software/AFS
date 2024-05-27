@@ -34,6 +34,7 @@ import com.arcadsoftware.beanmap.BeanMapList;
 import com.arcadsoftware.beanmap.BeanMapPartialList;
 import com.arcadsoftware.metadata.IMetaDataDeleteListener;
 import com.arcadsoftware.metadata.IMetaDataModifyListener;
+import com.arcadsoftware.metadata.IMetaDataSelectionListener;
 import com.arcadsoftware.metadata.MetaDataAttribute;
 import com.arcadsoftware.metadata.MetaDataEntity;
 import com.arcadsoftware.metadata.MetaDataLink;
@@ -312,9 +313,10 @@ public class MetaDataParentResource extends DataParentResource {
 				}
 			}
 		}
+		// Post selection management
 		Activator.getInstance().test(MetaDataTest.EVENTCODE_LIST, getEntity(), result, getUser(), language);
 		if (getEntity().getMetadata().getBoolean(MetaDataEntity.METADATA_EVENTONSELECTION)) {
-			Activator.getInstance().fireSelectionEvent(getEntity(),result,getUser());
+			Activator.getInstance().fireSelectionEvent(getEntity(), result, getUser());
 		}
 		// Add a parameter "links" to insert all links into the results list...
 		String links = getColumns(form, "attributes"); //$NON-NLS-1$ 
@@ -324,6 +326,11 @@ public class MetaDataParentResource extends DataParentResource {
 				if (link != null) {
 					addLinkSelection(result, link, translate, deleted, language);
 				}
+			}
+		}
+		if (result.size() > 0) {
+			for (IMetaDataSelectionListener listener: Activator.getInstance().getSelectionListener(getEntity().getType())) {
+				listener.onSelection(getEntity(), result, getUser(), language);
 			}
 		}
 		// mise en forme du résultat.
@@ -361,6 +368,11 @@ public class MetaDataParentResource extends DataParentResource {
 				Activator.getInstance().test(MetaDataTest.EVENTCODE_LIST, linkEntity, list, getUser(), language);
 				if (getEntity().getMetadata().getBoolean(MetaDataEntity.METADATA_EVENTONSELECTION)) {
 					Activator.getInstance().fireSelectionEvent(linkEntity, list, getUser());
+				}
+				if (list.size() > 0) {
+					for (IMetaDataSelectionListener listener: Activator.getInstance().getSelectionListener(linkEntity.getType())) {
+						listener.onSelection(linkEntity, list, getUser(), language);
+					}
 				}
 				r.put(link.getCode(), list);
 			}
