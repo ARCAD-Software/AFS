@@ -94,7 +94,7 @@ public class SystemTestTask extends TimerTask {
 						shutdown();
 					}
 				}
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				Activator.getInstance().debug(e.getLocalizedMessage(), e);
 			}
 		}
@@ -111,8 +111,10 @@ public class SystemTestTask extends TimerTask {
 				int i = 0;
 				while (bundle.getState() == Bundle.STARTING) {
 					try {
-						wait(1000);
-					} catch (InterruptedException e) {}
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						return;
+					}
 					i++;
 					if (i == 30) {
 						break;
