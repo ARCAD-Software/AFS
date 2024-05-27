@@ -419,26 +419,30 @@ public class XmlRegistry implements IEntityRegistry {
 			return;
 		}
 		// Déclenchement des évènements.
-		ServiceReference sf = getContext().getServiceReference(EventAdmin.class.getName());
-		if (sf == null) {
-			activator.log("No Event Service available when throwing event: " + topic);
-			return;
-		}
-		EventAdmin ea = (EventAdmin) getContext().getService(sf);
-		if (ea == null) {
-			activator.warn("No Event Service available when throwing event: " + topic);
-			return;
-		}
-		Properties properties = new Properties();
-		properties.put(MetaDataEventHandler.EVENT_PROP_ENTITY, entity);
-		properties.put(MetaDataEventHandler.EVENT_PROP_TYPE, entity.getType());
-		properties.put(MetaDataEventHandler.EVENT_PROP_REGISTRY, this);
-		if (codes != null) {
-			properties.put(MetaDataEventHandler.EVENT_PROP_CODES, codes);
-		}
 		try {
-			ea.postEvent(new Event(topic, (Dictionary) properties));
-		} catch (SecurityException e) {
+			ServiceReference sf = getContext().getServiceReference(EventAdmin.class.getName());
+			if (sf == null) {
+				activator.log("No Event Service available when throwing event: " + topic);
+				return;
+			}
+			EventAdmin ea = (EventAdmin) getContext().getService(sf);
+			if (ea == null) {
+				activator.warn("No Event Service available when throwing event: " + topic);
+				return;
+			}
+			Properties properties = new Properties();
+			properties.put(MetaDataEventHandler.EVENT_PROP_ENTITY, entity);
+			properties.put(MetaDataEventHandler.EVENT_PROP_TYPE, entity.getType());
+			properties.put(MetaDataEventHandler.EVENT_PROP_REGISTRY, this);
+			if (codes != null) {
+				properties.put(MetaDataEventHandler.EVENT_PROP_CODES, codes);
+			}
+			try {
+				ea.postEvent(new Event(topic, (Dictionary) properties));
+			} catch (SecurityException e) {
+				activator.debug(e);
+			}
+		} catch (IllegalStateException e) {
 			activator.debug(e);
 		}
 	}
