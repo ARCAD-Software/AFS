@@ -30,6 +30,7 @@ import com.arcadsoftware.metadata.IEntityTesterService;
 import com.arcadsoftware.metadata.IMetaDataDeleteListener;
 import com.arcadsoftware.metadata.IMetaDataLinkingListener;
 import com.arcadsoftware.metadata.IMetaDataModifyListener;
+import com.arcadsoftware.metadata.IMetaDataSelectionListener;
 import com.arcadsoftware.metadata.MetaDataAttribute;
 import com.arcadsoftware.metadata.MetaDataEntity;
 import com.arcadsoftware.metadata.MetaDataEventHandler;
@@ -62,6 +63,7 @@ public class Activator extends AbstractActivator implements IEntityTesterService
 	private ServiceTracker<IMetaDataModifyListener, Object> modifyTracker;
 	private ServiceTracker<IMetaDataDeleteListener, Object> deleteTracker;
 	private ServiceTracker<IMetaDataLinkingListener, Object> linkingTracker;
+	private ServiceTracker<IMetaDataSelectionListener, Object> selectionTracker;
 
 	@Override
 	public void start(BundleContext bundleContext) throws Exception {
@@ -75,6 +77,8 @@ public class Activator extends AbstractActivator implements IEntityTesterService
 		deleteTracker.open();
 		linkingTracker = new ServiceTracker<IMetaDataLinkingListener, Object>(bundleContext, IMetaDataLinkingListener.clazz, null);
 		linkingTracker.open();
+		selectionTracker = new ServiceTracker<IMetaDataSelectionListener, Object>(bundleContext, IMetaDataSelectionListener.clazz, null);
+		selectionTracker.open();
 	}
 
 	@Override
@@ -88,7 +92,23 @@ public class Activator extends AbstractActivator implements IEntityTesterService
 		deleteTracker = null;
 		linkingTracker.close();
 		linkingTracker = null;
+		selectionTracker.close();
+		selectionTracker = null;
 		instance = null;
+	}
+
+	public List<IMetaDataSelectionListener> getSelectionListener(String type) {
+		ArrayList<IMetaDataSelectionListener> result = new ArrayList<IMetaDataSelectionListener>();
+		ServiceReference<IMetaDataSelectionListener>[] refs = selectionTracker.getServiceReferences();
+		if (refs != null) {
+			for(ServiceReference<IMetaDataSelectionListener> ref: refs) {
+				Object o = ref.getProperty(IMetaDataModifyListener.PROP_TYPE);
+				if ((o == null) || (type == null) || type.equals(o)) {
+					result.add((IMetaDataSelectionListener) selectionTracker.getService(ref));
+				}
+			}
+		}
+		return result;
 	}
 
 	public List<IMetaDataModifyListener> getModifyListener(String type) {

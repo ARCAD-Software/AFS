@@ -31,6 +31,7 @@ import com.arcadsoftware.beanmap.BeanMapPartialList;
 import com.arcadsoftware.metadata.IMetaDataDeleteListener;
 import com.arcadsoftware.metadata.IMetaDataLinkingListener;
 import com.arcadsoftware.metadata.IMetaDataModifyListener;
+import com.arcadsoftware.metadata.IMetaDataSelectionListener;
 import com.arcadsoftware.metadata.MetaDataAttribute;
 import com.arcadsoftware.metadata.MetaDataEntity;
 import com.arcadsoftware.metadata.MetaDataLink;
@@ -444,6 +445,11 @@ public class MetaDataItemResource extends DataItemResource {
 		if ((entity.getMetadata().getBoolean(MetaDataEntity.METADATA_EVENTONSELECTION)) && (result.size() > 1)) {
 			Activator.getInstance().fireSelectionEvent(getEntity(), result, getUser());
 		}
+		if (result.size() > 0) {
+			for (IMetaDataSelectionListener listener: Activator.getInstance().getSelectionListener(getEntity().getType())) {
+				listener.onSelection(getEntity(), result, getUser(), language);
+			}
+		}
 		// mise en forme du résultat.
 		switch (result.size()) {
 		case 0:
@@ -825,15 +831,18 @@ public class MetaDataItemResource extends DataItemResource {
 		}
 		Activator.getInstance().test(MetaDataTest.EVENTCODE_LIST, linkEntity, result, getUser(), language);
 		if (getEntity().getMetadata().getBoolean(MetaDataEntity.METADATA_EVENTONSELECTION)) {
-			Activator.getInstance().fireSelectionEvent(linkEntity,result,getUser());
+			Activator.getInstance().fireSelectionEvent(linkEntity, result, getUser());
+		}
+		for (IMetaDataSelectionListener listener: Activator.getInstance().getSelectionListener(linkEntity.getType())) {
+			listener.onSelection(linkEntity, result, getUser(), language);
 		}
 		return getRepresentation(variant, form, result, language, true);
 	}
 
 	private Representation testLinks(Variant variant, Form form, Language language) {
 		boolean tested = false;
-		for (BeanMap item:getItems()) {
-			for (BeanMap linked:linkeds) {
+		for (BeanMap item: getItems()) {
+			for (BeanMap linked: linkeds) {
 				if (getEntity().getMapper().linkTest(link, item.getId(), linked.getId())) {
 					tested = true;
 				}
@@ -858,8 +867,8 @@ public class MetaDataItemResource extends DataItemResource {
 		List<IMetaDataLinkingListener> listeners = Activator.getInstance().getLinkingListener(link);
 		boolean errors = false;
 		boolean added = false;
-		for (BeanMap item:getItems()) {
-			for (BeanMap linked:linkeds) {
+		for (BeanMap item: getItems()) {
+			for (BeanMap linked: linkeds) {
 				if (getEntity().getMapper().linkTest(link, item.getId(), linked.getId())) {
 					// If the data are already linked we ignore this operation, but we return an "Ok" message.
 					Activator.getInstance().debug("Metadata link already exist: " + link.getParent().getType() + //
@@ -906,7 +915,7 @@ public class MetaDataItemResource extends DataItemResource {
 			if (id.length() > 0) {
 				BeanMap bean = null;
 				try {
-					bean = linkEntity.getMapper().selection(linkEntity, Integer.parseInt(id), (List<ReferenceLine>)null, true);
+					bean = linkEntity.getMapper().selection(linkEntity, Integer.parseInt(id), (List<ReferenceLine>) null, true);
 				} catch (NumberFormatException e) {}
 				if (bean != null) {
 					result.add(bean);
@@ -920,7 +929,7 @@ public class MetaDataItemResource extends DataItemResource {
 			if (att != null) {
 				refline = new ReferenceLine(att);
 			}
-			for(String code:ids) { //$NON-NLS-1$
+			for(String code: ids) { //$NON-NLS-1$
 				if (code.length() > 0) {
 					BeanMap bean = linkEntity.getMapper().selectionFirst(linkEntity, null, true, refline, code);
 					if (bean != null) {
