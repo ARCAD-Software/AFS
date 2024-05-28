@@ -108,18 +108,6 @@ public class SystemTestTask extends TimerTask {
 		// Stop all started bundles...
 		for (Bundle bundle: context.getBundles()) {
 			if (toShutdown(bundle.getSymbolicName())) {
-				int i = 0;
-				while (bundle.getState() == Bundle.STARTING) {
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						return;
-					}
-					i++;
-					if (i == 30) {
-						break;
-					}
-				}
 				if ((bundle.getState() == Bundle.STARTING) || (bundle.getState() == Bundle.ACTIVE)) {
 					try {
 						bundle.stop();
@@ -130,16 +118,29 @@ public class SystemTestTask extends TimerTask {
 	}
 
 	private boolean toShutdown(String sname) {
-		for (String s: new String[] {"org.eclipse.osgi", "org.eclipse.equinox", "javax.", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				"org.restlet", "bc", "org.ops4j.pax", "org.apache.commons.commons",  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		for (String s: new String[] {
+				"org.eclipse.osgi", //$NON-NLS-1$
+				"org.eclipse.equinox", //$NON-NLS-1$
+				"javax.", //$NON-NLS-1$
+				"org.restlet", //$NON-NLS-1$
+				"bc", //$NON-NLS-1$
+				"org.ops4j.pax", //$NON-NLS-1$
+				"org.apache.commons.commons", //$NON-NLS-1$
 				"org.apache.felix"}) { //$NON-NLS-1$
 			if (sname.startsWith(s)) {
 				return false;
 			}
 		}
-		for (String bn: new String[] {"com.arcadsoftware.osgi", "com.arcadsoftware.runtime", //$NON-NLS-1$ //$NON-NLS-2$
-				"com.arcadsoftware.crypt", "com.arcadsoftware.groovy.security", "groovy", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ 
-				"com.arcadsoftware.rest", "xstream", "org.apache.sshd.osgi", "com.arcadsoftware.cm.simple"}) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		for (String bn: new String[] {
+				"com.arcadsoftware.osgi", //$NON-NLS-1$
+				"com.arcadsoftware.runtime", //$NON-NLS-1$
+				"com.arcadsoftware.crypt", //$NON-NLS-1$
+				"com.arcadsoftware.groovy.security", //$NON-NLS-1$
+				"groovy", //$NON-NLS-1$ 
+				"com.arcadsoftware.rest", //$NON-NLS-1$ 
+				"xstream", //$NON-NLS-1$
+				"org.apache.sshd.osgi", //$NON-NLS-1$
+				"com.arcadsoftware.cm.simple"}) { //$NON-NLS-1$
 			if (sname.equals(bn)) {
 				return false;
 			}
