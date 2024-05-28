@@ -122,4 +122,14 @@ public class DataSourceFactory {
 		return null;
 	}
 
+	/**
+	 * Get a running OSGi Service Datasource.
+	 * 
+	 * @param activator
+	 * @param name
+	 * @return
+	 */
+	public static DataSource getDataSource(String name) {
+		return Activator.getInstance().getDataSource(name);
+	}
 }

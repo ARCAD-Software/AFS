@@ -127,7 +127,7 @@ public class Activator extends AbstractConfiguredActivator {
 	public void stop(BundleContext context) throws Exception {
 		dstracker.close();
 		ArrayList<DataSource> dslist = new ArrayList<DataSource>();
-		for(ServiceRegistration<DataSource> serviceRegistration: currentDataSources) {
+		for (ServiceRegistration<DataSource> serviceRegistration: currentDataSources) {
 			ServiceReference<DataSource> r = serviceRegistration.getReference();
 			DataSource ds = context.getService(r);
 			fireSyncDSChangeEvent(IDataSourceEvent.TOPIC_REMOVE,
@@ -475,5 +475,17 @@ public class Activator extends AbstractConfiguredActivator {
 			props.put(id + Activator.KEY_DATABASETIMEOUT, Integer.toString(timeout));
 		}
 		updateConfiguration(props);
+	}
+
+	public DataSource getDataSource(String name) {
+		if (name != null) {
+			for (ServiceRegistration<DataSource> serviceRegistration: currentDataSources) {
+				final ServiceReference<DataSource> r = serviceRegistration.getReference();
+				if (name.equalsIgnoreCase((String) r.getProperty(DatabaseTracker.DatabaseID))) {
+					return getContext().getService(r);
+				}
+			}
+		}
+		return null;
 	}
 }
