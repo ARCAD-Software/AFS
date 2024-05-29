@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Binaries Web Storage Service
 Bundle-SymbolicName: com.arcadsoftware.server.binaries;singleton:=true
-Bundle-Version: 1.2.4
+Bundle-Version: 1.2.4.qualifier
 Bundle-Activator: com.arcadsoftware.server.binaries.internal.Activator
 Bundle-Vendor: ARCAD Software
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
