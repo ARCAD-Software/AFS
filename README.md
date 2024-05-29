@@ -1,10 +1,10 @@
-# AFS-OS release version 2023.7.24.
+# AFS-OS release version 2023.7.25.
 
-Release date Tue May 21 16:21:49 CEST 2024.
+Release date Wed May 29 14:29:47 CEST 2024.
 
-Link to the update site of [Version 2023.7.24](https://github.com/ARCAD-Software/AFS/releases/download/2023.7.24/).
+Link to the update site of [Version 2023.7.25](https://github.com/ARCAD-Software/AFS/releases/download/2023.7.25/).
 
-4 Bundles modified in this release.
+5 Bundles modified in this release.
 
 
 
@@ -12,24 +12,24 @@ Link to the update site of [Version 2023.7.24](https://github.com/ARCAD-Software
 
 Bundle Symbolic Name | Modification | Version
 -------------------- | ------------ | -------
-[com.arcadsoftware.afs.client.brands](bundles/client/afs.client.brands) | **Upgraded** from version 1.0.2 | **1.0.3**
+[com.arcadsoftware.afs.client.brands](bundles/client/afs.client.brands) | Not changed | 1.0.3
 [com.arcadsoftware.afs.client.cli](bundles/client/afs.client.cli) | Not changed | 1.3.2
 [com.arcadsoftware.afs.client.core](bundles/client/afs.client.core) | Not changed | 1.4.3
 [com.arcadsoftware.afs.client.core.base](bundles/client/afs.client.core.base) | Not changed | 1.6.2
 [com.arcadsoftware.afs.client.core.rcp](bundles/client/afs.client.core.rcp) | Not changed | 1.3.2
-[com.arcadsoftware.afs.client.editors](bundles/client/afs.client.editors) | **Upgraded** from version 1.2.2 | **1.2.3**
+[com.arcadsoftware.afs.client.editors](bundles/client/afs.client.editors) | Not changed | 1.2.3
 [com.arcadsoftware.afs.client.list](bundles/client/afs.client.list) | Not changed | 1.3.2
 [com.arcadsoftware.afs.client.macro](bundles/client/afs.client.macro) | Not changed | 1.2.2
 [com.arcadsoftware.afs.client.reporting](bundles/client/afs.client.reporting) | Not changed | 1.5.3
 [com.arcadsoftware.afs.client.server](bundles/client/afs.client.server) | Not changed | 1.5.2
 [com.arcadsoftware.afs.client.server.admin.common](bundles/client/afs.client.server.admin.common) | Not changed | 1.3.2
 [com.arcadsoftware.afs.client.server.admin.common.actions](bundles/client/afs.client.server.admin.common.actions) | Not changed | 1.3.2
-[com.arcadsoftware.afs.client.ssh](bundles/client/afs.client.ssh) | **Upgraded** from version 2.2.3 | **2.2.4**
+[com.arcadsoftware.afs.client.ssh](bundles/client/afs.client.ssh) | Not changed | 2.2.4
 [com.arcadsoftware.afs.client.users](bundles/client/afs.client.users) | Not changed | 1.4.3
 [com.arcadsoftware.afs.client.widgets](bundles/client/afs.client.widgets) | Not changed | 1.2.2
 [com.arcadsoftware.afs.client.widgets.rcp](bundles/client/afs.client.widgets.rcp) | Not changed | 1.3.2
 [com.arcadsoftware.afs.framework](bundles/client/afs.framework) | Not changed | 1.2.2
-[com.arcadsoftware.afs.framework.application](bundles/client/afs.framework.application) | **Upgraded** from version 1.3.3 | **1.3.4**
+[com.arcadsoftware.afs.framework.application](bundles/client/afs.framework.application) | Not changed | 1.3.4
 [com.arcadsoftware.afs.framework.application.rcp](bundles/client/afs.framework.application.rcp) | Not changed | 1.3.3
 [com.arcadsoftware.afs.framework.help](bundles/client/afs.framework.help) | Not changed | 1.2.2
 [com.arcadsoftware.afs.framework.ui](bundles/client/afs.framework.ui) | Not changed | 1.4.2
@@ -47,8 +47,8 @@ Bundle Symbolic Name | Modification | Version
 [com.arcadsoftware.crypt.xml](bundles/common/crypt.xml) | Not changed | 1.1.4
 [com.arcadsoftware.email](bundles/common/email) | Not changed | 1.4.3
 [com.arcadsoftware.groovy.security](bundles/common/groovy.security) | Not changed | 1.1.3
-[com.arcadsoftware.metadata](bundles/common/metadata) | Not changed | 1.5.7
-[com.arcadsoftware.osgi](bundles/common/osgi) | Not changed | 1.9.3
+[com.arcadsoftware.metadata](bundles/common/metadata) | **Upgraded** from version 1.5.7 | **1.5.8**
+[com.arcadsoftware.osgi](bundles/common/osgi) | **Upgraded** from version 1.9.3 | **1.9.4**
 [com.arcadsoftware.rest](bundles/common/rest) | Not changed | 3.1.3
 [com.arcadsoftware.ssh](bundles/common/ssh) | Not changed | 1.2.4
 
@@ -69,14 +69,14 @@ Bundle Symbolic Name | Modification | Version
 
 Bundle Symbolic Name | Modification | Version
 -------------------- | ------------ | -------
-[com.arcadsoftware.database.sql](bundles/server/database.sql) | Not changed | 2.3.4
+[com.arcadsoftware.database.sql](bundles/server/database.sql) | **Upgraded** from version 2.3.4 | **2.3.5**
 [com.arcadsoftware.database.sql.h2](bundles/server/database.sql.h2) | Not changed | 3.1.3
 [com.arcadsoftware.database.sql.postgresql](bundles/server/database.sql.postgresql) | Not changed | 1.2.3
 [com.arcadsoftware.metadata.binary](bundles/server/metadata.binary) | Not changed | 1.2.4
 [com.arcadsoftware.metadata.mapper.sql](bundles/server/metadata.mapper.sql) | Not changed | 1.3.6
 [com.arcadsoftware.metadata.mapper.sql.postgresql](bundles/server/metadata.mapper.sql.postgresql) | Not changed | 1.1.2
-[com.arcadsoftware.metadata.registry.xml](bundles/server/metadata.registry.xml) | Not changed | 1.2.3
-[com.arcadsoftware.metadata.rest](bundles/server/metadata.rest) | Not changed | 1.4.4
+[com.arcadsoftware.metadata.registry.xml](bundles/server/metadata.registry.xml) | **Upgraded** from version 1.2.3 | **1.2.4**
+[com.arcadsoftware.metadata.rest](bundles/server/metadata.rest) | **Upgraded** from version 1.4.4 | **1.4.5**
 [com.arcadsoftware.metadata.rights](bundles/server/metadata.rights) | Not changed | 1.3.3
 [com.arcadsoftware.metadata.server.user](bundles/server/metadata.server.user) | Not changed | 1.2.5
 [com.arcadsoftware.server.binaries](bundles/server/server.binaries) | Not changed | 1.2.4
