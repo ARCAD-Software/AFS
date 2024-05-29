@@ -194,7 +194,7 @@ public class XmlCriteriaStream extends XStreamCompact {
 		xs.useAttributeFor(ChangedCriteria.class, "beforedays"); //$NON-NLS-1$
 		xs.useAttributeFor(ChangedCriteria.class, "beforehours"); //$NON-NLS-1$
 		xs.useAttributeFor(ChangedCriteria.class, "beforeminuts"); //$NON-NLS-1$
-		// News Criteria of version 1.0.1
+		// New Criteria of version 1.0.1
 		xs.alias("deleted", DeletedCriteria.class); //$NON-NLS-1$
 		xs.useAttributeFor(DeletedCriteria.class, "attribute"); //$NON-NLS-1$
 		// New criteria of version 1.0.2
@@ -206,6 +206,8 @@ public class XmlCriteriaStream extends XStreamCompact {
 		xs.useAttributeFor(UnlinkCriteria.class, "attribute"); //$NON-NLS-1$
 		xs.useAttributeFor(UnlinkCriteria.class, "linkCode"); //$NON-NLS-1$
 		xs.useAttributeFor(UnlinkCriteria.class, "id"); //$NON-NLS-1$
+		// New criteria of version 1.5.1
+		xs.useAttributeFor(CurrentUserCriteria.class, "linkCode"); //$NON-NLS-1$
 		return xs;
 	}
 	
