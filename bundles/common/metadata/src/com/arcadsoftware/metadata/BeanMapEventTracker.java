@@ -203,6 +203,21 @@ public class BeanMapEventTracker extends ServiceTracker<EventAdmin, EventAdmin> 
 	public boolean fireEvent(String topic, MetaDataEntity entity, BeanMap bean, IConnectionUserBean user) {
 		return fireEvent(topic, entity, bean, null, user);
 	}
+	
+	/**
+	 * Fire an asynchronous BeanMap Event.
+	 * 
+	 * @param topic The Event Topic 
+	 * @param entity
+	 * @param bean
+	 * @param user
+	 * @param prop
+	 * @param value
+	 * @return
+	 */
+	public boolean fireEvent(String topic, MetaDataEntity entity, BeanMap bean, IConnectionUserBean user, String prop, Object value) {
+		return fireEvent(topic, entity, bean, null, user, prop, value);
+	}
 
 	/**
 	 * Fire an asynchronous BeanMap Event.
@@ -214,6 +229,18 @@ public class BeanMapEventTracker extends ServiceTracker<EventAdmin, EventAdmin> 
 	 * @return
 	 */
 	public boolean fireEvent(String topic, MetaDataEntity entity, BeanMap bean, BeanMap subBean, IConnectionUserBean user) {
+		return fireEvent(topic, entity, bean, subBean, user, null, null);
+	}
+	/**
+	 * Fire an asynchronous BeanMap Event.
+	 * 
+	 * @param topic
+	 * @param bean
+	 * @param subBean
+	 * @param user
+	 * @return
+	 */
+	public boolean fireEvent(String topic, MetaDataEntity entity, BeanMap bean, BeanMap subBean, IConnectionUserBean user, String prop, Object value) {
 		EventAdmin ea = (EventAdmin)getService();
 		if (ea != null) {
 			Dictionary<String, Object> properties = new Hashtable<String, Object>();
@@ -232,6 +259,9 @@ public class BeanMapEventTracker extends ServiceTracker<EventAdmin, EventAdmin> 
 			}
 			if (user != null) {
 				properties.put(MetaDataEventHandler.EVENT_PROP_USER, user);
+			}
+			if (prop != null) {
+				properties.put(prop, value);
 			}
 			try {
 				ea.postEvent(new Event(topic, properties));
