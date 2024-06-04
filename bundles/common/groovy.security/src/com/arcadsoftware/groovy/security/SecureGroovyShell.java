@@ -28,21 +28,11 @@ public class SecureGroovyShell extends GroovyShell {
 	private static Binding createBinding(IScriptAPI api) {
 		Binding binding = new Binding();
 		binding.setVariable("api", api); //$NON-NLS-1$
-		return null;
+		return binding;
 	}
 
 	public SecureGroovyShell(IScriptAPI api) {
 		super(api.getClass().getClassLoader(), createBinding(api), new SecuredCompilerConfiguration());
-	}
-
-	@Override
-	public Object evaluate(String scriptText) throws CompilationFailedException {
-		return super.evaluate("api.with {" + scriptText + '}'); //$NON-NLS-1$
-	}
-
-	@Override
-	public Object evaluate(String scriptText, String fileName) throws CompilationFailedException {
-		return super.evaluate("api.with {" + scriptText + '}', fileName); //$NON-NLS-1$
 	}
 
 	@Override

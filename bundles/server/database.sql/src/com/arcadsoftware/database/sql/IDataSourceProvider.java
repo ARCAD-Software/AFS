@@ -28,6 +28,7 @@ public interface IDataSourceProvider {
 	
 	/**
 	 * @return true if the given Database Type is acceptable for this Provider.
+	 * 
 	 * @see com.arcadsoftware.database.IDataSourceInformations
 	 */
 	public boolean acceptDatabaseType(String databaseType);

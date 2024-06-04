@@ -91,7 +91,6 @@ public class Activator extends AbstractConfiguredActivator {
 		super.start(context);
 		eventtracker = new ServiceTracker<>(context, EventAdmin.class.getName(), null);
 		eventtracker.open();
-		//registerService(IQueryRepository.class.getName(), new StandardQueryRepository(this));
 		registerService(CommandProvider.class.getName(), new DatabaseCommandProvider(this));
 		infos = new DataSourceInformations(this);
 		registerService(IDataSourceInformations.clazz, infos);
