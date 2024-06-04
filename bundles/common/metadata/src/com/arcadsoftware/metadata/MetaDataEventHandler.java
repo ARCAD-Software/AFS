@@ -94,6 +94,7 @@ public abstract class MetaDataEventHandler implements EventHandler {
 	public static final String EVENT_PROP_TYPE = "type"; //$NON-NLS-1$
 	public static final String EVENT_PROP_CODES = "codes"; //$NON-NLS-1$
 	public static final String EVENT_PROP_DOMAINS = "domain"; //$NON-NLS-1$
+	public static final String EVENT_PROP_HARDDELETE = "harddelete"; //$NON-NLS-1$
 
 	/**
 	 * The Service interface code.

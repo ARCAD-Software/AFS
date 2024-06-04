@@ -172,9 +172,9 @@ public class Activator extends AbstractActivator implements IEntityTesterService
 		}
 	}
 
-	public void fireDeleteEvent(MetaDataEntity entity, BeanMap bean, IConnectionUserBean user) {
+	public void fireDeleteEvent(MetaDataEntity entity, BeanMap bean, IConnectionUserBean user, boolean hardDelete) {
 		if (eventTracker != null) {
-			if (!eventTracker.fireEvent(MetaDataEventHandler.TOPIC_BEANMAP_DELETED, entity, bean, user)) {
+			if (!eventTracker.fireEvent(MetaDataEventHandler.TOPIC_BEANMAP_DELETED, entity, bean, user, MetaDataEventHandler.EVENT_PROP_HARDDELETE, hardDelete)) {
 				debug(String.format(Messages.Activator_Debug_EventNotFired, MetaDataEventHandler.TOPIC_BEANMAP_DELETED, user.toString(), bean.toString()));
 			}
 		}

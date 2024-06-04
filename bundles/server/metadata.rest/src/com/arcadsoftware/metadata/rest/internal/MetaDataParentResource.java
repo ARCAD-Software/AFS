@@ -602,7 +602,8 @@ public class MetaDataParentResource extends DataParentResource {
 			for(IMetaDataDeleteListener listener: listeners) {
 				listener.postDeletion(entity, item, getUser(), language);
 			}
-			Activator.getInstance().fireDeleteEvent(entity, item, getUser());
+			Activator.getInstance().fireDeleteEvent(entity, item, getUser(), hardelete || 
+					(entity.getMetadata().get("deleteCol") == null));
 		}
 		if (noerrors) {
 			setStatus(Status.SUCCESS_NO_CONTENT);

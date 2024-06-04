@@ -243,7 +243,7 @@ public class MetaDataItemResource extends DataItemResource {
 			setStatus(Status.CLIENT_ERROR_FORBIDDEN, Activator.getMessage("error.readonly", language)); //$NON-NLS-1$
 			return null;
 		}
-		boolean hardelete = isParameter(form, PARAM_HARDDELETE); //$NON-NLS-1$
+		final boolean hardelete = isParameter(form, PARAM_HARDDELETE); //$NON-NLS-1$
 		boolean noerrors = true;
 		List<IMetaDataDeleteListener> listeners = Activator.getInstance().getDeleteListener(entity.getType());
 		for (BeanMap item: getItems()) {
@@ -272,7 +272,8 @@ public class MetaDataItemResource extends DataItemResource {
 				for(IMetaDataDeleteListener listener: listeners) {
 					listener.postDeletion(entity, item, getUser(), language);
 				}
-				Activator.getInstance().fireDeleteEvent(entity, item, getUser());
+				Activator.getInstance().fireDeleteEvent(entity, item, getUser(), hardelete || 
+						(entity.getMetadata().get("deleteCol") == null));
 			}
 		}
 		if (noerrors) {
