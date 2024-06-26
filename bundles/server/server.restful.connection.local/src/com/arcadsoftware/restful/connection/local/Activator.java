@@ -74,7 +74,7 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 	private static final String PROP_CASESENSITIVE = "casesensitive"; //$NON-NLS-1$
 	private static final String PROP_ADMINACCOUNT = "admin.uid"; //$NON-NLS-1$
 	private static final String PROP_ADMINLOCK = "admin.unlock.delay"; //$NON-NLS-1$
-	private static final String LIST_PUBLIC_PROPS = KEY_LOCKCOUNT_MAX + ' ' + PROP_CASESENSITIVE;
+	private static final String LIST_PUBLIC_PROPS = KEY_LOCKCOUNT_MAX + ' ' + PROP_CASESENSITIVE + ' ' + PROP_PWDDURATION;
 	private static final boolean DEFAULT_CASESENSITIVE = true;
 	private static final int PWD_DURATION = 3650; // in days = 10 years
 	private static final int LOCKCOUNT_MAX = 5; // Valeur par défaut du nombre de tentative.
