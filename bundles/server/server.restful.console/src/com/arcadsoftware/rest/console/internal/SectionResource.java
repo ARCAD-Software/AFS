@@ -69,7 +69,7 @@ public class SectionResource extends UserLinkedResource {
 	@Override
 	protected Representation get(Variant variant) throws ResourceException {
 		if (file != null) {
-			return new FileRepresentation(file,variant.getMediaType());
+			return new FileRepresentation(file, variant.getMediaType());
 		}
 		if (isXSD(variant)) {
 			return new FileRepresentation(activator.getBundleFile("schemas/form.xsd"), MediaType.APPLICATION_W3C_SCHEMA); //$NON-NLS-1$
