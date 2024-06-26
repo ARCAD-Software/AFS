@@ -60,7 +60,20 @@ public class BinariesTranferService implements IBinariesTranferService {
 					try {
 						FileChannel outc = fos.getChannel();
 						try {
-							inc.transferTo(0, source.length(), outc);
+							long size = source.length();
+							long count = 0;
+							while (size > 0) {
+								long result = inc.transferTo(count, size, outc);
+								if (result == 0) {
+									break;
+								}
+								count += result;
+								size -= result;
+							}
+							if (size > 0) {
+								Activator.getInstance().error("File copy failed, incomplete file transfert (" + size + "b not copied).");
+								return false;
+							}
 						} finally {
 							outc.close();
 						}
