@@ -84,7 +84,7 @@ public class SectionsListResource extends UserLinkedResource {
 			}
 			HashMap<String, Category> list = new HashMap<String, Category>();
 			for (IRestConsoleSection s: activator.getSections()) {
-				if ((s instanceof IActivableConsoleNode) && !((IActivableConsoleNode)s).isActivated()) {
+				if ((s instanceof IActivableConsoleNode) && !((IActivableConsoleNode) s).isActivated()) {
 					continue;
 				}
 				String cat = s.getCategory(language);

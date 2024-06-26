@@ -65,14 +65,14 @@ public class ConfigListResource extends UserLinkedResource {
 		@SuppressWarnings("rawtypes")
 		ServiceReference ref = activator.getContext().getServiceReference(ConfigurationAdmin.class.getName());
 		if (ref == null) {
-			activator.warn("No ConfigurationAdmin service reference (required for Rest resource /config/)");
+			activator.warn("No ConfigurationAdmin service reference (required for Rest resource /admin/config/)");
 			setExisting(false);
 			return null;
 		}
 		@SuppressWarnings("unchecked")
 		ConfigurationAdmin configAdmin = (ConfigurationAdmin) activator.getContext().getService(ref);
 		if (configAdmin == null) {
-			activator.warn("No ConfigurationAdmin service (required for Rest resource /config/)");
+			activator.warn("No ConfigurationAdmin service (required for Rest resource /admin/config/)");
 			setExisting(false);
 			return null;
 		}
