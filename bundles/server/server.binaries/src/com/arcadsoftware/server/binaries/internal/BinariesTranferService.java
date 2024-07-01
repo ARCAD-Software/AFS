@@ -18,6 +18,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
@@ -35,9 +36,6 @@ public class BinariesTranferService implements IBinariesTranferService {
 
 	private Activator activator;
 
-	/**
-	 * @param activator
-	 */
 	public BinariesTranferService(Activator activator) {
 		super();
 		this.activator = activator;
@@ -111,6 +109,16 @@ public class BinariesTranferService implements IBinariesTranferService {
 			name = ""; //$NON-NLS-1$
 		}
 		File result = new File(activator.getFileNamePrefix(category, id) + name);
+		// Test a directory path trasversal attack...
+		try {
+			if (result.getCanonicalPath().startsWith(activator.getPath().getCanonicalPath())) {
+				activator.error("Invalid Path name : '" + result.getAbsolutePath() + "' does apears to be contained in: " + activator.getPath().getAbsolutePath());
+				return null;
+			}
+		} catch (IOException e) {
+			activator.error("Unable to get canonical path of: '" + result.getAbsolutePath() + "' does apears to be contained in: " + activator.getPath().getAbsolutePath(), e);
+			return null;
+		}
 		File parent = result.getParentFile();
 		if (parent != null) {
 			parent.mkdirs();
@@ -118,21 +126,13 @@ public class BinariesTranferService implements IBinariesTranferService {
 		return result;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.arcadsoftware.server.binaries.IBinariesTranferService#generateKey (java.lang.String, int, boolean)
-	 */
+	@Override
 	public String generateKey(String category, int id, boolean readOnly) {
 		activator.test(category, id);
 		return activator.store(category, id, readOnly);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.arcadsoftware.server.binaries.IBinariesTranferService#listCategory (java.lang.String)
-	 */
+	@Override
 	public List<Integer> listCategory(String category) {
 		File dir = new File(activator.getDirName(category));
 		ArrayList<Integer> result = new ArrayList<Integer>();
@@ -158,27 +158,18 @@ public class BinariesTranferService implements IBinariesTranferService {
 		return result;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.arcadsoftware.server.binaries.IBinariesTranferService#newFileId(java .lang.String)
-	 */
+	@Override
 	public int newFileId(String category) {
 		return activator.getNewFileId(category);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.arcadsoftware.server.binaries.IBinariesTranferService#moveFileId( java.lang.String, java.lang.String,
-	 * int)
-	 */
+	@Override
 	public int moveFileId(String newCategory, String oldCategory, int id) {
 		File source = activator.getFile(oldCategory, id);
 		if ((source != null) && source.isFile()) {
 			int nid = activator.getNewFileId(newCategory);
 			File target = getNewFileName(newCategory, nid, source);
-			if (source.renameTo(target)) {
+			if ((target != null) && source.renameTo(target)) {
 				activator.fileEventDel(oldCategory, id, source);
 				activator.fileEventNew(newCategory, nid, target);
 				return nid;
@@ -187,18 +178,13 @@ public class BinariesTranferService implements IBinariesTranferService {
 		return 0;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.arcadsoftware.server.binaries.IBinariesTranferService#newFileId(java .lang.String, java.lang.String,
-	 * int)
-	 */
+	@Override
 	public int newFileId(String newCategory, String oldCategory, int id) {
 		File source = activator.getFile(oldCategory, id);
 		if ((source != null) && source.isFile()) {
 			int nid = activator.getNewFileId(newCategory);
 			File target = getNewFileName(newCategory, nid, source);
-			if (copy(source, target)) {
+			if ((target != null) && copy(source, target)) {
 				activator.fileEventNew(newCategory, nid, target);
 				return nid;
 			}
@@ -206,11 +192,7 @@ public class BinariesTranferService implements IBinariesTranferService {
 		return 0;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.arcadsoftware.server.binaries.IBinariesTranferService#removeFile( java.lang.String, int)
-	 */
+	@Override
 	public boolean removeFile(String category, int id) {
 		File file = activator.getFile(category, id);
 		if ((file != null) && file.isFile()) {
@@ -222,11 +204,7 @@ public class BinariesTranferService implements IBinariesTranferService {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.arcadsoftware.server.binaries.IBinariesTranferService#generateTempFile(java.lang.String, int)
-	 */
+	@Override
 	public File generateTempFile(String category, int id) {
 		// We should copy the file into a temporary directory.
 		// Distant repository need to access to the web-service.
@@ -237,11 +215,7 @@ public class BinariesTranferService implements IBinariesTranferService {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.arcadsoftware.server.binaries.IBinariesTranferService#newFile(java.lang.String, int, java.io.File)
-	 */
+	@Override
 	public boolean newFile(String category, int id, File file) {
 		if ((category != null) && (file != null) && file.isFile()) {
 			if (activator.removeFiles(category, id)) {
@@ -250,6 +224,16 @@ public class BinariesTranferService implements IBinariesTranferService {
 			activator.test(category, id);
 			if (file.isFile()) {
 				File target = new File(activator.getFileNamePrefix(category, id) + file.getName());
+				// Test a directory path trasversal attack...
+				try {
+					if (target.getCanonicalPath().startsWith(activator.getPath().getCanonicalPath())) {
+						activator.error("Invalid Path name : '" + target.getAbsolutePath() + "' does apears to be contained in: " + activator.getPath().getAbsolutePath());
+						return false;
+					}
+				} catch (IOException e) {
+					activator.error("Unable to get canonical path of: '" + target.getAbsolutePath() + "' does apears to be contained in: " + activator.getPath().getAbsolutePath(), e);
+					return false;
+				}
 				// Ensure that parent exists
 				File parent = target.getParentFile();
 				if ((parent != null) && !parent.exists()) {
@@ -267,12 +251,7 @@ public class BinariesTranferService implements IBinariesTranferService {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.arcadsoftware.server.binaries.IBinariesTranferService#newFile(java.lang.String, int,
-	 * java.io.InputStream, java.lang.String)
-	 */
+	@Override
 	public boolean newFile(String category, int id, InputStream stream, String filename) {
 		if ((category != null) && (stream != null) && (filename != null)) {
 			if (activator.removeFiles(category, id)) {
@@ -281,6 +260,16 @@ public class BinariesTranferService implements IBinariesTranferService {
 			activator.test(category, id);
 			try {
 				File target = new File(activator.getFileNamePrefix(category, id) + filename);
+				// Test a directory path trasversal attack...
+				try {
+					if (target.getCanonicalPath().startsWith(activator.getPath().getCanonicalPath())) {
+						activator.error("Invalid Path name : '" + target.getAbsolutePath() + "' does apears to be contained in: " + activator.getPath().getAbsolutePath());
+						return false;
+					}
+				} catch (IOException e) {
+					activator.error("Unable to get canonical path of: '" + target.getAbsolutePath() + "' does apears to be contained in: " + activator.getPath().getAbsolutePath(), e);
+					return false;
+				}
 				if (!target.getParentFile().exists()) {
 					target.getParentFile().mkdirs();
 				}
@@ -311,15 +300,9 @@ public class BinariesTranferService implements IBinariesTranferService {
 		return false;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.arcadsoftware.server.binaries.IBinariesTranferService#ngetRootPath()
-	 */
-	
 	@Override
 	public String getRootPath() {
-		return activator.getPath();
+		return activator.getPath().getAbsolutePath();
 	}
 
 }

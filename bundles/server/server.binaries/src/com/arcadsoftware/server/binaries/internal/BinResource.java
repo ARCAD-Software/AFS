@@ -105,6 +105,18 @@ public class BinResource extends OSGiResource {
 				name = new File(name).getName();
 			}
 			file = new File(Activator.getInstance().getFileNamePrefix(category, id) + name);
+			// Test a directory path trasversal attack...
+			try {
+				if (file.getCanonicalPath().startsWith(Activator.getInstance().getPath().getCanonicalPath())) {
+					Activator.getInstance().error("Invalid Path name : '" + file.getAbsolutePath() + "' does apears to be contained in: " + Activator.getInstance().getPath().getAbsolutePath());
+					setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+					return null;
+				}
+			} catch (IOException e) {
+				Activator.getInstance().error("Unable to get canonical path of: '" + file.getAbsolutePath() + "' does apears to be contained in: " + Activator.getInstance().getPath().getAbsolutePath(), e);
+				setStatus(Status.SERVER_ERROR_INTERNAL);
+				return null;
+			}
 			try {
 				file.getParentFile().mkdirs();
 				if (!file.createNewFile()) {
@@ -203,6 +215,18 @@ public class BinResource extends OSGiResource {
 						name = new File(name).getName();
 					}
 					file = new File(Activator.getInstance().getFileNamePrefix(category, id) + name);
+					// Test a directory path trasversal attack...
+					try {
+						if (file.getCanonicalPath().startsWith(Activator.getInstance().getPath().getCanonicalPath())) {
+							Activator.getInstance().error("Invalid Path name : '" + file.getAbsolutePath() + "' does apears to be contained in: " + Activator.getInstance().getPath().getAbsolutePath());
+							setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+							return null;
+						}
+					} catch (IOException e) {
+						Activator.getInstance().error("Unable to get canonical path of: '" + file.getAbsolutePath() + "' does apears to be contained in: " + Activator.getInstance().getPath().getAbsolutePath(), e);
+						setStatus(Status.SERVER_ERROR_INTERNAL);
+						return null;
+					}
 					try {
 						file.getParentFile().mkdirs();
 						if (!file.createNewFile()) {
