@@ -74,7 +74,6 @@ public class Activator extends AbstractFileRepositoryActivator {
 		return ".xml"; //$NON-NLS-1$
 	}
 	
-	
 	private boolean isIgnored(Bundle bundle) {
 		if (ORG_CODEHAUS_GROOVY.equals(bundle.getSymbolicName()) ||
 			GROOVY.equals(bundle.getSymbolicName()) ||
@@ -109,7 +108,7 @@ public class Activator extends AbstractFileRepositoryActivator {
 	public String[] getFileList(String foldername, boolean useExtension, boolean recurse) {
 		ArrayList<String> result = new ArrayList<String>();
 		Collections.addAll(result, super.getFileList(foldername, useExtension, recurse));
-		for(Bundle b:getContext().getBundles()) {
+		for (Bundle b: getContext().getBundles()) {
 			final String folder = getBundleLayoutsFolder(b);
 			if (folder != null) {
 				addBundleFiles(b, foldername, useExtension, recurse, result);
@@ -125,7 +124,7 @@ public class Activator extends AbstractFileRepositoryActivator {
 			return result;
 		}
 		String filename = getFileName(filekey, langcode);
-		for(Bundle b:getContext().getBundles()) {
+		for (Bundle b: getContext().getBundles()) {
 			String folder = getBundleLayoutsFolder(b);
 			if (folder != null) {
 				if (folder.endsWith("/") && filename.startsWith("/")) { //$NON-NLS-1$ //$NON-NLS-2$
@@ -143,6 +142,4 @@ public class Activator extends AbstractFileRepositoryActivator {
 		}
 		return null;
 	}
-	
-	
 }

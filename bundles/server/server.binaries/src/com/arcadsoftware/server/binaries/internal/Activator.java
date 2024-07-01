@@ -56,7 +56,7 @@ public class Activator extends AbstractConfiguredActivator {
 	private int timeKeyDuration = 9000000; //150 minutes
 	private Timer timer;
 	private String serverAdress = "http://localhost"; //$NON-NLS-1$
-	private String path = DEFAULTPATH;
+	private File path = new File(DEFAULTPATH);
 	private boolean categoriesUpdated;
 	@SuppressWarnings("rawtypes")
 	private ServiceTracker eventTracker;
@@ -150,14 +150,15 @@ public class Activator extends AbstractConfiguredActivator {
 			}
 			o = properties.get(CONF_KEYPATH);
 			if (o != null) {
-				path = o.toString().trim();
-				if (path.length() == 0) {
-					path = DEFAULTPATH;
-				} else if ((!path.endsWith("/")) || (!path.endsWith("\\"))) { //$NON-NLS-1$ //$NON-NLS-2$
-					path = path + "/"; //$NON-NLS-1$
+				String p = o.toString().trim();
+				if (p.length() == 0) {
+					p = DEFAULTPATH;
+				} else if ((p.endsWith("/")) || (p.endsWith("\\"))) { //$NON-NLS-1$ //$NON-NLS-2$
+					p = p.substring(0, p.length() - 1);
 				}
+				path = new File(p);
 			} else {
-				path = DEFAULTPATH;
+				path = new File(DEFAULTPATH);
 			}
 			o = properties.get(CONF_KEYMAXSIZE);
 			if (o != null) {
@@ -271,17 +272,16 @@ public class Activator extends AbstractConfiguredActivator {
 		}
 	}
 	
-	public String getPath() {
+	public File getPath() {
 		return path;
 	}
 	
-	
 	protected String getDirName(String category) {
-		return path + category;
+		return path.getAbsolutePath() + category.replace('.', '_');
 	}
 	
 	protected String getFileNamePrefix(String category, int id) {
-		return path + category + getSubDir(id) + '/' + id + '_';
+		return path.getAbsolutePath() + category.replace('.', '_') + getSubDir(id) + '/' + id + '_';
 	}
 
 	private void fileEvent(Event event) {
