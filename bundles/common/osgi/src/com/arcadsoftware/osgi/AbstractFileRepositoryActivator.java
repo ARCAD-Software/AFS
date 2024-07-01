@@ -337,7 +337,17 @@ public abstract class AbstractFileRepositoryActivator extends AbstractConfigured
 	 * @return
 	 */
 	public File getExternalFile(String filename) {
-		return new File(baseDir + filename);
+		File result = new File(baseDir + filename);
+		File bdir = new File(baseDir);
+		// Directory path trasversal protection...
+		try {
+			if (!result.getCanonicalPath().startsWith(bdir.getCanonicalPath())) {
+				return new File(bdir, new File(filename).getName());
+			}
+		} catch (IOException e) {
+			return new File(bdir, new File(filename).getName());
+		}
+		return result;
 	}
 
 	/**
