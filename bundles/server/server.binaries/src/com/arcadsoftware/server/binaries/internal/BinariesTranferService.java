@@ -111,7 +111,7 @@ public class BinariesTranferService implements IBinariesTranferService {
 		File result = new File(activator.getFileNamePrefix(category, id) + name);
 		// Test a directory path trasversal attack...
 		try {
-			if (result.getCanonicalPath().startsWith(activator.getPath().getCanonicalPath())) {
+			if (!result.getCanonicalPath().startsWith(activator.getPath().getCanonicalPath())) {
 				activator.error("Invalid Path name : '" + result.getAbsolutePath() + "' does apears to be contained in: " + activator.getPath().getAbsolutePath());
 				return null;
 			}
@@ -226,7 +226,7 @@ public class BinariesTranferService implements IBinariesTranferService {
 				File target = new File(activator.getFileNamePrefix(category, id) + file.getName());
 				// Test a directory path trasversal attack...
 				try {
-					if (target.getCanonicalPath().startsWith(activator.getPath().getCanonicalPath())) {
+					if (!target.getCanonicalPath().startsWith(activator.getPath().getCanonicalPath())) {
 						activator.error("Invalid Path name : '" + target.getAbsolutePath() + "' does apears to be contained in: " + activator.getPath().getAbsolutePath());
 						return false;
 					}
@@ -262,7 +262,7 @@ public class BinariesTranferService implements IBinariesTranferService {
 				File target = new File(activator.getFileNamePrefix(category, id) + filename);
 				// Test a directory path trasversal attack...
 				try {
-					if (target.getCanonicalPath().startsWith(activator.getPath().getCanonicalPath())) {
+					if (!target.getCanonicalPath().startsWith(activator.getPath().getCanonicalPath())) {
 						activator.error("Invalid Path name : '" + target.getAbsolutePath() + "' does apears to be contained in: " + activator.getPath().getAbsolutePath());
 						return false;
 					}
