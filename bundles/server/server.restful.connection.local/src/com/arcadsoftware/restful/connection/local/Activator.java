@@ -34,6 +34,7 @@ import com.arcadsoftware.crypt.Crypto;
 import com.arcadsoftware.metadata.AbstractMapperService;
 import com.arcadsoftware.metadata.IMetaDataDeleteListener;
 import com.arcadsoftware.metadata.IMetaDataModifyListener;
+import com.arcadsoftware.metadata.IMetaDataSelectionListener;
 import com.arcadsoftware.metadata.MetaDataAttribute;
 import com.arcadsoftware.metadata.MetaDataEntity;
 import com.arcadsoftware.metadata.criteria.DeletedCriteria;
@@ -110,8 +111,9 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 		// Register itself as a console command provider.
 		registerService(CommandProvider.class.getName(), this);
 		// Register LocalAuth modification listener (set locked property correctly and manage password limit date).
-		registerService(IMetaDataModifyListener.clazz, new LocalAuthModifyListener(this), IMetaDataModifyListener.PROP_TYPE, LOCALAUTH);
-		registerService(IMetaDataDeleteListener.clazz, new LocalAuthDeleteListener(this), IMetaDataDeleteListener.PROP_TYPE, LOCALAUTH);
+		registerService(IMetaDataModifyListener.class, new LocalAuthModifyListener(this), IMetaDataModifyListener.PROP_TYPE, LOCALAUTH);
+		registerService(IMetaDataDeleteListener.class, new LocalAuthDeleteListener(this), IMetaDataDeleteListener.PROP_TYPE, LOCALAUTH);
+		registerService(IMetaDataSelectionListener.class, new LocalAuthSelectionListener(this), IMetaDataDeleteListener.PROP_TYPE, LOCALAUTH);
 		// Connection Cache access.
 		connectionCacheTracker = new ServiceTracker(context, IConnectionCache.class, null);
 		connectionCacheTracker.open();
