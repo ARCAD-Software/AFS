@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2024 ARCAD Software.
+ * Copyright (c) 2023 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -15,7 +15,6 @@ package com.arcadsoftware.editor.swt;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -127,15 +126,8 @@ public class DynamicEditorPart extends EditorPart implements IPersistableEditor,
 		}
 		final Map<String, Object> virtualValues = getVirtualValues();
 		if (virtualValues != null) {
-<<<<<<< master
-			for (String key: virtualValues.keySet()) {
+			for (final String key : virtualValues.keySet()) {
 				renderer.putVirtualValue(key, virtualValues.get(key));
-=======
-			final Set<String> keySet = virtualValues.keySet();
-			for (final String key : keySet) {
-				final Object value = virtualValues.get(key);
-				renderer.putVirtualValue(key, value);
->>>>>>> 38f2e60 Clean-up AFS Client
 			}
 		}
 		setFixedValues(renderer);

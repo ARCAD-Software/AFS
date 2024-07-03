@@ -19,7 +19,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 public class ExecUtils {
-<<<<<<< master
 
 	public static String executeCommandtoString(ArrayList<String> commandOptions, boolean verbose) throws IOException {
 		final ProcessBuilder processBuilder = new ProcessBuilder(commandOptions);
@@ -41,34 +40,5 @@ public class ExecUtils {
 		cmd.append("\n");//$NON-NLS-1$
 		cmd.append(line);
 		return cmd.toString();
-=======
-	public static String executeCommandtoString(ArrayList<String> commandOptions, boolean verbose)
-			throws IOException {
-		verbose = true;
-		final ProcessBuilder processBuilder = new ProcessBuilder(commandOptions);
-		processBuilder.redirectErrorStream(true);
-		final Process process = processBuilder.start();
-		final InputStream is = process.getInputStream();
-		final InputStreamReader isr = new InputStreamReader(is);
-		final char[] c = new char[8096];
-		int count = isr.read(c, 0, 8096);
-		final StringBuilder line = new StringBuilder();
-		while (count != -1) {
-			line.append(String.valueOf(c, 0, count));
-			count = isr.read(c, 0, 8096);
-		}
-		if (verbose) {
-			final StringBuilder cmd = new StringBuilder();
-			for (final String s : commandOptions) {
-				cmd.append(s).append(" "); //$NON-NLS-1$
-			}
-			cmd.append("\n");//$NON-NLS-1$
-			cmd.append(line);
-			return cmd.toString();
-		} else {
-			return line.toString();
-		}
-
->>>>>>> 38f2e60 Clean-up AFS Client
 	}
 }

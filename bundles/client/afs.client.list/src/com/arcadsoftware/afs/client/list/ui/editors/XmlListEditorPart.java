@@ -29,34 +29,7 @@ import com.arcadsoftware.mmk.lists.AbstractXmlList;
 public class XmlListEditorPart extends EditorPart {
 
 	public final static String XMLLIST_EDITOR_ID = "com.arcadsoftware.afs.client.list.ui.editors.XmlListEditor"; //$NON-NLS-1$
-<<<<<<< master
-=======
 
-	AbstractXmlList list;
-	AbstractXmlListViewer viewer;
-	AbstractXmlListEditorInput listInput;
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.IEditorPart#init(org.eclipse.ui.IEditorSite, org.eclipse.ui.IEditorInput)
-	 */
-	@Override
-	public void init(IEditorSite site, IEditorInput input)
-			throws PartInitException {
-		if ((input == null) || !(input instanceof AbstractXmlListEditorInput)) {
-			throw new PartInitException(Activator.resString("xmllist.editor.noEditorInput")); //$NON-NLS-1$
-		} else {
-			setInput(input);
-			firePropertyChange(PROP_TITLE);
-			listInput = (AbstractXmlListEditorInput) input;
-			list = listInput.getList();
-			setPartName(getPartName() + ": " + ((AbstractXmlListEditorInput) input).getName()); //$NON-NLS-1$
-		}
-		setSite(site);
-	}
->>>>>>> 38f2e60 Clean-up AFS Client
-
-<<<<<<< master
 	private AbstractXmlList list;
 	private AbstractXmlListViewer viewer;
 	private AbstractXmlListEditorInput listInput;
@@ -74,12 +47,6 @@ public class XmlListEditorPart extends EditorPart {
 		setSite(site);
 	}
 
-=======
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.ISaveablePart#isDirty()
-	 */
->>>>>>> 38f2e60 Clean-up AFS Client
 	@Override
 	public boolean isDirty() {
 		return false;
@@ -89,12 +56,7 @@ public class XmlListEditorPart extends EditorPart {
 	public void createPartControl(Composite parent) {
 		// Chargement uniquement des metadatas
 		list.load(false, true);
-<<<<<<< master
 		viewer = new AbstractXmlListViewer(parent, SWT.MULTI | SWT.FULL_SELECTION, list.getMetadatas()) {
-=======
-		viewer = new AbstractXmlListViewer(parent, SWT.MULTI | SWT.FULL_SELECTION,
-				list.getMetadatas()) {
->>>>>>> 38f2e60 Clean-up AFS Client
 			@Override
 			protected String getColumnHeader(String propertyName) {
 				return listInput.getColumnHeader(propertyName);
@@ -109,15 +71,12 @@ public class XmlListEditorPart extends EditorPart {
 	}
 
 	@Override
-	public void doSave(IProgressMonitor arg0) {}
-
-<<<<<<< master
-=======
+	public void doSave(IProgressMonitor arg0) {
 	}
 
->>>>>>> 38f2e60 Clean-up AFS Client
 	@Override
-	public void doSaveAs() {}
+	public void doSaveAs() {
+	}
 
 	@Override
 	public boolean isSaveAsAllowed() {
@@ -125,12 +84,6 @@ public class XmlListEditorPart extends EditorPart {
 	}
 
 	@Override
-<<<<<<< master
-	public void setFocus() {}
-=======
 	public void setFocus() {
-
 	}
-
->>>>>>> 38f2e60 Clean-up AFS Client
 }
