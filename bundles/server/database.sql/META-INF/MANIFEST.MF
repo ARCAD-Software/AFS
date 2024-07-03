@@ -21,7 +21,7 @@ Import-Package: com.arcadsoftware.crypt;version="[1.3.0,2.0.0)",
  org.osgi.service.event;version="[1.1.0,2.0.0)",
  org.osgi.util.tracker;version="[1.3.3,2.0.0)",
  org.w3c.dom
-Export-Package: com.arcadsoftware.database.sql;version="1.3.0";uses:="com.arcadsoftware.osgi,javax.sql,org.osgi.framework",
+Export-Package: com.arcadsoftware.database.sql;version="1.4.0";uses:="com.arcadsoftware.osgi,javax.sql,org.osgi.framework",
  com.arcadsoftware.dbutils;version="1.0.0";uses:="javax.sql,org.apache.commons.dbutils,org.apache.commons.dbutils.handlers"
 Bundle-ClassPath: .
 Automatic-Module-Name: com.arcadsoftware.database.sql

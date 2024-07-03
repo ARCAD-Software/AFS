@@ -27,7 +27,7 @@ public class DataSourceParameters {
 	private final String type;
 	private final String url;
 	private final String login;
-	private final String dialect;
+	private String dialect;
 	private final char[] pwd;
 	private final int poolmin;
 	private final int poolmax;
@@ -51,6 +51,10 @@ public class DataSourceParameters {
 
 	public Map<String, Object> getParameters() {
 		return parameters;
+	}
+	
+	public void setDialect(String dialect) {
+		this.dialect = dialect;
 	}
 	
 	public void addParameter(String name, Object value) {
