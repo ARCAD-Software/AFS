@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -33,12 +33,11 @@ public class SectionViewer extends AbstractColumnedTreeViewer {
 		super(parent, style);
 	}
 
-
 	@Override
 	public String getValue(Object element, int columnIndex) {
-		if (columnIndex==0){
-			if (element instanceof CategoryWrapper){
-				return  ((CategoryWrapper)element).getLabel();
+		if (columnIndex == 0) {
+			if (element instanceof CategoryWrapper) {
+				return ((CategoryWrapper) element).getLabel();
 			}
 		}
 		return null;
@@ -46,21 +45,21 @@ public class SectionViewer extends AbstractColumnedTreeViewer {
 
 	@Override
 	public ArcadColumns getReferenceColumns() {
-		ArcadColumns cols = new ArcadColumns();
-		cols.add(new ArcadColumn("category",Activator.resString("settingseditor.category.header.name"),ArcadColumn.VISIBLE,0,250,0));  //$NON-NLS-1$//$NON-NLS-2$
+		final ArcadColumns cols = new ArcadColumns();
+		cols.add(new ArcadColumn("category", Activator.resString("settingseditor.category.header.name"), //$NON-NLS-1$//$NON-NLS-2$
+				ArcadColumn.VISIBLE, 0, 250, 0));
 		return cols;
 	}
-	
-	
+
 	@Override
 	public String getIdentifier() {
 		return null;
 	}
 
-	public CategoryWrapper getSelectedCategory(){
-		IStructuredSelection selection = getSelection();
-		if (!selection.isEmpty()) {//TODO [SSC] vérifier le cast
-			return (CategoryWrapper)selection.getFirstElement();
+	public CategoryWrapper getSelectedCategory() {
+		final IStructuredSelection selection = getSelection();
+		if (!selection.isEmpty()) {// TODO [SSC] vérifier le cast
+			return (CategoryWrapper) selection.getFirstElement();
 		}
 		return null;
 	}
@@ -68,18 +67,13 @@ public class SectionViewer extends AbstractColumnedTreeViewer {
 	@Override
 	public AbstractColumnedTreeLabelProvider createTreeLabelProvider(
 			AbstractColumnedViewer viewer) {
-		return new ColumnedDefaultTreeLabelProvider(viewer){
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 4747861543215483962L;
-
+		return new ColumnedDefaultTreeLabelProvider(viewer) {
+			@Override
 			protected Image getImage(String key) {
-				//return Activator.getInstance().getImage(key);
+				// return Activator.getInstance().getImage(key);
 				return ImageManager.getInstance().getImage(key);
 			}
 		};
 	}
-	
-	
+
 }

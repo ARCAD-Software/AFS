@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -27,7 +27,7 @@ public class TargettoModelTreeUpdateStrategy extends UpdateListStrategy {
 	ArrayList<Integer> completed;
 
 	/**
-	 * 
+	 *
 	 */
 	public TargettoModelTreeUpdateStrategy(ArrayList<Integer> completed) {
 		super(true, POLICY_UPDATE);
@@ -38,7 +38,7 @@ public class TargettoModelTreeUpdateStrategy extends UpdateListStrategy {
 	protected IStatus doAdd(IObservableList observableList, Object element, int index) {
 		int ci = completed.size();
 		for (int i = ci - 1; i >= 0; i++) {
-			int j = completed.get(i).intValue();
+			final int j = completed.get(i).intValue();
 			if (j == index) {
 				ci = j;
 				completed.set(i, Integer.valueOf(j + 1));
@@ -53,10 +53,10 @@ public class TargettoModelTreeUpdateStrategy extends UpdateListStrategy {
 
 	@Override
 	protected IStatus doRemove(IObservableList observableList, int index) {
-		int ci = completed.indexOf(Integer.valueOf(index));
+		final int ci = completed.indexOf(Integer.valueOf(index));
 		completed.remove(ci);
 		for (int i = completed.size() - 1; i >= index; i--) {
-			int j = completed.get(i).intValue();
+			final int j = completed.get(i).intValue();
 			if (j > -1) {
 				completed.set(i, Integer.valueOf(j - 1));
 			}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -57,7 +57,7 @@ public class CustomDateInputSWTProvider implements IInputSWTProvider {
 	private static final Date EMPTY_DATE = new Date(0);
 	private static final String OK = Messages.DateInputSWTProvider_okButton;
 	private static final String BUTTON_LABEL = "..."; //$NON-NLS-1$
-	
+
 	private CustomDateTime customDateTimeDate;
 	private DateTime dateTime;
 	private boolean withCheckButton;
@@ -289,15 +289,22 @@ public class CustomDateInputSWTProvider implements IInputSWTProvider {
 		dialog.setDefaultButton(ok);
 		dialog.addShellListener(new ShellListener() {
 			@Override
-			public void shellIconified(ShellEvent e) {}
+			public void shellIconified(ShellEvent e) {
+			}
+
 			@Override
-			public void shellDeiconified(ShellEvent e) {}
+			public void shellDeiconified(ShellEvent e) {
+			}
+
 			@Override
 			public void shellDeactivated(ShellEvent e) {
 				dialog.close();
 			}
+
 			@Override
-			public void shellClosed(ShellEvent e) {}
+			public void shellClosed(ShellEvent e) {
+			}
+
 			@Override
 			public void shellActivated(ShellEvent e) {
 				dialogDateTime.setFocus();

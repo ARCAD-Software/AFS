@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -17,18 +17,19 @@ import com.arcadsoftware.afs.client.core.connection.ServerConnection;
 
 public class ConnectedBasicEditorAction extends AbstractConnectedEditorAction {
 
+	@Override
 	public boolean isAllowed() {
-		ServerConnection connection = getConnection();
-		if (connection!=null) {
+		final ServerConnection connection = getConnection();
+		if (connection != null) {
 			return connection.isAllowed(getExpectedRigths());
 		} else {
 			return false;
 		}
-	}	
-	
+	}
+
 	@Override
 	protected boolean canExecute() {
-		boolean result =  super.canExecute();
+		boolean result = super.canExecute();
 		if (result) {
 			result = isAllowed();
 		}

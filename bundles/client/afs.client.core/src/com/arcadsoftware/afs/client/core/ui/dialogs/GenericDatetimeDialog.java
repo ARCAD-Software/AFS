@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -34,17 +34,17 @@ public class GenericDatetimeDialog extends AbstractAFSDialog {
 	private DateTime dateInput;
 	private Spinner hourChooser;
 	private Spinner minutChooser;
-	
+
 	private Date edited;
-	private Calendar selectedDate=null;
-	
+	private Calendar selectedDate = null;
+
 	public GenericDatetimeDialog(Shell parentShell) {
 		super(parentShell, false, true);
 	}
 
 	@Override
 	public Point getSize() {
-		return new Point(345,150);
+		return new Point(345, 150);
 	}
 
 	@Override
@@ -55,40 +55,40 @@ public class GenericDatetimeDialog extends AbstractAFSDialog {
 	public void setEdited(Date edited) {
 		this.edited = edited;
 	}
-	
+
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		Composite composite = (Composite)super.createDialogArea(parent);
-		GridLayout gl  = (GridLayout)composite.getLayout();
+		final Composite composite = (Composite) super.createDialogArea(parent);
+		final GridLayout gl = (GridLayout) composite.getLayout();
 		gl.numColumns = 9;
 		gl.makeColumnsEqualWidth = false;
 		composite.setLayout(gl);
-		//gl.marginWidth=gl.marginHeight=gl.marginTop=gl.marginBottom=gl.marginLeft = gl.marginRight = 0;
-		new Label(composite,SWT.NONE).setText(Activator.resString("label.date"));
-		new Label(composite,SWT.NONE).setText(":");
+		// gl.marginWidth=gl.marginHeight=gl.marginTop=gl.marginBottom=gl.marginLeft = gl.marginRight = 0;
+		new Label(composite, SWT.NONE).setText(Activator.resString("label.date"));
+		new Label(composite, SWT.NONE).setText(":");
 		dateInput = new DateTime(composite, SWT.DATE);
-		
-		new Label(composite,SWT.NONE).setText(Activator.resString("label.hour"));
-		new Label(composite,SWT.NONE).setText(":");
-		hourChooser = new Spinner(composite,SWT.BORDER);
+
+		new Label(composite, SWT.NONE).setText(Activator.resString("label.hour"));
+		new Label(composite, SWT.NONE).setText(":");
+		hourChooser = new Spinner(composite, SWT.BORDER);
 		hourChooser.setMaximum(23);
-		new Label(composite,SWT.NONE).setText(Activator.resString("label.minute"));
-		new Label(composite,SWT.NONE).setText(":");
+		new Label(composite, SWT.NONE).setText(Activator.resString("label.minute"));
+		new Label(composite, SWT.NONE).setText(":");
 		//
-		minutChooser = new Spinner(composite,SWT.BORDER);
-		minutChooser.setMaximum(59);		
-		
-		Calendar cal = Calendar.getInstance();
-		if (edited!=null) {
+		minutChooser = new Spinner(composite, SWT.BORDER);
+		minutChooser.setMaximum(59);
+
+		final Calendar cal = Calendar.getInstance();
+		if (edited != null) {
 			cal.setTime(edited);
 		}
-		
+
 		dateInput.setDate(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
 		hourChooser.setSelection(cal.get(Calendar.HOUR_OF_DAY));
 		minutChooser.setSelection(cal.get(Calendar.MINUTE));
-		
+
 		return composite;
-	}		
+	}
 
 	@Override
 	protected void okPressed() {
@@ -96,30 +96,26 @@ public class GenericDatetimeDialog extends AbstractAFSDialog {
 		selectedDate.set(Calendar.DATE, dateInput.getDay());
 		selectedDate.set(Calendar.YEAR, dateInput.getYear());
 		selectedDate.set(Calendar.MONTH, dateInput.getMonth());
-		
+
 		selectedDate.set(Calendar.HOUR_OF_DAY, hourChooser.getSelection());
 		selectedDate.set(Calendar.MINUTE, minutChooser.getSelection());
 		super.okPressed();
 	}
-	
-	
-	public Calendar getSelectedDate(){
+
+	public Calendar getSelectedDate() {
 		return selectedDate;
 	}
-	
-	
-	
-	
-	public Calendar getSelectedTime(Date d){
-		this.setEdited(d);
-		if (this.open()==Window.OK){
-			return this.getSelectedDate();
+
+	public Calendar getSelectedTime(Date d) {
+		setEdited(d);
+		if (open() == Window.OK) {
+			return getSelectedDate();
 		}
 		return null;
 	}
-	
-	public Calendar getSelectedTime(){
+
+	public Calendar getSelectedTime() {
 		return getSelectedTime(null);
-	}	
-	
+	}
+
 }

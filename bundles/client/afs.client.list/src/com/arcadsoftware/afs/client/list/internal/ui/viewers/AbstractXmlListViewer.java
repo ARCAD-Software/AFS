@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -32,9 +32,16 @@ import com.arcadsoftware.mmk.lists.metadata.StoreItem;
 
 public abstract class AbstractXmlListViewer extends AbstractColumnedTableViewer {
 
+<<<<<<< master
 	private class SimpleBrowser implements IListBrowseListener {
 
 		public int index;
+=======
+	private final ListMetaDatas metadatas;
+
+	private class SimpleBrowser implements IListBrowseListener {
+		public int index = 0;
+>>>>>>> 38f2e60 Clean-up AFS Client
 		public ListMetaDatas metadata;
 		private final Object[] reciever;
 
@@ -51,6 +58,10 @@ public abstract class AbstractXmlListViewer extends AbstractColumnedTableViewer 
 				final String value = values[i];
 				dup.setValue(i, value);
 			}
+<<<<<<< master
+=======
+
+>>>>>>> 38f2e60 Clean-up AFS Client
 			reciever[index++] = dup;
 		}
 	}
@@ -81,10 +92,17 @@ public abstract class AbstractXmlListViewer extends AbstractColumnedTableViewer 
 		public Object[] getObjectArray() {
 			return values;
 		}
+<<<<<<< master
+=======
+
+>>>>>>> 38f2e60 Clean-up AFS Client
 	}
 
+<<<<<<< master
 	private final ListMetaDatas metadatas;
 
+=======
+>>>>>>> 38f2e60 Clean-up AFS Client
 	public AbstractXmlListViewer(Composite parent, int style, ListMetaDatas metadatas) {
 		super(parent, style, false);
 		this.metadatas = metadatas;
@@ -92,12 +110,26 @@ public abstract class AbstractXmlListViewer extends AbstractColumnedTableViewer 
 	}
 
 	@Override
+<<<<<<< master
 	public AbstractColumnedTableLabelProvider createTableLabelProvider(AbstractColumnedViewer viewer) {
+=======
+	public AbstractColumnedTableLabelProvider createTableLabelProvider(
+			AbstractColumnedViewer viewer) {
+>>>>>>> 38f2e60 Clean-up AFS Client
 		return new ColumnedDefaultTableLabelProvider(viewer) {
 			@Override
 			protected Image getActualImage(Object element, int actualColumnIndex) {
 				if (actualColumnIndex == 0) {
 					return AFSIcon.LIST.image();
+<<<<<<< master
+=======
+				} else {
+					final Image image = getCustomColumnImage(element, actualColumnIndex);
+					if (image == null) {
+						return super.getActualImage(element, actualColumnIndex);
+					}
+					return image;
+>>>>>>> 38f2e60 Clean-up AFS Client
 				}
 				final Image image = getCustomColumnImage(element, actualColumnIndex);
 				if (image == null) {

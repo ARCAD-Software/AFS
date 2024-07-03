@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -19,10 +19,9 @@ import com.arcadsoftware.editor.swt.renderer.IRendererBinding;
 
 /**
  * A BeanMap Container is a graphical object that is bind to a BeanMap value.
- * 
  * <p>
  * This interface is not intended to be instantiated. You should use one of the following interfaces.
- * 
+ *
  * @see IBeanMapContainerLinkedList
  * @see IBeanMapContainerValue
  * @see IBeanMapContainerList
@@ -32,13 +31,12 @@ public interface IBeanMapContainer {
 
 	/**
 	 * Get an optional SWT object associated with this container.
-	 * 
 	 * <p>
-	 * If not null and is an instance of Control then this object will be automatically added to the
-	 * management of user messages.
-	 * 
+	 * If not null and is an instance of Control then this object will be automatically added to the management of user
+	 * messages.
+	 *
 	 * @return The SWT Widget. Can be null.
 	 */
 	public Widget getWidget();
-	
+
 }

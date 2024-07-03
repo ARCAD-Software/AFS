@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -71,7 +71,12 @@ public abstract class AbstractXmlListEditorInput implements IEditorInput {
 	@Override
 	public boolean equals(Object arg0) {
 		if (arg0 instanceof AbstractXmlListEditorInput) {
+<<<<<<< master
 			return ((AbstractXmlListEditorInput) arg0).getList().getXmlFileName().equals(getList().getXmlFileName());
+=======
+			final AbstractXmlListEditorInput ed = (AbstractXmlListEditorInput) arg0;
+			return ed.getList().getXmlFileName().equals(getList().getXmlFileName());
+>>>>>>> 38f2e60 Clean-up AFS Client
 		}
 		return false;
 	}
@@ -89,14 +94,31 @@ public abstract class AbstractXmlListEditorInput implements IEditorInput {
 	 */
 	public static XmlListEditorPart openEditor(AbstractXmlListEditorInput input) {
 		try {
+<<<<<<< master
 			final IEditorPart editor = Activator.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(input, XmlListEditorPart.XMLLIST_EDITOR_ID);
+=======
+			final IEditorPart editor = Activator.getDefault()
+					.getWorkbench()
+					.getActiveWorkbenchWindow()
+					.getActivePage()
+					.openEditor(input,
+							XmlListEditorPart.XMLLIST_EDITOR_ID);
+
+>>>>>>> 38f2e60 Clean-up AFS Client
 			if (editor instanceof XmlListEditorPart) {
 				return (XmlListEditorPart) editor;
 			}
+<<<<<<< master
+=======
+			return null;
+>>>>>>> 38f2e60 Clean-up AFS Client
 		} catch (final PartInitException e) {
 			MessageManager.addExceptionBeta(e);
 		}
+<<<<<<< master
 		return null;
+=======
+>>>>>>> 38f2e60 Clean-up AFS Client
 	}
 
 	protected abstract String getColumnHeader(String propertyName);

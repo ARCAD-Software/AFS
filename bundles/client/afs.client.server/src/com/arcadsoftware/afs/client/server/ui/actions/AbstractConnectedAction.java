@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -21,18 +21,18 @@ import com.arcadsoftware.afs.client.server.connection.ConnectionManager;
 public abstract class AbstractConnectedAction extends ArcadAction implements IConnectionListener {
 
 	private ServerConnection serverConnection;
-	
+
 	public AbstractConnectedAction() {
 		setEnabled(false);
 		ConnectionManager.getInstance().addConnectionListener(this);
 	}
-	
+
 	@Override
 	public void OnConnection(final ServerConnection connection) {
 		setEnabled(true);
-		this.serverConnection = connection;
+		serverConnection = connection;
 	}
-	
+
 	protected ServerConnection getServerConnection() {
 		return serverConnection;
 	}

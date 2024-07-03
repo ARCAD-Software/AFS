@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -22,13 +22,13 @@ import com.arcadsoftware.afs.client.server.connection.ConnectionManager;
 import com.arcadsoftware.afs.client.server.ui.containers.ServerContainer;
 
 public abstract class AbstractExtendedServerAction extends ArcadAction implements ISecuredAction {
-	
+
 	private ServerContainer serverContainer;
 	private Server selectedServer;
 	private ServerConnection serverConnection;
-	
+
 	@Override
-	protected boolean canExecute() {		
+	protected boolean canExecute() {
 		return (selectedServer != null);
 	}
 
@@ -55,16 +55,15 @@ public abstract class AbstractExtendedServerAction extends ArcadAction implement
 	public void setServerConnection(ServerConnection serverConnection) {
 		this.serverConnection = serverConnection;
 	}
-	
-	private ServerConnection retrieveConnection(){
+
+	private ServerConnection retrieveConnection() {
 		if (serverConnection == null) {
-			serverConnection = ConnectionManager.getInstance().connect(selectedServer, true);		
+			serverConnection = ConnectionManager.getInstance().connect(selectedServer, true);
 			setServerConnection(serverConnection);
 		}
 		return serverConnection;
-	}	
-	
-	
+	}
+
 	@Override
 	protected boolean execute() {
 		retrieveConnection();
@@ -75,12 +74,12 @@ public abstract class AbstractExtendedServerAction extends ArcadAction implement
 			return false;
 		}
 	}
-	
+
 	@Override
 	public boolean isAllowed() {
 		return getServerConnection().isAllowed(getExpectedRigths());
-	}	
-	
+	}
+
 	public abstract boolean doOnServer();
-	
+
 }

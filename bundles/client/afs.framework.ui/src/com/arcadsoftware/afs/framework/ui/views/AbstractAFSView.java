@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -30,33 +30,34 @@ public class AbstractAFSView extends ViewPart {
 	protected String initialPartName = ""; //$NON-NLS-1$
 
 	protected void defineActions() {
-		//Do nothing
+		// Do nothing
 	}
 
 	protected void defineLocalToolbar(IToolBarManager manager) {
-		//Do nothing
+		// Do nothing
 	}
 
 	protected void defineLocalPullDown(IMenuManager manager) {
-		//Do nothing
+		// Do nothing
 	}
 
 	protected void defineLocalContextMenu(IMenuManager manager) {
-		//Do nothing
+		// Do nothing
 	}
 
 	protected void doOnDoubleClick() {
-		//Do nothing
+		// Do nothing
 	}
 
 	public void doOnSelect() {
-		//Do nothing
+		// Do nothing
 	}
 
 	protected void hookContextMenu() {
-		MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(IMenuManager manager) {
 				AbstractAFSView.this.fillContextMenu(manager);
 			}
@@ -64,7 +65,7 @@ public class AbstractAFSView extends ViewPart {
 	}
 
 	protected void contributeToActionBars() {
-		IActionBars bars = getViewSite().getActionBars();
+		final IActionBars bars = getViewSite().getActionBars();
 		fillLocalPullDown(bars.getMenuManager());
 		fillLocalToolBar(bars.getToolBarManager());
 		bars.updateActionBars();
@@ -90,8 +91,8 @@ public class AbstractAFSView extends ViewPart {
 	public void init(IViewSite site) throws PartInitException {
 		super.init(site);
 		initialPartName = getPartName();
-	}	
-	
+	}
+
 	@Override
 	public void createPartControl(Composite parent) {
 		setInterface();
@@ -104,11 +105,11 @@ public class AbstractAFSView extends ViewPart {
 
 	@Override
 	public void setFocus() {
-		//Do nothing
+		// Do nothing
 	}
-	
+
 	public void activate() {
-		//Do nothing
+		// Do nothing
 	}
-	
+
 }

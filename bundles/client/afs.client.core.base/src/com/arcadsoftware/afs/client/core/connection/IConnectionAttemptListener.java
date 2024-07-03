@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -12,7 +12,6 @@
  *     ARCAD Software - initial API and implementation
  *******************************************************************************/
 package com.arcadsoftware.afs.client.core.connection;
-
 
 public interface IConnectionAttemptListener {
 	public void OnConnectionAttempt(int attemptNumber, boolean result);

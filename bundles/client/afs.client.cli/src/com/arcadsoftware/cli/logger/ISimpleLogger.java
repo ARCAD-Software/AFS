@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -14,8 +14,12 @@
 package com.arcadsoftware.cli.logger;
 
 public interface ISimpleLogger {
+	
 	public void logError(String message);
-	public void logInfo(String message);	
-	public void logWarning(String message);	
-	public void logVerbose(String message);	
+
+	public void logInfo(String message);
+
+	public void logWarning(String message);
+
+	public void logVerbose(String message);
 }

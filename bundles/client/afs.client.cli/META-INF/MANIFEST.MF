@@ -3,7 +3,6 @@ Bundle-ManifestVersion: 2
 Bundle-Name: AFS - Client CLI
 Bundle-SymbolicName: com.arcadsoftware.afs.client.cli;singleton:=true
 Bundle-Version: 1.3.0.qualifier
-Bundle-Activator: com.arcadsoftware.logger.bridge.Activator
 Bundle-Vendor: ARCAD Software
 Require-Bundle: com.arcadsoftware.aev.core.services;bundle-version="11.0.4",
  com.arcadsoftware.afs.client.core.base;bundle-version="1.4.3",

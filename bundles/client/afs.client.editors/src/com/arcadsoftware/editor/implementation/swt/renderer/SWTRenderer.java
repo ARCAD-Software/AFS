@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -59,6 +59,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.IMessageManager;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.progress.UIJob;
 
 import com.arcadsoftware.aev.core.tools.StringTools;
@@ -123,15 +124,14 @@ import com.arcadsoftware.script.IScriptAction;
 import com.arcadsoftware.script.ScriptExecutionException;
 
 /**
- * This class define the interface between SWT widget providers and the rendering of theses objects.
- * 
- * FIXME Major inconsistency in this class...
- * 
+ * This class define the interface between SWT widget providers and the rendering of theses objects. FIXME Major
+ * inconsistency in this class...
  */
 public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectionProvider, IChangeListener,
 		IListChangeListener, IEditorChangeListener {
 
 	/*
+<<<<<<< master
 	 * not-TO-DO on the pipe...
 	 * 
 	 * 2. Faire en sorte que tant que le BeanMap n'a pas �t� charg� l'�diteur est en mode ReadOnly ! (Avec un
@@ -142,6 +142,12 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 	 * 4. Finir la gestion des Links dans l'ex�cution de scripts.
 	 * 
 	 * 5. A �clater en plusieurs classes !
+=======
+	 * not-TO-DO on the pipe... 2. Faire en sorte que tant que le BeanMap n'a pas été chargé l'éditeur est en mode
+	 * ReadOnly ! (Avec un binding sur l'état Enabled <--> la propriété enabled du Renderer... ). 3. Définir un
+	 * éditeur comme éditeur par défaut (prend le focus). 4. Finir la gestion des Links dans l'exécution de scripts.
+	 * 5. A éclater en plusieurs classes !
+>>>>>>> 38f2e60 Clean-up AFS Client
 	 */
 
 	private static final String ICONS_SLASH = "icons/"; //$NON-NLS-1$
@@ -171,6 +177,7 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 	private static final String EXCLAMATION_POINT = "!"; //$NON-NLS-1$
 	private static final String HELPCONTEXTID = "helpcontext"; //$NON-NLS-1$
 
+<<<<<<< master
 	private final ListenerList<IBeanMapChangedListener> loadEvents = new ListenerList<>();
 	private final ListenerList<IBeanMapControlerListener> beforeSaveControlers = new ListenerList<>();
 	private final ListenerList<IEditorChangeListener> changeEvents = new ListenerList<>();
@@ -178,7 +185,21 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 	private final ListenerList<IBeanMapChangedListener> saveEvents = new ListenerList<>();
 	private final ListenerList<IBeanMapSavedListener> beanMapSavedBeanListener = new ListenerList<>();
 	private final ListenerList<IBeanMapErrorOnSaveListener> errorOnSavedListener = new ListenerList<>();
+=======
+	/*
+	 * private class MMessages { Element element; Control control; IMessageManager manager; public MMessages(Element
+	 * element, IMessageManager manager, Control control) { //this.element = element; this.control = control;
+	 * this.manager = manager; } public void addMessage(Object key, String messageText, boolean critical) { if
+	 * (critical) { manager.addMessage(key, messageText, null, IMessageProvider.ERROR, control); } else {
+	 * manager.addMessage(key, messageText, null, IMessageProvider.WARNING, control); } } public void
+	 * removeMessage(Object key) { manager.removeMessage(key, control); } }
+	 */
+
+	private FormToolkit toolkit;
+	private RendererBinding rendererBinding = new RendererBinding(this);
+>>>>>>> 38f2e60 Clean-up AFS Client
 	private final IProviderFactory providerFactory = new SWTProviderFactory();
+<<<<<<< master
 	private final InternalEditors internalEditors = new InternalEditors(this);
 	private final ArrayList<IMessageManager> mmList = new ArrayList<IMessageManager>();
 	private final List<IActivated> activatedListeners = new ArrayList<IActivated>();
@@ -190,6 +211,11 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 	private final List<ILoadedListListener> loadedListListeners = new Vector<ILoadedListListener>();
 	private FormToolkit toolkit;
 	private RendererBinding rendererBinding;
+=======
+	private final HashMap<String, MetaDataTest> unvalidTest = new HashMap<>();
+	// private HashMap<String, ArrayList<MMessages>> mmtable = new HashMap<String, ArrayList<MMessages>>();
+	private final ArrayList<IMessageManager> mmList = new ArrayList<>();
+>>>>>>> 38f2e60 Clean-up AFS Client
 	private Composite parent;
 	private Composite firstParent;
 	private IMessageManager currentMessageManager;
@@ -201,21 +227,61 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 	private boolean changefiring;
 	private MetaDataFormater titleFormater;
 	private ISWTRenderer parentRenderer;
+<<<<<<< master
 	private ArrayList<IAction> currentIActions;
+=======
+	private final ListenerList loadEvents = new ListenerList();
+	private final ListenerList changeEvents = new ListenerList();
+	private final ListenerList titleEvents = new ListenerList();
+	private final ListenerList saveEvents = new ListenerList();
+	private final ListenerList beforeSaveControlers = new ListenerList();
+	private final ListenerList beanMapSavedBeanListener = new ListenerList();
+	private final ListenerList validityEvents = new ListenerList();
+	private ArrayList<IAction> currentIActions = new ArrayList<>();
+	private final InternalEditors internalEditors = new InternalEditors(this);
+	private final LoadingListeners loadingListeners = new LoadingListeners();
+	private final UpdateDateListeners updateDateListeners = new UpdateDateListeners();
+	private final RendererActions rendererActions = new RendererActions();
+>>>>>>> 38f2e60 Clean-up AFS Client
 	private Map<String, List<IListenerWidget>> listenerWidgets;
+<<<<<<< master
 	private boolean readOnly;
+=======
+	private boolean readOnly = false;
+
+	// private List<String> mandatoryAttributes;
+>>>>>>> 38f2e60 Clean-up AFS Client
 	private List<MandatoryAttribute> mandatoryAttributes;
+<<<<<<< master
+=======
+
+>>>>>>> 38f2e60 Clean-up AFS Client
 	private IToolBarManager formToolBarManager;
+<<<<<<< master
 	private boolean mustBeRefresh;
+=======
+	private final List<ILoadedListListener> loadedListListeners = new Vector<>();
+	private boolean mustBeRefresh = false;
+>>>>>>> 38f2e60 Clean-up AFS Client
 	private Map<String, Object> virtualValues;
 	private int id;
 	private IRightControler rightControler;
+<<<<<<< master
+=======
+	protected ArrayList<IToolBarManager> formToolbarManagers = new ArrayList<>();
+	private final List<IActivated> activatedListeners = new ArrayList<>();
+	private final Display parentDisplay;
+	private final ListenerList errorOnSavedListener = new ListenerList();
+>>>>>>> 38f2e60 Clean-up AFS Client
 
 	public SWTRenderer(Display display, String realm, String type, boolean readOnly) {
 		super(realm);
+<<<<<<< master
 		id = -1;
 		currentIActions = new ArrayList<IAction>();
 		rendererBinding = new RendererBinding(this);
+=======
+>>>>>>> 38f2e60 Clean-up AFS Client
 		parentDisplay = display;
 		this.readOnly = readOnly;
 		editorLoaderCreated(this);
@@ -226,31 +292,52 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 			// Prepare the BeanMapContainer.
 			warper = new BeanMapWarper(this);
 			lwarper = new LinkMapWarper(this);
+<<<<<<< master
 		}			
 	}	
 	
 	public SWTRenderer(String realm, String type, boolean readOnly) {
 		this(null, realm, type, readOnly);
+=======
+		}
+>>>>>>> 38f2e60 Clean-up AFS Client
 	}
-	
+
+	public SWTRenderer(String realm, String type, boolean readOnly) {
+		this(null, realm, type, readOnly);
+	}
+
 	public SWTRenderer(String realm, String type) {
 		this(realm, type, false);
 	}
 
+	@Override
 	public int getId() {
 		return id;
 	}
 
+<<<<<<< master
 	protected void editorLoaderCreated(SWTRenderer renderer) {}
 	
 	protected void dataLoaderCreated(SWTRenderer renderer) {}
 	
+=======
+	protected void editorLoaderCreated(SWTRenderer renderer) {
+
+	}
+
+	protected void dataLoaderCreated(SWTRenderer renderer) {
+
+	}
+
+	@Override
+>>>>>>> 38f2e60 Clean-up AFS Client
 	public ISWTDataLoader getDataLoader() {
 		return loader;
 	}
 
 	public void dispose() {
-		//mmtable.clear();
+		// mmtable.clear();
 		mmList.clear();
 		if (toolkit != null) {
 			toolkit.dispose();
@@ -261,6 +348,7 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 		rendererBinding.dispose();
 	}
 
+	@Override
 	public boolean isReadOnly() {
 		return readOnly;
 	}
@@ -270,8 +358,8 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 	}
 
 	private void disposeProviders(List<LayoutElement> layoutElements) {
-		for (LayoutElement element : layoutElements) {
-			Object provider = element.getProvider();
+		for (final LayoutElement element : layoutElements) {
+			final Object provider = element.getProvider();
 			if (provider instanceof IContainerSWTProvider) {
 				((IContainerSWTProvider) provider).dispose();
 				disposeProviders(element.getContaint());
@@ -285,7 +373,6 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 
 	/**
 	 * Create the SWT Editor into the specified parent.
-	 * 
 	 */
 	public void createPartControl(Composite newParent, String layoutName) {
 		toolkit = new FormToolkit(newParent.getDisplay());
@@ -309,7 +396,7 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 			}
 			p = getParam(BACKGROUND_COLOR, NONE);
 			if (!NONE.equalsIgnoreCase(p)) {
-				Color color = getColor(p);
+				final Color color = getColor(p);
 				if (color != null) {
 					toolkit.setBackground(color);
 				}
@@ -317,35 +404,45 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 			p = getParam(BACKGROUND_COLOR_SWT, NONE);
 			if (!NONE.equalsIgnoreCase(p)) {
 				try {
-					int color = Integer.parseInt(p);
+					final int color = Integer.parseInt(p);
 					toolkit.setBackground(Display.getCurrent().getSystemColor(color));
-				} catch (NumberFormatException e) {}
+				} catch (final NumberFormatException e) {
+				}
 			}
 			// Calculate the editor title.
 			titleFormater = new MetaDataFormater(getLocalizedMessage(getParam(TITLE, layoutName)), getStructure());
 			fireTitleChangedEvent();
-			IChangeListener tlistener = new IChangeListener() {
+			final IChangeListener tlistener = new IChangeListener() {
+				@Override
 				public void handleChange(ChangeEvent event) {
 					fireTitleChangedEvent();
 				}
 			};
+<<<<<<< master
 			for (MetaDataAttribute att : titleFormater.getAttributes()) {
 				if (att!=null) {
 					rendererBinding.getObservableAttribute(att).addChangeListener(tlistener);
+=======
+			for (final MetaDataAttribute att : titleFormater.getAttributes()) {
+				if (att != null) {
+					final IObservableValue ao = rendererBinding.getObservableAttribute(att);
+					ao.addChangeListener(tlistener);
+>>>>>>> 38f2e60 Clean-up AFS Client
 				}
 			}
 			// Render the SWT widgets !
 			parent = newParent;
 			parentProvider = null;
-			for (LayoutElement element : getLayoutElements()) {
+			for (final LayoutElement element : getLayoutElements()) {
 				renderElement(element);
 			}
 			rendererBinding.createPartControl();
 		}
 	}
-	
+
 	@Override
 	protected void clearLayout() {
+<<<<<<< master
 		Composite parent = getParent();
 		if (parent != null && !parent.isDisposed()) {
 		    for (Control child: parent.getChildren()) {
@@ -356,14 +453,29 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 		    rendererBinding.dispose();
 		    rendererBinding = new RendererBinding(this);
 		}	   
+=======
+		final Composite parent = getParent();
+		if ((parent != null) && !parent.isDisposed()) {
+			final Control[] children = parent.getChildren();
+			for (int i = children.length - 1; i >= 0; i--) {
+				children[i].dispose();
+			}
+			super.clearLayout();
+			// Clear and re-init renderer Binding
+			rendererBinding.dispose();
+			rendererBinding = new RendererBinding(this);
+		}
+>>>>>>> 38f2e60 Clean-up AFS Client
 	}
-	
+
 	/**
 	 * Reload Layout: clear content and reload layout
-	 * @param layoutName new Layout to load
+	 *
+	 * @param layoutName
+	 *            new Layout to load
 	 */
-	public void reloadPartControl(String layoutName) {	
-		clearLayout();		
+	public void reloadPartControl(String layoutName) {
+		clearLayout();
 		createPartControl(parent, layoutName);
 	}
 
@@ -377,6 +489,7 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 			sourceId = id;
 			if (sourceId != 0) {
 				loader.loadBeanMap(getStructure().getType(), id, new IBeanMapListener() {
+					@Override
 					public void changed(BeanMapEvent event) {
 						loadBeanMap(event);
 					}
@@ -391,7 +504,7 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 		if ((event == null) || (event.getSource() == null)) {
 			loadingListeners.fireLoadingError();
 		} else {
-			IBeanMap result = event.getSource();
+			final IBeanMap result = event.getSource();
 			synchronized (warper) {
 				warper.warp(result);
 				// Initialize local default values.
@@ -409,10 +522,19 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 			rendererBinding.loadBeanMap();
 			// Fire load events.
 			final BeanMapEvent event2 = new BeanMapEvent(warper);
+<<<<<<< master
 			for (final IBeanMapChangedListener listener: loadEvents) {
+=======
+			for (final Object listener : loadEvents.getListeners()) {
+>>>>>>> 38f2e60 Clean-up AFS Client
 				SafeRunnable.run(new SafeRunnable() {
+					@Override
 					public void run() {
+<<<<<<< master
 						listener.changed(event2);
+=======
+						((IBeanMapChangedListener) listener).changed(event2);
+>>>>>>> 38f2e60 Clean-up AFS Client
 					}
 				});
 			}
@@ -423,12 +545,14 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 			}
 			if (parentDisplay != null) {
 				parentDisplay.asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						fireTitleChangedEvent();
 					}
 				});
 			} else if ((parent != null) && !parent.isDisposed()) {
 				parent.getDisplay().asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						fireTitleChangedEvent();
 					}
@@ -437,6 +561,7 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 		}
 	}
 
+	@Override
 	public boolean save() {
 		boolean result = false;
 		if (loader != null) {
@@ -446,18 +571,18 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 					synchronized (warper) {
 						if (warper.isDirty()) {
 							if (sourceId == 0) {
-								BeanMap newBeanMap = loader.createBeanMap(warper.getModifications());
+								final BeanMap newBeanMap = loader.createBeanMap(warper.getModifications());
 								if (newBeanMap != null) {
 									mustBeRefresh = true;
 									id = newBeanMap.getId();
 									sourceId = id;
 									lwarper.setId(id);
 									load(id);
-									//load(newBeanMap.getId());
+									// load(newBeanMap.getId());
 								} else {
 									fireErrorOnSaveEvent(loader.getLastErrorMessage());
 									fireErrorOnSaveEvent(loader.getLastErrorUserMessage());
-									for (IMessageManager mm : mmList) {
+									for (final IMessageManager mm : mmList) {
 										mm.addMessage(SAVEMESSAGE, "Error while recording changes.", null,
 												IMessageProvider.ERROR);
 									}
@@ -466,11 +591,11 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 							} else {
 								if (loader.updateBeanMap(warper.getModifications())) {
 									mustBeRefresh = true;
-									//reload();
+									// reload();
 								} else {
 									fireErrorOnSaveEvent(loader.getLastErrorMessage());
 									fireErrorOnSaveEvent(loader.getLastErrorUserMessage());
-									for (IMessageManager mm : mmList) {
+									for (final IMessageManager mm : mmList) {
 										mm.addMessage(SAVEMESSAGE, "Error while recording changes.", null,
 												IMessageProvider.ERROR);
 									}
@@ -483,11 +608,11 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 					// We save the links here
 					synchronized (lwarper) {
 						if (lwarper.isDirty()) {
-							//If the beammap has been created but no value assigned,
-							//in this case, warper.isDirty()==false, so we need to force
-							//creation if there are some links
-							if (sourceId==0){
-								BeanMap newBeanMap = loader.createBeanMap(warper.getModifications());
+							// If the beammap has been created but no value assigned,
+							// in this case, warper.isDirty()==false, so we need to force
+							// creation if there are some links
+							if (sourceId == 0) {
+								final BeanMap newBeanMap = loader.createBeanMap(warper.getModifications());
 								if (newBeanMap != null) {
 									mustBeRefresh = true;
 									id = newBeanMap.getId();
@@ -495,7 +620,7 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 									lwarper.setId(id);
 								}
 							}
-							//Now we can save the links
+							// Now we can save the links
 							lwarper.save();
 							saved = true;
 						}
@@ -504,17 +629,25 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 						reload();
 					}
 					// Remove any save error messages !
-					for (IMessageManager mm : mmList) {
+					for (final IMessageManager mm : mmList) {
 						mm.removeMessage(SAVEMESSAGE);
 					}
 					// fire an event !
 					if (saved) {
+<<<<<<< master
 						// Envoi de l'evenement specifique de gestion des sauvegardes
 						// FIXME L'emploi de fireBeanMapSavedEvent et saveEvents est redondant. 
+=======
+						// Envoi de l'evenement specifique de gestion des
+						// sauvegardes
+						// FIXME L'emploi de fireBeanMapSavedEvent et saveEvents est redondant.
+>>>>>>> 38f2e60 Clean-up AFS Client
 						fireBeanMapSavedEvent();
 						fireSaveEvent();
-						// FIXME Sémantiquement le BeanMap n'a pas changé pourquoi déclencher un évènement Changed ?
-						// FIXME Surtout que cet évènement vient déjà d'être déclanché 10 lignes plus haut (reload()).
+						// FIXME Sémantiquement le BeanMap n'a pas changé pourquoi déclencher un évènement Changed
+						// ?
+						// FIXME Surtout que cet évènement vient déjà d'être déclanché 10 lignes plus haut
+						// (reload()).
 						fireChangedEvent();
 					}
 					result = saved;
@@ -526,22 +659,31 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 
 	public void fireSaveEvent() {
 		final BeanMapEvent event = new BeanMapEvent(warper);
+<<<<<<< master
 		for (final IBeanMapChangedListener listener: saveEvents) {
+=======
+		for (final Object listener : saveEvents.getListeners()) {
+>>>>>>> 38f2e60 Clean-up AFS Client
 			SafeRunnable.run(new SafeRunnable() {
+				@Override
 				public void run() {
+<<<<<<< master
 					listener.changed(event);
+=======
+					((IBeanMapChangedListener) listener).changed(event);
+>>>>>>> 38f2e60 Clean-up AFS Client
 				}
 			});
-		}		
+		}
 	}
-	
-	
-	public boolean canSavedEditor(IEntityAttributeProcessListener callback){
+
+	@Override
+	public boolean canSavedEditor(IEntityAttributeProcessListener callback) {
 		boolean result = true;
-		for (MetaDataAttribute attribute : getStructure().getAttributes().values()) {
+		for (final MetaDataAttribute attribute : getStructure().getAttributes().values()) {
 			if (attribute.isMandatory()) {
-				Object attributeValue = getCurrentBean().get(attribute.getCode());
-				//String name = entry.getValue().getName();
+				final Object attributeValue = getCurrentBean().get(attribute.getCode());
+				// String name = entry.getValue().getName();
 				if (attributeValue != null) {
 					if ((attributeValue instanceof String) && (((String) attributeValue).length() == 0)) {
 						result = false;
@@ -557,17 +699,17 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 		}
 		if (result) {
 			if (mandatoryAttributes != null) {
-				//for (String code : mandatoryAttributes) {
-				for (MandatoryAttribute mandatoryAttribute : mandatoryAttributes) {
-					String code = mandatoryAttribute.getCode();
+				// for (String code : mandatoryAttributes) {
+				for (final MandatoryAttribute mandatoryAttribute : mandatoryAttributes) {
+					final String code = mandatoryAttribute.getCode();
 					boolean mandatory = true;
 					if (mandatoryAttribute.isConditionned()) {
-						String conditionnedBy = mandatoryAttribute.getConditionedBy();
-						mandatory= getCurrentBean().getBoolean(conditionnedBy);
+						final String conditionnedBy = mandatoryAttribute.getConditionedBy();
+						mandatory = getCurrentBean().getBoolean(conditionnedBy);
 					}
 					if (mandatory) {
-						Object attributeValue = getCurrentBean().get(code);
-						//String name = getStructure().getAttribute(code).getName();
+						final Object attributeValue = getCurrentBean().get(code);
+						// String name = getStructure().getAttribute(code).getName();
 						if (attributeValue != null) {
 							if ((attributeValue instanceof String) && (((String) attributeValue).length() == 0)) {
 								result = false;
@@ -583,28 +725,94 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 				}
 			}
 		}
-		return result;		
+		return result;
 	}
-	
+
+	@Override
 	public boolean canSavedEditor(boolean withErrorMessage) {
 		final boolean showMessage = withErrorMessage;
-		IEntityAttributeProcessListener callback = new IEntityAttributeProcessListener(){
-			
+		final IEntityAttributeProcessListener callback = new IEntityAttributeProcessListener() {
+
+			@Override
 			public void processAction(MetaDataAttribute entry) {
 				if (showMessage) {
 					openCannotSaveWarning(entry.getName());
-				}				
+				}
 			}
-			
+
 		};
 		return canSavedEditor(callback);
+<<<<<<< master
+=======
+		//
+		//
+		// boolean result = true;
+		// Set<Entry<String, MetaDataAttribute>> attributesEntries = getStructure().getAttributes().entrySet();
+		// for (Entry<String, MetaDataAttribute> entry : attributesEntries) {
+		// if (entry.getValue().isMandatory()) {
+		// Object attributeValue = getCurrentBean().get(entry.getKey());
+		// String name = entry.getValue().getName();
+		// if (attributeValue != null) {
+		// if ((attributeValue instanceof String) && (((String) attributeValue).length() == 0)) {
+		// result = false;
+		// if (withErrorMessage) {
+		// openCannotSaveWarning(name);
+		// }
+		// break;
+		// }
+		// } else {
+		// result = false;
+		// if (withErrorMessage) {
+		// openCannotSaveWarning(name);
+		// }
+		// break;
+		// }
+		// }
+		// }
+		// if (result) {
+		// if (mandatoryAttributes != null) {
+		// for (String code : mandatoryAttributes) {
+		// Object attributeValue = getCurrentBean().get(code);
+		// String name = getStructure().getAttribute(code).getName();
+		// if (attributeValue != null) {
+		// if ((attributeValue instanceof String) && (((String) attributeValue).length() == 0)) {
+		// result = false;
+		// if (withErrorMessage) {
+		// openCannotSaveWarning(name);
+		// }
+		// break;
+		// }
+		// } else {
+		// result = false;
+		// if (withErrorMessage) {
+		// openCannotSaveWarning(name);
+		// }
+		// break;
+		// }
+		// }
+		// }
+		// }
+		// return result;
+>>>>>>> 38f2e60 Clean-up AFS Client
 	}
 
+	@Override
 	public boolean canSavedEditor() {
 		boolean result = canSavedEditor(true);
+<<<<<<< master
+=======
+
+>>>>>>> 38f2e60 Clean-up AFS Client
 		// Complete with possible added controls
+<<<<<<< master
 		for (IBeanMapControlerListener approver: beforeSaveControlers) {
 			result &= approver.isValid();
+=======
+		if ((beforeSaveControlers != null) && (beforeSaveControlers.size() > 0)) {
+			for (final Object approver : beforeSaveControlers.getListeners()) {
+				result &= ((IBeanMapControlerListener) approver).isValid();
+			}
+>>>>>>> 38f2e60 Clean-up AFS Client
 		}
 		return result;
 	}
@@ -618,8 +826,14 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 		if (!changefiring) {
 			changefiring = true;
 			try {
+<<<<<<< master
 				for (final IEditorChangeListener listener: changeEvents) {
+=======
+				for (final Object listener : changeEvents.getListeners()) {
+					final IEditorChangeListener l = (IEditorChangeListener) listener;
+>>>>>>> 38f2e60 Clean-up AFS Client
 					SafeRunnable.run(new SafeRunnable() {
+						@Override
 						public void run() {
 							listener.changed(SWTRenderer.this);
 						}
@@ -644,8 +858,14 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 				title = titleFormater.format(warper);
 			}
 		}
+<<<<<<< master
 		for (final IEditorTitleChangeListener listener: titleEvents) {
+=======
+		for (final Object listener : titleEvents.getListeners()) {
+			final IEditorTitleChangeListener l = (IEditorTitleChangeListener) listener;
+>>>>>>> 38f2e60 Clean-up AFS Client
 			SafeRunnable.run(new SafeRunnable() {
+				@Override
 				public void run() {
 					listener.changed(SWTRenderer.this, title);
 				}
@@ -653,10 +873,12 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 		}
 	}
 
+	@Override
 	public void addChangeListener(IEditorChangeListener listener) {
 		changeEvents.add(listener);
 	}
 
+	@Override
 	public void removeChangeListener(IEditorChangeListener listener) {
 		changeEvents.remove(listener);
 	}
@@ -673,12 +895,12 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 	}
 
 	private void renderElement(LayoutElement element) {
-		Object provider = element.getProvider();
+		final Object provider = element.getProvider();
 		if (provider instanceof IContainerSWTProvider) {
 			((IContainerSWTProvider) provider).create(this, element, element.getContaint().isEmpty(), getStructure());
 		} else if (provider instanceof IInputSWTProvider) {
 			// FIXME A refaire sans modifier l'ENTITY !!!!!!
-			boolean old = element.getElement().isReadonly();
+			final boolean old = element.getElement().isReadonly();
 			if (readOnly) {
 				element.getElement().setReadonly(true);
 			}
@@ -691,16 +913,17 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 		}
 	}
 
+	@Override
 	public ImageDescriptor getImageDescriptor(String key) {
-		int pos = key.indexOf(":");  //$NON-NLS-1$
+		final int pos = key.indexOf(":"); //$NON-NLS-1$
 		ImageDescriptor result = null;
-		if (pos>0) {
-			String bundleId = key.substring(0,pos);
-			String imageKey = key.substring(pos+1);
-			result = Activator.imageDescriptorFromPlugin(bundleId, imageKey);
+		if (pos > 0) {
+			final String bundleId = key.substring(0, pos);
+			final String imageKey = key.substring(pos + 1);
+			result = AbstractUIPlugin.imageDescriptorFromPlugin(bundleId, imageKey);
 		} else {
-			result = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(key);				
-		}	
+			result = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(key);
+		}
 
 		// Check local icons.
 		if (result == null) {
@@ -716,6 +939,7 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 		return result;
 	}
 
+	@Override
 	public String getLocalizedMessage(String key) {
 		String value = getMessage(key);
 		if (value == null) {
@@ -731,11 +955,21 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 		return value;
 	}
 
+	@Override
 	public FormToolkit getToolkit() {
 		return toolkit;
 	}
 
 	private void addManagedControl(Binding binding, Element element, IMessageManager manager, Control control) {
+<<<<<<< master
+=======
+		// Pour les tests...
+		/*
+		 * ArrayList<MMessages> list = mmtable.get(element.getCode()); if (list == null) { list = new
+		 * ArrayList<MMessages>(); } list.add(new MMessages(element, manager, control)); mmtable.put(element.getCode(),
+		 * list);
+		 */
+>>>>>>> 38f2e60 Clean-up AFS Client
 		// Pour les Erreurs de bindings...
 		rendererBinding.getBinding().bindValue(binding.getValidationStatus(),
 				new MessageStatusObservable(element, manager, control), null, null);
@@ -751,22 +985,24 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 		return "com.arcadsoftware.client.editor.swt"; ////$NON-NLS-1$
 	}
 
+	@Override
 	public Composite getParent() {
 		return parent;
 	}
 
+	@Override
 	public void createSubContainer(IContainerSWTProvider parentContainerProvider, ILayoutParameters parameters,
 			Composite compositeParent) {
 		if (firstParent == null) {
 			firstParent = compositeParent;
 		}
-		Composite oldParent = parent;
-		IContainerSWTProvider oldParentProvider = parentProvider;
+		final Composite oldParent = parent;
+		final IContainerSWTProvider oldParentProvider = parentProvider;
 		try {
 			parent = compositeParent;
 			parentProvider = parentContainerProvider;
 			if (parentProvider instanceof IValidatingSubWidgets) {
-				for (LayoutElement element : ((LayoutElement) parameters).getContaint()) {
+				for (final LayoutElement element : ((LayoutElement) parameters).getContaint()) {
 					if ((element.getProvider() instanceof IInputSWTProvider)
 							&& ((IValidatingSubWidgets) parentProvider).acceptInput((IInputSWTProvider) element
 									.getProvider())) {
@@ -782,7 +1018,7 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 					}
 				}
 			} else {
-				for (LayoutElement element : ((LayoutElement) parameters).getContaint()) {
+				for (final LayoutElement element : ((LayoutElement) parameters).getContaint()) {
 					renderElement(element);
 				}
 			}
@@ -792,12 +1028,13 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 		}
 	}
 
+	@Override
 	public void createSubContainer(IContainerSWTProvider parentContainerProvider, IMessageManager messageManager,
 			ILayoutParameters parameters, Composite parentComposite, ArrayList<IAction> actions) {
 		// Collect this message manager for global messages...
 		if (messageManager != null) {
 			boolean newone = true;
-			for (IMessageManager mm : mmList) {
+			for (final IMessageManager mm : mmList) {
 				if (mm.equals(messageManager)) {
 					newone = false;
 					break;
@@ -808,8 +1045,8 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 			}
 		}
 		// Process to sub-container creation.
-		IMessageManager oldmanager = currentMessageManager;
-		ArrayList<IAction> oldActions = currentIActions;
+		final IMessageManager oldmanager = currentMessageManager;
+		final ArrayList<IAction> oldActions = currentIActions;
 		try {
 			if (messageManager != null) {
 				currentMessageManager = messageManager;
@@ -824,22 +1061,27 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 		}
 	}
 
+	@Override
 	public IContainerSWTProvider getParentProvider() {
 		return parentProvider;
 	}
 
+	@Override
 	public void addSelectionChangedListener(ISelectionChangedListener listener) {
 		warper.addSelectionChangedListener(listener);
 	}
 
+	@Override
 	public ISelection getSelection() {
 		return warper;
 	}
 
+	@Override
 	public void removeSelectionChangedListener(ISelectionChangedListener listener) {
 		warper.removeSelectionChangedListener(listener);
 	}
 
+	@Override
 	public void setSelection(ISelection selection) {
 		IBeanMap value = null;
 		if (selection instanceof BeanMapWarper) {
@@ -849,13 +1091,14 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 		} else if (selection instanceof IBeanMap) {
 			value = (IBeanMap) selection;
 		} else if (selection instanceof IAdaptable) {
-			value = (IBeanMap) ((IAdaptable) selection).getAdapter(IBeanMap.class);
+			value = ((IAdaptable) selection).getAdapter(IBeanMap.class);
 		}
 		if (value != null) {
 			rendererBinding.importAttributes(value);
 		}
 	}
 
+	@Override
 	public void loadBeanMap(String type, int id, IBeanMapListener listener) {
 		if (loader == null) {
 			return;
@@ -863,25 +1106,32 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 		loader.loadBeanMap(type, id, listener);
 	}
 
+	@Override
 	public void addLoadListener(IBeanMapChangedListener listener) {
 		loadEvents.add(listener);
 	}
 
+	@Override
 	public void removeLoadListener(IBeanMapChangedListener listener) {
 		loadEvents.remove(listener);
 	}
 
+	@Override
 	public void addBeforeSaveControler(IBeanMapControlerListener listener) {
 		beforeSaveControlers.add(listener);
 	}
+
+	@Override
 	public void removeBeforeSaveControler(IBeanMapControlerListener listener) {
 		beforeSaveControlers.remove(listener);
-	}	
+	}
 
+	@Override
 	public void addSaveListener(IBeanMapChangedListener listener) {
 		saveEvents.add(listener);
 	}
 
+	@Override
 	public boolean isDirty() {
 		synchronized (warper) {
 			if (warper.isDirty()) {
@@ -893,17 +1143,39 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 		}
 	}
 
+	@Override
 	public void forceDirty() {
 		synchronized (warper) {
 			warper.forceDirty();
 		}
 		fireChangedEvent();
 	}
-	
+
+	@Override
 	public boolean isRecordable() {
+<<<<<<< master
+=======
+		// if (unvalidTest.isEmpty()) {
+		// return true;
+		// }
+		// for (MetaDataTest test : unvalidTest.values()) {
+		// if (test.isCritical()) {
+		// return false;
+		// }
+		// }
+>>>>>>> 38f2e60 Clean-up AFS Client
 		return true;
 	}
 
+<<<<<<< master
+=======
+	/*
+	 * (non-Javadoc)
+	 * @seecom.arcadsoftware.editor.swt.ISWTRenderer#removeSaveListener(com.
+	 * arcadsoftware.editor.swt.IBeanMapChangedListener)
+	 */
+	@Override
+>>>>>>> 38f2e60 Clean-up AFS Client
 	public void removeSaveListener(IBeanMapChangedListener listener) {
 		saveEvents.remove(listener);
 	}
@@ -912,12 +1184,101 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 		return false;
 	}
 
+<<<<<<< master
 	public void updateTest(MetaDataTest test, boolean isValid) {}
+=======
+	public void updateTest(MetaDataTest test, boolean isValid) {
+		// if (isValid) {
+		// if (unvalidTest.get(test.getCode()) != null) {
+		// unvalidTest.remove(test.getCode());
+		// fireTestUpdatedEvent(test, true);
+		// }
+		// // Remove messages...
+		// for (IMessageManager manager : mmList) {
+		// manager.removeMessage(test);
+		// }
+		// for (String code : test.getAttributes()) {
+		// MetaDataAttribute att = getStructure().getAttribute(code);
+		// if (att != null) {
+		// ArrayList<MMessages> list = mmtable.get(att.getCode());
+		// if (list != null) {
+		// for (MMessages mm : list) {
+		// mm.removeMessage(test);
+		// }
+		// }
+		// }
+		// }
+		// } else {
+		// if (unvalidTest.get(test.getCode()) == null) {
+		// unvalidTest.put(test.getCode(), test);
+		// fireTestUpdatedEvent(test, false);
+		// }
+		// // Add messages...
+		// for (IMessageManager manager : mmList) {
+		// if (test.isCritical()) {
+		// manager.addMessage(test, test.getMessage(), null, IMessageProvider.ERROR);
+		// } else {
+		// manager.addMessage(test, test.getMessage(), null, IMessageProvider.WARNING);
+		// }
+		// }
+		// for (String code : test.getAttributes()) {
+		// MetaDataAttribute att = getStructure().getAttribute(code);
+		// if (att != null) {
+		// ArrayList<MMessages> list = mmtable.get(att.getCode());
+		// if (list != null) {
+		// for (MMessages mm : list) {
+		// mm.addMessage(test, test.getMessage(), test.isCritical());
+		// }
+		// }
+		// }
+		// }
+		// }
+	}
+>>>>>>> 38f2e60 Clean-up AFS Client
 
+<<<<<<< master
 	public void addValidityListener(IControlValidityListener listener) {}
+=======
+	/*
+	 * private void fireTestUpdatedEvent(MetaDataTest test, boolean valid) { final ControlValidityEvent event = new
+	 * ControlValidityEvent(test, valid); Object[] listeners = validityEvents.getListeners(); for (int i = 0; i <
+	 * listeners.length; ++i) { final IControlValidityListener l = (IControlValidityListener) listeners[i];
+	 * SafeRunnable.run(new SafeRunnable() { public void run() { l.validityChanged(event); } }); } }
+	 */
+>>>>>>> 38f2e60 Clean-up AFS Client
 
+<<<<<<< master
 	public void removeValidityListener(IControlValidityListener listener) {}
+=======
+	/*
+	 * (non-Javadoc)
+	 * @seecom.arcadsoftware.editor.swt.ISWTRenderer#addValidityListener(com.
+	 * arcadsoftware.editor.swt.IControlValidityListener)
+	 */
+	@Override
+	public void addValidityListener(IControlValidityListener listener) {
+		validityEvents.add(listener);
+	}
+>>>>>>> 38f2e60 Clean-up AFS Client
 
+<<<<<<< master
+=======
+	/*
+	 * (non-Javadoc)
+	 * @see com.arcadsoftware.editor.swt.ISWTRenderer#removeValidityListener(com.
+	 * arcadsoftware.editor.swt.IControlValidityListener)
+	 */
+	@Override
+	public void removeValidityListener(IControlValidityListener listener) {
+		validityEvents.remove(listener);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.arcadsoftware.editor.swt.ISWTRenderer#reload()
+	 */
+	@Override
+>>>>>>> 38f2e60 Clean-up AFS Client
 	public void reload() {
 		if (sourceId != 0) {
 			// Reload must be updated from the server !
@@ -925,6 +1286,14 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 		}
 	}
 
+<<<<<<< master
+=======
+	/*
+	 * (non-Javadoc)
+	 * @see com.arcadsoftware.editor.swt.ISWTRenderer#getColor(java.lang.String)
+	 */
+	@Override
+>>>>>>> 38f2e60 Clean-up AFS Client
 	public Color getColor(String cssColor) {
 		Color result = null;
 		if (cssColor != null) {
@@ -932,27 +1301,34 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 				if (cssColor.length() == 7) {
 					// Color is like #FFFFFF
 					try {
-						int red = Integer.decode(_0X + cssColor.substring(1, 3)).intValue();
-						int green = Integer.decode(_0X + cssColor.substring(3, 5)).intValue();
-						int blue = Integer.decode(_0X + cssColor.substring(5)).intValue();
+						final int red = Integer.decode(_0X + cssColor.substring(1, 3)).intValue();
+						final int green = Integer.decode(_0X + cssColor.substring(3, 5)).intValue();
+						final int blue = Integer.decode(_0X + cssColor.substring(5)).intValue();
 						result = new Color(Display.getDefault(), new RGB(red, green, blue));
+<<<<<<< master
 					} catch (Exception e) {
+=======
+						// result = new Color(parent.getDisplay(), new RGB(red,
+						// green, blue));
+					} catch (final Exception e) {
+>>>>>>> 38f2e60 Clean-up AFS Client
 						result = null;
 					}
 				} else if (cssColor.length() == 4) {
 					// Color is like #FFF
 					try {
-						int red = Integer.decode(_0X + cssColor.substring(1, 2) + cssColor.substring(1, 2)).intValue();
-						int green = Integer.decode(_0X + cssColor.substring(2, 3) + cssColor.substring(2, 3))
+						final int red = Integer.decode(_0X + cssColor.substring(1, 2) + cssColor.substring(1, 2))
 								.intValue();
-						int blue = Integer.decode(_0X + cssColor.substring(4) + cssColor.substring(4)).intValue();
+						final int green = Integer.decode(_0X + cssColor.substring(2, 3) + cssColor.substring(2, 3))
+								.intValue();
+						final int blue = Integer.decode(_0X + cssColor.substring(4) + cssColor.substring(4)).intValue();
 						result = new Color(parent.getDisplay(), new RGB(red, green, blue));
-					} catch (Exception e) {
+					} catch (final Exception e) {
 						result = null;
 					}
 				}
 			}
-			String color = ColorMapTable.TABLE.get(cssColor);
+			final String color = ColorMapTable.TABLE.get(cssColor);
 			if (color != null) {
 				result = getColor(color);
 			}
@@ -963,6 +1339,7 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 	/**
 	 * @return a current BeanMap value copy.
 	 */
+	@Override
 	public BeanMap getCurrentBean() {
 		synchronized (warper) {
 			return warper.cloneCurrent();
@@ -977,23 +1354,45 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 	}
 
 	public List<IAction> getGlobalActions() {
-		ArrayList<IAction> actions = new ArrayList<IAction>(2);
-		for (IActionElement action : getActions()) {
+		final ArrayList<IAction> actions = new ArrayList<>(2);
+		for (final IActionElement action : getActions()) {
 			actions.add(new SWTScriptAction(this, action));
 		}
 		return actions;
 	}
 
+<<<<<<< master
+=======
+	/*
+	 * (non-Javadoc)
+	 * @seecom.arcadsoftware.editor.swt.ISWTRenderer#declareGlobalAction(com. arcadsoftware.editor.IActionElement)
+	 */
+	@Override
+>>>>>>> 38f2e60 Clean-up AFS Client
 	public void declareGlobalAction(IActionElement action) {
 		addAction(action);
 	}
 
+<<<<<<< master
+=======
+	/*
+	 * (non-Javadoc)
+	 * @see com.arcadsoftware.editor.swt.ISWTRenderer#getAction(com.arcadsoftware .editor.IActionElement)
+	 */
+	@Override
+>>>>>>> 38f2e60 Clean-up AFS Client
 	public IAction getAction(IActionElement action) {
 		return new SWTScriptAction(this, action);
 	}
 
+<<<<<<< master
+=======
+	/**
+	 *
+	 */
+>>>>>>> 38f2e60 Clean-up AFS Client
 	public void setFocus() {
-		if (firstParent != null && !firstParent.isDisposed()) {
+		if ((firstParent != null) && !firstParent.isDisposed()) {
 			firstParent.setFocus();
 		}
 	}
@@ -1003,27 +1402,27 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 	 */
 	public void restorState(IMemento memento) {
 		synchronized (warper) {
-			IMemento m = memento.getChild(ATTRIBUTES);
+			final IMemento m = memento.getChild(ATTRIBUTES);
 			if (m != null) {
 				restoreBeanMap(m, warper);
 			}
 		}
 		synchronized (lwarper) {
-			IMemento m = memento.getChild(LINKS);
+			final IMemento m = memento.getChild(LINKS);
 			if (m != null) {
-				for (IMemento oms : m.getChildren(OPERATION)) {
+				for (final IMemento oms : m.getChildren(OPERATION)) {
 					IMemento om = oms.getChild(ADD);
 					if (om != null) {
-						for (IMemento o : om.getChildren(OP)) {
-							BeanMap bm = new BeanMap(o.getID(), o.getInteger(IDID).intValue());
+						for (final IMemento o : om.getChildren(OP)) {
+							final BeanMap bm = new BeanMap(o.getID(), o.getInteger(IDID).intValue());
 							restoreBeanMap(o, bm);
 							lwarper.updateLinkList(oms.getID(), LinkMapWarper.LINKLIST_ADD, bm);
 						}
 					}
 					om = oms.getChild(REMOVE);
 					if (om != null) {
-						for (IMemento o : om.getChildren(OP)) {
-							BeanMap bm = new BeanMap(o.getID(), o.getInteger(IDID).intValue());
+						for (final IMemento o : om.getChildren(OP)) {
+							final BeanMap bm = new BeanMap(o.getID(), o.getInteger(IDID).intValue());
 							restoreBeanMap(o, bm);
 							lwarper.updateLinkList(oms.getID(), LinkMapWarper.LINKLIST_REMOVE, bm);
 						}
@@ -1037,7 +1436,7 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 	}
 
 	private void restoreBeanMap(IMemento am, IBeanMap bm) {
-		for (String key : am.getAttributeKeys()) {
+		for (final String key : am.getAttributeKeys()) {
 			bm.put(key, am.getString(key));
 		}
 	}
@@ -1052,9 +1451,9 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 		}
 		synchronized (lwarper) {
 			// Save links Changes.
-			IMemento m = memento.createChild(LINKS);
-			for (Entry<String, Operations> oe : lwarper.getPendingsOperations()) {
-				IMemento om = m.createChild(OPERATION, oe.getKey());
+			final IMemento m = memento.createChild(LINKS);
+			for (final Entry<String, Operations> oe : lwarper.getPendingsOperations()) {
+				final IMemento om = m.createChild(OPERATION, oe.getKey());
 				saveOperations(om.createChild(ADD), oe.getValue().addList);
 				saveOperations(om.createChild(REMOVE), oe.getValue().removeList);
 			}
@@ -1062,7 +1461,7 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 	}
 
 	private void saveBeanMap(IMemento am, BeanMap bm) {
-		for (Entry<String, Object> entry : bm.entrySet()) {
+		for (final Entry<String, Object> entry : bm.entrySet()) {
 			if (entry.getValue() instanceof BeanMap) {
 				am.putString(entry.getKey(), Integer.toString(((BeanMap) entry.getValue()).getId()));
 			} else if (entry.getValue() instanceof Date) {
@@ -1074,74 +1473,87 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 	}
 
 	private void saveOperations(IMemento memento, HashMap<Integer, BeanMap> list) {
-		for (BeanMap bm : list.values()) {
-			IMemento b = memento.createChild(OP, bm.getType());
+		for (final BeanMap bm : list.values()) {
+			final IMemento b = memento.createChild(OP, bm.getType());
 			b.putInteger(IDID, bm.getId());
 			saveBeanMap(b, bm);
 		}
 	}
 
+	@Override
 	public void addLinkitem(MetaDataLink link, BeanMap item) {
 		rendererBinding.getObservableLink(link, true, null).add(item);
 		loadListCompleted(item.getType());
 	}
 
+	@Override
 	public ITreeContentProvider getTreeContentProvider(MetaDataLink link, String fatherCode) {
-		BeanMapObservableLink l = (BeanMapObservableLink) rendererBinding.getObservableLink(link, true,null);
+		final BeanMapObservableLink l = (BeanMapObservableLink) rendererBinding.getObservableLink(link, true, null);
 		return new ObservableListTreeContentProvider(new BeanMapObservableLinkTreeFactory(this, l, fatherCode),
 				new BeanMapStructureAdvisor(l, fatherCode));
 	}
 
+	@Override
 	public void removeLinkitem(MetaDataLink link, BeanMap item) {
-		rendererBinding.getObservableLink(link, true,null).remove(item);
+		rendererBinding.getObservableLink(link, true, null).remove(item);
 		loadListCompleted(item.getType());
 	}
 
+	@Override
 	public void registerAction(IAction action) {
 		if (currentIActions != null) {
 			currentIActions.add(action);
 		}
 	}
 
+	@Override
 	public void handleChange(ChangeEvent event) {
 		// this is a very verbose firing...
 		fireChangedEvent();
 	}
 
+	@Override
 	public void handleListChange(ListChangeEvent event) {
 		// this is a very verbose firing...
 		fireChangedEvent();
 	}
 
+	@Override
 	public MetaDataEntity getStructure(Element element) {
 		return getLoader().loadMetaDataEntity(element.getType());
 	}
 
+	@Override
 	public MetaDataEntity getStructure(String type) {
 		return getLoader().loadMetaDataEntity(type);
 	}
 
+	@Override
 	public InputStream getBeanStream(String type, int id) {
 		return loader.loadStream(type, id);
 	}
 
+	@Override
 	public boolean updateBeanStream(String type, int id, File file) {
 		return loader.updateStream(type, id, file);
 	}
-	
-	public String getUploadBeanStreamAddress(String type, int id){
-		return loader.getUploadBeanStreamAddress(type,id);
-	}
-	
 
+	@Override
+	public String getUploadBeanStreamAddress(String type, int id) {
+		return loader.getUploadBeanStreamAddress(type, id);
+	}
+
+	@Override
 	public BeanMap loadBeanMap(String type, int id) {
 		return loader.loadBeanMap(type, id);
 	}
 
-	public BeanMap loadBeanMap(String type, int id,String attributeList) {
+	@Override
+	public BeanMap loadBeanMap(String type, int id, String attributeList) {
 		return loader.loadBeanMap(type, id, attributeList);
 	}
-	
+
+	@Override
 	public BeanMap createBeanMap(BeanMap beanMap) {
 		return loader.createBeanMap(beanMap);
 	}
@@ -1151,11 +1563,19 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 		return providerFactory;
 	}
 
+<<<<<<< master
+=======
+	/*
+	 * (non-Javadoc)
+	 * @see com.arcadsoftware.editor.swt.ISWTRenderer#getAction(java.lang.String)
+	 */
+	@Override
+>>>>>>> 38f2e60 Clean-up AFS Client
 	public IAction getAction(String code) {
 		if (code == null) {
 			return null;
 		}
-		for (IActionElement action : getActions()) {
+		for (final IActionElement action : getActions()) {
 			if (code.equals(action.getCode())) {
 				return new SWTScriptAction(this, action);
 			}
@@ -1163,8 +1583,16 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 		return null;
 	}
 
+<<<<<<< master
+=======
+	/*
+	 * (non-Javadoc)
+	 * @see com.arcadsoftware.editor.swt.ISWTRenderer#getTitleImage()
+	 */
+	@Override
+>>>>>>> 38f2e60 Clean-up AFS Client
 	public Image getTitleImage() {
-		String key = getParam(ICON, null);
+		final String key = getParam(ICON, null);
 		ImageDescriptor imageDescriptor = null;
 		if (key != null) {
 			imageDescriptor = getImageDescriptor(key);
@@ -1172,82 +1600,118 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 		return (imageDescriptor != null) ? imageDescriptor.createImage() : null;
 	}
 
+<<<<<<< master
+=======
+	/*
+	 * (non-Javadoc)
+	 * @see com.arcadsoftware.editor.swt.ISWTRenderer#getHelpContextId()
+	 */
+	@Override
+>>>>>>> 38f2e60 Clean-up AFS Client
 	public String getHelpContextId() {
-		return  getParam(HELPCONTEXTID, null);
+		return getParam(HELPCONTEXTID, null);
 	}
 
+<<<<<<< master
+=======
+	/*
+	 * (non-Javadoc)
+	 * @see com.arcadsoftware.editor.swt.IEditorChangeListener#changed(com.arcadsoftware .editor.swt.ISWTRenderer)
+	 */
+	@Override
+>>>>>>> 38f2e60 Clean-up AFS Client
 	public void changed(ISWTRenderer renderer) {
 		fireChangedEvent();
 	}
 
+	@Override
 	public Date getUpdateDate() {
-		BeanMap bean = getCurrentBean();
+		final BeanMap bean = getCurrentBean();
 		return (bean != null) ? bean.getDate() : null;
 	}
 
+	@Override
 	public BeanMap getSelectedBeanMap() {
 		return getCurrentBean();
 	}
 
+	@Override
 	public void addListenerWidget(IListenerWidget listenerWidget, String widgetId) {
 		if (listenerWidgets == null) {
-			listenerWidgets = new HashMap<String, List<IListenerWidget>>();
+			listenerWidgets = new HashMap<>();
 		}
 		List<IListenerWidget> list = listenerWidgets.get(widgetId);
 		if (list == null) {
-			list = new ArrayList<IListenerWidget>();
+			list = new ArrayList<>();
 			listenerWidgets.put(widgetId, list);
 		}
 		list.add(listenerWidget);
 	}
 
+	@Override
 	public void fireListenedWidgetChanged(IListenedWidget listenedWidget, BeanMap beanMap) {
 		if (listenerWidgets != null) {
-			List<IListenerWidget> list = listenerWidgets.get(listenedWidget.getId());
+			final List<IListenerWidget> list = listenerWidgets.get(listenedWidget.getId());
 			if (list != null) {
-				for (IListenerWidget listenerWidget : list) {
+				for (final IListenerWidget listenerWidget : list) {
 					listenerWidget.refreshWidget(beanMap);
 				}
 			}
 		}
 	}
 
+	@Override
 	public void refreshSelector(BeanMap beanMap) {
 		// Do nothing
 	}
 
+	@Override
 	public void addMandatoryAttribute(String code) {
 		if (mandatoryAttributes == null) {
+<<<<<<< master
 			mandatoryAttributes = new ArrayList<MandatoryAttribute>();
+=======
+			// mandatoryAttributes = new ArrayList<String>();
+			mandatoryAttributes = new ArrayList<>();
+>>>>>>> 38f2e60 Clean-up AFS Client
 		}
+<<<<<<< master
+=======
+		// mandatoryAttributes.add(code);
+>>>>>>> 38f2e60 Clean-up AFS Client
 		mandatoryAttributes.add(new MandatoryAttribute(code));
 	}
 
-	public void addMandatoryAttribute(String code, String conditionnedBy){
+	@Override
+	public void addMandatoryAttribute(String code, String conditionnedBy) {
 		if (mandatoryAttributes == null) {
 
-			mandatoryAttributes = new ArrayList<MandatoryAttribute>();
+			mandatoryAttributes = new ArrayList<>();
 		}
-		mandatoryAttributes.add(new MandatoryAttribute(code,conditionnedBy));		
+		mandatoryAttributes.add(new MandatoryAttribute(code, conditionnedBy));
 	}
-	
-	
+
+	@Override
 	public IInternalEditors getInternalEditors() {
 		return internalEditors;
 	}
 
+	@Override
 	public ILoadingListeners getLoadingListeners() {
 		return loadingListeners;
 	}
 
+	@Override
 	public IUpdateDateListeners getUpdateDateListeners() {
 		return updateDateListeners;
 	}
 
+	@Override
 	public IRendererActions getRendererActions() {
 		return rendererActions;
 	}
 
+	@Override
 	public IRendererBinding getRendererBinding() {
 		return rendererBinding;
 	}
@@ -1268,20 +1732,20 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 		addManagedControl(binding, element, currentMessageManager, control);
 	}
 
+	@Override
 	public void refreshEditorContent(BeanMap beanMap, ISWTRenderer renderer) {
 		internalEditors.refreshEditorsContent(beanMap, renderer);
 		rendererBinding.refreshBean(beanMap);
 	}
 
-	
-	private IStatus doRefreshEditors(BeanMap newBeanMap, final ISWTRenderer renderer){
-		IWorkbenchPage[] pages = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getPages();
+	private IStatus doRefreshEditors(BeanMap newBeanMap, final ISWTRenderer renderer) {
+		final IWorkbenchPage[] pages = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getPages();
 		if (pages != null) {
-			for (IWorkbenchPage workbenchPage : pages) {
-				IEditorReference[] editors = workbenchPage.getEditorReferences();
+			for (final IWorkbenchPage workbenchPage : pages) {
+				final IEditorReference[] editors = workbenchPage.getEditorReferences();
 				if (editors != null) {
-					for (IEditorReference editorReference : editors) {
-						Object editor = editorReference.getEditor(false);
+					for (final IEditorReference editorReference : editors) {
+						final Object editor = editorReference.getEditor(false);
 						if ((editor != null) && (editor instanceof IRefreshEditorContent)) {
 							if (!((IRefreshEditorContent) editor).isSameRenderer(SWTRenderer.this)) {
 								((IRefreshEditorContent) editor).refreshEditorContent(newBeanMap, renderer);
@@ -1291,32 +1755,32 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 				}
 			}
 		}
-		return Status.OK_STATUS;		
+		return Status.OK_STATUS;
 	}
-	
-	
+
+	@Override
 	public void refreshAllEditors(BeanMap beanMap, final ISWTRenderer renderer) {
 		final BeanMap newBeanMap = loadBeanMap(beanMap);
 		if (newBeanMap != null) {
 			UIJob job = null;
-			if (parentDisplay!=null) {
-				job = new UIJob(parentDisplay,Activator.getInstance().resString("refreshAllEditorsJobUiName")) { //$NON-NLS-1$
+			if (parentDisplay != null) {
+				job = new UIJob(parentDisplay, Activator.getInstance().resString("refreshAllEditorsJobUiName")) { //$NON-NLS-1$
 					@Override
 					public IStatus runInUIThread(IProgressMonitor monitor) {
-						return doRefreshEditors(newBeanMap,renderer);
+						return doRefreshEditors(newBeanMap, renderer);
 					}
 				};
 			} else {
 				job = new UIJob(Activator.getInstance().resString("refreshAllEditorsJobUiName")) { //$NON-NLS-1$
 					@Override
 					public IStatus runInUIThread(IProgressMonitor monitor) {
-						return doRefreshEditors(newBeanMap,renderer);
+						return doRefreshEditors(newBeanMap, renderer);
 					}
-				};				
+				};
 			}
-			if (job!=null){
+			if (job != null) {
 				job.schedule();
-			}			
+			}
 		}
 	}
 
@@ -1324,25 +1788,28 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 		return (beanMap != null) ? loadBeanMap(beanMap.getType(), beanMap.getId()) : beanMap;
 	}
 
+	@Override
 	public void setFormToolBar(IToolBarManager toolBarManager) {
 		formToolBarManager = toolBarManager;
 		formToolbarManagers.add(formToolBarManager);
 	}
 
+	@Override
 	public void addActionOnFormToolBar(IEditorAction action) {
 		if (formToolBarManager != null) {
 			formToolBarManager.add(action);
 			formToolBarManager.update(true);
-		}		
+		}
 	}
 
+	@Override
 	public void updateFormToolbar() {
-		for (IToolBarManager formToolbarManagerItem : formToolbarManagers) {
+		for (final IToolBarManager formToolbarManagerItem : formToolbarManagers) {
 			formToolbarManagerItem.update(true);
-			IContributionItem[] items = formToolbarManagerItem.getItems();
-			for (IContributionItem item : items) {
+			final IContributionItem[] items = formToolbarManagerItem.getItems();
+			for (final IContributionItem item : items) {
 				if (item instanceof ActionContributionItem) {
-					ActionContributionItem actionItem = (ActionContributionItem) item;
+					final ActionContributionItem actionItem = (ActionContributionItem) item;
 					if (actionItem.getAction() instanceof IRefreshableAction) {
 						((IRefreshableAction) actionItem.getAction()).refresh();
 					}
@@ -1351,36 +1818,52 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 		}
 	}
 
+	@Override
 	public void selectBeanMap(BeanMap bm) {
 		// Do nothing
 	}
 
+	@Override
 	public ISWTRenderer getParentRenderer() {
 		return parentRenderer;
 	}
 
+	@Override
 	public void setParentRenderer(ISWTRenderer renderer) {
 		parentRenderer = renderer;
 	}
 
+	@Override
 	public void addBeanMapSaveListener(IBeanMapSavedListener listener) {
 		beanMapSavedBeanListener.add(listener);
 	}
 
+	@Override
 	public void removeBeanMapSaveListener(IBeanMapSavedListener listener) {
 		beanMapSavedBeanListener.remove(listener);
 	}
 
 	protected void fireBeanMapSavedEvent() {
+<<<<<<< master
 		for (final IBeanMapSavedListener listener: beanMapSavedBeanListener) {
+=======
+		final Object[] listeners = beanMapSavedBeanListener.getListeners();
+		for (final Object listener : listeners) {
+			final IBeanMapSavedListener l = (IBeanMapSavedListener) listener;
+>>>>>>> 38f2e60 Clean-up AFS Client
 			SafeRunnable.run(new SafeRunnable() {
+				@Override
 				public void run() {
 					listener.beanMapSaved(getCurrentBean());
 				}
 			});
 		}
 	}
+<<<<<<< master
 	
+=======
+
+>>>>>>> 38f2e60 Clean-up AFS Client
 	public void addErrorOnSaveListener(IBeanMapErrorOnSaveListener listener) {
 		errorOnSavedListener.add(listener);
 	}
@@ -1388,81 +1871,120 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 	public void removeErrorOnSaveListener(IBeanMapErrorOnSaveListener listener) {
 		errorOnSavedListener.remove(listener);
 	}
-	
+
 	/**
 	 * Fire message
+	 *
 	 * @param errorMessage
 	 */
 	protected void fireErrorOnSaveEvent(final String errorMessage) {
+<<<<<<< master
 		for (final IBeanMapErrorOnSaveListener listener: errorOnSavedListener) {
+=======
+		final Object[] listeners = errorOnSavedListener.getListeners();
+		for (final Object listener : listeners) {
+			final IBeanMapErrorOnSaveListener l = (IBeanMapErrorOnSaveListener) listener;
+>>>>>>> 38f2e60 Clean-up AFS Client
 			SafeRunnable.run(new SafeRunnable() {
+				@Override
 				public void run() {
 					listener.onErrorOnSave(getCurrentBean(), errorMessage);
 				}
 			});
 		}
 	}
-	
+
 	/**
 	 * Fire User message
+	 *
 	 * @param errorUserMessage
 	 */
 	protected void fireErrorOnSaveEvent(final UserMessage errorUserMessage) {
+<<<<<<< master
 		for (final IBeanMapErrorOnSaveListener listener: errorOnSavedListener) {
+=======
+		final Object[] listeners = errorOnSavedListener.getListeners();
+		for (final Object listener : listeners) {
+			final IBeanMapErrorOnSaveListener l = (IBeanMapErrorOnSaveListener) listener;
+>>>>>>> 38f2e60 Clean-up AFS Client
 			SafeRunnable.run(new SafeRunnable() {
+				@Override
 				public void run() {
 					listener.onErrorOnSave(getCurrentBean(), errorUserMessage);
 				}
 			});
 		}
 	}
-	
-	
+
 	public void loadListCompleted(String type) {
 		if (loadedListListeners != null) {
-			//On scinde la boucle pour eviter les problemes des modifications concurrentes
-			ArrayList<ILoadedListListener> listerToDelete =  new ArrayList<ILoadedListListener>();
-			for (ILoadedListListener listener : loadedListListeners) {
+			// On scinde la boucle pour eviter les problemes des modifications concurrentes
+			final ArrayList<ILoadedListListener> listerToDelete = new ArrayList<>();
+			for (final ILoadedListListener listener : loadedListListeners) {
 				try {
 					if (listener.getListType().equals(type)) {
 						listener.loadedListComplete(this);
 					}
-				} catch (RuntimeException e) {
+				} catch (final RuntimeException e) {
 					listerToDelete.add(listener);
+<<<<<<< master
+=======
+					// removeLoadedList(listener);
+>>>>>>> 38f2e60 Clean-up AFS Client
 				}
 			}
+<<<<<<< master
+=======
+			// for (ILoadedList listener : listerToDelete) {
+			// listerToDelete.add(listener);
+			// }
+>>>>>>> 38f2e60 Clean-up AFS Client
 		}
 	}
 
+	@Override
 	public void addLoadedList(ILoadedListListener listener) {
 		loadedListListeners.add(listener);
 	}
 
+	@Override
 	public void removeLoadedList(ILoadedListListener listener) {
 		loadedListListeners.remove(listener);
 	}
 
+	@Override
 	public Object getVirtualValue(String key) {
 		return (virtualValues != null) ? virtualValues.get(key) : null;
 	}
 
+	@Override
 	public void putVirtualValue(String key, Object value) {
 		if (virtualValues == null) {
-			virtualValues = new HashMap<String, Object>();
+			virtualValues = new HashMap<>();
 		}
 		virtualValues.put(key, value);
 	}
 
+<<<<<<< master
+=======
+	@Override
+>>>>>>> 38f2e60 Clean-up AFS Client
 	public Object put(String key, Object value) {
 		synchronized (warper) {
 			return warper.put(key, value);
 		}
 	}
-	
+
 	/**
 	 * @return the mandatoryAttributes
 	 */
+<<<<<<< master
 	public List<MandatoryAttribute> getMandatoryAttributes() {		
+=======
+	// public List<String> getMandatoryAttributes() {
+	@Override
+	public List<MandatoryAttribute> getMandatoryAttributes() {
+>>>>>>> 38f2e60 Clean-up AFS Client
 		return mandatoryAttributes;
 	}
 
@@ -1474,44 +1996,69 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 		this.rightControler = rightControler;
 	}
 
+	@Override
 	public void setParentReadOnly(boolean readOnly) {
 		if (parent instanceof DynamicEditorComposite) {
 			((DynamicEditorComposite) parent).setInputEnabled(!readOnly);
 		}
 	}
 
+	@Override
 	public IToolBarManager getFormToolBarManager() {
 		return formToolBarManager;
 	}
-	
+
+	@Override
 	public void addActivatedListeners(IActivated listener) {
-		activatedListeners.add(listener);		
+		activatedListeners.add(listener);
 	}
 
+	@Override
 	public void removeActivatedListeners(IActivated listener) {
-		activatedListeners.remove(listener);		
+		activatedListeners.remove(listener);
 	}
 
+	@Override
 	public void fireActivatedEvent() {
+<<<<<<< master
 		for (IActivated listener : activatedListeners) {
 			try {
 				listener.activated();
 			} catch (RuntimeException e) {
 				removeActivatedListeners(listener);
+=======
+		if (activatedListeners != null) {
+			for (final IActivated listener : activatedListeners) {
+				try {
+					listener.activated();
+				} catch (final RuntimeException e) {
+					removeActivatedListeners(listener);
+				}
+>>>>>>> 38f2e60 Clean-up AFS Client
 			}
 		}
+<<<<<<< master
+=======
+
+>>>>>>> 38f2e60 Clean-up AFS Client
 	}
 
 	public IEditorLoader getEditorLoader() {
 		return getLoader();
 	}
 
+	@Override
 	public IMessageManager getMessageManager() {
 		return currentMessageManager;
 	}
+<<<<<<< master
 	
+=======
+
+	@Override
+>>>>>>> 38f2e60 Clean-up AFS Client
 	public Object runScriptAction(String name, Map<String, Object> parameters) {
-		IScriptAction sa = providerFactory.getScriptAction(name);
+		final IScriptAction sa = providerFactory.getScriptAction(name);
 		if (sa == null) {
 			return null;
 		}
@@ -1521,7 +2068,7 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 		sa.set("readonly", readOnly); //$NON-NLS-1$
 		sa.set("messageManager", currentMessageManager); //$NON-NLS-1$
 		if (parameters != null) {
-			for (Entry<String, Object> entry: parameters.entrySet()) {
+			for (final Entry<String, Object> entry : parameters.entrySet()) {
 				sa.set(entry.getKey(), entry.getValue());
 			}
 		}
@@ -1529,12 +2076,17 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 			if (sa.run()) {
 				return sa.get(IScriptAction.PARAM_RESULT);
 			}
-		} catch (ScriptExecutionException e) {}
+		} catch (final ScriptExecutionException e) {
+		}
 		return null;
 	}
 
 	public void requestSave() {
 		save();
 	}
+<<<<<<< master
 	
+=======
+
+>>>>>>> 38f2e60 Clean-up AFS Client
 }

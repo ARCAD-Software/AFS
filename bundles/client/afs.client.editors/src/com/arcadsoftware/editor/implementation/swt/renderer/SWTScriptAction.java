@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -22,15 +22,15 @@ import com.arcadsoftware.editor.IActionElement;
  */
 public class SWTScriptAction extends Action {
 
-	private SWTRenderer renderer;
-	private IActionElement action;
+	private final SWTRenderer renderer;
+	private final IActionElement action;
 
 	/**
 	 * @param renderer
 	 * @param action
 	 */
 	public SWTScriptAction(SWTRenderer renderer, IActionElement action) {
-		super(action.getName(),renderer.getImageDescriptor(action.getIcon()));
+		super(action.getName(), renderer.getImageDescriptor(action.getIcon()));
 		this.renderer = renderer;
 		this.action = action;
 	}
@@ -39,5 +39,5 @@ public class SWTScriptAction extends Action {
 	public void run() {
 		renderer.getRendererBinding().execute(action.getElements(), action.getScript());
 	}
-	
+
 }

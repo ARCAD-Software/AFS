@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -13,9 +13,8 @@
  *******************************************************************************/
 package com.arcadsoftware.afs.client.core.ui.wizards;
 
-import java.util.Map.Entry;
 import java.util.Hashtable;
-import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.swt.layout.GridData;
@@ -30,60 +29,57 @@ import com.arcadsoftware.editor.swt.ISWTRenderer;
 import com.arcadsoftware.editor.swt.MandatoryAttribute;
 import com.arcadsoftware.metadata.MetaDataAttribute;
 
-public abstract class AbstractConnectedLayoutWizardPage extends AbstractConnectedWizardPage 
-implements IEditorChangeListener {
-	
-	protected ConnectedDynamicEditorComposite editor;
+public abstract class AbstractConnectedLayoutWizardPage extends AbstractConnectedWizardPage
+		implements IEditorChangeListener {
 
+	protected ConnectedDynamicEditorComposite editor;
 
 	public AbstractConnectedLayoutWizardPage(ServerConnection connection,
 			String pageName, String title, String description) {
-		super(connection,pageName, title, description);
+		super(connection, pageName, title, description);
 	}
 
+	@Override
 	public void screenToBeanMap(BeanMap beanmap) {
 		beanmap.addAll(editor.getCurrent());
 	}
 
-
-
 	@Override
 	protected void createControlPage(Composite parent) {
-		editor = new ConnectedDynamicEditorComposite(getConnection(),parent,0, getType(), getLayoutName(),false,false){
+		editor = new ConnectedDynamicEditorComposite(getConnection(), parent, 0, getType(), getLayoutName(), false,
+				false) {
 			@Override
-			protected ServerConnection getConnection() {		
+			protected ServerConnection getConnection() {
 				return connection;
 			}
 		};
-		
-		Hashtable<String, Object> virtualValues = getVirtualValues();
+
+		final Hashtable<String, Object> virtualValues = getVirtualValues();
 		if (virtualValues != null) {
-			Set<String> keySet = virtualValues.keySet();
-			Iterator<String> keys = keySet.iterator();
-			while (keys.hasNext()) {
-				String key = keys.next();
-				Object value = virtualValues.get(key);
+			final Set<String> keySet = virtualValues.keySet();
+			for (final String key : keySet) {
+				final Object value = virtualValues.get(key);
 				editor.getRenderer().putVirtualValue(key, value);
-				
+
 			}
-		}	
+		}
 		editor.createPartControl(getLayoutName());
-		
-		GridData gridData = new GridData(GridData.FILL_BOTH);
+
+		final GridData gridData = new GridData(GridData.FILL_BOTH);
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.grabExcessVerticalSpace = true;
 		gridData.horizontalSpan = 3;
 		editor.setLayoutData(gridData);
-		if ((initalBeanmap != null)){
+		if ((initalBeanmap != null)) {
 			editor.load(initalBeanmap);
 		} else {
 			editor.loadEmptyEntity();
-			setFixedValues(editor.getRenderer());	
-		}		
-		
+			setFixedValues(editor.getRenderer());
+		}
+
 		editor.getRenderer().addChangeListener(this);
-		
-		setPageComplete(checkData());		
+
+		setPageComplete(checkData());
 	}
 
 	public abstract String getType();
@@ -93,46 +89,52 @@ implements IEditorChangeListener {
 	protected Hashtable<String, Object> getVirtualValues() {
 		return null;
 	}
-	
-	public void setFixedValues(ISWTRenderer renderer){
-		
+
+	public void setFixedValues(ISWTRenderer renderer) {
+
 	}
-	
+
 	@Override
 	protected boolean checkData() {
-		if (editor == null)
+		if (editor == null) {
 			return true;
-		ISWTRenderer renderer = editor.getRenderer();
+		}
+		final ISWTRenderer renderer = editor.getRenderer();
 		if (!renderer.canSavedEditor(false)) {
-			Set<Entry<String, MetaDataAttribute>> attributesEntries = renderer.getStructure().getAttributes().entrySet();
-			for (Entry<String, MetaDataAttribute> entry : attributesEntries) {
+			final Set<Entry<String, MetaDataAttribute>> attributesEntries = renderer.getStructure().getAttributes()
+					.entrySet();
+			for (final Entry<String, MetaDataAttribute> entry : attributesEntries) {
 				if (entry.getValue().isMandatory()) {
-					Object attributeValue = renderer.getCurrentBean().get(entry.getKey());
-					String name = entry.getValue().getName();
+					final Object attributeValue = renderer.getCurrentBean().get(entry.getKey());
+					final String name = entry.getValue().getName();
 					if (attributeValue != null) {
-						if (attributeValue instanceof String && ((String) attributeValue).length() == 0)
+						if ((attributeValue instanceof String) && (((String) attributeValue).length() == 0)) {
 							return setMandatoryErrorMessage(name);
-					} else
+						}
+					} else {
 						return setMandatoryErrorMessage(name);
+					}
 				}
 			}
 			if (renderer.getMandatoryAttributes() != null) {
-				//for (String code : renderer.getMandatoryAttributes()) {
-				for (MandatoryAttribute mandatoryAttribute: renderer.getMandatoryAttributes()) {
-					String code = mandatoryAttribute.getCode();					
+				// for (String code : renderer.getMandatoryAttributes()) {
+				for (final MandatoryAttribute mandatoryAttribute : renderer.getMandatoryAttributes()) {
+					final String code = mandatoryAttribute.getCode();
 					boolean mandatory = true;
 					if (mandatoryAttribute.isConditionned()) {
-						String conditionnedBy = mandatoryAttribute.getConditionedBy();
-						mandatory= renderer.getCurrentBean().getBoolean(conditionnedBy);
+						final String conditionnedBy = mandatoryAttribute.getConditionedBy();
+						mandatory = renderer.getCurrentBean().getBoolean(conditionnedBy);
 					}
-					if (mandatory) {					
-						Object attributeValue = renderer.getCurrentBean().get(code);
-						String name = renderer.getStructure().getAttribute(code).getName();
+					if (mandatory) {
+						final Object attributeValue = renderer.getCurrentBean().get(code);
+						final String name = renderer.getStructure().getAttribute(code).getName();
 						if (attributeValue != null) {
-							if (attributeValue instanceof String && ((String) attributeValue).length() == 0)
+							if ((attributeValue instanceof String) && (((String) attributeValue).length() == 0)) {
 								return setMandatoryErrorMessage(name);
-						} else
+							}
+						} else {
 							return setMandatoryErrorMessage(name);
+						}
 					}
 				}
 			}
@@ -149,6 +151,7 @@ implements IEditorChangeListener {
 		return false;
 	}
 
+	@Override
 	public void changed(ISWTRenderer renderer) {
 		setPageComplete(checkData());
 	}
@@ -159,6 +162,4 @@ implements IEditorChangeListener {
 		super.dispose();
 	}
 
-
-	
 }

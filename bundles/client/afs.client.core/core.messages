@@ -35,13 +35,11 @@ ERR-HTTP-1001$2=A HTTP Error 1001 occurred.
 ERR-HTTP-X$1=%2$s %3$s
 ERR-HTTP-X$2=A HTTP Error %1$s occurred.
 
-
 COR-SRH-E000001$1=The connection is missing
 COR-SRH-E000001$2=A server connection is needed to make the search view correctly work.
 
 COR-SRH-E000002$1=An unknown error occurred during retrieving data.
 COR-SRH-E000002$2=An unknown error occurred during retrieving data.
-
 
 #Dynamic Container Creation using extension Point
 
@@ -54,13 +52,8 @@ COR-CTC-E000001$2=The right defined into the container %1$s definition is not a 
 COR-CTC-E000002$1=Invalid URL %1$s
 COR-CTC-E000002$2=The connection URL is malformed
 
-
 COR-CTC-E000003$1=No Truststore Provider found
 COR-CTC-E000003$2=The Truststore Provider has been found to secured the connection
 
-
-
-
 COR-ACT-E000000$1=Forbidden Action
 COR-ACT-E000000$2=User has no right to run this operation.
-

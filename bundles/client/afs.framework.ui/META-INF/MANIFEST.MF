@@ -32,7 +32,7 @@ Export-Package: com.arcadsoftware.afs.framework.ui,
  com.arcadsoftware.afs.framework.ui.propertypage,
  com.arcadsoftware.afs.framework.ui.viewers,
  com.arcadsoftware.afs.framework.ui.views
-Bundle-ClassPath: afs.framework.ui.jar
+Bundle-ClassPath: .
 Automatic-Module-Name: com.arcadsoftware.afs.framework.ui
 Bundle-License: https://www.eclipse.org/legal/epl-2.0
 Bundle-License-Name: Eclipse Public License Version 2.0

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -12,8 +12,6 @@
  *     ARCAD Software - initial API and implementation
  *******************************************************************************/
 package com.arcadsoftware.afs.client.server.internals.ui.composites;
-
-
 
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.eclipse.swt.SWT;
@@ -29,46 +27,45 @@ import com.arcadsoftware.crypt.CertificateInformation;
 public class SSLLocalCertificateListComposite extends AbstractAFSStandardComposite {
 
 	private static final FastDateFormat DF = FastDateFormat.getInstance("yyyyMMdd - HH:mm:sss");
-	
+
 	private List certificateList;
 	private java.util.List<CertificateInformation> input;
-	
+
 	private CertificateInformation selectedCertificate;
-	
+
 	public SSLLocalCertificateListComposite(Composite parent, int style) {
-		super(parent, style,false);
+		super(parent, style, false);
 		createControlPage();
 	}
 
 	@Override
 	public void createControlPage() {
-		certificateList = new List(this,SWT.V_SCROLL| SWT.H_SCROLL);
-		GridData gd = new GridData(GridData.FILL_BOTH);
+		certificateList = new List(this, SWT.V_SCROLL | SWT.H_SCROLL);
+		final GridData gd = new GridData(GridData.FILL_BOTH);
 		gd.grabExcessHorizontalSpace = true;
 		gd.grabExcessVerticalSpace = true;
-		certificateList.setLayoutData(gd);	
+		certificateList.setLayoutData(gd);
 		certificateList.addSelectionListener(
-			new SelectionAdapter() {
-				@Override
-				public void widgetSelected(SelectionEvent arg0) {
-					updateSelectedCertificate();
-				}
-			}
-		);		
+				new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent arg0) {
+						updateSelectedCertificate();
+					}
+				});
 	}
-	
+
 	public void setInput(java.util.List<CertificateInformation> input) {
 		this.input = input;
-		//""server.connection.certificate.detail=Subject: %s, Issuer: %s.\n""
+		// ""server.connection.certificate.detail=Subject: %s, Issuer: %s.\n""
 		for (final CertificateInformation ci : input) {
 			final StringBuilder sb = new StringBuilder();
 			sb.append("[").append(ci.getAlgorithm()).append("] - [");
 			sb.append(ci.getFingerPrint()).append("] - [");
 			sb.append(DF.format(ci.getStartDate())).append(" / ");
 			sb.append(DF.format(ci.getExpirationDate())).append("]");
-			certificateList.add(sb.toString());			
+			certificateList.add(sb.toString());
 		}
-		if(!input.isEmpty()) {
+		if (!input.isEmpty()) {
 			certificateList.select(0);
 			updateSelectedCertificate();
 		}
@@ -77,7 +74,7 @@ public class SSLLocalCertificateListComposite extends AbstractAFSStandardComposi
 	public CertificateInformation getSelectedCertificate() {
 		return selectedCertificate;
 	}
-	
+
 	private void updateSelectedCertificate() {
 		selectedCertificate = input.get(certificateList.getSelectionIndex());
 	}

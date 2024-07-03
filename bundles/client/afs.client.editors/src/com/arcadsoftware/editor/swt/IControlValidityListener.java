@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -14,9 +14,9 @@
 package com.arcadsoftware.editor.swt;
 
 /**
- * This listener is fire when 
+ * This listener is fire when
  */
 public interface IControlValidityListener {
-	
+
 	public void validityChanged(ControlValidityEvent event);
 }

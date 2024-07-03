@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -30,19 +30,19 @@ public class LinkMapWarper {
 	public static final int LINKLIST_REMOVE = 1;
 	public static final int LINKLIST_EDIT = 2;
 
-	private SWTRenderer renderer;
+	private final SWTRenderer renderer;
 	private int id;
 
 	public class Operations {
-		public HashMap<Integer, BeanMap> addList = new HashMap<Integer, BeanMap>();
-		public HashMap<Integer, BeanMap> removeList = new HashMap<Integer, BeanMap>();
+		public HashMap<Integer, BeanMap> addList = new HashMap<>();
+		public HashMap<Integer, BeanMap> removeList = new HashMap<>();
 
 		public boolean isEmpty() {
 			return addList.isEmpty() && removeList.isEmpty();
 		}
 	}
 
-	HashMap<String, Operations> ops = new HashMap<String, Operations>();
+	HashMap<String, Operations> ops = new HashMap<>();
 
 	public LinkMapWarper(SWTRenderer renderer) {
 		super();
@@ -62,19 +62,20 @@ public class LinkMapWarper {
 			this.code = code;
 		}
 
+		@Override
 		public void changed(BeanMapListEvent event) {
-			BeanMapList result = event.getSource();
+			final BeanMapList result = event.getSource();
 			// We (try to) apply pendings operations...
-			Operations op = linkwarper.ops.get(code);
+			final Operations op = linkwarper.ops.get(code);
 			if (op != null) {
 				try {
-					for (BeanMap bm : op.removeList.values()) {
+					for (final BeanMap bm : op.removeList.values()) {
 						result.remove(bm);
 					}
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					Activator.getInstance().debug("Error during remove operation...", e); //$NON-NLS-1$
 				}
-				for (BeanMap bm : op.addList.values()) {
+				for (final BeanMap bm : op.addList.values()) {
 					if (result.indexOf(bm) == -1) {
 						result.add(bm);
 					}
@@ -87,36 +88,38 @@ public class LinkMapWarper {
 
 	/**
 	 * Load a BeanMap sublist.
-	 * 
 	 * <p>
 	 * Caching the list is the responsibility of the loader.
 	 */
 	public void loadLinkList(String code, String type, IBeanMapListListener listener, String attributeList) {
-		loadLinkList(code,type,listener,attributeList,null,0);
+		loadLinkList(code, type, listener, attributeList, null, 0);
 	}
-	
-	public void loadLinkList(String code, String type, IBeanMapListListener listener, String attributeList, String orderList) {
-		loadLinkList(code,type,listener,attributeList,orderList,0);
+
+	public void loadLinkList(String code, String type, IBeanMapListListener listener, String attributeList,
+			String orderList) {
+		loadLinkList(code, type, listener, attributeList, orderList, 0);
 	}
-	
-	public void loadLinkList(String code, String type, IBeanMapListListener listener, String attributeList, String orderList, int pageCount) {
-		IBeanMapListListener warperListener = new WarperListener(this, listener, code);
+
+	public void loadLinkList(String code, String type, IBeanMapListListener listener, String attributeList,
+			String orderList, int pageCount) {
+		final IBeanMapListListener warperListener = new WarperListener(this, listener, code);
 		if (id == 0) {
 			// Null id state for newly created BeanMap (so we should got an empty link list !)
 			warperListener.changed(new BeanMapListEvent(new BeanMapList()));
 		} else {
-			if (attributeList != null && orderList!=null){
+			if ((attributeList != null) && (orderList != null)) {
 				renderer.getDataLoader().loadSubList(
-						renderer.getStructure().getType(), id, code, type, warperListener,attributeList, orderList,pageCount);
-			} else if (attributeList!=null){
+						renderer.getStructure().getType(), id, code, type, warperListener, attributeList, orderList,
+						pageCount);
+			} else if (attributeList != null) {
 				renderer.getDataLoader().loadSubList(
-						renderer.getStructure().getType(), id, code, type, warperListener,attributeList,pageCount);
-			}else {
+						renderer.getStructure().getType(), id, code, type, warperListener, attributeList, pageCount);
+			} else {
 				renderer.getDataLoader().loadSubList(
 						renderer.getStructure().getType(), id, code, type, warperListener);
 			}
 		}
-		
+
 	}
 
 	/**
@@ -125,9 +128,9 @@ public class LinkMapWarper {
 	public BeanMap loadLinkedItem(String type, int itemId, String attributeList) {
 		BeanMap loadedItem = null;
 		if (id > 0) {
-			if (attributeList!=null)
+			if (attributeList != null) {
 				loadedItem = renderer.getDataLoader().loadBeanMap(type, itemId, attributeList);
-			else {
+			} else {
 				loadedItem = renderer.getDataLoader().loadBeanMap(type, itemId);
 			}
 		}
@@ -136,7 +139,7 @@ public class LinkMapWarper {
 		}
 		return loadedItem;
 	}
-	
+
 	public int getId() {
 		return id;
 	}
@@ -151,7 +154,7 @@ public class LinkMapWarper {
 	 */
 	public void updateLinkList(String code, int linklistAdd, BeanMap o) {
 		Operations op = ops.get(code);
-		Integer currentId = Integer.valueOf(o.getId());
+		final Integer currentId = Integer.valueOf(o.getId());
 		if (op == null) {
 			op = new Operations();
 			switch (linklistAdd) {
@@ -195,12 +198,12 @@ public class LinkMapWarper {
 	 * Save the recorded operations.
 	 */
 	public void save() {
-		for (Entry<String, Operations> op : ops.entrySet()) {
-			for (Integer i : op.getValue().addList.keySet()) {
+		for (final Entry<String, Operations> op : ops.entrySet()) {
+			for (final Integer i : op.getValue().addList.keySet()) {
 				renderer.getDataLoader().putSubListItem(renderer.getStructure().getType(), id, op.getKey(),
 						i.intValue());
 			}
-			for (Integer i : op.getValue().removeList.keySet()) {
+			for (final Integer i : op.getValue().removeList.keySet()) {
 				renderer.getDataLoader().deleteSubListItem(renderer.getStructure().getType(), id, op.getKey(),
 						i.intValue());
 			}

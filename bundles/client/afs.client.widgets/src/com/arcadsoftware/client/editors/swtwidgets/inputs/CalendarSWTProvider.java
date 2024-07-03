@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -40,10 +40,11 @@ import com.arcadsoftware.metadata.MetaDataEntity;
  */
 public class CalendarSWTProvider implements IInputSWTProvider {
 
+	@Override
 	public void create(ISWTRenderer renderer, ILayoutParameters parameters, Element element,
 			MetaDataEntity structure) {
-		Composite parent = renderer.getParent();
-		String label = renderer.getLocalizedMessage(parameters.getParameter(LABEL, element.getName()));
+		final Composite parent = renderer.getParent();
+		final String label = renderer.getLocalizedMessage(parameters.getParameter(LABEL, element.getName()));
 		if (label.length() > 0) {
 			renderer.getToolkit().createLabel(parent, label);
 			renderer.getToolkit().createLabel(parent, TWO_POINTS);
@@ -59,7 +60,7 @@ public class CalendarSWTProvider implements IInputSWTProvider {
 				}
 			}
 		} else {
-			ExpandableComposite group = renderer.getToolkit().createExpandableComposite(parent,
+			final ExpandableComposite group = renderer.getToolkit().createExpandableComposite(parent,
 					ExpandableComposite.TREE_NODE | ExpandableComposite.TITLE_BAR);
 			group.setLayout(new FillLayout());
 			group.addExpansionListener(new ScrolledCompositeExpansionListener());
@@ -83,5 +84,7 @@ public class CalendarSWTProvider implements IInputSWTProvider {
 		renderer.getRendererBinding().bindElement(element, dateTime);
 	}
 
-	public void dispose() {}
+	@Override
+	public void dispose() {
+	}
 }

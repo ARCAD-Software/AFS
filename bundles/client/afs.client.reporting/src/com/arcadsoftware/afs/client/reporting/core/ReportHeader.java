@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -15,17 +15,14 @@ package com.arcadsoftware.afs.client.reporting.core;
 
 import com.arcadsoftware.aev.core.model.ArcadEntity;
 
-public class ReportHeader extends ArcadEntity{
-	
+public class ReportHeader extends ArcadEntity {
 
-	
 	private String name = ""; //$NON-NLS-1$
 	private String description = "";//$NON-NLS-1$
 	private String category = "";//$NON-NLS-1$
 	private String urlOrFilename = ""; //$NON-NLS-1$
 	private String version = "";//$NON-NLS-1$
-	
-	
+
 	public String getName() {
 		return name;
 	}
@@ -61,36 +58,40 @@ public class ReportHeader extends ArcadEntity{
 	public void setVersion(String version) {
 		this.version = version;
 	}
-	
-	public ReportHeader(String filename,String name, String description, String category) {
+
+	public ReportHeader(String filename, String name, String description, String category) {
 		this(filename, name, description, category, null);
 	}
-	
-	public ReportHeader(String filename,String name, String description, String category, String version) {
+
+	public ReportHeader(String filename, String name, String description, String category, String version) {
 		super();
-		this.urlOrFilename = filename;
+		urlOrFilename = filename;
 		this.name = name;
 		this.description = description;
-		if ((category==null) || category.equals("")) //$NON-NLS-1$
+		if ((category == null) || category.equals("")) { //$NON-NLS-1$
 			this.category = ReportCategory.DEFAULT_CATEGORY;
-		else
+		} else { // $NON-NLS-1$
 			this.category = category;
+		}
 
-		if (version==null)
+		if (version == null) {
 			this.version = ""; //$NON-NLS-1$
-		else
+		} else {
 			this.version = version;
+		}
 	}
 
+	@Override
 	public String getLabel() {
-		return name; 
+		return name;
 	}
 
 	public boolean isEqualTo(ReportHeader report) {
-		if (report!=null) {
-			return report.getUrlOrFilename().equalsIgnoreCase(urlOrFilename) && report.getCategory().equalsIgnoreCase(category);
+		if (report != null) {
+			return report.getUrlOrFilename().equalsIgnoreCase(urlOrFilename)
+					&& report.getCategory().equalsIgnoreCase(category);
 		}
 		return false;
 	}
-	
+
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -44,25 +44,26 @@ public class Activator extends AbstractAFSUIPlugin {
 	public static Activator getDefault() {
 		return plugin;
 	}
-	
+
 	public static void setMessageProvider(ILocalizationProvider msgProvider) {
 		messageProvider = msgProvider;
 	}
-	
+
 	public static String resString(String key) {
-		if (messageProvider==null)
+		if (messageProvider == null) {
 			return plugin.getResourceString(key);
-		else {
-			String value = messageProvider.getResourceString(key);
-			if ((value==null) || value.equalsIgnoreCase("") || value.equalsIgnoreCase(key)) {
+		} else {
+			final String value = messageProvider.getResourceString(key);
+			if ((value == null) || value.equalsIgnoreCase("") || value.equalsIgnoreCase(key)) {
 				return plugin.getResourceString(key);
 			}
 		}
 		return key;
 	}
 
-	private ServiceTracker<?,?> helpTracker;
+	private ServiceTracker<?, ?> helpTracker;
 
+	@Override
 	public void start(BundleContext context) throws Exception {
 		plugin = this;
 		super.start(context);
@@ -70,11 +71,12 @@ public class Activator extends AbstractAFSUIPlugin {
 		helpTracker.open();
 		try {
 			DynamicHelp.init(this);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			log(e);
 		}
 	}
 
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
 		if (helpTracker != null) {
@@ -88,15 +90,15 @@ public class Activator extends AbstractAFSUIPlugin {
 	public String getResourceBundleName() {
 		return "com.arcadsoftware.afs.framework.ui.internal.resources";
 	}
-	
+
 	@Override
 	protected void fillImageRegistry() {
-		putImageInRegistry("DLG_ARCAD", getIconPath() + "arcad-16.png"); //$NON-NLS-1$ //$NON-NLS-2$		
+		putImageInRegistry("DLG_ARCAD", getIconPath() + "arcad-16.png"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Override
 	protected ResourceBundle loadResourceBundle(String bundleName, Locale local) throws MissingResourceException {
-		return ResourceBundle.getBundle(bundleName, Locale.getDefault());		
+		return ResourceBundle.getBundle(bundleName, Locale.getDefault());
 	}
 
 	@Override
@@ -106,7 +108,7 @@ public class Activator extends AbstractAFSUIPlugin {
 
 	public IDynamicHelpService getDynamicHelpService() {
 		if (helpTracker != null) {
-			Object s = helpTracker.getService();
+			final Object s = helpTracker.getService();
 			if (s instanceof IDynamicHelpService) {
 				return (IDynamicHelpService) s;
 			}

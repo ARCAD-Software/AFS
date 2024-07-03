@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -22,16 +22,16 @@ import com.arcadsoftware.afs.client.server.admin.common.ui.actions.AbstractCopyT
 
 public class CopyToClipboardAction extends AbstractCopyToClipboardAction {
 
-	public CopyToClipboardAction(){
+	public CopyToClipboardAction() {
 		super();
 	}
-	
+
 	@Override
 	public void run() {
-		String content = getContent();
-		Clipboard clipBoard = new Clipboard(Display.getCurrent());
-        TextTransfer transfer = TextTransfer.getInstance();
-        clipBoard.setContents(new Object[] { content }, new Transfer[] {transfer});
+		final String content = getContent();
+		final Clipboard clipBoard = new Clipboard(Display.getCurrent());
+		final TextTransfer transfer = TextTransfer.getInstance();
+		clipBoard.setContents(new Object[] { content }, new Transfer[] { transfer });
 	}
-		
+
 }

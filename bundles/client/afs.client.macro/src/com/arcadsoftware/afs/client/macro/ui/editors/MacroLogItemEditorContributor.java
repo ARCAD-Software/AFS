@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -19,27 +19,26 @@ import org.eclipse.ui.part.EditorActionBarContributor;
 
 public class MacroLogItemEditorContributor extends EditorActionBarContributor {
 
-	
-	private MacroLogItemEditorPart editor; 
-	
+	private MacroLogItemEditorPart editor;
+
 	public MacroLogItemEditorContributor() {
 	}
+
 	@Override
 	public void setActiveEditor(IEditorPart targetEditor) {
 		if (targetEditor instanceof MacroLogItemEditorPart) {
-			editor = (MacroLogItemEditorPart)targetEditor;
+			editor = (MacroLogItemEditorPart) targetEditor;
 		} else {
 			editor = null;
 		}
 	}
-	
+
 	@Override
 	public void contributeToToolBar(IToolBarManager toolBarManager) {
 		super.contributeToToolBar(toolBarManager);
-		if (editor!=null) {
+		if (editor != null) {
 			editor.getViewer().contributeToToolBar(toolBarManager);
 		}
 	}
-	
-}
 
+}

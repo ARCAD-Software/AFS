@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -50,8 +50,7 @@ public class DateUtils {
 				final Date d = from.parse(value);
 				final String result = to.format(d);
 				return result;
-			} catch (final ParseException e) {
-			}
+			} catch (final ParseException e) {}
 		}
 		return null;
 	}

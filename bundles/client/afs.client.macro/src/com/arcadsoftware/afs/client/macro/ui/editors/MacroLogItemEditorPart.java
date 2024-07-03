@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -26,53 +26,53 @@ import com.arcadsoftware.afs.client.macro.internal.Activator;
 import com.arcadsoftware.afs.client.macro.internal.ui.viewers.MacroLogItemTableViewer;
 import com.arcadsoftware.afs.client.macro.model.MacroLogItemDefinitions;
 
-
 public class MacroLogItemEditorPart extends EditorPart {
 
 	public final static String MACROLOGITEM_EDITOR_ID = "com.arcadsoftware.afs.client.macro.ui.editors.MacroLogItemEditor"; //$NON-NLS-1$
-	
+
 	MacroLogItemDefinitions list;
 	MacroLogItemTableViewer viewer;
 	MacroLogItemEditorInput listInput;
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.IEditorPart#init(org.eclipse.ui.IEditorSite, org.eclipse.ui.IEditorInput)
 	 */
+	@Override
 	public void init(IEditorSite site, IEditorInput input)
-		throws PartInitException {
-		if ((input == null) || !(input instanceof MacroLogItemEditorInput))
+			throws PartInitException {
+		if ((input == null) || !(input instanceof MacroLogItemEditorInput)) {
 			throw new PartInitException(Activator.resString("macroLogItem.editor.noEditorInput")); //$NON-NLS-1$
-		else{
+		} else {
 			setInput(input);
 			firePropertyChange(PROP_TITLE);
-			listInput = (MacroLogItemEditorInput)input;
+			listInput = (MacroLogItemEditorInput) input;
 			list = listInput.getMacroLogItemDefinitions();
-			setPartName(getPartName()+": "+((MacroLogItemEditorInput)input).getName()); //$NON-NLS-1$
+			setPartName(getPartName() + ": " + ((MacroLogItemEditorInput) input).getName()); //$NON-NLS-1$
 		}
-		this.setSite(site);		
-	}	
+		setSite(site);
+	}
 
-	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#isDirty()
 	 */
+	@Override
 	public boolean isDirty() {
 		return false;
 	}
-	
+
 	@Override
 	public void createPartControl(Composite parent) {
 		viewer = new MacroLogItemTableViewer(parent, SWT.FULL_SELECTION);
 		viewer.setInput(list);
 	}
 
-	
 	@Override
 	public void doSave(IProgressMonitor arg0) {
 
 	}
 
-	
 	@Override
 	public void doSaveAs() {
 
@@ -83,13 +83,11 @@ public class MacroLogItemEditorPart extends EditorPart {
 		return false;
 	}
 
-
 	@Override
 	public void setFocus() {
 
-		
 	}
-	
+
 	public MacroLogItemTableViewer getViewer() {
 		return viewer;
 	}

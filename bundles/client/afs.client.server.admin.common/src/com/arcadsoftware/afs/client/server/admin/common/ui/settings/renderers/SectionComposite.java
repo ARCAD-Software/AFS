@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -65,11 +65,8 @@ import com.arcadsoftware.rest.console.SectionId;
 
 public class SectionComposite extends Composite implements ICopyContentProvider {
 
-	private static final long serialVersionUID = 4242786210805837401L;
-
 	private class BooleanListener extends SelectionAdapter {
 
-		private static final long serialVersionUID = -5455219279707156958L;
 		public String id;
 
 		public BooleanListener(final String id) {
@@ -87,7 +84,6 @@ public class SectionComposite extends Composite implements ICopyContentProvider 
 
 	private class StringListener implements ModifyListener {
 
-		private static final long serialVersionUID = -2595376260038536069L;
 		public String id;
 
 		public StringListener(final String id) {
@@ -111,7 +107,6 @@ public class SectionComposite extends Composite implements ICopyContentProvider 
 	 */
 	private class TimeListener extends SelectionAdapter {
 
-		private static final long serialVersionUID = -4467533872401921518L;
 		public String id;
 		public DateTime widget;
 
@@ -148,15 +143,13 @@ public class SectionComposite extends Composite implements ICopyContentProvider 
 	private void addSpecialAction(final Menu menu, final IAction action, final String imageKey) {
 		addSpecialAction(menu, action, ImageManager.getInstance().getImage(imageKey));
 	}
-	
+
 	private void addSpecialAction(final Menu menu, final IAction action, final Image image) {
 		final MenuItem item = new MenuItem(menu, SWT.PUSH);
 		item.setText(action.getText());
 		item.setImage(image);
 		item.addSelectionListener(
 				new SelectionAdapter() {
-					private static final long serialVersionUID = -9128932647047024202L;
-
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
 						action.run();
@@ -168,8 +161,6 @@ public class SectionComposite extends Composite implements ICopyContentProvider 
 		copyToClipboardAction = getCopyToClipboardAction();
 
 		sendbyMailAction = new SendbyMailAction() {
-			private static final long serialVersionUID = 1516655434896342659L;
-
 			@Override
 			public String getContent() {
 				return sectionToString();
@@ -187,8 +178,6 @@ public class SectionComposite extends Composite implements ICopyContentProvider 
 		item.setText(property.getLabel());
 		item.addSelectionListener(
 				new SelectionAdapter() {
-					private static final long serialVersionUID = -6594404587531109541L;
-
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
 						final ActionManager itemManager = actionManager.clone(true);
@@ -338,7 +327,7 @@ public class SectionComposite extends Composite implements ICopyContentProvider 
 				calendar.setTimeInMillis(timeVal);
 			}
 		} catch (final NumberFormatException e) {
-			//do not catch
+			// do not catch
 		}
 		time.setTime(calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), 0);
 		time.addSelectionListener(new TimeListener(property.getId(), time));
@@ -367,8 +356,6 @@ public class SectionComposite extends Composite implements ICopyContentProvider 
 		addSpecialAction(menu, sendbyMailAction, IIconConsts.SENDMAIL);
 		toolItem.addSelectionListener(
 				new SelectionAdapter() {
-					private static final long serialVersionUID = 3303530498167486897L;
-
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
 						final Rectangle rect = toolItem.getBounds();
@@ -382,7 +369,7 @@ public class SectionComposite extends Composite implements ICopyContentProvider 
 
 	/**
 	 * This method is used to create the content of a section
-	 * 
+	 *
 	 * @param sectionId
 	 * @param form
 	 * @param help
@@ -400,7 +387,7 @@ public class SectionComposite extends Composite implements ICopyContentProvider 
 
 	/**
 	 * This method is used to create the content of a section
-	 * 
+	 *
 	 * @param sectionId
 	 * @param form
 	 * @param help
@@ -477,7 +464,7 @@ public class SectionComposite extends Composite implements ICopyContentProvider 
 
 	/**
 	 * Load extensions
-	 * 
+	 *
 	 * @return
 	 */
 	private AbstractCopyToClipboardAction getCopyToClipboardAction() {
@@ -511,7 +498,7 @@ public class SectionComposite extends Composite implements ICopyContentProvider 
 			return result;
 		}
 		final String defaultValue = property.getDefaultvalue();
-		if (defaultValue == null || defaultValue.equals("")) {
+		if ((defaultValue == null) || defaultValue.equals("")) {
 			return ConsoleProperty.TYPE_STRING;
 		}
 		if (defaultValue.equalsIgnoreCase("true") || defaultValue.equalsIgnoreCase("false")) { //$NON-NLS-1$ //$NON-NLS-2$
@@ -540,7 +527,7 @@ public class SectionComposite extends Composite implements ICopyContentProvider 
 			final Object value = entry.getValue();
 			if (value instanceof String) {
 				final ConsoleProperty prop = actionManager.getForm().getProperty(entry.getKey());
-				if (prop != null && prop.isPassword()) {
+				if ((prop != null) && prop.isPassword()) {
 					content.append(((String) value).length() + "*"); //$NON-NLS-1$
 				} else {
 					content.append((String) value);

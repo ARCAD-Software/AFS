@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -23,7 +23,7 @@ import com.arcadsoftware.afs.client.server.internals.ui.dialogs.UserAuthenticati
 public class UserAuthentication implements IUserAuthentication {
 
 	private class UIOperation implements Runnable {
-		
+
 		private PasswordAuthentication authentication;
 		private final String host;
 		private final String message;
@@ -46,7 +46,7 @@ public class UserAuthentication implements IUserAuthentication {
 
 	@Override
 	public PasswordAuthentication getUserAuthentication(String scheme, String host, String message) {
-		UIOperation uio = new UIOperation(scheme, host, message);
+		final UIOperation uio = new UIOperation(scheme, host, message);
 		if (Display.getCurrent() != null) {
 			uio.run();
 		} else {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -24,9 +24,9 @@ import com.arcadsoftware.afs.client.server.admin.common.core.model.ConsoleConnec
 import com.arcadsoftware.afs.client.server.admin.common.ui.settings.renderers.ActionManager;
 
 public class SectionSettingEditorInput implements IEditorInput {
-	
-	private ActionManager actionManager;
-	
+
+	private final ActionManager actionManager;
+
 	public SectionSettingEditorInput(ActionManager actionManager) {
 		this.actionManager = actionManager;
 	}
@@ -34,11 +34,11 @@ public class SectionSettingEditorInput implements IEditorInput {
 	public ConsoleConnector getConnector() {
 		return actionManager.getConnector();
 	}
-	
+
 	public ActionManager getActionManager() {
 		return actionManager;
 	}
-	
+
 	@Override
 	public <T> T getAdapter(Class<T> adapter) {
 		return null;
@@ -66,23 +66,23 @@ public class SectionSettingEditorInput implements IEditorInput {
 
 	@Override
 	public String getToolTipText() {
-		String h = actionManager.getSectionId().getHelp();
+		final String h = actionManager.getSectionId().getHelp();
 		if (h == null) {
 			return ""; //$NON-NLS-1$
 		}
 		return h;
 	}
-	
+
 	/**
 	 * Ouverture de l'éditeur associé à un input.
-	 * 
+	 *
 	 * @param input
 	 * @return
 	 */
 	public static SectionSettingEditor openEditor(SectionSettingEditorInput input) {
 		if (input.getConnector().getServerConnection().isConnected()) {
 			try {
-				IEditorPart editor = Activator.getInstance()
+				final IEditorPart editor = Activator.getInstance()
 						.getWorkbench()
 						.getActiveWorkbenchWindow()
 						.getActivePage()
@@ -91,12 +91,12 @@ public class SectionSettingEditorInput implements IEditorInput {
 					return (SectionSettingEditor) editor;
 				}
 				return null;
-			} catch (PartInitException e) {
-				Activator.getInstance().log(Activator.LOGLVL_FATAL,e.getLocalizedMessage(),e);
+			} catch (final PartInitException e) {
+				Activator.getInstance().log(Activator.LOGLVL_FATAL, e.getLocalizedMessage(), e);
 				return null;
 			}
 		}
 		return null;
-	}		
+	}
 
 }

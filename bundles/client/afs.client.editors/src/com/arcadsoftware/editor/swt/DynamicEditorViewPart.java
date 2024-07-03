@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -27,60 +27,50 @@ import com.arcadsoftware.editor.implementation.swt.renderer.SWTRenderer;
 public abstract class DynamicEditorViewPart extends ViewPart {
 
 	private static final String COM_ARCADSOFTWARE_EDITORS_TEST_VIEWER = "com.arcadsoftware.editors.test.viewer"; //$NON-NLS-1$
+
 	private DynamicEditorComposite edyn;
 
 	public DynamicEditorViewPart() {
 		super();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
-	 */
 	@Override
 	public void createPartControl(Composite parent) {
 		edyn = new DynamicEditorComposite(parent, null, getType(), getLayoutName());
 		((SWTRenderer) edyn.getRenderer()).addTitleChangeListener(new IEditorTitleChangeListener() {
 
+			@Override
 			@SuppressWarnings("synthetic-access")
 			public void changed(ISWTRenderer renderer, String title) {
 				setPartName(title);
 			}
 		});
 		// loading
-
 		// Define the selection provider.
 		getSite().setSelectionProvider(edyn.getSelectionProvider());
-
 		// Create the help context id for the viewer's control
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(edyn, COM_ARCADSOFTWARE_EDITORS_TEST_VIEWER);
-		IActionBars bars = getViewSite().getActionBars();
+		final IActionBars bars = getViewSite().getActionBars();
 		fillLocalPullDown(bars.getMenuManager());
 		fillLocalToolBar(bars.getToolBarManager());
 	}
 
 	protected void fillLocalPullDown(IMenuManager manager) {
-		for (IAction action : edyn.getBasicActions()) {
+		for (final IAction action : edyn.getBasicActions()) {
 			manager.add(action);
 		}
 		manager.add(new Separator());
-		for (IAction action : edyn.getGlobalActions()) {
+		for (final IAction action : edyn.getGlobalActions()) {
 			manager.add(action);
 		}
 	}
 
 	protected void fillLocalToolBar(IToolBarManager manager) {
-		for (IAction action : edyn.getBasicActions()) {
+		for (final IAction action : edyn.getBasicActions()) {
 			manager.add(action);
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-	 */
 	@Override
 	public void setFocus() {
 		edyn.setFocus();

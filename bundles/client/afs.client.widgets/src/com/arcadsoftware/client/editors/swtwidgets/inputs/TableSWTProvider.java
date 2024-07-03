@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -87,8 +87,7 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 	protected Action editAction;
 	protected Action addAction;
 	protected Action removeAction;
-	
-	
+
 	private String internalEditorId;
 	protected ISWTRenderer renderer;
 	private ILayoutParameters parameters;
@@ -97,37 +96,37 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 	private boolean storeViewerState = true;
 	private String attributeList = null;
 	private String orderList = null;
-	
+
 	private boolean enableMultiselection = false;
-	
+
 	private String subEditionAttribute = null;
 	private String subEditionType = null;
-	
 
+	@Override
 	public void create(ISWTRenderer swtRenderer, ILayoutParameters layoutParameters, Element Element,
 			MetaDataEntity structure) {
-		this.renderer = swtRenderer;
-		this.setParameters(layoutParameters);
-		this.element = (MetaDataLink) Element;
+		renderer = swtRenderer;
+		setParameters(layoutParameters);
+		element = (MetaDataLink) Element;
 		setInternalEditorId(getLayoutParameters().getParameter(INTERNAL_EDITOR_ID));
-		
+
 		attributeList = getLayoutParameters().getParameter(IConstants.ATTRIBUTE_LIST);
 		orderList = getLayoutParameters().getParameter(IConstants.ORDER_LIST);
 		subEditionAttribute = parameters.getParameter(IConstants.EDITION_ATTRIBUTE);
 		subEditionType = parameters.getParameter(IConstants.EDITION_TYPE);
-		
-		
-		//This method is called to let descendant classes having their own action manager 
+
+		// This method is called to let descendant classes having their own action manager
 		manageActions(layoutParameters);
 		createToolBarEditorActions();
 
-		List<Action> actions = new ArrayList<Action>();
+		final List<Action> actions = new ArrayList<>();
 
-		List<Action> previousActions = getPreviousActions();
-		if (previousActions != null)
-			for (Action action : previousActions) {
+		final List<Action> previousActions = getPreviousActions();
+		if (previousActions != null) {
+			for (final Action action : previousActions) {
 				actions.add(action);
 			}
+		}
 
 		if (getLayoutParameters().getParameterBoolean(ADD_ACTION)) {
 			addAction = createAddAction(getLayoutParameters().getParameterBoolean(ADD_EDITOR), element, renderer
@@ -136,7 +135,8 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 			actions.add(addAction);
 		}
 		if (getLayoutParameters().getParameterBoolean(EDIT_ACTION)) {
-			editAction = createEditAction(renderer.getLocalizedMessage(getLayoutParameters().getParameter(EDIT_ACTION_LABEL)));
+			editAction = createEditAction(
+					renderer.getLocalizedMessage(getLayoutParameters().getParameter(EDIT_ACTION_LABEL)));
 			editAction.setEnabled(!renderer.isReadOnly());
 			actions.add(editAction);
 		}
@@ -147,34 +147,36 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 			actions.add(removeAction);
 		}
 
-		List<Action> nextActions = getNextActions();
-		if (nextActions != null)
-			for (Action action : nextActions) {
+		final List<Action> nextActions = getNextActions();
+		if (nextActions != null) {
+			for (final Action action : nextActions) {
 				actions.add(action);
 			}
+		}
 
 		createControlPart(actions);
 
-
-		List<ElementParameter> widgetListened = getLayoutParameters().getListElementParameter(WIDGET_LISTENED);
-		if (widgetListened != null)
-			for (ElementParameter elementParameter : widgetListened) {
-				renderer.addListenerWidget(this, getLayoutParameters().getElementParameter(elementParameter, WIDGET_ID));
+		final List<ElementParameter> widgetListened = getLayoutParameters().getListElementParameter(WIDGET_LISTENED);
+		if (widgetListened != null) {
+			for (final ElementParameter elementParameter : widgetListened) {
+				renderer.addListenerWidget(this,
+						getLayoutParameters().getElementParameter(elementParameter, WIDGET_ID));
 			}
+		}
 	}
-	
-	protected void manageActions( ILayoutParameters layoutParameters){
-		
+
+	protected void manageActions(ILayoutParameters layoutParameters) {
+
 	}
-	
-	protected void createControlPart(List<Action> actions){
-		createControl(renderer.getParent(),actions);
+
+	protected void createControlPart(List<Action> actions) {
+		createControl(renderer.getParent(), actions);
 	}
-	
-	protected void createControl(Composite parent,List<Action> actions){
-		
-		boolean multiSelection = getLayoutParameters().getParameterBoolean(IConstants.MULTI);
-		
+
+	protected void createControl(Composite parent, List<Action> actions) {
+
+		final boolean multiSelection = getLayoutParameters().getParameterBoolean(IConstants.MULTI);
+
 		int style = 0;
 		if (multiSelection) {
 			style = SWT.MULTI;
@@ -182,10 +184,10 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 		} else {
 			style = SWT.SINGLE;
 		}
-		
+
 		style = style | SWT.FULL_SELECTION | SWT.V_SCROLL | SWT.H_SCROLL;
 
-		if (getLayoutParameters().getParameter(IConstants.STORE_VIEWER_STATE)!=null) {
+		if (getLayoutParameters().getParameter(IConstants.STORE_VIEWER_STATE) != null) {
 			storeViewerState = getLayoutParameters().getParameterBoolean(IConstants.STORE_VIEWER_STATE);
 		} else {
 			storeViewerState = true;
@@ -193,20 +195,20 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 		if ((getLayoutParameters().getParameter(IConstants.BORDER) == null) || //
 				getLayoutParameters().getParameterBoolean(IConstants.BORDER)) {
 			style = style | SWT.BORDER;
-		}		
-		
+		}
+
 		createControlBeforeTable(renderer.getParent());
-		
+
 		if (getInternalEditorId() == null) {
-			setList(createBeanMapTableViewerWithoutInternalEditorId(parent,style, actions));
+			setList(createBeanMapTableViewerWithoutInternalEditorId(parent, style, actions));
 		} else {
 			if (editAction == null) {
 				editAction = createEditAction(null);
 			}
-			setList(createBeanMapTableViewerWithInternalEditorId(parent,style, actions));
+			setList(createBeanMapTableViewerWithInternalEditorId(parent, style, actions));
 		}
-		//TODO RAP
-		//renderer.getToolkit().paintBordersFor(renderer.getParent());		
+		// TODO RAP
+		// renderer.getToolkit().paintBordersFor(renderer.getParent());
 
 		final Table listWidget = (Table) getList().getWidget();
 
@@ -215,16 +217,17 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 		}
 
 		if (renderer.getParent().getLayout() instanceof GridLayout) {
-			GridData layoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
-			int hspan = getLayoutParameters().getParameterInteger(IConstants.COLSPAN,1);
+			final GridData layoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
+			final int hspan = getLayoutParameters().getParameterInteger(IConstants.COLSPAN, 1);
 			layoutData.horizontalSpan = hspan;
-			int hHint = getLayoutParameters().getParameterInteger(IConstants.HEIGHT,0);
-			if (hHint > 0)
+			final int hHint = getLayoutParameters().getParameterInteger(IConstants.HEIGHT, 0);
+			if (hHint > 0) {
 				layoutData.heightHint = hHint;
+			}
 			listWidget.setLayoutData(layoutData);
 			// TODO Move this parameter to the container and form objects:
 			if (!getLayoutParameters().getParameterBoolean(BORDER_SPACE)) {
-				GridLayout layout = (GridLayout) renderer.getParent().getLayout();
+				final GridLayout layout = (GridLayout) renderer.getParent().getLayout();
 				layout.marginBottom = 0;
 				layout.marginHeight = 0;
 				layout.marginLeft = 0;
@@ -233,32 +236,33 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 				layout.marginWidth = 0;
 			}
 		}
-		
+
 		renderer.getRendererBinding().bindElement(element, getList(), parameters);
 		createEditorActions();
-		createControlAfterTable(renderer.getParent());		
+		createControlAfterTable(renderer.getParent());
 	}
-	
+
 	/**
 	 * Bind Element to widget
 	 */
 	protected void bindElement() {
 		renderer.getRendererBinding().bindElement(element, getList());
 	}
-	
+
 	protected void createControlBeforeTable(Composite parent) {
-		
+
 	}
-	
+
 	protected void createControlAfterTable(Composite parent) {
-		
+
 	}
-	
+
 	protected boolean mustBeCleanValue() {
 		return false;
 	}
 
-	protected BeanMapTableViewer createBeanMapTableViewerWithoutInternalEditorId(Composite parent,int style, List<Action> actions){
+	protected BeanMapTableViewer createBeanMapTableViewerWithoutInternalEditorId(Composite parent, int style,
+			List<Action> actions) {
 		return new BeanMapTableViewer(parent, style, renderer, getLayoutParameters(), element, actions) {
 			@Override
 			protected void doOnDoubleClick(IStructuredSelection selection) {
@@ -268,10 +272,10 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 					doActionOnDoubleClick();
 				}
 			}
-			
+
 			@Override
 			public AbstractColumnedLabelProviderAdapter createLabelProvider(AbstractColumnedViewer viewer) {
-				AbstractColumnedLabelProviderAdapter specific = createSpecificLabelProvider(viewer);
+				final AbstractColumnedLabelProviderAdapter specific = createSpecificLabelProvider(viewer);
 				return specific == null ? super.createLabelProvider(viewer) : specific;
 			}
 
@@ -279,7 +283,7 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 			protected boolean mustBeCleanValue() {
 				return TableSWTProvider.this.mustBeCleanValue();
 			}
-			
+
 			@Override
 			public String getIdentifier() {
 				if (storeViewerState) {
@@ -288,63 +292,61 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 					return null;
 				}
 			}
-			
+
 			@Override
 			public String getAttributeList() {
-				String result = TableSWTProvider.this.getAttributeList();
+				final String result = TableSWTProvider.this.getAttributeList();
 				if (result == null) {
 					return super.getAttributeList();
 				}
 				return result;
 			}
-			
+
 			@Override
 			public String getOrderList() {
-				String result = TableSWTProvider.this.getOrderList();
+				final String result = TableSWTProvider.this.getOrderList();
 				if (result == null) {
 					return super.getOrderList();
 				}
 				return result;
 			}
-			
+
 			@Override
 			protected String translateValue(String value, int columnIndex) {
 				return TableSWTProvider.this.translateValue(value, columnIndex);
 			}
-			
+
 			@Override
-			protected String formatAlternativeValue(BeanMap bean,String rawValue,
-					 String columndid) {
-				return TableSWTProvider.this.formatAlternativeValue(bean,rawValue, columndid);
+			protected String formatAlternativeValue(BeanMap bean, String rawValue,
+					String columndid) {
+				return TableSWTProvider.this.formatAlternativeValue(bean, rawValue, columndid);
 			}
-			
+
 			@Override
-			protected String formatMaskedValue(BeanMap bean,String rawValue,
-					 String columndid) {
-				return TableSWTProvider.this.formatMaskedValue(bean,rawValue, columndid);
-			}			
-			
+			protected String formatMaskedValue(BeanMap bean, String rawValue,
+					String columndid) {
+				return TableSWTProvider.this.formatMaskedValue(bean, rawValue, columndid);
+			}
+
 			@Override
-			protected Image getUserDefinedActualImage(Object element,int actualColumnIndex) {
-				Image image = TableSWTProvider.this.getUserDefinedActualImage(element,actualColumnIndex);
-				if (image==null) {				
-					return super.getUserDefinedActualImage(element,actualColumnIndex);
+			protected Image getUserDefinedActualImage(Object element, int actualColumnIndex) {
+				final Image image = TableSWTProvider.this.getUserDefinedActualImage(element, actualColumnIndex);
+				if (image == null) {
+					return super.getUserDefinedActualImage(element, actualColumnIndex);
 				} else {
 					return image;
 				}
 			}
-			
+
 		};
 	}
-	
-	
-	public Image getUserDefinedActualImage(Object element,int actualColumnIndex){
+
+	public Image getUserDefinedActualImage(Object element, int actualColumnIndex) {
 		return null;
 	}
-	
 
-
-	protected BeanMapTableViewer createBeanMapTableViewerWithInternalEditorId(Composite parent,int style, List<Action> actions){
+	protected BeanMapTableViewer createBeanMapTableViewerWithInternalEditorId(Composite parent, int style,
+			List<Action> actions) {
 		return new BeanMapTableViewer(parent, style, renderer, getLayoutParameters(), element, actions) {
 			@Override
 			protected void doOnSelectionChange(IStructuredSelection selection) {
@@ -355,7 +357,7 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 
 			@Override
 			public AbstractColumnedLabelProviderAdapter createLabelProvider(AbstractColumnedViewer viewer) {
-				AbstractColumnedLabelProviderAdapter specific = createSpecificLabelProvider(viewer);
+				final AbstractColumnedLabelProviderAdapter specific = createSpecificLabelProvider(viewer);
 				return specific == null ? super.createLabelProvider(viewer) : specific;
 			}
 
@@ -368,62 +370,61 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 			protected boolean mustBeCleanValue() {
 				return TableSWTProvider.this.mustBeCleanValue();
 			}
-			
+
 			@Override
 			protected String translateValue(String value, int columnIndex) {
 				return TableSWTProvider.this.translateValue(value, columnIndex);
 			}
-			
+
 			@Override
 			public String getAttributeList() {
-				String result = TableSWTProvider.this.getAttributeList();
+				final String result = TableSWTProvider.this.getAttributeList();
 				if (result == null) {
 					return super.getAttributeList();
 				}
 				return result;
 			}
-			
+
 			@Override
 			public String getOrderList() {
-				String result = TableSWTProvider.this.getOrderList();
+				final String result = TableSWTProvider.this.getOrderList();
 				if (result == null) {
 					return super.getOrderList();
 				}
 				return result;
 			}
-			
+
 			@Override
 			public void loadedListComplete(ISWTRenderer renderer) {
 				super.loadedListComplete(renderer);
 				TableSWTProvider.this.afterloadedListComplete();
 			}
-			
+
 			@Override
-			protected Image getUserDefinedActualImage(Object element,int actualColumnIndex) {
-				Image image = TableSWTProvider.this.getUserDefinedActualImage(element,actualColumnIndex);
-				if (image==null) {				
-					return super.getUserDefinedActualImage(element,actualColumnIndex);
+			protected Image getUserDefinedActualImage(Object element, int actualColumnIndex) {
+				final Image image = TableSWTProvider.this.getUserDefinedActualImage(element, actualColumnIndex);
+				if (image == null) {
+					return super.getUserDefinedActualImage(element, actualColumnIndex);
 				} else {
 					return image;
 				}
-			}		
-			
+			}
+
 		};
 	}
-	
-	public String translateValue(String value, int columnIndex){
+
+	public String translateValue(String value, int columnIndex) {
 		return value;
 	}
-	
-	
+
 	private void createToolBarEditorActions() {
-		List<ElementParameter> elements = getLayoutParameters().getListElementParameter(EDITOR_ACTION);
-		for (ElementParameter elementParameter : elements) {
+		final List<ElementParameter> elements = getLayoutParameters().getListElementParameter(EDITOR_ACTION);
+		for (final ElementParameter elementParameter : elements) {
 			if (getLayoutParameters().getElementParameterBoolean(elementParameter, IN_INTERNAL_TOOL_BAR)
-					&& toolbarManager == null) {
-				ToolBar toolBar = new ToolBar(renderer.getParent(), SWT.NONE);
+					&& (toolbarManager == null)) {
+				final ToolBar toolBar = new ToolBar(renderer.getParent(), SWT.NONE);
 				if (renderer.getParent().getLayout() instanceof GridLayout) {
-					GridData layoutData = new GridData(GridData.HORIZONTAL_ALIGN_END);
+					final GridData layoutData = new GridData(GridData.HORIZONTAL_ALIGN_END);
 					layoutData.horizontalSpan = 3;
 					toolBar.setLayoutData(layoutData);
 				}
@@ -435,35 +436,41 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 	}
 
 	private void createEditorActions() {
-		List<ElementParameter> elements = getLayoutParameters().getListElementParameter(EDITOR_ACTION);
+		final List<ElementParameter> elements = getLayoutParameters().getListElementParameter(EDITOR_ACTION);
 
-		for (ElementParameter elementParameter : elements) {
-			String label = renderer.getLocalizedMessage(getLayoutParameters().getElementParameter(elementParameter, LABEL));
-			String icon = getLayoutParameters().getElementParameter(elementParameter, ICON);
+		for (final ElementParameter elementParameter : elements) {
+			final String label = renderer
+					.getLocalizedMessage(getLayoutParameters().getElementParameter(elementParameter, LABEL));
+			final String icon = getLayoutParameters().getElementParameter(elementParameter, ICON);
 
-			IEditorAction action = EditorActionFactory.getEditorAction(getLayoutParameters().getElementParameter(
+			final IEditorAction action = EditorActionFactory.getEditorAction(getLayoutParameters().getElementParameter(
 					elementParameter, ACTION));
 			if (action != null) {
 				action.setText(label);
 				action.setToolTipText(label);
-				if (icon != null)
+				if (icon != null) {
 					action.setImageDescriptor(renderer.getImageDescriptor(icon));
+				}
 				action.setBeanMapSelector(this);
 				action.setRenderer(renderer);
 				action.setTableViewer(getList());
 				action.setElement(element);
 				action.setInternalEditorId(getInternalEditorId());
-				if (getLayoutParameters().getElementParameterBoolean(elementParameter, IN_TOOL_BAR))
+				if (getLayoutParameters().getElementParameterBoolean(elementParameter, IN_TOOL_BAR)) {
 					renderer.getRendererActions().addToolBarAction(action);
+				}
 
-				String menuLabel = renderer.getLocalizedMessage(getLayoutParameters().getElementParameter(elementParameter,
-						MENU_LABEL));
-				if (menuLabel != null)
+				final String menuLabel = renderer
+						.getLocalizedMessage(getLayoutParameters().getElementParameter(elementParameter,
+								MENU_LABEL));
+				if (menuLabel != null) {
 					renderer.getRendererActions().addMenuAction(menuLabel, action);
-				if (getLayoutParameters().getElementParameterBoolean(elementParameter, IN_FORM_TOOL_BAR))
+				}
+				if (getLayoutParameters().getElementParameterBoolean(elementParameter, IN_FORM_TOOL_BAR)) {
 					renderer.addActionOnFormToolBar(action);
+				}
 				if (getLayoutParameters().getElementParameterBoolean(elementParameter, IN_INTERNAL_TOOL_BAR)
-						&& toolbarManager != null) {
+						&& (toolbarManager != null)) {
 					toolbarManager.add(action);
 					toolbarManager.update(true);
 				}
@@ -480,7 +487,7 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 
 	/**
 	 * In order to change the default LabelProvider by a specific LabelProvider
-	 * 
+	 *
 	 * @param viewer
 	 * @return
 	 */
@@ -496,146 +503,146 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 		return null;
 	}
 
-	
-	protected void createBeanMap(final MetaDataLink link,final boolean withOpenEditor){
+	protected void createBeanMap(final MetaDataLink link, final boolean withOpenEditor) {
 		BeanMap beanMap = renderer.createBeanMap(new BeanMap(link.getType(), 0));
 		if (beanMap != null) {
 			beanMap = renderer.loadBeanMap(link.getType(), beanMap.getId());
 			renderer.addLinkitem(link, beanMap);
 			getList().setBeanMapValue(beanMap);
 			if (withOpenEditor) {
-				if(canEdit(beanMap)) {
-					if (getInternalEditorId() == null)
-						if (editBeanMap(beanMap)){
+				if (canEdit(beanMap)) {
+					if (getInternalEditorId() == null) {
+						if (editBeanMap(beanMap)) {
 							getList().refresh();
-						}					
-					else {
-						renderer.getInternalEditors().loadInternalEditor(getInternalEditorId(), beanMap.getId());
-						renderer.getInternalEditors().setAdd(getInternalEditorId());
+						} else {
+							renderer.getInternalEditors().loadInternalEditor(getInternalEditorId(), beanMap.getId());
+							renderer.getInternalEditors().setAdd(getInternalEditorId());
+						}
 					}
 				}
 			}
 		}
 	}
-	
+
 	/**
-	 * Edit Bean Map(s). 
+	 * Edit Bean Map(s).
 	 */
-	protected void updateBeanMap(){
+	protected void updateBeanMap() {
 		if (enableMultiselection) {
-			BeanMapList beanMapList = getList().getSelected();
-			if (beanMapList!=null) {
-				for (BeanMap beanMap : beanMapList) {
+			final BeanMapList beanMapList = getList().getSelected();
+			if (beanMapList != null) {
+				for (final BeanMap beanMap : beanMapList) {
 					internalEditBeanMap(beanMap);
 				}
 			}
 		} else {
-			BeanMap beanMap = getList().getBeanMapValue();
+			final BeanMap beanMap = getList().getBeanMapValue();
 			internalEditBeanMap(beanMap);
 		}
 	}
-	
-	private void internalEditBeanMap(BeanMap beanMap){
+
+	private void internalEditBeanMap(BeanMap beanMap) {
 		if (beanMap != null) {
 			BeanMap edited;
-			if ( (subEditionAttribute!=null) && (subEditionAttribute.length()>0) 
-					&& (subEditionType!=null) && (subEditionType.length()>0)) {
-				edited = new BeanMap(subEditionType,beanMap.getInt(subEditionAttribute));
-			} else{
+			if ((subEditionAttribute != null) && (subEditionAttribute.length() > 0)
+					&& (subEditionType != null) && (subEditionType.length() > 0)) {
+				edited = new BeanMap(subEditionType, beanMap.getInt(subEditionAttribute));
+			} else {
 				edited = beanMap;
 			}
 			if (getInternalEditorId() == null) {
-				if (canEdit(edited)){
-					if (editBeanMap(edited)){
-						if (edited!=beanMap) {
+				if (canEdit(edited)) {
+					if (editBeanMap(edited)) {
+						if (edited != beanMap) {
 							beanMap.addAll(subEditionAttribute, edited);
 						}
 						getList().refresh();
 					}
 				}
 			} else {
-				renderer.getInternalEditors().loadInternalEditor(getInternalEditorId(), beanMap.getId(),getEditCallback());
+				renderer.getInternalEditors().loadInternalEditor(getInternalEditorId(), beanMap.getId(),
+						getEditCallback());
 			}
 		} else if (getInternalEditorId() != null) {
 			renderer.getInternalEditors().loadInternalEditor(getInternalEditorId(),
-					ISWTRenderer.EMPTY_ENTITY_ID,getEditCallback());
+					ISWTRenderer.EMPTY_ENTITY_ID, getEditCallback());
 		}
 	}
-	
-	
-	private void internalRemoveBeanMap(final MetaDataLink link, BeanMap beanMap, boolean forceConfirmation){
+
+	private void internalRemoveBeanMap(final MetaDataLink link, BeanMap beanMap, boolean forceConfirmation) {
 		if (beanMap != null) {
 			boolean continueDeletion = true;
 			if (forceConfirmation) {
 				continueDeletion = MessageDialog.openQuestion(LoggedUIPlugin.getShell(), renderer
-						.getLocalizedMessage(getLayoutParameters().getParameter(REMOVE_CONFIRMATION_TITLE)), renderer
-						.getLocalizedMessage(getLayoutParameters().getParameter(REMOVE_CONFIRMATION_MESSAGE)));
+						.getLocalizedMessage(getLayoutParameters().getParameter(REMOVE_CONFIRMATION_TITLE)),
+						renderer
+								.getLocalizedMessage(getLayoutParameters().getParameter(REMOVE_CONFIRMATION_MESSAGE)));
 			}
 			if (continueDeletion) {
 				doBeforeRemovingLink(beanMap);
 				doRemovingLink(link, beanMap);
 			}
-		}	
+		}
 	}
-	
+
 	protected boolean doBeforeRemovingLink(BeanMap beanMap) {
 		return true;
 	}
-	
+
 	protected void doRemovingLink(MetaDataLink link, BeanMap beanMap) {
 		renderer.removeLinkitem(link, beanMap);
 	}
-	
+
 	protected boolean doAfterRemovingLink() {
 		return true;
-	}	
-	
-	protected void removeBeanMap(final MetaDataLink link){
-		
+	}
+
+	protected void removeBeanMap(final MetaDataLink link) {
+
 		if (enableMultiselection) {
-			BeanMapList beanMapList = getList().getSelected();
-			if (beanMapList!=null) {
+			final BeanMapList beanMapList = getList().getSelected();
+			if (beanMapList != null) {
 				if (MessageDialog.openQuestion(LoggedUIPlugin.getShell(), renderer
-						.getLocalizedMessage(getLayoutParameters().getParameter(REMOVE_CONFIRMATION_TITLE)), renderer
-						.getLocalizedMessage(getLayoutParameters().getParameter(REMOVE_CONFIRMATION_MESSAGE)))) {
-					
-					for (BeanMap beanMap : beanMapList) {
+						.getLocalizedMessage(getLayoutParameters().getParameter(REMOVE_CONFIRMATION_TITLE)),
+						renderer
+								.getLocalizedMessage(
+										getLayoutParameters().getParameter(REMOVE_CONFIRMATION_MESSAGE)))) {
+
+					for (final BeanMap beanMap : beanMapList) {
 						internalRemoveBeanMap(link, beanMap, false);
 					}
 					doAfterRemovingLink();
 				}
 			}
-			
-		} else {		
-			BeanMap beanMap = getList().getBeanMapValue();
+
+		} else {
+			final BeanMap beanMap = getList().getBeanMapValue();
 			internalRemoveBeanMap(link, beanMap, true);
 			doAfterRemovingLink();
 		}
-	}	
-	
-	
-	protected ILoaderCallback getEditCallback(){
+	}
+
+	protected ILoaderCallback getEditCallback() {
 		return null;
 	}
-	
-	
-	protected boolean canEdit(BeanMap beanMap){
+
+	protected boolean canEdit(BeanMap beanMap) {
 		return true;
 	}
-	
-	protected boolean editBeanMap(BeanMap beanMap){	
+
+	protected boolean editBeanMap(BeanMap beanMap) {
 		OpenBeanMapEditor.openEditor(beanMap);
 		return true;
 	}
-	
-	
+
 	protected Action createAddAction(final boolean withOpenEditor, final MetaDataLink link, final String label) {
 		return new Action(label) {
 			@Override
 			public ImageDescriptor getImageDescriptor() {
-				String addIcon = getLayoutParameters().getParameter(ADD_ICON);
+				final String addIcon = getLayoutParameters().getParameter(ADD_ICON);
 				return (addIcon != null) ? renderer.getImageDescriptor(addIcon) : super.getImageDescriptor();
 			}
+
 			@Override
 			public void run() {
 				createBeanMap(link, withOpenEditor);
@@ -647,7 +654,7 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 		return new Action(label) {
 			@Override
 			public ImageDescriptor getImageDescriptor() {
-				String editIcon = getLayoutParameters().getParameter(EDIT_ICON);
+				final String editIcon = getLayoutParameters().getParameter(EDIT_ICON);
 				return (editIcon != null) ? renderer.getImageDescriptor(editIcon) : super.getImageDescriptor();
 			}
 
@@ -658,13 +665,12 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 		};
 	}
 
-	
 	protected Action createRemoveAction(final MetaDataLink link, final String label) {
 		return new Action(label) {
 
 			@Override
 			public ImageDescriptor getImageDescriptor() {
-				String removeIcon = getLayoutParameters().getParameter(REMOVE_ICON);
+				final String removeIcon = getLayoutParameters().getParameter(REMOVE_ICON);
 				return (removeIcon != null) ? renderer.getImageDescriptor(removeIcon) : super.getImageDescriptor();
 			}
 
@@ -675,50 +681,62 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 		};
 	}
 
+	@Override
 	public void dispose() {
 		// Do nothing
 	}
 
+	@Override
 	public void refreshWidget(BeanMap beanMap) {
 		renderer.getRendererBinding().refreshBean(beanMap);
 	}
 
+	@Override
 	public BeanMap getSelectedBeanMap() {
 		return getList().getBeanMapValue();
 	}
 
+	@Override
 	public void refreshSelector(BeanMap beanMap) {
 		refreshWidget(beanMap);
 	}
 
+	@Override
 	public ImageDescriptor getImageDescriptor(String key) {
 		return renderer.getImageDescriptor(key);
 	}
 
+	@Override
 	public ISWTRenderer getRenderer() {
 		return renderer;
 	}
 
+	@Override
 	public BeanMapList getInput() {
 		return (getList().getBeanMapList() != null) ? getList().getBeanMapList() : new BeanMapList();
 	}
 
+	@Override
 	public void setInput(BeanMapList beanMapList) {
 		getList().setBeanMapList(beanMapList);
 	}
 
+	@Override
 	public void refresh() {
 		getList().refresh();
 	}
 
+	@Override
 	public BeanMap getSelection() {
 		return getList().getBeanMapValue();
 	}
 
+	@Override
 	public void selectBeanMap(BeanMap bm) {
 		getList().setBeanMapValue(bm);
 	}
 
+	@Override
 	public BeanMapTableViewer getViewer() {
 		return getList();
 	}
@@ -728,8 +746,9 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 		list.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (renderer != null && !renderer.isReadOnly())
+				if ((renderer != null) && !renderer.isReadOnly()) {
 					renderer.updateFormToolbar();
+				}
 			}
 		});
 	}
@@ -750,10 +769,12 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 		this.parameters = parameters;
 	}
 
+	@Override
 	public ILayoutParameters getLayoutParameters() {
 		return parameters;
 	}
 
+	@Override
 	public MetaDataLink getLink() {
 		return element;
 	}
@@ -764,19 +785,19 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 		}
 		return attributeList;
 	}
-	
+
 	public String getOrderList() {
 		if ((orderList != null) && (orderList.length() == 0)) {
 			return null;
 		}
 		return orderList;
 	}
-	
-	protected String formatAlternativeValue(BeanMap bean,String rawValue,
+
+	protected String formatAlternativeValue(BeanMap bean, String rawValue,
 			String columndid) {
 		return rawValue;
 	}
-	
+
 	protected String formatMaskedValue(BeanMap bean, String rawValue,
 			String columndid) {
 		return rawValue;
@@ -791,5 +812,5 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 	public boolean isEnableMultiselection() {
 		return enableMultiselection;
 	}
-	
+
 }

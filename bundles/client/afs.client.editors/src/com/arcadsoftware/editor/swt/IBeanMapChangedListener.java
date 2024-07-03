@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -17,15 +17,16 @@ import com.arcadsoftware.beanmap.BeanMapEvent;
 
 /**
  * This listener is linked to a BeanMap and fire when the BeanMap is replaced by another one.
- * 
- * <p>When we load or reset the BeanMap.
+ * <p>
+ * When we load or reset the BeanMap.
  */
 public interface IBeanMapChangedListener {
 
 	/**
 	 * Fired when a new BeanMap replace another one. the BeanMapEvent reference the new BeanMap.
-	 *  
-	 * @param event a BeanMap linked Event.
+	 * 
+	 * @param event
+	 *            a BeanMap linked Event.
 	 */
 	public void changed(BeanMapEvent event);
 }

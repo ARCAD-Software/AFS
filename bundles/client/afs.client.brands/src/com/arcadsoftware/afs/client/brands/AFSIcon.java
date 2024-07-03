@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -22,11 +22,10 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
 /**
- * 
  * @author ARCAD Software
  */
 public enum AFSIcon {
-	
+
 	ARCAD("icons/arcad.png"),
 	ADD("icons/add.png"),
 	CREATE("icons/create.png"),
@@ -77,16 +76,15 @@ public enum AFSIcon {
 	}
 
 	/**
-	 * 
 	 * @return
 	 */
 	public String path() {
-		return this.path;
+		return path;
 	}
 
 	/**
 	 * Get the Icon image.
-	 * 
+	 *
 	 * @return
 	 */
 	public Image image() {
@@ -100,7 +98,7 @@ public enum AFSIcon {
 
 	/**
 	 * Get the Image descriptor.
-	 * 
+	 *
 	 * @return
 	 */
 	public ImageDescriptor imageDescriptor() {
@@ -112,9 +110,9 @@ public enum AFSIcon {
 
 	private void load() {
 		try {
-			Bundle bundle = FrameworkUtil.getBundle(getClass());
+			final Bundle bundle = FrameworkUtil.getBundle(getClass());
 			imageDescriptor = ImageDescriptor.createFromURL(bundle.getEntry(path));
-		} catch (Exception var2) {
+		} catch (final Exception var2) {
 			imageDescriptor = ImageDescriptor.getMissingImageDescriptor();
 		}
 		image = imageDescriptor.createImage(true, Display.getDefault());
@@ -122,12 +120,12 @@ public enum AFSIcon {
 
 	/**
 	 * Get an image from registry.
-	 * 
+	 *
 	 * @param key
 	 * @return
 	 */
 	public static Image getImage(String key) {
-		for (AFSIcon icon : values()) {
+		for (final AFSIcon icon : values()) {
 			if (icon.path.equalsIgnoreCase(key)) {
 				return icon.image();
 			}
@@ -137,7 +135,7 @@ public enum AFSIcon {
 
 	/**
 	 * Add top right overlay Image on Base Image.
-	 * 
+	 *
 	 * @param baseImage
 	 * @param overlayImage
 	 * @return
@@ -149,7 +147,7 @@ public enum AFSIcon {
 
 	/**
 	 * Add overlay Image on Base Image.
-	 * 
+	 *
 	 * @param baseImage
 	 * @param overlayImage
 	 * @param position
@@ -158,7 +156,7 @@ public enum AFSIcon {
 	 */
 	public static ImageDescriptor getImageDecoratedDescriptor(Image bImage, ImageDescriptor overlayImageDescriptor,
 			int position) {
-		if (bImage != null && overlayImageDescriptor != null) {
+		if ((bImage != null) && (overlayImageDescriptor != null)) {
 			return new DecorationOverlayIcon(bImage, overlayImageDescriptor, position);
 		}
 		return null;

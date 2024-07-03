@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -19,28 +19,24 @@ import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
 import com.arcadsoftware.metadata.MetaDataLink;
 
-
-
-
-
-public abstract class  AbstractConnectedTableWithButtonBarSelectionSWTProvider 
-extends AbstractConnectedTableWithButtonBarSWTProvider {
+public abstract class AbstractConnectedTableWithButtonBarSelectionSWTProvider
+		extends AbstractConnectedTableWithButtonBarSWTProvider {
 	@Override
-	protected void createBeanMap(final MetaDataLink link,final boolean withOpenEditor){	
+	protected void createBeanMap(final MetaDataLink link, final boolean withOpenEditor) {
 		if (creationAllowed()) {
 			final BeanMap groupBeanMap = renderer.getCurrentBean();
-			ServerConnection connection = getConnection();
-			if (connection!=null) {
+			final ServerConnection connection = getConnection();
+			if (connection != null) {
 				BeanMap selected = selectBeanMap(connection);
-				if (selected!=null) {
-					boolean checkExistence = getLayoutParameters().getParameterBoolean("unique");
+				if (selected != null) {
+					final boolean checkExistence = getLayoutParameters().getParameterBoolean("unique");
 					if (checkExistence) {
-						//test if not already exists
-						BeanMapList users = getHelper().getLinkList(groupBeanMap,link.getName(), link.getType());
-						for (BeanMap user:users) {
-							if (user.getId()==selected.getId()) {		
+						// test if not already exists
+						final BeanMapList users = getHelper().getLinkList(groupBeanMap, link.getName(), link.getType());
+						for (final BeanMap user : users) {
+							if (user.getId() == selected.getId()) {
 								String message = getLayoutParameters().getParameter("alreadyExistMessage");
-								if ((message==null) || message.length()==0){
+								if ((message == null) || (message.length() == 0)) {
 									message = Activator.resString("msg.error.selected.alreadyExist");
 								} else {
 									message = renderer.getLocalizedMessage(message);
@@ -59,8 +55,7 @@ extends AbstractConnectedTableWithButtonBarSWTProvider {
 			missingRight(getExpectedAddRight());
 		}
 	}
-	
-	
+
 	public abstract BeanMap selectBeanMap(ServerConnection connection);
-	
+
 }

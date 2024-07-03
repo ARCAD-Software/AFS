@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -26,45 +26,49 @@ import com.arcadsoftware.editor.swt.IWidgetValue;
 import com.arcadsoftware.metadata.Element;
 
 public abstract class AbstractFixedCombo implements IWidgetValue {
-	private Combo combo;
+	private final Combo combo;
+
 	public AbstractFixedCombo(Composite parent, int style, ILayoutParameters parameters, ISWTRenderer renderer,
-			Element element, int horizontalSpan){
+			Element element, int horizontalSpan) {
 		combo = new Combo(parent, style);
 		if (parent.getLayout() instanceof GridLayout) {
 			combo.setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, true, false, horizontalSpan, 1));
 		}
 		fill(combo);
 	}
-	
+
+	@Override
 	public Control getWidget() {
 		return combo;
 	}
 
-	
-	public Object getValue() {		
+	@Override
+	public Object getValue() {
 		return indexToValue(combo.getSelectionIndex());
 	}
 
-	
+	@Override
 	public void addSelectionListener(SelectionListener SelectionListener) {
 		combo.addSelectionListener(SelectionListener);
 	}
 
-	
+	@Override
 	public void setValue(Object newValue) {
-		int index = valueToIndex(newValue);
+		final int index = valueToIndex(newValue);
 		combo.select(index);
 	}
 
-
+	@Override
 	public Object getValueType() {
 		return getType();
 	}
-	
+
 	public abstract void fill(Combo combo);
+
 	public abstract int valueToIndex(Object value);
+
 	public abstract Object indexToValue(int index);
-	public abstract Object getType();	
-	
+
+	public abstract Object getType();
 
 }

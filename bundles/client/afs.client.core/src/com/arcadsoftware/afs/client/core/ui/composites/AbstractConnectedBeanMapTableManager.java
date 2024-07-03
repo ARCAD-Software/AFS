@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -45,145 +45,146 @@ import com.arcadsoftware.metadata.MetaDataEntity;
 public abstract class AbstractConnectedBeanMapTableManager extends AbstractConnectedComposite {
 
 	ConnectedBeanMapListTableViewer viewer;
-	private MetaDataEntity entity;
-	
+	private final MetaDataEntity entity;
+
 	private BeanMap selectedItem;
-	
+
 	private IAction addAction;
 	private IAction editAction;
 	private IAction deleteAction;
-	
+
 	private boolean allowEdit;
 	private boolean allowMultiSelection;
-	
+
 	private Button bAdd;
 	private Button bDelete;
 	private boolean readonly = false;
-	
-	
-	public AbstractConnectedBeanMapTableManager(Composite parent, int style, ServerConnection connection, 
+
+	public AbstractConnectedBeanMapTableManager(Composite parent, int style, ServerConnection connection,
 			boolean allowEdit) {
-		this(parent, style, connection,allowEdit,false);
+		this(parent, style, connection, allowEdit, false);
 	}
-	
-	public AbstractConnectedBeanMapTableManager(Composite parent, int style, ServerConnection connection, 
+
+	public AbstractConnectedBeanMapTableManager(Composite parent, int style, ServerConnection connection,
 			boolean allowEdit, boolean multiSelection) {
-		super(parent, style, connection,false);
+		super(parent, style, connection, false);
 		format();
 		entity = getHelper().getEntity(getType());
 		this.allowEdit = allowEdit;
-		this.allowMultiSelection = multiSelection;
+		allowMultiSelection = multiSelection;
 		makeAction();
-		createContent(this);		
+		createContent(this);
 	}
 
 	public AbstractConnectedBeanMapTableManager(Composite parent, int style, ServerConnection connection) {
-		super(parent, style, connection,false);
+		super(parent, style, connection, false);
 		format();
 		entity = getHelper().getEntity(getType());
 		makeAction();
-		createContent(this);		
-	}	
-	
-	protected void format() {
-		GridLayout grid = new GridLayout(3, false);
-		grid.marginHeight = 0;
-		grid.marginWidth = 0;
-		this.setLayout(grid);
-		GridData gridData = new GridData(GridData.FILL_BOTH);
-		this.setLayoutData(gridData);
+		createContent(this);
 	}
 
-	private void makeAction(){
+	@Override
+	protected void format() {
+		final GridLayout grid = new GridLayout(3, false);
+		grid.marginHeight = 0;
+		grid.marginWidth = 0;
+		setLayout(grid);
+		final GridData gridData = new GridData(GridData.FILL_BOTH);
+		setLayoutData(gridData);
+	}
+
+	private void makeAction() {
 		if (getAllowAdd()) {
-			addAction = new Action(){
+			addAction = new Action() {
 				@Override
-				public void run() {		
+				public void run() {
 					add();
 				}
 			};
 		}
-		
+
 		if (getAllowEdit()) {
-			editAction = new Action(){
+			editAction = new Action() {
 				@Override
-				public void run() {		
+				public void run() {
 					update();
 				}
 			};
 		}
 		if (getAllowDelete()) {
-			deleteAction = new Action(){
+			deleteAction = new Action() {
 				@Override
-				public void run() {		
+				public void run() {
 					delete();
 				}
-			};		
+			};
 		}
-		
+
 	}
-	
+
 	protected boolean getAllowEdit() {
 		return allowEdit;
 	}
-	
+
 	protected boolean getAllowDelete() {
 		return true;
-	}	
-	
+	}
+
 	protected boolean getAllowAdd() {
 		return true;
-	}		
-	
-	
+	}
+
 	@Override
-	public void createContent(Composite parent){
-		
-		int style =  SWT.FULL_SELECTION;
+	public void createContent(Composite parent) {
+
+		int style = SWT.FULL_SELECTION;
 		if (allowMultiSelection) {
 			style = style | SWT.MULTI;
 		}
-		
-		viewer = new ConnectedBeanMapListTableViewer(getConnection(), parent, style,entity, getAttributeList()){
-			protected Image getCustomColumnImage(Object element, int actualColumnIndex){
+
+		viewer = new ConnectedBeanMapListTableViewer(getConnection(), parent, style, entity, getAttributeList()) {
+			@Override
+			protected Image getCustomColumnImage(Object element, int actualColumnIndex) {
 				return AbstractConnectedBeanMapTableManager.this.getCustomColumnImage(element, actualColumnIndex);
-			}			
-			
+			}
+
 			@Override
 			protected int getColumnSize(String attribute) {
-				int size = getUserColumnSize(attribute);
-				if (size==-1) { 
+				final int size = getUserColumnSize(attribute);
+				if (size == -1) {
 					return super.getColumnSize(attribute);
 				}
 				return size;
 			}
-			
+
 			@Override
 			public String getIdentifier() {
 				return null;
 			}
-			
+
 			@Override
 			protected void doOnSelectionChange(IStructuredSelection selection) {
 				AbstractConnectedBeanMapTableManager.this.onSelection(selection);
 			}
-			
+
+			@Override
 			protected void doOnDoubleClick(IStructuredSelection selection) {
 				onDoubleClick(selection);
 			}
-			
+
 			@Override
 			public String getValue(Object element, int columnIndex) {
-				String s = AbstractConnectedBeanMapTableManager.this.getValue(element, columnIndex);
-				if (s==null) {
+				final String s = AbstractConnectedBeanMapTableManager.this.getValue(element, columnIndex);
+				if (s == null) {
 					return super.getValue(element, columnIndex);
 				} else {
 					return s;
 				}
 			}
-			
+
 		};
-		
+
 		GridData gridData = new GridData(GridData.FILL_BOTH);
 		gridData.horizontalAlignment = GridData.FILL;
 		gridData.verticalAlignment = GridData.FILL;
@@ -191,8 +192,8 @@ public abstract class AbstractConnectedBeanMapTableManager extends AbstractConne
 		gridData.grabExcessVerticalSpace = true;
 		gridData.horizontalSpan = 3;
 		viewer.getTable().setLayoutData(gridData);
-		///create button bar
-		Composite buttonBar = new Composite(parent,SWT.NONE);
+		/// create button bar
+		final Composite buttonBar = new Composite(parent, SWT.NONE);
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalAlignment = GridData.FILL;
 		gridData.grabExcessHorizontalSpace = true;
@@ -200,80 +201,76 @@ public abstract class AbstractConnectedBeanMapTableManager extends AbstractConne
 		gridData.heightHint = 25;
 		buttonBar.setLayoutData(gridData);
 		buttonBar.setLayout(new FormLayout());
-		
-		if (getAllowAdd() || getAllowEdit() || getAllowDelete()) {		
-			//create button
+
+		if (getAllowAdd() || getAllowEdit() || getAllowDelete()) {
+			// create button
 			if (getAllowAdd()) {
 				bAdd = createButton(buttonBar,
-						Activator.resString(isCreateDeleteStyle() ? "button.create.text" : "button.add.text"), 
+						Activator.resString(isCreateDeleteStyle() ? "button.create.text" : "button.add.text"),
 						isCreateDeleteStyle() ? AFSIcon.CREATE.imageDescriptor() : AFSIcon.ADD.imageDescriptor(),
 						addAction,
 						1, -100, 100, 25);
 			}
 			if (getAllowEdit()) {
 				createButton(buttonBar,
-						Activator.resString("button.edit.text"), 
+						Activator.resString("button.edit.text"),
 						AFSIcon.EDIT.imageDescriptor(),
 						editAction,
-						1, (getAllowAdd()?-210:-100), 100, 25);			
+						1, (getAllowAdd() ? -210 : -100), 100, 25);
 			}
 			if (getAllowDelete()) {
-				bDelete=createButton(buttonBar,
-						Activator.resString(isCreateDeleteStyle() ? "button.delete.text" : "button.remove.text"), 
+				bDelete = createButton(buttonBar,
+						Activator.resString(isCreateDeleteStyle() ? "button.delete.text" : "button.remove.text"),
 						isCreateDeleteStyle() ? AFSIcon.DELETE.imageDescriptor() : AFSIcon.REMOVE.imageDescriptor(),
 						deleteAction,
 						0, -0, 100, 25);
 			}
 		}
-		
+
 	}
 
-	private Button createButton(Composite buttonBar, 								
-								String label,
-								ImageDescriptor imageDescriptor,
-			                    final IAction action, 			                    
-			                    int anchor, int offset, int width, int height){
-		Button b = new Button(buttonBar, SWT.PUSH);
+	private Button createButton(Composite buttonBar,
+			String label,
+			ImageDescriptor imageDescriptor,
+			final IAction action,
+			int anchor, int offset, int width, int height) {
+		final Button b = new Button(buttonBar, SWT.PUSH);
 		b.setText(label);
 		b.setImage(imageDescriptor.createImage());
-		FormData fData = new FormData();
-		fData.top = new FormAttachment( 0, 0);
-    	fData.height = height;
-    	fData.width =width;
-    	if (anchor==0) {//left anchor 
-    		fData.left = new FormAttachment( 0, offset);
-    	} else {
-    		fData.left = new FormAttachment( 100, offset);
-    	}
-	    b.setLayoutData(fData);
-	    
-	    if (action!=null) {
-	    	b.addSelectionListener(
-        		new SelectionAdapter() {
-        			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
-        				action.run();
-        			};
-        		}
-	        );
-	    }
-	    return b;
-	}	
-	
-	
+		final FormData fData = new FormData();
+		fData.top = new FormAttachment(0, 0);
+		fData.height = height;
+		fData.width = width;
+		if (anchor == 0) {// left anchor
+			fData.left = new FormAttachment(0, offset);
+		} else {
+			fData.left = new FormAttachment(100, offset);
+		}
+		b.setLayoutData(fData);
+
+		if (action != null) {
+			b.addSelectionListener(
+					new SelectionAdapter() {
+						@Override
+						public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
+							action.run();
+						}
+					});
+		}
+		return b;
+	}
+
 	protected int getUserColumnSize(String attribute) {
 		return -1;
 	}
-	
-	
 
 	public void onSelection(IStructuredSelection selection) {
 		if (!selection.isEmpty()) {
-			setSelectedBeanMap((BeanMap)selection.getFirstElement());
-		} else
+			setSelectedBeanMap((BeanMap) selection.getFirstElement());
+		} else {
 			setSelectedBeanMap(null);
+		}
 	}
-
-	
 
 	protected boolean doOnAdd() {
 		return true;
@@ -292,7 +289,7 @@ public abstract class AbstractConnectedBeanMapTableManager extends AbstractConne
 	protected boolean doOnDelete(BeanMap deleted) {
 		return true;
 	}
-	
+
 	public void setSelectedBeanMap(BeanMap selectedItem) {
 		this.selectedItem = selectedItem;
 	}
@@ -301,34 +298,31 @@ public abstract class AbstractConnectedBeanMapTableManager extends AbstractConne
 		return selectedItem;
 	}
 
-	
-	public BeanMapList getSelectedBeanMapList(){
+	public BeanMapList getSelectedBeanMapList() {
 		return viewer.getSelectedBeanMapList();
 	}
-	
-	
-	public void add(){
+
+	public void add() {
 		if (doOnAdd()) {
 			refresh();
 		}
 	}
-	
-	
+
 	public void refresh() {
 		viewer.refresh();
 	}
-	
+
 	@Override
-	public void update(){
+	public void update() {
 		if (allowMultiSelection) {
-			BeanMapList selectedList = viewer.getSelectedBeanMapList();
-			for (BeanMap bean : selectedList){
+			final BeanMapList selectedList = viewer.getSelectedBeanMapList();
+			for (final BeanMap bean : selectedList) {
 				if (isValidItem(bean)) {
 					if (doOnUpdate(bean)) {
 						refresh();
 					}
 				}
-			}			
+			}
 		} else {
 			if (getSelectedBeanMap() != null) {
 				if (isValidItem(getSelectedBeanMap())) {
@@ -336,113 +330,110 @@ public abstract class AbstractConnectedBeanMapTableManager extends AbstractConne
 						refresh();
 					}
 				}
-			}		
+			}
 		}
 	}
-	
-	protected String getConfirmationDialogTitle(){
+
+	protected String getConfirmationDialogTitle() {
 		return "ARCAD";
 	}
-	
-	protected String getDeletionConfirmationMessage(boolean multi){
+
+	protected String getDeletionConfirmationMessage(boolean multi) {
 		return CoreUILabels.resString("confirmDeletion.text");
 	}
-	
-	public void delete(){
+
+	public void delete() {
 		if (allowMultiSelection) {
-			BeanMapList selectedList = viewer.getSelectedBeanMapList();
-			if (selectedList.size()>0) {
-				if (MessageDialog.openConfirm(EvolutionCoreUIPlugin.getShell(), getConfirmationDialogTitle(), //$NON-NLS-1$
-						getDeletionConfirmationMessage(allowMultiSelection))) { //$NON-NLS-1$			
-					for (BeanMap bean : selectedList){
+			final BeanMapList selectedList = viewer.getSelectedBeanMapList();
+			if (selectedList.size() > 0) {
+				if (MessageDialog.openConfirm(EvolutionCoreUIPlugin.getShell(), getConfirmationDialogTitle(),
+						getDeletionConfirmationMessage(allowMultiSelection))) {
+					for (final BeanMap bean : selectedList) {
 						if (isValidItem(bean)) {
-							if (doOnDelete(bean)) {								
+							if (doOnDelete(bean)) {
 								refresh();
 							}
 						}
-					}			
+					}
 					setSelectedBeanMap(null);
 				}
 			}
 		} else {
 			if (getSelectedBeanMap() != null) {
 				if (isValidItem(getSelectedBeanMap())) {
-					if (MessageDialog.openConfirm(EvolutionCoreUIPlugin.getShell(), getConfirmationDialogTitle(), //$NON-NLS-1$
-							getDeletionConfirmationMessage(false))) { //$NON-NLS-1$
+					if (MessageDialog.openConfirm(EvolutionCoreUIPlugin.getShell(), getConfirmationDialogTitle(),
+							getDeletionConfirmationMessage(false))) {
 						if (doOnDelete(getSelectedBeanMap())) {
 							setSelectedBeanMap(null);
 							refresh();
 						}
 					}
 				}
-			}		
+			}
 		}
 	}
-	
+
 	public boolean isValidItem(BeanMap item) {
 		return item.getType().equalsIgnoreCase(getType());
 	}
-	
+
 	protected ArrayList<Action> getActions() {
-		return new ArrayList<Action>();
-	}	
-	
-	
-	protected Image getCustomColumnImage(Object element, int actualColumnIndex){
+		return new ArrayList<>();
+	}
+
+	protected Image getCustomColumnImage(Object element, int actualColumnIndex) {
 		return null;
 	}
-	
+
 	public void setInput(BeanMapList list) {
 		viewer.setInput(list);
-		
+
 	}
 
 	protected void onDoubleClick(IStructuredSelection selection) {
-		if(getAllowEdit()) {
-			if (editAction!=null) {
+		if (getAllowEdit()) {
+			if (editAction != null) {
 				editAction.run();
 			}
 		}
 	}
-		
-	
+
 	public void setReadonly(boolean readonly) {
 		this.readonly = readonly;
 		bAdd.setEnabled(!readonly);
 		bDelete.setEnabled(!readonly);
 	}
-	
+
 	public boolean isReadonly() {
 		return readonly;
 	}
-	
+
 	public String getValue(Object element, int columnIndex) {
 		return null;
 	}
-	
+
 	public void setSelection(BeanMap selectedBeanMap) {
 		viewer.getViewer().setSelection(
-			new StructuredSelection(selectedBeanMap)
-		);
+				new StructuredSelection(selectedBeanMap));
 	}
-	
+
 	public void setSelection(BeanMapList selectedBeanMapList) {
 		viewer.getViewer().setSelection(
-			new StructuredSelection(selectedBeanMapList.toArray())
-		);
-	}		
-	
+				new StructuredSelection(selectedBeanMapList.toArray()));
+	}
+
 	/**
-	 * Override and return false if the bottom toolbar buttons must be "Add" and "Remove"
-	 * instead of "Create" and "Delete".
-	 * 
+	 * Override and return false if the bottom toolbar buttons must be "Add" and "Remove" instead of "Create" and
+	 * "Delete".
+	 *
 	 * @return true
 	 */
-	public boolean isCreateDeleteStyle(){
+	public boolean isCreateDeleteStyle() {
 		return true;
 	}
-	
+
 	public abstract String getType();
+
 	public abstract String getAttributeList();
-	
+
 }

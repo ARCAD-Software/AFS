@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -39,28 +39,25 @@ public abstract class AbstractSearchAndResultComposite extends Composite impleme
 
 	protected ServerConnection connection;
 	protected DataAccessHelper helper;
-	
-	
+
 	private Composite mainComposite;
-	
-	
+
 	protected AbstractSearchComposite searchComposite;
 	protected AbstractResultComposite resultComposite;
 	private MetaDataEntity entity = null;
 
-
 	public AbstractSearchAndResultComposite(Composite parent, int style) {
-		super(parent,style);
-		GridLayout gd = new GridLayout(1,false);
+		super(parent, style);
+		final GridLayout gd = new GridLayout(1, false);
 		gd.marginLeft = gd.marginTop = gd.marginRight = gd.marginBottom = 0;
 		gd.marginHeight = gd.marginWidth = 0;
-		this.setLayout(gd);
-		GridData gridData = new GridData(GridData.FILL_BOTH);
+		setLayout(gd);
+		final GridData gridData = new GridData(GridData.FILL_BOTH);
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.grabExcessVerticalSpace = true;
-		this.setLayoutData(gridData);		
-		this.setBackground(parent.getBackground());
-		if (connection!=null) {
+		setLayoutData(gridData);
+		setBackground(parent.getBackground());
+		if (connection != null) {
 			createContent(this);
 		}
 	}
@@ -70,73 +67,75 @@ public abstract class AbstractSearchAndResultComposite extends Composite impleme
 	}
 
 	public void setConnection(ServerConnection connexion) {
-		this.connection = connexion;
+		connection = connexion;
 		helper = new DataAccessHelper(connexion);
 		connectionChanged(connexion);
 	}
 
+	@Override
 	public boolean isAllowed() {
-		if (connection!=null)
+		if (connection != null) {
 			return connection.isAllowed(getExpectedRigths());
-		else {
-			LogUITools.logError(Activator.getDefault().getBundle(), 
+		} else {
+			LogUITools.logError(Activator.getDefault().getBundle(),
 					UserMessageManager.getInstance().getMessage(IACCMessages.ERR_SRH_CONNECTIONMISSING));
 			return false;
 		}
 	}
-	
-	
-	
+
 	protected void connectionChanged(ServerConnection connection) {
-		entity= helper.getEntity(getType());
+		entity = helper.getEntity(getType());
 		createContent(this);
 		this.layout();
 	}
 
-	private void createContent(Composite parent){
-		if (mainComposite!=null) {
+	private void createContent(Composite parent) {
+		if (mainComposite != null) {
 			mainComposite.dispose();
 		}
-		mainComposite = AFSFormatTools.createComposite(parent,1,false);
+		mainComposite = AFSFormatTools.createComposite(parent, 1, false);
 		mainComposite.setBackground(parent.getBackground());
 		GridData gridData = new GridData(GridData.FILL_BOTH);
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.grabExcessVerticalSpace = true;
 		mainComposite.setLayoutData(gridData);
-		GridLayout gd = (GridLayout)mainComposite.getLayout();
+		final GridLayout gd = (GridLayout) mainComposite.getLayout();
 		gd.marginLeft = gd.marginTop = gd.marginRight = gd.marginBottom = 0;
 		gd.marginHeight = gd.marginWidth = 0;
-		
+
 		if (isAllowed()) {
 			if (entity != null) {
-				if (shashed()) {				
-					SashForm listAndEditor = new SashForm(mainComposite, getSashOrientation());
+				if (shashed()) {
+					final SashForm listAndEditor = new SashForm(mainComposite, getSashOrientation());
 					listAndEditor.setBackground(parent.getBackground());
 					gridData = new GridData(GridData.FILL_BOTH);
 					gridData.grabExcessHorizontalSpace = true;
 					gridData.grabExcessVerticalSpace = true;
 					listAndEditor.setLayoutData(gridData);
-					
-					searchComposite = createSearchComposite(connection,listAndEditor, entity);	
+
+					searchComposite = createSearchComposite(connection, listAndEditor, entity);
 					searchComposite.setBackground(parent.getBackground());
 					formatSearchComposite(searchComposite);
-	
+
 					resultComposite = createResultComposite(listAndEditor, getDisplayedSelectClause(), searchComposite
-							.getQueryManager(),connection);
+							.getQueryManager(), connection);
 					resultComposite.setBackground(parent.getBackground());
 					formatResultComposite(resultComposite);
-					listAndEditor.setWeights(getWeights());				
+					listAndEditor.setWeights(getWeights());
 				} else {
-					if (searchCompositeFirst()) {					
-						searchComposite = createSearchComposite(connection,mainComposite, entity);									
-						resultComposite = createResultComposite(mainComposite, getDisplayedSelectClause(), searchComposite
-								.getQueryManager(),connection);
+					if (searchCompositeFirst()) {
+						searchComposite = createSearchComposite(connection, mainComposite, entity);
+						resultComposite = createResultComposite(mainComposite, getDisplayedSelectClause(),
+								searchComposite
+										.getQueryManager(),
+								connection);
 					} else {
-						resultComposite = createResultComposite(mainComposite, getDisplayedSelectClause(),null ,connection);
-						searchComposite = createSearchComposite(connection,mainComposite, entity);
+						resultComposite = createResultComposite(mainComposite, getDisplayedSelectClause(), null,
+								connection);
+						searchComposite = createSearchComposite(connection, mainComposite, entity);
 						resultComposite.setQueryManager(searchComposite
 								.getQueryManager());
-						
+
 					}
 					formatSearchComposite(searchComposite);
 					formatResultComposite(resultComposite);
@@ -150,37 +149,34 @@ public abstract class AbstractSearchAndResultComposite extends Composite impleme
 			}
 		} else {
 			new BasicResultNotAllowedComposite(mainComposite);
-		}		
+		}
 	}
-	
-	protected void formatSearchComposite(Composite c){
-		GridData gridData = new GridData(GridData.FILL_BOTH);
-		gridData.grabExcessHorizontalSpace = true;
-		gridData.grabExcessVerticalSpace = true;
-		c.setLayoutData(gridData);		
-	}
-	
-	protected void formatResultComposite(Composite c){
-		GridData gridData = new GridData(GridData.FILL_BOTH);
+
+	protected void formatSearchComposite(Composite c) {
+		final GridData gridData = new GridData(GridData.FILL_BOTH);
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.grabExcessVerticalSpace = true;
 		c.setLayoutData(gridData);
-	}	
-	
-	public Composite getMainComposite(){
+	}
+
+	protected void formatResultComposite(Composite c) {
+		final GridData gridData = new GridData(GridData.FILL_BOTH);
+		gridData.grabExcessHorizontalSpace = true;
+		gridData.grabExcessVerticalSpace = true;
+		c.setLayoutData(gridData);
+	}
+
+	public Composite getMainComposite() {
 		return mainComposite;
 	}
-	
-	
-	protected int[] getWeights(){
+
+	protected int[] getWeights() {
 		return new int[] { 28, 100 };
 	}
-	
 
-	
 	protected AbstractResultComposite createResultComposite(Composite parent, String selectClause,
-			QueryManager queryManager,ServerConnection connection) {
-		return new BasicResultComposite(parent, entity, selectClause, queryManager,connection);
+			QueryManager queryManager, ServerConnection connection) {
+		return new BasicResultComposite(parent, entity, selectClause, queryManager, connection);
 	}
 
 	public MetaDataEntity getStructure() {
@@ -189,7 +185,7 @@ public abstract class AbstractSearchAndResultComposite extends Composite impleme
 
 	/**
 	 * Redefine this method in the inherited classes to create your own "searchComposite".
-	 * 
+	 *
 	 * @param parent
 	 *            : Composite : The parent composite of the search Editor
 	 * @return AbstractSearchComposite : A composite inherited from AbstractSearchComposite
@@ -200,7 +196,7 @@ public abstract class AbstractSearchAndResultComposite extends Composite impleme
 	/**
 	 * Redefine this method in the inherited classes to return a string which represents the bean identifier you want to
 	 * manipulate through this search view.
-	 * 
+	 *
 	 * @return String : Bean Identifier.
 	 */
 	public abstract String getType();
@@ -208,40 +204,41 @@ public abstract class AbstractSearchAndResultComposite extends Composite impleme
 	protected String getDisplayedSelectClause() {
 		return searchComposite.createSelectClause();
 	}
-	
+
 	protected abstract void readStructureError();
-	
+
 	/**
 	 * Re-create Result Composite , and re-fill it with current data
 	 */
 	public void resetResultComposite() {
 		// Recreate result composite
-		
-		// Get parent to be cleaned of current resultComposite	
-		Composite listAndEditor = resultComposite.getParent();
+
+		// Get parent to be cleaned of current resultComposite
+		final Composite listAndEditor = resultComposite.getParent();
 		// store current input
-		Object input = resultComposite.getInput();		
-		Object gridData = resultComposite.getLayoutData();
+		final Object input = resultComposite.getInput();
+		final Object gridData = resultComposite.getLayoutData();
 
 		// Dispose old result composite
 		resultComposite.dispose();
-		
+
 		// Recreate the new one
-		resultComposite = createResultComposite(listAndEditor, getDisplayedSelectClause(), searchComposite.getQueryManager(),connection);
+		resultComposite = createResultComposite(listAndEditor, getDisplayedSelectClause(),
+				searchComposite.getQueryManager(), connection);
 		resultComposite.contentChanged((BeanMapList) input);
-		
+
 		resultComposite.setBackground(listAndEditor.getBackground());
-		
+
 		resultComposite.setLayoutData(gridData);
-		if (listAndEditor instanceof SashForm){
-		 ((SashForm)listAndEditor).setWeights(getWeights());
+		if (listAndEditor instanceof SashForm) {
+			((SashForm) listAndEditor).setWeights(getWeights());
 		}
 
 		// Reset query manager listener
 		searchComposite.getQueryManager().setResultListener(resultComposite);
-		
+
 		// Force layout of parent
-		listAndEditor.layout(true);	
+		listAndEditor.layout(true);
 	}
 
 	/**
@@ -249,27 +246,26 @@ public abstract class AbstractSearchAndResultComposite extends Composite impleme
 	 */
 	protected void resetActions() {
 	}
-	
+
 	/**
 	 * Provide specific actions to container
-	 * 
+	 *
 	 * @return
 	 */
 	public List<Action> getActions() {
-		return new ArrayList<Action>();
+		return new ArrayList<>();
 	}
-	
-	
+
 	protected int getSashOrientation() {
-		return SWT.HORIZONTAL;		
+		return SWT.HORIZONTAL;
 	}
-	
-	protected boolean shashed(){
+
+	protected boolean shashed() {
 		return true;
 	}
-	
-	protected boolean searchCompositeFirst(){
+
+	protected boolean searchCompositeFirst() {
 		return true;
-	}	
-	
+	}
+
 }

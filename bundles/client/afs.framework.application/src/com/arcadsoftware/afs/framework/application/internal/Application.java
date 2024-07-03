@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -21,22 +21,21 @@ import org.eclipse.ui.PlatformUI;
 
 public class Application implements IApplication {
 
-
+	@Override
 	public Object start(IApplicationContext context) throws Exception {
 		Object result = null;
-		Display display = PlatformUI.createDisplay();
+		final Display display = PlatformUI.createDisplay();
 		try {
 			int returnCode;
-			try {					
-				BasicWorkbenchAdvisor ad = new BasicWorkbenchAdvisor();
+			try {
+				final BasicWorkbenchAdvisor ad = new BasicWorkbenchAdvisor();
 				returnCode = PlatformUI.createAndRunWorkbench(display, ad);
 				if (returnCode == PlatformUI.RETURN_RESTART) {
 					result = IApplication.EXIT_RESTART;
 				} else {
 					result = IApplication.EXIT_OK;
 				}
-			}
-			catch (Exception e) {
+			} catch (final Exception e) {
 				Activator.getInstance().log(e);
 			}
 
@@ -46,19 +45,18 @@ public class Application implements IApplication {
 		return result;
 	}
 
-
+	@Override
 	public void stop() {
 		final IWorkbench workbench = PlatformUI.getWorkbench();
 		if (workbench == null) {
 			return;
 		}
 		final Display display = workbench.getDisplay();
-		display.syncExec(() ->{
-				if (!display.isDisposed()) {
-					workbench.close();
-				}
+		display.syncExec(() -> {
+			if (!display.isDisposed()) {
+				workbench.close();
 			}
-		);
+		});
 	}
 
 }

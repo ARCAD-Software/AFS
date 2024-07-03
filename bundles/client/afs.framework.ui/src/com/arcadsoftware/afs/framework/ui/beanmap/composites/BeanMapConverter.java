@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -26,12 +26,13 @@ public class BeanMapConverter {
 		}
 		if (control instanceof Combo) {
 			return ((Combo) control).getText();
-		}	
-		if (control instanceof Button) {			
+		}
+		if (control instanceof Button) {
 			return ((Combo) control).getSelection();
 		}
 		return null;
 	}
-	
-	public static void setValue(Control control, Object value) {}
+
+	public static void setValue(Control control, Object value) {
+	}
 }

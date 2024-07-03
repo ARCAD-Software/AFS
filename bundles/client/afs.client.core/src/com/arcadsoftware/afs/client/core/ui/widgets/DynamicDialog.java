@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -27,65 +27,58 @@ import com.arcadsoftware.editor.ElementParameter;
 import com.arcadsoftware.editor.swt.ISWTRenderer;
 
 public class DynamicDialog extends AbstractBeanMapDialog {
-	
-	private static final String WIDTH="width";
-	private static final String HEIGHT="height";
-	private static final String LAYOUT_NAME="layoutName";
-	private static final String TITLE="title";	
-	public static final String SAVE="saveInDialog";
-	public static final String SHOWDIALOGBUTTON="showDialogButton";
-	
-	public static final int SAVED_SUCCEED=0;
-	public static final int SAVED_FAILED=1;
-	public static final int SAVED_UNDEFINED=21;
-	
-	private String layoutName;
-	private Point size;
-	private String title;
+
+	private static final String WIDTH = "width"; //$NON-NLS-1$
+	private static final String HEIGHT = "height"; //$NON-NLS-1$
+	private static final String LAYOUT_NAME = "layoutName"; //$NON-NLS-1$
+	private static final String TITLE = "title"; //$NON-NLS-1$
+	public static final String SAVE = "saveInDialog"; //$NON-NLS-1$
+	public static final String SHOWDIALOGBUTTON = "showDialogButton"; //$NON-NLS-1$
+	public static final int SAVED_SUCCEED = 0;
+	public static final int SAVED_FAILED = 1;
+	public static final int SAVED_UNDEFINED = 21;
+
+	private final String layoutName;
+	private final Point size;
+	private final String title;
 	private boolean saveInDialog;
 	private boolean showButton = true;
-	private boolean readOnly = false;
-	
-	
+	private boolean readOnly;
 	private int saved = SAVED_UNDEFINED;
-	
-	public DynamicDialog(Shell parentShell,  ServerConnection connection,
-			BeanMap edited,ISWTRenderer renderer, ElementParameter e, boolean readonly, boolean addition) {
-		super(parentShell,connection,true,true);	
+
+	public DynamicDialog(Shell parentShell, ServerConnection connection,
+			BeanMap edited, ISWTRenderer renderer, ElementParameter e, boolean readonly, boolean addition) {
+		super(parentShell, connection, true, true);
 		setEditedBeanMap(edited);
-		String layoutName = e.getParameter(LAYOUT_NAME);				
-		String title = e.getParameter(TITLE);				
-		int width = e.getParameterInteger(WIDTH, 400);
-		int height = e.getParameterInteger(HEIGHT, 300);
-		this.layoutName=layoutName;
-		this.size = new Point(width,height);
-		this.title= renderer.getLocalizedMessage(title);
-		if (!addition) { 
-			saveInDialog =  e.getParameterBoolean(SAVE);
-			this.readOnly = readonly;
+		final String layoutName = e.getParameter(LAYOUT_NAME);
+		final String title = e.getParameter(TITLE);
+		final int width = e.getParameterInteger(WIDTH, 400);
+		final int height = e.getParameterInteger(HEIGHT, 300);
+		this.layoutName = layoutName;
+		size = new Point(width, height);
+		this.title = renderer.getLocalizedMessage(title);
+		if (!addition) {
+			saveInDialog = e.getParameterBoolean(SAVE);
+			readOnly = readonly;
 		} else {
-			saveInDialog =  false;
-			this.readOnly = false;
+			saveInDialog = false;
+			readOnly = false;
 		}
-		
-		String value = e.getParameter(SHOWDIALOGBUTTON);
-		if (value==null) {
+		final String value = e.getParameter(SHOWDIALOGBUTTON);
+		if (value == null) {
 			showButton = true;
-		} else {		
+		} else {
 			showButton = e.getParameterBoolean(SHOWDIALOGBUTTON);
 		}
-				
-	}	
-	
-	
+	}
+
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		Control c =  super.createDialogArea(parent);
+		final Control c = super.createDialogArea(parent);
 		editor.setEnabled(!readOnly);
 		return c;
 	}
-	
-	
+
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		if (showButton) {
@@ -93,32 +86,30 @@ public class DynamicDialog extends AbstractBeanMapDialog {
 				super.createButtonsForButtonBar(parent);
 			} else {
 				createButton(parent, IDialogConstants.CANCEL_ID,
-						DialogConstantProvider.getInstance().CANCEL_LABEL,false);				
+						DialogConstantProvider.getInstance().CANCEL_LABEL, false);
 			}
-		}		
+		}
 	}
-	
+
 	@Override
 	protected void doBeforeClosing(BeanMap result) {
 		super.doBeforeClosing(result);
 		if (saveInDialog) {
 			if (!readOnly) {
-				boolean saveResult = editor.save();
-				saved = saveResult?SAVED_SUCCEED:SAVED_FAILED;
+				final boolean saveResult = editor.save();
+				saved = saveResult ? SAVED_SUCCEED : SAVED_FAILED;
 			} else {
 				saved = SAVED_SUCCEED;
 			}
-		}		
+		}
 	}
-	
 
-	
 	@Override
 	public String getType() {
-		if (initalBeanmap!=null)
+		if (initalBeanmap != null) {
 			return initalBeanmap.getType();
-		else
-			return "";
+		}
+		return "";
 	}
 
 	@Override
@@ -131,16 +122,12 @@ public class DynamicDialog extends AbstractBeanMapDialog {
 		return title;
 	}
 
-	
-	public int getSavedStatus(){
+	public int getSavedStatus() {
 		return saved;
 	}
-
-
 
 	@Override
 	public Point getSize() {
 		return size;
 	}
-	
 }

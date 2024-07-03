@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -29,15 +29,15 @@ import com.arcadsoftware.editor.swt.IBeanMapSavedListener;
 public abstract class AbstractConnectedBeanMapEditAction extends AbstractConnectedBeanMapAction implements IBeanMapSavedListener, IBeanMapErrorOnSaveListener, IBeanMapModifier {
 
 	private ConnectedDynamicEditor editor;
-	
+
 	public AbstractConnectedBeanMapEditAction(ServerConnection connection) {
 		super(connection);
 	}
-	
+
 	public AbstractConnectedBeanMapEditAction() {
 		super();
 	}
-	
+
 	protected boolean isReadOnly() {
 		return false;
 	}
@@ -45,7 +45,7 @@ public abstract class AbstractConnectedBeanMapEditAction extends AbstractConnect
 	protected boolean isReadOnly(BeanMap bean) {
 		return false;
 	}
-	
+
 	protected void beanEdit(BeanMap beanMap) {
 		if (beanMap != null) {
 			doBeforeEditing(beanMap);
@@ -72,14 +72,14 @@ public abstract class AbstractConnectedBeanMapEditAction extends AbstractConnect
 	protected boolean isExternalRefreshAllowed() {
 		return true;
 	}
-	
+
 	@Override
 	protected boolean execute() {
 		BeanMap b = getBeanMapToManage();
 		if (b == null) {			
-			BeanMapList list = getBeanMapListToManage();
+			final BeanMapList list = getBeanMapListToManage();
 			if (list != null) {
-				for (BeanMap bean: list) {
+				for (final BeanMap bean: list) {
 					beanEdit(bean);
 				}
 			}
@@ -88,21 +88,22 @@ public abstract class AbstractConnectedBeanMapEditAction extends AbstractConnect
 		}
 		return true;
 	}
-	
+
 	protected String getLayoutName(BeanMap beanmap) {
 		return getLayoutName();
 	}
-	
+
 	protected String getLayoutName() {
 		return null;
 	}
-	
+
+	@Override
 	public void beanMapSaved(BeanMap beanmap) {
 		if (beanmap != null) {
 			saved(beanmap);
 		}
-	}	
-	
+	}
+
 	protected void saved(BeanMap beanMap) {
 		doAfterSaving(beanMap);
 	}

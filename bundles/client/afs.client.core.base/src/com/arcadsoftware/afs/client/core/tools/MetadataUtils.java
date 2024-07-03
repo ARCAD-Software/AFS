@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -19,6 +19,7 @@ import com.arcadsoftware.afs.client.core.connection.DataAccessHelper;
 import com.arcadsoftware.metadata.MetaDataAttribute;
 import com.arcadsoftware.metadata.MetaDataEntity;
 
+<<<<<<< master
 /**
  * Singleton class allowing to get Entities attribute description.
  * 
@@ -28,19 +29,29 @@ import com.arcadsoftware.metadata.MetaDataEntity;
  * @author ARCAD Software
  */
 public final class MetadataUtils {
+=======
+public class MetadataUtils {
+>>>>>>> 38f2e60 Clean-up AFS Client
 
 	private static MetadataUtils instance = new MetadataUtils();
+<<<<<<< master
 	private final Hashtable<String, MetaDataEntity> entities;
+=======
+	private static Hashtable<String, MetaDataEntity> entities;
+>>>>>>> 38f2e60 Clean-up AFS Client
 
 	private MetadataUtils() {
 		entities = new Hashtable<>();
 	}
 
+<<<<<<< master
 	/**
 	 * Get the singleton instance.
 	 * 
 	 * @return
 	 */
+=======
+>>>>>>> 38f2e60 Clean-up AFS Client
 	public static MetadataUtils getInstance() {
 		return instance;
 	}
@@ -59,11 +70,33 @@ public final class MetadataUtils {
 	 *            The complex attribute string to be resolved.
 	 * @return the final MetaDataAttribute or null;
 	 */
+<<<<<<< master
 	public synchronized MetaDataAttribute resolveMetaDataAttribute(DataAccessHelper helper, MetaDataEntity primaryEntity,
 			String attribute) {
 		// FIXME Remove the terminal recurent call...
 		final int pos = attribute.indexOf('.');
 		if (pos < 0) {
+=======
+	public MetaDataAttribute resolveMetaDataAttribute(DataAccessHelper helper, MetaDataEntity primaryEntity,
+			String attribute) {
+		final int pos = attribute.indexOf('.');
+		if (pos > -1) {
+			final String primaryCode = attribute.substring(0, pos);
+			final String remainingAttribute = attribute.substring(pos + 1);
+			final MetaDataAttribute primaryAttribute = primaryEntity.getAttribute(primaryCode);
+			if (primaryAttribute != null) {
+				final String primaryType = primaryAttribute.getType();
+				MetaDataEntity secondaryEntity = entities.get(primaryType);
+				if (secondaryEntity == null) {
+					secondaryEntity = helper.getEntity(primaryType);
+					entities.put(primaryType, secondaryEntity);
+				}
+				if (secondaryEntity != null) {
+					return resolveMetaDataAttribute(helper, secondaryEntity, remainingAttribute);
+				}
+			}
+		} else {
+>>>>>>> 38f2e60 Clean-up AFS Client
 			return primaryEntity.getAttribute(attribute);
 		}
 		final String primaryCode = attribute.substring(0, pos);

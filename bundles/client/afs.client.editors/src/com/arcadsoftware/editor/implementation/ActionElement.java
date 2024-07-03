@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -23,10 +23,11 @@ public class ActionElement implements IActionElement {
 	private String script;
 	private String[] elements;
 
-	/* (non-Javadoc)
-	 * 
+	/*
+	 * (non-Javadoc)
 	 * @see com.arcadsoftware.editor.IActionElement#getName()
 	 */
+	@Override
 	public String getName() {
 		return name;
 	}
@@ -35,10 +36,11 @@ public class ActionElement implements IActionElement {
 		this.name = name;
 	}
 
-	/* (non-Javadoc)
-	 * 
+	/*
+	 * (non-Javadoc)
 	 * @see com.arcadsoftware.editor.IActionElement#getIcon()
 	 */
+	@Override
 	public String getIcon() {
 		return icon;
 	}
@@ -47,10 +49,11 @@ public class ActionElement implements IActionElement {
 		this.icon = icon;
 	}
 
-	/* (non-Javadoc)
-	 * 
+	/*
+	 * (non-Javadoc)
 	 * @see com.arcadsoftware.editor.IActionElement#getScript()
 	 */
+	@Override
 	public String getScript() {
 		return script;
 	}
@@ -63,10 +66,11 @@ public class ActionElement implements IActionElement {
 		this.code = code;
 	}
 
-	/* (non-Javadoc)
-	 * 
+	/*
+	 * (non-Javadoc)
 	 * @see com.arcadsoftware.editor.IActionElement#getCode()
 	 */
+	@Override
 	public String getCode() {
 		return code;
 	}
@@ -75,10 +79,11 @@ public class ActionElement implements IActionElement {
 		elements = els.split(" "); //$NON-NLS-1$
 	}
 
-	/* (non-Javadoc)
-	 * 
+	/*
+	 * (non-Javadoc)
 	 * @see com.arcadsoftware.editor.IActionElement#getElements()
 	 */
+	@Override
 	public String[] getElements() {
 		return elements;
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -13,7 +13,7 @@
  *******************************************************************************/
 /**
  * This class manages widget table to display indirect links.
- * For instance, if current beanMap has an attribute 'type' and this type has a link 'properties', 
+ * For instance, if current beanMap has an attribute 'type' and this type has a link 'properties',
  * this widget table is able to show the list of properties linked to the type.
  */
 package com.arcadsoftware.afs.client.core.ui.widgets;
@@ -33,32 +33,33 @@ import com.arcadsoftware.metadata.MetaDataAttribute;
 import com.arcadsoftware.metadata.MetaDataEntity;
 import com.arcadsoftware.metadata.MetaDataLink;
 
-public class ConnectedIndirectLinkTableSWTProvider extends ConnectedTableWithUserDefinedButtonBarSWTProvider implements IWidgetValue{
+public class ConnectedIndirectLinkTableSWTProvider extends ConnectedTableWithUserDefinedButtonBarSWTProvider
+		implements IWidgetValue {
 
 	public static final String ATTRIBUTE_REFLINK = "refLink"; //$NON-NLS-1$
 	MetaDataAttribute attribute;
-	
+
 	@Override
 	public void create(ISWTRenderer swtRenderer,
 			ILayoutParameters layoutParameters, Element element,
 			MetaDataEntity structure) {
-		attribute = (MetaDataAttribute)element;
-		this.renderer = swtRenderer;
+		attribute = (MetaDataAttribute) element;
+		renderer = swtRenderer;
 		readOnlyEdition = true;
-		
-		String refLink = layoutParameters.getParameter(ATTRIBUTE_REFLINK);
-		MetaDataEntity entity = getHelper().getEntity(attribute.getType());
-		MetaDataLink linkElement = entity.getLink(refLink);
+
+		final String refLink = layoutParameters.getParameter(ATTRIBUTE_REFLINK);
+		final MetaDataEntity entity = getHelper().getEntity(attribute.getType());
+		final MetaDataLink linkElement = entity.getLink(refLink);
 		super.create(swtRenderer, layoutParameters, linkElement, entity);
-		
+
 		bindElement();
 	}
-		
+
 	@Override
 	protected void createControlAfterTable(Composite parent) {
 		super.createControlAfterTable(parent);
 	}
-	
+
 	@Override
 	protected void bindElement() {
 		renderer.getRendererBinding().bindElement(attribute, this);
@@ -71,26 +72,28 @@ public class ConnectedIndirectLinkTableSWTProvider extends ConnectedTableWithUse
 
 	@Override
 	public Object getValue() {
-		BeanMap currentBeanMap = renderer.getCurrentBean();
-		int attributeId = currentBeanMap.getInt(attribute.getCode());
-		if (attributeId > 0)
+		final BeanMap currentBeanMap = renderer.getCurrentBean();
+		final int attributeId = currentBeanMap.getInt(attribute.getCode());
+		if (attributeId > 0) {
 			return new BeanMap(attribute.getType(), attributeId);
+		}
 		return null;
 	}
 
 	@Override
 	public void addSelectionListener(SelectionListener selectionListener) {
-		
+
 	}
 
 	@Override
 	public void setValue(Object newValue) {
-		if (newValue instanceof BeanMap){
-			BeanMap bm = (BeanMap)newValue;
-			MetaDataLink link = getLink();
-			BeanMapTableViewer viewer = getViewer();
+		if (newValue instanceof BeanMap) {
+			final BeanMap bm = (BeanMap) newValue;
+			final MetaDataLink link = getLink();
+			final BeanMapTableViewer viewer = getViewer();
 			// load links
-			BeanMapList list = getHelper().getLinkList(bm.getType(), bm.getId(), link.getCode(), link.getType(), viewer.getAttributeList(), viewer.getOrderList());
+			final BeanMapList list = getHelper().getLinkList(bm.getType(), bm.getId(), link.getCode(), link.getType(),
+					viewer.getAttributeList(), viewer.getOrderList());
 			getList().setBeanMapList(list);
 		}
 	}
@@ -100,5 +103,4 @@ public class ConnectedIndirectLinkTableSWTProvider extends ConnectedTableWithUse
 		return BeanMap.class;
 	}
 
-	
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -33,20 +33,20 @@ import com.arcadsoftware.editor.swt.ISWTRenderer;
 import com.arcadsoftware.metadata.MetaDataEntity;
 
 /**
- * This class implement a Composite Container SWT Widget provider for the
- * dynamic editors.
+ * This class implement a Composite Container SWT Widget provider for the dynamic editors.
  */
 public class CompositeContainerSWTProvider implements IContainerSWTProvider {
 
+	@Override
 	public void create(ISWTRenderer renderer, ILayoutParameters parameters, boolean isEmpty, MetaDataEntity structure) {
 
-		boolean withBorder = parameters.getParameterBoolean(BORDER);
+		final boolean withBorder = parameters.getParameterBoolean(BORDER);
 		int style = SWT.NONE;
 		if (withBorder) {
 			style = SWT.BORDER;
 		}
 		Composite composite;
-		GridLayout layout = new GridLayout(parameters.getParameterInteger(COLS, 3), false);
+		final GridLayout layout = new GridLayout(parameters.getParameterInteger(COLS, 3), false);
 		if (!parameters.getParameterBoolean(WITH_MARGIN)) {
 			layout.marginBottom = 0;
 			layout.marginHeight = 0;
@@ -74,7 +74,7 @@ public class CompositeContainerSWTProvider implements IContainerSWTProvider {
 			composite = renderer.getToolkit().createComposite(body2, style);
 			final Composite body = composite;
 			body.setLayout(layout);
-			//body.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true, 3, 1));
+			// body.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true, 3, 1));
 			body2.setContent(body);
 			body2.addControlListener(new ControlListener() {
 				public void controlMoved(ControlEvent e) {
@@ -91,17 +91,18 @@ public class CompositeContainerSWTProvider implements IContainerSWTProvider {
 			composite = renderer.getToolkit().createComposite(renderer.getParent(), style);
 			if (renderer.getParent().getLayout() instanceof GridLayout) {
 				composite.setLayoutData(ContainerUtils.createGridData(parameters));
-			}	
+			}
 			composite.setLayout(layout);
 			renderer.createSubContainer(this, parameters, composite);
 		}
 	}
 
+	@Override
 	public void dispose() {
 		// Do nothing
 	}
-	
-	protected int getTableHeight(){
+
+	protected int getTableHeight() {
 		return SWT.DEFAULT;
 	}
 

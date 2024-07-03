@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -13,56 +13,57 @@
  *******************************************************************************/
 package com.arcadsoftware.afs.client.server.ui.actions;
 
-
 import org.eclipse.jface.resource.ImageDescriptor;
 
 import com.arcadsoftware.aev.core.ui.container.Container;
 import com.arcadsoftware.afs.client.server.ui.containers.ServerContainer;
 import com.arcadsoftware.afs.framework.ui.containers.ContainerEntryActions;
 
+public class ServerContainerActions extends ContainerEntryActions {
 
-public class ServerContainerActions extends ContainerEntryActions{
-
-	public ServerContainerActions(){
+	public ServerContainerActions() {
 		super();
 	}
-	
-	public ServerContainerActions(Container container){
+
+	public ServerContainerActions(Container container) {
 		super(container, true);
 	}
-	
+
 	@Override
 	public void makeAction() {
-		ServerAddAction addAction = new ServerAddAction(){
-			
+		final ServerAddAction addAction = new ServerAddAction() {
+
 			@Override
 			protected void setInterface() {
 				super.setInterface();
-				ServerContainer sc = (ServerContainer)getContainer();
+				final ServerContainer sc = (ServerContainer) getContainer();
 
-				String text = sc.getAddServerText();
-				String tooltip = sc.getAddServerTooltip();;
-				ImageDescriptor image = sc.getAddServerImage();;
-				if(text != null)
+				final String text = sc.getAddServerText();
+				final String tooltip = sc.getAddServerTooltip();
+				final ImageDescriptor image = sc.getAddServerImage();
+				if (text != null) {
 					setText(text);
-				if(tooltip != null)
+				}
+				if (tooltip != null) {
 					setToolTipText(tooltip);
-				if(image != null)
+				}
+				if (image != null) {
 					setImageDescriptor(image);
+				}
 			}
-			
+
 			@Override
 			protected void doAfterRun() {
 				if (runOk) {
-					ServerContainer sc = (ServerContainer)getContainer();
-					if (sc!=null) {
+					final ServerContainer sc = (ServerContainer) getContainer();
+					if (sc != null) {
 						sc.addServer(getAddedServer());
 						sc.getViewer().refresh(sc);
 					}
 				}
-			}			
-		};		
-			
+			}
+		};
+
 		addAction(addAction);
 	}
 

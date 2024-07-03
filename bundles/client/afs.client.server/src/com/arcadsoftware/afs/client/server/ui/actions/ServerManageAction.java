@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -19,22 +19,22 @@ import com.arcadsoftware.afs.client.server.connection.ConnectionManager;
 import com.arcadsoftware.afs.client.server.internals.Activator;
 
 public class ServerManageAction extends AbstractServerAction {
-	
+
 	@Override
 	protected void setInterface() {
 		setText(Activator.resString("server.action.manage.text")); //$NON-NLS-1$
 		setToolTipText(Activator.resString("server.action.manage.tooltip"));//$NON-NLS-1$
-		setImageDescriptor(AFSIcon.SERVER_EDIT.imageDescriptor());		
+		setImageDescriptor(AFSIcon.SERVER_EDIT.imageDescriptor());
 	}
-	
+
 	@Override
 	protected boolean execute() {
-		ServerConnection connection = ConnectionManager.getInstance().connect(selectedServer,manageUser());
+		final ServerConnection connection = ConnectionManager.getInstance().connect(selectedServer, manageUser());
 		return (connection != null) && connection.isConnected();
 	}
 
-	public boolean manageUser(){
+	public boolean manageUser() {
 		return true;
 	}
-	
+
 }

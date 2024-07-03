@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -29,28 +29,31 @@ import com.arcadsoftware.editor.swt.ISWTRenderer;
 import com.arcadsoftware.metadata.MetaDataEntity;
 
 /**
- * This class implement a Image Decorator SWT Widget provider for the dynamic
- * editors.
+ * This class implement a Image Decorator SWT Widget provider for the dynamic editors.
  */
 public class ImageDecoratorSWTProvider implements IDecoratorSWTProvider {
 
 	private Image image;
 
+	@Override
 	public Widget create(ISWTRenderer renderer, final ILayoutParameters parameters, MetaDataEntity structure) {
-		Label label = new Label(renderer.getParent(), SWT.NONE);
-		ImageDescriptor imageDescriptor = renderer.getImageDescriptor(parameters.getParameter(URL));
+		final Label label = new Label(renderer.getParent(), SWT.NONE);
+		final ImageDescriptor imageDescriptor = renderer.getImageDescriptor(parameters.getParameter(URL));
 		if (imageDescriptor != null) {
 			image = imageDescriptor.createImage();
 			label.setImage(image);
 		}
-		if (renderer.getParent().getLayout() instanceof GridLayout)
-			label.setLayoutData(new GridData(GridData.BEGINNING, GridData.BEGINNING, false, false, 3, 1));		
+		if (renderer.getParent().getLayout() instanceof GridLayout) {
+			label.setLayoutData(new GridData(GridData.BEGINNING, GridData.BEGINNING, false, false, 3, 1));
+		}
 		return label;
 	}
 
+	@Override
 	public void dispose() {
-		if (image != null && !image.isDisposed())
+		if ((image != null) && !image.isDisposed()) {
 			image.dispose();
+		}
 	}
 
 }

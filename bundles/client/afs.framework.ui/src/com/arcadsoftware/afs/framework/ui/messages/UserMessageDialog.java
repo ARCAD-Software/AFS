@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -30,7 +30,7 @@ public class UserMessageDialog extends AbstractAFSDialog {
 
 	private final UserMessage um;
 	private Label messageLabel;
-	
+
 	protected UserMessageDialog(Shell parentShell, UserMessage um) {
 		super(parentShell);
 		this.um = um;
@@ -38,14 +38,14 @@ public class UserMessageDialog extends AbstractAFSDialog {
 
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		Composite composite = (Composite)super.createDialogArea(parent);
-		GridLayout gl  =new GridLayout(2, false);
+		final Composite composite = (Composite) super.createDialogArea(parent);
+		final GridLayout gl = new GridLayout(2, false);
 		gl.marginHeight = gl.marginWidth = 5;
 		gl.marginLeft = gl.marginTop = gl.marginRight = gl.marginBottom = 0;
 		composite.setLayout(gl);
-		Label image = new Label(composite, SWT.NONE);		
-		GridData gd = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);		
-		gd.heightHint = 32;		
+		final Label image = new Label(composite, SWT.NONE);
+		final GridData gd = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
+		gd.heightHint = 32;
 		gd.widthHint = 32;
 		image.setLayoutData(gd);
 		image.setBackgroundImage(AFSIcon.ARCAD.image());
@@ -54,7 +54,7 @@ public class UserMessageDialog extends AbstractAFSDialog {
 		messageLabel.setText(um.toString());
 		return composite;
 	}
-	
+
 	@Override
 	public int getHeight() {
 		return 200;
@@ -69,9 +69,9 @@ public class UserMessageDialog extends AbstractAFSDialog {
 	public String getTitle() {
 		return "Message";
 	}
-	
+
 	public static void show(UserMessage um) {
-		new UserMessageDialog(Activator.getDefault().getPluginShell(),um).open();
+		new UserMessageDialog(Activator.getDefault().getPluginShell(), um).open();
 	}
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -13,9 +13,9 @@
  *******************************************************************************/
 package com.arcadsoftware.afs.client.core.ui.propertysource;
 
-
 public abstract class AbstractAFSProperties {
-	
+
 	public abstract Object getPropertyValue(Object id);
+
 	public abstract void setPropertyValue(Object id, Object value);
 }

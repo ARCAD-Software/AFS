@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -13,12 +13,11 @@
  *******************************************************************************/
 package com.arcadsoftware.editor.swt;
 
-
 /**
  * This interface is used to fire event when the editor is saved.
  */
 public interface IContentSaved {
-	
+
 	/**
 	 * Fire event when the content of the editor is saved.
 	 */

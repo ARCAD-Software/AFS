@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -34,13 +34,36 @@ public class Activator extends AbstractAFSUIPlugin implements ILocalizationProvi
 
 	// The shared instance
 	private static Activator plugin;
+<<<<<<< master
+=======
 
+	/**
+	 * The constructor
+	 */
+	public Activator() {
+	}
+>>>>>>> 38f2e60 Clean-up AFS Client
+
+<<<<<<< master
+=======
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
+	 */
+>>>>>>> 38f2e60 Clean-up AFS Client
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
 	}
 
+<<<<<<< master
+=======
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+	 */
+>>>>>>> 38f2e60 Clean-up AFS Client
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
@@ -71,10 +94,20 @@ public class Activator extends AbstractAFSUIPlugin implements ILocalizationProvi
 	}
 
 	@Override
+<<<<<<< master
 	protected void fillImageRegistry() {}
+=======
+	protected void fillImageRegistry() {
+
+	}
+>>>>>>> 38f2e60 Clean-up AFS Client
 
 	@Override
 	protected String getApplicationTitle() {
 		return TITLE;
 	}
+<<<<<<< master
+=======
+
+>>>>>>> 38f2e60 Clean-up AFS Client
 }

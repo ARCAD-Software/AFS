@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -17,17 +17,17 @@ import java.util.ResourceBundle;
 
 public class Resources {
 	public static final String PLUGIN_ID = "com.arcadsoftware.afs.client.core.base"; //$NON-NLS-1$
-	public static final String BUNDLE_ID = PLUGIN_ID+".resources"; //$NON-NLS-1$
-	
-	private ResourceBundle resourceBundle;
-	
+	public static final String BUNDLE_ID = PLUGIN_ID + ".resources"; //$NON-NLS-1$
+
+	private final ResourceBundle resourceBundle;
+
 	private static Resources resources = new Resources();
-	
+
 	private Resources() {
-		this.resourceBundle = ResourceBundle.getBundle(BUNDLE_ID);
+		resourceBundle = ResourceBundle.getBundle(BUNDLE_ID);
 	}
-	
-	public static String resString(final String key, Object...params) {
+
+	public static String resString(final String key, Object... params) {
 		return String.format(resources.resourceBundle.getString(key), params);
 	}
 }

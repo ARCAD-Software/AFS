@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -21,51 +21,52 @@ import com.arcadsoftware.afs.client.core.ui.views.AbstractConnectedView;
 import com.arcadsoftware.afs.framework.ui.views.AbstractAFSView;
 import com.arcadsoftware.beanmap.BeanMap;
 
-public abstract class ViewManagedContainerProvider extends AbstractConnectedContainerProvider 
-implements IOpenViewContainer{
+public abstract class ViewManagedContainerProvider extends AbstractConnectedContainerProvider
+		implements IOpenViewContainer {
 
 	AbstractConnectedContainer provider;
-	
+
 	public ViewManagedContainerProvider(AbstractConnectedContainer parent) {
 		super(parent);
-		this.provider = parent;
-		
+		provider = parent;
+
 	}
 
-	
-	public void OpenManagementView(){
-		String viewId = getManagementViewId();
-		
-		IViewPart view = Activator.getDefault().showView(viewId);
+	@Override
+	public void OpenManagementView() {
+		final String viewId = getManagementViewId();
+
+		final IViewPart view = Activator.getDefault().showView(viewId);
 		if (view instanceof AbstractConnectedView) {
-			AbstractConnectedView connectedView = (AbstractConnectedView)view;
-			connectedView.setConnection(this.getServerConnection());
-			//connectedView.activate();
-			doOnView(connectedView);		
+			final AbstractConnectedView connectedView = (AbstractConnectedView) view;
+			connectedView.setConnection(getServerConnection());
+			// connectedView.activate();
+			doOnView(connectedView);
 		}
 		if ((view instanceof IBeanMapSelectionListener) &&
-			(getParent() instanceof BeanMapItem)){	
-			IBeanMapSelectionListener listener = (IBeanMapSelectionListener)view;
-			BeanMap beanMap = ((BeanMapItem)getParent()).getBeanMap();			
-			listener.beanMapSelected(beanMap);			
+				(getParent() instanceof BeanMapItem)) {
+			final IBeanMapSelectionListener listener = (IBeanMapSelectionListener) view;
+			final BeanMap beanMap = ((BeanMapItem) getParent()).getBeanMap();
+			listener.beanMapSelected(beanMap);
 		}
-		
-		if(view instanceof AbstractAFSView) {
-			((AbstractAFSView)view).activate();
+
+		if (view instanceof AbstractAFSView) {
+			((AbstractAFSView) view).activate();
 		}
 	}
-	
+
 	protected void doOnView(AbstractConnectedView view) {
-		
+
 	}
-	
+
+	@Override
 	public boolean hasChildren() {
 		return false;
-	}	
-	
+	}
+
 	@Override
 	public Object[] getFixedChildren() {
 		return null;
 	}
-	
+
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -25,13 +25,13 @@ import com.arcadsoftware.editor.swt.ISWTRenderer;
 import com.arcadsoftware.metadata.MetaDataEntity;
 
 public class VirtualLabelSWTProvider implements IDecoratorSWTProvider {
-	
 
 	private String defaultText;
 	private Label label;
 
+	@Override
 	public Widget create(ISWTRenderer renderer, ILayoutParameters parameters, MetaDataEntity structure) {
-		String lbx = parameters.getParameter("label", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		final String lbx = parameters.getParameter("label", ""); //$NON-NLS-1$ //$NON-NLS-2$
 		// Base label
 		if (lbx.length() > 0) {
 			renderer.getToolkit().createLabel(renderer.getParent(), renderer.getLocalizedMessage(lbx));
@@ -44,27 +44,21 @@ public class VirtualLabelSWTProvider implements IDecoratorSWTProvider {
 			label.setLayoutData(new GridData(GridData.BEGINNING, GridData.BEGINNING, false, false,
 					((GridLayout) renderer.getParent().getLayout()).numColumns, 1));
 		}
-		String virtualKey = parameters.getParameter("virtual", ""); //$NON-NLS-1$ //$NON-NLS-2$
-		Object objectValue =  renderer.getVirtualValue(virtualKey);
-		String value ="";
+		final String virtualKey = parameters.getParameter("virtual", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		final Object objectValue = renderer.getVirtualValue(virtualKey);
+		String value = "";
 		if (objectValue instanceof String) {
-			if (objectValue!=null) {
+			if (objectValue != null) {
 				value = (String) objectValue;
 			}
 		}
-		label.setText(value);		
+		label.setText(value);
 		return label;
 	}
 
-
-
+	@Override
 	public void dispose() {
 
 	}
-
-
-
-
-
 
 }

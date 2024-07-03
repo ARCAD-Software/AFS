@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -36,37 +36,37 @@ import com.arcadsoftware.metadata.MetaDataEntity;
 
 public class BeanMapListTreeViewer extends AbstractColumnedTreeViewer {
 
-	private Hashtable<Integer, String> positionToAttribute = new Hashtable<Integer, String>();
+	private final Hashtable<Integer, String> positionToAttribute = new Hashtable<>();
 	private final SimpleDateFormat defaultFormatter = new SimpleDateFormat("MM/dd/yyyy"); //$NON-NLS-1$
 	private MetaDataEntity entity;
 	private String attributeList;
 	private List<Action> actions;
-	
-	public BeanMapListTreeViewer(Composite parent, int style, MetaDataEntity entity, 
+
+	public BeanMapListTreeViewer(Composite parent, int style, MetaDataEntity entity,
 			String attributeList) {
-		super(parent, style,false);
-		this.attributeList = attributeList;	
+		super(parent, style, false);
+		this.attributeList = attributeList;
 		this.entity = entity;
 		init();
 	}
 
 	public BeanMapListTreeViewer(Composite parent, int style) {
-		super(parent, style,false);
+		super(parent, style, false);
 	}
 
 	public void initialize(MetaDataEntity entity, String attributeList) {
-		this.attributeList = attributeList;	
+		this.attributeList = attributeList;
 		this.entity = entity;
 		init();
-		
+
 	}
-	
+
 	@Override
 	public AbstractColumnedTreeLabelProvider createTreeLabelProvider(AbstractColumnedViewer viewer) {
 		return new ColumnedDefaultTreeLabelProvider(viewer) {
 			@Override
 			protected Image getActualImage(Object element, int actualColumnIndex) {
-				Image image = getCustomColumnImage(element, actualColumnIndex);
+				final Image image = getCustomColumnImage(element, actualColumnIndex);
 				if (image == null) {
 					return super.getActualImage(element, actualColumnIndex);
 				}
@@ -77,64 +77,64 @@ public class BeanMapListTreeViewer extends AbstractColumnedTreeViewer {
 
 	protected Image getCustomColumnImage(Object element, int actualColumnIndex) {
 		return null;
-	}	
-	
+	}
+
 	protected String getColumnHeader(String attribute) {
-		MetaDataAttribute metaAttribute =  entity.getAttribute(attribute);
+		final MetaDataAttribute metaAttribute = entity.getAttribute(attribute);
 		if ((metaAttribute != null) && (metaAttribute.getName() != null)) {
 			return metaAttribute.getName();
 		}
 		return ""; //$NON-NLS-1$
 	}
-	
+
 	protected int getColumnSize(String attribute) {
-		MetaDataAttribute metaAttribute =  entity.getAttribute(attribute);
-		if ( metaAttribute != null ) {
+		final MetaDataAttribute metaAttribute = entity.getAttribute(attribute);
+		if (metaAttribute != null) {
 			return metaAttribute.getColSize();
 		}
-		return 100;		
-	}	
+		return 100;
+	}
 
 	@Override
 	public ArcadColumns getReferenceColumns() {
-		ArcadColumns refColumns = new ArcadColumns();
-		String[] values = attributeList.split(" "); //$NON-NLS-1$
+		final ArcadColumns refColumns = new ArcadColumns();
+		final String[] values = attributeList.split(" "); //$NON-NLS-1$
 		for (int i = 0; i < values.length; i++) {
-			ArcadColumn col = new ArcadColumn();
-			String value = values[i];						
+			final ArcadColumn col = new ArcadColumn();
+			final String value = values[i];
 			col.setIdentifier(value);
-			String header = getColumnHeader(value);
+			final String header = getColumnHeader(value);
 			col.setName(header);
 			col.setUserName(header);
 			col.setVisible(ArcadColumn.VISIBLE);
 			col.setPosition(i);
 			col.setActualIndex(i);
-			col.setWidth(getColumnSize(value));			
-			positionToAttribute.put(i, value);			
-			refColumns.add(col);			
-		}		
+			col.setWidth(getColumnSize(value));
+			positionToAttribute.put(i, value);
+			refColumns.add(col);
+		}
 		return refColumns;
 	}
 
 	@Override
 	public Object getTypedValue(Object element, int columnIndex) {
-		Object value = ((BeanMap) element).get(positionToAttribute.get(columnIndex));
+		final Object value = ((BeanMap) element).get(positionToAttribute.get(columnIndex));
 		if (value != null) {
 			return value;
 		}
 		return getValue(element, columnIndex);
-	}	
-	
+	}
+
 	public SimpleDateFormat getDateFormatter() {
 		return defaultFormatter;
 	}
-	
+
 	@Override
 	public String getValue(Object element, int columnIndex) {
 		if (element != null) {
-			String attributeName = positionToAttribute.get(columnIndex);
-			BeanMap beanMap = ((BeanMap) element);
-			Object o = beanMap.get(attributeName);
+			final String attributeName = positionToAttribute.get(columnIndex);
+			final BeanMap beanMap = ((BeanMap) element);
+			final Object o = beanMap.get(attributeName);
 			if (o instanceof Date) {
 				SimpleDateFormat sd = getDateFormatter();
 				if (sd == null) {
@@ -146,16 +146,16 @@ public class BeanMapListTreeViewer extends AbstractColumnedTreeViewer {
 		}
 		return null;
 	}
-	
+
 	public String attributeFromPosition(int columnIndex) {
 		return positionToAttribute.get(columnIndex);
 	}
-	
+
 	@Override
 	protected List<Action> getNextActions() {
-		List<Action> result = new ArrayList<Action>();
+		final List<Action> result = new ArrayList<>();
 		if (actions != null) {
-			for (Action action: actions) {
+			for (final Action action : actions) {
 				if (action != null) {
 					if (adaptActionToSelection(action)) {
 						result.add(action);
@@ -168,10 +168,10 @@ public class BeanMapListTreeViewer extends AbstractColumnedTreeViewer {
 		return result;
 	}
 
-	protected boolean adaptActionToSelection(Action action){
+	protected boolean adaptActionToSelection(Action action) {
 		return true;
 	}
-	
+
 	/**
 	 * @param actions
 	 *            the actions to set
@@ -179,21 +179,22 @@ public class BeanMapListTreeViewer extends AbstractColumnedTreeViewer {
 	public void setActions(List<Action> actions) {
 		this.actions = actions;
 	}
-	
+
 	/**
 	 * Get set actions
 	 */
 	public List<Action> getActions() {
 		return actions;
 	}
-	
+
 	/**
-	 *  Get Attribute Name from Column Index
+	 * Get Attribute Name from Column Index
+	 *
 	 * @param columnIndex
 	 * @return
 	 */
-	public String positionToAttribute(int columnIndex){
+	public String positionToAttribute(int columnIndex) {
 		return positionToAttribute.get(columnIndex);
 	}
-	
+
 }

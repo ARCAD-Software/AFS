@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -22,49 +22,58 @@ import com.arcadsoftware.aev.core.ui.container.Container;
 public class ContainerEntry extends Container implements IDoubleClickContainer {
 
 	private final ContainerReference reference;
-	private final ArrayList<ContainerReference> childs = new ArrayList<ContainerReference>();
-	
+	private final ArrayList<ContainerReference> childs = new ArrayList<>();
+
 	public ContainerEntry(Container parent, ContainerReference ref) {
 		super(parent);
-		reference = ref; 
+		reference = ref;
 		ContainerExtensionManager.getInstance().createChildExtensions(childs, ref.getId());
 	}
 
-	public  ArrayList<ContainerReference> getChilds() {
+	public ArrayList<ContainerReference> getChilds() {
 		return childs;
 	}
-	
-	public void doOnDoubleClick() {}
 
+	@Override
+	public void doOnDoubleClick() {
+	}
+
+	@Override
 	public Object[] getChildren() {
 		if (childs.size() > 0) {
-			ContainerEntry[] result = new ContainerEntry[childs.size()];
-			for(int i = 0; i < childs.size(); i++) {
-				result[i] = new ContainerEntry(this, childs.get(i));				
+			final ContainerEntry[] result = new ContainerEntry[childs.size()];
+			for (int i = 0; i < childs.size(); i++) {
+				result[i] = new ContainerEntry(this, childs.get(i));
 			}
 			return result;
 		}
 		return new Object[0];
 	}
 
+	@Override
 	public Image getImage() {
 		return reference.getImage();
 	}
 
+	@Override
 	public String getLabel() {
 		return reference.getLabel();
 	}
 
+	@Override
 	public String getUniqueKey() {
 		return getParent().getUniqueKey().concat(reference.getUniqueKey());
 	}
 
+	@Override
 	public boolean hasChildren() {
 		return childs.size() > 0;
 	}
 
-	public void refresh() {}
-	
+	@Override
+	public void refresh() {
+	}
+
 	@Override
 	public int getIdentifier() {
 		return reference.getIdentifier();

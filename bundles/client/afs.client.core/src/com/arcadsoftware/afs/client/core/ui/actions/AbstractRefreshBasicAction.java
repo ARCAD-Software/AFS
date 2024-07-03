@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -19,12 +19,13 @@ import com.arcadsoftware.afs.client.core.internal.Activator;
 import com.arcadsoftware.afs.client.core.ui.views.AbstractConnectedView;
 
 public abstract class AbstractRefreshBasicAction extends ArcadAction {
-	
-	public AbstractRefreshBasicAction(){
+
+	public AbstractRefreshBasicAction() {
 		super();
-		
+
 	}
-	public AbstractRefreshBasicAction(String id){
+
+	public AbstractRefreshBasicAction(String id) {
 		super();
 		setId(id);
 	}
@@ -35,6 +36,7 @@ public abstract class AbstractRefreshBasicAction extends ArcadAction {
 		setToolTipText(Activator.resString("common.action.refresh.tooltip")); //$NON-NLS-1$
 		setImageDescriptor(AFSIcon.REFRESH.imageDescriptor());
 	}
+
 	public abstract AbstractConnectedView getView();
-		
+
 }

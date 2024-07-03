@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -17,7 +17,7 @@ import com.arcadsoftware.aev.core.ui.actions.ArcadActions;
 import com.arcadsoftware.aev.core.ui.container.Container;
 
 public abstract class ContainerEntryActions extends ArcadActions {
-	
+
 	public ContainerEntryActions() {
 		this(null, true);
 	}
@@ -25,12 +25,12 @@ public abstract class ContainerEntryActions extends ArcadActions {
 	public ContainerEntryActions(boolean initAction) {
 		this(null, initAction);
 	}
-	
+
 	public ContainerEntryActions(Container container, boolean initAction) {
 		super(container);
 		if (initAction) {
 			makeAction();
 		}
 	}
-	
+
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -30,45 +30,49 @@ public class ServerContainer extends Container {
 
 	protected Servers serverList;
 	private final boolean autoExpandOnConnection;
-	
+
 	public ServerContainer(Container parent, boolean autoExpandOnConnection) {
 		super(parent);
 		this.autoExpandOnConnection = autoExpandOnConnection;
-		this.actions = new ServerContainerActions(this);
+		actions = new ServerContainerActions(this);
 		serverList = ServerLoader.getInstance().load();
 	}
 
-	public void addServer(Server server){
+	public void addServer(Server server) {
 		serverList.add(server);
 	}
-	public void deleteServer(Server server){
+
+	public void deleteServer(Server server) {
 		serverList.remove(server);
 		refresh();
-	}	
-	
+	}
+
+	@Override
 	public String getLabel() {
 		return Activator.resString("navigationView.node.connections"); //$NON-NLS-1$
 	}
 
+	@Override
 	public Image getImage() {
 		return AFSIcon.SERVERS.image();
 	}
 
-	
+	@Override
 	public Object[] getChildren() {
-		ArrayList<ServerItem> list = new ArrayList<>();
-		for (int i=0;i<serverList.size();i++) {
+		final ArrayList<ServerItem> list = new ArrayList<>();
+		for (int i = 0; i < serverList.size(); i++) {
 			list.add(createServerItem(serverList.get(i)));
 		}
-		return list.toArray();	
+		return list.toArray();
 	}
-	
+
 	/**
 	 * Create server Item. Can be redefined by overriding
+	 *
 	 * @param server
 	 * @return
 	 */
-	protected ServerItem createServerItem(Server server){
+	protected ServerItem createServerItem(Server server) {
 		return new ServerItem(this, server, autoExpandOnConnection) {
 			@Override
 			public Image getImage() {
@@ -80,15 +84,18 @@ public class ServerContainer extends Container {
 	protected Image getServerItemImage() {
 		return AFSIcon.SERVER.image();
 	}
-	
+
+	@Override
 	public boolean hasChildren() {
 		return !serverList.isEmpty();
 	}
 
+	@Override
 	public String getUniqueKey() {
 		return getParent().getUniqueKey().concat("/SRVMAN"); //$NON-NLS-1$
 	}
 
+	@Override
 	public void refresh() {
 		serverList = ServerLoader.getInstance().load();
 	}

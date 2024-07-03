@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -35,11 +35,12 @@ import com.arcadsoftware.metadata.MetaDataEntity;
 
 public class PatternProvider implements IInputSWTProvider {
 
+	@Override
 	public void create(ISWTRenderer renderer, ILayoutParameters parameters, Element element, MetaDataEntity entity) {
 		if (!(element instanceof MetaDataAttribute)) {
 			return;
 		}
-		String label = renderer.getLocalizedMessage(parameters.getParameter(IConstants.LABEL, element.getName()));
+		final String label = renderer.getLocalizedMessage(parameters.getParameter(IConstants.LABEL, element.getName()));
 		if ((label != null) && (label.length() > 0)) {
 			renderer.getToolkit().createLabel(renderer.getParent(), label);
 			renderer.getToolkit().createLabel(renderer.getParent(), IConstants.TWO_POINTS);
@@ -47,29 +48,30 @@ public class PatternProvider implements IInputSWTProvider {
 
 		final Text text = renderer.getToolkit().createText(renderer.getParent(), "", SWT.BORDER); //$NON-NLS-1$
 		if (renderer.getParent().getLayout() instanceof GridLayout) {
-			GridData layoutData = new GridData();
+			final GridData layoutData = new GridData();
 			if (parameters.getParameterBoolean(IConstants.FILL_HORIZONTAL)) {
 				layoutData.horizontalAlignment = GridData.FILL;
 			}
 			if (label.length() == 0) {
 				layoutData.horizontalSpan = 3;
 			}
-			//<FM number="2010/564" version="09.03.02" date=Dec 7, 2010 user=md>
-			//Traitement du tag height
-			int height = parameters.getParameterInteger(IConstants.HEIGHT,-1);
+			// <FM number="2010/564" version="09.03.02" date=Dec 7, 2010 user=md>
+			// Traitement du tag height
+			final int height = parameters.getParameterInteger(IConstants.HEIGHT, -1);
 			if (height > -1) {
 				layoutData.heightHint = height;
 			}
-			//</FM>				
+			// </FM>
 			text.setLayoutData(layoutData);
 		}
-		//TODO RAP
-		//renderer.getToolkit().paintBordersFor(renderer.getParent());		
+		// TODO RAP
+		// renderer.getToolkit().paintBordersFor(renderer.getParent());
 		if (element.isReadonly()) {
 			text.setEditable(false);
 		}
-		//if (element.isStringType() && (((MetaDataAttribute) element).getLength() > 0)) {
-		if (MetaDataAttribute.TYPE_STRING.equals(element.getType()) && (((MetaDataAttribute) element).getLength() > 0)) {
+		// if (element.isStringType() && (((MetaDataAttribute) element).getLength() > 0)) {
+		if (MetaDataAttribute.TYPE_STRING.equals(element.getType())
+				&& (((MetaDataAttribute) element).getLength() > 0)) {
 			text.setTextLimit(((MetaDataAttribute) element).getLength());
 		}
 		if (parameters.getParameterBoolean(IConstants.DEFAULT)) {
@@ -78,16 +80,19 @@ public class PatternProvider implements IInputSWTProvider {
 		if (parameters.getParameterBoolean(IConstants.MANDATORY)) {
 			renderer.addMandatoryAttribute(element.getCode());
 		}
-		String p = parameters.getParameter("pattern"); //$NON-NLS-1$
+		final String p = parameters.getParameter("pattern"); //$NON-NLS-1$
 		if ((p != null) && (p.trim().length() > 0)) {
 			final IMessageManager messages = renderer.getMessageManager();
 			final Pattern pattern = Pattern.compile(p);
 			final String messagekey = "pattern.warn." + element.getCode(); //$NON-NLS-1$
-			final String message = renderer.getLocalizedMessage(parameters.getParameter("message", String.format(Messages.patternMessage, element.getName()))); //$NON-NLS-1$
+			final String message = renderer.getLocalizedMessage(
+					parameters.getParameter("message", String.format(Messages.patternMessage, element.getName()))); //$NON-NLS-1$
 			text.addModifyListener(new ModifyListener() {
+				@Override
 				public void modifyText(ModifyEvent e) {
 					if (!text.isDisposed()) {
-						if ((text.getText() == null) || (text.getText().length() == 0) || pattern.matcher(text.getText()).matches()) {
+						if ((text.getText() == null) || (text.getText().length() == 0)
+								|| pattern.matcher(text.getText()).matches()) {
 							messages.removeMessage(messagekey, text);
 						} else {
 							messages.addMessage(messagekey, message, null, IMessageProvider.WARNING, text);
@@ -99,6 +104,8 @@ public class PatternProvider implements IInputSWTProvider {
 		renderer.getRendererBinding().bindElement(element, text);
 	}
 
-	public void dispose() {}
+	@Override
+	public void dispose() {
+	}
 
 }

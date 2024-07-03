@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -44,22 +44,20 @@ import com.arcadsoftware.aev.core.ui.viewers.columned.AbstractColumnedTreeViewer
 import com.arcadsoftware.aev.core.ui.viewers.columned.AbstractColumnedViewer;
 
 public class ContainerTreeViewer extends AbstractColumnedTreeViewer {
-	
+
 	IContainer dropSource;
 	Action doubleClickAction = null;
-	
 
 	public ContainerTreeViewer(Composite parent, int style, boolean withInit) {
 		super(parent, style, withInit);
 		getViewer().addSelectionChangedListener(new ContainerTreeSelectionChangedListener());
 		initializeDragAndDropManagement();
-		//hookDoubleClickAction();
+		// hookDoubleClickAction();
 	}
 
 	public ContainerTreeViewer(Composite parent, int style) {
-		this(parent, style,true);
+		this(parent, style, true);
 	}
-
 
 	@Override
 	protected void setOptions() {
@@ -84,15 +82,16 @@ public class ContainerTreeViewer extends AbstractColumnedTreeViewer {
 
 	@Override
 	public ArcadColumns getReferenceColumns() {
-		ArcadColumns cols = new ArcadColumns();
+		final ArcadColumns cols = new ArcadColumns();
 		cols.add(new ArcadColumn("container", "", "", ArcadColumn.VISIBLE, 0, 800)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return cols;
 	}
 
 	@Override
 	public String getValue(Object element, int columnIndex) {
-		if (element instanceof IContainer)
+		if (element instanceof IContainer) {
 			return ((IContainer) element).getLabel();
+		}
 		return ""; //$NON-NLS-1$
 	}
 
@@ -103,28 +102,31 @@ public class ContainerTreeViewer extends AbstractColumnedTreeViewer {
 
 	private IContainer getContainerFromKey(String key, TreeItem node) {
 		IContainer container = null;
-		Object o = node.getData();
-		if ((o instanceof IContainer) && (((IContainer) o).getUniqueKey().equals(key)))
+		final Object o = node.getData();
+		if ((o instanceof IContainer) && (((IContainer) o).getUniqueKey().equals(key))) {
 			return (IContainer) o;
-		TreeItem[] nodes = node.getItems();
-		for (int i = 0; i < nodes.length; i++) {
-			if (nodes[i].getData() instanceof IContainer) {
-				IContainer c = (IContainer) nodes[i].getData();
-				if (c.getUniqueKey().equals(key))
+		}
+		final TreeItem[] nodes = node.getItems();
+		for (final TreeItem node2 : nodes) {
+			if (node2.getData() instanceof IContainer) {
+				final IContainer c = (IContainer) node2.getData();
+				if (c.getUniqueKey().equals(key)) {
 					return c;
-				container = getContainerFromKey(key, nodes[i]);
-				if (container != null)
+				}
+				container = getContainerFromKey(key, node2);
+				if (container != null) {
 					return container;
+				}
 			}
 		}
 		return container;
 	}
 
 	IContainer getContainerFromKey(String key) {
-		Tree tree = this.getTree();
-		TreeItem[] rootnodes = tree.getItems();
-		for (int i = 0; i < rootnodes.length; i++) {
-			IContainer c = getContainerFromKey(key, rootnodes[i]);
+		final Tree tree = getTree();
+		final TreeItem[] rootnodes = tree.getItems();
+		for (final TreeItem rootnode : rootnodes) {
+			final IContainer c = getContainerFromKey(key, rootnode);
 			if (c != null) {
 				return c;
 			}
@@ -132,14 +134,9 @@ public class ContainerTreeViewer extends AbstractColumnedTreeViewer {
 		return null;
 	}
 
-
 	/*
-	 * 
-	 * @author ARCAD Software
-	 * 
-	 * Pour changer le modèle de ce commentaire de type généré, allez à :
-	 * Fenêtre&gt;Préférences&gt;Java&gt;Génération de code&gt;Code et
-	 * commentaires
+	 * @author ARCAD Software Pour changer le modèle de ce commentaire de type généré, allez à :
+	 * Fenêtre&gt;Préférences&gt;Java&gt;Génération de code&gt;Code et commentaires
 	 */
 	private class ContainerTreeDragSourceListener implements DragSourceListener {
 		/**
@@ -149,23 +146,28 @@ public class ContainerTreeViewer extends AbstractColumnedTreeViewer {
 			// Do nothing
 		}
 
+		@Override
 		public void dragStart(DragSourceEvent event) {
-			IContainer c = getSelectedElement();
+			final IContainer c = getSelectedElement();
 			dropSource = c;
-			if (c != null)
+			if (c != null) {
 				event.doit = c.isDragable();
-			else
+			} else {
 				event.doit = false;
+			}
 		}
 
+		@Override
 		public void dragSetData(DragSourceEvent event) {
-			IContainer c = getSelectedElement();
-			if (c != null)
+			final IContainer c = getSelectedElement();
+			if (c != null) {
 				event.data = c.getUniqueKey();
-			else
+			} else {
 				event.data = null;
+			}
 		}
 
+		@Override
 		public void dragFinished(DragSourceEvent event) {
 			// Do nothing
 		}
@@ -179,7 +181,7 @@ public class ContainerTreeViewer extends AbstractColumnedTreeViewer {
 		@Override
 		public boolean performDrop(Object data) {
 			if (getCurrentTarget() instanceof IContainer) {
-				IContainer c = getContainerFromKey(((IContainer) getCurrentTarget()).getUniqueKey());
+				final IContainer c = getContainerFromKey(((IContainer) getCurrentTarget()).getUniqueKey());
 				if (c != null) {
 					if (dropSource != null) {
 						return c.performDrop(dropSource);
@@ -206,8 +208,9 @@ public class ContainerTreeViewer extends AbstractColumnedTreeViewer {
 		public boolean validateDrop(Object target, int operation, TransferData transferType) {
 			// ComponentDropped = false;
 			if (target != null) {
-				if (dropSource != null)
+				if (dropSource != null) {
 					return ((IContainer) target).valideDrop(dropSource);
+				}
 				// ComponentDropped =
 				// ComponentWithKeyTransfer.getInstance().isSupportedType(transferType);
 				return ((IContainer) target).valideDrop(transferType);
@@ -222,11 +225,13 @@ public class ContainerTreeViewer extends AbstractColumnedTreeViewer {
 	}
 
 	protected class ContainerTreeSelectionChangedListener implements ISelectionChangedListener {
+		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
-			if (event.getSelection().isEmpty())
+			if (event.getSelection().isEmpty()) {
 				return;
+			}
 			if (event.getSelection() instanceof IStructuredSelection) {
-				IStructuredSelection sel = (IStructuredSelection) event.getSelection();
+				final IStructuredSelection sel = (IStructuredSelection) event.getSelection();
 				doOnSelect(sel.getFirstElement());
 			}
 		}
@@ -234,64 +239,66 @@ public class ContainerTreeViewer extends AbstractColumnedTreeViewer {
 
 	protected void initializeDragAndDropManagement() {
 		if (getViewer() != null) {
-			int ops = DND.DROP_COPY | DND.DROP_MOVE;
-			Transfer[] transfers = new Transfer[] { TextTransfer.getInstance() };
+			final int ops = DND.DROP_COPY | DND.DROP_MOVE;
+			final Transfer[] transfers = new Transfer[] { TextTransfer.getInstance() };
 			getViewer().addDragSupport(ops, transfers, new ContainerTreeDragSourceListener(getViewer()));
-			int ops2 = DND.DROP_COPY | DND.DROP_MOVE;
-			Transfer[] transfers2 = new Transfer[] { TextTransfer.getInstance() };
+			final int ops2 = DND.DROP_COPY | DND.DROP_MOVE;
+			final Transfer[] transfers2 = new Transfer[] { TextTransfer.getInstance() };
 			getViewer().addDropSupport(ops2, transfers2, new ContainerTreeDropTargetListener(getViewer()));
 		}
 	}
 
 	public IContainer getSelectedElement() {
-		IStructuredSelection selection = this.getSelection();
-		Object o = selection.getFirstElement();
-		if (o instanceof IContainer)
+		final IStructuredSelection selection = getSelection();
+		final Object o = selection.getFirstElement();
+		if (o instanceof IContainer) {
 			return (IContainer) selection.getFirstElement();
+		}
 		return null;
 	}
 
-//	private void hookDoubleClickAction() {
-//		doubleClickAction = new Action() {
-//			@Override
-//			public void run() {
-//				if (!getSelection().isEmpty()) {
-//					IStructuredSelection selection = getSelection();
-//					doOnDoubleClick(selection);
-//				}
-//			}
-//		};
-//		getViewer().addDoubleClickListener(new IDoubleClickListener() {
-//			public void doubleClick(DoubleClickEvent event) {
-//				doubleClickAction.run();
-//			}
-//		});
-//	}
+	// private void hookDoubleClickAction() {
+	// doubleClickAction = new Action() {
+	// @Override
+	// public void run() {
+	// if (!getSelection().isEmpty()) {
+	// IStructuredSelection selection = getSelection();
+	// doOnDoubleClick(selection);
+	// }
+	// }
+	// };
+	// getViewer().addDoubleClickListener(new IDoubleClickListener() {
+	// public void doubleClick(DoubleClickEvent event) {
+	// doubleClickAction.run();
+	// }
+	// });
+	// }
 
 	public void refresh(Object element) {
-		if (element != null && element instanceof Container)
+		if ((element != null) && (element instanceof Container)) {
 			((Container) element).refresh();
+		}
 		getViewer().refresh(element);
 	}
 
 	public void expandFromKey(String key) {
 		TreeItem node = null;
-		StringTokenizer st = new StringTokenizer(key, "/", false); //$NON-NLS-1$
+		final StringTokenizer st = new StringTokenizer(key, "/", false); //$NON-NLS-1$
 		String s = ""; //$NON-NLS-1$
 		while (st.hasMoreElements()) {
 			s = s.concat("/").concat(st.nextToken()); //$NON-NLS-1$
 			node = expandFromAbsoluteKey(s);
 		}
-		if (node != null)
-			this.getTree().setSelection(new TreeItem[] { node });
+		if (node != null) {
+			getTree().setSelection(new TreeItem[] { node });
+		}
 	}
 
-
 	public TreeItem getNodeFromAbsoluteKey(String key) {
-		Tree tree = this.getTree();
-		TreeItem[] rootnodes = tree.getItems();
-		for (int i = 0; i < rootnodes.length; i++) {
-			TreeItem node = getNodeFromKey(key, rootnodes[i]);
+		final Tree tree = getTree();
+		final TreeItem[] rootnodes = tree.getItems();
+		for (final TreeItem rootnode : rootnodes) {
+			final TreeItem node = getNodeFromKey(key, rootnode);
 			if (node != null) {
 				return node;
 			}
@@ -300,10 +307,10 @@ public class ContainerTreeViewer extends AbstractColumnedTreeViewer {
 	}
 
 	private TreeItem expandFromAbsoluteKey(String key) {
-		Tree tree = this.getTree();
-		TreeItem[] rootnodes = tree.getItems();
-		for (int i = 0; i < rootnodes.length; i++) {
-			TreeItem node = getNodeFromKey(key, rootnodes[i]);
+		final Tree tree = getTree();
+		final TreeItem[] rootnodes = tree.getItems();
+		for (final TreeItem rootnode : rootnodes) {
+			final TreeItem node = getNodeFromKey(key, rootnode);
 			if (node != null) {
 				node.setExpanded(true);
 				getTreeViewer().expandToLevel(node.getData(), 1);
@@ -315,18 +322,21 @@ public class ContainerTreeViewer extends AbstractColumnedTreeViewer {
 
 	private TreeItem getNodeFromKey(String key, TreeItem node) {
 		TreeItem resultNode = null;
-		Object o = node.getData();
-		if ((o instanceof IContainer) && (((IContainer) o).getUniqueKey().equals(key)))
+		final Object o = node.getData();
+		if ((o instanceof IContainer) && (((IContainer) o).getUniqueKey().equals(key))) {
 			return node;
-		TreeItem[] nodes = node.getItems();
-		for (int i = 0; i < nodes.length; i++) {
-			if (nodes[i].getData() instanceof IContainer) {
-				IContainer c = (IContainer) nodes[i].getData();
-				if (c.getUniqueKey().equals(key))
-					return nodes[i];
-				resultNode = getNodeFromKey(key, nodes[i]);
-				if (resultNode != null)
+		}
+		final TreeItem[] nodes = node.getItems();
+		for (final TreeItem node2 : nodes) {
+			if (node2.getData() instanceof IContainer) {
+				final IContainer c = (IContainer) node2.getData();
+				if (c.getUniqueKey().equals(key)) {
+					return node2;
+				}
+				resultNode = getNodeFromKey(key, node2);
+				if (resultNode != null) {
 					return resultNode;
+				}
 			}
 		}
 		return resultNode;

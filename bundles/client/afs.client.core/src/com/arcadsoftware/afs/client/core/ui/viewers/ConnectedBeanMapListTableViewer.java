@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -23,9 +23,9 @@ import com.arcadsoftware.metadata.MetaDataAttribute;
 import com.arcadsoftware.metadata.MetaDataEntity;
 
 public class ConnectedBeanMapListTableViewer extends BeanMapListTableViewer {
-	private ServerConnection connection;
-	private DataAccessHelper helper;
-	
+	private final ServerConnection connection;
+	private final DataAccessHelper helper;
+
 	public ConnectedBeanMapListTableViewer(ServerConnection connection, Composite parent, int style,
 			MetaDataEntity entity, String attributeList) {
 		super(parent, style);
@@ -34,33 +34,31 @@ public class ConnectedBeanMapListTableViewer extends BeanMapListTableViewer {
 		initialize(entity, attributeList);
 	}
 
-	
-	
 	@Override
 	protected int getColumnSize(String attribute) {
-		MetaDataAttribute metaDataAttribute =  
-				MetadataUtils.getInstance().resolveMetaDataAttribute(helper,entity,attribute);
-		if (metaDataAttribute!=null) {
-			return metaDataAttribute.getColSize();			
-		} else {		
+		final MetaDataAttribute metaDataAttribute = MetadataUtils.getInstance().resolveMetaDataAttribute(helper, entity,
+				attribute);
+		if (metaDataAttribute != null) {
+			return metaDataAttribute.getColSize();
+		} else {
 			return super.getColumnSize(attribute);
 		}
 	}
-	
+
 	@Override
 	protected String getColumnHeader(String attribute) {
-		MetaDataAttribute metaDataAttribute =  
-				MetadataUtils.getInstance().resolveMetaDataAttribute(helper,entity,attribute);
-		if (metaDataAttribute!=null) {
-			return metaDataAttribute.getName();			
-		} else {		
+		final MetaDataAttribute metaDataAttribute = MetadataUtils.getInstance().resolveMetaDataAttribute(helper, entity,
+				attribute);
+		if (metaDataAttribute != null) {
+			return metaDataAttribute.getName();
+		} else {
 			return super.getColumnHeader(attribute);
 		}
-		
+
 	}
-	
+
 	public ServerConnection getConnection() {
 		return connection;
 	}
-	
+
 }

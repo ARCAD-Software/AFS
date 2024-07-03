@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -34,11 +34,11 @@ import com.arcadsoftware.afs.framework.ui.containers.ContainerReference;
 import com.arcadsoftware.afs.framework.ui.containers.viewer.ContainerTreeViewer;
 
 public abstract class AbstractNavigatorView extends AbstractAFSView {
-	
+
 	protected ContainerTreeViewer viewer;
 	protected RootContainerInput sc;
 	private List<ContainerReference> containerList;
-	
+
 	public AbstractNavigatorView() {
 		super();
 		defineActions();
@@ -50,18 +50,20 @@ public abstract class AbstractNavigatorView extends AbstractAFSView {
 			protected void doOnDoubleClick(IStructuredSelection selection) {
 				AbstractNavigatorView.this.doOnDoubleClick(selection);
 			}
+
 			@Override
 			protected void doOnSelect(Object selected) {
 				AbstractNavigatorView.this.doOnSelection();
 			}
+
 			@Override
 			protected void fillContextMenu(IMenuManager newManager) {
 				defineLocalContextMenu(newManager);
 			}
-			
+
 		};
-	}	
-	
+	}
+
 	@Override
 	protected void defineLocalContextMenu(IMenuManager manager) {
 		final IContainer c = viewer.getSelectedElement();
@@ -75,8 +77,8 @@ public abstract class AbstractNavigatorView extends AbstractAFSView {
 			}
 		}
 		manager.add(new Separator("Additions")); //$NON-NLS-1$
-	}	
-	
+	}
+
 	@Override
 	public void createPartControl(Composite parent) {
 		readContainers();
@@ -86,11 +88,11 @@ public abstract class AbstractNavigatorView extends AbstractAFSView {
 		viewer.setInput(sc);
 		viewerCreated(viewer);
 	}
-	
+
 	protected void viewerCreated(ContainerTreeViewer viewer) {
-		//Do nothing
+		// Do nothing
 	}
-	
+
 	private void readContainers() {
 		containerList = new ArrayList<>();
 		ContainerExtensionManager.getInstance().createExtensions(containerList);
@@ -98,22 +100,25 @@ public abstract class AbstractNavigatorView extends AbstractAFSView {
 			containerList.get(i).setIdentifier(i);
 		}
 	}
-	
+
 	protected RootContainerInput defineInput() {
 		return new AFSRootContainerInput(viewer.getViewer()) {
 
+			@Override
 			public String getLabel() {
 				return getRootName();
 			}
 
+			@Override
 			public Image getImage() {
 				return getRootImage();
 			}
 
+			@Override
 			public Object[] getChildren() {
 				return getRootChildren(this);
 			}
-			
+
 			@Override
 			public ArcadActions getRootContainerActions() {
 				return getRootActions();
@@ -125,26 +130,26 @@ public abstract class AbstractNavigatorView extends AbstractAFSView {
 			}
 		};
 	}
-	
+
 	protected void doOnDoubleClick(IStructuredSelection selection) {
-		Object o = selection.getFirstElement();
+		final Object o = selection.getFirstElement();
 		if (o instanceof IContainer) {
 			doubleClickOnContainer((IContainer) o);
 		}
 	}
-	
+
 	protected void doOnSelection() {
-		IStructuredSelection sel = viewer.getSelection();
-		Object o = sel.getFirstElement();
+		final IStructuredSelection sel = viewer.getSelection();
+		final Object o = sel.getFirstElement();
 		if (o instanceof IContainer) {
 			containerSelected((IContainer) o);
 		}
-	}	
-	
-	private ContainerEntry createContainer(Container parent,ContainerReference reference){
-		ContainerEntry container = new ContainerEntry(parent,reference);
-		for (ContainerReference r: container.getChilds()) {
-			for (ContainerReference ref : containerList) {
+	}
+
+	private ContainerEntry createContainer(Container parent, ContainerReference reference) {
+		final ContainerEntry container = new ContainerEntry(parent, reference);
+		for (final ContainerReference r : container.getChilds()) {
+			for (final ContainerReference ref : containerList) {
 				if (r.getId().equalsIgnoreCase(ref.getId())) {
 					// We affect the identifier computed into the getContainerList() method()
 					// This identifier is a integer that nedd to be passed to the viewer
@@ -153,9 +158,9 @@ public abstract class AbstractNavigatorView extends AbstractAFSView {
 				}
 			}
 		}
-		return container;		
-	}		
-		
+		return container;
+	}
+
 	public List<ContainerReference> getContainerList() {
 		return containerList;
 	}
@@ -163,37 +168,41 @@ public abstract class AbstractNavigatorView extends AbstractAFSView {
 	public String getRootName() {
 		return ""; //$NON-NLS-1$
 	}
-	
+
 	public Image getRootImage() {
 		return null;
 	}
-	
+
 	public ArcadActions getRootActions() {
 		return null;
 	}
-	
+
 	public Object[] getRootChildren(Container root) {
 		final List<Container> results = new ArrayList<>();
-		for (ContainerReference ref : containerList) {
+		for (final ContainerReference ref : containerList) {
 			// We add only container with no parent category
-			if(ref.getCategory().length() == 0) {
-				results.add(createContainer(root,ref));
+			if (ref.getCategory().length() == 0) {
+				results.add(createContainer(root, ref));
 			}
-		}		
+		}
 		return results.toArray();
 	}
-	
-	protected void doubleClickOnContainer(IContainer o) {}
-	
-	protected void containerSelected(IContainer o) {}	
+
+	protected void doubleClickOnContainer(IContainer o) {
+	}
+
+	protected void containerSelected(IContainer o) {
+	}
 
 	public Container getInput() {
 		return sc;
 	}
-	
-	protected void fillFixedContainerAction(IMenuManager manager) {}
-	
-	protected void fillFixedContainerProviderAction(IMenuManager manager) {}	
-	
+
+	protected void fillFixedContainerAction(IMenuManager manager) {
+	}
+
+	protected void fillFixedContainerProviderAction(IMenuManager manager) {
+	}
+
 	public abstract String getViewId();
 }

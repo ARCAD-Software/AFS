@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -23,19 +23,17 @@ public abstract class AbstractBeanMapEditorComposite extends AbstractAFSEditorCo
 	public AbstractBeanMapEditorComposite(Composite parent, int style,
 			AbstractAFSEditorPart editor) {
 		super(parent, style, editor);
-		
+
 	}
 
 	@Override
 	public void toScreen() {
 
-
 	}
-	
+
 	@Override
 	public void fromScreen() {
 
-
-	}	
+	}
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -23,17 +23,16 @@ public abstract class AbstractConnectedSearchSWTProvider extends
 		AbstractSearchSWTProvider {
 
 	protected ServerConnection connection;
-	
+
 	@Override
 	public ISearchBeanMap getSelector() {
-		ISWTDataLoader loader = renderer.getDataLoader();
+		final ISWTDataLoader loader = renderer.getDataLoader();
 		if (loader instanceof CoreContentLoader) {
-			connection = ((CoreContentLoader)loader).getConnection();			
+			connection = ((CoreContentLoader) loader).getConnection();
 		}
 		return getConnectedSelector(connection);
 	}
 
 	public abstract ISearchBeanMap getConnectedSelector(ServerConnection connection);
 
-	
 }

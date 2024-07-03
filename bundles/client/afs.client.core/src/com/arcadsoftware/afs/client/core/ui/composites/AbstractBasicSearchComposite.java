@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -40,78 +40,75 @@ public abstract class AbstractBasicSearchComposite extends AbstractSearchComposi
 	protected DynamicEditorComposite composite;
 	protected Composite searchCompositeParent;
 
-	public AbstractBasicSearchComposite(Composite parent, MetaDataEntity structure,ServerConnection connection) {
-		super(parent, structure,connection);
+	public AbstractBasicSearchComposite(Composite parent, MetaDataEntity structure, ServerConnection connection) {
+		super(parent, structure, connection);
 	}
 
 	protected boolean addSearchClause(String attributeCode) {
 		return true;
 	}
 
-	
-	public BeanMap getSearchBeanMap(){
+	public BeanMap getSearchBeanMap() {
 		return composite.getRenderer().getCurrentBean();
 	}
-	
+
 	public void putSearchAttribute(String key, Object value) {
 		composite.getRenderer().put(key, value);
 	}
-	
-	
+
 	@Override
 	protected String createSearchClause() {
-		BeanMap beanMap = getSearchBeanMap();
+		final BeanMap beanMap = getSearchBeanMap();
 		if (beanMap != null) {
-			ArrayList<ISearchCriteria> stdCriteriaList = new ArrayList<ISearchCriteria>();
-			ArrayList<String> stringCriteriaList = new ArrayList<String>();
-			for (Map.Entry<String, Object> entry : beanMap.entrySet()) {
+			final ArrayList<ISearchCriteria> stdCriteriaList = new ArrayList<>();
+			final ArrayList<String> stringCriteriaList = new ArrayList<>();
+			for (final Map.Entry<String, Object> entry : beanMap.entrySet()) {
 				if (addSearchClause(entry.getKey())) {
-					Object o = entry.getValue();
+					final Object o = entry.getValue();
 					if (o instanceof String) {
-						String value = ((String) entry.getValue()).trim();
+						final String value = ((String) entry.getValue()).trim();
 						if (value.length() > 0) {
-							ContainCriteria c = new ContainCriteria(entry.getKey(), value);
+							final ContainCriteria c = new ContainCriteria(entry.getKey(), value);
 							stdCriteriaList.add(c);
 						}
 					} else if (o instanceof Integer) {
-						String value = (((Integer) entry.getValue()).toString());
+						final String value = (((Integer) entry.getValue()).toString());
 						if (value.length() > 0) {
-							EqualCriteria c = new EqualCriteria(entry.getKey(), value);
+							final EqualCriteria c = new EqualCriteria(entry.getKey(), value);
 							stdCriteriaList.add(c);
 						}
 					} else if (o instanceof Boolean) {
-						Boolean value = (Boolean) entry.getValue();
-						EqualCriteria c = new EqualCriteria(entry.getKey(), value.booleanValue() ? TRUE_INT_VALUE
+						final Boolean value = (Boolean) entry.getValue();
+						final EqualCriteria c = new EqualCriteria(entry.getKey(), value.booleanValue() ? TRUE_INT_VALUE
 								: FALSE_INT_VALUE);
 						stdCriteriaList.add(c);
 					} else if (o instanceof BeanMap) {
-						String value = completeClauseForLinkedBeanMap((BeanMap) entry.getValue());
+						final String value = completeClauseForLinkedBeanMap((BeanMap) entry.getValue());
 						if (!value.isEmpty()) {
 							stringCriteriaList.add(value);
 						}
 					} else if (o == null) {
-						IsNullCriteria c = new IsNullCriteria(entry.getKey());
+						final IsNullCriteria c = new IsNullCriteria(entry.getKey());
 						stdCriteriaList.add(c);
 					}
 				}
 			}
 
 			StringBuilder builder = null;
-			XmlCriteriaStream x = new XmlCriteriaStream();
-			for (int i = 0; i < stdCriteriaList.size(); i++) {
+			final XmlCriteriaStream x = new XmlCriteriaStream();
+			for (final ISearchCriteria c : stdCriteriaList) {
 				if (builder == null) {
 					builder = new StringBuilder();
 				}
-				ISearchCriteria c = stdCriteriaList.get(i);
 				builder.append(x.toXML(c));
 			}
-			for (int i = 0; i < stringCriteriaList.size(); i++) {
+			for (final String element : stringCriteriaList) {
 				if (builder == null) {
 					builder = new StringBuilder();
 				}
-				builder.append(stringCriteriaList.get(i));
+				builder.append(element);
 			}
-			StringBuilder result = new StringBuilder();
+			final StringBuilder result = new StringBuilder();
 			if (builder != null) {
 				result.append(AND_TAG);
 				result.append(builder);
@@ -129,31 +126,29 @@ public abstract class AbstractBasicSearchComposite extends AbstractSearchComposi
 	}
 
 	/**
-	 * Search Part creation
-	 * 
-	 * If this method is overriden and DynamicEditorComposite composite is not use,
-	 * clearSearchPart must also be overriden
-	 * 
+	 * Search Part creation If this method is overriden and DynamicEditorComposite composite is not use, clearSearchPart
+	 * must also be overriden
 	 */
-	protected void createSearchPart(Composite parent){
-		if (composite != null){
+	protected void createSearchPart(Composite parent) {
+		if (composite != null) {
 			composite.dispose();
 		}
-		composite = new ConnectedDynamicEditorComposite(connection,parent, SWT.NONE, getType(), getLayoutName()){
+		composite = new ConnectedDynamicEditorComposite(connection, parent, SWT.NONE, getType(), getLayoutName()) {
+			@Override
 			protected ServerConnection getConnection() {
 				return connection;
-			};
+			}
 		};
 		composite.loadEmptyEntity();
 		if (composite.getParent().getLayout() instanceof GridLayout) {
-			GridData gridData = new GridData(GridData.FILL_BOTH);
+			final GridData gridData = new GridData(GridData.FILL_BOTH);
 			gridData.grabExcessHorizontalSpace = true;
 			gridData.grabExcessVerticalSpace = true;
 			gridData.horizontalSpan = 3;
 			composite.setLayoutData(gridData);
 		}
 	}
-	
+
 	@Override
 	public void clearAll() {
 		clearSearchPart();
@@ -165,8 +160,9 @@ public abstract class AbstractBasicSearchComposite extends AbstractSearchComposi
 	 * This method will be overriden if createSearchPart is overriden and DynamicEditorComposite composite is not used
 	 * as the main composite for search editor
 	 */
-	protected void clearSearchPart() {}
-	
+	protected void clearSearchPart() {
+	}
+
 	protected String completeClauseForLinkedBeanMap(BeanMap beanMap) {
 		return ""; //$NON-NLS-1$
 	}

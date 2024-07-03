@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -18,6 +18,7 @@ import java.net.URL;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
@@ -37,53 +38,61 @@ public abstract class LoggedUIPlugin extends AbstractUIPlugin implements ILogged
 
 	protected ResourceBundle resourceBundle;
 
+	@Override
 	public void log(String message) {
-		getLog().log(new Status(Status.INFO, getBundle().getSymbolicName(), message));
+		getLog().log(new Status(IStatus.INFO, getBundle().getSymbolicName(), message));
 	}
 
+	@Override
 	public void log(String message, Throwable e) {
-		getLog().log(new Status(Status.ERROR, getBundle().getSymbolicName(), message, e));
+		getLog().log(new Status(IStatus.ERROR, getBundle().getSymbolicName(), message, e));
 	}
 
+	@Override
 	public void log(Throwable e) {
-		getLog().log(new Status(Status.ERROR, getBundle().getSymbolicName(), e.getLocalizedMessage(), e));
+		getLog().log(new Status(IStatus.ERROR, getBundle().getSymbolicName(), e.getLocalizedMessage(), e));
 	}
 
+	@Override
 	public void warn(String message) {
-		getLog().log(new Status(Status.WARNING, getBundle().getSymbolicName(), message));
+		getLog().log(new Status(IStatus.WARNING, getBundle().getSymbolicName(), message));
 	}
 
+	@Override
 	public void warn(String message, Throwable e) {
-		getLog().log(new Status(Status.WARNING, getBundle().getSymbolicName(), message, e));
+		getLog().log(new Status(IStatus.WARNING, getBundle().getSymbolicName(), message, e));
 	}
 
+	@Override
 	public void debug(String message) {
 		if (isDebugging()) {
 			getLog().log(
-					new Status(Status.INFO, getBundle().getSymbolicName(),
+					new Status(IStatus.INFO, getBundle().getSymbolicName(),
 							Activator.resString("Log.debug") + message)); //$NON-NLS-1$
 		}
 	}
 
+	@Override
 	public void debug(String message, Throwable e) {
 		if (isDebugging()) {
 			getLog().log(
-					new Status(Status.INFO, getBundle().getSymbolicName(),
+					new Status(IStatus.INFO, getBundle().getSymbolicName(),
 							Activator.resString("Log.debug") + message, e)); //$NON-NLS-1$
 		}
 	}
 
+	@Override
 	public void debug(Throwable e) {
 		if (isDebugging()) {
 			getLog().log(
-					new Status(Status.INFO, getBundle().getSymbolicName(),
+					new Status(IStatus.INFO, getBundle().getSymbolicName(),
 							Activator.resString("Log.debug") + e.getLocalizedMessage(), e)); //$NON-NLS-1$
 		}
 	}
 
 	/**
 	 * Returns the plugin's resource bundle,
-	 * 
+	 *
 	 * @return resource bundle
 	 */
 	public ResourceBundle getResourceBundle() {
@@ -94,25 +103,25 @@ public abstract class LoggedUIPlugin extends AbstractUIPlugin implements ILogged
 	 * Returns the string from the plugin's resource bundle, or 'key' if not found.
 	 */
 	public String resString(String key) {
-		ResourceBundle bundle = resourceBundle;
+		final ResourceBundle bundle = resourceBundle;
 		if (bundle == null) {
 			return key;
 		}
 		try {
-			String value = bundle.getString(key);
+			final String value = bundle.getString(key);
 			if (value.startsWith("!")) { //$NON-NLS-1$
-				String newKey = value.substring(1, value.length());
+				final String newKey = value.substring(1, value.length());
 				return resString(newKey);
 			}
 			return bundle.getString(key);
-		} catch (MissingResourceException e) {
+		} catch (final MissingResourceException e) {
 			return key;
 		}
 	}
 
 	/**
 	 * Convenience method for getting the current shell.
-	 * 
+	 *
 	 * @return the shell
 	 */
 	public static Shell getShell() {
@@ -120,7 +129,7 @@ public abstract class LoggedUIPlugin extends AbstractUIPlugin implements ILogged
 	}
 
 	protected ImageDescriptor putImageInRegistry(String id, String fileName) {
-		ImageDescriptor fid = getPluginImage(fileName);
+		final ImageDescriptor fid = getPluginImage(fileName);
 		getImageRegistry().put(id, fid);
 		return fid;
 	}
@@ -128,7 +137,7 @@ public abstract class LoggedUIPlugin extends AbstractUIPlugin implements ILogged
 	public ImageDescriptor getPluginImage(String fileName) {
 		try {
 			return ImageDescriptor.createFromURL(new URL(getBundle().getEntry("/"), fileName)); //$NON-NLS-1$
-		} catch (MalformedURLException e) {
+		} catch (final MalformedURLException e) {
 			return null;
 		}
 	}
@@ -141,7 +150,7 @@ public abstract class LoggedUIPlugin extends AbstractUIPlugin implements ILogged
 		Image image = null;
 		try {
 			image = getImageRegistry().get(key);
-		} catch (Throwable t) {
+		} catch (final Throwable t) {
 			return null;
 		}
 		return image;

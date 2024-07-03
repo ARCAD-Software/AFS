@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -46,14 +46,15 @@ public abstract class AbstractAFSPropertySection extends AbstractPropertySection
 
 	public class TextModifyListener implements ModifyListener {
 
-		private String id;
-		private Text owner;
+		private final String id;
+		private final Text owner;
 
 		public TextModifyListener(Text owner, String id) {
 			this.owner = owner;
 			this.id = id;
 		}
 
+		@Override
 		public void modifyText(ModifyEvent arg0) {
 			properties.setPropertyValue(id, owner.getText());
 		}
@@ -61,8 +62,8 @@ public abstract class AbstractAFSPropertySection extends AbstractPropertySection
 
 	private class ButtonSelectionListener extends SelectionAdapter {
 
-		private String id;
-		private Button owner;
+		private final String id;
+		private final Button owner;
 
 		public ButtonSelectionListener(Button owner, String id) {
 			this.owner = owner;
@@ -77,20 +78,20 @@ public abstract class AbstractAFSPropertySection extends AbstractPropertySection
 
 	public AbstractAFSPropertySection() {
 		super();
-		textListeners = new Hashtable<Text, TextModifyListener>();
-		checkboxListeners = new Hashtable<Button, ButtonSelectionListener>();
+		textListeners = new Hashtable<>();
+		checkboxListeners = new Hashtable<>();
 	}
 
 	@Override
 	public void createControls(Composite parent, TabbedPropertySheetPage aTabbedPropertySheetPage) {
 		super.createControls(parent, aTabbedPropertySheetPage);
-		FillLayout fl = (FillLayout) parent.getLayout();
+		final FillLayout fl = (FillLayout) parent.getLayout();
 		fl.spacing = fl.marginWidth = fl.marginHeight = 5;
-		Section section = getWidgetFactory().createSection(parent, ExpandableComposite.TITLE_BAR);
+		final Section section = getWidgetFactory().createSection(parent, ExpandableComposite.TITLE_BAR);
 		section.setText(getSectionTitle());
-		Composite composite = getWidgetFactory().createComposite(section, SWT.NONE);
+		final Composite composite = getWidgetFactory().createComposite(section, SWT.NONE);
 		section.setClient(composite);
-		GridLayout gl = new GridLayout(3, false);
+		final GridLayout gl = new GridLayout(3, false);
 		gl.verticalSpacing = 2;
 		gl.marginWidth = gl.marginHeight = 0;
 		composite.setLayout(gl);
@@ -104,11 +105,11 @@ public abstract class AbstractAFSPropertySection extends AbstractPropertySection
 	protected Text createText(Composite parent, String label, String id, boolean readonly) {
 		getWidgetFactory().createCLabel(parent, label);
 		getWidgetFactory().createCLabel(parent, ":"); //$NON-NLS-1$
-		Text text = getWidgetFactory().createText(parent, ""); //$NON-NLS-1$
-		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		final Text text = getWidgetFactory().createText(parent, ""); //$NON-NLS-1$
+		final GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.grabExcessHorizontalSpace = true;
 		text.setLayoutData(gd);
-		TextModifyListener listener = new TextModifyListener(text, id);
+		final TextModifyListener listener = new TextModifyListener(text, id);
 		text.addModifyListener(listener);
 		textListeners.put(text, listener);
 		text.setEditable(!readonly);
@@ -118,14 +119,14 @@ public abstract class AbstractAFSPropertySection extends AbstractPropertySection
 	}
 
 	protected void registerText(Text text, String propertyId) {
-		TextModifyListener listener = new TextModifyListener(text, propertyId);
+		final TextModifyListener listener = new TextModifyListener(text, propertyId);
 		textListeners.put(text, listener);
 		text.addModifyListener(listener);
 		text.setData(propertyId);
 	}
 
 	protected void registerCheckbox(Button checkbox, String propertyId) {
-		ButtonSelectionListener listener = new ButtonSelectionListener(checkbox, propertyId);
+		final ButtonSelectionListener listener = new ButtonSelectionListener(checkbox, propertyId);
 		checkboxListeners.put(checkbox, listener);
 		checkbox.addSelectionListener(listener);
 		checkbox.setData(propertyId);
@@ -138,11 +139,11 @@ public abstract class AbstractAFSPropertySection extends AbstractPropertySection
 	protected Button createCheckbox(Composite parent, String label, String id, boolean readonly) {
 		getWidgetFactory().createCLabel(parent, "");//$NON-NLS-1$
 		getWidgetFactory().createCLabel(parent, ""); //$NON-NLS-1$
-		Button checkbox = getWidgetFactory().createButton(parent, label, SWT.CHECK);
-		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		final Button checkbox = getWidgetFactory().createButton(parent, label, SWT.CHECK);
+		final GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.grabExcessHorizontalSpace = true;
 		checkbox.setLayoutData(gd);
-		ButtonSelectionListener listener = new ButtonSelectionListener(checkbox, id);
+		final ButtonSelectionListener listener = new ButtonSelectionListener(checkbox, id);
 		checkbox.addSelectionListener(listener);
 		checkboxListeners.put(checkbox, listener);
 		checkbox.setEnabled(!readonly);
@@ -150,13 +151,14 @@ public abstract class AbstractAFSPropertySection extends AbstractPropertySection
 		return checkbox;
 	}
 
+	@Override
 	public void setInput(IWorkbenchPart part, ISelection selection) {
 		super.setInput(part, selection);
 		if (selection instanceof IStructuredSelection) {
-			Object input = ((IStructuredSelection) selection).getFirstElement();
+			final Object input = ((IStructuredSelection) selection).getFirstElement();
 			if (input instanceof IAdaptable) {
-				IAdaptable adaptable = (IAdaptable) input;
-				Object result = adaptable.getAdapter(AbstractAFSProperties.class);
+				final IAdaptable adaptable = (IAdaptable) input;
+				final Object result = adaptable.getAdapter(AbstractAFSProperties.class);
 				if (result instanceof AbstractAFSProperties) {
 					properties = (AbstractAFSProperties) result;
 					inputChanged();
@@ -165,17 +167,18 @@ public abstract class AbstractAFSPropertySection extends AbstractPropertySection
 		}
 	}
 
-	public void inputChanged() {}
+	public void inputChanged() {
+	}
 
 	public void refreshCheckbox(Button button) {
-		ButtonSelectionListener listener = checkboxListeners.get(button);
+		final ButtonSelectionListener listener = checkboxListeners.get(button);
 		if (listener != null) {
 			button.removeSelectionListener(listener);
-			String id = (String) button.getData();
+			final String id = (String) button.getData();
 			if (id != null) {
-				Object value = properties.getPropertyValue(id);
+				final Object value = properties.getPropertyValue(id);
 				if ((value != null) && (value instanceof Boolean)) {
-					Boolean vboolean = (Boolean) value;
+					final Boolean vboolean = (Boolean) value;
 					button.setSelection(vboolean);
 				}
 			}
@@ -184,12 +187,12 @@ public abstract class AbstractAFSPropertySection extends AbstractPropertySection
 	}
 
 	public void refreshText(Text text) {
-		TextModifyListener listener = textListeners.get(text);
+		final TextModifyListener listener = textListeners.get(text);
 		if (listener != null) {
 			text.removeModifyListener(listener);
-			String id = (String) text.getData();
+			final String id = (String) text.getData();
 			if (id != null) {
-				String value = (String) properties.getPropertyValue(id);
+				final String value = (String) properties.getPropertyValue(id);
 				if (value != null) {
 					text.setText(value);
 				}
@@ -198,11 +201,12 @@ public abstract class AbstractAFSPropertySection extends AbstractPropertySection
 		}
 	}
 
+	@Override
 	public void refresh() {
-		for (Entry<Text, TextModifyListener> entry : textListeners.entrySet()) {
+		for (final Entry<Text, TextModifyListener> entry : textListeners.entrySet()) {
 			refreshText(entry.getKey());
 		}
-		for (Entry<Button, ButtonSelectionListener> entry : checkboxListeners.entrySet()) {
+		for (final Entry<Button, ButtonSelectionListener> entry : checkboxListeners.entrySet()) {
 			refreshCheckbox(entry.getKey());
 		}
 	}

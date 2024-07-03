@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -16,24 +16,23 @@ package com.arcadsoftware.afs.client.reporting.core;
 import com.arcadsoftware.aev.core.model.ArcadEntity;
 import com.arcadsoftware.afs.client.reporting.Activator;
 
-
-
 public class ReportCategory extends ArcadEntity {
 	public static final String DEFAULT_CATEGORY = Activator.resString("category.default"); //$NON-NLS-1$
-	public static final char CATEGORY_SEPARATOR = '/'; 
+	public static final char CATEGORY_SEPARATOR = '/';
 	private String category = ""; //$NON-NLS-1$
-	
-	
-	public ReportCategory(String category,int level){
+
+	public ReportCategory(String category, int level) {
 		super();
-		this.category=category;
+		this.category = category;
 		setLevel(level);
 	}
-	
+
+	@Override
 	public String getLabel() {
-		int pos = category.lastIndexOf(CATEGORY_SEPARATOR);
-		if (pos!=-1)
-			return category.substring(pos+1);		
+		final int pos = category.lastIndexOf(CATEGORY_SEPARATOR);
+		if (pos != -1) {
+			return category.substring(pos + 1);
+		}
 		return category;
 	}
 }

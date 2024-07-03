@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -39,8 +39,8 @@ public class GroovyScriptSWTProvider implements IInputSWTProvider, IConstants {
 
 	@Override
 	public void create(ISWTRenderer renderer, ILayoutParameters parameters, Element element, MetaDataEntity entity) {
-		String label = renderer.getLocalizedMessage(parameters.getParameter(LABEL, element.getName()));
-		if (label!=null) {
+		final String label = renderer.getLocalizedMessage(parameters.getParameter(LABEL, element.getName()));
+		if (label != null) {
 			if (label.length() > 0) {
 				renderer.getToolkit().createLabel(renderer.getParent(), label);
 				renderer.getToolkit().createLabel(renderer.getParent(), TWO_POINTS);
@@ -50,40 +50,42 @@ public class GroovyScriptSWTProvider implements IInputSWTProvider, IConstants {
 		if (element.isReadonly() || parameters.getParameterBoolean(READ_ONLY)) {
 			style |= SWT.READ_ONLY;
 		}
-		StyledText text = new StyledText(renderer.getParent(), style); 
+		final StyledText text = new StyledText(renderer.getParent(), style);
 		renderer.getToolkit().adapt(text, true, true);
 		renderer.getToolkit().paintBordersFor(renderer.getParent());
-		String[] apis = getApisMethodNames(parameters, element, entity);
-		String completionKey = parameters.getParameter(COMPLETIONKEY);
+		final String[] apis = getApisMethodNames(parameters, element, entity);
+		final String completionKey = parameters.getParameter(COMPLETIONKEY);
 		if ((apis != null) && (apis.length > 0) && (completionKey != null)) {
-            SimpleContentProposalProvider scp = new SimpleContentProposalProvider(apis);
-            scp.setProposals(apis);
-            KeyStroke ks;
+			final SimpleContentProposalProvider scp = new SimpleContentProposalProvider(apis);
+			scp.setProposals(apis);
+			KeyStroke ks;
 			try {
-	            ks = KeyStroke.getInstance(completionKey);
-			} catch (ParseException e) {
-	            ks = KeyStroke.getInstance(SWT.F10);
+				ks = KeyStroke.getInstance(completionKey);
+			} catch (final ParseException e) {
+				ks = KeyStroke.getInstance(SWT.F10);
 			}
-			ContentProposalAdapter adapter = new ContentProposalAdapter(text, new TextContentAdapter(), scp, ks, null);
-	        adapter.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_REPLACE);
-        }
+			final ContentProposalAdapter adapter = new ContentProposalAdapter(text, new TextContentAdapter(), scp, ks,
+					null);
+			adapter.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_REPLACE);
+		}
 		// TODO Ajouter une gestion contextuelle de l'aide en ligne (dans une popup...)
 		text.addLineStyleListener(new GroovyLineStyler(apis));
 		if (renderer.getParent().getLayout() instanceof GridLayout) {
-			GridData layoutData = new GridData(GridData.FILL_BOTH);
+			final GridData layoutData = new GridData(GridData.FILL_BOTH);
 			layoutData.grabExcessVerticalSpace = true;
 			if (label.length() == 0) {
 				layoutData.horizontalSpan = 3;
 			}
 			layoutData.minimumHeight = 80;
-			//Traitement du tag height
-			int height = parameters.getParameterInteger(HEIGHT,-1);
+			// Traitement du tag height
+			final int height = parameters.getParameterInteger(HEIGHT, -1);
 			if (height > -1) {
 				layoutData.heightHint = height;
 			}
 			text.setLayoutData(layoutData);
 		}
-		if (MetaDataAttribute.TYPE_STRING.equals(element.getType()) && (((MetaDataAttribute) element).getLength() > 0)) {
+		if (MetaDataAttribute.TYPE_STRING.equals(element.getType())
+				&& (((MetaDataAttribute) element).getLength() > 0)) {
 			text.setTextLimit(((MetaDataAttribute) element).getLength());
 		}
 		if (parameters.getParameterBoolean(DEFAULT)) {
@@ -98,14 +100,14 @@ public class GroovyScriptSWTProvider implements IInputSWTProvider, IConstants {
 
 	/**
 	 * Override this method to add a completion list of methods names.
-	 * 
+	 *
 	 * @param parameters
 	 * @param element
 	 * @param entity
 	 * @return can return null.
 	 */
 	protected String[] getApisMethodNames(ILayoutParameters parameters, Element element, MetaDataEntity entity) {
-		String api = parameters.getParameter(API);
+		final String api = parameters.getParameter(API);
 		if ((api == null) || (api.trim().length() == 0)) {
 			return null;
 		}

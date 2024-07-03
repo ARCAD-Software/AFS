@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -24,26 +24,27 @@ import org.eclipse.ui.actions.ContributionItemFactory;
 import com.arcadsoftware.afs.framework.application.internal.Activator;
 
 public abstract class AbstractBasicMenuFactory implements IBasicMenuFactory {
-	
-	public boolean isMenuVisible(String menuPath){
-		IConfigurationManager manager = Activator.getInstance().getConfigurationManager();
-		if (manager!=null) {
-			return manager.isMenuVisible(menuPath);			
+
+	public boolean isMenuVisible(String menuPath) {
+		final IConfigurationManager manager = Activator.getInstance().getConfigurationManager();
+		if (manager != null) {
+			return manager.isMenuVisible(menuPath);
 		}
 		return false;
 	}
-	
-	public String getMenuLabel(String menuPath){
-		IConfigurationManager manager = Activator.getInstance().getConfigurationManager();
-		if (manager!=null) {
-			return manager.getMenuLabel(menuPath);			
+
+	public String getMenuLabel(String menuPath) {
+		final IConfigurationManager manager = Activator.getInstance().getConfigurationManager();
+		if (manager != null) {
+			return manager.getMenuLabel(menuPath);
 		}
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 
-	protected boolean addMenu(String menuId, IActionRegister actionBarAdvisor, MenuManager menu, IWorkbenchWindow windows, ActionFactory action) {
+	protected boolean addMenu(String menuId, IActionRegister actionBarAdvisor, MenuManager menu,
+			IWorkbenchWindow windows, ActionFactory action) {
 		if (isMenuVisible(menuId)) {
-			IWorkbenchAction a = action.create(windows);
+			final IWorkbenchAction a = action.create(windows);
 			actionBarAdvisor.register(a);
 			menu.add(a);
 			return true;
@@ -51,7 +52,8 @@ public abstract class AbstractBasicMenuFactory implements IBasicMenuFactory {
 		return false;
 	}
 
-	protected boolean addMenu(String menuId, IActionRegister actionBarAdvisor, MenuManager menu, IWorkbenchAction action) {
+	protected boolean addMenu(String menuId, IActionRegister actionBarAdvisor, MenuManager menu,
+			IWorkbenchAction action) {
 		if (isMenuVisible(menuId)) {
 			actionBarAdvisor.register(action);
 			menu.add(action);
@@ -59,15 +61,16 @@ public abstract class AbstractBasicMenuFactory implements IBasicMenuFactory {
 		}
 		return false;
 	}
-	
-	protected boolean addMenu(String menuId, IActionRegister actionBarAdvisor, MenuManager menu, IWorkbenchWindow windows, ContributionItemFactory action) {
-		if (isMenuVisible(menuId)){			
-			IContributionItem a = action.create(windows);
+
+	protected boolean addMenu(String menuId, IActionRegister actionBarAdvisor, MenuManager menu,
+			IWorkbenchWindow windows, ContributionItemFactory action) {
+		if (isMenuVisible(menuId)) {
+			final IContributionItem a = action.create(windows);
 			menu.add(a);
 			return true;
 		}
 		return false;
-	}	
+	}
 
 	protected boolean addMenu(String menuId, IActionRegister actionBarAdvisor, MenuManager menu, IAction action) {
 		if (isMenuVisible(menuId)) {

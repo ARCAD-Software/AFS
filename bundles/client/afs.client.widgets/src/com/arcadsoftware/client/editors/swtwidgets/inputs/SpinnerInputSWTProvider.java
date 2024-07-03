@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -44,13 +44,14 @@ public class SpinnerInputSWTProvider implements IInputSWTProvider, IEditorChange
 	Spinner spinner;
 	int digits;
 	private String enabledIfProperty;
-	
+
+	@Override
 	public void create(ISWTRenderer renderer, ILayoutParameters parameters, Element element,
 			MetaDataEntity structure) {
 		digits = parameters.getParameterInteger(DIGITS, 0);
-		int minimum = parameters.getParameterInteger(MIN, Integer.MIN_VALUE);
-		int maximum = parameters.getParameterInteger(MAX, Integer.MAX_VALUE);
-		String label = renderer.getLocalizedMessage(parameters.getParameter(LABEL, element.getName()));
+		final int minimum = parameters.getParameterInteger(MIN, Integer.MIN_VALUE);
+		final int maximum = parameters.getParameterInteger(MAX, Integer.MAX_VALUE);
+		final String label = renderer.getLocalizedMessage(parameters.getParameter(LABEL, element.getName()));
 		if (label.length() > 0) {
 			renderer.getToolkit().createLabel(renderer.getParent(), label);
 			renderer.getToolkit().createLabel(renderer.getParent(), TWO_POINTS);
@@ -60,30 +61,34 @@ public class SpinnerInputSWTProvider implements IInputSWTProvider, IEditorChange
 		spinner.setEnabled(!element.isReadonly());
 		spinner.setMinimum(minimum);
 		spinner.setMaximum(maximum);
-		if (parameters.getParameterBoolean(DEFAULT))
+		if (parameters.getParameterBoolean(DEFAULT)) {
 			spinner.setFocus();
-		if (renderer.getParent().getLayout() instanceof GridLayout)
+		}
+		if (renderer.getParent().getLayout() instanceof GridLayout) {
 			if (label.length() > 0) {
 				spinner.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			} else {
 				spinner.setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, true, false, 3, 1));
 			}
+		}
 		spinner.setDigits(digits);
-		//TODO RAP
-		//renderer.getToolkit().paintBordersFor(renderer.getParent());		
+		// TODO RAP
+		// renderer.getToolkit().paintBordersFor(renderer.getParent());
 
-		this.enabledIfProperty = parameters.getParameter(IConstants.ENABLED_IF, null);
-		if(enabledIfProperty != null) {
+		enabledIfProperty = parameters.getParameter(IConstants.ENABLED_IF, null);
+		if (enabledIfProperty != null) {
 			handleEnabledIfChange(renderer);
 			renderer.addChangeListener(this);
 		}
-		
-		if (digits != 0)
+
+		if (digits != 0) {
 			renderer.getRendererBinding().bindElement(element, new IWidgetValue() {
+				@Override
 				public void addSelectionListener(SelectionListener selectionListener) {
 					spinner.addSelectionListener(selectionListener);
 				}
 
+				@Override
 				public Object getValue() {
 					Double value = Double.valueOf(spinner.getSelection());
 					for (int i = 0; i < digits; i++) {
@@ -92,14 +97,17 @@ public class SpinnerInputSWTProvider implements IInputSWTProvider, IEditorChange
 					return value;
 				}
 
+				@Override
 				public Object getValueType() {
 					return Spinner.class;
 				}
 
+				@Override
 				public Control getWidget() {
 					return spinner;
 				}
 
+				@Override
 				public void setValue(Object newValue) {
 					Double value = Double.parseDouble((String) newValue);
 					for (int i = 0; i < digits; i++) {
@@ -108,23 +116,25 @@ public class SpinnerInputSWTProvider implements IInputSWTProvider, IEditorChange
 					spinner.setSelection(value.intValue());
 				}
 			});
-		else
+		} else {
 			renderer.getRendererBinding().bindElement(element, spinner);
+		}
 	}
 
+	@Override
 	public void dispose() {
 		// Do nothing
 	}
-	
+
 	@Override
 	public void changed(ISWTRenderer renderer) {
 		handleEnabledIfChange(renderer);
 	}
-	
+
 	private void handleEnabledIfChange(final ISWTRenderer renderer) {
-		if(spinner != null  && !spinner.isDisposed() && enabledIfProperty != null) {			
+		if ((spinner != null) && !spinner.isDisposed() && (enabledIfProperty != null)) {
 			final boolean enabled = renderer.getCurrentBean().getBoolean(enabledIfProperty);
-			spinner.getDisplay().asyncExec(() -> this.spinner.setEnabled(enabled));			
+			spinner.getDisplay().asyncExec(() -> spinner.setEnabled(enabled));
 		}
 	}
 

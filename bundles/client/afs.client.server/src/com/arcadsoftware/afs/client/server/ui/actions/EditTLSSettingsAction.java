@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -21,25 +21,25 @@ import com.arcadsoftware.afs.client.server.internals.Activator;
 import com.arcadsoftware.afs.client.server.ui.dialogs.SSLSettingsDialog;
 
 public class EditTLSSettingsAction extends ArcadAction {
-	
+
 	@Override
 	protected void setInterface() {
 		setText(Activator.resString("sslsettings.action.edit.text"));//$NON-NLS-1$
 		setToolTipText(Activator.resString("sslsettings.action.edit.tooltip"));//$NON-NLS-1$
 		setImageDescriptor(AFSIcon.TLS.imageDescriptor());
 	}
-	
+
 	@Override
 	protected boolean execute() {
-		final ITrustStoreProvider provider = getTrustStoreProvider();	
+		final ITrustStoreProvider provider = getTrustStoreProvider();
 		if (provider != null) {
 			SSLSettingsDialog.update(provider);
 			return true;
 		}
 		return false;
 	}
-	
+
 	private ITrustStoreProvider getTrustStoreProvider() {
 		return TrustStoreProviderExtensionManager.getTrustStoreProvider();
-	}	
+	}
 }

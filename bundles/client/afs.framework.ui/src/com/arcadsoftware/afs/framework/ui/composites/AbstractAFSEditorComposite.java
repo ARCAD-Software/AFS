@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -30,49 +30,51 @@ import com.arcadsoftware.afs.framework.ui.editors.AbstractAFSEditorPart;
 import com.arcadsoftware.afs.framework.ui.editors.IDirtyListener;
 import com.arcadsoftware.afs.framework.ui.editors.IFireContentChangeProvider;
 
-public abstract class AbstractAFSEditorComposite extends AbstractAFSComposite implements ModifyListener,SelectionListener,IFireContentChangeProvider {
-	
+public abstract class AbstractAFSEditorComposite extends AbstractAFSComposite
+		implements ModifyListener, SelectionListener, IFireContentChangeProvider {
+
 	private class DirtyListener {
 
-		private AbstractAFSListenerList contentChangedListeners = new AbstractAFSListenerList(3);
+		private final AbstractAFSListenerList contentChangedListeners = new AbstractAFSListenerList(3);
 
-		public void fireContentChanged() {		
-			for (Object l: contentChangedListeners.getListeners()) {
+		public void fireContentChanged() {
+			for (final Object l : contentChangedListeners.getListeners()) {
 				try {
 					((IDirtyListener) l).dirtyEvent(dirty);
-				} catch (RuntimeException e1) {
+				} catch (final RuntimeException e1) {
 					removeDirtyListener((IDirtyListener) l);
-				}				
-			}	
-		}		
-		
+				}
+			}
+		}
+
 		public void addDirtyListener(IDirtyListener listener) {
 			contentChangedListeners.add(listener);
 		}
-		
+
 		public void removeDirtyListener(IDirtyListener listener) {
 			contentChangedListeners.remove(listener);
-		}			
+		}
 	}
-	
+
 	private Object edited;
 	private boolean dirty;
-	private DirtyListener l = new DirtyListener(); 
-	private AbstractAFSEditorPart parentEditorPart;
-	
+	private final DirtyListener l = new DirtyListener();
+	private final AbstractAFSEditorPart parentEditorPart;
+
 	public AbstractAFSEditorComposite(Composite parent, int style, AbstractAFSEditorPart editor) {
 		this(parent, style, null, editor, true);
-	}	
-	
+	}
+
 	public AbstractAFSEditorComposite(Composite parent, int style, Object edited, AbstractAFSEditorPart editor) {
 		this(parent, style, edited, editor, true);
-	}	
+	}
 
-	public AbstractAFSEditorComposite(Composite parent, int style, AbstractAFSEditorPart editor,boolean withinit) {
+	public AbstractAFSEditorComposite(Composite parent, int style, AbstractAFSEditorPart editor, boolean withinit) {
 		this(parent, style, null, editor, withinit);
 	}
 
-	public AbstractAFSEditorComposite(Composite parent, int style, Object edited, AbstractAFSEditorPart editor,boolean withinit) {
+	public AbstractAFSEditorComposite(Composite parent, int style, Object edited, AbstractAFSEditorPart editor,
+			boolean withinit) {
 		super(parent, style);
 		this.edited = edited;
 		parentEditorPart = editor;
@@ -81,48 +83,50 @@ public abstract class AbstractAFSEditorComposite extends AbstractAFSComposite im
 			createContent();
 		}
 	}
-	
+
 	public void format() {
-		GridLayout gridLayout =new GridLayout(1,false); 
-		gridLayout.marginWidth = 0;		
+		final GridLayout gridLayout = new GridLayout(1, false);
+		gridLayout.marginWidth = 0;
 		gridLayout.marginHeight = 0;
 		gridLayout.verticalSpacing = 0;
 		setLayout(gridLayout);
-		GridData gridData = new GridData(GridData.FILL_BOTH);
+		final GridData gridData = new GridData(GridData.FILL_BOTH);
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.grabExcessVerticalSpace = true;
-		setLayoutData(gridData);		
+		setLayoutData(gridData);
 	}
-	
-	public void registerControl(Control c) {		
+
+	public void registerControl(Control c) {
 		if (c instanceof Text) {
-			((Text)c).addModifyListener(this);
+			((Text) c).addModifyListener(this);
 		} else if (c instanceof Button) {
-			((Button )c).addSelectionListener(this);
+			((Button) c).addSelectionListener(this);
 		} else if (c instanceof Combo) {
-			((Combo )c).addSelectionListener(this);
-			((Combo )c).addModifyListener(this);
+			((Combo) c).addSelectionListener(this);
+			((Combo) c).addModifyListener(this);
 		}
-	}	
-	
+	}
+
 	public void addChangeListener(IDirtyListener listener) {
-		l.addDirtyListener(listener);		
+		l.addDirtyListener(listener);
 	}
-	
+
 	public void removeChangeListener(IDirtyListener listener) {
-		l.removeDirtyListener(listener);		
+		l.removeDirtyListener(listener);
 	}
-	
+
+	@Override
 	public void modifyText(ModifyEvent arg0) {
 		dirty = true;
 		l.fireContentChanged();
 	}
-	
+
+	@Override
 	public void widgetSelected(SelectionEvent arg0) {
 		dirty = true;
 		l.fireContentChanged();
 	}
-	
+
 	public boolean isDirty() {
 		return dirty;
 	}
@@ -131,42 +135,46 @@ public abstract class AbstractAFSEditorComposite extends AbstractAFSComposite im
 		dirty = true;
 		l.fireContentChanged();
 	}
-	
+
 	public void setDirty(boolean dirty) {
 		this.dirty = dirty;
-	}		
+	}
 
 	protected boolean checkData(Object edited) {
 		return true;
 	}
-	
-	public void widgetDefaultSelected(SelectionEvent e) {}		
-	
+
+	@Override
+	public void widgetDefaultSelected(SelectionEvent e) {
+	}
+
 	public Object getEdited() {
 		return edited;
 	}
-	
+
 	public void setEdited(Object edited) {
 		this.edited = edited;
 		toScreen();
 	}
-	
+
 	public AbstractAFSEditorPart getParentEditorPart() {
 		return parentEditorPart;
-	}	
-	
+	}
+
 	public abstract void createContent();
-	
+
 	public abstract void toScreen();
-	
-	public void fromScreen() {}
-	
+
+	public void fromScreen() {
+	}
+
 	public boolean checkData() {
 		return true;
 	}
-	
+
+	@Override
 	public void fireContentChanged() {
 		dirty = true;
-		l.fireContentChanged();		
+		l.fireContentChanged();
 	}
 }

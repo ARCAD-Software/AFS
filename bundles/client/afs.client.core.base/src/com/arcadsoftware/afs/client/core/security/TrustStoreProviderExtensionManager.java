@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -17,31 +17,27 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
-import org.osgi.service.log.LogService;
 
-import com.arcadsoftware.aev.core.osgi.ServiceRegistry;
 import com.arcadsoftware.afs.client.core.connection.ITrustStoreProvider;
+import com.arcadsoftware.afs.client.core.internal.BaseActivator;
 
 public class TrustStoreProviderExtensionManager {
+	
 	public static final String TRUSTSTORE_EXTENSION_ID = "com.arcadsoftware.afs.client.truststore.provider"; //$NON-NLS-1$
 	public static final String CLASS_ATTRIBUTE = "class"; //$NON-NLS-1$
-	
-	private TrustStoreProviderExtensionManager() {
-		
-	}
-	
+
+	private TrustStoreProviderExtensionManager() {}
+
 	public static ITrustStoreProvider getTrustStoreProvider() {
 		final IExtensionRegistry registry = Platform.getExtensionRegistry();
 		final IConfigurationElement[] elements = registry.getConfigurationElementsFor(TRUSTSTORE_EXTENSION_ID);
-		for (IConfigurationElement element : elements) {
+		for (final IConfigurationElement element : elements) {
 			try {
-				return (ITrustStoreProvider)element.createExecutableExtension(CLASS_ATTRIBUTE);
+				return (ITrustStoreProvider) element.createExecutableExtension(CLASS_ATTRIBUTE);
+			} catch (final CoreException e) {
+				BaseActivator.getDefault().warn("TrustStoreProviderExtensionManager::getTrustStoreProvider", e);
 			}
-			catch (CoreException e) {
-				ServiceRegistry.lookup(LogService.class)
-					.ifPresent(logger -> logger.log(LogService.LOG_WARNING, "TrustStoreProviderExtensionManager::getTrustStoreProvider", e));
-			}
-		}	
+		}
 		return null;
 	}
 }

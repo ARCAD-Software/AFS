@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -31,6 +31,7 @@ public class DynamicEditorMatchingStrategy implements IEditorMatchingStrategy {
 		super();
 	}
 
+	@Override
 	public boolean matches(IEditorReference editorRef, IEditorInput input) {
 		String type = null;
 		int id = 0;
@@ -38,7 +39,7 @@ public class DynamicEditorMatchingStrategy implements IEditorMatchingStrategy {
 			type = ((IBeanMapEditorInput) input).getType();
 			id = ((IBeanMapEditorInput) input).getId();
 		} else {
-			BeanMap bm = (BeanMap) ((IAdaptable) input).getAdapter(BeanMap.class);
+			final BeanMap bm = ((IAdaptable) input).getAdapter(BeanMap.class);
 			if (bm != null) {
 				type = bm.getType();
 				id = bm.getId();
@@ -50,7 +51,7 @@ public class DynamicEditorMatchingStrategy implements IEditorMatchingStrategy {
 		IEditorInput input2;
 		try {
 			input2 = editorRef.getEditorInput();
-		} catch (PartInitException e) {
+		} catch (final PartInitException e) {
 			Activator.getInstance().debug(e);
 			return false;
 		}
@@ -60,7 +61,7 @@ public class DynamicEditorMatchingStrategy implements IEditorMatchingStrategy {
 			type2 = ((IBeanMapEditorInput) input2).getType();
 			id2 = ((IBeanMapEditorInput) input2).getId();
 		} else {
-			BeanMap bm = (BeanMap) ((IAdaptable) input2).getAdapter(BeanMap.class);
+			final BeanMap bm = ((IAdaptable) input2).getAdapter(BeanMap.class);
 			if (bm != null) {
 				type2 = bm.getType();
 				id2 = bm.getId();

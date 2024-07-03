@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -16,31 +16,32 @@ package com.arcadsoftware.afs.framework.messages;
 import com.arcadsoftware.beanmap.BeanMap;
 
 public class LogMessage extends UserMessage {
-	
+
 	private int level;
-	
+
 	public LogMessage(UserMessage m, int level) {
-		this(m.getCode(), m.getTextLevel1(),m.getTextLevel2(),level);
+		this(m.getCode(), m.getTextLevel1(), m.getTextLevel2(), level);
 	}
-	
+
 	public LogMessage(String code, String textLevel1, String textlevel2, int level) {
 		super(code, textLevel1, textlevel2);
 		this.level = level;
 	}
-	
+
 	public LogMessage() {
 		super();
 	}
-	
+
+	@Override
 	public void fromBeanMap(BeanMap bean) {
 		super.fromBeanMap(bean);
-		int level = bean.getInt(IMSGConstants.MESSAGE_LEVEL);
-		setLevel(level);		
+		final int level = bean.getInt(IMSGConstants.MESSAGE_LEVEL);
+		setLevel(level);
 	}
-	
+
 	@Override
 	public BeanMap toBeanMap() {
-		BeanMap result = super.toBeanMap();
+		final BeanMap result = super.toBeanMap();
 		result.put(IMSGConstants.MESSAGE_LEVEL, level);
 		return result;
 	}
@@ -52,16 +53,17 @@ public class LogMessage extends UserMessage {
 	public void setLevel(int level) {
 		this.level = level;
 	}
-	
+
+	@Override
 	public String getMessageEntity() {
 		return IMSGConstants.ENTITY_MESSAGE;
 	}
 
 	@Override
-	public String toString() {		
+	public String toString() {
 		String value = super.toString();
 		value = value + "\nLevel: " + level;
 		return value;
-	}	
-	
+	}
+
 }

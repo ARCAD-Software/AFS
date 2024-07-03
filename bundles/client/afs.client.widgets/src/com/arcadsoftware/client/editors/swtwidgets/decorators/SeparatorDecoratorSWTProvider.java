@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -28,23 +28,25 @@ import com.arcadsoftware.editor.swt.ISWTRenderer;
 import com.arcadsoftware.metadata.MetaDataEntity;
 
 /**
- * This class implement a Separator Decorator SWT Widget provider for the
- * dynamic editors.
+ * This class implement a Separator Decorator SWT Widget provider for the dynamic editors.
  */
 public class SeparatorDecoratorSWTProvider implements IDecoratorSWTProvider {
 
+	@Override
 	public Widget create(ISWTRenderer renderer, ILayoutParameters parameters, MetaDataEntity structure) {
-		int orientation = (HORIZONTAL.equals(parameters.getParameter(ORIENTATION))) ? SWT.HORIZONTAL : SWT.VERTICAL;
-		Label separator = renderer.getToolkit().createSeparator(renderer.getParent(), orientation);
-		if (renderer.getParent().getLayout() instanceof GridLayout){
+		final int orientation = (HORIZONTAL.equals(parameters.getParameter(ORIENTATION))) ? SWT.HORIZONTAL
+				: SWT.VERTICAL;
+		final Label separator = renderer.getToolkit().createSeparator(renderer.getParent(), orientation);
+		if (renderer.getParent().getLayout() instanceof GridLayout) {
 			separator.setLayoutData(new GridData(
-					orientation == SWT.HORIZONTAL ? GridData.FILL : GridData.BEGINNING, 
+					orientation == SWT.HORIZONTAL ? GridData.FILL : GridData.BEGINNING,
 					orientation == SWT.VERTICAL ? GridData.FILL : GridData.BEGINNING,
 					false, false, 3, 1));
 		}
 		return separator;
 	}
 
+	@Override
 	public void dispose() {
 		// Do nothing
 	}

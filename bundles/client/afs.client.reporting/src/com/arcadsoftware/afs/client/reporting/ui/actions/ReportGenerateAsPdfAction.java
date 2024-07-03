@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -13,28 +13,23 @@
  *******************************************************************************/
 package com.arcadsoftware.afs.client.reporting.ui.actions;
 
-
-
 import java.util.List;
 
 import com.arcadsoftware.afs.client.brands.AFSIcon;
 import com.arcadsoftware.afs.client.core.connection.ServerConnection;
 import com.arcadsoftware.afs.client.reporting.Activator;
 
+public class ReportGenerateAsPdfAction extends AbstractPreviewAction {
 
-
-public class ReportGenerateAsPdfAction extends AbstractPreviewAction{
-	
-	
 	public ReportGenerateAsPdfAction(ServerConnection connection) {
 		super(connection);
 	}
 
 	@Override
 	protected void setInterface() {
-		this.setText(Activator.resString("report.action.generate.pdf.text")); //$NON-NLS-1$
-		this.setToolTipText(Activator.resString("report.action.generate.pdf.text")); //$NON-NLS-1$
-		this.setImageDescriptor(AFSIcon.REPORT_PDF.imageDescriptor()); 
+		setText(Activator.resString("report.action.generate.pdf.text")); //$NON-NLS-1$
+		setToolTipText(Activator.resString("report.action.generate.pdf.text")); //$NON-NLS-1$
+		setImageDescriptor(AFSIcon.REPORT_PDF.imageDescriptor());
 	}
 
 	@Override
@@ -42,8 +37,9 @@ public class ReportGenerateAsPdfAction extends AbstractPreviewAction{
 		return REPORT_FORMAT_PDF;
 	}
 
+	@Override
 	public List<Integer> getExpectedRigths() {
 		return null;
-	}	
-	
+	}
+
 }

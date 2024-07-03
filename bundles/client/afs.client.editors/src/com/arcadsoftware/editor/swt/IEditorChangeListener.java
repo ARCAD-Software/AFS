@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -20,8 +20,9 @@ public interface IEditorChangeListener {
 
 	/**
 	 * Fired when a new BeanMap replace another one. the BeanMapEvent reference the new BeanMap.
-	 * 
-	 * @param renderer the renderer source of this event.
+	 *
+	 * @param renderer
+	 *            the renderer source of this event.
 	 */
 	public void changed(ISWTRenderer renderer);
 

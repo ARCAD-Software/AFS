@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -13,11 +13,12 @@
  *******************************************************************************/
 package com.arcadsoftware.afs.framework.services;
 
-
 public interface IDynamicHelpService {
 
 	public static final String clazz = IDynamicHelpService.class.getName();
+
 	public void register(Object control, String helpId);
+
 	public void showHelp(String helpId);
-	
+
 }

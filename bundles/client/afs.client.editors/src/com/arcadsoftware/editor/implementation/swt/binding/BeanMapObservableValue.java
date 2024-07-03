@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -44,10 +44,10 @@ public class BeanMapObservableValue extends AbstractVetoableValue implements IBe
 	public static final String TYPE_BASIC_DATE = "date"; //$NON-NLS-1$
 	public static final String TYPE_BASIC_ICON = "icon"; //$NON-NLS-1$
 
-	private MetaDataAttribute attribute;
-	private BeanMapWarper warper;
+	private final MetaDataAttribute attribute;
+	private final BeanMapWarper warper;
 	private String type;
-	private SWTRenderer renderer;
+	private final SWTRenderer renderer;
 	private BeanMap loadedBeanMap = null;
 	private BeanMap tempLoadedBeanMap = null;
 	private int currentLoading = 0;
@@ -73,7 +73,6 @@ public class BeanMapObservableValue extends AbstractVetoableValue implements IBe
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @seeorg.eclipse.core.databinding.observable.value.AbstractVetoableValue# doSetApprovedValue(java.lang.Object)
 	 */
 	@Override
@@ -90,12 +89,11 @@ public class BeanMapObservableValue extends AbstractVetoableValue implements IBe
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.core.databinding.observable.value.AbstractObservableValue #doGetValue()
 	 */
 	@Override
 	protected Object doGetValue() {
-		Object obj = warper.get(attribute.getCode());
+		final Object obj = warper.get(attribute.getCode());
 		if (obj == null) {
 			if (type.equals(TYPE_BASIC_BOOLEAN)) {
 				return Boolean.valueOf(false);
@@ -106,7 +104,7 @@ public class BeanMapObservableValue extends AbstractVetoableValue implements IBe
 		if ((type.equals(TYPE_BASIC_DATE)) && (obj instanceof String)) {
 			try {
 				return ISODateFormater.toDate((String) obj);
-			} catch (ParseException e) {
+			} catch (final ParseException e) {
 				// Nothing to do here.
 			}
 		}
@@ -136,10 +134,10 @@ public class BeanMapObservableValue extends AbstractVetoableValue implements IBe
 		// Reference to another entity (BeanMap).
 		// We should only return the entity reference Id but to accelerate the
 		// widget rendering we replace this reference with a BeanMap object.
-		
-		MetaDataEntity refEntity = renderer.getEditorLoader().loadMetaDataEntity(attribute.getType());
-		if (refEntity!=null) {		
-		//if (attribute.isReference()) {
+
+		final MetaDataEntity refEntity = renderer.getEditorLoader().loadMetaDataEntity(attribute.getType());
+		if (refEntity != null) {
+			// if (attribute.isReference()) {
 			int id = 0;
 			if (obj instanceof IIdentifiedBean) {
 				id = ((IIdentifiedBean) obj).getId();
@@ -148,7 +146,7 @@ public class BeanMapObservableValue extends AbstractVetoableValue implements IBe
 			} else if (obj instanceof String) {
 				try {
 					id = Integer.parseInt((String) obj);
-				} catch (NumberFormatException e) {
+				} catch (final NumberFormatException e) {
 					// Nothing to do here.
 				}
 			}
@@ -178,9 +176,9 @@ public class BeanMapObservableValue extends AbstractVetoableValue implements IBe
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.core.databinding.observable.value.IObservableValue#getValueType ()
 	 */
+	@Override
 	public Object getValueType() {
 		if (type.equals(TYPE_BASIC_INTEGER)) {
 			return Integer.class;
@@ -204,9 +202,10 @@ public class BeanMapObservableValue extends AbstractVetoableValue implements IBe
 
 	public void fireInitialization() {
 		getRealm().asyncExec(new Runnable() {
+			@Override
 			@SuppressWarnings("synthetic-access")
 			public void run() {
-				Object nv = doGetValue();
+				final Object nv = doGetValue();
 				Object ov = null;
 				if (nv == null) {
 					ov = new Object();
@@ -222,9 +221,9 @@ public class BeanMapObservableValue extends AbstractVetoableValue implements IBe
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.arcadsoftware.utils.IBeanMapListener#changed(com.arcadsoftware.utils .BeanMapEvent)
 	 */
+	@Override
 	public void changed(BeanMapEvent event) {
 		final BeanMap beanMap;
 		if (event != null) {
@@ -238,11 +237,12 @@ public class BeanMapObservableValue extends AbstractVetoableValue implements IBe
 		}
 		getRealm().asyncExec(new Runnable() {
 
+			@Override
 			@SuppressWarnings("synthetic-access")
 			public void run() {
-				BeanMap old = BeanMapObservableValue.this.loadedBeanMap;
-				BeanMapObservableValue.this.loadedBeanMap = beanMap;
-				BeanMapObservableValue.this.tempLoadedBeanMap = beanMap;
+				final BeanMap old = loadedBeanMap;
+				loadedBeanMap = beanMap;
+				tempLoadedBeanMap = beanMap;
 				BeanMapObservableValue.this.fireValueChange(Diffs.createValueDiff(old, beanMap));
 			}
 

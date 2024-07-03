@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -43,22 +43,22 @@ import com.arcadsoftware.metadata.MetaDataLink;
 
 /**
  * The checkTable editor allow to represent the association between a data and a limited number of possible values.
- * 
  * <p>
  * The tree will be filled this all possibles data, loaded just one time when the widget is created.
- *
  * <p>
  * TODO Implement a hierarchical representation of items... (with parent references or "group by" parameter...)
- * 
+ *
  * @author ARCAD Software
  */
 public class CheckTreeSWTProvider implements IInputSWTProvider {
-	
-	public void create(final ISWTRenderer renderer, ILayoutParameters parameters, final Element element, MetaDataEntity structure) {
+
+	@Override
+	public void create(final ISWTRenderer renderer, ILayoutParameters parameters, final Element element,
+			MetaDataEntity structure) {
 		if (!(element instanceof MetaDataLink)) {
 			return;
 		}
-		final MetaDataEntity entity = ((MetaDataLink)element).getRefEntity();
+		final MetaDataEntity entity = ((MetaDataLink) element).getRefEntity();
 		if (entity == null) {
 			return;
 		}
@@ -81,9 +81,9 @@ public class CheckTreeSWTProvider implements IInputSWTProvider {
 			formater = null;
 		}
 		// Create the Widget:
-		Tree tree = new Tree(renderer.getParent(), SWT.CHECK);
+		final Tree tree = new Tree(renderer.getParent(), SWT.CHECK);
 		if (renderer.getParent().getLayout() instanceof GridLayout) {
-			GridData layoutData = new GridData();
+			final GridData layoutData = new GridData();
 			layoutData.horizontalSpan = 3;
 			if (parameters.getParameterBoolean(IConstants.FILL_HORIZONTAL, true)) {
 				layoutData.horizontalAlignment = GridData.FILL;
@@ -93,8 +93,8 @@ public class CheckTreeSWTProvider implements IInputSWTProvider {
 				layoutData.verticalAlignment = GridData.FILL;
 				layoutData.grabExcessVerticalSpace = true;
 			}
-			//Traitement du tag height
-			int height = parameters.getParameterInteger(IConstants.HEIGHT,-1);
+			// Traitement du tag height
+			final int height = parameters.getParameterInteger(IConstants.HEIGHT, -1);
 			if (height > -1) {
 				layoutData.heightHint = height;
 			}
@@ -104,24 +104,33 @@ public class CheckTreeSWTProvider implements IInputSWTProvider {
 		// Create the viewer :
 		final CheckboxTreeViewer viewer = new CheckboxTreeViewer(tree);
 		viewer.setContentProvider(new ITreeContentProvider() {
-			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
-			public void dispose() {}
-			
+			@Override
+			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+			}
+
+			@Override
+			public void dispose() {
+			}
+
+			@Override
 			public boolean hasChildren(Object element) {
 				return false;
 			}
-			
+
+			@Override
 			public Object getParent(Object element) {
 				return null;
 			}
-			
+
+			@Override
 			public Object[] getElements(Object inputElement) {
 				if (inputElement instanceof BeanMapList) {
-					return ((BeanMapList)inputElement).toArray();
+					return ((BeanMapList) inputElement).toArray();
 				}
 				return null;
 			}
-			
+
+			@Override
 			public Object[] getChildren(Object parentElement) {
 				return null;
 			}
@@ -132,7 +141,7 @@ public class CheckTreeSWTProvider implements IInputSWTProvider {
 				if ((formater == null) || !(element instanceof IBeanMap)) {
 					return super.getText(element);
 				}
-				return formater.format((IBeanMap)element);
+				return formater.format((IBeanMap) element);
 			}
 		});
 		// Sorting capability
@@ -141,19 +150,23 @@ public class CheckTreeSWTProvider implements IInputSWTProvider {
 		}
 		// Check state listening (update the model).
 		viewer.addCheckStateListener(new ICheckStateListener() {
+			@Override
 			public void checkStateChanged(CheckStateChangedEvent event) {
 				if (event.getChecked()) {
-					renderer.addLinkitem((MetaDataLink)element, (BeanMap) event.getElement());
+					renderer.addLinkitem((MetaDataLink) element, (BeanMap) event.getElement());
 				} else {
-					renderer.removeLinkitem((MetaDataLink)element, (BeanMap) event.getElement());
+					renderer.removeLinkitem((MetaDataLink) element, (BeanMap) event.getElement());
 				}
 			}
 		});
-		// The table contain all the data (they will be checked (or not according to the current BeanMap associated values).
+		// The table contain all the data (they will be checked (or not according to the current BeanMap associated
+		// values).
 		// TODO loadList should support attributes selection... (connect to the formatter).
 		renderer.getDataLoader().loadList(entity.getType(), new IBeanMapListListener() {
+			@Override
 			public void changed(final BeanMapListEvent event) {
 				viewer.getTree().getDisplay().asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						viewer.setInput(event.getSource());
 					}
@@ -161,16 +174,21 @@ public class CheckTreeSWTProvider implements IInputSWTProvider {
 			}
 		});
 		renderer.getRendererBinding().bindElement(element, new IBeanMapContainerList() {
-			public void loadedListComplete(ISWTRenderer renderer) {}
-			
+			@Override
+			public void loadedListComplete(ISWTRenderer renderer) {
+			}
+
+			@Override
 			public String getListType() {
 				return entity.getType();
 			}
-			
+
+			@Override
 			public Widget getWidget() {
 				return viewer.getTree();
 			}
-			
+
+			@Override
 			public void setBeanMapList(BeanMapList list) {
 				if (list == null) {
 					viewer.setCheckedElements(new Object[0]);
@@ -178,26 +196,30 @@ public class CheckTreeSWTProvider implements IInputSWTProvider {
 					viewer.setCheckedElements(list.toArray());
 				}
 			}
-			
+
+			@Override
 			public BeanMapList getBeanMapList() {
 				try {
-					return new BeanMapList((BeanMap[])viewer.getCheckedElements());
-				} catch (ClassCastException e) {
+					return new BeanMapList((BeanMap[]) viewer.getCheckedElements());
+				} catch (final ClassCastException e) {
 					return new BeanMapList();
 				}
 			}
-			
+
+			@Override
 			public String getAttributeList() {
 				if (formater != null) {
 					return formater.getAttributeCodes();
 				}
 				return null;
 			}
-			
+
+			@Override
 			public String getOrderList() {
 				return null;
 			}
-			
+
+			@Override
 			public void addBeanMapToList(int index, BeanMap beanMap) {
 				viewer.setChecked(beanMap, true);
 			}
@@ -205,6 +227,8 @@ public class CheckTreeSWTProvider implements IInputSWTProvider {
 		tree.setFocus();
 	}
 
-	public void dispose() {}
+	@Override
+	public void dispose() {
+	}
 
 }

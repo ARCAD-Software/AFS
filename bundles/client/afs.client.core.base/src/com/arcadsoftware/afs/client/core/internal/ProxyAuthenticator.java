@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -29,31 +29,31 @@ import com.arcadsoftware.afs.client.core.connection.IUserAuthentication;
 
 /**
  * This class override the Eclipse code to do not popup a dialog each time a Proxy login is required.
- * 
+ *
  * @author ARCAD Software
  */
 public class ProxyAuthenticator extends Authenticator {
 
 	private static ProxyAuthenticator instance = new ProxyAuthenticator();
-	
+
 	public static ProxyAuthenticator getInstance() {
 		return instance;
 	}
-	
+
 	private final Hashtable<String, PasswordAuthentication> cache;
-	
+
 	protected ProxyAuthenticator() {
 		super();
-		cache = new Hashtable<String, PasswordAuthentication>();
+		cache = new Hashtable<>();
 	}
-	
+
 	@Override
 	protected PasswordAuthentication getPasswordAuthentication() {
 		String scheme = getRequestingScheme();
 		if ((scheme == null) || scheme.isEmpty()) {
 			scheme = getRequestingProtocol();
 		}
-		InetAddress address = getRequestingSite(); // can be null;
+		final InetAddress address = getRequestingSite(); // can be null;
 		String host = null;
 		if (address != null) {
 			host = address.getCanonicalHostName();
@@ -67,12 +67,13 @@ public class ProxyAuthenticator extends Authenticator {
 		host = host.toLowerCase();
 		// Get Proxy auth from Eclipse preferences...
 		IProxyService proxyService = null;
-		ServiceReference<IProxyService> sr = BaseActivator.getDefault().getBundle().getBundleContext().getServiceReference(IProxyService.class);
+		final ServiceReference<IProxyService> sr = BaseActivator.getDefault().getBundle().getBundleContext()
+				.getServiceReference(IProxyService.class);
 		if (sr != null) {
 			proxyService = BaseActivator.getDefault().getBundle().getBundleContext().getService(sr);
 		}
 		if ((proxyService != null) && proxyService.isProxiesEnabled()) {
-			IProxyData[] proxyDatas = proxyService.getProxyData();
+			final IProxyData[] proxyDatas = proxyService.getProxyData();
 			if (proxyDatas != null) {
 				final String proxytype;
 				if ("https".equalsIgnoreCase(scheme)) { //$NON-NLS-1$
@@ -80,13 +81,14 @@ public class ProxyAuthenticator extends Authenticator {
 				} else {
 					proxytype = IProxyData.HTTP_PROXY_TYPE;
 				}
-				for (IProxyData pd: proxyDatas) {
+				for (final IProxyData pd : proxyDatas) {
 					if (proxytype.equals(pd.getType()) && pd.isRequiresAuthentication()) {
 						String proxyHost = pd.getHost();
 						if (proxyHost != null) {
 							proxyHost = proxyHost.toLowerCase();
 							if ((proxyHost.startsWith(host) || host.startsWith(proxyHost)) &&
-									(pd.getUserId() != null) && !pd.getUserId().isEmpty() && pd.getPassword() != null) {
+									(pd.getUserId() != null) && !pd.getUserId().isEmpty()
+									&& (pd.getPassword() != null)) {
 								return new PasswordAuthentication(pd.getUserId(), pd.getPassword().toCharArray());
 							}
 						}
@@ -106,21 +108,22 @@ public class ProxyAuthenticator extends Authenticator {
 	}
 
 	private PasswordAuthentication getUserAuthentication(String scheme, String host, String requestingPrompt) {
-		for (IConfigurationElement e: Platform.getExtensionRegistry().getConfigurationElementsFor("com.arcadsoftware.afs.client.core.userAuthentication")) { //$NON-NLS-1$
+		for (final IConfigurationElement e : Platform.getExtensionRegistry()
+				.getConfigurationElementsFor("com.arcadsoftware.afs.client.core.userAuthentication")) { //$NON-NLS-1$
 			try {
-				Object o = e.createExecutableExtension("class"); //$NON-NLS-1$
+				final Object o = e.createExecutableExtension("class"); //$NON-NLS-1$
 				if (o instanceof IUserAuthentication) {
-					PasswordAuthentication auth = ((IUserAuthentication) o).getUserAuthentication(scheme, host, requestingPrompt);
+					final PasswordAuthentication auth = ((IUserAuthentication) o).getUserAuthentication(scheme, host,
+							requestingPrompt);
 					if (auth != null) {
 						return auth;
 					}
 				}
-			} catch (CoreException e1) {
-				BaseActivator.getDefault().error(e1.getLocalizedMessage(),e1);
+			} catch (final CoreException e1) {
+				BaseActivator.getDefault().error(e1.getLocalizedMessage(), e1);
 			}
 		}
 		return null;
 	}
 
-	
 }

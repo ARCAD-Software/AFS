@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -21,100 +21,107 @@ import com.arcadsoftware.afs.client.core.connection.DataAccessHelper;
 import com.arcadsoftware.afs.client.core.connection.ServerConnection;
 import com.arcadsoftware.afs.client.reporting.core.ReportHeader;
 
-public class ReportPreviewEditorInput implements IEditorInput {	
+public class ReportPreviewEditorInput implements IEditorInput {
 
-    // URL : {proxy}{reportRunTarget}&__format={viewerType}{&otherParams}&__locale={locale}
-	public static final String URL_FORMAT="%s%s&__format=%s%s&__locale=%s";
-	
-	private ServerConnection connection;
-	private DataAccessHelper helper;
-    ReportHeader report;
-    
-    private String viewerType;
-    private String extraParams;
+	// URL : {proxy}{reportRunTarget}&__format={viewerType}{&otherParams}&__locale={locale}
+	public static final String URL_FORMAT = "%s%s&__format=%s%s&__locale=%s";
 
-    public String getViewerType(){
-        return viewerType;
-    }
-    
-    public String getViewerExtraParameters(){
-        return extraParams;
-    }
+	private final ServerConnection connection;
+	private final DataAccessHelper helper;
+	ReportHeader report;
 
-    public void setViewerType(String viewerType){
-        this.viewerType = viewerType;
-    }
+	private String viewerType;
+	private final String extraParams;
 
-    public ReportHeader getReport(){
-        return report;
-    }
+	public String getViewerType() {
+		return viewerType;
+	}
 
-    public ReportPreviewEditorInput(ServerConnection connection,ReportHeader report, String viewerType, String extraParams){
-        this.report = report;
-        this.viewerType = viewerType;
-        this.extraParams = extraParams;
-        this.connection =  connection;
-        helper = new DataAccessHelper(connection);
-    }
+	public String getViewerExtraParameters() {
+		return extraParams;
+	}
 
-    public boolean exists(){
-        return false;
-    }
+	public void setViewerType(String viewerType) {
+		this.viewerType = viewerType;
+	}
 
-    public ImageDescriptor getImageDescriptor(){
-        return null;
-    }
+	public ReportHeader getReport() {
+		return report;
+	}
 
-    public String getName(){
-        return report.getName();
-    }
+	public ReportPreviewEditorInput(ServerConnection connection, ReportHeader report, String viewerType,
+			String extraParams) {
+		this.report = report;
+		this.viewerType = viewerType;
+		this.extraParams = extraParams;
+		this.connection = connection;
+		helper = new DataAccessHelper(connection);
+	}
 
-    public IPersistableElement getPersistable(){
-        return null;
-    }
+	@Override
+	public boolean exists() {
+		return false;
+	}
 
-    public String getToolTipText(){
-        return report.getDescription();
-    }
-
-    @Override
-    public <T> T getAdapter(Class<T> adapter) {    
-    	return null;
-    }
-
-    public static ReportPreviewEditor openEditor(ReportPreviewEditorInput input){
-		ReportPreviewExternalEditor extEditor = new ReportPreviewExternalEditor(input);
-		extEditor.preview();		
+	@Override
+	public ImageDescriptor getImageDescriptor() {
 		return null;
-    }
-    
-    
-	/* (non-Javadoc)
+	}
+
+	@Override
+	public String getName() {
+		return report.getName();
+	}
+
+	@Override
+	public IPersistableElement getPersistable() {
+		return null;
+	}
+
+	@Override
+	public String getToolTipText() {
+		return report.getDescription();
+	}
+
+	@Override
+	public <T> T getAdapter(Class<T> adapter) {
+		return null;
+	}
+
+	public static ReportPreviewEditor openEditor(ReportPreviewEditorInput input) {
+		final ReportPreviewExternalEditor extEditor = new ReportPreviewExternalEditor(input);
+		extEditor.preview();
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
+	@Override
 	public boolean equals(Object arg0) {
-		if (arg0 instanceof ReportPreviewEditorInput){
-			if (arg0!=null) {
-				ReportPreviewEditorInput ed = (ReportPreviewEditorInput)arg0;
-				return ed.getReport().isEqualTo(this.report);
+		if (arg0 instanceof ReportPreviewEditorInput) {
+			if (arg0 != null) {
+				final ReportPreviewEditorInput ed = (ReportPreviewEditorInput) arg0;
+				return ed.getReport().isEqualTo(report);
 			}
-		}		
+		}
 		return false;
-		
-	}	    
-	    
+
+	}
+
 	@Override
 	public int hashCode() {
-		//Note: modifiy this method according to the equals method
+		// Note: modifiy this method according to the equals method
 		return super.hashCode();
 	}
-	
+
 	public ServerConnection getConnection() {
 		return connection;
 	}
-	
+
 	public DataAccessHelper getHelper() {
 		return helper;
 	}
-	
+
 }

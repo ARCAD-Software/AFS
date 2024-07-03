@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -37,24 +37,24 @@ import com.arcadsoftware.metadata.MetaDataLink;
  */
 public class BeanMapObservableLink extends WritableList<BeanMap> implements IBeanMapListListener {
 
-	private MetaDataLink link;
-	private LinkMapWarper warper;
+	private final MetaDataLink link;
+	private final LinkMapWarper warper;
 	private boolean populated;
 	private boolean autoPopulate;
-	private SWTRenderer renderer;
+	private final SWTRenderer renderer;
 	private String attributeList = null;
 	private String orderList = null;
 	private ILayoutParameters parameters;
-	
+
 	private static String PROP_PAGE_COUNT = "pageCount";
 
 	/**
 	 * Create a Link observable.
-	 * 
+	 *
 	 * @param link
 	 * @param warper
 	 */
-	public BeanMapObservableLink(MetaDataLink link, LinkMapWarper warper, SWTRenderer renderer,String attributeList) {
+	public BeanMapObservableLink(MetaDataLink link, LinkMapWarper warper, SWTRenderer renderer, String attributeList) {
 		super(new ArrayList<BeanMap>(), BeanMap.class);
 		this.link = link;
 		this.warper = warper;
@@ -62,27 +62,31 @@ public class BeanMapObservableLink extends WritableList<BeanMap> implements IBea
 		populated = false;
 		autoPopulate = true;
 		this.attributeList = attributeList;
-		this.parameters = null;
+		parameters = null;
 	}
-	
-	public BeanMapObservableLink(MetaDataLink link, LinkMapWarper warper, SWTRenderer renderer, boolean autoPopulate,String attributeList, String orderList) {
-		this(link, warper, renderer,autoPopulate, attributeList);
+
+	public BeanMapObservableLink(MetaDataLink link, LinkMapWarper warper, SWTRenderer renderer, boolean autoPopulate,
+			String attributeList, String orderList) {
+		this(link, warper, renderer, autoPopulate, attributeList);
 		this.orderList = orderList;
 	}
-	
-	public BeanMapObservableLink(MetaDataLink link, LinkMapWarper warper, SWTRenderer renderer,String attributeList, String orderList) {
+
+	public BeanMapObservableLink(MetaDataLink link, LinkMapWarper warper, SWTRenderer renderer, String attributeList,
+			String orderList) {
 		this(link, warper, renderer, attributeList);
 		this.orderList = orderList;
 	}
 
-	public BeanMapObservableLink(MetaDataLink link, LinkMapWarper warper, SWTRenderer renderer, boolean autoPopulate,String attributeList) {
-		this(link, warper, renderer,attributeList);
+	public BeanMapObservableLink(MetaDataLink link, LinkMapWarper warper, SWTRenderer renderer, boolean autoPopulate,
+			String attributeList) {
+		this(link, warper, renderer, attributeList);
 		this.autoPopulate = autoPopulate;
-		this.parameters = null;
+		parameters = null;
 	}
-	
-	public BeanMapObservableLink(MetaDataLink link, LinkMapWarper warper, SWTRenderer renderer, boolean autoPopulate,String attributeList,String orderList, ILayoutParameters parameters) {
-		this(link, warper, renderer,autoPopulate, attributeList);
+
+	public BeanMapObservableLink(MetaDataLink link, LinkMapWarper warper, SWTRenderer renderer, boolean autoPopulate,
+			String attributeList, String orderList, ILayoutParameters parameters) {
+		this(link, warper, renderer, autoPopulate, attributeList);
 		this.parameters = parameters;
 		this.orderList = orderList;
 	}
@@ -106,13 +110,14 @@ public class BeanMapObservableLink extends WritableList<BeanMap> implements IBea
 	public void populate() {
 		populated = true;
 		String pageCount = null;
-		if(parameters != null){
+		if (parameters != null) {
 			pageCount = parameters.getParameter(PROP_PAGE_COUNT);
 		}
-		if(pageCount != null){
-			warper.loadLinkList(link.getCode(), link.getType(), this,attributeList, orderList,Integer.valueOf(pageCount).intValue());
-		}else{
-			warper.loadLinkList(link.getCode(), link.getType(), this,attributeList, orderList);	
+		if (pageCount != null) {
+			warper.loadLinkList(link.getCode(), link.getType(), this, attributeList, orderList,
+					Integer.valueOf(pageCount).intValue());
+		} else {
+			warper.loadLinkList(link.getCode(), link.getType(), this, attributeList, orderList);
 		}
 	}
 
@@ -214,7 +219,6 @@ public class BeanMapObservableLink extends WritableList<BeanMap> implements IBea
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.core.databinding.observable.list.WritableList#add(int, java.lang.Object)
 	 */
 	@Override
@@ -222,21 +226,20 @@ public class BeanMapObservableLink extends WritableList<BeanMap> implements IBea
 		autoPop();
 		super.add(index, element);
 		if (element != null) {
-			warper.updateLinkList(link.getCode(), LinkMapWarper.LINKLIST_ADD, (BeanMap) element);
+			warper.updateLinkList(link.getCode(), LinkMapWarper.LINKLIST_ADD, element);
 		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.core.databinding.observable.list.WritableList#add(java.lang.Object)
 	 */
 	@Override
 	public boolean add(BeanMap element) {
 		autoPop();
-		boolean result = super.add(element);
+		final boolean result = super.add(element);
 		if (element != null) {
-			warper.updateLinkList(link.getCode(), LinkMapWarper.LINKLIST_ADD, (BeanMap) element);
+			warper.updateLinkList(link.getCode(), LinkMapWarper.LINKLIST_ADD, element);
 		}
 		return result;
 	}
@@ -245,9 +248,9 @@ public class BeanMapObservableLink extends WritableList<BeanMap> implements IBea
 	@Override
 	public boolean addAll(Collection c) {
 		autoPop();
-		boolean result = super.addAll(c);
+		final boolean result = super.addAll(c);
 		if (c != null) {
-			for (Object o : c) {
+			for (final Object o : c) {
 				warper.updateLinkList(link.getCode(), LinkMapWarper.LINKLIST_ADD, (BeanMap) o);
 			}
 		}
@@ -258,9 +261,9 @@ public class BeanMapObservableLink extends WritableList<BeanMap> implements IBea
 	@Override
 	public boolean addAll(int index, Collection c) {
 		autoPop();
-		boolean result = super.addAll(index, c);
+		final boolean result = super.addAll(index, c);
 		if (c != null) {
-			for (Object o : c) {
+			for (final Object o : c) {
 				warper.updateLinkList(link.getCode(), LinkMapWarper.LINKLIST_ADD, (BeanMap) o);
 			}
 		}
@@ -270,12 +273,12 @@ public class BeanMapObservableLink extends WritableList<BeanMap> implements IBea
 	@Override
 	public BeanMap set(int index, BeanMap element) {
 		autoPop();
-		BeanMap result = super.set(index, element);
+		final BeanMap result = super.set(index, element);
 		if (result != null) {
-			warper.updateLinkList(link.getCode(), LinkMapWarper.LINKLIST_REMOVE, (BeanMap) result);
+			warper.updateLinkList(link.getCode(), LinkMapWarper.LINKLIST_REMOVE, result);
 		}
 		if (element != null) {
-			warper.updateLinkList(link.getCode(), LinkMapWarper.LINKLIST_ADD, (BeanMap) element);
+			warper.updateLinkList(link.getCode(), LinkMapWarper.LINKLIST_ADD, element);
 		}
 		return result;
 	}
@@ -289,9 +292,9 @@ public class BeanMapObservableLink extends WritableList<BeanMap> implements IBea
 	@Override
 	public BeanMap remove(int index) {
 		autoPop();
-		BeanMap result = super.remove(index);
+		final BeanMap result = super.remove(index);
 		if (result != null) {
-			warper.updateLinkList(link.getCode(), LinkMapWarper.LINKLIST_REMOVE, (BeanMap) result);
+			warper.updateLinkList(link.getCode(), LinkMapWarper.LINKLIST_REMOVE, result);
 		}
 		return result;
 	}
@@ -299,7 +302,7 @@ public class BeanMapObservableLink extends WritableList<BeanMap> implements IBea
 	@Override
 	public boolean remove(Object o) {
 		autoPop();
-		boolean result = super.remove(o);
+		final boolean result = super.remove(o);
 		if (result) {
 			warper.updateLinkList(link.getCode(), LinkMapWarper.LINKLIST_REMOVE, (BeanMap) o);
 		}
@@ -309,9 +312,9 @@ public class BeanMapObservableLink extends WritableList<BeanMap> implements IBea
 	@Override
 	public boolean removeAll(Collection<?> c) {
 		autoPop();
-		boolean result = super.removeAll(c);
+		final boolean result = super.removeAll(c);
 		if (result) {
-			for (Object o : c) {
+			for (final Object o : c) {
 				warper.updateLinkList(link.getCode(), LinkMapWarper.LINKLIST_REMOVE, (BeanMap) o);
 			}
 		}
@@ -321,7 +324,7 @@ public class BeanMapObservableLink extends WritableList<BeanMap> implements IBea
 	@Override
 	public void clear() {
 		autoPop();
-		for (Object o : wrappedList) {
+		for (final Object o : wrappedList) {
 			warper.updateLinkList(link.getCode(), LinkMapWarper.LINKLIST_REMOVE, (BeanMap) o);
 		}
 		super.clear();
@@ -330,29 +333,33 @@ public class BeanMapObservableLink extends WritableList<BeanMap> implements IBea
 	@Override
 	public boolean retainAll(Collection<?> c) {
 		autoPop();
-		for (Object o : c) {
-			if (wrappedList.indexOf(o) == -1)
+		for (final Object o : c) {
+			if (wrappedList.indexOf(o) == -1) {
 				warper.updateLinkList(link.getCode(), LinkMapWarper.LINKLIST_REMOVE, (BeanMap) o);
+			}
 		}
 		return super.retainAll(c);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.arcadsoftware.utils.IBeanMapListListener#changed(com.arcadsoftware.utils.BeanMapListEvent)
 	 */
+	@Override
 	public void changed(BeanMapListEvent event) {
 		final BeanMapList list = event.getSource();
-		final String listType  = (event instanceof BeanMapListTypedEvent) ? ((BeanMapListTypedEvent)event).getType() : null;
+		final String listType = (event instanceof BeanMapListTypedEvent) ? ((BeanMapListTypedEvent) event).getType()
+				: null;
 		getRealm().asyncExec(new Runnable() {
+			@Override
 			@SuppressWarnings("synthetic-access")
 			public void run() {
 				BeanMapObservableLink.this.updateWrappedList(list);
-				if (list != null && list.size() > 0)
+				if ((list != null) && (list.size() > 0)) {
 					renderer.loadListCompleted(list.get(0).getType());
-				else if (listType != null)
+				} else if (listType != null) {
 					renderer.loadListCompleted(listType);
+				}
 			}
 		});
 	}
@@ -362,7 +369,7 @@ public class BeanMapObservableLink extends WritableList<BeanMap> implements IBea
 	 */
 	public BeanMap find(int id) {
 		if (wrappedList != null) {
-			for (Object o : wrappedList) {
+			for (final Object o : wrappedList) {
 				if ((o instanceof BeanMap) && (((BeanMap) o).getId() == id)) {
 					return (BeanMap) o;
 				}
@@ -378,10 +385,10 @@ public class BeanMapObservableLink extends WritableList<BeanMap> implements IBea
 		for (int i = wrappedList.size() - 1; i >= 0; i--) {
 			if (item.getId() == wrappedList.get(i).getId()) {
 				checkRealm();
-				// Ensure that all Required Attributes are loaded 
-				item.addAll(warper.loadLinkedItem(item.getType(), item.getId(), attributeList));		
-				
-				BeanMap oldElement = wrappedList.set(i, item);
+				// Ensure that all Required Attributes are loaded
+				item.addAll(warper.loadLinkedItem(item.getType(), item.getId(), attributeList));
+
+				final BeanMap oldElement = wrappedList.set(i, item);
 				fireListChange(Diffs.createListDiff(Diffs.createListDiffEntry(i, false, oldElement), Diffs
 						.createListDiffEntry(i, true, item)));
 				renderer.loadListCompleted(item.getType());

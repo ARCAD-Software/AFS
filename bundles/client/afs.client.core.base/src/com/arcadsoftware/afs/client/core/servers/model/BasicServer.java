@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -25,7 +25,7 @@ public class BasicServer implements IServer, Cloneable {
 	private String proxyPort = "";//$NON-NLS-1$
 	private String proxyLogin = "";//$NON-NLS-1$
 	private String proxyPassword = "";//$NON-NLS-1$
-	
+
 	@Override
 	public String getUrl() {
 		return url;
@@ -59,7 +59,7 @@ public class BasicServer implements IServer, Cloneable {
 	@Override
 	@Deprecated
 	public Server duplicate() {
-		Server result = new Server();
+		final Server result = new Server();
 		result.setName(name);
 		result.assign(this);
 		return result;
@@ -71,19 +71,19 @@ public class BasicServer implements IServer, Cloneable {
 	}
 
 	@Override
-	public void assign(IServer source) {		
+	public void assign(IServer source) {
 		setUrl(source.getUrl());
 		setLastLogin(source.getLastLogin());
 		setRememberPassword(source.isRememberPassword());
-		if (source.isRememberPassword()){
+		if (source.isRememberPassword()) {
 			setLastPassword(source.getLastPassword());
 		}
 		setProxyHost(source.getProxyHost());
 		setProxyPort(source.getProxyPort());
 		setProxyLogin(source.getProxyLogin());
 		setProxyPassword(source.getProxyPassword());
-	}	
-	
+	}
+
 	@Override
 	public String getLastLogin() {
 		return lastLogin;
@@ -101,7 +101,7 @@ public class BasicServer implements IServer, Cloneable {
 
 	@Override
 	public void setLastPassword(String lastPassword) {
-		//TODO [SSC] Crypter le password
+		// TODO [SSC] Crypter le password
 		this.lastPassword = lastPassword;
 	}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -20,7 +20,7 @@ import org.eclipse.ui.IPersistableElement;
 import com.arcadsoftware.beanmap.BeanMap;
 
 /**
- * 
+ *
  */
 public class BeanMapEditorInput implements IBeanMapEditorInput {
 
@@ -56,28 +56,33 @@ public class BeanMapEditorInput implements IBeanMapEditorInput {
 	 */
 	public BeanMapEditorInput(BeanMap beanMap, String realm, String layoutName) {
 		super();
-		this.setBeanMap(beanMap);
+		setBeanMap(beanMap);
 		this.realm = realm;
 		this.layoutName = layoutName;
-		this.readOnly = false;
+		readOnly = false;
 	}
 
+	@Override
 	public int getId() {
 		return getBeanMap().getId();
 	}
 
+	@Override
 	public String getType() {
 		return getBeanMap().getType();
 	}
 
+	@Override
 	public boolean exists() {
 		return true;
 	}
 
+	@Override
 	public ImageDescriptor getImageDescriptor() {
 		return ImageDescriptor.getMissingImageDescriptor();
 	}
 
+	@Override
 	public String getName() {
 		if (getBeanMap() == null) {
 			return ""; //$NON-NLS-1$
@@ -85,12 +90,15 @@ public class BeanMapEditorInput implements IBeanMapEditorInput {
 		return getBeanMap().toString();
 	}
 
+	@Override
 	public IPersistableElement getPersistable() {
 		return new IPersistableElement() {
+			@Override
 			public String getFactoryId() {
 				return ELEMENT_FACTORY_ID;
 			}
 
+			@Override
 			public void saveState(IMemento memento) {
 				MementoSaveBeanMap.save(memento, getBeanMap());
 				memento.putString(REALM, realm);
@@ -99,19 +107,22 @@ public class BeanMapEditorInput implements IBeanMapEditorInput {
 		};
 	}
 
+	@Override
 	public String getToolTipText() {
 		return EMPTY;
 	}
-	
+
 	@Override
-	public <T> T getAdapter(Class<T> adapter) {	
+	public <T> T getAdapter(Class<T> adapter) {
 		return null;
 	}
-	
+
+	@Override
 	public String getRealm() {
 		return realm;
 	}
 
+	@Override
 	public String getLayoutName() {
 		return layoutName;
 	}
@@ -123,6 +134,7 @@ public class BeanMapEditorInput implements IBeanMapEditorInput {
 	public BeanMap getBeanMap() {
 		return beanMap;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if ((obj instanceof BeanMapEditorInput) && (((BeanMapEditorInput) obj).getBeanMap() != null)) {
@@ -135,11 +147,11 @@ public class BeanMapEditorInput implements IBeanMapEditorInput {
 	public boolean isReadOnly() {
 		return readOnly;
 	}
-	
+
 	public void setReadOnly(boolean readOnly) {
 		this.readOnly = readOnly;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -34,8 +34,11 @@ import com.arcadsoftware.beanmap.BeanMap;
 public abstract class AbstractImportAction extends AbstractConnectedBeanMapAction {
 
 	protected abstract AuthType getSelectedAuthType();
+
 	protected abstract Object[] getSelectedItems();
-	protected abstract void completeUserBeanMap(BeanMap user);	
+
+	protected abstract void completeUserBeanMap(BeanMap user);
+
 	protected abstract int[] getProfiles(BeanMap user);
 
 	public AbstractImportAction(ServerConnection connection) {
@@ -48,56 +51,58 @@ public abstract class AbstractImportAction extends AbstractConnectedBeanMapActio
 		setToolTipText(Activator.resString("users.import.action.tooltip")); //$NON-NLS-1$
 		setImageDescriptor(AFSIcon.USER_GROUP_IMPORT.imageDescriptor());
 	}
-	
+
 	@Override
 	protected boolean canExecute() {
-		Object[] items = getSelectedItems();
+		final Object[] items = getSelectedItems();
 		if ((items == null) || (items.length == 0)) {
 			return false;
 		}
 		if (!isAllowed()) {
-			LogUITools.logError(Activator.getDefault().getBundle(), UserMessageManager.getInstance().getMessage(IACCMessages.ERR_ACTION_NO_RIGHT));
-			MessageDialog.openError(Activator.getDefault().getPluginShell(), getText(), Activator.resString("msg.error.right.missing")); //$NON-NLS-1$
+			LogUITools.logError(Activator.getDefault().getBundle(),
+					UserMessageManager.getInstance().getMessage(IACCMessages.ERR_ACTION_NO_RIGHT));
+			MessageDialog.openError(Activator.getDefault().getPluginShell(), getText(),
+					Activator.resString("msg.error.right.missing")); //$NON-NLS-1$
 			return false;
 		}
 		return true;
 	}
-	
+
 	@SuppressWarnings("incomplete-switch")
 	@Override
 	protected boolean execute() {
 		final Object[] items = getSelectedItems();
-		if((items != null) && (items.length > 0)) {
-			switch(getSelectedAuthType()) {
-				case IBMI:
-					return importFromIBMi(items);
-				case LDAP:
-					return importFromLDAP(items);
+		if ((items != null) && (items.length > 0)) {
+			switch (getSelectedAuthType()) {
+			case IBMI:
+				return importFromIBMi(items);
+			case LDAP:
+				return importFromLDAP(items);
 			}
 		}
 		return false;
 	}
-	
+
 	private boolean importFromIBMi(final Object[] items) {
-		for (Object o: items) {
+		for (final Object o : items) {
 			if (o instanceof BeanMap) {
 				createIBMiUser((BeanMap) o);
 			}
 		}
 		return true;
 	}
-	
-	private void createIBMiUser(final BeanMap user) {				
+
+	private void createIBMiUser(final BeanMap user) {
 		boolean revert = false;
 		final DataAccessHelper helper = new DataAccessHelper(connection);
-		final BeanMap ibmiAuth = new BeanMap(AuthType.IBMI.code());				
-		try {					
+		final BeanMap ibmiAuth = new BeanMap(AuthType.IBMI.code());
+		try {
 			completeUserBeanMap(user);
 			revert = !helper.create(user);
-			if(!revert) {
+			if (!revert) {
 				final int[] profiles = getProfiles(user);
-				if(profiles != null) {
-					for(int pId : profiles) {
+				if (profiles != null) {
+					for (final int pId : profiles) {
 						helper.createLink(IUsersConsts.ENTITY_USER, user.getId(), IUsersConsts.USER_LINK_PROFILES, pId);
 					}
 				}
@@ -105,9 +110,9 @@ public abstract class AbstractImportAction extends AbstractConnectedBeanMapActio
 				ibmiAuth.put("login", user.getString("ibmiauth.login"));
 				revert = !helper.create(ibmiAuth);
 			}
-		} catch(final Exception e) {
-			Activator.getDefault().error("Unable to import the IBMi user \"" + 
-					user.getString("ibmiauth.login", "-unknown-") + //$NON-NLS-1$ 
+		} catch (final Exception e) {
+			Activator.getDefault().error("Unable to import the IBMi user \"" +
+					user.getString("ibmiauth.login", "-unknown-") + //$NON-NLS-1$
 					": " + e.getLocalizedMessage(), e); //$NON-NLS-1$
 			revert = true;
 		}
@@ -118,8 +123,8 @@ public abstract class AbstractImportAction extends AbstractConnectedBeanMapActio
 
 	private boolean importFromLDAP(final Object[] items) {
 		BeanMap user = null;
-		LDAPAccessHelper ldapHelper = new LDAPAccessHelper(connection);
-		for (Object item : items) {
+		final LDAPAccessHelper ldapHelper = new LDAPAccessHelper(connection);
+		for (final Object item : items) {
 			if (item instanceof BeanMap) {
 				user = (BeanMap) item;
 				if (IUsersConsts.ENTITY_USER.equals(user.getType())) {

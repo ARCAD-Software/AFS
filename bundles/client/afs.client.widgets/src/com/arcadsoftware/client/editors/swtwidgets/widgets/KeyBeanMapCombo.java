@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -25,9 +25,9 @@ import com.arcadsoftware.editor.ILayoutParameters;
 import com.arcadsoftware.editor.swt.ISWTRenderer;
 import com.arcadsoftware.metadata.MetaDataEntity;
 
-public class KeyBeanMapCombo extends BeanMapCombo{
+public class KeyBeanMapCombo extends BeanMapCombo {
 
-	private static final String ATTRIBUTE_KEY = "key";
+	private static final String ATTRIBUTE_KEY = "key"; //$NON-NLS-1$
 	private String keyAttribute;
 
 	public KeyBeanMapCombo(Composite parent, int style, ILayoutParameters parameters, ISWTRenderer renderer,
@@ -35,9 +35,10 @@ public class KeyBeanMapCombo extends BeanMapCombo{
 		super(parent, style, parameters, renderer, structure, horizontalSpan);
 		keyAttribute = parameters.getParameter(ATTRIBUTE_KEY);
 	}
-		
+
 	/**
 	 * Create a BeanMapCombo out of dynamic editors: no renderer, no translate
+	 *
 	 * @param parent
 	 * @param style
 	 * @param format
@@ -53,11 +54,12 @@ public class KeyBeanMapCombo extends BeanMapCombo{
 
 	@Override
 	public void setBeanMapList(BeanMapList list) {
-		if (list == null)
+		if (list == null) {
 			list = new BeanMapList();
-		
+		}
+
 		this.list = list;
-		String[] items = new String[list.size() + 1];
+		final String[] items = new String[list.size() + 1];
 		items[0] = ""; //$NON-NLS-1$
 		Object curid = 0;
 		if (current != null) {
@@ -65,9 +67,9 @@ public class KeyBeanMapCombo extends BeanMapCombo{
 		}
 		int selection = -1;
 		for (int i = 0; i < list.size(); i++) {
-			BeanMap beanMap = list.get(i);
+			final BeanMap beanMap = list.get(i);
 			items[i + 1] = beanMaptoString(beanMap);
-			if (beanMap.get(keyAttribute)!=null && beanMap.get(keyAttribute).equals(curid)) {
+			if ((beanMap.get(keyAttribute) != null) && beanMap.get(keyAttribute).equals(curid)) {
 				selection = i + 1;
 			}
 		}
@@ -79,7 +81,7 @@ public class KeyBeanMapCombo extends BeanMapCombo{
 			combo.setText(beanMaptoString(current));
 		}
 	}
-	
+
 	@Override
 	public void setBeanMapValue(BeanMap beanMap) {
 		if (beanMap == null) {
@@ -87,8 +89,8 @@ public class KeyBeanMapCombo extends BeanMapCombo{
 			combo.setText(""); //$NON-NLS-1$
 		} else if (!beanMap.equals(current)) {
 			current = beanMap;
-			if (list != null) {				
-				int i = list.getFirstIndex(keyAttribute, beanMap.get(keyAttribute));
+			if (list != null) {
+				final int i = list.getFirstIndex(keyAttribute, beanMap.get(keyAttribute));
 				if (i >= 0) {
 					combo.select(i + 1);
 					return;

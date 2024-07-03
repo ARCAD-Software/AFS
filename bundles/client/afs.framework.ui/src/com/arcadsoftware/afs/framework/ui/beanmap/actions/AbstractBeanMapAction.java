@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -14,20 +14,18 @@
 package com.arcadsoftware.afs.framework.ui.beanmap.actions;
 
 import com.arcadsoftware.aev.core.ui.actions.ArcadAction;
-
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
 
 /**
  * Define an action associated to a BeanMap or a list of BeanMap (or both).
- * 
  * <p>
  * Note that a BeanMap <b>or</b> a BeanMapList is enough to activate this action.
- * 
+ *
  * @author ARCAD Software
  */
-public abstract  class AbstractBeanMapAction extends ArcadAction {
-	
+public abstract class AbstractBeanMapAction extends ArcadAction {
+
 	@Override
 	protected boolean canExecute() {
 		if (getBeanMapToManage() == null) {
@@ -36,20 +34,22 @@ public abstract  class AbstractBeanMapAction extends ArcadAction {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Override this method to associate a BeanMap to this Action
+	 *
 	 * @return
 	 */
 	protected BeanMap getBeanMapToManage() {
 		return null;
 	}
-	
+
 	/**
 	 * Override this method to associate a BeanMapList to this Action.
+	 *
 	 * @return
 	 */
 	protected BeanMapList getBeanMapListToManage() {
 		return null;
-	}	
+	}
 }

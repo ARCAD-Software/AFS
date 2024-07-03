@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -14,11 +14,11 @@
 package com.arcadsoftware.client.editors.swtwidgets.inputs;
 
 import static com.arcadsoftware.client.editors.swtwidgets.IConstants.DEFAULT;
+import static com.arcadsoftware.client.editors.swtwidgets.IConstants.DEFAULT_VALUE;
 import static com.arcadsoftware.client.editors.swtwidgets.IConstants.LABEL;
 import static com.arcadsoftware.client.editors.swtwidgets.IConstants.READ_ONLY;
-import static com.arcadsoftware.client.editors.swtwidgets.IConstants.TWO_POINTS;
-import static com.arcadsoftware.client.editors.swtwidgets.IConstants.DEFAULT_VALUE;
 import static com.arcadsoftware.client.editors.swtwidgets.IConstants.TOOLTIP;
+import static com.arcadsoftware.client.editors.swtwidgets.IConstants.TWO_POINTS;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -35,8 +35,9 @@ import com.arcadsoftware.metadata.MetaDataEntity;
  */
 public class CheckBoxInputSWTProvider implements IInputSWTProvider {
 
+	@Override
 	public void create(ISWTRenderer renderer, ILayoutParameters parameters, Element element, MetaDataEntity entity) {
-		String label = renderer.getLocalizedMessage(parameters.getParameter(LABEL, element.getName()));
+		final String label = renderer.getLocalizedMessage(parameters.getParameter(LABEL, element.getName()));
 		if (label.length() > 0) {
 			renderer.getToolkit().createLabel(renderer.getParent(), label);
 			renderer.getToolkit().createLabel(renderer.getParent(), TWO_POINTS);
@@ -49,7 +50,7 @@ public class CheckBoxInputSWTProvider implements IInputSWTProvider {
 			checkBox = new Button(renderer.getParent(), SWT.CHECK);
 		}
 		if (label.length() == 0) {
-			GridData layoutData = new GridData();
+			final GridData layoutData = new GridData();
 			layoutData.horizontalSpan = 3;
 			checkBox.setLayoutData(layoutData);
 		}
@@ -57,14 +58,16 @@ public class CheckBoxInputSWTProvider implements IInputSWTProvider {
 		if (parameters.getParameterBoolean(DEFAULT)) {
 			checkBox.setFocus();
 		}
-		boolean value = parameters.getParameterBoolean(DEFAULT_VALUE, false);
+		final boolean value = parameters.getParameterBoolean(DEFAULT_VALUE, false);
 		checkBox.setSelection(value);
-		String tooltip = renderer.getLocalizedMessage(parameters.getParameter(TOOLTIP));
+		final String tooltip = renderer.getLocalizedMessage(parameters.getParameter(TOOLTIP));
 		if ((tooltip != null) && (tooltip.length() > 0)) {
-			checkBox.setToolTipText(tooltip);			
+			checkBox.setToolTipText(tooltip);
 		}
 		renderer.getRendererBinding().bindElement(element, checkBox);
 	}
 
-	public void dispose() {}
+	@Override
+	public void dispose() {
+	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -23,38 +23,36 @@ import com.arcadsoftware.afs.framework.ui.images.ImageManager;
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
 
-
 public class GenericEnumerationSelectorDialog extends AbstractBeanMapListSelectorDialog {
 
-	private String entityType;
-	private String dialogTitle;
-	private String attributeList;
-	private String iconKey;
+	private final String entityType;
+	private final String dialogTitle;
+	private final String attributeList;
+	private final String iconKey;
 
-	
 	public GenericEnumerationSelectorDialog(Shell parentShell,
 			ServerConnection connection, boolean multiselection,
 			String type,
 			String attributList,
 			String title,
 			String iconKey) {
-		super(parentShell,  multiselection);
-		this.entityType = type;
-		this.attributeList = attributList;
-		this.dialogTitle = title;
+		super(parentShell, multiselection);
+		entityType = type;
+		attributeList = attributList;
+		dialogTitle = title;
 		this.iconKey = iconKey;
 		initialize(connection);
 	}
 
 	@Override
 	public BeanMapList getInput() {
-		BeanMapList list = helper.getList(getType(), getAttributeList());
+		final BeanMapList list = helper.getList(getType(), getAttributeList());
 		return list;
 	}
 
 	@Override
 	public Point getSize() {
-		return new Point(600,500);
+		return new Point(600, 500);
 	}
 
 	@Override
@@ -71,39 +69,38 @@ public class GenericEnumerationSelectorDialog extends AbstractBeanMapListSelecto
 	public String getTitle() {
 		return dialogTitle;
 	}
-	
+
 	@Override
 	public Image getElementIcon() {
-		if (iconKey!=null) {
+		if (iconKey != null) {
 			return ImageManager.getInstance().getImage(iconKey);
 		}
 		return super.getElementIcon();
 	}
-	
-	
+
 	public static BeanMap select(ServerConnection connection,
 			String type,
 			String attributList,
 			String title,
-			String iconKey){
-		GenericEnumerationSelectorDialog dialog = 
-			new GenericEnumerationSelectorDialog(Activator.getDefault().getPluginShell(),
-					connection,false,
-					type,attributList,
-					title,
-					iconKey); 
-		return GenericEnumerationSelectorDialog.select(dialog);
-	}	
-	
+			String iconKey) {
+		final GenericEnumerationSelectorDialog dialog = new GenericEnumerationSelectorDialog(
+				Activator.getDefault().getPluginShell(),
+				connection, false,
+				type, attributList,
+				title,
+				iconKey);
+		return AbstractBeanMapListSelectorDialog.select(dialog);
+	}
+
 	public static BeanMap select(ServerConnection connection,
 			String type,
 			String title,
-			String iconKey){
-		GenericEnumerationSelectorDialog dialog = 
-			new GenericEnumerationSelectorDialog(Activator.getDefault().getPluginShell(),
-					connection,false,
-					type,"code name",title,iconKey); 
-		return GenericEnumerationSelectorDialog.select(dialog);
-	}		
-	
+			String iconKey) {
+		final GenericEnumerationSelectorDialog dialog = new GenericEnumerationSelectorDialog(
+				Activator.getDefault().getPluginShell(),
+				connection, false,
+				type, "code name", title, iconKey);
+		return AbstractBeanMapListSelectorDialog.select(dialog);
+	}
+
 }

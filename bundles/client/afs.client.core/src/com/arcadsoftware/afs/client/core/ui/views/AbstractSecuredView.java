@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -22,26 +22,28 @@ import com.arcadsoftware.afs.framework.ui.plugins.LogUITools;
 public abstract class AbstractSecuredView extends AbstractConnectedView implements ISecuredAction {
 
 	private boolean allowedToSearch;
-	
+
+	@Override
 	public boolean isAllowed() {
 		if (getConnection() != null) {
-			allowedToSearch = getConnection().isAllowed(getExpectedRigths()); 
+			allowedToSearch = getConnection().isAllowed(getExpectedRigths());
 		} else {
 			allowedToSearch = false;
-			LogUITools.logError(Activator.getDefault().getBundle(), UserMessageManager.getInstance().getMessage(IACCMessages.ERR_SRH_CONNECTIONMISSING));
+			LogUITools.logError(Activator.getDefault().getBundle(),
+					UserMessageManager.getInstance().getMessage(IACCMessages.ERR_SRH_CONNECTIONMISSING));
 		}
 		return allowedToSearch;
 	}
 
 	/**
 	 * FIXME this value is undefined if isAllowed() is not called before !!!
-	 * 
+	 *
 	 * @return
 	 * @deprecated use {@link #isAllowed()}
 	 */
+	@Deprecated
 	public boolean isAllowedToSearch() {
 		return allowedToSearch;
 	}
-	
-	
+
 }

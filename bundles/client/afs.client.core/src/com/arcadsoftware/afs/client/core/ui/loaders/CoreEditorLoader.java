@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -21,50 +21,52 @@ import com.arcadsoftware.afs.client.core.connection.ServerConnection;
 import com.arcadsoftware.editor.IEditorLoader;
 import com.arcadsoftware.metadata.MetaDataEntity;
 
-
 public class CoreEditorLoader implements IEditorLoader {
 
-	Hashtable<ServerConnection,DataAccessHelper> helpers;
+	Hashtable<ServerConnection, DataAccessHelper> helpers;
 	ServerConnection connection = null;
-	
-	public CoreEditorLoader(){
-		helpers = new Hashtable<ServerConnection,DataAccessHelper>();
+
+	public CoreEditorLoader() {
+		helpers = new Hashtable<>();
 	}
-	
-	public void setServerConnection(ServerConnection connexion) {		
-		this.connection = connexion;
+
+	public void setServerConnection(ServerConnection connexion) {
+		connection = connexion;
 
 	}
-	
-	private DataAccessHelper getHelper(ServerConnection connexion){
+
+	private DataAccessHelper getHelper(ServerConnection connexion) {
 		DataAccessHelper helper = helpers.get(connexion);
-		if (helper==null) {
+		if (helper == null) {
 			helper = new DataAccessHelper(connection);
 			helpers.put(connection, helper);
 		}
 		return helper;
 	}
-	
+
+	@Override
 	public String loadXMLLayoutDocument(String name, String type, int kind) {
-		if (connection!=null) {
-			DataAccessHelper helper = getHelper(connection);
+		if (connection != null) {
+			final DataAccessHelper helper = getHelper(connection);
 			return helper.getLayoutFile(name, type);
 		}
 		return null;
 	}
 
+	@Override
 	public Properties loadProperties(String name) {
-		if (connection!=null) {
-			DataAccessHelper helper = getHelper(connection);
+		if (connection != null) {
+			final DataAccessHelper helper = getHelper(connection);
 			return helper.getProperties(name);
 		}
 		return null;
 	}
 
+	@Override
 	public MetaDataEntity loadMetaDataEntity(String type) {
-		if (connection!=null) {
-			DataAccessHelper helper = getHelper(connection);
-			return helper.getEntity(type);	
+		if (connection != null) {
+			final DataAccessHelper helper = getHelper(connection);
+			return helper.getEntity(type);
 		}
 		return null;
 	}

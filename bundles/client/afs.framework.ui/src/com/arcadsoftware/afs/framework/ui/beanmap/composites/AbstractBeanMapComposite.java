@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -20,31 +20,31 @@ import com.arcadsoftware.afs.framework.ui.composites.AbstractAFSStandardComposit
 import com.arcadsoftware.beanmap.BeanMap;
 
 public abstract class AbstractBeanMapComposite extends AbstractAFSStandardComposite {
-	
+
 	private final BeanMapControler controler;
-	
+
 	public AbstractBeanMapComposite(Composite parent, int style) {
 		super(parent, style);
 		controler = new BeanMapControler(this);
 	}
-	
-	public AbstractBeanMapComposite(Composite parent, int style,BeanMap original) {
+
+	public AbstractBeanMapComposite(Composite parent, int style, BeanMap original) {
 		this(parent, style);
 		setBeanMap(original);
 	}
-	
+
 	protected BeanMapControler getControler() {
 		return controler;
 	}
-	
+
 	public void setBeanMap(BeanMap original) {
 		controler.setBeanMap(original);
 	}
-	
-	public void bindControl(String attribute, Control c){
+
+	public void bindControl(String attribute, Control c) {
 		controler.bindControl(attribute, c);
 	}
-	
+
 	public BeanMap getUpdated() {
 		return controler.getUpdated();
 	}

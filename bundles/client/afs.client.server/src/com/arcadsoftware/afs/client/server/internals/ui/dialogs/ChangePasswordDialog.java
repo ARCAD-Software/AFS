@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -43,17 +43,17 @@ import com.arcadsoftware.rest.ServerErrorException;
 
 /**
  * This dialog manage the modification of the current user password, according to the server constraints.
- * 
+ *
  * @author ARCAD Software
  */
 public class ChangePasswordDialog extends AbstractAFSDialog {
 
 	/**
-	 * Open the Change password dialog and return true if the user has effectively changed its password on the server connection.
-	 * 
+	 * Open the Change password dialog and return true if the user has effectively changed its password on the server
+	 * connection.
 	 * <p>
 	 * The <code>serverConnection</code> object is updated with the new password.
-	 * 
+	 *
 	 * @param parentShell
 	 * @param serverConnection
 	 * @return
@@ -114,7 +114,8 @@ public class ChangePasswordDialog extends AbstractAFSDialog {
 		label.setLayoutData(new GridData());
 		repassword = new Text(parent, SWT.PASSWORD | SWT.BORDER);
 		repassword.setLayoutData(new GridData(GridData.FILL, GridData.CENTER, true, false));
-		ModifyListener listener = new ModifyListener() {
+		final ModifyListener listener = new ModifyListener() {
+			@Override
 			public void modifyText(ModifyEvent e) {
 				if ((password.getText().length() == 0) || (repassword.getText().length() == 0)) {
 					message.setText(Activator.resString("server.dialog.changePassword.empty")); //$NON-NLS-1$
@@ -136,7 +137,8 @@ public class ChangePasswordDialog extends AbstractAFSDialog {
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		// create OK and Cancel buttons by default
-		okButton = createButton(parent, IDialogConstants.CLIENT_ID, DialogConstantProvider.getInstance().OK_LABEL, true);
+		okButton = createButton(parent, IDialogConstants.CLIENT_ID, DialogConstantProvider.getInstance().OK_LABEL,
+				true);
 		okButton.addSelectionListener(
 				new SelectionAdapter() {
 					@Override
@@ -145,14 +147,16 @@ public class ChangePasswordDialog extends AbstractAFSDialog {
 						final String newPassword = password.getText();
 						boolean cxn;
 						if (server.getServer().getUrl().toLowerCase().startsWith("https")) { //$NON-NLS-1$
-							cxn = server.connectWithCertificats(server.getServer().getLastLogin(), server.getServer().getLastPassword(), false, false);
+							cxn = server.connectWithCertificats(server.getServer().getLastLogin(),
+									server.getServer().getLastPassword(), false, false);
 						} else {
-							cxn = server.connectWithoutCertificats(server.getServer().getLastLogin(), server.getServer().getLastPassword(), false, false);
+							cxn = server.connectWithoutCertificats(server.getServer().getLastLogin(),
+									server.getServer().getLastPassword(), false, false);
 						}
 						if (!cxn) {
 							message.setText(Activator.resString("server.dialog.changePassword.connectionerror")); //$NON-NLS-1$
 						} else {
-							final HashMap<String, Object> parameters = new HashMap<String, Object>(2);
+							final HashMap<String, Object> parameters = new HashMap<>(2);
 							parameters.put("oldpassword", server.getServer().getLastPassword()); //$NON-NLS-1$
 							parameters.put("newpassword", newPassword); //$NON-NLS-1$
 							try {
@@ -160,7 +164,7 @@ public class ChangePasswordDialog extends AbstractAFSDialog {
 								server.setPassword(newPassword);
 								server.getServer().setLastPassword(newPassword);
 								okPressed();
-							} catch (ServerErrorException ex) {
+							} catch (final ServerErrorException ex) {
 								Activator.getDefault().error(ex.getErrorMessage(), ex);
 								message.setText(ex.getDescription());
 								message.getParent().layout();

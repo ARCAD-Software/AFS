@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -19,41 +19,39 @@ import org.eclipse.swt.widgets.Composite;
 import com.arcadsoftware.afs.client.core.connection.DataAccessHelper;
 import com.arcadsoftware.afs.client.core.connection.ServerConnection;
 import com.arcadsoftware.afs.framework.ui.composites.AbstractAFSComposite;
+
 /**
  * This class provides a composite in a connected context.<br>
  * First, Create the composite giving a serverConnection<br>
- * 
- * @author ARCAD Software
  *
+ * @author ARCAD Software
  */
 public abstract class AbstractConnectedComposite extends AbstractAFSComposite {
 
 	protected ServerConnection connection;
 	protected DataAccessHelper helper;
-	
+
 	public AbstractConnectedComposite(Composite parent, int style,
 			ServerConnection connection) {
-		this(parent, style,connection,true);
+		this(parent, style, connection, true);
 	}
-	
+
 	public AbstractConnectedComposite(Composite parent, int style,
 			ServerConnection connection, boolean init) {
 		super(parent, style);
 		this.connection = connection;
-		this.helper = new DataAccessHelper(connection);		
+		helper = new DataAccessHelper(connection);
 		format();
 		if (init) {
 			createContent(this);
 		}
 	}
-	
-	protected void format(){			 
-		GridLayout gridLayout = new GridLayout(3,false);
-		this.setLayout(gridLayout);		
+
+	protected void format() {
+		final GridLayout gridLayout = new GridLayout(3, false);
+		setLayout(gridLayout);
 	}
 
-
-	
 	public ServerConnection getConnection() {
 		return connection;
 	}
@@ -64,9 +62,10 @@ public abstract class AbstractConnectedComposite extends AbstractAFSComposite {
 
 	/**
 	 * Creates the content of the composite
-	 * @param parent the composite itself
+	 *
+	 * @param parent
+	 *            the composite itself
 	 */
 	public abstract void createContent(Composite parent);
-
 
 }

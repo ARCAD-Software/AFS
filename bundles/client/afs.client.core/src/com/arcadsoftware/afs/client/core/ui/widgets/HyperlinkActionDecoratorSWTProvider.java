@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -12,7 +12,6 @@
  *     ARCAD Software - initial API and implementation
  *******************************************************************************/
 package com.arcadsoftware.afs.client.core.ui.widgets;
-
 
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.forms.widgets.Hyperlink;
@@ -28,12 +27,12 @@ import com.arcadsoftware.metadata.MetaDataEntity;
 public class HyperlinkActionDecoratorSWTProvider extends AbstractHyperlinkConnectedDecoratorSWTProvider {
 
 	private final static String URLTEXT = "urltext";
-	
+
 	IEditorAction action = null;
-	
+
 	@Override
 	protected void processLinkActivated(BeanMap bean) {
-		if (action != null){
+		if (action != null) {
 			action.run();
 		}
 	}
@@ -41,28 +40,28 @@ public class HyperlinkActionDecoratorSWTProvider extends AbstractHyperlinkConnec
 	@Override
 	public Widget createContent(ISWTRenderer renderer, ILayoutParameters parameters, MetaDataEntity structure) {
 		return super.createContent(renderer, parameters, structure);
-		
+
 	}
 
 	@Override
-	protected String getHyperLinkText(ILayoutParameters parameters, BeanMap bean){
-		String text = renderer.getLocalizedMessage(parameters.getParameter(URLTEXT, "")); //$NON-NLS-1$
+	protected String getHyperLinkText(ILayoutParameters parameters, BeanMap bean) {
+		final String text = renderer.getLocalizedMessage(parameters.getParameter(URLTEXT, "")); //$NON-NLS-1$
 		return text;
 	}
-	
+
 	@Override
-	protected Hyperlink createHyperlink(ILayoutParameters parameters, BeanMap bean){
+	protected Hyperlink createHyperlink(ILayoutParameters parameters, BeanMap bean) {
 		// get Action
-		String actionId = parameters.getParameter(IConstants.ACTION, "");
-		if (actionId != null && !actionId.isEmpty()){
+		final String actionId = parameters.getParameter(IConstants.ACTION, "");
+		if ((actionId != null) && !actionId.isEmpty()) {
 			action = EditorActionFactory.getEditorAction(actionId);
-			
+
 			if (action != null) {
 				action.setBeanMapSelector(renderer);
 				action.setRenderer(renderer);
 			}
 		}
-		
+
 		return super.createHyperlink(parameters, bean);
 	}
 

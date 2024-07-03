@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -21,7 +21,7 @@ public abstract class AbstractAFSSavedEditorPart extends AbstractAFSEditorPart {
 
 	@Override
 	public boolean isDirty() {
-		for (AbstractAFSEditorComposite child : childComposites) {
+		for (final AbstractAFSEditorComposite child : childComposites) {
 			if (child.isDirty()) {
 				return true;
 			}
@@ -31,7 +31,7 @@ public abstract class AbstractAFSSavedEditorPart extends AbstractAFSEditorPart {
 
 	@Override
 	public boolean checkData() {
-		for (AbstractAFSEditorComposite child : childComposites) {
+		for (final AbstractAFSEditorComposite child : childComposites) {
 			if (!child.checkData()) {
 				return false;
 			}
@@ -41,7 +41,7 @@ public abstract class AbstractAFSSavedEditorPart extends AbstractAFSEditorPart {
 
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-		for (AbstractAFSEditorComposite child : childComposites) {
+		for (final AbstractAFSEditorComposite child : childComposites) {
 			child.fromScreen();
 		}
 		saveContent(monitor);

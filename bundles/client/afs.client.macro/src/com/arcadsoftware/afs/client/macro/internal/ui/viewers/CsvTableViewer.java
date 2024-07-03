@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -29,37 +29,35 @@ import com.arcadsoftware.afs.client.macro.model.CSVLine;
 import com.arcadsoftware.afs.client.macro.model.CSVLines;
 
 public class CsvTableViewer extends AbstractColumnedTableViewer {
-	
-	private CSVLines content;
-	
-	public CsvTableViewer(Composite parent, int style,CSVLines content) {
+
+	private final CSVLines content;
+
+	public CsvTableViewer(Composite parent, int style, CSVLines content) {
 		super(parent, style, false);
 		this.content = content;
 		init();
-	}	
-	
+	}
 
 	@Override
 	protected void doOnSelectionChange(IStructuredSelection selection) {
 	}
 
 	protected ArrayList<Action> createActions() {
-		ArrayList<Action> result = new ArrayList<Action>();		
+		final ArrayList<Action> result = new ArrayList<>();
 		return result;
 	}
-	
-	
+
 	@Override
 	public AbstractColumnedTableLabelProvider createTableLabelProvider(
 			AbstractColumnedViewer viewer) {
 		return new ColumnedDefaultTableLabelProvider(viewer);
 	}
-	
+
 	@Override
 	public String getValue(Object element, int columnIndex) {
-		if (element instanceof CSVLine){
-			CSVLine line = (CSVLine)element;
-			String header = content.getHeaders()[columnIndex];
+		if (element instanceof CSVLine) {
+			final CSVLine line = (CSVLine) element;
+			final String header = content.getHeaders()[columnIndex];
 			return line.get(header).replace("\"", "");
 		}
 		return "";
@@ -69,31 +67,30 @@ public class CsvTableViewer extends AbstractColumnedTableViewer {
 	public String getIdentifier() {
 		return null;
 	}
-	
+
 	@Override
 	public ArcadColumns getReferenceColumns() {
-		ArcadColumns refColumns = new ArcadColumns();
-		String[] headers = content.getHeaders();
-		for (int i=0;i<headers.length;i++) {
-			String header = headers[i];
-			int width = content.getColumnWidths()[i];
-			refColumns.add( new ArcadColumn(header+"id", formatHeader(header),ArcadColumn.VISIBLE,i,width*10,i)); //$NON-NLS-1$
-		}				
+		final ArcadColumns refColumns = new ArcadColumns();
+		final String[] headers = content.getHeaders();
+		for (int i = 0; i < headers.length; i++) {
+			final String header = headers[i];
+			final int width = content.getColumnWidths()[i];
+			refColumns.add(new ArcadColumn(header + "id", formatHeader(header), ArcadColumn.VISIBLE, i, width * 10, i)); //$NON-NLS-1$
+		}
 		return refColumns;
 	}
 
 	private String formatHeader(String header) {
-		String formattedHeader ="";
-		String[] segments = header.split("_");
-		for (int i=0;i<segments.length;i++) {
-			String segment = segments[i]; 
-			formattedHeader = formattedHeader+ (formattedHeader.length()==0?"":" ")+segment.substring(0,1).toUpperCase();
-			if (segment.length()>1) {
-				formattedHeader = formattedHeader+segment.substring(1, segment.length()).toLowerCase(); 
+		String formattedHeader = "";
+		final String[] segments = header.split("_");
+		for (final String segment : segments) {
+			formattedHeader = formattedHeader + (formattedHeader.length() == 0 ? "" : " ")
+					+ segment.substring(0, 1).toUpperCase();
+			if (segment.length() > 1) {
+				formattedHeader = formattedHeader + segment.substring(1, segment.length()).toLowerCase();
 			}
 		}
 		return formattedHeader;
 	}
-	
-	
+
 }

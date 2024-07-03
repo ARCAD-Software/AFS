@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -16,11 +16,12 @@ package com.arcadsoftware.afs.framework.ui.images;
 import java.util.Hashtable;
 import java.util.Set;
 
-import org.eclipse.jface.viewers.DecorationOverlayIcon;
-import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.viewers.DecorationOverlayIcon;
+import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 import com.arcadsoftware.afs.framework.ui.internal.Activator;
 
@@ -33,11 +34,11 @@ public class ImageManager {
 
 	private static ImageManager instance = new ImageManager();
 
-	private Hashtable<String, ImageDescriptor> imageDescriptorRegistry;
-	private ImageRegistry imageRegistry;
+	private final Hashtable<String, ImageDescriptor> imageDescriptorRegistry;
+	private final ImageRegistry imageRegistry;
 
 	private ImageManager() {
-		imageDescriptorRegistry = new Hashtable<String, ImageDescriptor>();
+		imageDescriptorRegistry = new Hashtable<>();
 		imageRegistry = new ImageRegistry();
 	}
 
@@ -46,12 +47,12 @@ public class ImageManager {
 	}
 
 	private ImageDescriptor registerImage(String key) {
-		int pos = key.indexOf(":"); //$NON-NLS-1$
+		final int pos = key.indexOf(":"); //$NON-NLS-1$
 		ImageDescriptor result = null;
 		if (pos > 0) {
-			String bundleId = key.substring(0, pos);
-			String imageKey = key.substring(pos + 1);
-			result = Activator.imageDescriptorFromPlugin(bundleId, imageKey);
+			final String bundleId = key.substring(0, pos);
+			final String imageKey = key.substring(pos + 1);
+			result = AbstractUIPlugin.imageDescriptorFromPlugin(bundleId, imageKey);
 		} else {
 			result = Activator.getDefault().getImageDescriptor(key);
 		}
@@ -79,17 +80,18 @@ public class ImageManager {
 	}
 
 	public Image getImage(String key) {
-		Image result = imageRegistry.get(key);
+		final Image result = imageRegistry.get(key);
 		// We try to find registre the image
-		if (result == null)
+		if (result == null) {
 			registerImage(key);
+		}
 		return imageRegistry.get(key);
 	}
 
 	public String getDescriptorKey(ImageDescriptor descriptor) {
-		Set<String> keys = imageDescriptorRegistry.keySet();
-		for (String key : keys) {
-			ImageDescriptor im = imageDescriptorRegistry.get(key);
+		final Set<String> keys = imageDescriptorRegistry.keySet();
+		for (final String key : keys) {
+			final ImageDescriptor im = imageDescriptorRegistry.get(key);
 			if (im == descriptor) {
 				return key;
 			}
@@ -98,7 +100,7 @@ public class ImageManager {
 	}
 
 	public Image getImageFromDescriptor(ImageDescriptor descriptor) {
-		String key = getDescriptorKey(descriptor);
+		final String key = getDescriptorKey(descriptor);
 		if (key != null) {
 			return imageRegistry.get(key);
 		}
@@ -107,7 +109,7 @@ public class ImageManager {
 
 	/**
 	 * add top right overlay Image on Base Image
-	 * 
+	 *
 	 * @param baseImage
 	 * @param overlayImage
 	 * @return
@@ -118,7 +120,7 @@ public class ImageManager {
 
 	/**
 	 * add overlay Image on Base Image
-	 * 
+	 *
 	 * @param baseImage
 	 * @param overlayImage
 	 * @param position
@@ -126,12 +128,13 @@ public class ImageManager {
 	 * @return
 	 */
 	public ImageDescriptor getImageDecoratedDescriptor(String baseImage, String overlayImage, int position) {
-		if (baseImage != null && overlayImage != null) {
-			String decoratedImageId = baseImage.concat(overlayImage);
-			Image bImage = imageRegistry.get(baseImage);
-			ImageDescriptor overlayImageDescriptor = getImageDescriptor(overlayImage);
-			DecorationOverlayIcon decoratedImage = new DecorationOverlayIcon(bImage, overlayImageDescriptor, position);
-			ImageDescriptor result = imageDescriptorRegistry.get(decoratedImageId);
+		if ((baseImage != null) && (overlayImage != null)) {
+			final String decoratedImageId = baseImage.concat(overlayImage);
+			final Image bImage = imageRegistry.get(baseImage);
+			final ImageDescriptor overlayImageDescriptor = getImageDescriptor(overlayImage);
+			final DecorationOverlayIcon decoratedImage = new DecorationOverlayIcon(bImage, overlayImageDescriptor,
+					position);
+			final ImageDescriptor result = imageDescriptorRegistry.get(decoratedImageId);
 			if (result == null) {
 				imageDescriptorRegistry.put(decoratedImageId, decoratedImage);
 				imageRegistry.put(decoratedImageId, decoratedImage);

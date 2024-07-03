@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -56,15 +56,16 @@ public class ServerHandle {
 		this.login = login;
 		this.password = password;
 	}
-	
+
 	/**
 	 * Returns the URL of the related Server
-	 * @return the URL of the related erver
+	 *
+	 * @return the URL of the related Server
 	 */
 	public String getUrl() {
 		return url;
 	}
-	
+
 	/**
 	 * Sets the URL of the related Server you want to reach
 	 * @param url  Sets the URL of the related Server 
@@ -72,15 +73,16 @@ public class ServerHandle {
 	public void setUrl(String url) {
 		this.url = url;
 	}
-	
+
 	/**
 	 * Returns the login used to connect the server
-	 * @return - the login used to connect the server
+	 *
+	 * @return the login used to connect the server
 	 */
 	public String getLogin() {
 		return login;
 	}
-	
+
 	/**
 	 * Sets the login used to connect the server
 	 * @param login - A valid Server login
@@ -88,18 +90,21 @@ public class ServerHandle {
 	public void setLogin(String login) {
 		this.login = login;
 	}
-	
+
 	/**
-	 * Gets the related password used to connect the server 
-	 * @return - the related password used to connect the server
+	 * Gets the related password used to connect the server
+	 *
+	 * @return the related password used to connect the server
 	 */
 	public String getPassword() {
 		return password;
 	}
-	
+
 	/**
-	 * Sets the related password used to connect the server 
-	 * @param password - the related password used to connect the server 
+	 * Sets the related password used to connect the server
+	 *
+	 * @param password
+	 *            the related password used to connect the server
 	 */
 	public void setPassword(String password) {
 		this.password = password;
@@ -107,7 +112,7 @@ public class ServerHandle {
 	
     private boolean afsConnect() {
 		IServer server = new BasicServer();
-		server.setUrl(url);		
+		server.setUrl(url);
 		connection = new ServerConnection(server);
 		connection.setTrustStoreprovider(trustStoreProvider);
 		if (connection.connect(login, password, true)) {
@@ -115,7 +120,7 @@ public class ServerHandle {
 			return true;
 		}
 		return false;
-    }
+	}
 
 	/**
 	 * "Connects" to the AFS Server.
@@ -128,16 +133,16 @@ public class ServerHandle {
 		connected = afsConnect();
 		return connected;
 	}
-	
+
 	/**
 	 * Returns the connection status
 	 * 
-	 * @return - true if the server is connected, false otherwise.
+	 * @return true if the server is connected, false otherwise.
 	 */
 	public boolean isConnected() {
 		return connected;
 	}
-	
+
 	/**
 	 * 
 	 * @return may return null if the ServerHandle is not "connected".
@@ -145,7 +150,7 @@ public class ServerHandle {
 	public DataAccessHelper getHelper() {
 		return helper;
 	}
-	
+
 	/**
 	 * Return the server connection
 	 * 
@@ -154,7 +159,7 @@ public class ServerHandle {
 	public ServerConnection getConnection() {
 		return connection;
 	}
-	
+
 	/**
 	 * 
 	 * @param trustStoreProvider
@@ -162,7 +167,7 @@ public class ServerHandle {
 	public void setTrustStoreProvider(ITrustStoreProvider trustStoreProvider) {
 		this.trustStoreProvider = trustStoreProvider;
 	}
-	
+
 	/**
 	 * 
 	 * @return may return null.

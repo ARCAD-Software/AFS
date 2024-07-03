@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -19,8 +19,6 @@ import com.arcadsoftware.beanmap.BeanMap;
 public abstract class AbstractConnectedWizardedWithParentAddAction extends
 		AbstractConnectedWizardedAddAction {
 
-
-
 	public AbstractConnectedWizardedWithParentAddAction(
 			ServerConnection connexion) {
 		super(connexion);
@@ -28,38 +26,36 @@ public abstract class AbstractConnectedWizardedWithParentAddAction extends
 
 	@Override
 	public void initBeanMap(BeanMap beanmap) {
-		BeanMap parent = getParent();
-		if (parent!=null) {
-			beanmap.put(getParentAttribute(),getParentValue(parent));
+		final BeanMap parent = getParent();
+		if (parent != null) {
+			beanmap.put(getParentAttribute(), getParentValue(parent));
 		}
 	}
-	
+
 	@Override
 	protected boolean canExecute() {
-		boolean result =super.canExecute();
+		final boolean result = super.canExecute();
 		if (result) {
-			BeanMap parent = getParent();
+			final BeanMap parent = getParent();
 			return matchingCondition(parent);
 		}
 		return result;
 	}
-	
+
 	public boolean matchingCondition(BeanMap parent) {
 		if (parent != null) {
-			return   (parent.getId()>0);
+			return (parent.getId() > 0);
 		} else {
-			return  false;
+			return false;
 		}
 	}
-	
-	public Object getParentValue(BeanMap parent){
+
+	public Object getParentValue(BeanMap parent) {
 		return parent.getId();
 	}
-	
-	
+
 	public abstract String getParentAttribute();
+
 	public abstract BeanMap getParent();
-	
-	
 
 }

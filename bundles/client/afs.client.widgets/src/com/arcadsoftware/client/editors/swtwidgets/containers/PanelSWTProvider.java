@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -40,26 +40,25 @@ import com.arcadsoftware.editor.swt.ISWTRenderer;
 import com.arcadsoftware.metadata.MetaDataEntity;
 
 /**
- * This class implement a Panel Container SWT Widget provider for the dynamic
- * editors.
- * 
- * Panel container can be contained only by Panels container
- * 
+ * This class implement a Panel Container SWT Widget provider for the dynamic editors. Panel container can be contained
+ * only by Panels container
+ *
  * @see PanelsSWTProvider
  */
 public class PanelSWTProvider implements IContainerSWTProvider {
 
 	private Image image;
 
+	@Override
 	public void create(ISWTRenderer renderer, ILayoutParameters parameters, boolean isEmpty, MetaDataEntity structure) {
-		String icon = parameters.getParameter(ICON);
+		final String icon = parameters.getParameter(ICON);
 		if ((icon != null) && (icon.length() > 0)) {
-			ImageDescriptor id = renderer.getImageDescriptor(icon);
+			final ImageDescriptor id = renderer.getImageDescriptor(icon);
 			if (id != null) {
 				image = id.createImage();
 			}
 		}
-		String label = renderer.getLocalizedMessage(parameters.getParameter(LABEL));
+		final String label = renderer.getLocalizedMessage(parameters.getParameter(LABEL));
 		if (parameters.getParameterBoolean(SCROLL)) {
 			final ScrolledComposite body2 = new ScrolledComposite(renderer.getParent(), SWT.BORDER | SWT.V_SCROLL
 					| SWT.H_SCROLL);
@@ -69,20 +68,24 @@ public class PanelSWTProvider implements IContainerSWTProvider {
 			createPanel(renderer, parameters, label, body, body2);
 			body2.setContent(body);
 			body2.addControlListener(new ControlListener() {
-				public void controlMoved(ControlEvent e) {}
+				@Override
+				public void controlMoved(ControlEvent e) {
+				}
+
+				@Override
 				public void controlResized(ControlEvent e) {
 					body2.setMinSize(body.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 				}
 			});
 		} else {
-			Composite body = createBody(renderer, parameters, renderer.getParent());
+			final Composite body = createBody(renderer, parameters, renderer.getParent());
 			createPanel(renderer, parameters, label, body, body);
 		}
 	}
 
 	private Composite createBody(ISWTRenderer renderer, ILayoutParameters parameters, Composite parent) {
-		Composite body = renderer.getToolkit().createComposite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout(parameters.getParameterInteger(COLS, 3), false);
+		final Composite body = renderer.getToolkit().createComposite(parent, SWT.NONE);
+		final GridLayout layout = new GridLayout(parameters.getParameterInteger(COLS, 3), false);
 		if (!parameters.getParameterBoolean(WITH_MARGIN)) {
 			layout.marginBottom = 0;
 			layout.marginHeight = 0;
@@ -91,7 +94,7 @@ public class PanelSWTProvider implements IContainerSWTProvider {
 			layout.marginTop = 0;
 			layout.marginWidth = 0;
 		} else {
-			int margin = parameters.getParameterInteger("margin",2);			
+			final int margin = parameters.getParameterInteger("margin", 2);
 			layout.marginBottom = margin;
 			layout.marginHeight = margin;
 			layout.marginLeft = margin;
@@ -109,7 +112,7 @@ public class PanelSWTProvider implements IContainerSWTProvider {
 	private void createPanel(ISWTRenderer renderer, ILayoutParameters parameters, String label, Composite composite,
 			Control control) {
 		if (renderer.getParent() instanceof CTabFolder) {
-			CTabItem ti = new CTabItem((CTabFolder) renderer.getParent(), SWT.NONE);
+			final CTabItem ti = new CTabItem((CTabFolder) renderer.getParent(), SWT.NONE);
 			ti.setText(label);
 			if (image != null) {
 				ti.setImage(image);
@@ -117,7 +120,7 @@ public class PanelSWTProvider implements IContainerSWTProvider {
 			ti.setControl(control);
 			renderer.createSubContainer(this, parameters, composite);
 		} else if (renderer.getParent() instanceof TabFolder) {
-			TabItem ti = new TabItem((TabFolder) renderer.getParent(), SWT.NONE);
+			final TabItem ti = new TabItem((TabFolder) renderer.getParent(), SWT.NONE);
 			ti.setText(label);
 			if (image != null) {
 				ti.setImage(image);
@@ -127,8 +130,9 @@ public class PanelSWTProvider implements IContainerSWTProvider {
 		}
 	}
 
+	@Override
 	public void dispose() {
-		if (image != null && !image.isDisposed()) {
+		if ((image != null) && !image.isDisposed()) {
 			image.dispose();
 		}
 	}

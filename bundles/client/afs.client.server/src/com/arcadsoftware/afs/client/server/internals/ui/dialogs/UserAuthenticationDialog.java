@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -35,7 +35,7 @@ public class UserAuthenticationDialog extends Dialog {
 	private final String host;
 	private final String message;
 	private PasswordAuthentication userAuthentication;
-	
+
 	public UserAuthenticationDialog(Shell parentShell, String scheme, String host, String message) {
 		super(parentShell);
 		this.scheme = scheme;
@@ -59,14 +59,14 @@ public class UserAuthenticationDialog extends Dialog {
 
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		Composite main = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout();
+		final Composite main = new Composite(parent, SWT.NONE);
+		final GridLayout layout = new GridLayout();
 		layout.numColumns = 3;
 		main.setLayout(layout);
 		main.setLayoutData(new GridData(GridData.FILL_BOTH));
-		Label label = new Label(main, SWT.WRAP);
+		final Label label = new Label(main, SWT.WRAP);
 		label.setText(host + " [" + scheme + "]:\n\n" + message); //$NON-NLS-1$ //$NON-NLS-2$
-		GridData data = new GridData(GridData.FILL_HORIZONTAL);
+		final GridData data = new GridData(GridData.FILL_HORIZONTAL);
 		data.horizontalSpan = 3;
 		label.setLayoutData(data);
 		createUsernameFields(main);
@@ -78,24 +78,24 @@ public class UserAuthenticationDialog extends Dialog {
 	protected void createPasswordFields(Composite parent) {
 		new Label(parent, SWT.NONE).setText("Password:");
 		passwordField = new Text(parent, SWT.BORDER | SWT.PASSWORD);
-		GridData data = new GridData(GridData.FILL_HORIZONTAL);
+		final GridData data = new GridData(GridData.FILL_HORIZONTAL);
 		data.widthHint = convertHorizontalDLUsToPixels(IDialogConstants.ENTRY_FIELD_WIDTH);
 		passwordField.setLayoutData(data);
-		new Label(parent, SWT.NONE); //spacer
+		new Label(parent, SWT.NONE); // spacer
 	}
 
 	protected void createUsernameFields(Composite parent) {
 		new Label(parent, SWT.NONE).setText("Login:");
 		usernameField = new Text(parent, SWT.BORDER);
-		GridData data = new GridData(GridData.FILL_HORIZONTAL);
+		final GridData data = new GridData(GridData.FILL_HORIZONTAL);
 		data.widthHint = convertHorizontalDLUsToPixels(IDialogConstants.ENTRY_FIELD_WIDTH);
 		usernameField.setLayoutData(data);
-		new Label(parent, SWT.NONE); //spacer
+		new Label(parent, SWT.NONE); // spacer
 	}
 
 	/**
-	 * Returns the UserAuthentication entered by the user, or null if the user
-	 * canceled.
+	 * Returns the UserAuthentication entered by the user, or null if the user canceled.
+	 *
 	 * @return the authentication information
 	 */
 	public PasswordAuthentication getAuthentication() {

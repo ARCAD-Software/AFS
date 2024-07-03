@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -30,11 +30,12 @@ public abstract class AbstractBasicConnectedView extends AbstractSecuredView {
 	private Composite parentComposite;
 	private Composite mainComposite;
 	private IToolBarManager toolbarManager;
-	
+
+	@Override
 	public List<Integer> getExpectedRigths() {
 		return null;
 	}
-	
+
 	@Override
 	protected void connectionChanged(ServerConnection connection) {
 		super.connectionChanged(connection);
@@ -45,29 +46,29 @@ public abstract class AbstractBasicConnectedView extends AbstractSecuredView {
 		toolbarManager.update(true);
 	}
 
-	private void createContent(Composite parent){
-		if (mainComposite!=null) {
+	private void createContent(Composite parent) {
+		if (mainComposite != null) {
 			mainComposite.dispose();
 		}
-		mainComposite = AFSFormatTools.createComposite(parent,1,false);
+		mainComposite = AFSFormatTools.createComposite(parent, 1, false);
 		if (parent.getLayout() instanceof GridLayout) {
-			GridData gridData = new GridData(GridData.FILL_BOTH);
+			final GridData gridData = new GridData(GridData.FILL_BOTH);
 			gridData.grabExcessHorizontalSpace = true;
 			gridData.grabExcessVerticalSpace = true;
 			mainComposite.setLayoutData(gridData);
 		}
-		GridLayout gd = (GridLayout)mainComposite.getLayout();
+		GridLayout gd = (GridLayout) mainComposite.getLayout();
 		gd.marginLeft = gd.marginTop = gd.marginRight = gd.marginBottom = 1;
 		gd.marginHeight = gd.marginWidth = 0;
-		
+
 		if (isAllowed()) {
 			extended_HeaderControl(mainComposite);
-			Composite parentResultComposite = createContentComposite(mainComposite);
-			GridData gridData = new GridData(GridData.FILL_BOTH);
+			final Composite parentResultComposite = createContentComposite(mainComposite);
+			final GridData gridData = new GridData(GridData.FILL_BOTH);
 			gridData.grabExcessHorizontalSpace = true;
 			gridData.grabExcessVerticalSpace = true;
 			parentResultComposite.setLayoutData(gridData);
-			gd = new GridLayout(1,false);
+			gd = new GridLayout(1, false);
 			gd.marginLeft = gd.marginTop = gd.marginRight = gd.marginBottom = 0;
 			gd.marginHeight = gd.marginWidth = 0;
 			parentResultComposite.setLayout(gd);
@@ -75,26 +76,29 @@ public abstract class AbstractBasicConnectedView extends AbstractSecuredView {
 			super.createPartControl(parent);
 		} else {
 			new BasicResultNotAllowedComposite(mainComposite);
-		}		
+		}
 	}
-	
-	public void extended_HeaderControl(Composite parent) {}
-	
-	public void extended_FooterControl(Composite parent) {}
-	
+
+	public void extended_HeaderControl(Composite parent) {
+	}
+
+	public void extended_FooterControl(Composite parent) {
+	}
+
 	public abstract Composite createContentComposite(Composite parent);
-	
+
 	@Override
 	public void createPartControl(Composite parent) {
-		parentComposite =parent;
+		parentComposite = parent;
 		DynamicHelp.updateContextHelpId(getDynamicHelpId(), parentComposite);
 	}
 
 	@Override
 	protected void defineLocalToolbar(IToolBarManager manager) {
 		super.defineLocalToolbar(manager);
-		this.toolbarManager = manager;
-	}	
+		toolbarManager = manager;
+	}
 
-	protected void fillToolbar(IToolBarManager manager) {}
+	protected void fillToolbar(IToolBarManager manager) {
+	}
 }

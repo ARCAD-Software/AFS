@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -27,54 +27,53 @@ import com.arcadsoftware.afs.client.brands.AFSIcon;
 
 public abstract class AbstractSplashDialog extends ArcadDialog {
 
-	private boolean centered  = true;
-	
+	private boolean centered = true;
+
 	public AbstractSplashDialog(Shell parentShell) {
-		this(parentShell,false,false,true); 
+		this(parentShell, false, false, true);
 	}
 
-	public AbstractSplashDialog(Shell parentShell, boolean OkButtonOnly,boolean resizable,boolean centered) {
-		super(parentShell, OkButtonOnly);		
+	public AbstractSplashDialog(Shell parentShell, boolean OkButtonOnly, boolean resizable, boolean centered) {
+		super(parentShell, OkButtonOnly);
 		if (resizable) {
 			int style = getShellStyle();
 			style = style | SWT.RESIZE | SWT.MAX;
 			setShellStyle(style);
-		}		
+		}
 		this.centered = true;
 	}
 
-
 	@Override
 	protected Control createButtonBar(Composite arg0) {
-		Composite composite = (Composite)super.createButtonBar(arg0);
-		GridLayout l = (GridLayout)composite.getLayout();
+		final Composite composite = (Composite) super.createButtonBar(arg0);
+		final GridLayout l = (GridLayout) composite.getLayout();
 		l.marginHeight = l.marginWidth = 3;
 		return composite;
-	}	
+	}
 
 	@Override
 	protected void configureShell(Shell newShell) {
-		Point size = getSize();
-		int width = size.x;
-		int height = size.y;
+		final Point size = getSize();
+		final int width = size.x;
+		final int height = size.y;
 		super.configureShell(newShell);
 		newShell.setSize(size);
 		newShell.setText(getTitle());
 		if (centered) {
-			Rectangle parentBounds = newShell.getDisplay().getPrimaryMonitor().getBounds();
-			int x = parentBounds.x + (parentBounds.width - width) / 2;
-			int y = parentBounds.y + (parentBounds.height - height) / 2;
+			final Rectangle parentBounds = newShell.getDisplay().getPrimaryMonitor().getBounds();
+			final int x = parentBounds.x + ((parentBounds.width - width) / 2);
+			final int y = parentBounds.y + ((parentBounds.height - height) / 2);
 			newShell.setLocation(x, y);
 		}
 		newShell.setImage(getImage());
 	}
-	public Image getImage(){
+
+	public Image getImage() {
 		return AFSIcon.ARCAD.image();
 	}
-	
-	
+
 	public abstract Point getSize();
+
 	public abstract String getTitle();
-		
-	
+
 }

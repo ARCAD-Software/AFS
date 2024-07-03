@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -34,23 +34,21 @@ import com.arcadsoftware.metadata.MetaDataAttribute;
 
 /**
  * This warper maintain 3 version of asame BeanMap :
- * 
  * <ul>
  * <li>The original one as given to the <code>warp</code> method.
  * <li>The current one (the warper can be used like a BeanMap).
  * <li>The diff between the current and the original one.
  * </ul>
- * 
  */
 public class BeanMapWarper implements ISelection, IBeanMap, IIdentifiedBean, ITypedBean, IDatedBean {
 
 	private BeanMap source;
 	private BeanMap current;
 	private BeanMap changed;
-	private SWTRenderer renderer;
+	private final SWTRenderer renderer;
 	private boolean dirty;
 
-	private ListenerList selListeners = new ListenerList();
+	private final ListenerList selListeners = new ListenerList();
 
 	public BeanMapWarper(SWTRenderer renderer) {
 		super();
@@ -62,7 +60,7 @@ public class BeanMapWarper implements ISelection, IBeanMap, IIdentifiedBean, ITy
 		dirty = false;
 		if (source != null) {
 			changed = new BeanMap(source.getType(), source.getId());
-			current = (BeanMap) source.clone();
+			current = source.clone();
 		} else if (renderer.getStructure() != null) {
 			changed = new BeanMap(renderer.getStructure().getType());
 			current = new BeanMap(renderer.getStructure().getType());
@@ -74,10 +72,11 @@ public class BeanMapWarper implements ISelection, IBeanMap, IIdentifiedBean, ITy
 
 	private void fireChangedSelectionEvent() {
 		final SelectionChangedEvent event = new SelectionChangedEvent(renderer, this);
-		Object[] listeners = selListeners.getListeners();
-		for (int i = 0; i < listeners.length; ++i) {
-			final ISelectionChangedListener l = (ISelectionChangedListener) listeners[i];
+		final Object[] listeners = selListeners.getListeners();
+		for (final Object listener : listeners) {
+			final ISelectionChangedListener l = (ISelectionChangedListener) listener;
 			SafeRunnable.run(new SafeRunnable() {
+				@Override
 				public void run() {
 					l.selectionChanged(event);
 				}
@@ -93,9 +92,9 @@ public class BeanMapWarper implements ISelection, IBeanMap, IIdentifiedBean, ITy
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.jface.viewers.ISelection#isEmpty()
 	 */
+	@Override
 	public boolean isEmpty() {
 		return source == null;
 	}
@@ -116,70 +115,70 @@ public class BeanMapWarper implements ISelection, IBeanMap, IIdentifiedBean, ITy
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.arcadsoftware.utils.IBeanMap#entrySet()
 	 */
+	@Override
 	public Set<Entry<String, Object>> entrySet() {
 		return current.entrySet();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.arcadsoftware.utils.IBeanMap#get(java.lang.String)
 	 */
+	@Override
 	public Object get(String key) {
 		return current.get(key);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.arcadsoftware.utils.IBeanMap#get(java.lang.String, java.lang.Class)
 	 */
+	@Override
 	public <T> T get(String key, Class<T> clazz) {
 		return current.get(key, clazz);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.arcadsoftware.utils.IBeanMap#getInt(java.lang.String)
 	 */
+	@Override
 	public int getInt(String key) {
 		return current.getInt(key);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.arcadsoftware.utils.IBeanMap#getString(java.lang.String)
 	 */
+	@Override
 	public String getString(String key) {
 		return current.getString(key);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.arcadsoftware.utils.IBeanMap#keys()
 	 */
+	@Override
 	public Set<String> keys() {
 		return current.keys();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.arcadsoftware.utils.IBeanMap#put(java.lang.String, java.lang.Object)
 	 */
+	@Override
 	public Object put(String key, Object value) {
 		// Just ignore non declared attributes.
-		MetaDataAttribute att = renderer.getStructure().getAttribute(key);
+		final MetaDataAttribute att = renderer.getStructure().getAttribute(key);
 		if (att == null) {
 			return null;
 		}
-		Object oldValue = current.get(key);
+		final Object oldValue = current.get(key);
 		// No change...
 		if (value == null) {
 			if (oldValue == null) {
@@ -191,16 +190,16 @@ public class BeanMapWarper implements ISelection, IBeanMap, IIdentifiedBean, ITy
 		if (!att.isReadonly()) {
 			// If we are changing an already changed value, and get back to the original value.
 			if (source != null) {
-				Object sourceValue = source.get(key);
+				final Object sourceValue = source.get(key);
 				if (value == null) {
 					changed.put(key, null);
 					// We can not force "null" value !
 				} else if (value.equals(sourceValue)) {
 					// Cancel change.
-					//Ceci est une grosse erreur !!!!!!
-					//->changed.put(key, null);
+					// Ceci est une grosse erreur !!!!!!
+					// ->changed.put(key, null);
 					changed.remove(key);
-					
+
 				} else {
 					changed.put(key, value);
 				}
@@ -216,36 +215,36 @@ public class BeanMapWarper implements ISelection, IBeanMap, IIdentifiedBean, ITy
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.arcadsoftware.utils.IBeanMap#size()
 	 */
+	@Override
 	public int size() {
 		return current.size();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.arcadsoftware.utils.IIdentifiedBean#getId()
 	 */
+	@Override
 	public int getId() {
 		return current.getId();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.arcadsoftware.utils.ITypedBean#equalsType(com.arcadsoftware.utils.ITypedBean)
 	 */
+	@Override
 	public boolean equalsType(ITypedBean bm) {
 		return current.equalsType(bm);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.arcadsoftware.utils.ITypedBean#getType()
 	 */
+	@Override
 	public String getType() {
 		if (renderer.getStructure() != null) {
 			return renderer.getStructure().getType();
@@ -255,9 +254,9 @@ public class BeanMapWarper implements ISelection, IBeanMap, IIdentifiedBean, ITy
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.arcadsoftware.utils.IDatedBean#getDate()
 	 */
+	@Override
 	public Date getDate() {
 		if (source != null) {
 			return source.getDate();
@@ -267,9 +266,9 @@ public class BeanMapWarper implements ISelection, IBeanMap, IIdentifiedBean, ITy
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.arcadsoftware.utils.IDatedBean#moreRecent(com.arcadsoftware.utils.IDatedBean)
 	 */
+	@Override
 	public boolean moreRecent(IDatedBean bm) {
 		if (source != null) {
 			return source.moreRecent(bm);
@@ -279,9 +278,9 @@ public class BeanMapWarper implements ISelection, IBeanMap, IIdentifiedBean, ITy
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.arcadsoftware.utils.IDatedBean#setDate(java.util.Date)
 	 */
+	@Override
 	public void setDate(Date date) {
 		current.setDate(date);
 	}
@@ -290,17 +289,17 @@ public class BeanMapWarper implements ISelection, IBeanMap, IIdentifiedBean, ITy
 	 * @return the modifications Attributes between the source and the current version of this BeanMap.
 	 */
 	public BeanMap getModifications() {
-		BeanMap clone = (BeanMap) changed.clone();
+		final BeanMap clone = changed.clone();
 		// Add the mandatory attributes
-		for (MetaDataAttribute a : renderer.getStructure().getAttributes().values()) {
+		for (final MetaDataAttribute a : renderer.getStructure().getAttributes().values()) {
 			if (a.isMandatory() && (clone.get(a.getCode()) == null)) {
 				clone.put(a.getCode(), current.get(a.getCode()));
 			}
 		}
 		// Clean up the clone...
-		for (Entry<String, Object> e : clone.entrySet()) {
+		for (final Entry<String, Object> e : clone.entrySet()) {
 			if (e.getValue() instanceof BeanMap) {
-				int id = ((BeanMap) e.getValue()).getId();
+				final int id = ((BeanMap) e.getValue()).getId();
 				if (id <= 0) {
 					clone.put(e.getKey(), null);
 				}
@@ -314,13 +313,13 @@ public class BeanMapWarper implements ISelection, IBeanMap, IIdentifiedBean, ITy
 	}
 
 	public BeanMap cloneCurrent() {
-		return (BeanMap) current.clone();
+		return current.clone();
 	}
 
 	public void updateCurrent(BeanMap item) {
 		if (source == null) {
-			source = (BeanMap) item.clone();
-			for (Entry<String, Object> entry : item.entrySet()) {
+			source = item.clone();
+			for (final Entry<String, Object> entry : item.entrySet()) {
 				current.put(entry.getKey(), entry.getValue());
 				if (entry.getValue().equals(changed.get(entry.getKey()))) {
 					changed.put(entry.getKey(), null);
@@ -328,7 +327,7 @@ public class BeanMapWarper implements ISelection, IBeanMap, IIdentifiedBean, ITy
 			}
 			return;
 		}
-		for (Entry<String, Object> entry : item.entrySet()) {
+		for (final Entry<String, Object> entry : item.entrySet()) {
 			if (entry.getValue() == null) {
 				source.put(entry.getKey(), null);
 				current.put(entry.getKey(), null);
@@ -344,37 +343,39 @@ public class BeanMapWarper implements ISelection, IBeanMap, IIdentifiedBean, ITy
 			}
 		}
 		ArrayList<String> keysToRemove = null;
-		for (Entry<String, Object> srcEntry : source.entrySet()) {
+		for (final Entry<String, Object> srcEntry : source.entrySet()) {
 			if (srcEntry.getValue() != null) {
 				if (item.get(srcEntry.getKey()) == null) {
-					if (keysToRemove == null)
-						keysToRemove = new ArrayList<String>();
+					if (keysToRemove == null) {
+						keysToRemove = new ArrayList<>();
+					}
 					keysToRemove.add(srcEntry.getKey());
 				}
 			}
 		}
-		if (keysToRemove != null)
+		if (keysToRemove != null) {
 			// La suppression est faite a posteriori pour �viter les acc�s
 			// concurrentiels
-			for (String key : keysToRemove) {
+			for (final String key : keysToRemove) {
 				source.keys().remove(key);
 				current.keys().remove(key);
 				// if (changed.get(srcEntry.getKey()) == null) {
 				// changed.put(entry.getKey(), null);
 				// }
 			}
+		}
 	}
 
-
+	@Override
 	public float getFloat(String key) {
 		return current.getFloat(key);
 	}
 
-
+	@Override
 	public IBeanMap addAll(IBeanMap bean) {
-		for(Entry<String, Object> e:bean.entrySet()) {
-			  put(e.getKey(),e.getValue());
-			 }
+		for (final Entry<String, Object> e : bean.entrySet()) {
+			put(e.getKey(), e.getValue());
+		}
 		return this;
 	}
 

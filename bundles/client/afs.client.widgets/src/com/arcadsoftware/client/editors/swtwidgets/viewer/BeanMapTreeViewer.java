@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -58,29 +58,29 @@ import com.arcadsoftware.metadata.Element;
 import com.arcadsoftware.metadata.MetaDataAttribute;
 import com.arcadsoftware.metadata.MetaDataEntity;
 
-public class BeanMapTreeViewer extends AbstractColumnedTreeViewer 
+public class BeanMapTreeViewer extends AbstractColumnedTreeViewer
 		implements IBeanMapContainerList, IBeanMapContainerValue, ILoadedListListener {
 
 	private static final String BEAN_MAP_TREE_VIEWER = "BeanMapTreeViewer"; //$NON-NLS-1$
 
-	private MetaDataEntity structure;
+	private final MetaDataEntity structure;
 	protected ArcadColumns cols;
 	protected BeanMapList list;
 	SelectionAdapter selectionAdapter;
-	private List<Action> actionsList;
+	private final List<Action> actionsList;
 	ILayoutParameters parameters;
 	ISWTRenderer renderer;
 	protected ITreeSWTProvider swtProvider;
 	List<ElementParameter> elems;
 	protected BeanMap selection;
 
-	//private Map<String, Map<Integer, BeanMap>> beanMapsValues = new HashMap<String, Map<Integer, BeanMap>>();
-	protected Map<String, MetaDataEntity> structures = new HashMap<String, MetaDataEntity>();
+	// private Map<String, Map<Integer, BeanMap>> beanMapsValues = new HashMap<String, Map<Integer, BeanMap>>();
+	protected Map<String, MetaDataEntity> structures = new HashMap<>();
 
 	public BeanMapTreeViewer(Composite parent, int style, ISWTRenderer renderer, ILayoutParameters parameters,
 			Element element, List<Action> actionsList) {
 		super(parent, style, false);
-		this.structure = renderer.getStructure(element);
+		structure = renderer.getStructure(element);
 		this.actionsList = actionsList;
 		this.parameters = parameters;
 		this.renderer = renderer;
@@ -91,21 +91,24 @@ public class BeanMapTreeViewer extends AbstractColumnedTreeViewer
 	@Override
 	public AbstractColumnedTreeLabelProvider createTreeLabelProvider(AbstractColumnedViewer viewer) {
 		if (parameters.getParameterBoolean(USE_BOOLEAN_IMAGE)) {
-			return  new ColumnedDefaultTreeLabelProvider(viewer) {
+			return new ColumnedDefaultTreeLabelProvider(viewer) {
 				@Override
 				protected Image getActualImage(Object element, int actualColumnIndex) {
 					Image result = null;
-					String entryKey = cols.items(actualColumnIndex).getIdentifier().replaceAll(
+					final String entryKey = cols.items(actualColumnIndex).getIdentifier().replaceAll(
 							BEAN_MAP_TREE_VIEWER + '.' + structure.getType() + '.', EMPTY);
-					MetaDataAttribute attribute = structure.getAttribute(entryKey);				
+					final MetaDataAttribute attribute = structure.getAttribute(entryKey);
 					if (MetaDataAttribute.TYPE_BOOLEAN.equals(attribute.getType())) {
-						BeanMapArcadEntity beanMapArcadEntity = (BeanMapArcadEntity) element;
-						Object attributeValue = beanMapArcadEntity.getBeanMap().get(entryKey);
-						if (attributeValue != null)
-							result = attributeValue.equals(Integer.valueOf(1)) ? AFSIcon.CHECKBOX_FILLED.image() : AFSIcon.CHECKBOX_EMPTY.image();
+						final BeanMapArcadEntity beanMapArcadEntity = (BeanMapArcadEntity) element;
+						final Object attributeValue = beanMapArcadEntity.getBeanMap().get(entryKey);
+						if (attributeValue != null) {
+							result = attributeValue.equals(Integer.valueOf(1)) ? AFSIcon.CHECKBOX_FILLED.image()
+									: AFSIcon.CHECKBOX_EMPTY.image();
+						}
 					}
-					if (result == null)
+					if (result == null) {
 						result = super.getActualImage(element, actualColumnIndex);
+					}
 					return result;
 				}
 			};
@@ -115,34 +118,35 @@ public class BeanMapTreeViewer extends AbstractColumnedTreeViewer
 
 	@Override
 	public String getIdentifier() {
-		String viewerId = parameters.getParameter(TREE_VIEWER_ID);
-		if (viewerId == null)
+		final String viewerId = parameters.getParameter(TREE_VIEWER_ID);
+		if (viewerId == null) {
 			return super.getIdentifier() + '.' + structure.getType();
-		else
-			return super.getIdentifier() + '.' + structure.getType()+ '.' +viewerId;
+		} else {
+			return super.getIdentifier() + '.' + structure.getType() + '.' + viewerId;
+		}
 	}
-	
+
 	@Override
 	public ArcadColumns getReferenceColumns() {
 		cols = new ArcadColumns();
 		elems = parameters.getListElementParameter(COLUMN);
 
-		if (elems != null && !elems.isEmpty()) {
-			for (ElementParameter element : elems) {
-				String label = renderer.getLocalizedMessage(parameters.getElementParameter(element, LABEL));
-				String key = parameters.getElementParameter(element, ATTRIBUTE);
-				MetaDataAttribute attribute = structure.getAttribute(key);
+		if ((elems != null) && !elems.isEmpty()) {
+			for (final ElementParameter element : elems) {
+				final String label = renderer.getLocalizedMessage(parameters.getElementParameter(element, LABEL));
+				final String key = parameters.getElementParameter(element, ATTRIBUTE);
+				final MetaDataAttribute attribute = structure.getAttribute(key);
 				if (attribute != null) {
-					int visible = (attribute.isVisible()) ? ArcadColumn.VISIBLE : ArcadColumn.HIDDEN;
-					String columnLabel = (label != null) ? label : attribute.getName();
+					final int visible = (attribute.isVisible()) ? ArcadColumn.VISIBLE : ArcadColumn.HIDDEN;
+					final String columnLabel = (label != null) ? label : attribute.getName();
 					cols.add(new ArcadColumn(BEAN_MAP_TREE_VIEWER + '.' + structure.getType() + '.' + key,
 							columnLabel, columnLabel, visible, cols.count(), attribute.getColSize()));
 				}
 			}
 		} else {
-			for (Map.Entry<String, MetaDataAttribute> entry : structure.getAttributes().entrySet()) {
-				MetaDataAttribute attribute = entry.getValue();
-				int visible = (attribute.isVisible()) ? ArcadColumn.VISIBLE : ArcadColumn.HIDDEN;
+			for (final Map.Entry<String, MetaDataAttribute> entry : structure.getAttributes().entrySet()) {
+				final MetaDataAttribute attribute = entry.getValue();
+				final int visible = (attribute.isVisible()) ? ArcadColumn.VISIBLE : ArcadColumn.HIDDEN;
 				cols.add(new ArcadColumn(BEAN_MAP_TREE_VIEWER + '.' + structure.getType() + '.' + entry.getKey(),
 						attribute.getName(), attribute.getName(), visible, cols.count(), attribute.getColSize()));
 			}
@@ -158,50 +162,61 @@ public class BeanMapTreeViewer extends AbstractColumnedTreeViewer
 	protected boolean mustBeCleanValue() {
 		return false;
 	}
-	
+
+	@Override
 	public void addBeanMapToList(int index, BeanMap beanMap) {
-		if (list == null)
+		if (list == null) {
 			list = new BeanMapList();
+		}
 		list.add(beanMap);
 	}
 
+	@Override
 	public BeanMapList getBeanMapList() {
 		return list;
 	}
 
+	@Override
 	public void setBeanMapList(BeanMapList list) {
-		BeanMap newSelection = getBeanMapValue();
-		if (newSelection != null)
+		final BeanMap newSelection = getBeanMapValue();
+		if (newSelection != null) {
 			selection = newSelection;
+		}
 		this.list = list;
-		ArcadCollection collection = swtProvider.createContentData(list);
-		if (collection != null){
+		final ArcadCollection collection = swtProvider.createContentData(list);
+		if (collection != null) {
 			setInput(collection);
 		} else {
 			setInput(list);
 		}
 		refresh();
-		if (selection != null) 
+		if (selection != null) {
 			setBeanMapValue(selection);
+		}
 	}
 
+	@Override
 	public Widget getWidget() {
 		return getViewer().getControl();
 	}
 
+	@Override
 	public String getListType() {
 		return structure.getType();
 	}
 
+	@Override
 	public void loadedListComplete(ISWTRenderer renderer) {
 		if (list != null) {
 			setBeanMapList(list);
 		}
 	}
 
+	@Override
 	public void addSelectionListener(SelectionAdapter newSelectionAdapter) {
 		selectionAdapter = newSelectionAdapter;
 		getViewer().addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				selectionAdapter.widgetSelected(null);
 			}
@@ -214,36 +229,39 @@ public class BeanMapTreeViewer extends AbstractColumnedTreeViewer
 		if (actionsList == null) {
 			actions = super.makeActions();
 		} else {
-			Action[] superActions = super.makeActions();
+			final Action[] superActions = super.makeActions();
 			actions = new Action[superActions.length + actionsList.size()];
 			System.arraycopy(superActions, 0, actions, 0, superActions.length);
 			for (int i = 0; i < actionsList.size(); i++) {
 				actions[superActions.length + i] = actionsList.get(i);
 			}
 		}
-		for (Action action : actions) {
+		for (final Action action : actions) {
 			if (action instanceof IRefreshableAction) {
 				((IRefreshableAction) action).refresh();
 			}
 		}
 		return actions;
 	}
-	
+
+	@Override
 	public BeanMap getBeanMapValue() {
 		if (getSelection().isEmpty()) {
 			return null;
 		}
-		Object o = getSelection().getFirstElement();
-		if (o instanceof BeanMap){
-			return (BeanMap)o;
-		} else if (o instanceof BeanMapArcadEntity){
-			return  ((BeanMapArcadEntity) getSelection().getFirstElement()).getBeanMap();
-		} else
+		final Object o = getSelection().getFirstElement();
+		if (o instanceof BeanMap) {
+			return (BeanMap) o;
+		} else if (o instanceof BeanMapArcadEntity) {
+			return ((BeanMapArcadEntity) getSelection().getFirstElement()).getBeanMap();
+		} else {
 			return null;
+		}
 	}
 
+	@Override
 	public void setBeanMapValue(BeanMap beanMap) {
-		//getTable().select(list.indexOf(beanMap));
+		// getTable().select(list.indexOf(beanMap));
 		getViewer().setSelection(new StructuredSelection(beanMap));
 	}
 
@@ -258,34 +276,36 @@ public class BeanMapTreeViewer extends AbstractColumnedTreeViewer
 	public void setSwtProvider(ITreeSWTProvider swtProvider) {
 		this.swtProvider = swtProvider;
 	}
-	
 
+	@Override
 	public String getAttributeList() {
 		return null;
 	}
 
+	@Override
 	public String getOrderList() {
 		return null;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	/**
-	 * Get selected list of beanMaps
-	 * The returned items can have different types since they can come from different levels.
+	 * Get selected list of beanMaps The returned items can have different types since they can come from different
+	 * levels.
+	 *
 	 * @return
 	 */
 	public BeanMapList getSelected() {
-		BeanMapList selected = new BeanMapList();
-		IStructuredSelection ss = getSelection();
-		Iterator<Object> it = ss.iterator();
-		while(it.hasNext()) {
-			Object o = it.next();
+		final BeanMapList selected = new BeanMapList();
+		final IStructuredSelection ss = getSelection();
+		final Iterator<Object> it = ss.iterator();
+		while (it.hasNext()) {
+			final Object o = it.next();
 			if (o instanceof BeanMapArcadEntity) {
-				BeanMapArcadEntity entity = (BeanMapArcadEntity)o;
+				final BeanMapArcadEntity entity = (BeanMapArcadEntity) o;
 				selected.add(entity.getBeanMap());
-			} else if(o instanceof BeanMap) {
-				selected.add((BeanMap)o);
-			} 
+			} else if (o instanceof BeanMap) {
+				selected.add((BeanMap) o);
+			}
 		}
 		return selected;
 	}

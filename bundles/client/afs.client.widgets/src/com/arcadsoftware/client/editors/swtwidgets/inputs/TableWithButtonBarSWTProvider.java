@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -43,162 +43,166 @@ import com.arcadsoftware.editor.swt.actions.IEditorAction;
 
 /**
  * This widget manages a Table with three buttons dedicated to the Add, Update and Delete action</br>
- * This button are displayed into a ButtonBar located under the table 
- * 
+ * This button are displayed into a ButtonBar located under the table
+ *
  * @author ARCAD Software
  */
-public abstract class  TableWithButtonBarSWTProvider extends TableSWTProvider {
-	
-	private static final String ACTIONID_ADD="*add"; //$NON-NLS-1$
-	private static final String ACTIONID_DELETE="*delete";//$NON-NLS-1$
-	private static final String ACTIONID_UPDATE="*update";//$NON-NLS-1$
-	
+public abstract class TableWithButtonBarSWTProvider extends TableSWTProvider {
+
+	private static final String ACTIONID_ADD = "*add"; //$NON-NLS-1$
+	private static final String ACTIONID_DELETE = "*delete";//$NON-NLS-1$
+	private static final String ACTIONID_UPDATE = "*update";//$NON-NLS-1$
+
 	IAction dbclickAction;
-	HashMap<String,IEditorAction> allActions;
-	List<IAction>  menuActions;
+	HashMap<String, IEditorAction> allActions;
+	List<IAction> menuActions;
 	List<IAction> toolbarActions;
 	protected boolean readOnlyEdition;
-	
+
 	@Override
 	protected void manageActions(ILayoutParameters parameters) {
-		allActions = new HashMap<String, IEditorAction>();
-		menuActions = new ArrayList<IAction>();
-		toolbarActions = new ArrayList<IAction>();
+		allActions = new HashMap<>();
+		menuActions = new ArrayList<>();
+		toolbarActions = new ArrayList<>();
 
-		List<ElementParameter>  actions = parameters.getListElementParameter(IConstants.EDITOR_ACTION);
-		for (ElementParameter action: actions) {
-			String actionId = parameters.getElementParameter(action, IConstants.ACTION);
-			String label = parameters.getElementParameter(action, IConstants.LABEL);
-			String icon = parameters.getElementParameter(action, IConstants.ICON);			
-			boolean dbclick = parameters.getElementParameterBoolean(action, IConstants.DBCLICK);
-			boolean showInMenu =parameters.getElementParameterBoolean(action, IConstants.SHOW_INMENU);
-			boolean showInToolbar =parameters.getElementParameterBoolean(action, IConstants.SHOW_INTOOLBAR);
+		final List<ElementParameter> actions = parameters.getListElementParameter(IConstants.EDITOR_ACTION);
+		for (final ElementParameter action : actions) {
+			final String actionId = parameters.getElementParameter(action, IConstants.ACTION);
+			final String label = parameters.getElementParameter(action, IConstants.LABEL);
+			final String icon = parameters.getElementParameter(action, IConstants.ICON);
+			final boolean dbclick = parameters.getElementParameterBoolean(action, IConstants.DBCLICK);
+			final boolean showInMenu = parameters.getElementParameterBoolean(action, IConstants.SHOW_INMENU);
+			final boolean showInToolbar = parameters.getElementParameterBoolean(action, IConstants.SHOW_INTOOLBAR);
 			IEditorAction a = null;
-			if (actionId!=null) {
+			if (actionId != null) {
 				if (actionId.equalsIgnoreCase(ACTIONID_ADD)) {
-					a= createAddEditorAction();
+					a = createAddEditorAction();
 				} else if (actionId.equalsIgnoreCase(ACTIONID_UPDATE)) {
-					a= createEditEditorAction();
+					a = createEditEditorAction();
 				} else if (actionId.equalsIgnoreCase(ACTIONID_DELETE)) {
 					a = createRemoveEditorAction();
-				} else {			
+				} else {
 					a = createCustomAction(actionId);
-					if (a == null) {							
+					if (a == null) {
 						a = EditorActionFactory.getEditorAction(actionId);
 					}
 				}
-				if (a!=null) {
+				if (a != null) {
 					a.setText(renderer.getLocalizedMessage(label));
 					a.setToolTipText(renderer.getLocalizedMessage(label));
 					a.setBeanMapSelector(this);
 					a.setRenderer(renderer);
 					a.setTableViewer(getList());
-					a.setElement(element);					
-					if (icon != null)
-						a.setImageDescriptor(renderer.getImageDescriptor(icon));		
-					if (showInMenu)
+					a.setElement(element);
+					if (icon != null) {
+						a.setImageDescriptor(renderer.getImageDescriptor(icon));
+					}
+					if (showInMenu) {
 						menuActions.add(a);
-					if (showInToolbar)
-						menuActions.add(a);		
-					allActions.put(actionId,a);
-				}	
-				if (dbclick){
+					}
+					if (showInToolbar) {
+						menuActions.add(a);
+					}
+					allActions.put(actionId, a);
+				}
+				if (dbclick) {
 					dbclickAction = a;
 				}
 			}
-		}			
-	}	
-	
+		}
+	}
+
 	protected IEditorAction createCustomAction(String actionId) {
 		return null;
 	}
-	
+
 	@Override
-	public void setList(BeanMapTableViewer list) {	
+	public void setList(BeanMapTableViewer list) {
 		super.setList(list);
-		Iterator<String> it = allActions.keySet().iterator();
+		final Iterator<String> it = allActions.keySet().iterator();
 		while (it.hasNext()) {
-			allActions.get(it.next()).setTableViewer(list); 			
+			allActions.get(it.next()).setTableViewer(list);
 		}
 	}
-	
-	private Button createButton(Composite parent,ILayoutParameters parameters,ElementParameter button){
-		
-		String text = parameters.getElementParameter(button, IConstants.LABEL);
-		if (text!=null)
-			text = renderer.getLocalizedMessage(text);
-		else
-			text=""; //$NON-NLS-1$
 
-		Button b = getRenderer().getToolkit().createButton(parent, text, SWT.PUSH);
-		int anchor = parameters.getElementParameterInteger(button, IConstants.ANCHOR,0);
-		int offset = parameters.getElementParameterInteger(button, IConstants.OFFSET,0);		
-		int width = parameters.getElementParameterInteger(button, IConstants.WIDTH,-1);	
-		int height = parameters.getElementParameterInteger(button, IConstants.HEIGHT,-1);								
-		
-		FormData fData = new FormData();
-		fData.top = new FormAttachment( 0, 0);
-    	fData.height = height;
-    	fData.width =width;
-    	if (anchor==0) {//left anchor 
-    		fData.left = new FormAttachment( 0, offset);
-    	} else {
-    		fData.left = new FormAttachment( 100, offset);
-    	}
-	    b.setLayoutData(fData);
-	    
-	    String actionId = parameters.getElementParameter(button, IConstants.ACTIONID);
-	    final IAction action = allActions.get(actionId);
-	    if (action!=null) {
-	    	b.addSelectionListener(
-        		new SelectionAdapter() {
-        			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
-        				action.run();
-        				relayout(e.widget);
-        			};
-        		}
-	        );
-	    	if (text.equalsIgnoreCase("")){ //$NON-NLS-1$
-	    		b.setText(action.getText());
-	    	}
-    		if (action.getImageDescriptor()!=null) {
-    			b.setImage(action.getImageDescriptor().createImage());
-    		}	    	
-	    }
-	    return b;
+	private Button createButton(Composite parent, ILayoutParameters parameters, ElementParameter button) {
+
+		String text = parameters.getElementParameter(button, IConstants.LABEL);
+		if (text != null) {
+			text = renderer.getLocalizedMessage(text);
+		} else {
+			text = ""; //$NON-NLS-1$
+		}
+
+		final Button b = getRenderer().getToolkit().createButton(parent, text, SWT.PUSH);
+		final int anchor = parameters.getElementParameterInteger(button, IConstants.ANCHOR, 0);
+		final int offset = parameters.getElementParameterInteger(button, IConstants.OFFSET, 0);
+		final int width = parameters.getElementParameterInteger(button, IConstants.WIDTH, -1);
+		final int height = parameters.getElementParameterInteger(button, IConstants.HEIGHT, -1);
+
+		final FormData fData = new FormData();
+		fData.top = new FormAttachment(0, 0);
+		fData.height = height;
+		fData.width = width;
+		if (anchor == 0) {// left anchor
+			fData.left = new FormAttachment(0, offset);
+		} else {
+			fData.left = new FormAttachment(100, offset);
+		}
+		b.setLayoutData(fData);
+
+		final String actionId = parameters.getElementParameter(button, IConstants.ACTIONID);
+		final IAction action = allActions.get(actionId);
+		if (action != null) {
+			b.addSelectionListener(
+					new SelectionAdapter() {
+						@Override
+						public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
+							action.run();
+							relayout(e.widget);
+						}
+					});
+			if (text.equalsIgnoreCase("")) { //$NON-NLS-1$
+				b.setText(action.getText());
+			}
+			if (action.getImageDescriptor() != null) {
+				b.setImage(action.getImageDescriptor().createImage());
+			}
+		}
+		return b;
 	}
-	
+
 	protected void relayout(Widget widget) {
 		if (widget instanceof Control) {
-			Composite parent = ((Control) widget).getParent().getParent();
+			final Composite parent = ((Control) widget).getParent().getParent();
 			if (parent.getLayout() instanceof TableWrapLayout) {
-				parent.getParent().layout(true,true);
+				parent.getParent().layout(true, true);
 			}
 		}
 	}
 
-	private void manageButtonBar(Composite parent,ILayoutParameters parameters, String position){
-		List<ElementParameter>  buttons = parameters.getListElementParameter(IConstants.BUTTON);
-		List<ElementParameter>  buttonBars = parameters.getListElementParameter(IConstants.BUTTONBAR);
-		for (ElementParameter buttonBar:buttonBars){
-			String id = parameters.getElementParameter(buttonBar, IConstants.ID);
-			String pos = parameters.getElementParameter(buttonBar, IConstants.POSITION);
-			int height = parameters.getElementParameterInteger(buttonBar, IConstants.HEIGHT,-1);
-			if (pos.equalsIgnoreCase(position)){
-				//create de la barre
-				Composite bar = new Composite(parent,SWT.NONE);
+	private void manageButtonBar(Composite parent, ILayoutParameters parameters, String position) {
+		final List<ElementParameter> buttons = parameters.getListElementParameter(IConstants.BUTTON);
+		final List<ElementParameter> buttonBars = parameters.getListElementParameter(IConstants.BUTTONBAR);
+		for (final ElementParameter buttonBar : buttonBars) {
+			final String id = parameters.getElementParameter(buttonBar, IConstants.ID);
+			final String pos = parameters.getElementParameter(buttonBar, IConstants.POSITION);
+			final int height = parameters.getElementParameterInteger(buttonBar, IConstants.HEIGHT, -1);
+			if (pos.equalsIgnoreCase(position)) {
+				// create de la barre
+				final Composite bar = new Composite(parent, SWT.NONE);
 				if (parent.getLayout() instanceof GridLayout) {
-					GridData layoutData = new GridData(GridData.FILL_HORIZONTAL);
+					final GridData layoutData = new GridData(GridData.FILL_HORIZONTAL);
 					layoutData.horizontalSpan = 3;
 					if (height != -1) {
-						layoutData.heightHint=height;
+						layoutData.heightHint = height;
 					} else {
 						layoutData.grabExcessVerticalSpace = true;
 						layoutData.verticalAlignment = GridData.FILL_VERTICAL;
 					}
 					bar.setLayoutData(layoutData);
 				} else if (parent.getLayout() instanceof TableWrapLayout) {
-					TableWrapData twd = new TableWrapData(TableWrapData.FILL_GRAB);
+					final TableWrapData twd = new TableWrapData(TableWrapData.FILL_GRAB);
 					twd.colspan = ((TableWrapLayout) parent.getLayout()).numColumns;
 					if (height > 0) {
 						twd.heightHint = height;
@@ -209,68 +213,68 @@ public abstract class  TableWithButtonBarSWTProvider extends TableSWTProvider {
 					bar.setLayoutData(twd);
 				}
 				bar.setLayout(new FormLayout());
-				for (ElementParameter button:buttons){
-					String barId = parameters.getElementParameter(button, IConstants.BUTTONBARID);
+				for (final ElementParameter button : buttons) {
+					final String barId = parameters.getElementParameter(button, IConstants.BUTTONBARID);
 					if (barId.equalsIgnoreCase(id)) {
-						createButton(bar,parameters,button);						
+						createButton(bar, parameters, button);
 					}
 				}
-			}			
-		}		
-	}	
-	
-	private IEditorAction createAddEditorAction(){
-		return new AbstractEditorAction(){
+			}
+		}
+	}
+
+	private IEditorAction createAddEditorAction() {
+		return new AbstractEditorAction() {
 			@Override
 			public void run() {
 				createBeanMap(TableWithButtonBarSWTProvider.this.element, true);
 			}
 		};
 	}
-	
-	private IEditorAction createEditEditorAction(){
-		return new AbstractEditorAction(){
+
+	private IEditorAction createEditEditorAction() {
+		return new AbstractEditorAction() {
 			@Override
 			public void run() {
 				updateBeanMap();
 			}
 		};
-	}	
-	
-	private IEditorAction createRemoveEditorAction(){
-		return new AbstractEditorAction(){
+	}
+
+	private IEditorAction createRemoveEditorAction() {
+		return new AbstractEditorAction() {
 			@Override
 			public void run() {
 				removeBeanMap(TableWithButtonBarSWTProvider.this.element);
 			}
 		};
-	}		
-	
-	@Override
-	protected void createControlBeforeTable(Composite parent) {		
-		super.createControlBeforeTable(parent);
-		manageButtonBar(parent,getLayoutParameters(),IConstants.BEFORE);		
 	}
-	
+
+	@Override
+	protected void createControlBeforeTable(Composite parent) {
+		super.createControlBeforeTable(parent);
+		manageButtonBar(parent, getLayoutParameters(), IConstants.BEFORE);
+	}
+
 	@Override
 	protected void createControlAfterTable(Composite parent) {
 		super.createControlAfterTable(parent);
-		manageButtonBar(parent,getLayoutParameters(),IConstants.AFTER);	
+		manageButtonBar(parent, getLayoutParameters(), IConstants.AFTER);
 	}
-	
+
 	@Override
 	protected void doActionOnDoubleClick() {
-		if (dbclickAction!=null){
+		if (dbclickAction != null) {
 			dbclickAction.run();
 		} else {
 			super.doActionOnDoubleClick();
 		}
 	}
-	
-	public String getEditionLayoutName(){
-		return getLayoutParameters().getParameter(IConstants.LAYOUT_NAME,"");
+
+	public String getEditionLayoutName() {
+		return getLayoutParameters().getParameter(IConstants.LAYOUT_NAME, "");
 	}
-	
+
 	public HashMap<String, IEditorAction> getAllActions() {
 		return allActions;
 	}

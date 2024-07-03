@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -33,7 +33,7 @@ public class BeanMapStructureAdvisor extends TreeStructureAdvisor {
 	@Override
 	public Object getParent(Object element) {
 		if (element instanceof IBeanMap) {
-			Object father = ((IBeanMap) element).get(fatherCode);
+			final Object father = ((IBeanMap) element).get(fatherCode);
 			if (father != null) {
 				int fid = 0;
 				if (father instanceof Integer) {
@@ -41,7 +41,7 @@ public class BeanMapStructureAdvisor extends TreeStructureAdvisor {
 				} else if (father instanceof String) {
 					try {
 						fid = Integer.parseInt((String) father);
-					} catch (NumberFormatException e) {
+					} catch (final NumberFormatException e) {
 						MessageManager.addException(e, MessageManager.LEVEL_PRODUCTION);
 					}
 				} else if (father instanceof IIdentifiedBean) {
@@ -49,7 +49,7 @@ public class BeanMapStructureAdvisor extends TreeStructureAdvisor {
 				}
 				// Look for this beanmap into the global list !
 				if (fid != 0) {
-					for (Object o : link) {
+					for (final Object o : link) {
 						if ((o instanceof IIdentifiedBean) && (((IIdentifiedBean) o).getId() == fid)) {
 							return o;
 						}
@@ -63,20 +63,20 @@ public class BeanMapStructureAdvisor extends TreeStructureAdvisor {
 	@Override
 	public Boolean hasChildren(Object element) {
 		if (element instanceof IIdentifiedBean) {
-			int id = ((IIdentifiedBean) element).getId();
+			final int id = ((IIdentifiedBean) element).getId();
 			if (id == 0) {
 				return Boolean.valueOf(false);
 			}
-			for (Object e : link) {
+			for (final Object e : link) {
 				if (e instanceof IBeanMap) {
-					Object o = ((IBeanMap) e).get(fatherCode);
+					final Object o = ((IBeanMap) e).get(fatherCode);
 					int fid = 0;
 					if (o instanceof Integer) {
 						fid = ((Integer) o).intValue();
 					} else if (o instanceof String) {
 						try {
 							fid = Integer.parseInt((String) o);
-						} catch (NumberFormatException ee) {
+						} catch (final NumberFormatException ee) {
 							MessageManager.addException(ee, MessageManager.LEVEL_PRODUCTION);
 						}
 					} else if (o instanceof IIdentifiedBean) {

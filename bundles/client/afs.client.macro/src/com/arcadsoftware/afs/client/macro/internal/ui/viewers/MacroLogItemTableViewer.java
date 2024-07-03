@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -48,7 +48,7 @@ public class MacroLogItemTableViewer extends AbstractColumnedTableViewer {
 	public static final String MSG_ESCAPE = "*ESCAPE"; //$NON-NLS-1$
 	public static final String MSG_STATUS = "*STATUS"; //$NON-NLS-1$
 
-	private List<String> includedMessageTypes = new ArrayList<>();
+	private final List<String> includedMessageTypes = new ArrayList<>();
 
 	private class FilterAction extends Action {
 
@@ -65,9 +65,9 @@ public class MacroLogItemTableViewer extends AbstractColumnedTableViewer {
 		@Override
 		public void run() {
 			if (isChecked()) {
-				MacroLogItemTableViewer.this.includeMessageType(messageType);
+				includeMessageType(messageType);
 			} else {
-				MacroLogItemTableViewer.this.removeMessageType(messageType);
+				removeMessageType(messageType);
 			}
 			viewer.getViewer().refresh();
 		}
@@ -88,12 +88,12 @@ public class MacroLogItemTableViewer extends AbstractColumnedTableViewer {
 
 		/*
 		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.ViewerFilter#select(org.eclipse.jface.viewers.
-		 * Viewer, java.lang.Object, java.lang.Object)
+		 * @see org.eclipse.jface.viewers.ViewerFilter#select(org.eclipse.jface.viewers. Viewer, java.lang.Object,
+		 * java.lang.Object)
 		 */
+		@Override
 		public boolean select(Viewer viewer, Object parentElement, Object element) {
-			MacroLogItemDefinition mli = (MacroLogItemDefinition) element;
+			final MacroLogItemDefinition mli = (MacroLogItemDefinition) element;
 			return isIncludedInMessageType(mli.getType());
 		}
 	}
@@ -105,9 +105,10 @@ public class MacroLogItemTableViewer extends AbstractColumnedTableViewer {
 	}
 
 	public void removeMessageType(String messageType) {
-		int res = includedMessageTypes.indexOf(messageType);
-		if (res >= 0)
+		final int res = includedMessageTypes.indexOf(messageType);
+		if (res >= 0) {
 			includedMessageTypes.remove(res);
+		}
 	}
 
 	public boolean isIncludedInMessageType(String messageType) {
@@ -119,9 +120,8 @@ public class MacroLogItemTableViewer extends AbstractColumnedTableViewer {
 		init();
 	}
 
-
 	protected List<Action> createActions() {
-		List<Action> result = new ArrayList<>();
+		final List<Action> result = new ArrayList<>();
 
 		filterCompletionMessage = new FilterAction(this, Activator.resString("macro.msgtype.completion"), MSG_COMP);
 		filterDiagnosticMessage = new FilterAction(this, Activator.resString("macro.msgtype.diagnostic"), MSG_DIAG);
@@ -155,13 +155,13 @@ public class MacroLogItemTableViewer extends AbstractColumnedTableViewer {
 		includedMessageTypes.add(MSG_NOTIFY);
 		includedMessageTypes.add(MSG_RQS);
 		includedMessageTypes.add(MSG_STATUS);
-		this.getViewer().addFilter(new LogItemFilter());
+		getViewer().addFilter(new LogItemFilter());
 	}
 
 	@Override
 	protected void fillContextMenu(IMenuManager manager) {
 		super.fillContextMenu(manager);
-		ContributionItem sectionContributionItem = GuiFormatTools.createMenu(filterActions);
+		final ContributionItem sectionContributionItem = GuiFormatTools.createMenu(filterActions);
 		manager.add(sectionContributionItem);
 
 	}
@@ -174,7 +174,7 @@ public class MacroLogItemTableViewer extends AbstractColumnedTableViewer {
 	@Override
 	public String getValue(Object element, int columnIndex) {
 		if (element instanceof MacroLogItemDefinition) {
-			MacroLogItemDefinition le = (MacroLogItemDefinition) element;
+			final MacroLogItemDefinition le = (MacroLogItemDefinition) element;
 			switch (columnIndex) {
 			case 0:
 				return le.getSequence();
@@ -204,7 +204,7 @@ public class MacroLogItemTableViewer extends AbstractColumnedTableViewer {
 
 	@Override
 	public ArcadColumns getReferenceColumns() {
-		ArcadColumns refColumns = new ArcadColumns();
+		final ArcadColumns refColumns = new ArcadColumns();
 		refColumns.add(new ArcadColumn("sequence", Activator.resString("macroLogItem.header.sequence"), //$NON-NLS-1$
 				ArcadColumn.VISIBLE, 0, 100, 0));
 		refColumns.add(

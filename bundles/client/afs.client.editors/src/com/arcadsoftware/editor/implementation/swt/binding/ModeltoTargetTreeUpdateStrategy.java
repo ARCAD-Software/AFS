@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -29,9 +29,9 @@ import com.arcadsoftware.beanmap.IIdentifiedBean;
  */
 public class ModeltoTargetTreeUpdateStrategy extends UpdateListStrategy {
 
-	private String fatherCode;
-	private int fatherId;
-	private BeanMapObservableLink sourceLink;
+	private final String fatherCode;
+	private final int fatherId;
+	private final BeanMapObservableLink sourceLink;
 	ArrayList<Integer> completed;
 
 	public ModeltoTargetTreeUpdateStrategy(BeanMapObservableLink sourceLink, String fatherCode, int fatherId,
@@ -44,7 +44,7 @@ public class ModeltoTargetTreeUpdateStrategy extends UpdateListStrategy {
 	}
 
 	private boolean accept(BeanMap element) {
-		Object father = element.get(fatherCode);
+		final Object father = element.get(fatherCode);
 		int fid = 0;
 		if (father != null) {
 			if (father instanceof Integer) {
@@ -52,7 +52,7 @@ public class ModeltoTargetTreeUpdateStrategy extends UpdateListStrategy {
 			} else if (father instanceof String) {
 				try {
 					fid = Integer.parseInt((String) father);
-				} catch (NumberFormatException e) {
+				} catch (final NumberFormatException e) {
 					MessageManager.addException(e, MessageManager.LEVEL_PRODUCTION);
 				}
 			} else if (father instanceof IIdentifiedBean) {
@@ -75,7 +75,7 @@ public class ModeltoTargetTreeUpdateStrategy extends UpdateListStrategy {
 			// Get first element really added from position index.
 			int i = -1;
 			for (int j = index; j >= 0; j--) {
-				int x = completed.get(j).intValue();
+				final int x = completed.get(j).intValue();
 				if (x > -1) {
 					i = x;
 					break;
@@ -98,7 +98,7 @@ public class ModeltoTargetTreeUpdateStrategy extends UpdateListStrategy {
 		if (windex > -1) {
 			completed.remove(index);
 			for (int i = completed.size() - 1; i >= index; i--) {
-				int j = completed.get(i).intValue();
+				final int j = completed.get(i).intValue();
 				if (j > -1) {
 					completed.set(i, Integer.valueOf(j - 1));
 				}

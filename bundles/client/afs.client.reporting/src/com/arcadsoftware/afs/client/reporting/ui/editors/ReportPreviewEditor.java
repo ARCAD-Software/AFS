@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -30,8 +30,6 @@ import com.arcadsoftware.afs.client.core.connection.ServerConnection;
 import com.arcadsoftware.afs.client.reporting.Activator;
 import com.arcadsoftware.afs.client.reporting.core.ReportHeader;
 
-
-
 public class ReportPreviewEditor extends EditorPart {
 
 	private ReportPreviewEditorInput reportInput;
@@ -39,79 +37,88 @@ public class ReportPreviewEditor extends EditorPart {
 	private String currentUrl = null;
 	private ReportHeader editedReport;
 	private Browser browser;
-	
-    public ReportPreviewEditor(){
-    }
 
-    public void doSave(IProgressMonitor progressMonitor){
-    }
+	public ReportPreviewEditor() {
+	}
 
-    public void doSaveAs(){
-    }
+	@Override
+	public void doSave(IProgressMonitor progressMonitor) {
+	}
 
-    public boolean isDirty(){
-        return false;
-    }
+	@Override
+	public void doSaveAs() {
+	}
 
-    public boolean isSaveAsAllowed(){
-        return false;
-    }
+	@Override
+	public boolean isDirty() {
+		return false;
+	}
 
-    public void setFocus(){
-    }
-    
-    public void init(IEditorSite site, IEditorInput input)
-        throws PartInitException {
-        if(input == null || !(input instanceof ReportPreviewEditorInput))
-            throw new PartInitException(Activator.resString("error.services.initializeEditor")); //$NON-NLS-1$
-        setInput(input);
-        reportInput = (ReportPreviewEditorInput)input;
-        editedReport = reportInput.getReport();
-        connection = reportInput.getConnection();
-        if(editedReport != null){
-            String partName = editedReport.getName();
-            setPartName((new StringBuilder(String.valueOf(getPartName()))).append(": ").append(partName).toString()); //$NON-NLS-1$
-            firePropertyChange(1);
-        }
-        setSite(site);
-    }
+	@Override
+	public boolean isSaveAsAllowed() {
+		return false;
+	}
 
-    public void createPartControl(Composite parent) {
-        browser = new Browser(parent, IWorkbenchBrowserSupport.AS_EDITOR | IWorkbenchBrowserSupport.LOCATION_BAR | IWorkbenchBrowserSupport.STATUS);
-        browser.setLayoutData(new GridData(4, 4, true, true, 3, 1));
-        preview();
-    }
-    
-    public void preview(){
-        try {           
-            String previewType = ((ReportPreviewEditorInput)getEditorInput()).getViewerType();
-            String previewExtraParams = ((ReportPreviewEditorInput)getEditorInput()).getViewerExtraParameters();
-            
-            String reportUrl = editedReport.getUrlOrFilename();            
-            String proxyUrl = reportInput.getHelper().getRedirection(Activator.PROXYURL);  
+	@Override
+	public void setFocus() {
+	}
 
-            currentUrl = String.format(ReportPreviewEditorInput.URL_FORMAT, 
-            		proxyUrl, 
-            		reportUrl, 
-            		previewType, 
-            		(previewExtraParams == null)?"":"&"+previewExtraParams, 
-            		Locale.getDefault());
-                        
-            // Internal Browser
-            browser.setUrl(currentUrl);
-            
-        } catch(Exception e) {
-        	MessageManager.addException(e,MessageManager.LEVEL_PRODUCTION);
-        }
-    }
+	@Override
+	public void init(IEditorSite site, IEditorInput input)
+			throws PartInitException {
+		if ((input == null) || !(input instanceof ReportPreviewEditorInput)) {
+			throw new PartInitException(Activator.resString("error.services.initializeEditor")); //$NON-NLS-1$
+		}
+		setInput(input);
+		reportInput = (ReportPreviewEditorInput) input;
+		editedReport = reportInput.getReport();
+		connection = reportInput.getConnection();
+		if (editedReport != null) {
+			final String partName = editedReport.getName();
+			setPartName((new StringBuilder(String.valueOf(getPartName()))).append(": ").append(partName).toString()); //$NON-NLS-1$
+			firePropertyChange(1);
+		}
+		setSite(site);
+	}
 
-    public void refreshReport(){
-    	if (currentUrl!=null ){
-    		browser.setUrl(currentUrl);
-    	}
-    }
-        
-    public ServerConnection getConnection() {
+	@Override
+	public void createPartControl(Composite parent) {
+		browser = new Browser(parent, IWorkbenchBrowserSupport.AS_EDITOR | IWorkbenchBrowserSupport.LOCATION_BAR
+				| IWorkbenchBrowserSupport.STATUS);
+		browser.setLayoutData(new GridData(4, 4, true, true, 3, 1));
+		preview();
+	}
+
+	public void preview() {
+		try {
+			final String previewType = ((ReportPreviewEditorInput) getEditorInput()).getViewerType();
+			final String previewExtraParams = ((ReportPreviewEditorInput) getEditorInput()).getViewerExtraParameters();
+
+			final String reportUrl = editedReport.getUrlOrFilename();
+			final String proxyUrl = reportInput.getHelper().getRedirection(Activator.PROXYURL);
+
+			currentUrl = String.format(ReportPreviewEditorInput.URL_FORMAT,
+					proxyUrl,
+					reportUrl,
+					previewType,
+					(previewExtraParams == null) ? "" : "&" + previewExtraParams,
+					Locale.getDefault());
+
+			// Internal Browser
+			browser.setUrl(currentUrl);
+
+		} catch (final Exception e) {
+			MessageManager.addException(e, MessageManager.LEVEL_PRODUCTION);
+		}
+	}
+
+	public void refreshReport() {
+		if (currentUrl != null) {
+			browser.setUrl(currentUrl);
+		}
+	}
+
+	public ServerConnection getConnection() {
 		return connection;
 	}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -27,51 +27,49 @@ import com.arcadsoftware.afs.framework.ui.propertypage.AbstractAFSPropertyPage;
 import com.arcadsoftware.metadata.client.DataAccess;
 import com.arcadsoftware.rest.connection.ConnectionUserBean;
 
-
-
 public abstract class AbstractConnectedPropertypage extends AbstractAFSPropertyPage {
 
 	protected ServerConnection getServerConnection() {
-		IAdaptable element = getElement();
+		final IAdaptable element = getElement();
 		if (element != null) {
-			Object o = element.getAdapter(ServerConnection.class);
+			final Object o = element.getAdapter(ServerConnection.class);
 			if (o instanceof ServerConnection) {
-				return (ServerConnection)o;
+				return (ServerConnection) o;
 			}
 		}
 		return null;
 	}
-	
+
 	protected ConnectionUserBean getUser() {
-		ServerConnection cnx = getServerConnection();
-		if (cnx!=null) {
+		final ServerConnection cnx = getServerConnection();
+		if (cnx != null) {
 			return cnx.getUser();
 		}
 		return null;
 	}
 
 	protected DataAccess getDataAccess() {
-		ServerConnection cnx = getServerConnection();
-		if (cnx!=null) {
+		final ServerConnection cnx = getServerConnection();
+		if (cnx != null) {
 			return cnx.getDataAccess();
 		}
 		return null;
-	}	
-	
+	}
+
 	public boolean isAllowed() {
-		ServerConnection connection = getServerConnection();
-		if (connection!=null) {
+		final ServerConnection connection = getServerConnection();
+		if (connection != null) {
 			return connection.isAllowed(getExpectedRigths());
 		} else {
 			return false;
 		}
 	}
-	
-	 @Override
+
+	@Override
 	protected Control createContents(Composite parent) {
 		// Check rights, if any defined
-		if (! isAllowed()) {
-			Label notAllowed = new Label(parent,SWT.NONE);
+		if (!isAllowed()) {
+			final Label notAllowed = new Label(parent, SWT.NONE);
 			notAllowed.setText(Activator.resString("search.label.notAllowed"));
 			return notAllowed;
 		}
@@ -82,5 +80,4 @@ public abstract class AbstractConnectedPropertypage extends AbstractAFSPropertyP
 		return null;
 	}
 
-	 
 }

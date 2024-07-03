@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -17,30 +17,30 @@ public interface IServerLoader {
 
 	/**
 	 * Load the server connection list already registered to this Client.
-	 * 
+	 *
 	 * @return
 	 */
 	public Servers load();
-	
+
 	/**
 	 * Register a new server connection.
-	 * 
+	 *
 	 * @param server
 	 * @return
 	 */
 	public boolean add(Server server);
-	
+
 	/**
 	 * Unregister a server connection.
-	 * 
+	 *
 	 * @param server
 	 * @return
 	 */
 	public boolean delete(Server server);
-	
+
 	/**
 	 * Update the registration of a Server connection.
-	 * 
+	 *
 	 * @param server
 	 * @return
 	 */

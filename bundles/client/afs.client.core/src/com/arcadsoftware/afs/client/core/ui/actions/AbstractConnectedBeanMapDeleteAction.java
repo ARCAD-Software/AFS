@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -19,36 +19,39 @@ import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
 
 public abstract class AbstractConnectedBeanMapDeleteAction extends
-		AbstractConnectedBeanMapAction{
+		AbstractConnectedBeanMapAction {
 
 	public AbstractConnectedBeanMapDeleteAction(ServerConnection connection) {
 		super(connection);
 	}
 
-	public boolean beanDelete(BeanMap bean){
+	public boolean beanDelete(BeanMap bean) {
 		return helper.delete(bean);
 	}
-	
+
 	@Override
 	protected boolean execute() {
-		BeanMap b = getBeanMapToManage();
+		final BeanMap b = getBeanMapToManage();
 		setCancelled(true);
-		if (b==null) {			
-			BeanMapList list= getBeanMapListToManage();
-			if (list!=null) {
-				if (Activator.getDefault().openConfirm(getTitleDeleteConfirmationMessage(),getDeleteConfirmationMessage())){ //$NON-NLS-1$
+		if (b == null) {
+			final BeanMapList list = getBeanMapListToManage();
+			if (list != null) {
+				if (Activator.getDefault().openConfirm(getTitleDeleteConfirmationMessage(),
+						getDeleteConfirmationMessage())) {
 					setCancelled(false);
-					for (BeanMap bean:list){
-						boolean result = beanDelete(bean);
-						if (!result)
+					for (final BeanMap bean : list) {
+						final boolean result = beanDelete(bean);
+						if (!result) {
 							return false;
+						}
 					}
 				} else {
 					return false;
 				}
 			}
 		} else {
-			if (Activator.getDefault().openConfirm(getTitleDeleteConfirmationMessage(),getDeleteConfirmationMessage())){ //$NON-NLS-1$
+			if (Activator.getDefault().openConfirm(getTitleDeleteConfirmationMessage(),
+					getDeleteConfirmationMessage())) {
 				setCancelled(false);
 				return beanDelete(b);
 			} else {
@@ -57,17 +60,17 @@ public abstract class AbstractConnectedBeanMapDeleteAction extends
 		}
 		return true;
 	}
-	
-	protected String getDeleteConfirmationMessage(){
+
+	protected String getDeleteConfirmationMessage() {
 		return Activator.resString("action.delete.confirmation");
 	}
-	
-	protected String getTitleDeleteConfirmationMessage() {		
+
+	protected String getTitleDeleteConfirmationMessage() {
 		return Activator.resString("action.delete.confirmation.title");
-	}	
-	
+	}
+
 	@Override
-	protected int getActionType(){
+	protected int getActionType() {
 		return IBeanMapActionListener.ACTION_DELETE;
 	}
 }

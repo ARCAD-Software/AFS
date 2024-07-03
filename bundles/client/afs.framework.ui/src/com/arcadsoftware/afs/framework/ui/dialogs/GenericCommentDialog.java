@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -26,7 +26,7 @@ import com.arcadsoftware.aev.core.ui.tools.GuiFormatTools;
 import com.arcadsoftware.afs.framework.ui.internal.Activator;
 
 public class GenericCommentDialog extends AbstractAFSDialog {
-	
+
 	private final String valueLabel;
 	private final boolean mandatory;
 	private final String title;
@@ -39,11 +39,11 @@ public class GenericCommentDialog extends AbstractAFSDialog {
 		valueLabel = label;
 		this.mandatory = mandatory;
 	}
-	
+
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		Composite composite = (Composite) super.createDialogArea(parent);
-		GridLayout gridLayout = new GridLayout();
+		final Composite composite = (Composite) super.createDialogArea(parent);
+		final GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = 3;
 		composite.setLayout(gridLayout);
 		GuiFormatTools.createLabel(composite, valueLabel, false, 3);
@@ -59,9 +59,10 @@ public class GenericCommentDialog extends AbstractAFSDialog {
 	protected void okPressed() {
 		value = valueText.getText();
 		if (mandatory) {
-			if (value.trim().length()==0) {
+			if (value.trim().length() == 0) {
 				Activator.getDefault().openError(
-						String.format(Activator.resString("GenericCommentDialog.message.err.mandatoryvalue"), valueLabel));
+						String.format(Activator.resString("GenericCommentDialog.message.err.mandatoryvalue"),
+								valueLabel));
 			} else {
 				super.okPressed();
 			}
@@ -84,9 +85,9 @@ public class GenericCommentDialog extends AbstractAFSDialog {
 	public String getTitle() {
 		return title;
 	}
-	
+
 	public static String getText(Shell parentShell, String title, String label, boolean mandatory) {
-		GenericCommentDialog dialog = new GenericCommentDialog(parentShell, title, label,mandatory);
+		final GenericCommentDialog dialog = new GenericCommentDialog(parentShell, title, label, mandatory);
 		if (dialog.open() == 0) {
 			return dialog.getValue();
 		}

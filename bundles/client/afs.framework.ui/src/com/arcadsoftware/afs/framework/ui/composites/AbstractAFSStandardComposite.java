@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -37,7 +37,7 @@ public abstract class AbstractAFSStandardComposite extends AbstractArcadComposit
 	private class ContentChangeListener extends AbstractChangeListener {
 	}
 
-	private ContentChangeListener l = new ContentChangeListener();
+	private final ContentChangeListener l = new ContentChangeListener();
 	protected boolean errorData;
 	protected String errorMessage;
 	protected boolean inModificationMode;
@@ -57,7 +57,7 @@ public abstract class AbstractAFSStandardComposite extends AbstractArcadComposit
 
 	protected void format() {
 		setLayout(new GridLayout(3, false));
-		GridData gridData = new GridData(GridData.FILL_BOTH);
+		final GridData gridData = new GridData(GridData.FILL_BOTH);
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.grabExcessVerticalSpace = true;
 		gridData.horizontalSpan = 3;
@@ -69,73 +69,78 @@ public abstract class AbstractAFSStandardComposite extends AbstractArcadComposit
 	 * La surcharge de cette méthode permet de déclarer vos règles de validation de saisie.<br>
 	 * Pour intégrer l'appel de cette fonction à vos contrôle de saisie, vous pouvez utiliser les méthodes
 	 * "addCheckDataListeners()" disponible sur les Combo et les Text.
-	 * 
+	 *
 	 * @return boolean : <b>True</b> si les informations saisies sont valides, <b>false</b> sinon.
 	 */
 	protected boolean checkData() {
 		return true;
-	};
+	}
 
 	/**
 	 * Méthode permettant d'ajouter un iSelectionListener et un ModifyListener déclenchant la validation de la données
 	 * saisie pour une liste Combo.
-	 * 
+	 *
 	 * @param c
 	 *            Combo : Combo à mettre sous contrôle
 	 */
 	protected void addCheckDataListeners(Combo c) {
 		c.addSelectionListener(new SelectionAdapter() {
-					public void widgetSelected(SelectionEvent event) {
-						checkData();
-					}
-				});
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				checkData();
+			}
+		});
 		c.addModifyListener(new ModifyListener() {
-					public void modifyText(ModifyEvent e) {
-						checkData();
-					}
-				});
+			@Override
+			public void modifyText(ModifyEvent e) {
+				checkData();
+			}
+		});
 	}
 
 	/**
 	 * Méthode permettant d'ajouter un ModifyListener déclenchant la validation de la données saisie pour un widget de
 	 * type Text.
-	 * 
+	 *
 	 * @param c
 	 *            Text : Text à mettre sous contrôle
 	 */
 	protected void addCheckDataListeners(Text t) {
 		t.addModifyListener(new ModifyListener() {
-					public void modifyText(ModifyEvent e) {
-						checkData();
-					}
-				});
+			@Override
+			public void modifyText(ModifyEvent e) {
+				checkData();
+			}
+		});
 	}
 
 	/**
 	 * Méthode permettant d'ajouter un iSelectionListener déclenchant la validation de la données saisie pour un widget
 	 * de type Button.
-	 * 
+	 *
 	 * @param spinner
-	 *            : un {@link Spinner} à mettre sous contrôle
+	 *            un {@link Spinner} à mettre sous contrôle
 	 */
 	protected void addCheckDataListeners(Spinner spinner) {
 		spinner.addSelectionListener(new SelectionAdapter() {
-					public void widgetSelected(SelectionEvent event) {
-						checkData();
-					}
-				});
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				checkData();
+			}
+		});
 	}
 
 	/**
 	 * Méthode permettant d'ajouter un iSelectionListener déclenchant la validation de la données saisie pour un widget
 	 * de type Button.
-	 * 
+	 *
 	 * @param b
 	 *            Button : Button à mettre sous contrôle
 	 */
 	protected void addCheckDataListeners(Button b) {
 		b.addSelectionListener(
 				new SelectionAdapter() {
+					@Override
 					public void widgetSelected(SelectionEvent event) {
 						checkData();
 					}
@@ -150,10 +155,12 @@ public abstract class AbstractAFSStandardComposite extends AbstractArcadComposit
 		this.errorData = errorData;
 	}
 
+	@Override
 	public String getErrorMessage() {
 		return errorMessage;
 	}
 
+	@Override
 	public void setErrorMessage(String errorMessage) {
 		this.errorMessage = errorMessage;
 	}
@@ -184,17 +191,21 @@ public abstract class AbstractAFSStandardComposite extends AbstractArcadComposit
 		l.removeContentChangedListener(listener);
 	}
 
+	@Override
 	public void modifyText(ModifyEvent arg0) {
 		dirty = true;
 		l.fireContentChanged();
 	}
 
+	@Override
 	public void widgetSelected(SelectionEvent arg0) {
 		dirty = true;
 		l.fireContentChanged();
 	}
 
-	public void widgetDefaultSelected(SelectionEvent arg0) {}
+	@Override
+	public void widgetDefaultSelected(SelectionEvent arg0) {
+	}
 
 	public boolean isDirty() {
 		return dirty;

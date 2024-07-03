@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -24,51 +24,48 @@ import com.arcadsoftware.beanmap.BeanMapList;
 public class GenericSimpleSearchBeanMapListDialog extends
 		AbstractSimpleSearchBeanMapListDialog {
 
-	
-	private String entityType;
-	private String dialogTitle;
-	private String attributteList;
-	private String searchClause;
-	private Point size;
+	private final String entityType;
+	private final String dialogTitle;
+	private final String attributteList;
+	private final String searchClause;
+	private final Point size;
 	private IColumnHeaderProvider columnHeaderProvider = null;
-	
-	
+
 	public GenericSimpleSearchBeanMapListDialog(Shell parentShell,
-			ServerConnection connection,boolean showAll,
+			ServerConnection connection, boolean showAll,
 			String entityType,
 			String attributteList,
 			String title,
 			Point size,
 			IColumnHeaderProvider columnHeaderProvider) {
-		super(parentShell, connection,showAll);
+		super(parentShell, connection, showAll);
 		this.entityType = entityType;
-		this.dialogTitle = title;
+		dialogTitle = title;
 		this.attributteList = attributteList;
 		this.size = size;
 		this.columnHeaderProvider = columnHeaderProvider;
-		this.searchClause = null;
+		searchClause = null;
 		initialize(connection);
 	}
-	
+
 	public GenericSimpleSearchBeanMapListDialog(Shell parentShell,
-			ServerConnection connection,boolean showAll,
+			ServerConnection connection, boolean showAll,
 			String entityType,
 			String attributteList,
 			String searchClause,
 			String title,
 			Point size,
 			IColumnHeaderProvider columnHeaderProvider) {
-		super(parentShell, connection,showAll);
+		super(parentShell, connection, showAll);
 		this.entityType = entityType;
-		this.dialogTitle = title;
+		dialogTitle = title;
 		this.attributteList = attributteList;
 		this.size = size;
 		this.columnHeaderProvider = columnHeaderProvider;
 		this.searchClause = searchClause;
 		initialize(connection);
-	}	
-	
-	
+	}
+
 	@Override
 	public String getSearchClause() {
 		return searchClause;
@@ -93,76 +90,73 @@ public class GenericSimpleSearchBeanMapListDialog extends
 	public String getTitle() {
 		return dialogTitle;
 	}
-	
+
 	@Override
 	protected String getUserDefineColumnHeader(String attribute) {
-		if (columnHeaderProvider!=null) {
+		if (columnHeaderProvider != null) {
 			return columnHeaderProvider.getUserDefineColumnHeader(attribute);
 		}
 		return null;
 	}
-	
+
 	public static BeanMapList selectList(ServerConnection connection,
 			String entityType,
 			String attributteList,
 			String title,
-			Point size){
-		return selectList(connection,entityType,attributteList,title,size, null,null);
+			Point size) {
+		return selectList(connection, entityType, attributteList, title, size, null, null);
 	}
-	
+
 	public static BeanMapList selectList(ServerConnection connection,
 			String entityType,
 			String attributteList,
-			String searchClause,			
+			String searchClause,
 			String title,
-			Point size){
-		return selectList(connection,entityType,attributteList,title,size, null,searchClause);
-	}	
-	
+			Point size) {
+		return selectList(connection, entityType, attributteList, title, size, null, searchClause);
+	}
+
 	public static BeanMap select(ServerConnection connection,
 			String entityType,
 			String attributteList,
 			String title,
-			Point size){
-		return select(connection,entityType,attributteList,title,size, null);
-	}		
-	
+			Point size) {
+		return select(connection, entityType, attributteList, title, size, null);
+	}
+
 	public static BeanMapList selectList(ServerConnection connection,
 			String entityType,
 			String attributteList,
 			String title,
 			Point size,
 			IColumnHeaderProvider colProvider,
-			String searchClause){
-		GenericSimpleSearchBeanMapListDialog dialog = 
-			new GenericSimpleSearchBeanMapListDialog(
-					Activator.getDefault().getPluginShell(),
-					connection, true,
-					entityType,
-					attributteList,
-					searchClause,
-					title,
-					size,
-					colProvider);
-		return GenericSimpleSearchBeanMapListDialog.selectList(dialog);
+			String searchClause) {
+		final GenericSimpleSearchBeanMapListDialog dialog = new GenericSimpleSearchBeanMapListDialog(
+				Activator.getDefault().getPluginShell(),
+				connection, true,
+				entityType,
+				attributteList,
+				searchClause,
+				title,
+				size,
+				colProvider);
+		return AbstractSearchBeanMapListDialog.selectList(dialog);
 	}
-	
+
 	public static BeanMap select(ServerConnection connection,
 			String entityType,
 			String attributteList,
 			String title,
 			Point size,
-			IColumnHeaderProvider colProvider){
-		GenericSimpleSearchBeanMapListDialog dialog = 
-			new GenericSimpleSearchBeanMapListDialog(Activator.getDefault().getPluginShell(),
-					connection,true,
-					entityType,
-					attributteList,
-					title,
-					size,colProvider);
-		return GenericSimpleSearchBeanMapListDialog.select(dialog);
-	}	
-	
-	
+			IColumnHeaderProvider colProvider) {
+		final GenericSimpleSearchBeanMapListDialog dialog = new GenericSimpleSearchBeanMapListDialog(
+				Activator.getDefault().getPluginShell(),
+				connection, true,
+				entityType,
+				attributteList,
+				title,
+				size, colProvider);
+		return AbstractSearchBeanMapListDialog.select(dialog);
+	}
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -74,7 +74,7 @@ import com.arcadsoftware.metadata.Element;
 import com.arcadsoftware.metadata.MetaDataEntity;
 import com.arcadsoftware.metadata.MetaDataLink;
 
-public class TreeSWTProvider 
+public class TreeSWTProvider
 		implements IInputSWTProvider, IListenerWidget, IBeanMapSelector, ITreeSWTProvider {
 
 	private BeanMapTreeViewer list;
@@ -82,67 +82,70 @@ public class TreeSWTProvider
 	protected Action addAction;
 	protected Action removeAction;
 	protected Action editAction;
-	
+
 	private String internalEditorId;
 	protected ISWTRenderer renderer;
 	private ILayoutParameters parameters;
 	protected MetaDataLink element;
 	private ToolBarManager toolbarManager;
-	
+
+	@Override
 	public void create(ISWTRenderer swtRenderer, ILayoutParameters layoutParameters,
 			Element Element, MetaDataEntity structure) {
-		this.renderer = swtRenderer;
-		this.setParameters(layoutParameters);
-		this.element = (MetaDataLink) Element;
+		renderer = swtRenderer;
+		setParameters(layoutParameters);
+		element = (MetaDataLink) Element;
 		setInternalEditorId(getParameters().getParameter(INTERNAL_EDITOR_ID));
-		
-		
-		//This method is called to let descendant classes having their own action manager 
+
+		// This method is called to let descendant classes having their own action manager
 		manageActions(layoutParameters);
 		createToolBarEditorActions();
 
-		List<Action> actions = new ArrayList<Action>();
-		List<Action> previousActions = getPreviousActions();
-		if (previousActions != null)
-			for (Action action : previousActions) {
+		final List<Action> actions = new ArrayList<>();
+		final List<Action> previousActions = getPreviousActions();
+		if (previousActions != null) {
+			for (final Action action : previousActions) {
 				actions.add(action);
 			}
+		}
 
 		if (getParameters().getParameterBoolean(EDIT_ACTION)) {
-			editAction = createEditAction(renderer.getLocalizedMessage(getParameters().getParameter(EDIT_ACTION_LABEL)));
+			editAction = createEditAction(
+					renderer.getLocalizedMessage(getParameters().getParameter(EDIT_ACTION_LABEL)));
 			editAction.setEnabled(!renderer.isReadOnly());
 			actions.add(editAction);
 		}
 		if (getParameters().getParameterBoolean(REMOVE_ACTION)) {
-			Action removeAction = createRemoveAction(element, renderer.getLocalizedMessage(getParameters()
+			final Action removeAction = createRemoveAction(element, renderer.getLocalizedMessage(getParameters()
 					.getParameter(REMOVE_ACTION_LABEL)));
 			removeAction.setEnabled(!renderer.isReadOnly());
 			actions.add(removeAction);
 		}
 
-		List<Action> nextActions = getNextActions();
-		if (nextActions != null){
-			for (Action action : nextActions) {
+		final List<Action> nextActions = getNextActions();
+		if (nextActions != null) {
+			for (final Action action : nextActions) {
 				actions.add(action);
 			}
 		}
 
 		createControlPart(actions);
-		
-		List<ElementParameter> widgetListened = getParameters().getListElementParameter(WIDGET_LISTENED);
-		if (widgetListened != null){
-			for (ElementParameter elementParameter : widgetListened) {
+
+		final List<ElementParameter> widgetListened = getParameters().getListElementParameter(WIDGET_LISTENED);
+		if (widgetListened != null) {
+			for (final ElementParameter elementParameter : widgetListened) {
 				renderer.addListenerWidget(this, getParameters().getElementParameter(elementParameter, WIDGET_ID));
 			}
 		}
 	}
-	
-	protected void createControlPart(List<Action> actions){
-		createControl(renderer.getParent(),actions);
+
+	protected void createControlPart(List<Action> actions) {
+		createControl(renderer.getParent(), actions);
 	}
-	
-	protected void createControl(Composite parent,List<Action> actions){
-		int style = isMultiSelection() ? SWT.MULTI : SWT.SINGLE | SWT.FULL_SELECTION | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL;
+
+	protected void createControl(Composite parent, List<Action> actions) {
+		final int style = isMultiSelection() ? SWT.MULTI
+				: SWT.SINGLE | SWT.FULL_SELECTION | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL;
 		createControlBeforeTree(parent);
 		if (getInternalEditorId() == null) {
 			setList(createBeanMapTreeViewerWithoutInternalEditorId(style, actions));
@@ -152,8 +155,8 @@ public class TreeSWTProvider
 			}
 			setList(createBeanMapTreeViewerWithInternalEditorId(style, actions));
 		}
-		//TODO RAP
-		//renderer.getToolkit().paintBordersFor(renderer.getParent());		
+		// TODO RAP
+		// renderer.getToolkit().paintBordersFor(renderer.getParent());
 
 		final Tree listWidget = (Tree) getList().getWidget();
 
@@ -161,11 +164,11 @@ public class TreeSWTProvider
 			listWidget.setFocus();
 		}
 		if (parent.getLayout() instanceof GridLayout) {
-			GridData layoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
+			final GridData layoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
 			layoutData.horizontalSpan = 3;
 			listWidget.setLayoutData(layoutData);
 			if (!getParameters().getParameterBoolean(BORDER_SPACE)) {
-				GridLayout layout = (GridLayout) parent.getLayout();
+				final GridLayout layout = (GridLayout) parent.getLayout();
 				layout.marginBottom = layout.marginHeight = layout.marginLeft = layout.marginRight = layout.marginTop = layout.marginWidth = 0;
 			}
 		}
@@ -174,31 +177,31 @@ public class TreeSWTProvider
 		bindElement();
 		createControlAfterTree(parent);
 	}
-	
+
 	protected void bindElement() {
 		renderer.getRendererBinding().bindElement(element, getList());
 	}
-	
 
 	public BeanMapTreeViewer getList() {
 		return list;
 	}
-	
+
 	public void setList(BeanMapTreeViewer list) {
 		this.list = list;
 		list.setSwtProvider(this);
 		list.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (renderer != null && !renderer.isReadOnly())
+				if ((renderer != null) && !renderer.isReadOnly()) {
 					renderer.updateFormToolbar();
+				}
 			}
 		});
 	}
-	
+
 	/**
 	 * In order to change the default LabelProvider by a specific LabelProvider
-	 * 
+	 *
 	 * @param viewer
 	 * @return
 	 */
@@ -213,15 +216,15 @@ public class TreeSWTProvider
 	protected List<Action> getNextActions() {
 		return null;
 	}
-	
+
 	private void createToolBarEditorActions() {
-		List<ElementParameter> elements = getParameters().getListElementParameter(EDITOR_ACTION);
-		for (ElementParameter elementParameter : elements) {
+		final List<ElementParameter> elements = getParameters().getListElementParameter(EDITOR_ACTION);
+		for (final ElementParameter elementParameter : elements) {
 			if (getParameters().getElementParameterBoolean(elementParameter, IN_INTERNAL_TOOL_BAR)
-					&& toolbarManager == null) {
-				ToolBar toolBar = new ToolBar(renderer.getParent(), SWT.NONE);
+					&& (toolbarManager == null)) {
+				final ToolBar toolBar = new ToolBar(renderer.getParent(), SWT.NONE);
 				if (renderer.getParent().getLayout() instanceof GridLayout) {
-					GridData layoutData = new GridData(GridData.HORIZONTAL_ALIGN_END);
+					final GridData layoutData = new GridData(GridData.HORIZONTAL_ALIGN_END);
 					layoutData.horizontalSpan = 3;
 					toolBar.setLayoutData(layoutData);
 				}
@@ -231,12 +234,12 @@ public class TreeSWTProvider
 			}
 		}
 	}
-	
+
 	protected Action createEditAction(final String label) {
 		return new Action(label) {
 			@Override
 			public ImageDescriptor getImageDescriptor() {
-				String editIcon = getLayoutParameters().getParameter(EDIT_ICON);
+				final String editIcon = getLayoutParameters().getParameter(EDIT_ICON);
 				return (editIcon != null) ? renderer.getImageDescriptor(editIcon) : super.getImageDescriptor();
 			}
 
@@ -246,13 +249,13 @@ public class TreeSWTProvider
 			}
 		};
 	}
-	
+
 	private Action createRemoveAction(final MetaDataLink link, final String label) {
 		return new Action() {
 
 			@Override
 			public ImageDescriptor getImageDescriptor() {
-				String removeIcon = getParameters().getParameter(REMOVE_ICON);
+				final String removeIcon = getParameters().getParameter(REMOVE_ICON);
 				return (removeIcon != null) ? renderer.getImageDescriptor(removeIcon) : super.getImageDescriptor();
 			}
 
@@ -263,32 +266,34 @@ public class TreeSWTProvider
 
 			@Override
 			public void run() {
-				BeanMap beanMap = getList().getBeanMapValue();
+				final BeanMap beanMap = getList().getBeanMapValue();
 				if (beanMap != null) {
 					if (MessageDialog.openQuestion(LoggedUIPlugin.getShell(), renderer
-							.getLocalizedMessage(getParameters().getParameter(REMOVE_CONFIRMATION_TITLE)), renderer
-							.getLocalizedMessage(getParameters().getParameter(REMOVE_CONFIRMATION_MESSAGE)))) {
+							.getLocalizedMessage(getParameters().getParameter(REMOVE_CONFIRMATION_TITLE)),
+							renderer
+									.getLocalizedMessage(getParameters().getParameter(REMOVE_CONFIRMATION_MESSAGE)))) {
 						renderer.removeLinkitem(link, beanMap);
 					}
 				}
 			}
 		};
 	}
-	
-	protected BeanMapTreeViewer createBeanMapTreeViewerWithInternalEditorId(int style, List<Action> actions){
+
+	protected BeanMapTreeViewer createBeanMapTreeViewerWithInternalEditorId(int style, List<Action> actions) {
 		return new BeanMapTreeViewer(renderer.getParent(), style, renderer, getParameters(), element, actions) {
 			@Override
 			protected void doOnSelectionChange(IStructuredSelection selection) {
-				if (editAction != null)
+				if (editAction != null) {
 					editAction.run();
+				}
 			}
 
 			@Override
 			public AbstractColumnedLabelProviderAdapter createLabelProvider(AbstractColumnedViewer viewer) {
-				AbstractColumnedLabelProviderAdapter specific = createSpecificLabelProvider(viewer);
+				final AbstractColumnedLabelProviderAdapter specific = createSpecificLabelProvider(viewer);
 				return specific == null ? super.createLabelProvider(viewer) : specific;
 			}
-			
+
 			@Override
 			public IContentProvider createContentProvider() {
 				return createSpecificContentProvider();
@@ -315,20 +320,21 @@ public class TreeSWTProvider
 			}
 		};
 	}
-	
-	private BeanMapTreeViewer createBeanMapTreeViewerWithoutInternalEditorId(int style, List<Action> actions){
+
+	private BeanMapTreeViewer createBeanMapTreeViewerWithoutInternalEditorId(int style, List<Action> actions) {
 		return new BeanMapTreeViewer(renderer.getParent(), style, renderer, getParameters(), element, actions) {
 			@Override
 			protected void doOnDoubleClick(IStructuredSelection selection) {
-				if (editAction != null)
+				if (editAction != null) {
 					editAction.run();
-				else
+				} else {
 					doActionOnDoubleClick();
+				}
 			}
 
 			@Override
 			public AbstractColumnedLabelProviderAdapter createLabelProvider(AbstractColumnedViewer viewer) {
-				AbstractColumnedLabelProviderAdapter specific = createSpecificLabelProvider(viewer);
+				final AbstractColumnedLabelProviderAdapter specific = createSpecificLabelProvider(viewer);
 				return specific == null ? super.createLabelProvider(viewer) : specific;
 			}
 
@@ -336,7 +342,7 @@ public class TreeSWTProvider
 			public IContentProvider createContentProvider() {
 				return createSpecificContentProvider();
 			}
-			
+
 			@Override
 			protected boolean mustBeCleanValue() {
 				return TreeSWTProvider.this.mustBeCleanValue();
@@ -353,110 +359,129 @@ public class TreeSWTProvider
 			}
 		};
 	}
-	
-	protected IContentProvider createSpecificContentProvider(){
+
+	protected IContentProvider createSpecificContentProvider() {
 		return null;
 	}
-	
+
 	private void createEditorActions() {
-		List<ElementParameter> elements = getParameters().getListElementParameter(EDITOR_ACTION);
+		final List<ElementParameter> elements = getParameters().getListElementParameter(EDITOR_ACTION);
 
-		for (ElementParameter elementParameter : elements) {
-			String label = renderer.getLocalizedMessage(getParameters().getElementParameter(elementParameter, LABEL));
-			String icon = getParameters().getElementParameter(elementParameter, ICON);
+		for (final ElementParameter elementParameter : elements) {
+			final String label = renderer
+					.getLocalizedMessage(getParameters().getElementParameter(elementParameter, LABEL));
+			final String icon = getParameters().getElementParameter(elementParameter, ICON);
 
-			IEditorAction action = EditorActionFactory.getEditorAction(getParameters().getElementParameter(
+			final IEditorAction action = EditorActionFactory.getEditorAction(getParameters().getElementParameter(
 					elementParameter, ACTION));
 			if (action != null) {
 				action.setText(label);
 				action.setToolTipText(label);
-				if (icon != null)
+				if (icon != null) {
 					action.setImageDescriptor(renderer.getImageDescriptor(icon));
+				}
 				action.setBeanMapSelector(this);
 				action.setRenderer(renderer);
 				action.setTreeViewer(getList());
 				action.setElement(element);
 				action.setInternalEditorId(getInternalEditorId());
-				if (getParameters().getElementParameterBoolean(elementParameter, IN_TOOL_BAR))
+				if (getParameters().getElementParameterBoolean(elementParameter, IN_TOOL_BAR)) {
 					renderer.getRendererActions().addToolBarAction(action);
+				}
 
-				String menuLabel = renderer.getLocalizedMessage(getParameters().getElementParameter(elementParameter,
-						MENU_LABEL));
-				if (menuLabel != null)
+				final String menuLabel = renderer
+						.getLocalizedMessage(getParameters().getElementParameter(elementParameter,
+								MENU_LABEL));
+				if (menuLabel != null) {
 					renderer.getRendererActions().addMenuAction(menuLabel, action);
-				if (getParameters().getElementParameterBoolean(elementParameter, IN_FORM_TOOL_BAR))
+				}
+				if (getParameters().getElementParameterBoolean(elementParameter, IN_FORM_TOOL_BAR)) {
 					renderer.addActionOnFormToolBar(action);
+				}
 				if (getParameters().getElementParameterBoolean(elementParameter, IN_INTERNAL_TOOL_BAR)
-						&& toolbarManager != null) {
+						&& (toolbarManager != null)) {
 					toolbarManager.add(action);
 					toolbarManager.update(true);
 				}
 			}
 		}
 	}
-	
+
 	/**
 	 * Management of double click in context of internal editor
 	 */
 	protected void doActionOnDoubleClick() {
 		// Do nothing
 	}
-	
+
 	protected boolean mustBeCleanValue() {
 		return false;
 	}
-	
+
+	@Override
 	public void dispose() {
 		// Do nothing
 	}
 
+	@Override
 	public void refreshWidget(BeanMap beanMap) {
 		renderer.getRendererBinding().refreshBean(beanMap);
 	}
 
+	@Override
 	public BeanMap getSelectedBeanMap() {
 		return getList().getBeanMapValue();
 	}
 
+	@Override
 	public void refreshSelector(BeanMap beanMap) {
 		refreshWidget(beanMap);
 	}
 
+	@Override
 	public void selectBeanMap(BeanMap bm) {
 		getList().setBeanMapValue(bm);
 	}
 
+	@Override
 	public ImageDescriptor getImageDescriptor(String key) {
 		return renderer.getImageDescriptor(key);
 	}
 
+	@Override
 	public BeanMapList getInput() {
 		if (getList().getBeanMapList() == null) {
 			return new BeanMapList();
 		}
-		return  getList().getBeanMapList();
+		return getList().getBeanMapList();
 	}
 
+	@Override
 	public MetaDataLink getLink() {
 		return element;
 	}
 
+	@Override
 	public ISWTRenderer getRenderer() {
 		return renderer;
 	}
 
+	@Override
 	public BeanMap getSelection() {
 		return getList().getBeanMapValue();
 	}
 
+	@Override
 	public BeanMapTreeViewer getViewer() {
 		return getList();
 	}
 
+	@Override
 	public void refresh() {
 		getList().refresh();
 	}
 
+	@Override
 	public void setInput(BeanMapList beanMapList) {
 		getList().setBeanMapList(beanMapList);
 	}
@@ -477,123 +502,133 @@ public class TreeSWTProvider
 		this.parameters = parameters;
 	}
 
+	@Override
 	public ArcadCollection createContentData(BeanMapList list) {
 		return null;
 	}
 
+	@Override
 	public String getValue(Object element, int columnIndex) {
 		return null;
 	}
 
-	protected void manageActions( ILayoutParameters layoutParameters){
-		
+	protected void manageActions(ILayoutParameters layoutParameters) {
+
 	}
-	
-	protected void createControlBeforeTree(Composite parent) {	
+
+	protected void createControlBeforeTree(Composite parent) {
 	}
-	
+
 	protected void createControlAfterTree(Composite parent) {
 	}
 
 	public ILayoutParameters getLayoutParameters() {
 		return parameters;
 	}
-	
-	protected void createBeanMap(final MetaDataLink link,final boolean withOpenEditor){
+
+	protected void createBeanMap(final MetaDataLink link, final boolean withOpenEditor) {
 		BeanMap beanMap = renderer.createBeanMap(new BeanMap(link.getType(), 0));
 		if (beanMap != null) {
 			beanMap = renderer.loadBeanMap(link.getType(), beanMap.getId());
 			renderer.addLinkitem(link, beanMap);
 			getList().setBeanMapValue(beanMap);
 			if (withOpenEditor) {
-				if(canEdit(beanMap)) {
-					if (getInternalEditorId() == null)
-						if (editBeanMap(beanMap)){
+				if (canEdit(beanMap)) {
+					if (getInternalEditorId() == null) {
+						if (editBeanMap(beanMap)) {
 							getList().refresh();
-						}					
-					else {
-						renderer.getInternalEditors().loadInternalEditor(getInternalEditorId(), beanMap.getId());
-						renderer.getInternalEditors().setAdd(getInternalEditorId());
+						} else {
+							renderer.getInternalEditors().loadInternalEditor(getInternalEditorId(), beanMap.getId());
+							renderer.getInternalEditors().setAdd(getInternalEditorId());
+						}
 					}
 				}
 			}
 		}
 	}
-	protected ILoaderCallback getEditCallback(){
+
+	protected ILoaderCallback getEditCallback() {
 		return null;
 	}
-	
-	
-	protected boolean canEdit(BeanMap beanMap){
+
+	protected boolean canEdit(BeanMap beanMap) {
 		return true;
 	}
-	
-	protected boolean editBeanMap(BeanMap beanMap){	
+
+	protected boolean editBeanMap(BeanMap beanMap) {
 		OpenBeanMapEditor.openEditor(beanMap);
 		return true;
 	}
-	protected void updateBeanMap(){
-		BeanMap beanMap = getList().getBeanMapValue();
+
+	protected void updateBeanMap() {
+		final BeanMap beanMap = getList().getBeanMapValue();
 		if (beanMap != null) {
 			if (getInternalEditorId() == null) {
-				if (canEdit(beanMap)){
-					if (editBeanMap(beanMap)){
+				if (canEdit(beanMap)) {
+					if (editBeanMap(beanMap)) {
 						getList().refresh();
 					}
 				}
-			} else
-				renderer.getInternalEditors().loadInternalEditor(getInternalEditorId(), beanMap.getId(),getEditCallback());
-		} else if (getInternalEditorId() != null)
+			} else {
+				renderer.getInternalEditors().loadInternalEditor(getInternalEditorId(), beanMap.getId(),
+						getEditCallback());
+			}
+		} else if (getInternalEditorId() != null) {
 			renderer.getInternalEditors().loadInternalEditor(getInternalEditorId(),
-					ISWTRenderer.EMPTY_ENTITY_ID,getEditCallback());
+					ISWTRenderer.EMPTY_ENTITY_ID, getEditCallback());
+		}
 	}
-		
-	private void internalRemoveBeanMap(final MetaDataLink link, BeanMap beanMap, boolean forceConfirmation){
+
+	private void internalRemoveBeanMap(final MetaDataLink link, BeanMap beanMap, boolean forceConfirmation) {
 		if (beanMap != null) {
 			boolean continueDeletion = true;
 			if (forceConfirmation) {
 				continueDeletion = MessageDialog.openQuestion(LoggedUIPlugin.getShell(), renderer
-						.getLocalizedMessage(getLayoutParameters().getParameter(REMOVE_CONFIRMATION_TITLE)), renderer
-						.getLocalizedMessage(getLayoutParameters().getParameter(REMOVE_CONFIRMATION_MESSAGE)));
+						.getLocalizedMessage(getLayoutParameters().getParameter(REMOVE_CONFIRMATION_TITLE)),
+						renderer
+								.getLocalizedMessage(getLayoutParameters().getParameter(REMOVE_CONFIRMATION_MESSAGE)));
 			}
 			if (continueDeletion) {
 				doBeforeRemovingLink(beanMap);
 				renderer.removeLinkitem(link, beanMap);
 			}
-		}	
+		}
 	}
-	
+
 	protected boolean doBeforeRemovingLink(BeanMap beanMap) {
 		return true;
 	}
-	
+
 	protected boolean doAfterRemovingLink() {
 		return true;
-	}	
-	private boolean enableMultiselection = false;
-	
-	protected void removeBeanMap(final MetaDataLink link){
+	}
+
+	private final boolean enableMultiselection = false;
+
+	protected void removeBeanMap(final MetaDataLink link) {
 		if (enableMultiselection) {
-			BeanMapList beanMapList = getList().getSelected();
-			if (beanMapList!=null) {
+			final BeanMapList beanMapList = getList().getSelected();
+			if (beanMapList != null) {
 				if (MessageDialog.openQuestion(LoggedUIPlugin.getShell(), renderer
-						.getLocalizedMessage(getLayoutParameters().getParameter(REMOVE_CONFIRMATION_TITLE)), renderer
-						.getLocalizedMessage(getLayoutParameters().getParameter(REMOVE_CONFIRMATION_MESSAGE)))) {
-					
-					for (BeanMap beanMap : beanMapList) {
+						.getLocalizedMessage(getLayoutParameters().getParameter(REMOVE_CONFIRMATION_TITLE)),
+						renderer
+								.getLocalizedMessage(
+										getLayoutParameters().getParameter(REMOVE_CONFIRMATION_MESSAGE)))) {
+
+					for (final BeanMap beanMap : beanMapList) {
 						internalRemoveBeanMap(link, beanMap, false);
 					}
 					doAfterRemovingLink();
 				}
 			}
-			
-		} else {		
-			BeanMap beanMap = getList().getBeanMapValue();
+
+		} else {
+			final BeanMap beanMap = getList().getBeanMapValue();
 			internalRemoveBeanMap(link, beanMap, true);
 			doAfterRemovingLink();
 		}
 	}
-	
+
 	protected String getAttributeList() {
 		return null;
 	}
@@ -601,7 +636,7 @@ public class TreeSWTProvider
 	protected String getOrderList() {
 		return null;
 	}
-	
+
 	protected boolean isMultiSelection() {
 		return false;
 	}

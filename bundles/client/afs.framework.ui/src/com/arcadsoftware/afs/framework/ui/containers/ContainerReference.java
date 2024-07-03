@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -15,7 +15,7 @@ package com.arcadsoftware.afs.framework.ui.containers;
 
 import org.eclipse.swt.graphics.Image;
 
-public class ContainerReference  {
+public class ContainerReference {
 
 	private int identifier = -1;
 	private String label = ""; //$NON-NLS-1$
@@ -24,7 +24,7 @@ public class ContainerReference  {
 	private String uniqueKey = "";//$NON-NLS-1$
 	private String id = "";//$NON-NLS-1$
 	private String category = "";//$NON-NLS-1$
-	
+
 	public String getCategory() {
 		if (category == null) {
 			category = "";//$NON-NLS-1$

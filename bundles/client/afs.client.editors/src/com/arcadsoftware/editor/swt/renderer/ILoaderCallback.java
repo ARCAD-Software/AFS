@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -16,7 +16,7 @@ package com.arcadsoftware.editor.swt.renderer;
 import com.arcadsoftware.editor.swt.ISWTRenderer;
 
 public interface ILoaderCallback {
-	
-	public void process (ISWTRenderer parentRenderer, ISWTRenderer editorRenderer, String editorId, int entityId);
-	
+
+	public void process(ISWTRenderer parentRenderer, ISWTRenderer editorRenderer, String editorId, int entityId);
+
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -30,35 +30,41 @@ import com.arcadsoftware.editor.swt.actions.IEditorAction;
 import com.arcadsoftware.metadata.MetaDataEntity;
 
 /**
- * This class implement an Action Decorator SWT Widget provider for the dynamic
- * editors. This decorator is not visible in editor.
+ * This class implement an Action Decorator SWT Widget provider for the dynamic editors. This decorator is not visible
+ * in editor.
  */
 public class ActionDecoratorSWTProvider implements IDecoratorSWTProvider {
 
+	@Override
 	public Widget create(ISWTRenderer renderer, ILayoutParameters parameters, MetaDataEntity structure) {
-		String label = renderer.getLocalizedMessage(parameters.getParameter(LABEL));
-		String icon = parameters.getParameter(ICON);
+		final String label = renderer.getLocalizedMessage(parameters.getParameter(LABEL));
+		final String icon = parameters.getParameter(ICON);
 
-		IEditorAction action = EditorActionFactory.getEditorAction(parameters.getParameter(ACTION));
+		final IEditorAction action = EditorActionFactory.getEditorAction(parameters.getParameter(ACTION));
 		if (action != null) {
 			action.setText(label);
 			action.setToolTipText(label);
-			if (icon != null)
+			if (icon != null) {
 				action.setImageDescriptor(renderer.getImageDescriptor(icon));
+			}
 			action.setBeanMapSelector(renderer);
 			action.setRenderer(renderer);
-			if (parameters.getParameterBoolean(IN_TOOL_BAR))
+			if (parameters.getParameterBoolean(IN_TOOL_BAR)) {
 				renderer.getRendererActions().addToolBarAction(action);
+			}
 
-			String menuLabel = renderer.getLocalizedMessage(parameters.getParameter(MENU_LABEL));
-			if (menuLabel != null)
+			final String menuLabel = renderer.getLocalizedMessage(parameters.getParameter(MENU_LABEL));
+			if (menuLabel != null) {
 				renderer.getRendererActions().addMenuAction(menuLabel, action);
-			if (parameters.getParameterBoolean(IN_FORM_TOOL_BAR))
+			}
+			if (parameters.getParameterBoolean(IN_FORM_TOOL_BAR)) {
 				renderer.addActionOnFormToolBar(action);
+			}
 		}
 		return null;
 	}
 
+	@Override
 	public void dispose() {
 		// Do nothing
 	}

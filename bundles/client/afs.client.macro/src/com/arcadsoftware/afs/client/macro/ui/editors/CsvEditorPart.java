@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -26,52 +26,53 @@ import com.arcadsoftware.afs.client.macro.internal.Activator;
 import com.arcadsoftware.afs.client.macro.internal.ui.viewers.CsvTableViewer;
 import com.arcadsoftware.afs.client.macro.model.CSVLines;
 
-
 public class CsvEditorPart extends EditorPart {
 
 	public final static String CSVFILE_EDITOR_ID = "com.arcadsoftware.afs.client.macro.ui.editors.CsvEditor"; //$NON-NLS-1$
-	
+
 	CSVLines list;
 	CsvTableViewer viewer;
 	CsvEditorInput listInput;
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.IEditorPart#init(org.eclipse.ui.IEditorSite, org.eclipse.ui.IEditorInput)
 	 */
+	@Override
 	public void init(IEditorSite site, IEditorInput input)
-		throws PartInitException {
-		if ((input == null) || !(input instanceof CsvEditorInput))
+			throws PartInitException {
+		if ((input == null) || !(input instanceof CsvEditorInput)) {
 			throw new PartInitException(Activator.resString("csv.editor.noEditorInput")); //$NON-NLS-1$
-		else{
+		} else {
 			setInput(input);
 			firePropertyChange(PROP_TITLE);
-			listInput = (CsvEditorInput)input;
+			listInput = (CsvEditorInput) input;
 			list = listInput.getInput();
-			setPartName(((CsvEditorInput)input).getName()); //$NON-NLS-1$
+			setPartName(((CsvEditorInput) input).getName());
 		}
-		this.setSite(site);		
-	}	
+		setSite(site);
+	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#isDirty()
 	 */
+	@Override
 	public boolean isDirty() {
 		return false;
 	}
-	
+
 	@Override
 	public void createPartControl(Composite parent) {
 		viewer = new CsvTableViewer(parent, SWT.NONE, list);
 		viewer.setInput(list);
 	}
 
-	
 	@Override
 	public void doSave(IProgressMonitor arg0) {
 
 	}
 
-	
 	@Override
 	public void doSaveAs() {
 
@@ -82,13 +83,11 @@ public class CsvEditorPart extends EditorPart {
 		return false;
 	}
 
-
 	@Override
 	public void setFocus() {
 
-		
 	}
-	
+
 	public CsvTableViewer getViewer() {
 		return viewer;
 	}

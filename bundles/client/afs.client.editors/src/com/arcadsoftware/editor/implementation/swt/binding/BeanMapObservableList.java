@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -31,13 +31,13 @@ import com.arcadsoftware.editor.implementation.swt.renderer.SWTRenderer;
  */
 public class BeanMapObservableList extends ObservableList implements IListContainer {
 
-	private String type;
+	private final String type;
 	private boolean populated;
 	private boolean autoPopulate;
-	private SWTRenderer renderer;
+	private final SWTRenderer renderer;
 
 	/**
-	 * 
+	 *
 	 */
 	@SuppressWarnings("unchecked")
 	public BeanMapObservableList(SWTRenderer renderer, String type, boolean autoPopulate) {
@@ -77,13 +77,14 @@ public class BeanMapObservableList extends ObservableList implements IListContai
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.arcadsoftware.editor.internal.swt.IListContainer#load(com.arcadsoftware.utils.BeanMapList)
 	 */
+	@Override
 	public void load(BeanMapList list) {
 		updateWrappedList(list);
-		if (list != null && list.size() > 0)
+		if ((list != null) && (list.size() > 0)) {
 			renderer.loadListCompleted(list.get(0).getType());
+		}
 	}
 
 	private void autoPop() {

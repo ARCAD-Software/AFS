@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -27,21 +27,18 @@ import com.arcadsoftware.beanmap.BeanMap;
 
 /**
  * Define an "Add" action, that will create a new data (BeanMap) through the several step of a wizard.
- * 
  * <p>
  * Implementation of this action need to define :
- * 
  * <ul>
- * <li> The type of the manipulated data.
- * <li> The pages of the associated wizard.
- * <li> A general error user message if the creation fail.
+ * <li>The type of the manipulated data.
+ * <li>The pages of the associated wizard.
+ * <li>A general error user message if the creation fail.
  * </ul>
- * 
+ *
  * @author ARCAD Software
  */
 public abstract class AbstractConnectedWizardedAddAction extends
 		AbstractConnectedWizardedAction {
-
 
 	public AbstractConnectedWizardedAddAction(ServerConnection connexion) {
 		super(connexion);
@@ -67,7 +64,7 @@ public abstract class AbstractConnectedWizardedAddAction extends
 	public boolean runActions() {
 		boolean result = false;
 		if (wizardToBeanmap(currentBeanMap) && doBeforeSaving(currentBeanMap)) {
-			if (saveBeanMap(currentBeanMap)){
+			if (saveBeanMap(currentBeanMap)) {
 				doAfterSaving(currentBeanMap);
 				result = true;
 			} else {
@@ -76,51 +73,47 @@ public abstract class AbstractConnectedWizardedAddAction extends
 		}
 		return result;
 	}
-	
-	public boolean saveBeanMap(BeanMap beanMap){
+
+	public boolean saveBeanMap(BeanMap beanMap) {
 		return helper.create(beanMap);
 	}
-	
-	
-	public boolean wizardToBeanmap(BeanMap newCurrentBeanMap){
-		for (AbstractConnectedWizardPage page:pageList)  {
-			if (page.isLinkedToCurrentBeanMap()){
+
+	public boolean wizardToBeanmap(BeanMap newCurrentBeanMap) {
+		for (final AbstractConnectedWizardPage page : pageList) {
+			if (page.isLinkedToCurrentBeanMap()) {
 				page.screenToBeanMap(newCurrentBeanMap);
 			}
 		}
 		return true;
 	}
-	
+
 	@Override
-	protected int getActionType(){
+	protected int getActionType() {
 		return IBeanMapActionListener.ACTION_ADD;
 	}
+
 	/**
 	 * This method is called if an error occurred during the BeanMap Creation;
 	 */
 	public void handleError() {
-		LogUITools.logError(getBundle(), getErrorMessage()); 
+		LogUITools.logError(getBundle(), getErrorMessage());
 	}
-		
+
 	/**
 	 * Define the type of the created BeanMap
+	 *
 	 * @return the type of the BeanMp to create
 	 */
 	public abstract String getType();
-	
-	
+
 	/**
-	 * @return the Bundle from where the action is executed 
+	 * @return the Bundle from where the action is executed
 	 */
 	public abstract Bundle getBundle();
-	
-	
+
 	/**
 	 * @return the error message to display when the BeanMap creation failed.
 	 */
 	public abstract UserMessage getErrorMessage();
-	
-
-
 
 }

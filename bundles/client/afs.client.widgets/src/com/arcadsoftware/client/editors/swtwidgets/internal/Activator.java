@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -26,7 +26,7 @@ public class Activator extends LoggedUIPlugin {
 
 	/**
 	 * Returns the shared instance
-	 * 
+	 *
 	 * @return the shared instance
 	 */
 	public static Activator getInstance() {
@@ -35,7 +35,6 @@ public class Activator extends LoggedUIPlugin {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
 	 */
 	@Override
@@ -46,7 +45,6 @@ public class Activator extends LoggedUIPlugin {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
 	 */
 	@Override
@@ -57,7 +55,7 @@ public class Activator extends LoggedUIPlugin {
 
 	/**
 	 * Returns the string from the plugin's resource bundle, or 'key' if not found.
-	 * 
+	 *
 	 * @param key
 	 *            The resource key.
 	 * @return The string from the plugin's resource bundle, or 'key' if not found.
@@ -66,9 +64,9 @@ public class Activator extends LoggedUIPlugin {
 		return getInstance().resString(key);
 	}
 
-	
+	@Override
 	public void error(String message, Throwable e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

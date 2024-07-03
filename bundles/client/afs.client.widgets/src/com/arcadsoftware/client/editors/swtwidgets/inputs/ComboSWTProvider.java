@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -40,18 +40,19 @@ import com.arcadsoftware.metadata.MetaDataEntity;
  * This class implement a Combo SWT Widget provider for the dynamic editors.
  */
 public class ComboSWTProvider implements IInputSWTProvider {
-	
+
 	protected BeanMapCombo combo;
 	protected ISWTRenderer renderer;
-	
+
 	protected String attributeFilter;
 	protected String value;
 	protected boolean equals;
 
+	@Override
 	public void create(ISWTRenderer swtRenderer, ILayoutParameters parameters, Element element,
 			MetaDataEntity structure) {
 		renderer = swtRenderer;
-		String label = renderer.getLocalizedMessage(parameters.getParameter(LABEL, element.getName()));
+		final String label = renderer.getLocalizedMessage(parameters.getParameter(LABEL, element.getName()));
 		int horizontalSpan = 3;
 		if (label.length() > 0) {
 			renderer.getToolkit().createLabel(renderer.getParent(), label);
@@ -59,26 +60,26 @@ public class ComboSWTProvider implements IInputSWTProvider {
 			horizontalSpan = 1;
 		}
 		combo = createCombo(parameters, element, structure, horizontalSpan);
-		Combo widget = (Combo) combo.getWidget();
+		final Combo widget = (Combo) combo.getWidget();
 		widget.setEnabled(!element.isReadonly() && !parameters.getParameterBoolean(READ_ONLY));
 		if (parameters.getParameterBoolean(DEFAULT)) {
 			widget.setFocus();
 		}
-		//TODO RAP
-		//renderer.getToolkit().paintBordersFor(renderer.getParent());		
+		// TODO RAP
+		// renderer.getToolkit().paintBordersFor(renderer.getParent());
 		if (parameters.getParameterBoolean(MANDATORY)) {
 			renderer.addMandatoryAttribute(element.getCode());
 		}
-		
+
 		/**
 		 * Manager attribute Filter for list
 		 */
 		attributeFilter = parameters.getParameter(IConstants.ATTRIBUTEFILTER);
-		if (attributeFilter != null && ((MetaDataAttribute)element).isReference()){
-			MetaDataEntity attrEntity = structure.getEntity(element.getType());
-			if (attrEntity != null){
-				MetaDataAttribute attr = attrEntity.getAttribute(attributeFilter);
-				if (attr != null){
+		if ((attributeFilter != null) && ((MetaDataAttribute) element).isReference()) {
+			final MetaDataEntity attrEntity = structure.getEntity(element.getType());
+			if (attrEntity != null) {
+				final MetaDataAttribute attr = attrEntity.getAttribute(attributeFilter);
+				if (attr != null) {
 					value = parameters.getParameter(IConstants.VALUE);
 					equals = parameters.getParameterBoolean(IConstants.EQUALITY, true);
 				} else {
@@ -88,50 +89,56 @@ public class ComboSWTProvider implements IInputSWTProvider {
 				attributeFilter = null;
 			}
 		}
-		
+
 		renderer.addLoadedList(combo);
-		bindElement(element);		
+		bindElement(element);
 	}
-	
+
 	/**
 	 * Create Combo widget
+	 *
 	 * @param parameters
 	 * @param element
 	 * @param structure
 	 * @param horizontalSpan
 	 * @return
 	 */
-	protected BeanMapCombo createCombo(ILayoutParameters parameters, Element element, MetaDataEntity structure, int horizontalSpan){
+	protected BeanMapCombo createCombo(ILayoutParameters parameters, Element element, MetaDataEntity structure,
+			int horizontalSpan) {
 		return new BeanMapCombo(renderer.getParent(), SWT.READ_ONLY, parameters, renderer, element, horizontalSpan);
 	}
 
-	protected void bindElement(Element element){
-		
-		if (attributeFilter == null){
+	protected void bindElement(Element element) {
+
+		if (attributeFilter == null) {
 			renderer.getRendererBinding().bindElement(element, combo);
-			
-		} else {			
+
+		} else {
 			// Manually prepare list and intercept selection
-			renderer.getDataLoader().loadList(element.getType(), attributeFilter, equals, value, new IBeanMapListListener() {
-				public void changed(final BeanMapListEvent event) {
-					combo.getWidget().getDisplay().asyncExec(new Runnable() {
-						public void run() {
-							combo.setBeanMapList(event.getSource());
+			renderer.getDataLoader().loadList(element.getType(), attributeFilter, equals, value,
+					new IBeanMapListListener() {
+						@Override
+						public void changed(final BeanMapListEvent event) {
+							combo.getWidget().getDisplay().asyncExec(new Runnable() {
+								@Override
+								public void run() {
+									combo.setBeanMapList(event.getSource());
+								}
+							});
 						}
 					});
-				};
-			});
 			final Element tmp = element;
 			combo.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
-					BeanMap s = combo.getBeanMapValue();
+					final BeanMap s = combo.getBeanMapValue();
 					renderer.put(tmp.getCode(), (s != null) ? s.getId() : null);
 				}
 			});
 		}
 	}
-	
+
+	@Override
 	public void dispose() {
 		renderer.removeLoadedList(combo);
 	}
