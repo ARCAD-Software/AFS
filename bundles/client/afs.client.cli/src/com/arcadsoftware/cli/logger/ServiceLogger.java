@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -13,46 +13,39 @@
  *******************************************************************************/
 package com.arcadsoftware.cli.logger;
 
-
-
-
-
 public class ServiceLogger implements ISimpleLogger {
 
-	
-	private LogEntries logEntries;
-	
-	
-	public ServiceLogger(){
-		logEntries = new LogEntries();	
+	private final LogEntries logEntries;
+
+	public ServiceLogger() {
+		logEntries = new LogEntries();
 	}
-	
+
 	public LogEntries getLogEntries() {
 		return logEntries;
 	}
-	
-	
+
 	@Override
 	public void logError(String message) {
-		logEntries.add(new LogEntry(IMessageLogger.LOGLVL_FATAL,message));
+		logEntries.add(new LogEntry(IMessageLogger.LOGLVL_FATAL, message));
 	}
 
 	@Override
 	public void logInfo(String message) {
-		logEntries.add(new LogEntry(IMessageLogger.LOGLVL_INFO,message));
-		
+		logEntries.add(new LogEntry(IMessageLogger.LOGLVL_INFO, message));
+
 	}
 
 	@Override
 	public void logVerbose(String message) {
-		logEntries.add(new LogEntry(IMessageLogger.LOGLVL_VERBOSE,message));
-		
+		logEntries.add(new LogEntry(IMessageLogger.LOGLVL_VERBOSE, message));
+
 	}
 
 	@Override
 	public void logWarning(String message) {
-		logEntries.add(new LogEntry(IMessageLogger.LOGLVL_WARNING,message));
-		
-	}	
+		logEntries.add(new LogEntry(IMessageLogger.LOGLVL_WARNING, message));
+
+	}
 
 }

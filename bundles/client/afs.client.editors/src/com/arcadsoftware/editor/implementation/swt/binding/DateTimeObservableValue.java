@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -28,27 +28,26 @@ import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Widget;
 
 /**
- * Observable inspired from :
- * 
- * https://bugs.eclipse.org/bugs/show_bug.cgi?id=169876
+ * Observable inspired from : https://bugs.eclipse.org/bugs/show_bug.cgi?id=169876
  */
 public class DateTimeObservableValue extends AbstractObservableValue<Date> {
 
 	private final DateTime dateTime;
-	private Calendar calendar;
+	private final Calendar calendar;
 	boolean updating = false;
 	Date currentSelection;
 
 	/**
 	 * Standard constructor for an SWT ObservableValue. Makes sure that the observable gets disposed when the SWT widget
 	 * is disposed.
-	 * 
+	 *
 	 * @param widget
 	 */
 	public DateTimeObservableValue(DateTime widget) {
 		super(DisplayRealm.getRealm(widget.getDisplay()));
 		dateTime = widget;
 		widget.addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				DateTimeObservableValue.this.dispose();
 			}
@@ -60,7 +59,7 @@ public class DateTimeObservableValue extends AbstractObservableValue<Date> {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (!updating) {
-					Date newSelection = getSelection();
+					final Date newSelection = getSelection();
 					fireValueChange(Diffs.createValueDiff(currentSelection, newSelection));
 					currentSelection = newSelection;
 				}
@@ -74,7 +73,7 @@ public class DateTimeObservableValue extends AbstractObservableValue<Date> {
 		Date newValue;
 		try {
 			updating = true;
-			newValue = (Date) value;
+			newValue = value;
 			oldValue = getSelection();
 			setSelection(newValue);
 			currentSelection = newValue;
@@ -89,6 +88,7 @@ public class DateTimeObservableValue extends AbstractObservableValue<Date> {
 		return getSelection();
 	}
 
+	@Override
 	public Object getValueType() {
 		return Date.class;
 	}
@@ -96,8 +96,8 @@ public class DateTimeObservableValue extends AbstractObservableValue<Date> {
 	Date getSelection() {
 		// calendar.clear();
 		// Control 1 (If conflict, Control 1 overrides Control 2)
-		int style = dateTime.getStyle();
-		if ((style & SWT.CALENDAR) != 0 || (style & SWT.DATE) != 0) {
+		final int style = dateTime.getStyle();
+		if (((style & SWT.CALENDAR) != 0) || ((style & SWT.DATE) != 0)) {
 			// Calendar or Date
 			calendar.set(dateTime.getYear(), dateTime.getMonth(), dateTime.getDay());
 		} else {
@@ -112,8 +112,8 @@ public class DateTimeObservableValue extends AbstractObservableValue<Date> {
 	private void setSelection(Date value) {
 		calendar.setTime(value);
 		// Control 1
-		int style = dateTime.getStyle();
-		if ((style & SWT.CALENDAR) != 0 || (style & SWT.DATE) != 0) {
+		final int style = dateTime.getStyle();
+		if (((style & SWT.CALENDAR) != 0) || ((style & SWT.DATE) != 0)) {
 			// Calendar or Date
 			dateTime.setYear(calendar.get(Calendar.YEAR));
 			dateTime.setMonth(calendar.get(Calendar.MONTH));
@@ -128,7 +128,6 @@ public class DateTimeObservableValue extends AbstractObservableValue<Date> {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.jface.databinding.swt.ISWTObservable#getWidget()
 	 */
 	public Widget getWidget() {

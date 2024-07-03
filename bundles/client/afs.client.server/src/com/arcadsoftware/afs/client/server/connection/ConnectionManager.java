@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -28,53 +28,53 @@ import com.arcadsoftware.afs.framework.messages.UserMessageManager;
 import com.arcadsoftware.afs.framework.ui.AbstractAFSListenerList;
 
 public class ConnectionManager {
-	
+
 	public static ConnectionManager getInstance() {
 		return SingletonManager.get(ConnectionManager.class);
 	}
-	
-	private final AbstractAFSListenerList connectionListeners = new AbstractAFSListenerList();	
+
+	private final AbstractAFSListenerList connectionListeners = new AbstractAFSListenerList();
 	private Optional<ServerConnection> lastServerConnection = Optional.empty();
-	
+
 	private ConnectionManager() {
 		super();
 	}
-	
+
 	public void addConnectionListener(IConnectionListener listener) {
 		connectionListeners.add(listener);
 	}
-	
+
 	public void removeConnectionListener(IConnectionListener listener) {
 		connectionListeners.remove(listener);
 	}
-	
+
 	private void fireConnection(ServerConnection connection) {
-		for (Object o: getInstance().connectionListeners.getListeners()) {
-			IConnectionListener listener = (IConnectionListener) o;
+		for (final Object o : getInstance().connectionListeners.getListeners()) {
+			final IConnectionListener listener = (IConnectionListener) o;
 			try {
 				listener.OnConnection(connection);
-			} catch (Exception e) {
-				Activator.getInstance().error(e.getLocalizedMessage(),e);
+			} catch (final Exception e) {
+				Activator.getInstance().error(e.getLocalizedMessage(), e);
 				removeConnectionListener(listener);
 			}
 		}
 		getInstance().lastServerConnection = Optional.ofNullable(connection);
-	}	
+	}
 
 	public Optional<ServerConnection> getLastServerConnection() {
 		return lastServerConnection;
 	}
-	
-	public ServerConnection connect(Server selectedServer,boolean manageUser) {
+
+	public ServerConnection connect(Server selectedServer, boolean manageUser) {
 		return connect(selectedServer, manageUser, ServerLoader.getInstance());
 	}
-	
+
 	public ServerConnection connect(Server selectedServer, boolean manageUser, IServerLoader serverLoader) {
 		if ((selectedServer != null) && ConnectionDialog.connect(selectedServer, manageUser)) {
-			ServerConnection result = new ServerConnection(selectedServer);
+			final ServerConnection result = new ServerConnection(selectedServer);
 			result.setTrustStoreprovider(TrustStoreProviderExtensionManager.getTrustStoreProvider());
 			result.setMessageManager(UserMessageManager.getInstance());
-			if (result.connect(selectedServer.getLastLogin(), selectedServer.getLastPassword(),manageUser)) {
+			if (result.connect(selectedServer.getLastLogin(), selectedServer.getLastPassword(), manageUser)) {
 				if (!selectedServer.isRememberPassword()) {
 					selectedServer.setLastPassword(""); //$NON-NLS-1$
 				}
@@ -86,5 +86,5 @@ public class ConnectionManager {
 			return result;
 		}
 		return null;
-	}		
+	}
 }

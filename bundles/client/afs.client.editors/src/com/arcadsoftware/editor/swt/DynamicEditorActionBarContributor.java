@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -45,7 +45,7 @@ public class DynamicEditorActionBarContributor extends EditorActionBarContributo
 
 	@Override
 	public void contributeToMenu(IMenuManager newMenuManager) {
-		this.menuManager = newMenuManager;
+		menuManager = newMenuManager;
 	}
 
 	@Override
@@ -55,13 +55,13 @@ public class DynamicEditorActionBarContributor extends EditorActionBarContributo
 
 	@Override
 	public void contributeToToolBar(IToolBarManager newToolBarManager) {
-		this.toolBarManager = newToolBarManager;
+		toolBarManager = newToolBarManager;
 	}
 
 	@Override
 	public void setActiveEditor(IEditorPart targetEditor) {
 		if (targetEditor instanceof DynamicEditorPart) {
-			DynamicEditorPart editor = (DynamicEditorPart) targetEditor;
+			final DynamicEditorPart editor = (DynamicEditorPart) targetEditor;
 			refreshToolBar(editor);
 			refreshMenu(editor);
 		}
@@ -69,9 +69,9 @@ public class DynamicEditorActionBarContributor extends EditorActionBarContributo
 
 	private void refreshToolBar(DynamicEditorPart editor) {
 		toolBarManager.removeAll();
-		List<IAction> actions = editor.getToolBarActions();
+		final List<IAction> actions = editor.getToolBarActions();
 		if (actions != null) {
-			for (IAction action: actions) {
+			for (final IAction action : actions) {
 				toolBarManager.add(action);
 			}
 		}
@@ -79,17 +79,17 @@ public class DynamicEditorActionBarContributor extends EditorActionBarContributo
 	}
 
 	private void refreshMenu(DynamicEditorPart editor) {
-		Map<String, List<IAction>> actions = editor.getMenuActions();
+		final Map<String, List<IAction>> actions = editor.getMenuActions();
 		if (actions != null) {
-			List<IMenuManager> menus = new ArrayList<IMenuManager>();
-			for (Map.Entry<String, List<IAction>> entry : actions.entrySet()) {
+			final List<IMenuManager> menus = new ArrayList<>();
+			for (final Map.Entry<String, List<IAction>> entry : actions.entrySet()) {
 				IMenuManager menu = null;
-				IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+				final IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 				if (activeWorkbenchWindow instanceof ApplicationWindow) {
-					MenuManager menuBarManager = ((ApplicationWindow) activeWorkbenchWindow).getMenuBarManager();
+					final MenuManager menuBarManager = ((ApplicationWindow) activeWorkbenchWindow).getMenuBarManager();
 					if (menuBarManager != null) {
-						for (IContributionItem item : menuBarManager.getItems()) {
-							if (item instanceof MenuManager
+						for (final IContributionItem item : menuBarManager.getItems()) {
+							if ((item instanceof MenuManager)
 									&& ((MenuManager) item).getMenuText().equalsIgnoreCase(entry.getKey())) {
 								menu = (IMenuManager) item;
 								break;
@@ -108,11 +108,11 @@ public class DynamicEditorActionBarContributor extends EditorActionBarContributo
 					menu.removeAll();
 					menus.add(menu);
 				}
-				for (IAction action: entry.getValue()) {
+				for (final IAction action : entry.getValue()) {
 					menu.add(action);
 				}
 			}
-			for (IMenuManager menu: menus) {
+			for (final IMenuManager menu : menus) {
 				menu.update(true);
 			}
 		}

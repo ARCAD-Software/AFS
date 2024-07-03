@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -21,42 +21,40 @@ import com.arcadsoftware.rest.console.ConsoleMessage;
 import com.arcadsoftware.rest.console.ConsoleProperty;
 import com.arcadsoftware.rest.console.SectionId;
 
-
-
 public class Form {
 	SectionId section;
-	List<ConsoleField> fields; 
+	List<ConsoleField> fields;
 
-	public Form(SectionId section,List<ConsoleField> fields){
+	public Form(SectionId section, List<ConsoleField> fields) {
 		this.fields = fields;
 		this.section = section;
 	}
-	
-	public boolean containsAction(){
-		for (ConsoleField c :fields){
-			if (c instanceof ConsoleAction){
+
+	public boolean containsAction() {
+		for (final ConsoleField c : fields) {
+			if (c instanceof ConsoleAction) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
-	public List<ConsoleField> getFields(){
+
+	public List<ConsoleField> getFields() {
 		return fields;
 	}
 
-	public boolean isMessageOnly(){
-		return  ((fields.size()==1) && (fields.get(0) instanceof ConsoleMessage));
+	public boolean isMessageOnly() {
+		return ((fields.size() == 1) && (fields.get(0) instanceof ConsoleMessage));
 	}
-	
-	public SectionId getSection(){
+
+	public SectionId getSection() {
 		return section;
 	}
-	
-	public ConsoleProperty getProperty(String id){
-		for (ConsoleField field:fields) {
-			if (field instanceof ConsoleProperty){
-				ConsoleProperty prop = (ConsoleProperty)field;
+
+	public ConsoleProperty getProperty(String id) {
+		for (final ConsoleField field : fields) {
+			if (field instanceof ConsoleProperty) {
+				final ConsoleProperty prop = (ConsoleProperty) field;
 				if (prop.getId().equalsIgnoreCase(id)) {
 					return prop;
 				}
@@ -64,5 +62,5 @@ public class Form {
 		}
 		return null;
 	}
-	
+
 }

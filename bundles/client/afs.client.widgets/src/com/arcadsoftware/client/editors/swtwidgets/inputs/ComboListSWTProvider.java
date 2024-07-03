@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -30,7 +30,7 @@ public class ComboListSWTProvider implements IInputSWTProvider, IConstants {
 
 	@Override
 	public void create(ISWTRenderer renderer, ILayoutParameters parameters, Element element, MetaDataEntity structure) {
-		String label = renderer.getLocalizedMessage(parameters.getParameter(LABEL, element.getName()));
+		final String label = renderer.getLocalizedMessage(parameters.getParameter(LABEL, element.getName()));
 		if (label.length() > 0) {
 			renderer.getToolkit().createLabel(renderer.getParent(), label);
 			renderer.getToolkit().createLabel(renderer.getParent(), TWO_POINTS);
@@ -50,7 +50,7 @@ public class ComboListSWTProvider implements IInputSWTProvider, IConstants {
 				combo.setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, false, false, 3, 1));
 			}
 		}
-		for (ElementParameter item : parameters.getListElementParameter("item")) { //$NON-NLS-1$
+		for (final ElementParameter item : parameters.getListElementParameter("item")) { //$NON-NLS-1$
 			combo.add(parameters.getElementParameter(item, "value")); //$NON-NLS-1$
 		}
 		combo.setEnabled(!element.isReadonly());

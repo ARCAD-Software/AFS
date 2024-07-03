@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -19,7 +19,7 @@ import com.arcadsoftware.editor.swt.renderer.ILoadedListListener;
 
 /**
  * Define a BeanMapList container that can be bind to a MetaDataLink.
- * 
+ *
  * @see IBeanMapContainer
  */
 public interface IBeanMapContainerList extends IBeanMapContainer, ILoadedListListener {
@@ -31,14 +31,14 @@ public interface IBeanMapContainerList extends IBeanMapContainer, ILoadedListLis
 
 	/**
 	 * set the BeanMap list.
-	 * 
+	 *
 	 * @param list
 	 */
 	public void setBeanMapList(BeanMapList list);
 
 	/**
 	 * Add a element to the list.
-	 * 
+	 *
 	 * @param index
 	 * @param beanMap
 	 */
@@ -46,14 +46,14 @@ public interface IBeanMapContainerList extends IBeanMapContainer, ILoadedListLis
 
 	/**
 	 * Get the list of used attributes (this is used when the list is loaded).
-	 * 
+	 *
 	 * @return null if none attribute is required.
 	 */
 	public String getAttributeList();
-	
+
 	/**
 	 * Get the list of attributes to be ordered (this is used when the list is loaded).
-	 * 
+	 *
 	 * @return null if no specific order is required.
 	 */
 	public String getOrderList();

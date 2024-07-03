@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -49,7 +49,6 @@ public class BeanMapCombo implements IBeanMapContainerList, IBeanMapContainerVal
 	protected ISWTRenderer renderer;
 
 	/**
-	 * 
 	 * @param parent
 	 * @param style
 	 * @param parameters
@@ -74,7 +73,6 @@ public class BeanMapCombo implements IBeanMapContainerList, IBeanMapContainerVal
 	}
 
 	/**
-	 * 
 	 * @param parent
 	 * @param style
 	 * @param parameters
@@ -86,7 +84,7 @@ public class BeanMapCombo implements IBeanMapContainerList, IBeanMapContainerVal
 			MetaDataEntity structure, int horizontalSpan) {
 		this.renderer = renderer;
 		this.structure = structure;
-		if (parameters.getParameter(IConstants.FORMAT) != null && structure != null) {
+		if ((parameters.getParameter(IConstants.FORMAT) != null) && (structure != null)) {
 			attributesFormater = new MetaDataFormater(parameters.getParameter(IConstants.FORMAT), structure);
 		}
 		translate = parameters.getParameterBoolean("translate"); //$NON-NLS-1$
@@ -98,6 +96,7 @@ public class BeanMapCombo implements IBeanMapContainerList, IBeanMapContainerVal
 
 	/**
 	 * Create a BeanMapCombo out of dynamic editors: no renderer, no translate
+	 *
 	 * @param parent
 	 * @param style
 	 * @param format
@@ -112,10 +111,10 @@ public class BeanMapCombo implements IBeanMapContainerList, IBeanMapContainerVal
 		if (format != null) {
 			attributesFormater = new MetaDataFormater(format, structure);
 		}
-		this.renderer = null;
-		this.translate = false; //$NON-NLS-1$
+		renderer = null;
+		translate = false;
 
-		GridData gridData = new GridData(GridData.BEGINNING);
+		final GridData gridData = new GridData(GridData.BEGINNING);
 		gridData.horizontalAlignment = GridData.FILL;
 		gridData.grabExcessHorizontalSpace = true;
 		if (label != null) {
@@ -132,6 +131,7 @@ public class BeanMapCombo implements IBeanMapContainerList, IBeanMapContainerVal
 		}
 	}
 
+	@Override
 	public BeanMapList getBeanMapList() {
 		return list;
 	}
@@ -151,14 +151,18 @@ public class BeanMapCombo implements IBeanMapContainerList, IBeanMapContainerVal
 
 	/**
 	 * Set list of BeanMaps.
-	 * @param list list of beanMaps. Can be null.
+	 *
+	 * @param list
+	 *            list of beanMaps. Can be null.
 	 */
+	@Override
 	public void setBeanMapList(BeanMapList list) {
-		if (list == null)
+		if (list == null) {
 			list = new BeanMapList();
+		}
 
 		this.list = list;
-		String[] items = new String[list.size() + 1];
+		final String[] items = new String[list.size() + 1];
 		items[0] = ""; //$NON-NLS-1$
 		int curid = 0;
 		if (current != null) {
@@ -166,7 +170,7 @@ public class BeanMapCombo implements IBeanMapContainerList, IBeanMapContainerVal
 		}
 		int selection = -1;
 		for (int i = 0; i < list.size(); i++) {
-			BeanMap beanMap = list.get(i);
+			final BeanMap beanMap = list.get(i);
 			items[i + 1] = beanMaptoString(beanMap);
 			if (beanMap.getId() == curid) {
 				selection = i + 1;
@@ -181,7 +185,7 @@ public class BeanMapCombo implements IBeanMapContainerList, IBeanMapContainerVal
 		}
 	}
 
-
+	@Override
 	public void addBeanMapToList(int index, BeanMap beanMap) {
 		if (list == null) {
 			list = new BeanMapList();
@@ -189,17 +193,19 @@ public class BeanMapCombo implements IBeanMapContainerList, IBeanMapContainerVal
 		list.add(beanMap);
 	}
 
+	@Override
 	public BeanMap getBeanMapValue() {
-		int index = combo.getSelectionIndex();
+		final int index = combo.getSelectionIndex();
 		if ((index < 0) || (index > list.size())) {
 			return current;
-		} 
+		}
 		if (index == 0) {
 			return null;
 		}
 		return list.get(index - 1);
 	}
 
+	@Override
 	public void setBeanMapValue(BeanMap beanMap) {
 		if (beanMap == null) {
 			current = null;
@@ -207,7 +213,7 @@ public class BeanMapCombo implements IBeanMapContainerList, IBeanMapContainerVal
 		} else if (!beanMap.equals(current)) {
 			current = beanMap;
 			if (list != null) {
-				int i = list.findIndex(beanMap.getId());
+				final int i = list.findIndex(beanMap.getId());
 				if (i >= 0) {
 					combo.select(i + 1);
 					return;
@@ -217,21 +223,25 @@ public class BeanMapCombo implements IBeanMapContainerList, IBeanMapContainerVal
 		}
 	}
 
+	@Override
 	public void addSelectionListener(SelectionAdapter selectionAdapter) {
 		combo.addSelectionListener(selectionAdapter);
 	}
 
+	@Override
 	public Widget getWidget() {
 		return combo;
 	}
 
+	@Override
 	public String getListType() {
 		return structure.getType();
 	}
 
+	@Override
 	public void loadedListComplete(ISWTRenderer renderer) {
 		if (list != null) {
-			if(sort!=null && sort.length()>0){
+			if ((sort != null) && (sort.length() > 0)) {
 				Collections.sort(list, new Comparator<BeanMap>() {
 					@Override
 					public int compare(BeanMap beanMap1, BeanMap beanMap2) {
@@ -243,10 +253,12 @@ public class BeanMapCombo implements IBeanMapContainerList, IBeanMapContainerVal
 		}
 	}
 
+	@Override
 	public String getAttributeList() {
 		return null;
 	}
 
+	@Override
 	public String getOrderList() {
 		return null;
 	}

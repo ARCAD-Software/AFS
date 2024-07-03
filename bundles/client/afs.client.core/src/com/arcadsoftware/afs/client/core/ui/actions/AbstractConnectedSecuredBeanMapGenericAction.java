@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -23,32 +23,32 @@ import com.arcadsoftware.afs.framework.ui.beanmap.actions.AbstractBeanMapAction;
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
 
-
-public abstract class AbstractConnectedSecuredBeanMapGenericAction extends AbstractBeanMapAction 
-implements ISecuredAction{
+public abstract class AbstractConnectedSecuredBeanMapGenericAction extends AbstractBeanMapAction
+		implements ISecuredAction {
 
 	protected DataAccessHelper helper;
 	protected ServerConnection connection;
-	protected List<IBeanMapActionListener>listeners;
-	
-	public AbstractConnectedSecuredBeanMapGenericAction(ServerConnection connection){
+	protected List<IBeanMapActionListener> listeners;
+
+	public AbstractConnectedSecuredBeanMapGenericAction(ServerConnection connection) {
 		super();
 		helper = new DataAccessHelper(connection);
-		this.connection = connection; 
+		this.connection = connection;
 	}
 
 	@Override
 	protected boolean canExecute() {
-		boolean result =  super.canExecute();
+		boolean result = super.canExecute();
 		if (result) {
 			result = isAllowed();
 		}
 		return result;
 	}
-	
+
+	@Override
 	public boolean isAllowed() {
-		boolean result = connection.isAllowed(getExpectedRigths());
-		if(!result) {
+		final boolean result = connection.isAllowed(getExpectedRigths());
+		if (!result) {
 			Activator.getDefault().missingRight(getExpectedRigths());
 		}
 		return result;
@@ -57,13 +57,13 @@ implements ISecuredAction{
 	@Override
 	protected boolean execute() {
 		setCancelled(false);
-		BeanMap b = getBeanMapToManage();
-		if (b==null) {			
-			BeanMapList list= getBeanMapListToManage();
-			if (list!=null) {
+		final BeanMap b = getBeanMapToManage();
+		if (b == null) {
+			final BeanMapList list = getBeanMapListToManage();
+			if (list != null) {
 				boolean result = true;
-				for (BeanMap bean:list){
-					if (!doOnBeanMap(bean)){
+				for (final BeanMap bean : list) {
+					if (!doOnBeanMap(bean)) {
 						result = false;
 						break;
 					}
@@ -76,51 +76,50 @@ implements ISecuredAction{
 			return doOnBeanMap(b);
 		}
 	}
+
 	@Override
 	protected void doAfterRun() {
 		super.doAfterRun();
-		if (isRunOk() && !isCancelled()){
-			if (listeners != null && getActionType() != IBeanMapActionListener.ACTION_NONE){
-				BeanMapList beanMaps = getActionBeanMapList();
+		if (isRunOk() && !isCancelled()) {
+			if ((listeners != null) && (getActionType() != IBeanMapActionListener.ACTION_NONE)) {
+				final BeanMapList beanMaps = getActionBeanMapList();
 				if (beanMaps != null) {
-					for (IBeanMapActionListener listener : listeners) {
+					for (final IBeanMapActionListener listener : listeners) {
 						listener.actionDone(getActionType(), beanMaps);
 					}
 				} else {
-					BeanMap beanMap = getActionBeanMap();
-					if (beanMap != null){
-						for (IBeanMapActionListener listener : listeners) {
+					final BeanMap beanMap = getActionBeanMap();
+					if (beanMap != null) {
+						for (final IBeanMapActionListener listener : listeners) {
 							listener.actionDone(getActionType(), beanMap);
 						}
 					}
 				}
 			}
-			
-			
+
 		}
 	}
-	
-	protected BeanMapList getActionBeanMapList(){
+
+	protected BeanMapList getActionBeanMapList() {
 		return getBeanMapListToManage();
-	}	
-	
-	protected BeanMap getActionBeanMap(){
+	}
+
+	protected BeanMap getActionBeanMap() {
 		return getBeanMapToManage();
 	}
-	
-	
-	
-	protected int getActionType(){
+
+	protected int getActionType() {
 		return IBeanMapActionListener.ACTION_NONE;
 	}
-	
-	public void addActionListener(IBeanMapActionListener listener){
-		if (listeners == null){
-			listeners = new ArrayList<IBeanMapActionListener>();
+
+	public void addActionListener(IBeanMapActionListener listener) {
+		if (listeners == null) {
+			listeners = new ArrayList<>();
 		}
-		if (!listeners.contains(listener)){
+		if (!listeners.contains(listener)) {
 			listeners.add(listener);
 		}
 	}
-	public abstract boolean doOnBeanMap(BeanMap b);	
+
+	public abstract boolean doOnBeanMap(BeanMap b);
 }

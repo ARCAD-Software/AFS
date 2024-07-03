@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -20,23 +20,24 @@ import com.arcadsoftware.afs.client.core.ui.editors.ConnectedDynamicEditor;
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
 
-public class BasicConnectedBeanMapEditAction extends AbstractConnectedBeanMapEditAction  {
+public class BasicConnectedBeanMapEditAction extends AbstractConnectedBeanMapEditAction {
 
 	protected ConnectedDynamicEditor editor;
-	private BeanMap edited;
-	
-	public BasicConnectedBeanMapEditAction(ServerConnection connection,BeanMap edited) {
+	private final BeanMap edited;
+
+	public BasicConnectedBeanMapEditAction(ServerConnection connection, BeanMap edited) {
 		super(connection);
 		this.edited = edited;
 	}
 
 	@Override
 	protected BeanMapList getBeanMapListToManage() {
-		BeanMapList list = new BeanMapList();
+		final BeanMapList list = new BeanMapList();
 		list.add(edited);
 		return list;
 	}
 
+	@Override
 	public List<Integer> getExpectedRigths() {
 		return null;
 	}

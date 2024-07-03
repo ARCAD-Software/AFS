@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -30,42 +30,41 @@ import com.arcadsoftware.afs.client.server.internals.Activator;
 
 public class ServerTableViewer extends AbstractColumnedTableViewer {
 
-
 	public ServerTableViewer(Composite parent, int style) {
 		super(parent, style);
 	}
 
 	public Server getServerFromSelection(ISelection selection) {
-		IStructuredSelection sel = (IStructuredSelection)selection;
+		final IStructuredSelection sel = (IStructuredSelection) selection;
 		if (!sel.isEmpty()) {
-			Object o = sel.getFirstElement();
+			final Object o = sel.getFirstElement();
 			if (o instanceof Server) {
-				return (Server)o;
+				return (Server) o;
 			}
 		}
 		return null;
 	}
-	
-	public Server getSelectedServer(){
-		IStructuredSelection selection = getSelection();
+
+	public Server getSelectedServer() {
+		final IStructuredSelection selection = getSelection();
 		if (!selection.isEmpty()) {
-			Object o = selection.getFirstElement();
+			final Object o = selection.getFirstElement();
 			if (o instanceof Server) {
-				return (Server)o;
+				return (Server) o;
 			}
 		}
 		return null;
 	}
-	
+
 	@Override
 	public AbstractColumnedTableLabelProvider createTableLabelProvider(
 			AbstractColumnedViewer viewer) {
-		return new ColumnedDefaultTableLabelProvider(viewer){
+		return new ColumnedDefaultTableLabelProvider(viewer) {
 			@Override
 			protected Image getActualImage(Object element, int actualColumnIndex) {
-				if (actualColumnIndex==0) {
+				if (actualColumnIndex == 0) {
 					if (element instanceof Server) {
-						String id = ((Server)element).getIconID();
+						final String id = ((Server) element).getIconID();
 						return Activator.getInstance().getImage(id);
 					}
 				}
@@ -78,8 +77,10 @@ public class ServerTableViewer extends AbstractColumnedTableViewer {
 	public String getValue(Object element, int columnIndex) {
 		if (element instanceof Server) {
 			switch (columnIndex) {
-			case 0: return ((Server)element).getName();
-			case 1: return ((Server)element).getUrl();
+			case 0:
+				return ((Server) element).getName();
+			case 1:
+				return ((Server) element).getUrl();
 			default:
 				break;
 			}
@@ -87,37 +88,32 @@ public class ServerTableViewer extends AbstractColumnedTableViewer {
 		return ""; //$NON-NLS-1$
 	}
 
-	
-	
-	
 	@Override
 	public ArcadColumns getReferenceColumns() {
-		ArcadColumns cols = new ArcadColumns();
-		ArcadColumn col = 
-			new ArcadColumn("servername",Activator.resString("serverview.header.servername"),ArcadColumn.VISIBLE,0,200,0); //$NON-NLS-1$ //$NON-NLS-2$
+		final ArcadColumns cols = new ArcadColumns();
+		ArcadColumn col = new ArcadColumn("servername", Activator.resString("serverview.header.servername"), //$NON-NLS-1$ //$NON-NLS-2$
+				ArcadColumn.VISIBLE, 0, 200, 0);
 		cols.add(col);
-		col = 
-			new ArcadColumn("url",Activator.resString("serverview.header.url"),ArcadColumn.VISIBLE,1,200,1); //$NON-NLS-1$ //$NON-NLS-2$
+		col = new ArcadColumn("url", Activator.resString("serverview.header.url"), ArcadColumn.VISIBLE, 1, 200, 1); //$NON-NLS-1$ //$NON-NLS-2$
 		cols.add(col);
 		return cols;
 	}
 
 	@Override
 	protected Action[] makeActions() {
-		Action[] superActions = super.makeActions();
-		Action[] additionalActions = getViewerActions();
-		Action[] actions = new Action[superActions.length + additionalActions.length];
+		final Action[] superActions = super.makeActions();
+		final Action[] additionalActions = getViewerActions();
+		final Action[] actions = new Action[superActions.length + additionalActions.length];
 		System.arraycopy(superActions, 0, actions, 0, superActions.length);
 		// Ajout de l'action d'affichage de l'éditeur de tris
 		for (int i = 0; i < additionalActions.length; i++) {
 			actions[superActions.length + i] = additionalActions[i];
 		}
 		return actions;
-	}	
-	
+	}
+
 	protected Action[] getViewerActions() {
 		return new Action[0];
 	}
-	
-	
+
 }

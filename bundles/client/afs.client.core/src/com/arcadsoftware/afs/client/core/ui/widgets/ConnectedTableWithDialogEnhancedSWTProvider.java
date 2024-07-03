@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -13,35 +13,29 @@
  *******************************************************************************/
 package com.arcadsoftware.afs.client.core.ui.widgets;
 
-
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.metadata.MetaDataLink;
 
-
 public class ConnectedTableWithDialogEnhancedSWTProvider extends ConnectedTableWithDialogSWTProvider {
-	
-	
+
 	@Override
 	protected void doRemovingLink(MetaDataLink link, BeanMap beanMap) {
 		getHelper().remove(beanMap);
 		super.doRemovingLink(link, beanMap);
 	}
-	
+
 	@Override
 	protected boolean doAfterRemovingLink() {
 		renderer.save();
 		renderer.refreshAllEditors(renderer.getCurrentBean(), renderer);
-		return super.doAfterRemovingLink();	
+		return super.doAfterRemovingLink();
 	}
-	
+
 	@Override
-	protected void additionalInformation(BeanMap beanMap,MetaDataLink link){
-		if (link.getMetadata()!=null) {
-			if (link.getMetadata().contains("reverseLink")) {
-				String parentAttibute = link.getMetadata().getString("reverseLink");
-				beanMap.put(parentAttibute, renderer.getSelectedBeanMap().getId());
-			}
+	protected void additionalInformation(BeanMap beanMap, MetaDataLink link) {
+		if ((link.getMetadata() != null) && (link.getMetadata().contains("reverseLink"))) { //$NON-NLS-1$
+			beanMap.put(link.getMetadata().getString("reverseLink"), renderer.getSelectedBeanMap().getId()); //$NON-NLS-1$
 		}
 	}
-	
+
 }

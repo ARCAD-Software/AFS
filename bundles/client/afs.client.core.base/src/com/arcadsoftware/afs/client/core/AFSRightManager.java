@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -23,27 +23,26 @@ import com.arcadsoftware.afs.client.core.singletons.SingletonManager;
 
 public class AFSRightManager {
 
-	public static final String EXTENSION_ID="com.arcadsoftware.afs.client.core.rightmanager"; //$NON-NLS-1$
-	public static final String CLASS_ATTRIBUTE = "class"; //$NON-NLS-1$	
-	
+	public static final String EXTENSION_ID = "com.arcadsoftware.afs.client.core.rightmanager"; //$NON-NLS-1$
+	public static final String CLASS_ATTRIBUTE = "class"; //$NON-NLS-1$
+
 	private AFSRightManager() {
-		
+
 	}
-	
-	public static IRightManagerExtension getRightManager(){
+
+	public static IRightManagerExtension getRightManager() {
 		final IExtensionRegistry registry = Platform.getExtensionRegistry();
 		final IConfigurationElement[] elements = registry.getConfigurationElementsFor(EXTENSION_ID);
-		for (IConfigurationElement element : elements) {			
+		for (final IConfigurationElement element : elements) {
 			final String className = element.getAttribute(CLASS_ATTRIBUTE);
 			try {
-				final IRightManagerExtension extensionInstance = 
-						(IRightManagerExtension)element.createExecutableExtension(CLASS_ATTRIBUTE);
+				final IRightManagerExtension extensionInstance = (IRightManagerExtension) element
+						.createExecutableExtension(CLASS_ATTRIBUTE);
 				return SingletonManager.get(extensionInstance.getClass());
+			} catch (final CoreException e) {
+				BaseActivator.getLogger().warn(String.format("Error looking for %s instance.", className), e);
 			}
-			catch (CoreException e) {
-				BaseActivator.getLogger().warn(String.format("Error looking for %s instance.", className) , e);				
-			}
-		}	
-		return null;		
-	}		
+		}
+		return null;
+	}
 }

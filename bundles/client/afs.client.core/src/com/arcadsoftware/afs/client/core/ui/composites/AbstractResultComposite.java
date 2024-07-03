@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -55,11 +55,11 @@ import com.arcadsoftware.beanmap.BeanMapList;
 import com.arcadsoftware.metadata.MetaDataAttribute;
 import com.arcadsoftware.metadata.MetaDataEntity;
 
-public abstract class AbstractResultComposite extends Composite 
-implements IListActions, ISearchListener, IBeanMapActionListener { 
+public abstract class AbstractResultComposite extends Composite
+		implements IListActions, ISearchListener, IBeanMapActionListener {
 
-	private  AbstractColumnedViewer viewer;
-	
+	private AbstractColumnedViewer viewer;
+
 	protected MetaDataEntity entityStructure;
 	BeanMap selectedBeanMap;
 	Composite globalCmp;
@@ -70,17 +70,13 @@ implements IListActions, ISearchListener, IBeanMapActionListener {
 	private Button nextButton;
 	protected QueryManager queryManager;
 	private Label pageCountLabel;
-	
+
 	protected ServerConnection connection;
 	protected DataAccessHelper helper;
-	
-	
-	protected boolean autosearch = true; 
-	
-	
-	protected boolean showInfo= true;
-	
-	
+
+	protected boolean autosearch = true;
+
+	protected boolean showInfo = true;
 
 	public AbstractResultComposite(Composite parent, MetaDataEntity entityStructure, QueryManager queryManager,
 			ServerConnection connection) {
@@ -94,7 +90,7 @@ implements IListActions, ISearchListener, IBeanMapActionListener {
 	}
 
 	public AbstractResultComposite(Composite parent, MetaDataEntity entityStructure, String selectClause,
-			QueryManager queryManager,ServerConnection connection) {
+			QueryManager queryManager, ServerConnection connection) {
 		super(parent, SWT.NONE);
 		this.entityStructure = entityStructure;
 		this.selectClause = selectClause;
@@ -105,51 +101,52 @@ implements IListActions, ISearchListener, IBeanMapActionListener {
 		createContent();
 	}
 
-	public AbstractResultComposite(Composite parent, String entityType, String selectClause,ServerConnection connection) {
-		super(parent, SWT.NONE);		
-		this.selectClause = selectClause;	
+	public AbstractResultComposite(Composite parent, String entityType, String selectClause,
+			ServerConnection connection) {
+		super(parent, SWT.NONE);
+		this.selectClause = selectClause;
 		this.connection = connection;
-		this.queryManager = new QueryManager(connection);
+		queryManager = new QueryManager(connection);
 		helper = new DataAccessHelper(connection);
-		this.entityStructure = helper.getEntity(entityType);
+		entityStructure = helper.getEntity(entityType);
 		queryManager.setResultListener(this);
 		showInfo = displayInfo();
 		createContent();
 	}
-	
+
 	public AbstractResultComposite(Composite parent, String entityType, ServerConnection connection) {
-		super(parent, SWT.NONE);			
+		super(parent, SWT.NONE);
 		this.connection = connection;
-		this.queryManager = new QueryManager(connection);
+		queryManager = new QueryManager(connection);
 		helper = new DataAccessHelper(connection);
-		this.entityStructure = helper.getEntity(entityType);
+		entityStructure = helper.getEntity(entityType);
 		queryManager.setResultListener(this);
 		showInfo = displayInfo();
 		createContent();
-	}	
-	
-	
+	}
+
 	public QueryManager getQueryManager() {
 		return queryManager;
 	}
-	
+
 	public void setQueryManager(QueryManager queryManager) {
 		this.queryManager = queryManager;
 	}
-	
+
 	public MetaDataEntity getEntityStructure() {
 		return entityStructure;
 	}
-	
-	protected boolean getDisplayAsTree(){
+
+	protected boolean getDisplayAsTree() {
 		return false;
 	}
-	
-	protected int getViewerStyle(){
+
+	protected int getViewerStyle() {
 		return SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI;
 	}
-	protected AbstractColumnedViewer createTableViewer(Composite parent){
-		AbstractColumnedViewer myViewer = new BeanMapListTableViewer(parent, getViewerStyle(), entityStructure,
+
+	protected AbstractColumnedViewer createTableViewer(Composite parent) {
+		final AbstractColumnedViewer myViewer = new BeanMapListTableViewer(parent, getViewerStyle(), entityStructure,
 				getDisplayedSelectClause()) {
 			@Override
 			protected void doOnDoubleClick(IStructuredSelection selection) {
@@ -159,12 +156,12 @@ implements IListActions, ISearchListener, IBeanMapActionListener {
 			@Override
 			protected void doOnSelectionChange(IStructuredSelection selection) {
 				if (!selection.isEmpty()) {
-					if (selection.getFirstElement() instanceof BeanMap){
+					if (selection.getFirstElement() instanceof BeanMap) {
 						selectedBeanMap = (BeanMap) selection.getFirstElement();
 						doOnClickEvent(selectedBeanMap);
 					}
 				}
-				setActionsEnability(this.getActions());
+				setActionsEnability(getActions());
 			}
 
 			@Override
@@ -175,91 +172,95 @@ implements IListActions, ISearchListener, IBeanMapActionListener {
 			@Override
 			public AbstractColumnedTableLabelProvider createTableLabelProvider(AbstractColumnedViewer newViewer) {
 				AbstractColumnedTableLabelProvider provider = createSpecificTableLabelProvider(newViewer);
-				if (provider == null)
+				if (provider == null) {
 					provider = super.createTableLabelProvider(newViewer);
+				}
 				return provider;
 			}
 
 			@Override
 			public IContentProvider createContentProvider() {
-				IContentProvider provider = createSpecificContentProvider();
-				if (provider==null)
+				final IContentProvider provider = createSpecificContentProvider();
+				if (provider == null) {
 					return super.createContentProvider();
+				}
 				return provider;
-			}			
-			
+			}
+
 			@Override
 			public SimpleDateFormat getDateFormatter() {
-				SimpleDateFormat sd = AbstractResultComposite.this.getDateFormatter();
-				if (sd != null)
+				final SimpleDateFormat sd = AbstractResultComposite.this.getDateFormatter();
+				if (sd != null) {
 					return sd;
+				}
 				return super.getDateFormatter();
 			}
+
 			@Override
 			protected String getColumnHeader(String attribute) {
-				String header = AbstractResultComposite.this.getColumnHeader(attribute);
-				if (header!=null)
+				final String header = AbstractResultComposite.this.getColumnHeader(attribute);
+				if (header != null) {
 					return header;
+				}
 				return super.getColumnHeader(attribute);
-			};
-			
+			}
+
 			@Override
 			protected int getColumnSize(String attribute) {
-				int size = AbstractResultComposite.this.getColumnSize(attribute);
-				if (size!=-1)
+				final int size = AbstractResultComposite.this.getColumnSize(attribute);
+				if (size != -1) {
 					return size;
+				}
 				return super.getColumnSize(attribute);
-			};			
-			
+			}
+
 			@Override
 			protected Image getCustomColumnImage(Object element,
 					int actualColumnIndex) {
-				Image image = AbstractResultComposite.this.getCustomColumnImage(element,actualColumnIndex);
-				if (image!=null)
+				final Image image = AbstractResultComposite.this.getCustomColumnImage(element, actualColumnIndex);
+				if (image != null) {
 					return image;
+				}
 				return super.getCustomColumnImage(element, actualColumnIndex);
 			}
-			
+
 			@Override
 			protected List<Action> getNextActions() {
-				setActionsEnability(this.getActions());
+				setActionsEnability(getActions());
 				return super.getNextActions();
-			}			
-			
+			}
+
 			@Override
 			public ArcadColumns getReferenceColumns() {
-				ArcadColumns userDefinedColumns = getUserDefinedReferenceColumns();
-				if (userDefinedColumns==null){				
+				final ArcadColumns userDefinedColumns = getUserDefinedReferenceColumns();
+				if (userDefinedColumns == null) {
 					return super.getReferenceColumns();
 				}
 				return userDefinedColumns;
 			}
-			
+
 			@Override
 			public String getValue(Object element, int columnIndex) {
-				String attribute = positionToAttribute(columnIndex);
-				String value = AbstractResultComposite.this.getValue(element, attribute, columnIndex);
-				if (value==null) {
+				final String attribute = positionToAttribute(columnIndex);
+				final String value = AbstractResultComposite.this.getValue(element, attribute, columnIndex);
+				if (value == null) {
 					return super.getValue(element, columnIndex);
 				} else {
 					return value;
 				}
-			}			
-			
+			}
+
 			@Override
 			protected boolean adaptActionToSelection(Action action) {
 				return AbstractResultComposite.this.adaptActionToSelection(action);
 			}
 
-			
-			
-			
 		};
 		return myViewer;
 	}
-	
-	protected AbstractColumnedViewer createTreeViewer(Composite parent){
-		AbstractColumnedViewer myViewer = new BeanMapListTreeViewer(parent, getViewerStyle(), entityStructure,
+
+	protected AbstractColumnedViewer createTreeViewer(Composite parent) {
+		final AbstractColumnedViewer myViewer = new BeanMapListTreeViewer(parent, getViewerStyle(), entityStructure,
 				getDisplayedSelectClause()) {
 			@Override
 			protected void doOnDoubleClick(IStructuredSelection selection) {
@@ -269,16 +270,16 @@ implements IListActions, ISearchListener, IBeanMapActionListener {
 			@Override
 			protected void doOnSelectionChange(IStructuredSelection selection) {
 				if (!selection.isEmpty()) {
-					if (selection.getFirstElement() instanceof BeanMap){
+					if (selection.getFirstElement() instanceof BeanMap) {
 						selectedBeanMap = (BeanMap) selection.getFirstElement();
 						doOnClickEvent(selectedBeanMap);
 					}
-					if (selection.getFirstElement() instanceof BeanMapCollectionItem){
-						BeanMapCollectionItem bci = (BeanMapCollectionItem)selection.getFirstElement();
+					if (selection.getFirstElement() instanceof BeanMapCollectionItem) {
+						final BeanMapCollectionItem bci = (BeanMapCollectionItem) selection.getFirstElement();
 						selectedBeanMap = bci.getBeanMap();
 						selectedBeanMap.put("_item", bci);
 						doOnClickEvent(selectedBeanMap);
-					}					
+					}
 					AbstractResultComposite.this.doOnSelectionChange(selection);
 				}
 			}
@@ -290,67 +291,74 @@ implements IListActions, ISearchListener, IBeanMapActionListener {
 
 			@Override
 			public AbstractColumnedTreeLabelProvider createTreeLabelProvider(AbstractColumnedViewer newViewer) {
-				 AbstractColumnedTreeLabelProvider provider = createSpecificTreeLabelProvider(newViewer);
-				if (provider == null)
-					provider =super.createTreeLabelProvider(newViewer);
+				AbstractColumnedTreeLabelProvider provider = createSpecificTreeLabelProvider(newViewer);
+				if (provider == null) {
+					provider = super.createTreeLabelProvider(newViewer);
+				}
 				return provider;
-			}			
+			}
 
 			@Override
 			public IContentProvider createContentProvider() {
-				IContentProvider provider = createSpecificContentProvider();
-				if (provider==null)
+				final IContentProvider provider = createSpecificContentProvider();
+				if (provider == null) {
 					return super.createContentProvider();
+				}
 				return provider;
 			}
-			
+
 			@Override
 			public SimpleDateFormat getDateFormatter() {
-				SimpleDateFormat sd = AbstractResultComposite.this.getDateFormatter();
-				if (sd != null)
+				final SimpleDateFormat sd = AbstractResultComposite.this.getDateFormatter();
+				if (sd != null) {
 					return sd;
+				}
 				return super.getDateFormatter();
 			}
+
 			@Override
 			protected String getColumnHeader(String attribute) {
-				String header = AbstractResultComposite.this.getColumnHeader(attribute);
-				if (header!=null)
+				final String header = AbstractResultComposite.this.getColumnHeader(attribute);
+				if (header != null) {
 					return header;
-				String newAttribute = AbstractResultComposite.this.transformColumnHeader(attribute);
+				}
+				final String newAttribute = AbstractResultComposite.this.transformColumnHeader(attribute);
 				return super.getColumnHeader(newAttribute);
-			};
-			
+			}
+
 			@Override
 			protected int getColumnSize(String attribute) {
-				int size = AbstractResultComposite.this.getColumnSize(attribute);
-				if (size!=-1)
+				final int size = AbstractResultComposite.this.getColumnSize(attribute);
+				if (size != -1) {
 					return size;
+				}
 				return super.getColumnSize(attribute);
-			};				
-			
+			}
+
 			@Override
 			public String getValue(Object element, int columnIndex) {
-				String attribute = attributeFromPosition(columnIndex);
-				String value = AbstractResultComposite.this.getValue(element, attribute, columnIndex);
-				if (value==null) {
+				final String attribute = attributeFromPosition(columnIndex);
+				final String value = AbstractResultComposite.this.getValue(element, attribute, columnIndex);
+				if (value == null) {
 					return super.getValue(element, columnIndex);
 				} else {
 					return value;
 				}
 			}
-			
+
 			@Override
-			protected Image getCustomColumnImage(Object element,int actualColumnIndex) {
-				Image image = AbstractResultComposite.this.getCustomColumnImage(element,actualColumnIndex);
-				if (image!=null)
+			protected Image getCustomColumnImage(Object element, int actualColumnIndex) {
+				final Image image = AbstractResultComposite.this.getCustomColumnImage(element, actualColumnIndex);
+				if (image != null) {
 					return image;
+				}
 				return super.getCustomColumnImage(element, actualColumnIndex);
 			}
-			
+
 			@Override
 			public ArcadColumns getReferenceColumns() {
-				ArcadColumns userDefinedColumns = getUserDefinedReferenceColumns();
-				if (userDefinedColumns==null){				
+				final ArcadColumns userDefinedColumns = getUserDefinedReferenceColumns();
+				if (userDefinedColumns == null) {
 					return super.getReferenceColumns();
 				}
 				return userDefinedColumns;
@@ -358,126 +366,120 @@ implements IListActions, ISearchListener, IBeanMapActionListener {
 
 			@Override
 			protected List<Action> getNextActions() {
-				setActionsEnability(this.getActions());
+				setActionsEnability(getActions());
 				return super.getNextActions();
 			}
-			
+
 			@Override
 			protected boolean adaptActionToSelection(Action action) {
 				return AbstractResultComposite.this.adaptActionToSelection(action);
 			}
-			
+
 		};
 		return myViewer;
-	}	
-	
-	
+	}
+
 	protected ArcadColumns getUserDefinedReferenceColumns() {
 		return null;
 	}
-	
-	protected AbstractColumnedViewer createViewer(Composite parent){
-		if (getDisplayAsTree())
+
+	protected AbstractColumnedViewer createViewer(Composite parent) {
+		if (getDisplayAsTree()) {
 			return createTreeViewer(parent);
-		else
+		} else {
 			return createTableViewer(parent);
+		}
 	}
-	
-	protected void setActions(List<Action> actions){
+
+	protected void setActions(List<Action> actions) {
 		if (viewer instanceof BeanMapListTreeViewer) {
-			((BeanMapListTreeViewer)viewer).setActions(actions);
+			((BeanMapListTreeViewer) viewer).setActions(actions);
 		}
 		if (viewer instanceof BeanMapListTableViewer) {
-			((BeanMapListTableViewer)viewer).setActions(actions);
-		}		
+			((BeanMapListTableViewer) viewer).setActions(actions);
+		}
 	}
-	
+
 	/**
 	 * Disable actions here if necessary, according to selected beanmaps for instance
 	 */
 	protected void setActionsEnability(List<Action> actions) {
 		// nothing by default
 	}
-	
+
 	protected Composite createViewerComposite(Composite parent) {
 		return parent;
 	}
-	
+
 	protected void addContentBeforeViewer(Composite parent) {
 
 	}
-	
+
 	protected void addContentAfterViewer(Composite parent) {
 
-	}	
-	
-	protected boolean displayInfo(){
-		return queryManager == null || (queryManager != null &&
-				(!queryManager.isUserDefinedCount() || 
-				(queryManager.isUserDefinedCount() && queryManager.getUserDefinedCount() > -1)));
 	}
-	
+
+	protected boolean displayInfo() {
+		return (queryManager == null) || ((queryManager != null) &&
+				(!queryManager.isUserDefinedCount() ||
+						(queryManager.isUserDefinedCount() && (queryManager.getUserDefinedCount() > -1))));
+	}
+
 	protected void createContent() {
-		GridLayout layout = new GridLayout(1, true);
+		final GridLayout layout = new GridLayout(1, true);
 		layout.marginHeight = layout.marginWidth = 0;
 		setLayout(layout);
 		setLayoutData(new GridData(GridData.FILL_BOTH));
 		globalCmp = GuiFormatTools.createComposite(this, 3, false, SWT.NONE, true);
-		GridLayout l = (GridLayout) globalCmp.getLayout();
+		final GridLayout l = (GridLayout) globalCmp.getLayout();
 		l.marginHeight = l.marginWidth = 0;
-		
+
 		globalCmp.layout();
 
-		
-		
-		Composite viewerComposite =createViewerComposite(globalCmp); 
-		
+		final Composite viewerComposite = createViewerComposite(globalCmp);
+
 		addContentBeforeViewer(viewerComposite);
 		viewer = createViewer(viewerComposite);
 		addContentAfterViewer(viewerComposite);
-		
+
 		setActions(getActions());
-		
-		
-		
+
 		viewer.getViewer().getControl().setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true, 3, 1));
-		
-		if (showInfo){
+
+		if (showInfo) {
 			infoPanel = GuiFormatTools.createComposite(globalCmp, 12, false, SWT.BORDER, true);
-			GridLayout gl =  (GridLayout)infoPanel.getLayout();
+			final GridLayout gl = (GridLayout) infoPanel.getLayout();
 			gl.marginHeight = gl.marginWidth = 0;
 			gl.marginRight = 0;
 			gl.marginTop = gl.marginBottom = gl.marginLeft = gl.marginRight = 0;
 			gl.marginLeft = 0;
-			gl.verticalSpacing = 0 ;
-			gl.horizontalSpacing = 0;		
-			
-			
-			//gl.verticalSpacing = 0;		
+			gl.verticalSpacing = 0;
+			gl.horizontalSpacing = 0;
+
+			// gl.verticalSpacing = 0;
 			((GridLayout) infoPanel.getLayout()).horizontalSpacing = 0;
-			GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
+			final GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 			gridData.grabExcessHorizontalSpace = true;
 			gridData.horizontalSpan = 3;
 			gridData.heightHint = 25;
-	
+
 			infoPanel.setLayoutData(gridData);
-	
-			Composite labelComposite = GuiFormatTools.createComposite(infoPanel, 3, false, SWT.NONE, true);
+
+			final Composite labelComposite = GuiFormatTools.createComposite(infoPanel, 3, false, SWT.NONE, true);
 			((GridLayout) labelComposite.getLayout()).marginHeight = 5;
-	
-	
-			infoLabel = createLabelledLabel(labelComposite, 
+
+			infoLabel = createLabelledLabel(labelComposite,
 					Activator.resString("search.label.resultCount")); //$NON-NLS-1$
-	
-			Composite pagesComposite = GuiFormatTools.createComposite(infoPanel, 3, false, SWT.NONE, true);
+
+			final Composite pagesComposite = GuiFormatTools.createComposite(infoPanel, 3, false, SWT.NONE, true);
 			((GridLayout) pagesComposite.getLayout()).marginHeight = 5;
-	
-			pageCountLabel = createLabelledLabel(pagesComposite, 
+
+			pageCountLabel = createLabelledLabel(pagesComposite,
 					Activator.resString("search.label.pageCount")); //$NON-NLS-1$
-	
-			previousButton = GuiFormatTools.createButton(infoPanel, 
+
+			previousButton = GuiFormatTools.createButton(infoPanel,
 					Activator.resString("search.button.previous"), GridData.VERTICAL_ALIGN_BEGINNING, 3, 100); //$NON-NLS-1$
-	
+
 			previousButton.setEnabled(false);
 			((GridData) previousButton.getLayoutData()).horizontalAlignment = SWT.END;
 			previousButton.addSelectionListener(new SelectionAdapter() {
@@ -486,10 +488,10 @@ implements IListActions, ISearchListener, IBeanMapActionListener {
 					queryManager.executePreviousQuery();
 				}
 			});
-	
-			nextButton = GuiFormatTools.createButton(infoPanel, 
+
+			nextButton = GuiFormatTools.createButton(infoPanel,
 					Activator.resString("search.button.next"), //$NON-NLS-1$
-					GridData.VERTICAL_ALIGN_BEGINNING | GridData.HORIZONTAL_ALIGN_END , 3, 100);
+					GridData.VERTICAL_ALIGN_BEGINNING | GridData.HORIZONTAL_ALIGN_END, 3, 100);
 			nextButton.setEnabled(false);
 			((GridData) nextButton.getLayoutData()).horizontalAlignment = SWT.END;
 			nextButton.addSelectionListener(new SelectionAdapter() {
@@ -499,33 +501,33 @@ implements IListActions, ISearchListener, IBeanMapActionListener {
 				}
 			});
 			if (isSearchManagementActivated()) {
-				IDialogSettings ds = getSettingSession();
-				if (ds!=null) {
-					Object o = ds.get("autosearch");
-					if (o==null) {
-						setAutosearch(true);	
+				final IDialogSettings ds = getSettingSession();
+				if (ds != null) {
+					final Object o = ds.get("autosearch");
+					if (o == null) {
+						setAutosearch(true);
 					} else {
 						autosearch = ds.getBoolean("autosearch");
 					}
 				} else {
-					
+
 				}
 			}
 		}
 	}
 
 	public static Label createLabelledLabel(Composite parent, String label) {
-		Label textLabel = new Label(parent, SWT.NONE | SWT.WRAP);
+		final Label textLabel = new Label(parent, SWT.NONE | SWT.WRAP);
 		GridData gridData = new GridData(SWT.CENTER, SWT.CENTER, false, false);
 		textLabel.setLayoutData(gridData);
 
 		textLabel.setText(label);
-		Label twopoints = new Label(parent, SWT.NONE);
+		final Label twopoints = new Label(parent, SWT.NONE);
 		twopoints.setText(":"); //$NON-NLS-1$
 		gridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
 		twopoints.setLayoutData(gridData);
 
-		Label lbl = new Label(parent, SWT.NONE);
+		final Label lbl = new Label(parent, SWT.NONE);
 		lbl.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		lbl.setData(textLabel);
 		return lbl;
@@ -534,80 +536,78 @@ implements IListActions, ISearchListener, IBeanMapActionListener {
 	/**
 	 * Returns a column Header label computed from the attribute.
 	 * <p>
-	 * This function first calls the  {@link #useDefaultColumnHeader(String) to know
-	 * if you want to manually manage the return of the value. 
+	 * This function first calls the {@link #useDefaultColumnHeader(String) to know if you want to manually manage the
+	 * return of the value.
 	 * </p>
 	 * <p>
-	 * If the call to {@link #useDefaultColumnHeader(String) returns false,
-	 * this method resolves the final  MetadataAtribute and returns its name. 
-	 * </p>
+	 * If the call to {@link #useDefaultColumnHeader(String) returns false, this method resolves the final
+	 * MetadataAtribute and returns its name. </p>
+	 *
 	 * @param attribute
 	 * @return the colunm label
 	 */
 	protected String getColumnHeader(String attribute) {
-		if (useDefaultColumnHeader(attribute)){
+		if (useDefaultColumnHeader(attribute)) {
 			return null;
-		}		
-		MetaDataAttribute metaDataAttribute =  
-				MetadataUtils.getInstance().resolveMetaDataAttribute(helper,entityStructure,attribute);
-		if (metaDataAttribute!=null) {
-			return metaDataAttribute.getName();			
+		}
+		final MetaDataAttribute metaDataAttribute = MetadataUtils.getInstance().resolveMetaDataAttribute(helper,
+				entityStructure, attribute);
+		if (metaDataAttribute != null) {
+			return metaDataAttribute.getName();
 		}
 		return null;
 	}
+
 	/**
-	 * Returns an indicator to say if you want the system to compute
-	 * the column header using the primary entity.
-	 * If return true, the system will try to compute the header using
-	 * the attribute and the primary entity</br>
-	 * If return false, the system will try to compute the value using the 
-	 * deeper entity and the attribute.
+	 * Returns an indicator to say if you want the system to compute the column header using the primary entity. If
+	 * return true, the system will try to compute the header using the attribute and the primary entity</br>
+	 * If return false, the system will try to compute the value using the deeper entity and the attribute.
 	 * <p>
 	 * Example:<br>
 	 * <ul>
 	 * <li>if the primary entity is <code>artifact</code></li>
-	 * <li>if the attribute equals to <code>creationrelease.number</code></br></li>
+	 * <li>if the attribute equals to <code>creationrelease.number</code></br>
+	 * </li>
 	 * </ul>
-	 * <p> 
-	 * 
-	 * if the method returns false: the system will return the label of the
-	 * <code>number</code> attribute into the entity <code>release</code> (because
-	 * the type of <code>creationrelease</code> is <code>release</code>).
+	 * <p>
+	 * if the method returns false: the system will return the label of the <code>number</code> attribute into the
+	 * entity <code>release</code> (because the type of <code>creationrelease</code> is <code>release</code>).
 	 * </p>
 	 * <p>
-	 * If this method return true, the system will return the label of the
-	 * <code>creationrelease.number</code> attribute into the entity <code>artefact</code><br>
-	 * In this case, you can also transform the attribute name before trying to resolve
-	 * the name by using the {@link #transformColumnHeader(String)}.
+	 * If this method return true, the system will return the label of the <code>creationrelease.number</code> attribute
+	 * into the entity <code>artefact</code><br>
+	 * In this case, you can also transform the attribute name before trying to resolve the name by using the
+	 * {@link #transformColumnHeader(String)}.
 	 * </p>
 	 * </p>
-	 *   
+	 * 
 	 * @param attribute
 	 * @return
 	 */
-	protected boolean useDefaultColumnHeader(String attribute){
+	protected boolean useDefaultColumnHeader(String attribute) {
 		return false;
 	}
-	
-	protected String transformColumnHeader(String attribute){
+
+	protected String transformColumnHeader(String attribute) {
 		return attribute;
 	}
-	
+
 	protected int getColumnSize(String attribute) {
-		MetaDataAttribute metaDataAttribute =  
-				MetadataUtils.getInstance().resolveMetaDataAttribute(helper,entityStructure,attribute);
-		if (metaDataAttribute!=null) {
-			return metaDataAttribute.getColSize();			
+		final MetaDataAttribute metaDataAttribute = MetadataUtils.getInstance().resolveMetaDataAttribute(helper,
+				entityStructure, attribute);
+		if (metaDataAttribute != null) {
+			return metaDataAttribute.getColSize();
 		}
 		return -1;
 	}
-	
-	public ServerConnection getConnection(){
+
+	public ServerConnection getConnection() {
 		return connection;
 	}
-	
+
 	/**
 	 * Return the viwer selection
+	 *
 	 * @return
 	 */
 	public IStructuredSelection getViewerSelection() {
@@ -616,26 +616,28 @@ implements IListActions, ISearchListener, IBeanMapActionListener {
 
 	/**
 	 * Returns the current selected BeanMaps into a BeanMapList
+	 *
 	 * @return the BeanMapList that contains all the selected elements of the list.
 	 */
 	public BeanMapList getSelectedBeanMap() {
-		IStructuredSelection selection = viewer.getSelection();
-		Iterator<?> it = selection.iterator();
-		BeanMapList result = new BeanMapList();
+		final IStructuredSelection selection = viewer.getSelection();
+		final Iterator<?> it = selection.iterator();
+		final BeanMapList result = new BeanMapList();
 		while (it.hasNext()) {
-			Object o = it.next();
+			final Object o = it.next();
 			if (o instanceof BeanMap) {
 				result.add((BeanMap) o);
 			} else if (o instanceof IBeanMapProvider) {
 				result.add(((IBeanMapProvider) o).providedBeanMap());
 			}
-			
+
 		}
 		return result;
 	}
 
 	/**
-	 * Returns the first selected beanMap. 
+	 * Returns the first selected beanMap.
+	 *
 	 * @return The selected beanMap
 	 */
 	public BeanMap getSelectedResult() {
@@ -644,9 +646,12 @@ implements IListActions, ISearchListener, IBeanMapActionListener {
 
 	/**
 	 * Uses his method to change the viewer Input
-	 * @param list the new BeanMapList you want to define as the current input
+	 *
+	 * @param list
+	 *            the new BeanMapList you want to define as the current input
 	 */
-	
+
+	@Override
 	public void contentChanged(BeanMapList list) {
 		setInput(list);
 		viewer.refresh();
@@ -655,31 +660,33 @@ implements IListActions, ISearchListener, IBeanMapActionListener {
 			nextButton.setEnabled(queryManager.canReadNextResults());
 		}
 	}
-	
-	public Object getInput(){
+
+	public Object getInput() {
 		return viewer.getInput();
 	}
-	
-	public void setInput(Object list){
+
+	public void setInput(Object list) {
 		viewer.setInput(list);
 	}
-	
+
+	@Override
 	public void setElementCount(int count, int currentPage, int numberOfPages) {
 		if (showInfo) {
-			
-			if (currentPage<numberOfPages) {
+
+			if (currentPage < numberOfPages) {
 				infoLabel.setBackground(Activator.getDefault().getColor("blue"));
-				infoLabel.setText(String.valueOf(count) +" "+Activator.resString("search.label.pending"));
+				infoLabel.setText(String.valueOf(count) + " " + Activator.resString("search.label.pending"));
 			} else {
 				infoLabel.setBackground(infoLabel.getParent().getBackground());
 				infoLabel.setText(String.valueOf(count));
 			}
 			pageCountLabel.setText(String.valueOf(currentPage) + '/' + String.valueOf(numberOfPages));
 		}
-	}	
-	
+	}
+
 	/**
 	 * Returns the underlying viewer
+	 *
 	 * @return
 	 */
 	public AbstractColumnedViewer getViewer() {
@@ -687,48 +694,53 @@ implements IListActions, ISearchListener, IBeanMapActionListener {
 	}
 
 	/**
-	 * Override this method to define you own viwer Identifier 
+	 * Override this method to define you own viwer Identifier
+	 *
 	 * @return the new Viwer Identifier
 	 */
 	public String getViewerIdentifier() {
-		//return getClass().getName();
+		// return getClass().getName();
 		return null;
 	}
 
 	/**
 	 * Define the action that will be available for the BeanMapList
 	 */
+	@Override
 	public abstract List<Action> getActions();
-	
+
 	/**
-	 * Override this method to define the behavior when the user
-	 * double click on an element on the list
-	 * @param selection The current selection selection 
+	 * Override this method to define the behavior when the user double click on an element on the list
+	 *
+	 * @param selection
+	 *            The current selection selection
 	 */
 	protected void doOnDoubleClickEvent(IStructuredSelection selection) {
 	}
 
 	/**
-	 * Override this method to define the behavior when the user
-	 * click on an element on the list
-	 * @param selection The current selection selection 
+	 * Override this method to define the behavior when the user click on an element on the list
+	 *
+	 * @param selection
+	 *            The current selection selection
 	 */
 	protected void doOnClickEvent(BeanMap selected) {
-	}	
-	
+	}
+
 	/**
-	 * Override this method to define the behavior when the user
-	 * click on an element on the list
-	 * @param selection The current selection selection 
+	 * Override this method to define the behavior when the user click on an element on the list
+	 *
+	 * @param selection
+	 *            The current selection selection
 	 */
 	protected void doOnSelectionChange(IStructuredSelection selection) {
-	}	
-		
-	
-	
+	}
+
 	/**
 	 * Override this method to define your own AbstractColumnedTableLabelProvider
-	 * @param newViewer the current BeanMapListTableViewer
+	 *
+	 * @param newViewer
+	 *            the current BeanMapListTableViewer
 	 * @return your own AbstractColumnedTableLabelProvider
 	 */
 	public AbstractColumnedTableLabelProvider createSpecificTableLabelProvider(AbstractColumnedViewer newViewer) {
@@ -737,121 +749,128 @@ implements IListActions, ISearchListener, IBeanMapActionListener {
 
 	/**
 	 * Override this method to define your own AbstractColumnedTableLabelProvider
-	 * @param newViewer the current BeanMapListTableViewer
+	 *
+	 * @param newViewer
+	 *            the current BeanMapListTableViewer
 	 * @return your own AbstractColumnedTableLabelProvider
 	 */
 	public AbstractColumnedTreeLabelProvider createSpecificTreeLabelProvider(AbstractColumnedViewer newViewer) {
 		return null;
-	}	
-	
+	}
+
 	public IContentProvider createSpecificContentProvider() {
 		return null;
-	}	
+	}
 
-	protected Image getCustomColumnImage(Object element, int actualColumnIndex){
+	protected Image getCustomColumnImage(Object element, int actualColumnIndex) {
 		return null;
-	}	
-	
+	}
+
 	/**
-	 * Override this method to define your own SimpleDateFormatter that will 
-	 * be used to display the the Date BeanMap Value
+	 * Override this method to define your own SimpleDateFormatter that will be used to display the the Date BeanMap
+	 * Value
+	 *
 	 * @return your own SimpleDateFormat object
 	 */
 	protected SimpleDateFormat getDateFormatter() {
 		return null;
-	}	
+	}
 
-	public String getValue(Object element, String attribute, int columnIndex){
+	public String getValue(Object element, String attribute, int columnIndex) {
 		return null;
 	}
-	
+
 	protected String getDisplayedSelectClause() {
-		return createSelectClause();		
+		return createSelectClause();
 	}
-	
-	
+
 	protected String createSelectClause() {
 		return selectClause;
-	}	
-	
-	public void add(BeanMap beanMap){
+	}
+
+	public void add(BeanMap beanMap) {
 		if (getInput() instanceof BeanMapList) {
-			BeanMapList list = (BeanMapList)getInput();
-			list.add(0,beanMap);
+			final BeanMapList list = (BeanMapList) getInput();
+			list.add(0, beanMap);
 			viewer.refresh();
 		}
 	}
-	public void add(BeanMap beanMap, int index){
+
+	public void add(BeanMap beanMap, int index) {
 		if (getInput() instanceof BeanMapList) {
-			BeanMapList list = (BeanMapList)getInput();
-			if (index >= 0 && index < list.size())
+			final BeanMapList list = (BeanMapList) getInput();
+			if ((index >= 0) && (index < list.size())) {
 				list.add(index, beanMap);
-			else
+			} else {
 				list.add(beanMap);
+			}
 			viewer.refresh();
 		}
 	}
-	
-	public void addUnique(BeanMap beanMap){
+
+	public void addUnique(BeanMap beanMap) {
 		if (getInput() instanceof BeanMapList) {
-			BeanMapList list = (BeanMapList)getInput();
-			if (-1 == list.findIndex(beanMap.getId())){
-				list.add(0,beanMap);
+			final BeanMapList list = (BeanMapList) getInput();
+			if (-1 == list.findIndex(beanMap.getId())) {
+				list.add(0, beanMap);
 				viewer.refresh();
-			}			
+			}
 		}
 	}
-	
-	public void add(BeanMapList beanMaps){
+
+	public void add(BeanMapList beanMaps) {
 		if (getInput() instanceof BeanMapList) {
-			BeanMapList list = (BeanMapList)getInput();
-			list.addAll(0,beanMaps);
+			final BeanMapList list = (BeanMapList) getInput();
+			list.addAll(0, beanMaps);
 			viewer.refresh();
 		}
-		
+
 	}
-	
+
 	/**
 	 * Add BeanMaps after checking they are not already in list
-	 * @param beanMaps list of beanMaps to be added
+	 *
+	 * @param beanMaps
+	 *            list of beanMaps to be added
 	 */
-	public void addUnique(BeanMapList beanMaps){
+	public void addUnique(BeanMapList beanMaps) {
 		if (getInput() instanceof BeanMapList) {
-			BeanMapList list = (BeanMapList)getInput();
-			for (BeanMap beanMap : beanMaps) {
-				if (-1 == list.findIndex(beanMap.getId())){
-					list.add(0,beanMap);
+			final BeanMapList list = (BeanMapList) getInput();
+			for (final BeanMap beanMap : beanMaps) {
+				if (-1 == list.findIndex(beanMap.getId())) {
+					list.add(0, beanMap);
 				}
 			}
 			viewer.refresh();
 		}
-		
+
 	}
-	
-	public void remove(BeanMap beanMap){
+
+	public void remove(BeanMap beanMap) {
 		if (getInput() instanceof BeanMapList) {
-			BeanMapList list = (BeanMapList)getInput();
+			final BeanMapList list = (BeanMapList) getInput();
 			list.remove(beanMap);
 			viewer.refresh();
 			removeBeanEditor(beanMap);
-		}		
-	}	
-	
-	public void remove(BeanMapList toRemove){
+		}
+	}
+
+	public void remove(BeanMapList toRemove) {
 		if (getInput() instanceof BeanMapList) {
-			BeanMapList list = (BeanMapList)getInput();
-			for (BeanMap b :toRemove) {
+			final BeanMapList list = (BeanMapList) getInput();
+			for (final BeanMap b : toRemove) {
 				list.remove(b);
 				removeBeanEditor(b);
 			}
 			viewer.refresh();
-		}		
+		}
 	}
-	
+
+	@Override
 	public void actionDone(int type, BeanMap bean) {
 		switch (type) {
 		case IBeanMapActionListener.ACTION_ADD:
-			BeanMap completed = helper.read(bean.getType(), bean.getId(), getAttributList());
+			final BeanMap completed = helper.read(bean.getType(), bean.getId(), getAttributList());
 			bean.addAll(completed);
 			add(bean);
 			break;
@@ -863,22 +882,23 @@ implements IListActions, ISearchListener, IBeanMapActionListener {
 			queryManager.executeCurrentQuery();
 			break;
 		case IBeanMapActionListener.ACTION_REFRESH:
-			if (viewer != null && !viewer.getControl().isDisposed())
+			if ((viewer != null) && !viewer.getControl().isDisposed()) {
 				viewer.refresh();
+			}
 			break;
 		default:
 			break;
 		}
 	}
- 
-	
+
+	@Override
 	public void actionDone(int type, BeanMapList list) {
 		switch (type) {
 		case IBeanMapActionListener.ACTION_ADD:
-			for (BeanMap bean : list) {
-				BeanMap completed = helper.read(bean.getType(), bean.getId(), getAttributList());
+			for (final BeanMap bean : list) {
+				final BeanMap completed = helper.read(bean.getType(), bean.getId(), getAttributList());
 				bean.addAll(completed);
-			}			
+			}
 			add(list);
 			break;
 		case IBeanMapActionListener.ACTION_DELETE:
@@ -889,95 +909,100 @@ implements IListActions, ISearchListener, IBeanMapActionListener {
 			queryManager.executeCurrentQuery();
 			break;
 		case IBeanMapActionListener.ACTION_REFRESH:
-			if (viewer != null && !viewer.getControl().isDisposed())
+			if ((viewer != null) && !viewer.getControl().isDisposed()) {
 				viewer.refresh();
+			}
 			break;
 		default:
 			break;
 		}
 	}
-	
+
+	@Override
 	public boolean isSearchManagementActivated() {
 		return true;
 	}
-	
-	protected String getAttributList(){
+
+	protected String getAttributList() {
 		return selectClause;
 	}
-	
+
+	@Override
 	public void setAutosearch(boolean autosearch) {
 		this.autosearch = autosearch;
-		IDialogSettings ds = getSettingSession();
-		if (ds!=null) {
+		final IDialogSettings ds = getSettingSession();
+		if (ds != null) {
 			ds.put("autosearch", autosearch);
 		}
 	}
-	
+
+	@Override
 	public boolean isAutosearch() {
 		return autosearch;
 	}
-	
-	
-	private IDialogSettings getSettingSession(){
-		AbstractUIPlugin activator = getActivator();
-		if (activator!=null) {
-			String sessionName = entityStructure.getName().trim()+".search.settings";
-			IDialogSettings pluginSetting = activator.getDialogSettings();
+
+	private IDialogSettings getSettingSession() {
+		final AbstractUIPlugin activator = getActivator();
+		if (activator != null) {
+			final String sessionName = entityStructure.getName().trim() + ".search.settings";
+			final IDialogSettings pluginSetting = activator.getDialogSettings();
 			IDialogSettings session = pluginSetting.getSection(sessionName);
-			if (session==null)
+			if (session == null) {
 				session = pluginSetting.addNewSection(sessionName);
+			}
 			return session;
 		}
-		return null;		
-	}
-	
-	
-	public AbstractUIPlugin getActivator(){
 		return null;
 	}
-	
+
+	public AbstractUIPlugin getActivator() {
+		return null;
+	}
+
 	@Override
 	public Composite getParentComposite() {
 		return this;
 	}
-	
-	protected boolean  adaptActionToSelection(Action action) {
+
+	protected boolean adaptActionToSelection(Action action) {
 		return true;
 	}
-	
+
 	/**
 	 * Force beanMap selection
+	 *
 	 * @param selectedBeanMap
 	 */
 	public void setSelectedBeanMap(BeanMap selectedBeanMap) {
 		viewer.getViewer().setSelection(
-			new StructuredSelection(selectedBeanMap)
-		);
+				new StructuredSelection(selectedBeanMap));
 	}
 
 	/**
 	 * Force BeanMap List selection
+	 *
 	 * @param selectedBeanMap
 	 */
 	public void setSelectedBeanMapList(BeanMapList selectedBeanMapList) {
 		viewer.getViewer().setSelection(
-			new StructuredSelection(selectedBeanMapList.toArray())
-		);
+				new StructuredSelection(selectedBeanMapList.toArray()));
 	}
-	
+
 	/**
-	 * Remove BeanMap editor if exists after change occurred in list. 
-	 * Empty by default. Must be redefined to be filled in inheriting classes.
+	 * Remove BeanMap editor if exists after change occurred in list. Empty by default. Must be redefined to be filled
+	 * in inheriting classes.
+	 *
 	 * @param bean
 	 */
-	protected void removeBeanEditor(BeanMap bean){
+	protected void removeBeanEditor(BeanMap bean) {
 	}
-	
+
 	/**
-	 * Refresh BeanMap editor if exists after change occurred in list. 
-	 * Empty by default. Must be redefined to be filled in inheriting classes.
+	 * Refresh BeanMap editor if exists after change occurred in list. Empty by default. Must be redefined to be filled
+	 * in inheriting classes.
+	 *
 	 * @param bean
 	 */
-	protected void refreshBeanEditor(BeanMap bean){		
+	protected void refreshBeanEditor(BeanMap bean) {
 	}
 }

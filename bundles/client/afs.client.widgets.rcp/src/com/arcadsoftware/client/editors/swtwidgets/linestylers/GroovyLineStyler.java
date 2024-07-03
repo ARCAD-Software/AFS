@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -30,13 +30,13 @@ import org.eclipse.swt.widgets.Display;
 public class GroovyLineStyler implements LineStyleListener {
 
 	private static final String[] KEYWORDS = { "abstract", "boolean", "break", "byte", "case", "catch", "char", "class", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
-		"continue", "default", "do", "double", "else", "extends", "false", "final", "finally", "float", "for", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$
-		"if", "implements", "import", "instanceof", "int", "interface", "long", "native", "new", "null", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$
-		"package", "private", "protected", "public", "return", "short", "static", "super", "switch", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
-		"synchronized", "this", "throw", "throws", "transient", "true", "try", "void", "volatile", "while", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$
-		"each", "find", "findAll" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			"continue", "default", "do", "double", "else", "extends", "false", "final", "finally", "float", "for", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$
+			"if", "implements", "import", "instanceof", "int", "interface", "long", "native", "new", "null", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$
+			"package", "private", "protected", "public", "return", "short", "static", "super", "switch", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
+			"synchronized", "this", "throw", "throws", "transient", "true", "try", "void", "volatile", "while", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$
+			"each", "find", "findAll" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	private static final String[] LANGUAGES_ELEMENTS = { "?.", "?:", ".@", ".", "->", "[]", "[:]" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
-	
+
 	public static final int EOF = -1;
 	public static final int EOL = 10;
 	public static final int WORD = 0;
@@ -49,29 +49,29 @@ public class GroovyLineStyler implements LineStyleListener {
 	public static final int API = 8;
 	public static final int LE = 9;
 	public static final int MAXIMUM_TOKEN = 10;
-	
-	GroovyScanner scanner;
-	int[] tokenColors;
-	int[] tokenStyles;
-	Color[] colors;
-	Vector<int[]> blockComments;
+
+	private GroovyScanner scanner;
+	private int[] tokenColors;
+	private int[] tokenStyles;
+	private Color[] colors;
+	private Vector<int[]> blockComments;
 
 	public GroovyLineStyler(String[] apis) {
 		super();
 		initialize();
 		scanner = new GroovyScanner(apis);
-		blockComments = new Vector<int[]>();
+		blockComments = new Vector<>();
 	}
 
 	private Color getColor(int type) {
-		if (type < 0 || type >= tokenColors.length) {
+		if ((type < 0) || (type >= tokenColors.length)) {
 			return null;
 		}
 		return colors[tokenColors[type]];
 	}
 
 	private int getFontStyle(int type) {
-		if (type < 0 || type >= tokenStyles.length) {
+		if ((type < 0) || (type >= tokenStyles.length)) {
 			return SWT.NORMAL;
 		}
 		return tokenStyles[type];
@@ -79,25 +79,25 @@ public class GroovyLineStyler implements LineStyleListener {
 
 	boolean inBlockComment(int start, int end) {
 		for (int i = 0; i < blockComments.size(); i++) {
-			int[] offsets = blockComments.elementAt(i);
+			final int[] offsets = blockComments.elementAt(i);
 			// start of comment in the line
-			if ((offsets[0] >= start) && (offsets[0] <= end))
-				return true;
 			// end of comment in the line
-			if ((offsets[1] >= start) && (offsets[1] <= end))
+			if (((offsets[0] >= start) && (offsets[0] <= end)) || ((offsets[1] >= start) && (offsets[1] <= end))) {
 				return true;
-			if ((offsets[0] <= start) && (offsets[1] >= end))
+			}
+			if ((offsets[0] <= start) && (offsets[1] >= end)) {
 				return true;
+			}
 		}
 		return false;
 	}
 
 	protected void initialize() {
-		Display display = Display.getDefault();
-		colors = new Color[] { new Color(display, new RGB(0, 0, 0)), // 
-				new Color(display, new RGB(63, 127, 95)), //  comment
-				new Color(display, new RGB(42, 0, 255)), //  string
-				new Color(display, new RGB(127, 0, 85)), //  key
+		final Display display = Display.getDefault();
+		colors = new Color[] { new Color(display, new RGB(0, 0, 0)), //
+				new Color(display, new RGB(63, 127, 95)), // comment
+				new Color(display, new RGB(42, 0, 255)), // string
+				new Color(display, new RGB(127, 0, 85)), // key
 				new Color(display, new RGB(100, 100, 100)), // API
 		};
 		tokenColors = new int[MAXIMUM_TOKEN];
@@ -123,49 +123,54 @@ public class GroovyLineStyler implements LineStyleListener {
 	}
 
 	void disposeColors() {
-		for (int i = 0; i < colors.length; i++) {
-			colors[i].dispose();
+		for (final Color color : colors) {
+			color.dispose();
 		}
 	}
 
 	/**
-	 * Event.detail line start offset (input) Event.text line text (input) LineStyleEvent.styles Enumeration of
-	 * StyleRanges, need to be in order. (output) LineStyleEvent.background line background color (output)
+	 * Event.detail line start offset (input) 
+	 * Event.text line text (input) 
+	 * LineStyleEvent.styles Enumeration of StyleRanges, need to be in order. 
+	 * (output) LineStyleEvent.background line background color (output)
 	 */
+	@Override
 	public void lineGetStyle(LineStyleEvent event) {
-		Vector<StyleRange> styles = new Vector<StyleRange>();
+		final Vector<StyleRange> styles = new Vector<>();
 		int token;
 		StyleRange lastStyle;
 		// If the line is part of a block comment, create one style for the entire line.
 		if (inBlockComment(event.lineOffset, event.lineOffset + event.lineText.length())) {
-			styles.addElement(new StyleRange(event.lineOffset, event.lineText.length(), getColor(COMMENT), null, getFontStyle(COMMENT)));
+			styles.addElement(new StyleRange(event.lineOffset, event.lineText.length(), getColor(COMMENT), null,
+					getFontStyle(COMMENT)));
 			event.styles = new StyleRange[styles.size()];
 			styles.copyInto(event.styles);
 			return;
 		}
-		Color defaultFgColor = ((Control) event.widget).getForeground();
+		final Color defaultFgColor = ((Control) event.widget).getForeground();
 		scanner.setRange(event.lineText);
 		token = scanner.nextToken();
 		while (token != EOF) {
 			if (token == OTHER) {
 				// do nothing for non-colored tokens
 			} else if (token != WHITE) {
-				Color color = getColor(token);
-				int fontStyle = getFontStyle(token);
+				final Color color = getColor(token);
+				final int fontStyle = getFontStyle(token);
 				// Only create a style if the token color is different than the
 				// widget's default foreground color and the token's style is not
 				// bold. Keywords are bolded.
-				if (color!=null) {
+				if (color != null) {
 					if ((!color.equals(defaultFgColor)) || (fontStyle != SWT.NORMAL)) {
-						StyleRange style = new StyleRange(scanner.getStartOffset() + event.lineOffset, scanner.getLength(),
+						final StyleRange style = new StyleRange(scanner.getStartOffset() + event.lineOffset,
+								scanner.getLength(),
 								color, null);
 						style.fontStyle = fontStyle;
 						if (styles.isEmpty()) {
 							styles.addElement(style);
 						} else {
 							// Merge similar styles. Doing so will improve performance.
-							lastStyle = (StyleRange) styles.lastElement();
-							if (lastStyle.similarTo(style) && (lastStyle.start + lastStyle.length == style.start)) {
+							lastStyle = styles.lastElement();
+							if (lastStyle.similarTo(style) && ((lastStyle.start + lastStyle.length) == style.start)) {
 								lastStyle.length += style.length;
 							} else {
 								styles.addElement(style);
@@ -173,12 +178,12 @@ public class GroovyLineStyler implements LineStyleListener {
 						}
 					}
 				}
-			} else if ((!styles.isEmpty()) && ((lastStyle = (StyleRange) styles.lastElement()).fontStyle == SWT.BOLD)) {
-				int start = scanner.getStartOffset() + event.lineOffset;
-				lastStyle = (StyleRange) styles.lastElement();
+			} else if ((!styles.isEmpty()) && ((lastStyle = styles.lastElement()).fontStyle == SWT.BOLD)) {
+				final int start = scanner.getStartOffset() + event.lineOffset;
+				lastStyle = styles.lastElement();
 				// A font style of SWT.BOLD implies that the last style
 				// represents a java keyword.
-				if (lastStyle.start + lastStyle.length == start) {
+				if ((lastStyle.start + lastStyle.length) == start) {
 					// Have the white space take on the style before it to
 					// minimize the number of style ranges created and the
 					// number of font style changes during rendering.
@@ -192,14 +197,13 @@ public class GroovyLineStyler implements LineStyleListener {
 	}
 
 	public void parseBlockComments(String text) {
-		blockComments = new Vector<int[]>();
-		StringReader buffer = new StringReader(text);
+		blockComments = new Vector<>();
+		final StringReader buffer = new StringReader(text);
 		int ch;
 		boolean blkComment = false;
 		int cnt = 0;
 		int[] offsets = new int[2];
 		boolean done = false;
-
 		try {
 			while (!done) {
 				switch (ch = buffer.read()) {
@@ -243,7 +247,7 @@ public class GroovyLineStyler implements LineStyleListener {
 				}
 				}
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			// ignore errors
 		}
 	}
@@ -277,20 +281,20 @@ public class GroovyLineStyler implements LineStyleListener {
 		 * Initialize the lookup table.
 		 */
 		void initialize(String[] apis) {
-			fgKeys = new Hashtable<String, Integer>();
+			fgKeys = new Hashtable<>();
 			if (apis != null) {
-				Integer k = new Integer(API);
-				for (int i = 0; i < apis.length; i++) {
-					fgKeys.put(apis[i], k);
+				final Integer k = new Integer(API);
+				for (final String element : apis) {
+					fgKeys.put(element, k);
 				}
 			}
 			Integer k = new Integer(KEY);
-			for (int i = 0; i < KEYWORDS.length; i++) {
-				fgKeys.put(KEYWORDS[i], k);
+			for (final String element : KEYWORDS) {
+				fgKeys.put(element, k);
 			}
 			k = new Integer(LE);
-			for (int i = 0; i < LANGUAGES_ELEMENTS.length; i++) {
-				fgKeys.put(LANGUAGES_ELEMENTS[i], k);
+			for (final String element : LANGUAGES_ELEMENTS) {
+				fgKeys.put(element, k);
 			}
 		}
 
@@ -384,9 +388,10 @@ public class GroovyLineStyler implements LineStyleListener {
 							c = read();
 						} while (Character.isJavaIdentifierPart((char) c));
 						unread(c);
-						Integer i = (Integer) fgKeys.get(fBuffer.toString());
-						if (i != null)
+						final Integer i = fgKeys.get(fBuffer.toString());
+						if (i != null) {
 							return i.intValue();
+						}
 						return WORD;
 					}
 					return OTHER;
@@ -411,8 +416,9 @@ public class GroovyLineStyler implements LineStyleListener {
 		}
 
 		protected void unread(int c) {
-			if (c != EOF)
+			if (c != EOF) {
 				fPos--;
+			}
 		}
 	}
 

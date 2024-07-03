@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -43,9 +43,9 @@ public class ServerDialog extends AbstractAFSDialog {
 
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		final Composite composite = (Composite) super.createDialogArea(parent); 
+		final Composite composite = (Composite) super.createDialogArea(parent);
 		final Group serverGroup = GuiFormatTools.createGroup(composite, Activator.resString("server.group"));
-		serverComposite = new ServerMainComposite(serverGroup,SWT.NONE,server);     
+		serverComposite = new ServerMainComposite(serverGroup, SWT.NONE, server);
 		return composite;
 	}
 
@@ -74,7 +74,7 @@ public class ServerDialog extends AbstractAFSDialog {
 	}
 
 	public static boolean updateServer(Server server) {
-		Server dupServer = server.clone();
+		final Server dupServer = server.clone();
 		if (new ServerDialog(Activator.getInstance().getPluginShell(), dupServer).open() == 0) {
 			server.setName(dupServer.getName());
 			server.setUrl(dupServer.getUrl());

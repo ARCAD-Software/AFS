@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -17,19 +17,20 @@ import com.arcadsoftware.aev.core.model.ArcadEntity;
 import com.arcadsoftware.afs.client.core.listeners.IBeanMapProvider;
 import com.arcadsoftware.beanmap.BeanMap;
 
-public class BeanMapCollectionItem extends  ArcadEntity implements IBeanMapProvider{
+public class BeanMapCollectionItem extends ArcadEntity implements IBeanMapProvider {
 
-	private BeanMap beanMap;
-	
-	public BeanMapCollectionItem( BeanMap beanMap) {
-		 this.beanMap = beanMap;
+	private final BeanMap beanMap;
+
+	public BeanMapCollectionItem(BeanMap beanMap) {
+		this.beanMap = beanMap;
 	}
-	
+
+	@Override
 	public String getLabel() {
 		return null;
 	}
 
-	public BeanMap getBeanMap(){
+	public BeanMap getBeanMap() {
 		return beanMap;
 	}
 

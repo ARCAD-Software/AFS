@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -35,11 +35,11 @@ public abstract class AbstractAFSEditorPart extends EditorPart implements IDirty
 	private boolean dirtyPart;
 	private String initialName = ""; //$NON-NLS-1$
 	private String errorMessage;
-	private ArrayList<IObjectSaved> savedListeners = new ArrayList<IObjectSaved>();;
+	private final ArrayList<IObjectSaved> savedListeners = new ArrayList<>();
 
 	public AbstractAFSEditorPart() {
 		super();
-		childComposites = new ArrayList<AbstractAFSEditorComposite>();
+		childComposites = new ArrayList<>();
 	}
 
 	public void registerComposite(AbstractAFSEditorComposite childComposite) {
@@ -57,6 +57,7 @@ public abstract class AbstractAFSEditorPart extends EditorPart implements IDirty
 		return dirtyPart;
 	}
 
+	@Override
 	public void dirtyEvent(boolean dirty) {
 		dirtyPart = dirty;
 		firePropertyChange(PROP_DIRTY);
@@ -81,7 +82,7 @@ public abstract class AbstractAFSEditorPart extends EditorPart implements IDirty
 
 	@Override
 	public void setFocus() {
-		IEditorInput input = getEditorInput();
+		final IEditorInput input = getEditorInput();
 		if (input instanceof IDynamicHelpIdProvider) {
 			DynamicHelp.showContextHelpId(((IDynamicHelpIdProvider) input).getDynamicHelpId());
 		}
@@ -99,7 +100,7 @@ public abstract class AbstractAFSEditorPart extends EditorPart implements IDirty
 		for (final IObjectSaved l : savedListeners) {
 			try {
 				l.doAfterSaving(entity);
-			} catch (RuntimeException e) {
+			} catch (final RuntimeException e) {
 				removeSavedListener(l);
 			}
 		}

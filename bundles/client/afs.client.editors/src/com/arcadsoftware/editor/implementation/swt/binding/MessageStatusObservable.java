@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -27,9 +27,9 @@ public class MessageStatusObservable extends AbstractObservableValue<IStatus> {
 
 	private static final String EMPTY = ""; //$NON-NLS-1$
 	private IStatus status = null;
-	private Element element;
-	private IMessageManager manager;
-	private Control control;
+	private final Element element;
+	private final IMessageManager manager;
+	private final Control control;
 
 	public MessageStatusObservable(Element element, IMessageManager manager, Control control) {
 		super(Realm.getDefault());
@@ -47,15 +47,16 @@ public class MessageStatusObservable extends AbstractObservableValue<IStatus> {
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.databinding.observable.value.IObservableValue#getValueType()
 	 */
+	@Override
 	public Object getValueType() {
 		return IStatus.class;
 	}
 
 	@Override
 	protected void doSetValue(IStatus value) {
-		if (value!=null) {
+		if (value != null) {
 			if (value instanceof IStatus) {
-				IStatus newstatus = (IStatus) value;
+				final IStatus newstatus = value;
 				try {
 					if (ValidationStatus.ok().equals(newstatus)) {
 						manager.removeMessage(element, control);

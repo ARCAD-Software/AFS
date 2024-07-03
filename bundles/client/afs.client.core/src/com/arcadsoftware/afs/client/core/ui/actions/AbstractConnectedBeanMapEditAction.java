@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -26,19 +26,19 @@ import com.arcadsoftware.beanmap.BeanMapList;
 import com.arcadsoftware.editor.swt.IBeanMapErrorOnSaveListener;
 import com.arcadsoftware.editor.swt.IBeanMapSavedListener;
 
-public abstract class AbstractConnectedBeanMapEditAction extends AbstractConnectedBeanMapAction 
-implements IBeanMapSavedListener,IBeanMapErrorOnSaveListener, IBeanMapModifier {
+public abstract class AbstractConnectedBeanMapEditAction extends AbstractConnectedBeanMapAction
+		implements IBeanMapSavedListener, IBeanMapErrorOnSaveListener, IBeanMapModifier {
 
 	protected ConnectedDynamicEditor editor;
-	
+
 	public AbstractConnectedBeanMapEditAction(ServerConnection connection) {
 		super(connection);
 	}
-	
+
 	public AbstractConnectedBeanMapEditAction() {
 		super();
 	}
-	
+
 	protected boolean isReadOnly() {
 		return false;
 	}
@@ -46,12 +46,12 @@ implements IBeanMapSavedListener,IBeanMapErrorOnSaveListener, IBeanMapModifier {
 	protected boolean isReadOnly(BeanMap bean) {
 		return false;
 	}
-	
+
 	protected void beanEdit(BeanMap beanMap) {
 		if (beanMap != null) {
 			doBeforeEditing(beanMap);
-			IEditorPart e = 
-				ConnectedDynamicEditor.openConnectedEditor(connection,beanMap,getLayoutName(beanMap),getVirtualValues(beanMap),this, isReadOnly() || isReadOnly(beanMap));
+			final IEditorPart e = ConnectedDynamicEditor.openConnectedEditor(connection, beanMap,
+					getLayoutName(beanMap), getVirtualValues(beanMap), this, isReadOnly() || isReadOnly(beanMap));
 			if (e instanceof ConnectedDynamicEditor) {
 				editor = (ConnectedDynamicEditor) e;
 				editor.addBeanMapSavedListener(this);
@@ -61,21 +61,21 @@ implements IBeanMapSavedListener,IBeanMapErrorOnSaveListener, IBeanMapModifier {
 		}
 	}
 
-	public Map<String , Object> getVirtualValues(BeanMap beanMap){
+	public Map<String, Object> getVirtualValues(BeanMap beanMap) {
 		return null;
 	}
-	
-	protected boolean isExternalRefreshAllowed(){
+
+	protected boolean isExternalRefreshAllowed() {
 		return true;
 	}
-	
+
 	@Override
 	protected boolean execute() {
-		BeanMap b = getBeanMapToManage();
-		if (b==null) {			
-			BeanMapList list= getBeanMapListToManage();
-			if (list!=null) {
-				for (BeanMap bean:list){
+		final BeanMap b = getBeanMapToManage();
+		if (b == null) {
+			final BeanMapList list = getBeanMapListToManage();
+			if (list != null) {
+				for (final BeanMap bean : list) {
 					beanEdit(bean);
 				}
 			}
@@ -84,46 +84,47 @@ implements IBeanMapSavedListener,IBeanMapErrorOnSaveListener, IBeanMapModifier {
 		}
 		return true;
 	}
-	
+
 	protected String getLayoutName(BeanMap beanmap) {
 		return getLayoutName();
 	}
-	
+
 	protected String getLayoutName() {
 		return null;
 	}
-	
+
+	@Override
 	public void beanMapSaved(BeanMap beanmap) {
 		if (beanmap != null) {
 			saved(beanmap);
 		}
-	}	
-	
+	}
+
 	protected void saved(BeanMap beanMap) {
 		doAfterSaving(beanMap);
 	}
-	
-	
+
 	protected void doBeforeEditing(BeanMap beanMap) {
 
 	}
-
 
 	protected void doAfterSaving(BeanMap beanMap) {
 
 	}
 
+	@Override
 	public void onErrorOnSave(BeanMap beanmap, String errorMessage) {
-		
+
 	}
 
+	@Override
 	public void onErrorOnSave(BeanMap beanmap, UserMessage errorUserMessage) {
-		
+
 	}
 
+	@Override
 	public void modify(BeanMap beanmap) {
-		
+
 	}
-		
-	
+
 }

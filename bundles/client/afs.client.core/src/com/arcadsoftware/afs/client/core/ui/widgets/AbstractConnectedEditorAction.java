@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -24,36 +24,38 @@ import com.arcadsoftware.editor.swt.ISWTDataLoader;
 import com.arcadsoftware.editor.swt.actions.AbstractEditorAction;
 
 public class AbstractConnectedEditorAction extends AbstractEditorAction
-implements ISecuredAction {
+		implements ISecuredAction {
 	private DataAccessHelper helper = null;
-	
-	public DataAccessHelper getHelper(){
-		if (helper==null) {
-			if (getConnection()!=null) {
+
+	public DataAccessHelper getHelper() {
+		if (helper == null) {
+			if (getConnection() != null) {
 				helper = new DataAccessHelper(getConnection());
 			}
 		}
 		return helper;
-	}	
-	
-	public ServerConnection getConnection(){
-		ISWTDataLoader dataLoader = renderer.getDataLoader();
-		if ( dataLoader instanceof CoreContentLoader) {
-			CoreContentLoader loader = (CoreContentLoader)dataLoader;
-			ServerConnection connection = loader.getConnection();
+	}
+
+	public ServerConnection getConnection() {
+		final ISWTDataLoader dataLoader = renderer.getDataLoader();
+		if (dataLoader instanceof CoreContentLoader) {
+			final CoreContentLoader loader = (CoreContentLoader) dataLoader;
+			final ServerConnection connection = loader.getConnection();
 			return connection;
-		}		
+		}
 		return null;
 	}
 
+	@Override
 	public List<Integer> getExpectedRigths() {
 		return null;
 	}
 
+	@Override
 	public boolean isAllowed() {
-		ServerConnection connection = getConnection();
-		if (connection!=null) {
-			boolean result = connection.isAllowed(getExpectedRigths());
+		final ServerConnection connection = getConnection();
+		if (connection != null) {
+			final boolean result = connection.isAllowed(getExpectedRigths());
 			if (!result) {
 				Activator.getDefault().missingRight(getExpectedRigths());
 			}
@@ -61,6 +63,6 @@ implements ISecuredAction {
 		} else {
 			return false;
 		}
-	}	
-	
+	}
+
 }

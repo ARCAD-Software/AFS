@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -19,15 +19,14 @@ import org.eclipse.ui.IMemento;
 
 import com.arcadsoftware.beanmap.BeanMap;
 
-/**
- * 
- */
 public class ElementFactory implements IElementFactory {
 
+	@Override
 	public IAdaptable createElement(IMemento memento) {
-		BeanMap beanMap = MementoSaveBeanMap.load(memento);
+		final BeanMap beanMap = MementoSaveBeanMap.load(memento);
 		if (beanMap != null) {
-			return new BeanMapEditorInput(beanMap, memento.getString(BeanMapEditorInput.REALM), memento.getString(BeanMapEditorInput.LAYOUT));
+			return new BeanMapEditorInput(beanMap, memento.getString(BeanMapEditorInput.REALM),
+					memento.getString(BeanMapEditorInput.LAYOUT));
 		}
 		return null;
 	}

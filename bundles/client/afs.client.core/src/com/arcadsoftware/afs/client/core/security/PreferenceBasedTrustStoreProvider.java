@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -14,35 +14,33 @@
 package com.arcadsoftware.afs.client.core.security;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import org.eclipse.jface.preference.IPersistentPreferenceStore;
-import org.osgi.service.log.LogService;
 
-import com.arcadsoftware.aev.core.osgi.ServiceRegistry;
 import com.arcadsoftware.afs.client.core.connection.ITrustStoreProvider;
+import com.arcadsoftware.afs.client.core.internal.Activator;
 import com.arcadsoftware.crypt.Crypto;
 
-public abstract class PreferenceBasedTrustStoreProvider implements ITrustStoreProvider{
+public abstract class PreferenceBasedTrustStoreProvider implements ITrustStoreProvider {
 
-	private static final String KEYSTORE_PASSWORD = "keystore.password";
-	private static final String KEYSTORE_PATH = "keystore.path";
-	private static final String TRUSTSTORE_PASSWORD = "truststore.password";
-	private static final String TRUSTSTORE_PATH = "truststore.path";
+	private static final String KEYSTORE_PASSWORD = "keystore.password"; //$NON-NLS-1$
+	private static final String KEYSTORE_PATH = "keystore.path"; //$NON-NLS-1$
+	private static final String TRUSTSTORE_PASSWORD = "truststore.password"; //$NON-NLS-1$
+	private static final String TRUSTSTORE_PATH = "truststore.path"; //$NON-NLS-1$
 	private final IPersistentPreferenceStore store; 
 
-	public PreferenceBasedTrustStoreProvider(){
+	public PreferenceBasedTrustStoreProvider() {
 		store = getPreferenceStore();
-		store.setDefault(KEYSTORE_PATH, "");
-		store.setDefault(TRUSTSTORE_PATH, "");
-		store.setDefault(KEYSTORE_PASSWORD, "");
-		store.setDefault(TRUSTSTORE_PASSWORD, "");
+		store.setDefault(KEYSTORE_PATH, ""); //$NON-NLS-1$
+		store.setDefault(TRUSTSTORE_PATH, ""); //$NON-NLS-1$
+		store.setDefault(KEYSTORE_PASSWORD, ""); //$NON-NLS-1$
+		store.setDefault(TRUSTSTORE_PASSWORD, ""); //$NON-NLS-1$
 	}
 	
 	protected abstract IPersistentPreferenceStore getPreferenceStore();
 	
-	protected Optional<LogService> getLogService() {
-		return ServiceRegistry.lookup(LogService.class);
+	protected void log(String message, Exception e) {
+		Activator.getDefault().log(message, e);
 	}
 	
 	@Override
@@ -73,7 +71,7 @@ public abstract class PreferenceBasedTrustStoreProvider implements ITrustStorePr
 	@Override
 	public void setTrustStorePassword(char[] password) {
 		String pwd = new String(password);
-		if(pwd.length() > 0 && !pwd.equals(store.getString(TRUSTSTORE_PASSWORD))) {
+		if((pwd.length() > 0) && !pwd.equals(store.getString(TRUSTSTORE_PASSWORD))) {
 			final String cryptedPassword = Crypto.encrypt(password);			
 			store.setValue(TRUSTSTORE_PASSWORD, cryptedPassword);			
 		}
@@ -82,13 +80,12 @@ public abstract class PreferenceBasedTrustStoreProvider implements ITrustStorePr
 	@Override
 	public void setKeyStorePath(String path) {
 		store.setValue(KEYSTORE_PATH, path);
-		
 	}
 
 	@Override
 	public void setKeyStorePassword(char[] password) {
 		String pwd = new String(password);
-		if(pwd.length() > 0 && !pwd.equals(store.getString(KEYSTORE_PASSWORD))) {
+		if((pwd.length() > 0) && !pwd.equals(store.getString(KEYSTORE_PASSWORD))) {
 			final String cryptedPassword = Crypto.encrypt(password);			
 			store.setValue(KEYSTORE_PASSWORD, cryptedPassword);			
 		}
@@ -99,9 +96,8 @@ public abstract class PreferenceBasedTrustStoreProvider implements ITrustStorePr
 		try {
 			store.save();
 			return true;
-		}
-		catch (IOException e) {
-			getLogService().ifPresent(logger -> logger.log(LogService.LOG_ERROR, "Failed to save TrustStoreProvider", e));
+		} catch (IOException e) {
+			log("Failed to save TrustStoreProvider", e);
 			return false;
 		}		
 	}
@@ -109,14 +105,14 @@ public abstract class PreferenceBasedTrustStoreProvider implements ITrustStorePr
 	@Override
 	public void resetToDefault() {
 		try {				
-			store.setValue(KEYSTORE_PATH, "");
-			store.setValue(TRUSTSTORE_PATH, "");
-			store.setValue(KEYSTORE_PASSWORD, "");
-			store.setValue(TRUSTSTORE_PASSWORD, "");
+			store.setValue(KEYSTORE_PATH, ""); //$NON-NLS-1$
+			store.setValue(TRUSTSTORE_PATH, ""); //$NON-NLS-1$
+			store.setValue(KEYSTORE_PASSWORD, ""); //$NON-NLS-1$
+			store.setValue(TRUSTSTORE_PASSWORD, ""); //$NON-NLS-1$
 			store.save();
 		}
 		catch (IOException e) {
-			getLogService().ifPresent(logger -> logger.log(LogService.LOG_ERROR, "Failed to reset TrustStoreProvider", e));
+			log("Failed to reset TrustStoreProvider", e);
 		}		
 	}
 

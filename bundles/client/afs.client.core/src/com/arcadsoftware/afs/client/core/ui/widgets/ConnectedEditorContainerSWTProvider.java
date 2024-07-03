@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -26,27 +26,30 @@ import com.arcadsoftware.editor.swt.ISWTDataLoader;
 import com.arcadsoftware.editor.swt.ISWTRenderer;
 import com.arcadsoftware.metadata.MetaDataEntity;
 
-public class ConnectedEditorContainerSWTProvider extends EditorContainerSWTProvider{
+public class ConnectedEditorContainerSWTProvider extends EditorContainerSWTProvider {
 
 	protected ServerConnection connection = null;
-	
+
+	@Override
 	public void create(ISWTRenderer swtRenderer, ILayoutParameters parameters, boolean isEmpty,
-			MetaDataEntity structure) {		
-		ISWTDataLoader loader = swtRenderer.getDataLoader();
+			MetaDataEntity structure) {
+		final ISWTDataLoader loader = swtRenderer.getDataLoader();
 		if (loader instanceof CoreContentLoader) {
-			connection = ((CoreContentLoader)loader).getConnection();	
-		}	
+			connection = ((CoreContentLoader) loader).getConnection();
+		}
 		super.create(swtRenderer, parameters, isEmpty, structure);
 	}
-	
-	protected DynamicEditorComposite createEditorComposite(Composite parent, String type, String layoutName) {		
-		DynamicEditorComposite dynamicEditorComposite = new ConnectedDynamicEditorComposite(connection, parent, 0, type,layoutName, getParentRenderer().isReadOnly());
+
+	@Override
+	protected DynamicEditorComposite createEditorComposite(Composite parent, String type, String layoutName) {
+		final DynamicEditorComposite dynamicEditorComposite = new ConnectedDynamicEditorComposite(connection, parent, 0,
+				type, layoutName, getParentRenderer().isReadOnly());
 		dynamicEditorComposite.loadEmptyEntity();
-		GridData gridData = new GridData(GridData.FILL_BOTH);
+		final GridData gridData = new GridData(GridData.FILL_BOTH);
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.grabExcessVerticalSpace = true;
 		dynamicEditorComposite.setLayoutData(gridData);
 		return dynamicEditorComposite;
 	}
-	
+
 }

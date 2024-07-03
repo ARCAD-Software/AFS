@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -29,7 +29,6 @@ import com.arcadsoftware.editor.implementation.swt.renderer.SWTRenderer;
 
 /**
  * The <code>EditorComposite</code> is multi-purpose Dynamic editor place holder.
- * 
  */
 public class DynamicEditorComposite extends Composite {
 
@@ -37,13 +36,11 @@ public class DynamicEditorComposite extends Composite {
 
 	/**
 	 * Construct the dynamic Editor according to the specific entity type and layout name given.
-	 * 
 	 * <p>
 	 * The construction load the editor layout, and the structurals informations about the edited BeanMap.
-	 * 
 	 * <p>
 	 * When it is done the beanMap must be
-	 * 
+	 *
 	 * @param parent
 	 *            A widget which will be the parent of the new instance (cannot be null)
 	 * @param realm
@@ -55,71 +52,76 @@ public class DynamicEditorComposite extends Composite {
 	 * @param readOnly
 	 *            the readOnly value.
 	 */
-	public DynamicEditorComposite(Composite parent,int style, String realm, String type, String layoutName, boolean readOnly) {
-		this(parent, style,realm,type,layoutName, readOnly,true);
+	public DynamicEditorComposite(Composite parent, int style, String realm, String type, String layoutName,
+			boolean readOnly) {
+		this(parent, style, realm, type, layoutName, readOnly, true);
 	}
 
-	public DynamicEditorComposite(Composite parent,int style, String realm, String type, String layoutName, boolean readOnly, boolean createContent) {
+	public DynamicEditorComposite(Composite parent, int style, String realm, String type, String layoutName,
+			boolean readOnly, boolean createContent) {
 		super(parent, style);
 		initContent(parent, realm, type, layoutName, readOnly, createContent);
 	}
-	
+
 	/**
 	 * Simple constructor; no content initialization. Must be completed by calling initContent
+	 *
 	 * @param parent
 	 * @param style
 	 */
-	public DynamicEditorComposite(Composite parent,int style) {
+	public DynamicEditorComposite(Composite parent, int style) {
 		super(parent, style);
 	}
-	
+
 	/**
 	 * Init content, possibly out of constructor
+	 *
 	 * @param parent
 	 * @param realm
 	 * @param type
 	 * @param readOnly
 	 */
-	protected void initContent(Composite parent, String realm, String type, String layoutName, boolean readOnly, boolean createContent){
-		//renderer = new SWTRenderer(realm, type, readOnly);
-		renderer = new SWTRenderer(parent.getDisplay(),realm, type, readOnly){
+	protected void initContent(Composite parent, String realm, String type, String layoutName, boolean readOnly,
+			boolean createContent) {
+		// renderer = new SWTRenderer(realm, type, readOnly);
+		renderer = new SWTRenderer(parent.getDisplay(), realm, type, readOnly) {
 			@Override
 			protected void dataLoaderCreated(SWTRenderer renderer) {
 				initializeDataLoader(renderer);
-			};
-			
+			}
+
 			@Override
 			protected void editorLoaderCreated(SWTRenderer renderer) {
 				initializeEditorLoader(renderer);
-			}; 
+			}
 		};
 		setLayout(new FillLayout());
 		if (createContent) {
 			createPartControl(layoutName);
 		}
 	}
-	
-	public void createPartControl(String layoutName){
+
+	public void createPartControl(String layoutName) {
 		renderer.createPartControl(this, layoutName);
 	}
-	
-	public DynamicEditorComposite(Composite parent, String realm, String type, String layoutName, boolean readOnly) {
-		this(parent,0,realm, type,layoutName,readOnly);
-	}	
 
-	protected void initializeEditorLoader(SWTRenderer renderer) {}
-	
-	protected void initializeDataLoader(SWTRenderer renderer) {}
-	
+	public DynamicEditorComposite(Composite parent, String realm, String type, String layoutName, boolean readOnly) {
+		this(parent, 0, realm, type, layoutName, readOnly);
+	}
+
+	protected void initializeEditorLoader(SWTRenderer renderer) {
+	}
+
+	protected void initializeDataLoader(SWTRenderer renderer) {
+	}
+
 	/**
 	 * Construct the dynamic Editor according to the specific entity type and layout name given.
-	 * 
 	 * <p>
 	 * The construction load the editor layout, and the structurals informations about the edited BeanMap.
-	 * 
 	 * <p>
 	 * When it is done the beanMap must be
-	 * 
+	 *
 	 * @param parent
 	 *            A widget which will be the parent of the new instance (cannot be null)
 	 * @param realm
@@ -135,7 +137,7 @@ public class DynamicEditorComposite extends Composite {
 
 	/**
 	 * Load the corresponding BeanMap for the given type (see constructor) and identifier.
-	 * 
+	 *
 	 * @param id
 	 *            A valid BeanMap identifier
 	 * @return true if the loading process complete.
@@ -147,7 +149,7 @@ public class DynamicEditorComposite extends Composite {
 	/**
 	 * Load the corresponding BeanMap for the given type (see constructor) and identifier. And notify changed when
 	 * beanMap loaded
-	 * 
+	 *
 	 * @param id
 	 *            A valid BeanMap identifier
 	 */
@@ -157,7 +159,7 @@ public class DynamicEditorComposite extends Composite {
 
 	/**
 	 * Load the an empty BeanMap for the given type (see constructor).
-	 * 
+	 *
 	 * @return true if the loading process complete.
 	 */
 	public boolean loadEmptyEntity() {
@@ -173,11 +175,10 @@ public class DynamicEditorComposite extends Composite {
 
 	/**
 	 * Get a copy of the currently edited BeanMap.
-	 * 
 	 * <p>
 	 * Any change made to this BeanMap will not reported to the editor. To do so, you must use the ISWTRenderer
 	 * interface.
-	 * 
+	 *
 	 * @return The currently edited BeanMap.
 	 * @see DynamicEditorComposite#getRenderer()
 	 */
@@ -187,7 +188,6 @@ public class DynamicEditorComposite extends Composite {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.swt.widgets.Widget#dispose()
 	 */
 	@Override
@@ -198,7 +198,7 @@ public class DynamicEditorComposite extends Composite {
 
 	/**
 	 * Access to the renderer interface can be used for low level tuning.
-	 * 
+	 *
 	 * @return The renderer interface.
 	 */
 	public ISWTRenderer getRenderer() {
@@ -222,7 +222,6 @@ public class DynamicEditorComposite extends Composite {
 
 	/**
 	 * Reload the editor contents from server.
-	 * 
 	 * <p>
 	 * Any modification will be lost.
 	 */
@@ -249,8 +248,8 @@ public class DynamicEditorComposite extends Composite {
 	}
 
 	private void setChildrenControlEnabled(boolean enable, Composite composite) {
-		Control[] controls = composite.getChildren();
-		for (Control control: controls) {
+		final Control[] controls = composite.getChildren();
+		for (final Control control : controls) {
 			if ((control instanceof Composite) && !(control instanceof Combo)) {
 				setChildrenControlEnabled(enable, (Composite) control);
 			} else if (control instanceof Text) {

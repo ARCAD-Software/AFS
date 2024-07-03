@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -38,6 +38,7 @@ import com.arcadsoftware.metadata.MetaDataEntity;
  */
 public class SectionContainerSWTProvider implements IContainerSWTProvider {
 
+	@Override
 	public void create(ISWTRenderer renderer, ILayoutParameters parameters, boolean isEmpty, MetaDataEntity structure) {
 		int style = ExpandableComposite.TREE_NODE;
 		if (parameters.getParameterBoolean(TWISTIE)) {
@@ -51,24 +52,24 @@ public class SectionContainerSWTProvider implements IContainerSWTProvider {
 		if (parameters.getParameterBoolean(EXPANDED)) {
 			style |= ExpandableComposite.EXPANDED;
 		}
-		
-		String description =parameters.getParameter(SECTION_DESCRIPTION, EMPTY);
-		if ((description!=null)  && (description.length()>0)){
+
+		String description = parameters.getParameter(SECTION_DESCRIPTION, EMPTY);
+		if ((description != null) && (description.length() > 0)) {
 			style |= Section.DESCRIPTION;
 			description = renderer.getLocalizedMessage(description);
 		}
-		
-		Section section = renderer.getToolkit().createSection(renderer.getParent(), style);
+
+		final Section section = renderer.getToolkit().createSection(renderer.getParent(), style);
 		if (renderer.getParent().getLayout() instanceof GridLayout) {
-			GridData gridData = ContainerUtils.createGridData(parameters);
-			section.setLayoutData(gridData);			
+			final GridData gridData = ContainerUtils.createGridData(parameters);
+			section.setLayoutData(gridData);
 		}
 		section.setText(renderer.getLocalizedMessage(parameters.getParameter(TITLE, EMPTY)));
-		if ((description!=null)  && (description.length()>0)){
+		if ((description != null) && (description.length() > 0)) {
 			section.setDescription(description);
 		}
-		
-		Composite client = renderer.getToolkit().createComposite(section);
+
+		final Composite client = renderer.getToolkit().createComposite(section);
 		client.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true, 3, 1));
 		section.setClient(client);
 		section.addExpansionListener(new ScrolledCompositeExpansionListener());
@@ -76,6 +77,7 @@ public class SectionContainerSWTProvider implements IContainerSWTProvider {
 		renderer.createSubContainer(this, parameters, client);
 	}
 
+	@Override
 	public void dispose() {
 		// Do nothing
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -44,9 +44,9 @@ import com.arcadsoftware.rest.connection.XmlCurrentUserStream;
 /**
  */
 public class ServerConnection {
-	// FIXME Beaucoup de problème dans la gestion des login et mots de passe dans cette classe !!!! 
+	// FIXME Beaucoup de problème dans la gestion des login et mots de passe dans cette classe !!!!
 	// FIXME This class is not thread safe !!!!!!!!!!!!!!
-	
+
 	private static final String HTTPPARAMETER_CLIENT_TRANSLATION = "localtranslate"; //$NON-NLS-1$
 
 	private final IServer server;
@@ -314,7 +314,8 @@ public class ServerConnection {
 	 *            if true, server will return non-translated message
 	 * @return
 	 */
-	public boolean connectWithoutCertificats(String login, String password, boolean managerUser, boolean localtranslate) {
+	public boolean connectWithoutCertificats(String login, String password, boolean managerUser,
+			boolean localtranslate) {
 		if (server != null) {
 			final DataAccess da = new DataAccess(server.getUrl(), login, password.toCharArray());
 			da.getWebServicesAccess().setXStream(new XmlBeanMapStream());
@@ -338,22 +339,22 @@ public class ServerConnection {
 		if ((BaseActivator.getDefault() == null) || (BaseActivator.getDefault().getBundle() == null)) {
 			return;
 		}
-		BundleContext bc = BaseActivator.getDefault().getBundle().getBundleContext();
+		final BundleContext bc = BaseActivator.getDefault().getBundle().getBundleContext();
 		if (bc == null) {
 			return;
 		}
-		ServiceReference<IProxyService> sr = bc.getServiceReference(IProxyService.class);
+		final ServiceReference<IProxyService> sr = bc.getServiceReference(IProxyService.class);
 		if (sr == null) {
 			return;
 		}
-		IProxyService proxyService = bc.getService(sr);
+		final IProxyService proxyService = bc.getService(sr);
 		if ((proxyService == null) || !proxyService.isProxiesEnabled()) {
 			return;
 		}
 		try {
 			// Eclipse already configure the java system properties for ProxyHost and ProxyPort.
 			// We only have to set the proxy login and password, if any.
-			IProxyData[] proxyDataForHost = proxyService.select(new URI(server.getUrl()));
+			final IProxyData[] proxyDataForHost = proxyService.select(new URI(server.getUrl()));
 			if (proxyDataForHost != null) {
 				String proxytype;
 				if (server.getUrl().trim().toLowerCase().startsWith("https")) { //$NON-NLS-1$
@@ -361,7 +362,7 @@ public class ServerConnection {
 				} else {
 					proxytype = IProxyData.HTTP_PROXY_TYPE;
 				}
-				for (IProxyData pd: proxyDataForHost) {
+				for (final IProxyData pd : proxyDataForHost) {
 					if (proxytype.equals(pd.getType())) {
 						char[] pwd = null;
 						if (pd.getPassword() != null) {
@@ -373,8 +374,9 @@ public class ServerConnection {
 					}
 				}
 			}
-		} catch (URISyntaxException e) {
-			errorMessage =  new UserMessage("ProxyError", "Incorrect server URL: " + server.getUrl(), e.getLocalizedMessage());
+		} catch (final URISyntaxException e) {
+			errorMessage = new UserMessage("ProxyError", "Incorrect server URL: " + server.getUrl(),
+					e.getLocalizedMessage());
 		}
 	}
 
@@ -397,7 +399,7 @@ public class ServerConnection {
 	 * @return
 	 */
 	public boolean connectWithCertificats(String login, String password, boolean managerUser, boolean localtranslate) {
-		
+
 		if (server != null) {
 			final ITrustStoreProvider trustStoreProvider = getTrustStoreProvider();
 			if (trustStoreProvider != null) {
@@ -405,17 +407,19 @@ public class ServerConnection {
 				final char[] trustStorePassword = trustStoreProvider.getTrustStorePassword();
 				final String keyStorePath = trustStoreProvider.getKeyStorePath();
 				final char[] keyStorePassword = trustStoreProvider.getKeyStorePassword();
-				
-				RestConnectionParameters parameters = new RestConnectionParameters(BaseActivator.getDefault());
-				parameters.setTrustStore(trustStorePath, trustStorePassword, trustStoreProvider.getTrustStoreType(), trustStoreProvider.getTrustManagerAlgorithm());
-				parameters.setKeyStore(keyStorePath, keyStorePassword, trustStoreProvider.getKeyPassword(), trustStoreProvider.getKeyStoreType(), trustStoreProvider.getKeyManagerAlgorithm());
+
+				final RestConnectionParameters parameters = new RestConnectionParameters(BaseActivator.getDefault());
+				parameters.setTrustStore(trustStorePath, trustStorePassword, trustStoreProvider.getTrustStoreType(),
+						trustStoreProvider.getTrustManagerAlgorithm());
+				parameters.setKeyStore(keyStorePath, keyStorePassword, trustStoreProvider.getKeyPassword(),
+						trustStoreProvider.getKeyStoreType(), trustStoreProvider.getKeyManagerAlgorithm());
 				parameters.setDisabledCipherSuites(trustStoreProvider.getDisabledCipherSuites());
 				parameters.setDisabledProtocols(trustStoreProvider.getDisabledProtocols());
 				parameters.setEnabledCipherSuites(trustStoreProvider.getEnabledCipherSuites());
 				parameters.setEnabledProtocols(trustStoreProvider.getEnabledProtocols());
 				parameters.setProtocol(trustStoreProvider.getProtocol());
-				parameters.setSecureRandomAlgorithm(trustStoreProvider.getSecureRandomAlgorithm());				
-				
+				parameters.setSecureRandomAlgorithm(trustStoreProvider.getSecureRandomAlgorithm());
+
 				final WebServiceAccess webServiceAccess = new WebServiceAccess(BaseActivator.getDefault(), parameters);
 				// FIXME Login et Password ne sont pas affecté aux champ de cette classe !!!!!!
 				webServiceAccess.setLogin(login);
@@ -458,7 +462,8 @@ public class ServerConnection {
 		callCurrentUser(dataAccess, true, localtranslate);
 	}
 
-	private void callCurrentUser(DataAccess da, boolean manageUser, boolean localtranslate) throws ServerErrorException {
+	private void callCurrentUser(DataAccess da, boolean manageUser, boolean localtranslate)
+			throws ServerErrorException {
 		if (da != null) {
 			final Map<String, Object> params = new HashMap<>();
 			if (localtranslate) {
@@ -473,10 +478,9 @@ public class ServerConnection {
 
 	/**
 	 * Get the server DataAccess interface.
-	 * 
 	 * <p>
 	 * Valid only after a call to <code>connect</code> method.
-	 * 
+	 *
 	 * @return null if not connected.
 	 * @see #connect(boolean)
 	 * @see #connect(String, String, boolean)
@@ -519,7 +523,7 @@ public class ServerConnection {
 
 	/**
 	 * Test if the current connected user possess all the given access rigths.
-	 * 
+	 *
 	 * @param expectedRights
 	 * @return
 	 */
@@ -539,6 +543,7 @@ public class ServerConnection {
 	 * @return false
 	 * @deprecated DO NOT USE THIS METHOD.
 	 */
+	@Deprecated
 	public boolean testAbout() {
 		return false;
 	}

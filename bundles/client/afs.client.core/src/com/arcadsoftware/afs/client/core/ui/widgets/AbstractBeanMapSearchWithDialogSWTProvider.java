@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -28,49 +28,47 @@ import com.arcadsoftware.metadata.Element;
 import com.arcadsoftware.metadata.MetaDataEntity;
 
 /**
- * Subclass this class to create a {@link AbstractSearchSWTProvider} where
- * the benMap selection is based on a dialog.<br/>
- * You just need to provide the dialog used to make the selection by implementing
- * the {@link #getDialog()} method
- * 
- * @author ARCAD Software
+ * Subclass this class to create a {@link AbstractSearchSWTProvider} where the benMap selection is based on a
+ * dialog.<br/>
+ * You just need to provide the dialog used to make the selection by implementing the {@link #getDialog()} method
  *
+ * @author ARCAD Software
  */
 public abstract class AbstractBeanMapSearchWithDialogSWTProvider extends AbstractSearchSWTProvider {
 
 	protected ServerConnection connection = null;
-	
-	
+
 	@Override
 	public void create(ISWTRenderer renderer, ILayoutParameters parameters,
 			Element element, MetaDataEntity structure) {
 		super.create(renderer, parameters, element, structure);
-		ISWTDataLoader loader = renderer.getDataLoader();
+		final ISWTDataLoader loader = renderer.getDataLoader();
 		if (loader instanceof CoreContentLoader) {
-			connection = ((CoreContentLoader)loader).getConnection();			
+			connection = ((CoreContentLoader) loader).getConnection();
 		}
-	}	
+	}
 
 	private class BeanMapSelector implements ISearchBeanMap {
+		@Override
 		public BeanMap search(MetaDataEntity structure) {
-			AbstractSimpleSearchBeanMapListDialog dialog = getDialog(connection);
-			if (dialog.open()==Window.OK){
+			final AbstractSimpleSearchBeanMapListDialog dialog = getDialog(connection);
+			if (dialog.open() == Window.OK) {
 				return dialog.getSelected();
 			}
 			return null;
-		}		
+		}
 	}
-	
+
 	@Override
 	public ISearchBeanMap getSelector() {
 		return new BeanMapSelector();
 	}
 
 	/**
-	 * Returns the dialog used to make the BeanMap selection 
+	 * Returns the dialog used to make the BeanMap selection
+	 *
 	 * @return An object that subclasses {@link AbstractSimpleSearchBeanMapListDialog}
 	 */
 	public abstract AbstractSimpleSearchBeanMapListDialog getDialog(ServerConnection connection);
-	
-	
+
 }

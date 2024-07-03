@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -22,23 +22,23 @@ import com.arcadsoftware.afs.client.core.connection.ServerConnection;
 public abstract class AbstractContainerConnectedActions extends ArcadActions {
 
 	protected ServerConnection connection;
-	public AbstractContainerConnectedActions(ServerConnection connection){
+
+	public AbstractContainerConnectedActions(ServerConnection connection) {
 		super();
 		this.connection = connection;
 		makeAction();
 	}
-	
-	
+
 	public void setExtentedActions(List<ArcadAction> extActions) {
-		if (extActions!=null) {
-			for (ArcadAction action:extActions) {
-				if (action==null) {
+		if (extActions != null) {
+			for (final ArcadAction action : extActions) {
+				if (action == null) {
 					addSeparator();
 				} else {
 					addAction(action);
 				}
-			}		
+			}
 		}
 	}
-	
+
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -135,7 +135,7 @@ public class ReportView extends AbstractConnectedView {
 		final NodeList children = node.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++) {
 			final Node child = children.item(i);
-			if (child instanceof Element && child.getNodeName().equalsIgnoreCase(element)) {
+			if ((child instanceof Element) && child.getNodeName().equalsIgnoreCase(element)) {
 				return (Element) child;
 			}
 		}
@@ -200,7 +200,7 @@ public class ReportView extends AbstractConnectedView {
 					if (descriptionElement == null) {
 						description = ""; //$NON-NLS-1$
 					} else {
-						description = descriptionElement.getTextContent(); //$NON-NLS-1$
+						description = descriptionElement.getTextContent();
 					}
 					final Element categoryElement = getElement(instElement, XMLNODE_CATEGORY);
 					if (categoryElement == null) {

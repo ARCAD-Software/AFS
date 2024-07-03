@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -191,7 +191,7 @@ public class ServerItemActions extends ContainerEntryActions {
 				return ServerItemActions.this.getServerConnection();
 			}
 		};
-		//aboutServerAction.setEnabled(true);
+		// aboutServerAction.setEnabled(true);
 
 		addAction(connectionAction);
 		addAction(aboutServerAction);
@@ -200,7 +200,7 @@ public class ServerItemActions extends ContainerEntryActions {
 		addAction(preferencesAction);
 		addAction(getLogFile);
 		addSeparator();
-		addAction(deleteAction);		
+		addAction(deleteAction);
 
 		final List<AbstractExtendedServerAction> actions = getExtentedActions();
 		if (!actions.isEmpty()) {

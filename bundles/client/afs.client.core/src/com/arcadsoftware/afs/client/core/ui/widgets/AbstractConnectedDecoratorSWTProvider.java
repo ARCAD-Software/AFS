@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -30,19 +30,19 @@ public abstract class AbstractConnectedDecoratorSWTProvider implements IDecorato
 	protected ServerConnection connection;
 	protected ISWTRenderer renderer;
 
-	
+	@Override
 	public Widget create(ISWTRenderer renderer, ILayoutParameters parameters, MetaDataEntity structure) {
 		this.renderer = renderer;
-		ISWTDataLoader loader = renderer.getDataLoader();
+		final ISWTDataLoader loader = renderer.getDataLoader();
 		if (loader instanceof CoreContentLoader) {
-			connection = ((CoreContentLoader)loader).getConnection();	
-			if (connection!=null) {
+			connection = ((CoreContentLoader) loader).getConnection();
+			if (connection != null) {
 				helper = new DataAccessHelper(connection);
 			}
-		}	
-		return createContent(renderer,parameters,structure);
+		}
+		return createContent(renderer, parameters, structure);
 	}
-	
+
 	public abstract Widget createContent(ISWTRenderer renderer, ILayoutParameters parameters, MetaDataEntity structure);
 
 }

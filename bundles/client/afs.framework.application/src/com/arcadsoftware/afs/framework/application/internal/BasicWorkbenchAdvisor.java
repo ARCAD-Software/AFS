@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -80,10 +80,8 @@ public class BasicWorkbenchAdvisor extends WorkbenchAdvisor {
 	@Override
 	public boolean preShutdown() {
 		boolean result = super.preShutdown();
-		if (result) {
-			if (getManager() != null) {
-				result = getManager().preShutdown();
-			}
+		if (result && (getManager() != null)) {
+			return getManager().preShutdown();
 		}
 		return result;
 	}

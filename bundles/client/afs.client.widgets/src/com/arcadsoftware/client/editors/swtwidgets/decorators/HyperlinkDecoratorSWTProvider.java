@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -27,24 +27,27 @@ import com.arcadsoftware.editor.swt.ISWTRenderer;
 import com.arcadsoftware.metadata.MetaDataEntity;
 
 /**
- * This class implement a Hyperlink Decorator SWT Widget provider for the
- * dynamic editors.
+ * This class implement a Hyperlink Decorator SWT Widget provider for the dynamic editors.
  */
 public class HyperlinkDecoratorSWTProvider implements IDecoratorSWTProvider {
 
 	private Hyperlink hyperlink;
 
+	@Override
 	public Widget create(ISWTRenderer renderer, ILayoutParameters parameters, MetaDataEntity structure) {
 		hyperlink = renderer.getToolkit().createHyperlink(renderer.getParent(),
 				parameters.getParameter(URL), SWT.NONE);
-		if (renderer.getParent().getLayout() instanceof GridLayout)
+		if (renderer.getParent().getLayout() instanceof GridLayout) {
 			hyperlink.setLayoutData(new GridData(GridData.BEGINNING, GridData.BEGINNING, false, false, 3, 1));
+		}
 		return hyperlink;
 	}
 
+	@Override
 	public void dispose() {
-		if (hyperlink != null && !hyperlink.isDisposed())
+		if ((hyperlink != null) && !hyperlink.isDisposed()) {
 			hyperlink.dispose();
+		}
 	}
 
 }

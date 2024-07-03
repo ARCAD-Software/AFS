@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -20,18 +20,16 @@ import org.eclipse.ui.part.EditorActionBarContributor;
 
 import com.arcadsoftware.afs.client.reporting.Activator;
 
-
 public class ReportPreviewEditorContributor extends EditorActionBarContributor {
-	
-	
-	private Action refreshAction;
+
+	private final Action refreshAction;
 	IToolBarManager toolBarManager;
 	ReportPreviewEditor currentEditor;
 	private boolean toolbarCreated = false;
-	
-	public ReportPreviewEditorContributor(){
+
+	public ReportPreviewEditorContributor() {
 		super();
-		refreshAction = new Action(){
+		refreshAction = new Action() {
 			@Override
 			public void run() {
 				currentEditor.refreshReport();
@@ -42,31 +40,34 @@ public class ReportPreviewEditorContributor extends EditorActionBarContributor {
 		refreshAction.setImageDescriptor(Activator.getDefault().getImageDescriptor("REFRESH")); //$NON-NLS-1$
 	}
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.IEditorActionBarContributor#setActiveEditor(org.eclipse.ui.IEditorPart)
-     */
-    public void setActiveEditor(IEditorPart targetEditor) {
-        if (targetEditor instanceof ReportPreviewEditor){
-        	currentEditor = (ReportPreviewEditor)targetEditor; 
-            manageToolbar();
-        }
-    }    
-    
-    private void manageToolbar(){
-        if (currentEditor!=null) {
-        	if (!toolbarCreated) {
-	            toolBarManager.add(refreshAction);
-	            toolbarCreated = true;
-        	}
-        }    	
-    }    
-    
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.part.EditorActionBarContributor#contributeToToolBar(org.eclipse.jface.action.IToolBarManager)
-     */
-    public void contributeToToolBar(IToolBarManager toolBarManager) {
-        super.contributeToToolBar(toolBarManager);
-        this.toolBarManager = toolBarManager;
-    }
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.IEditorActionBarContributor#setActiveEditor(org.eclipse.ui.IEditorPart)
+	 */
+	@Override
+	public void setActiveEditor(IEditorPart targetEditor) {
+		if (targetEditor instanceof ReportPreviewEditor) {
+			currentEditor = (ReportPreviewEditor) targetEditor;
+			manageToolbar();
+		}
+	}
+
+	private void manageToolbar() {
+		if (currentEditor != null) {
+			if (!toolbarCreated) {
+				toolBarManager.add(refreshAction);
+				toolbarCreated = true;
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.part.EditorActionBarContributor#contributeToToolBar(org.eclipse.jface.action.IToolBarManager)
+	 */
+	@Override
+	public void contributeToToolBar(IToolBarManager toolBarManager) {
+		super.contributeToToolBar(toolBarManager);
+		this.toolBarManager = toolBarManager;
+	}
 }

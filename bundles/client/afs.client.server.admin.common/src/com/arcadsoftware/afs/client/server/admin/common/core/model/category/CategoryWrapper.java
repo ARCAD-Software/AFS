@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -19,50 +19,52 @@ import com.arcadsoftware.rest.console.Category;
 import com.arcadsoftware.rest.console.SectionId;
 
 public class CategoryWrapper extends ArcadEntity {
-	
+
 	private Category category;
 	private SectionId sectionId = null;
 	private boolean isCategory = true;
-	
-	
-	public CategoryWrapper(Category category){
+
+	public CategoryWrapper(Category category) {
 		this.category = category;
-		this.setLevel(1);
+		setLevel(1);
 		isCategory = true;
 	}
-	
-	public CategoryWrapper(SectionId section){
-		this.sectionId = section;
-		this.setLevel(2);
+
+	public CategoryWrapper(SectionId section) {
+		sectionId = section;
+		setLevel(2);
 		isCategory = false;
-	}	
-	
+	}
+
 	@Override
 	public String getLabel() {
-		if (isCategory )
+		if (isCategory) {
 			return category.getLabel();
-		else
-			return sectionId.getLabel(); 
-		
+		} else {
+			return sectionId.getLabel();
+		}
+
 	}
 
-	public Category getCategory(){
+	public Category getCategory() {
 		return category;
 	}
-	public SectionId getSectionId(){
-		return sectionId;
-	}	
 
-	public boolean isSection(){
+	public SectionId getSectionId() {
+		return sectionId;
+	}
+
+	public boolean isSection() {
 		return !isCategory;
 	}
-	
+
 	@Override
 	public String getIconID() {
-		if (isCategory )
+		if (isCategory) {
 			return IIconConsts.CATEGORY;
-		else
+		} else {
 			return IIconConsts.SECTION;
+		}
 	}
-	
+
 }

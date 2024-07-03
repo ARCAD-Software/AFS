@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -18,13 +18,13 @@ import java.util.HashMap;
 import com.arcadsoftware.editor.implementation.Activator;
 
 public class ElementParameter {
-	
+
 	private static final String TRUE = "true"; //$NON-NLS-1$
 	private static final String YES = "yes"; //$NON-NLS-1$
-	
-	private String name;
-	private HashMap<String, String> params = new HashMap<String, String>();
-	
+
+	private final String name;
+	private final HashMap<String, String> params = new HashMap<>();
+
 	public ElementParameter(String name) {
 		super();
 		this.name = name;
@@ -37,26 +37,26 @@ public class ElementParameter {
 	public HashMap<String, String> getParams() {
 		return params;
 	}
-	
+
 	public String getParameter(String parameterName) {
 		return params.get(parameterName);
 	}
-	
+
 	public boolean getParameterBoolean(String key) {
-		String value = getParameter(key);
-		return (value != null && (TRUE.equalsIgnoreCase(value) || YES.equalsIgnoreCase(value)));
-	}	
-	
+		final String value = getParameter(key);
+		return ((value != null) && (TRUE.equalsIgnoreCase(value) || YES.equalsIgnoreCase(value)));
+	}
+
 	public int getParameterInteger(String key, int defaultValue) {
-		String val = params.get(key);
+		final String val = params.get(key);
 		if (val == null) {
 			return defaultValue;
 		}
 		try {
 			return Integer.parseInt(val);
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 			Activator.getInstance().log(e);
 			return defaultValue;
 		}
-	}	
+	}
 }

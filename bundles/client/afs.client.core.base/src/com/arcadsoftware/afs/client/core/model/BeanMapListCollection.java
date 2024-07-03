@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -14,68 +14,67 @@
 package com.arcadsoftware.afs.client.core.model;
 
 import com.arcadsoftware.aev.core.collections.ArcadCollection;
-import com.arcadsoftware.aev.core.collections.IArcadCollectionItem;
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
 
 public class BeanMapListCollection extends ArcadCollection {
 
 	public void add(BeanMapCollectionItem item) {
-		super.add((IArcadCollectionItem)item);
+		super.add(item);
 	}
-	
+
 	public void populate(BeanMapList list) {
-		for (BeanMap bean:list) {
+		for (final BeanMap bean : list) {
 			add(new BeanMapCollectionItem(bean));
-		}		
+		}
 	}
-	
+
 	public static BeanMapListCollection toBeanMapListCollection(BeanMapList list) {
-		BeanMapListCollection collection = new BeanMapListCollection();
-		for (BeanMap bean:list) {
+		final BeanMapListCollection collection = new BeanMapListCollection();
+		for (final BeanMap bean : list) {
 			collection.add(new BeanMapCollectionItem(bean));
-		}		
+		}
 		return collection;
 	}
-	
+
 	public BeanMapList toBeanMapList() {
-		BeanMapList list = new BeanMapList();
-		for (int i=0;i<this.count();i++) {
-			BeanMapCollectionItem item = (BeanMapCollectionItem)this.items(i);
+		final BeanMapList list = new BeanMapList();
+		for (int i = 0; i < count(); i++) {
+			final BeanMapCollectionItem item = (BeanMapCollectionItem) items(i);
 			list.add(item.getBeanMap());
 		}
 		return list;
 	}
-	
+
 	public BeanMapList toBeanMapList(String type) {
-		BeanMapList list = new BeanMapList();
-		for (int i=0;i<this.count();i++) {
-			BeanMapCollectionItem item = (BeanMapCollectionItem)this.items(i);
-			if(item.getBeanMap().getType().equalsIgnoreCase(type)) {
+		final BeanMapList list = new BeanMapList();
+		for (int i = 0; i < count(); i++) {
+			final BeanMapCollectionItem item = (BeanMapCollectionItem) items(i);
+			if (item.getBeanMap().getType().equalsIgnoreCase(type)) {
 				list.add(item.getBeanMap());
 			}
 		}
 		return list;
 	}
-	
+
 	public BeanMapCollectionItem findBeanMap(BeanMap b) {
-		for (int  i=0;i<this.count();i++) {
-			BeanMapCollectionItem item = (BeanMapCollectionItem)this.items(i);
-			if (item.getBeanMap()==b) {
+		for (int i = 0; i < count(); i++) {
+			final BeanMapCollectionItem item = (BeanMapCollectionItem) items(i);
+			if (item.getBeanMap() == b) {
 				return item;
 			}
-		}				
-		return null;	
+		}
+		return null;
 	}
-	
+
 	public BeanMapCollectionItem findBeanMap(int id) {
-		for (int  i=0;i<this.count();i++) {
-			BeanMapCollectionItem item = (BeanMapCollectionItem)this.items(i);
-			if (item.getBeanMap().getId()==id) {
+		for (int i = 0; i < count(); i++) {
+			final BeanMapCollectionItem item = (BeanMapCollectionItem) items(i);
+			if (item.getBeanMap().getId() == id) {
 				return item;
 			}
-		}				
-		return null;	
+		}
+		return null;
 	}
-	
+
 }

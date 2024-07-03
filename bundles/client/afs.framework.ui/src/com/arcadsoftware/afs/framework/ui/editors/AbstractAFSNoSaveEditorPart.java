@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -28,6 +28,7 @@ public abstract class AbstractAFSNoSaveEditorPart extends AbstractAFSEditorPart 
 	}
 
 	@Override
-	public void doSave(IProgressMonitor monitor) {}
+	public void doSave(IProgressMonitor monitor) {
+	}
 
 }

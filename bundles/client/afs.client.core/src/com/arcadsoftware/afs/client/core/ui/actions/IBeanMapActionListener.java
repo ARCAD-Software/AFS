@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -23,7 +23,8 @@ public interface IBeanMapActionListener {
 	public static int ACTION_DELETE = 3;
 	public static int ACTION_RELOAD = 4;
 	public static int ACTION_REFRESH = 5;
-	
-	public void actionDone(int type, BeanMap bean); 
-	public void actionDone(int type, BeanMapList list); 
+
+	public void actionDone(int type, BeanMap bean);
+
+	public void actionDone(int type, BeanMapList list);
 }

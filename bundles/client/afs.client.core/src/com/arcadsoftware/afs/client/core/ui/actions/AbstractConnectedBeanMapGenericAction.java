@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -22,30 +22,29 @@ import com.arcadsoftware.afs.framework.ui.beanmap.actions.AbstractBeanMapAction;
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
 
-
 public abstract class AbstractConnectedBeanMapGenericAction extends AbstractBeanMapAction
-implements IActionActivationManager{
+		implements IActionActivationManager {
 
 	protected DataAccessHelper helper;
 	protected ServerConnection connection;
-	protected List<IBeanMapActionListener>listeners;
-	
-	public AbstractConnectedBeanMapGenericAction(ServerConnection connection){
+	protected List<IBeanMapActionListener> listeners;
+
+	public AbstractConnectedBeanMapGenericAction(ServerConnection connection) {
 		super();
 		helper = new DataAccessHelper(connection);
-		this.connection = connection; 
+		this.connection = connection;
 	}
 
 	@Override
 	protected boolean execute() {
 		setCancelled(false);
-		BeanMap b = getBeanMapToManage();
-		if (b!=null) {			
+		final BeanMap b = getBeanMapToManage();
+		if (b != null) {
 			return doOnBeanMap(b);
 		} else {
-			BeanMapList list = getBeanMapListToManage();
-			for (BeanMap bean : list) {
-				if (!doOnBeanMap(bean)){
+			final BeanMapList list = getBeanMapListToManage();
+			for (final BeanMap bean : list) {
+				if (!doOnBeanMap(bean)) {
 					return false;
 				}
 			}
@@ -53,28 +52,30 @@ implements IActionActivationManager{
 		}
 	}
 
+	@Override
 	public boolean allowMultiSelection() {
 		return true;
-	}	
-	
+	}
+
+	@Override
 	public boolean isAvailable() {
 		return canExecute();
-	}	
-	
+	}
+
 	@Override
 	protected void doAfterRun() {
 		super.doAfterRun();
-		if (isRunOk() && !isCancelled()){
-			if (listeners != null && getActionType() != IBeanMapActionListener.ACTION_NONE){
-				BeanMapList beanMaps = getActionBeanMapList();
+		if (isRunOk() && !isCancelled()) {
+			if ((listeners != null) && (getActionType() != IBeanMapActionListener.ACTION_NONE)) {
+				final BeanMapList beanMaps = getActionBeanMapList();
 				if (beanMaps != null) {
-					for (IBeanMapActionListener listener : listeners) {
+					for (final IBeanMapActionListener listener : listeners) {
 						listener.actionDone(getActionType(), beanMaps);
 					}
 				} else {
-					BeanMap beanMap = getActionBeanMap();
-					if (beanMap != null){
-						for (IBeanMapActionListener listener : listeners) {
+					final BeanMap beanMap = getActionBeanMap();
+					if (beanMap != null) {
+						for (final IBeanMapActionListener listener : listeners) {
 							listener.actionDone(getActionType(), beanMap);
 						}
 					}
@@ -82,28 +83,27 @@ implements IActionActivationManager{
 			}
 		}
 	}
-	
-	protected BeanMapList getActionBeanMapList(){
+
+	protected BeanMapList getActionBeanMapList() {
 		return getBeanMapListToManage();
-	}	
-	
-	protected BeanMap getActionBeanMap(){
+	}
+
+	protected BeanMap getActionBeanMap() {
 		return getBeanMapToManage();
 	}
-	
-	
-	protected int getActionType(){
+
+	protected int getActionType() {
 		return IBeanMapActionListener.ACTION_NONE;
 	}
-	
-	public void addActionListener(IBeanMapActionListener listener){
-		if (listeners == null){
-			listeners = new ArrayList<IBeanMapActionListener>();
+
+	public void addActionListener(IBeanMapActionListener listener) {
+		if (listeners == null) {
+			listeners = new ArrayList<>();
 		}
-		if (!listeners.contains(listener)){
+		if (!listeners.contains(listener)) {
 			listeners.add(listener);
 		}
 	}
-	
-	public abstract boolean doOnBeanMap(BeanMap b);	
+
+	public abstract boolean doOnBeanMap(BeanMap b);
 }

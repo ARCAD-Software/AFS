@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -110,13 +110,9 @@ public interface IConstants {
 	public static final String ATTRIBUTEFILTER = "attributefilter"; //$NON-NLS-1$
 	public static final String VALUE = "value"; //$NON-NLS-1$
 	public static final String EQUALITY = "equals"; //$NON-NLS-1$
-
 	public static final String EMPTY = ""; //$NON-NLS-1$
 	public static final String TWO_POINTS = ":"; //$NON-NLS-1$
-	//<FM number="2010/564" version="09.03.02" date=Dec 7, 2010 user=md>
 	public static final String HEIGHT = "height"; //$NON-NLS-1$
-	//</FM>
-	
 	public static final String STORE_VIEWER_STATE = "storeState"; //$NON-NLS-1$
 	public static final String WIDTH = "width"; //$NON-NLS-1$
 	public static final String BUTTON = "button";//$NON-NLS-1$
@@ -133,29 +129,20 @@ public interface IConstants {
 	public static final String DBCLICK = "dbclick";//$NON-NLS-1$
 	public static final String SHOW_INMENU = "showInMenu";//$NON-NLS-1$
 	public static final String SHOW_INTOOLBAR = "showInToolbar";//$NON-NLS-1$	
-	
 	public static final String SECTION_DESCRIPTION = "description"; //$NON-NLS-1$
-	
-	
 	public static final String COLSPAN = "colSpan"; //$NON-NLS-1$
 	public static final String FILL_STYLE = "fillStyle"; //$NON-NLS-1$	
 	public static final String FILL_STYLE_HORIZONTAL = "horizontal"; //$NON-NLS-1$	
 	public static final String FILL_STYLE_VERTICAL = "vertical"; //$NON-NLS-1$
 	public static final String FILL_STYLE_BOTH = "both"; //$NON-NLS-1$
 	public static final String ISPASSWORD = "isPassword"; //$NON-NLS-1$
-	
-	
 	public static final String ATTRIBUTE_LIST = "attributeList"; //$NON-NLS-1$
 	public static final String ORDER_LIST = "orderList"; //$NON-NLS-1$
 	public static final String EDITION_ATTRIBUTE = "editionAttribute"; //$NON-NLS-1$
 	public static final String EDITION_TYPE = "editionType"; //$NON-NLS-1$
-	
 	public static final String MANDATORYATTRIBUTE = "mandatoryCondBy"; //$NON-NLS-1$
 	public static final String TEXTLIMIT = "limit"; //$NON-NLS-1$
-	
 	public static final String SHOWTEXT = "showText"; //$NON-NLS-1$
-	
 	public static final String LINES = "lines"; //$NON-NLS-1$
 	public static final String MONOSPACE_FONT = "monospaceFont"; //$NON-NLS-1$
-	
 }

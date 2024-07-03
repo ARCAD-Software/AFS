@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -28,32 +28,6 @@ public class Activator extends Plugin {
 
 	// The shared instance
 	private static Activator plugin;
-	
-	/**
-	 * The constructor
-	 */
-	public Activator() {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-	 */
-	@Override
-	public void start(BundleContext context) throws Exception {
-		super.start(context);
-		plugin = this;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-	 */
-	@Override
-	public void stop(BundleContext context) throws Exception {
-		plugin = null;
-		super.stop(context);
-	}
 
 	/**
 	 * Returns the shared instance
@@ -64,14 +38,32 @@ public class Activator extends Plugin {
 		return plugin;
 	}
 
-	public void error(String message, Throwable e) {
-		getLog().log(new Status(IStatus.ERROR,getBundle().getSymbolicName(), message, e));
-		
+	/**
+	 * The constructor
+	 */
+	public Activator() {
 	}
-	
+
+	@Override
+	public void start(BundleContext context) throws Exception {
+		plugin = this;
+		super.start(context);
+	}
+
+	@Override
+	public void stop(BundleContext context) throws Exception {
+		super.stop(context);
+		plugin = null;
+	}
+
+	public void error(String message, Throwable e) {
+		getLog().log(new Status(IStatus.ERROR, getBundle().getSymbolicName(), message, e));
+
+	}
+
 	public void error(String message) {
-		getLog().log(new Status(IStatus.ERROR,getBundle().getSymbolicName(), message));
-		
-	}		
-	
+		getLog().log(new Status(IStatus.ERROR, getBundle().getSymbolicName(), message));
+
+	}
+
 }

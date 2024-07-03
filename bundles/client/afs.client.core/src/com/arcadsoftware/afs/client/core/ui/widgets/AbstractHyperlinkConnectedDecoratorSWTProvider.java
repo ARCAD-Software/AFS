@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -28,76 +28,82 @@ import com.arcadsoftware.editor.swt.ISWTRenderer;
 import com.arcadsoftware.metadata.MetaDataEntity;
 
 public abstract class AbstractHyperlinkConnectedDecoratorSWTProvider extends AbstractConnectedDecoratorSWTProvider {
-	
+
 	protected Hyperlink hyperlink;
-	
+
 	@Override
 	public Widget createContent(ISWTRenderer renderer, ILayoutParameters parameters, MetaDataEntity structure) {
-		
+
 		initHyperLinkLabel(renderer, parameters, "");
 
 		final BeanMap bean = retrieveRelatedBeanMap(renderer, parameters, structure);
 		hyperlink = createHyperlink(parameters, bean);
-		
+
 		return hyperlink;
 	}
+
 	/**
 	 * Create HyperLink widget
+	 *
 	 * @param parameters
 	 * @return
 	 */
-	protected Hyperlink createHyperlink(ILayoutParameters parameters, final BeanMap bean){
-		Hyperlink hyperlink = renderer.getToolkit().createHyperlink(renderer.getParent(),
+	protected Hyperlink createHyperlink(ILayoutParameters parameters, final BeanMap bean) {
+		final Hyperlink hyperlink = renderer.getToolkit().createHyperlink(renderer.getParent(),
 				"", SWT.NONE);
-		if (renderer.getParent().getLayout() instanceof GridLayout)
-			hyperlink.setLayoutData(new GridData(GridData.BEGINNING, GridData.BEGINNING, false, false,1, 1));
-		
+		if (renderer.getParent().getLayout() instanceof GridLayout) {
+			hyperlink.setLayoutData(new GridData(GridData.BEGINNING, GridData.BEGINNING, false, false, 1, 1));
+		}
+
 		hyperlink.setText(getHyperLinkText(parameters, bean));
-		
-		hyperlink.addHyperlinkListener(				
-			new HyperlinkAdapter() {
-			   public void linkActivated(HyperlinkEvent e) {
-				   processLinkActivated(bean);			   
-			   }
-			}
-		);
-		
+
+		hyperlink.addHyperlinkListener(
+				new HyperlinkAdapter() {
+					@Override
+					public void linkActivated(HyperlinkEvent e) {
+						processLinkActivated(bean);
+					}
+				});
+
 		return hyperlink;
 	}
-	
+
 	protected abstract BeanMap retrieveRelatedBeanMap(ISWTRenderer renderer,
 			ILayoutParameters parameters, MetaDataEntity structure);
-	
+
 	/**
 	 * Initialize HyperLink title label
+	 *
 	 * @param renderer
 	 * @param parameters
 	 * @param defaultLabel
 	 */
-	protected void initHyperLinkLabel(ISWTRenderer renderer, ILayoutParameters parameters, String defaultLabel){
-		String label = renderer.getLocalizedMessage(parameters.getParameter(IConstants.LABEL,defaultLabel));
-		if (label!=null) {
+	protected void initHyperLinkLabel(ISWTRenderer renderer, ILayoutParameters parameters, String defaultLabel) {
+		final String label = renderer.getLocalizedMessage(parameters.getParameter(IConstants.LABEL, defaultLabel));
+		if (label != null) {
 			if (label.length() > 0) {
 				renderer.getToolkit().createLabel(renderer.getParent(), label);
 				renderer.getToolkit().createLabel(renderer.getParent(), IConstants.TWO_POINTS);
 			}
 		}
 	}
-	
+
 	@Override
 	public void dispose() {
-		if (hyperlink != null && !hyperlink.isDisposed())
+		if ((hyperlink != null) && !hyperlink.isDisposed()) {
 			hyperlink.dispose();
+		}
 	}
-	
+
 	/**
 	 * Init Hyperlink text
+	 *
 	 * @param parameters
 	 * @param bean
 	 * @return
 	 */
 	protected abstract String getHyperLinkText(ILayoutParameters parameters, BeanMap bean);
-		
+
 	protected abstract void processLinkActivated(BeanMap bean);
-	
+
 }

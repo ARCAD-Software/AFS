@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -23,7 +23,7 @@ import com.arcadsoftware.afs.framework.application.IConfigurationManager;
 public class BasicWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	private IConfigurationManager manager;
-	
+
 	public BasicWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer configurer) {
 		super(configurer);
 	}
@@ -34,29 +34,27 @@ public class BasicWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		}
 		return manager;
 	}
-	
+
 	@Override
 	public void preWindowOpen() {
 		if (getManager() != null) {
-	    	IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
-	    	//Manage visibility of the different elements
-	    	configurer.setInitialSize(getManager().getInitialSize());
-	    	int ss = getManager().getShellStyle();
-	    	if (ss != 0) {
-	    		configurer.setShellStyle(ss);
-	    	}
+			final IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
+			// Manage visibility of the different elements
+			configurer.setInitialSize(getManager().getInitialSize());
+			final int ss = getManager().getShellStyle();
+			if (ss != 0) {
+				configurer.setShellStyle(ss);
+			}
 			configurer.setShowCoolBar(getManager().isCoolBarVisible());
 			configurer.setShowProgressIndicator(getManager().isProgressBarVisible());
-			configurer.setShowFastViewBars(getManager().isFastViewBarVisible());
 			configurer.setShowStatusLine(getManager().isStatusLineVisible());
-			
-			//Perspective Bar Configuration
+			// Perspective Bar Configuration
 			configurer.setShowPerspectiveBar(getManager().isPerspectiveBarVisible());
 			getManager().setPerspectiveBarLocation();
 			getManager().setPerspectiveBarStyle();
 		}
 	}
-	
+
 	@Override
 	public void postWindowCreate() {
 		if (getManager() != null) {
@@ -68,5 +66,5 @@ public class BasicWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	public ActionBarAdvisor createActionBarAdvisor(IActionBarConfigurer configurer) {
 		return new BasicActionBarAdvisor(configurer);
 	}
-	
+
 }

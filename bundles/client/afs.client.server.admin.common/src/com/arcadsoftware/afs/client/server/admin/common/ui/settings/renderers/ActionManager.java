@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -26,23 +26,23 @@ import com.arcadsoftware.rest.console.SectionId;
 
 public class ActionManager {
 
-	private ConsoleConnector connection; 
+	private ConsoleConnector connection;
 	private SectionId sectionId;
 	private ConsoleAction action;
 	private Map<String, Object> values;
 	private Form form;
-	
+
 	public ActionManager(ConsoleConnector connection, SectionId sectionId) {
 		this.connection = connection;
 		this.sectionId = sectionId;
-		values = new HashMap<String, Object> ();
+		values = new HashMap<>();
 	}
-	
-	public ActionManager(ConsoleConnector connection, SectionId sectionId, ConsoleAction action){
-		this(connection,sectionId);
+
+	public ActionManager(ConsoleConnector connection, SectionId sectionId, ConsoleAction action) {
+		this(connection, sectionId);
 		this.action = action;
-	}		
-	
+	}
+
 	public ConsoleConnector getConnector() {
 		return connection;
 	}
@@ -58,11 +58,11 @@ public class ActionManager {
 	public void setSectionId(SectionId sectionId) {
 		this.sectionId = sectionId;
 	}
-	
+
 	public Map<String, Object> getValues() {
 		return values;
 	}
-	
+
 	public ConsoleAction getAction() {
 		return action;
 	}
@@ -80,30 +80,30 @@ public class ActionManager {
 	}
 
 	private void showMessage(ConsoleMessage message) {
-		int level = message.getMessageType();
+		final int level = message.getMessageType();
 		switch (level) {
 		case ConsoleMessage.ERROR:
-			Activator.getInstance().openError(message.getTitle(),message.getLabel());
+			Activator.getInstance().openError(message.getTitle(), message.getLabel());
 			break;
 		case ConsoleMessage.INFO:
-		case ConsoleMessage.DEBUG:			
-			Activator.getInstance().openInformation(message.getTitle(),message.getLabel());
+		case ConsoleMessage.DEBUG:
+			Activator.getInstance().openInformation(message.getTitle(), message.getLabel());
 			break;
 		case ConsoleMessage.WARNING:
-			Activator.getInstance().openWarning(message.getTitle(),message.getLabel());
-			break;						
+			Activator.getInstance().openWarning(message.getTitle(), message.getLabel());
+			break;
 		default:
 			break;
 		}
 	}
-	
+
 	public Form getForm() {
 		return form;
 	}
-	
+
 	public boolean execute() {
-		ConsoleConnector cnx = getConnector();
-		SectionId section = getSectionId();
+		final ConsoleConnector cnx = getConnector();
+		final SectionId section = getSectionId();
 		if (action == null) {
 			form = cnx.getSection(section);
 		} else {
@@ -111,24 +111,22 @@ public class ActionManager {
 		}
 		if (form != null) {
 			if (form.isMessageOnly()) {
-				showMessage((ConsoleMessage)form.getFields().get(0));
+				showMessage((ConsoleMessage) form.getFields().get(0));
 			} else if (form.getFields().size() > 0) {
 				SectionSettingEditorInput.openEditor(new SectionSettingEditorInput(this));
 			}
 		} else {
-			SectionSettingEditorInput.openEditor(new SectionSettingEditorInput(this));			
+			SectionSettingEditorInput.openEditor(new SectionSettingEditorInput(this));
 		}
 		return true;
-	}	
-	
-	
-	public ActionManager clone(boolean withValues){
-		ActionManager result = new ActionManager(getConnector(),getSectionId());
+	}
+
+	public ActionManager clone(boolean withValues) {
+		final ActionManager result = new ActionManager(getConnector(), getSectionId());
 		if (withValues) {
 			result.getValues().putAll(values);
-		}		
-		return result;		
+		}
+		return result;
 	}
-	
-	
+
 }

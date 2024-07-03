@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -23,8 +23,8 @@ import com.arcadsoftware.metadata.MetaDataAttribute;
 
 public class BeanMapLinkedCombo extends BeanMapCombo implements IBeanMapContainerLinkedList {
 
-	private String linkCode;
-	private MetaDataAttribute sourceAttribute;
+	private final String linkCode;
+	private final MetaDataAttribute sourceAttribute;
 
 	public BeanMapLinkedCombo(Composite parent, int style, String linkCode, MetaDataAttribute sourceAttribute,
 			ILayoutParameters parameters, ISWTRenderer renderer, Element element, int horizontalSpan) {
@@ -33,10 +33,12 @@ public class BeanMapLinkedCombo extends BeanMapCombo implements IBeanMapContaine
 		this.sourceAttribute = sourceAttribute;
 	}
 
+	@Override
 	public String getLinkCode() {
 		return linkCode;
 	}
 
+	@Override
 	public MetaDataAttribute getSourceAttribute() {
 		return sourceAttribute;
 	}

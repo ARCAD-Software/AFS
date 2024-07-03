@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -29,32 +29,39 @@ import org.osgi.framework.Bundle;
 
 import com.arcadsoftware.afs.framework.internals.Activator;
 
-public class UserMessageManager extends AbstractUserMessageManager{
-	
+public class UserMessageManager extends AbstractUserMessageManager {
+
 	private static final String USER_MESSAGE_EXTENSION = "com.arcadsoftware.afs.framework.userMessage"; //$NON-NLS-1$
 	private static final String PROPERTY_FILE = "filename"; //$NON-NLS-1$
 	private static UserMessageManager instance = new UserMessageManager();
-	
+
+	public static UserMessageManager getInstance() {
+		return instance;
+	}
+
 	private UserMessageManager() {
 		super(true);
 	}
-	
+
+	@Override
 	protected void load() {
 		try {
-			IExtensionRegistry reg = Platform.getExtensionRegistry();
+			final IExtensionRegistry reg = Platform.getExtensionRegistry();
 			if (reg != null) {
-				for (IConfigurationElement element : reg.getConfigurationElementsFor(USER_MESSAGE_EXTENSION)) {
-					String filename = element.getAttribute(PROPERTY_FILE);
-					String bundleName = element.getNamespaceIdentifier();
-					Bundle bundle = Platform.getBundle(bundleName);
-					addBundleFile(bundle,filename);
+				for (final IConfigurationElement element : reg.getConfigurationElementsFor(USER_MESSAGE_EXTENSION)) {
+					final String filename = element.getAttribute(PROPERTY_FILE);
+					final String bundleName = element.getNamespaceIdentifier();
+					final Bundle bundle = Platform.getBundle(bundleName);
+					addBundleFile(bundle, filename);
 				}
 			}
-		} catch (InvalidRegistryObjectException e) {
-			Activator.getDefault().error(e.getLocalizedMessage(), e);
-		}		
+		} catch (final InvalidRegistryObjectException e) {
+			if (Activator.getDefault() != null) {
+				Activator.getDefault().error(e.getLocalizedMessage(), e);
+			}
+		}
 	}
-	
+
 	private File getBundleFile(Bundle bundle, String filename) {
 		URL url = bundle.getEntry(filename);
 		if (url == null) {
@@ -66,51 +73,41 @@ public class UserMessageManager extends AbstractUserMessageManager{
 		}
 		try {
 			url = FileLocator.toFileURL(url);
-			return new File(new URL(null,url.toString().replaceAll(" ", "%20")).toURI()); //$NON-NLS-1$ //$NON-NLS-2$
-		} catch (URISyntaxException e) {
-			
-		} catch (Throwable e) {
-
-		}
+			return new File(new URL(null, url.toString().replaceAll(" ", "%20")).toURI()); //$NON-NLS-1$ //$NON-NLS-2$
+		} catch (final URISyntaxException e) {
+		} catch (final Throwable e) {}
 		return null;
 	}
 
-	private void addBundleFile(Bundle bundle,  String filename) {
-		Locale l = Locale.getDefault();		
-		String country = l.getCountry();
-		String lang = l.getLanguage();
-		int pos =filename.lastIndexOf(".");  //$NON-NLS-1$
-		
+	private void addBundleFile(Bundle bundle, String filename) {
+		final Locale l = Locale.getDefault();
+		final String country = l.getCountry();
+		final String lang = l.getLanguage();
+		final int pos = filename.lastIndexOf("."); //$NON-NLS-1$
 		String basename;
 		String extension;
-		if (pos>0) {
-			basename = filename.substring(0,pos);
-			extension = filename.substring(pos+1,filename.length());
+		if (pos > 0) {
+			basename = filename.substring(0, pos);
+			extension = filename.substring(pos + 1, filename.length());
 		} else {
 			basename = filename;
-			extension="properties";//$NON-NLS-1$
+			extension = "properties";//$NON-NLS-1$
 		}
-		
-		//File resultFile = new File(basename+"_"+lang+"_"+country+"."+extension);
-		File resultFile =  getBundleFile(bundle, basename + '_' + lang + '_' + country + '.' + extension);
+		// File resultFile = new File(basename+"_"+lang+"_"+country+"."+extension);
+		File resultFile = getBundleFile(bundle, basename + '_' + lang + '_' + country + '.' + extension);
 		if (resultFile == null) {
-			//resultFile = new File(basename+"_"+lang+"."+extension);
+			// resultFile = new File(basename+"_"+lang+"."+extension);
 			resultFile = getBundleFile(bundle, basename + '_' + lang + '.' + extension);
 			if (resultFile == null) {
-				resultFile = getBundleFile(bundle,basename + '.' + extension);				
+				resultFile = getBundleFile(bundle, basename + '.' + extension);
 			}
 		}
 		if (resultFile != null) {
 			try {
 				addPropertyFile(resultFile);
-			} catch (FileNotFoundException e) {
-			} catch (IOException e) {
-			}
+			} catch (final FileNotFoundException e) {
+			} catch (final IOException e) {}
 		}
 	}
-	
-	public static UserMessageManager getInstance() {
-		return instance;
-	}
-	
+
 }

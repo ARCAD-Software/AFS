@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -26,14 +26,14 @@ public class LayoutElement implements ILayoutParameters {
 
 	private static final String TRUE = "true"; //$NON-NLS-1$
 	private static final String YES = "yes"; //$NON-NLS-1$
-	
-	private String name;
-	private Object provider;
-	private HashMap<String, String> params = new HashMap<String, String>();
-	private List<ElementParameter> elementParams = new ArrayList<ElementParameter>();
-	private Element element;
-	private ArrayList<LayoutElement> container = new ArrayList<LayoutElement>();
-	private ArrayList<IActionElement> actions = new ArrayList<IActionElement>();
+
+	private final String name;
+	private final Object provider;
+	private final HashMap<String, String> params = new HashMap<>();
+	private final List<ElementParameter> elementParams = new ArrayList<>();
+	private final Element element;
+	private final ArrayList<LayoutElement> container = new ArrayList<>();
+	private final ArrayList<IActionElement> actions = new ArrayList<>();
 
 	/**
 	 * @param name
@@ -63,8 +63,9 @@ public class LayoutElement implements ILayoutParameters {
 		params.put(parameterName, value);
 	}
 
+	@Override
 	public ElementParameter addElementParameter(String elementName) {
-		ElementParameter elementParameter = new ElementParameter(elementName);
+		final ElementParameter elementParameter = new ElementParameter(elementName);
 		elementParams.add(elementParameter);
 		return elementParameter;
 	}
@@ -75,120 +76,129 @@ public class LayoutElement implements ILayoutParameters {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.arcadsoftware.editor.IParameters#getParameter(java.lang.String)
 	 */
+	@Override
 	public String getParameter(String parameterName) {
 		return params.get(parameterName);
 	}
 
+	@Override
 	public String getElementParameter(ElementParameter elementParameter, String key) {
 		return elementParameter.getParams().get(key);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.arcadsoftware.editor.IParameters#getParameterInteger(java.lang.String ,int)
 	 */
+	@Override
 	public int getParameterInteger(String parameterName, int defaultValue) {
-		String val = params.get(parameterName);
+		final String val = params.get(parameterName);
 		if (val == null) {
 			return defaultValue;
 		}
 		try {
 			return Integer.parseInt(val);
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 			Activator.getInstance().log(e);
 			return defaultValue;
 		}
 	}
 
+	@Override
 	public int getElementParameterInteger(ElementParameter elementParameter, String key, int defaultValue) {
-		String val = getElementParameter(elementParameter, key);
+		final String val = getElementParameter(elementParameter, key);
 		if (val == null) {
 			return defaultValue;
 		}
 		try {
 			return Integer.parseInt(val);
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 			Activator.getInstance().log(e);
 			return defaultValue;
 		}
 	}
 
-	/* (non-Javadoc)
-	 * 
+	/*
+	 * (non-Javadoc)
 	 * @see com.arcadsoftware.editor.IParameters#getParameterBoolean(java.lang.String )
 	 */
+	@Override
 	public boolean getParameterBoolean(String key) {
-		String value = getParameter(key);
+		final String value = getParameter(key);
 		return (value != null) && (TRUE.equalsIgnoreCase(value) || YES.equalsIgnoreCase(value));
 	}
 
+	@Override
 	public boolean getParameterBoolean(String key, boolean defaultValue) {
-		String value = getParameter(key);
+		final String value = getParameter(key);
 		if ((value == null) || (value.trim().length() == 0)) {
 			return defaultValue;
 		}
 		return TRUE.equalsIgnoreCase(value) || YES.equalsIgnoreCase(value);
 	}
 
+	@Override
 	public boolean getElementParameterBoolean(ElementParameter elementParameter, String key) {
-		String value = getElementParameter(elementParameter, key);
+		final String value = getElementParameter(elementParameter, key);
 		return (value != null) && (TRUE.equalsIgnoreCase(value) || YES.equalsIgnoreCase(value));
 	}
 
-	/* (non-Javadoc)
-	 * 
+	/*
+	 * (non-Javadoc)
 	 * @see com.arcadsoftware.editor.IParameters#getElement()
 	 */
 	public Element getElement() {
 		return element;
 	}
 
-	/* (non-Javadoc)
-	 * 
+	/*
+	 * (non-Javadoc)
 	 * @see com.arcadsoftware.editor.ILayoutParameters#isContainer()
 	 */
 	public boolean isContainer() {
 		return !container.isEmpty();
 	}
 
-	/* (non-Javadoc)
-	 * 
+	/*
+	 * (non-Javadoc)
 	 * @see com.arcadsoftware.editor.ILayoutParameters#getActions()
 	 */
+	@Override
 	public List<IActionElement> getActions() {
 		return actions;
 	}
 
-	/* (non-Javadoc)
-	 * 
+	/*
+	 * (non-Javadoc)
 	 * @see com.arcadsoftware.editor.ILayoutParameters#getParameter(java.lang.String, java.lang.String)
 	 */
+	@Override
 	public String getParameter(String parameterName, String defaultValue) {
-		String result = params.get(parameterName);
+		final String result = params.get(parameterName);
 		if (result == null) {
 			return defaultValue;
 		}
 		return result;
 	}
 
+	@Override
 	public String getElementParameter(ElementParameter elementParameter, String key, String defaultValue) {
-		String result = getElementParameter(elementParameter, key);
+		final String result = getElementParameter(elementParameter, key);
 		if (result == null) {
 			return defaultValue;
 		}
 		return result;
 	}
 
+	@Override
 	public List<ElementParameter> getListElementParameter(String elementName) {
 		if (elementParams == null) {
 			return null;
 		}
-		List<ElementParameter> result = new ArrayList<ElementParameter>(elementParams.size());
-		for (ElementParameter elementParameter : elementParams) {
+		final List<ElementParameter> result = new ArrayList<>(elementParams.size());
+		for (final ElementParameter elementParameter : elementParams) {
 			if (elementParameter.getName().equals(elementName)) {
 				result.add(elementParameter);
 			}

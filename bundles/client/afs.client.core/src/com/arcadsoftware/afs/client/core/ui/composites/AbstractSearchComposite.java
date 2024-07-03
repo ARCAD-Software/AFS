@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -75,25 +75,25 @@ public abstract class AbstractSearchComposite extends Composite {
 	protected ArcadAction searchAction;
 	private Spinner numberOfResult;
 
-	public AbstractSearchComposite(Composite parent, MetaDataEntity structure,ServerConnection connection) {
+	public AbstractSearchComposite(Composite parent, MetaDataEntity structure, ServerConnection connection) {
 		super(parent, SWT.BORDER);
-		this.entityStructure = structure;
+		entityStructure = structure;
 		this.connection = connection;
-		this.setBackground(parent.getBackground());
+		setBackground(parent.getBackground());
 		createContents();
 	}
 
 	public QueryManager getQueryManager() {
 		return queryManager;
 	}
-	
+
 	/**
 	 * Creation of the content of this composite.
 	 */
 	public void createContents() {
 		queryManager = createQueryManager(connection);
 		// Global composite creation
-		GridLayout layout = new GridLayout(1, true);
+		final GridLayout layout = new GridLayout(1, true);
 		layout.marginHeight = 0;
 		layout.marginWidth = 0;
 		layout.marginBottom = 0;
@@ -104,7 +104,7 @@ public abstract class AbstractSearchComposite extends Composite {
 			setLayoutData(new GridData(GridData.FILL_BOTH));
 		}
 		globalComposite = GuiFormatTools.createComposite(this, 3, false, SWT.NONE, true);
-		globalComposite.setBackground(this.getBackground());
+		globalComposite.setBackground(getBackground());
 		GridLayout l = (GridLayout) globalComposite.getLayout();
 		l.marginHeight = 0;
 		l.marginWidth = 0;
@@ -119,28 +119,28 @@ public abstract class AbstractSearchComposite extends Composite {
 		createSearchAction();
 
 		// In any case, we add a "search" button and a "Erase All button"
-		if(showButtonbar()) {
-		
-			Composite buttonBar = new Composite(this, SWT.NONE);
-			buttonBar.setBackground(this.getBackground());
+		if (showButtonbar()) {
+
+			final Composite buttonBar = new Composite(this, SWT.NONE);
+			buttonBar.setBackground(getBackground());
 			l = new GridLayout(3, false);
 			l.marginHeight = 0;
-			l.marginWidth =  0;
+			l.marginWidth = 0;
 			l.marginTop = 0;
 			l.marginBottom = 0;
 			l.marginRight = 0;
 			l.marginLeft = 5;
-			l.verticalSpacing = 0 ;
+			l.verticalSpacing = 0;
 			l.horizontalSpacing = 2;
 			buttonBar.setLayout(l);
-			GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
+			final GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 			gridData.grabExcessHorizontalSpace = true;
 			gridData.horizontalSpan = 3;
 			gridData.heightHint = 30;
 			buttonBar.setLayoutData(gridData);
-	
-			Button bclear = new Button(buttonBar, SWT.PUSH);
-			bclear.setBackground(this.getBackground());
+
+			final Button bclear = new Button(buttonBar, SWT.PUSH);
+			bclear.setBackground(getBackground());
 			bclear.setText(Activator.resString("search.button.eraseall")); //$NON-NLS-1$
 			bclear.addSelectionListener(new SelectionAdapter() {
 				@Override
@@ -148,9 +148,9 @@ public abstract class AbstractSearchComposite extends Composite {
 					clearAll();
 				}
 			});
-	
-			Button bSearch = new Button(buttonBar, SWT.PUSH);
-			bSearch.setBackground(this.getBackground());
+
+			final Button bSearch = new Button(buttonBar, SWT.PUSH);
+			bSearch.setBackground(getBackground());
 			bSearch.setText(Activator.resString("search.button.search")); //$NON-NLS-1$
 			bSearch.addSelectionListener(new SelectionAdapter() {
 				@Override
@@ -158,22 +158,22 @@ public abstract class AbstractSearchComposite extends Composite {
 					searchAction.run();
 				}
 			});
-	
-			Composite composite = new Composite(buttonBar, SWT.NONE);
-			composite.setBackground(this.getBackground());
-			GridLayout gridLayout = new GridLayout(3, false);
+
+			final Composite composite = new Composite(buttonBar, SWT.NONE);
+			composite.setBackground(getBackground());
+			final GridLayout gridLayout = new GridLayout(3, false);
 			gridLayout.marginHeight = 0;
 			gridLayout.marginWidth = 0;
 			composite.setLayout(gridLayout);
-	
+
 			numberOfResult = GuiFormatTools.createLabelledSpinner(composite, Activator
 					.resString("search.label.resultCount")); //$NON-NLS-1$
-			numberOfResult.setBackground(this.getBackground());
+			numberOfResult.setBackground(getBackground());
 			numberOfResult.setMinimum(10);
 			numberOfResult.setSelection(getDefaultResultCount());
 			numberOfResult.addSelectionListener(new SelectionAdapter() {
 				@Override
-				public void widgetSelected(SelectionEvent e) {				
+				public void widgetSelected(SelectionEvent e) {
 					SearchPreferenceManager.getInstance().setResultCount(numberOfResult.getSelection());
 				}
 			});
@@ -181,23 +181,22 @@ public abstract class AbstractSearchComposite extends Composite {
 		activeKeyListener(globalComposite);
 
 	}
-	
+
 	protected int getDefaultResultCount() {
 		return SearchPreferenceManager.getInstance().getResultCount();
 	}
-	
-	
-	protected boolean showButtonbar(){
+
+	protected boolean showButtonbar() {
 		return true;
 	}
-	
-	
+
 	/**
 	 * Create a QueryManager.<br/>
-	 * we delegate the the current AsbtarcSearchComposite to provide
-	 * a user-defined errorMessage and a Bundle reference used to display
-	 * this message.  
-	 * @param connection the current serverConnection
+	 * we delegate the the current AsbtarcSearchComposite to provide a user-defined errorMessage and a Bundle reference
+	 * used to display this message.
+	 *
+	 * @param connection
+	 *            the current serverConnection
 	 * @return a newly created QueryManager
 	 */
 	protected QueryManager createQueryManager(ServerConnection connection) {
@@ -206,7 +205,7 @@ public abstract class AbstractSearchComposite extends Composite {
 			protected UserMessage getErrorMessage() {
 				return getSearchErrorMessage();
 			}
-			
+
 			@Override
 			protected Bundle getBundle() {
 				return getParentBundle();
@@ -214,18 +213,15 @@ public abstract class AbstractSearchComposite extends Composite {
 		};
 	}
 
-
-
-
 	private void activeKeyListener(Composite c) {
-		Control[] controls = c.getChildren();
-		for (int i = 0; i < controls.length; i++) {
+		final Control[] controls = c.getChildren();
+		for (final Control control : controls) {
 
-			if (controls[i] instanceof Composite) {
-				activeKeyListener((Composite) controls[i]);
-			} else if (controls[i] instanceof Text) {
-				//System.out.println(controls[i].getClass());
-				controls[i].addKeyListener(enterKeyListener);
+			if (control instanceof Composite) {
+				activeKeyListener((Composite) control);
+			} else if (control instanceof Text) {
+				// System.out.println(controls[i].getClass());
+				control.addKeyListener(enterKeyListener);
 			}
 		}
 
@@ -235,30 +231,33 @@ public abstract class AbstractSearchComposite extends Composite {
 		searchAction = new AbstractConnectedBasicAction(connection) {
 			@Override
 			protected boolean execute() {
-				String selectClause = createSelectClause();
-				if (selectClause != null)
+				final String selectClause = createSelectClause();
+				if (selectClause != null) {
 					queryManager.setQuery(entityStructure, selectClause, createSearchClause(), createOrderClause());
-				else
+				} else {
 					queryManager.setQuery(entityStructure, createSearchClause());
+				}
 				return true;
 			}
-			
+
+			@Override
 			public List<Integer> getExpectedRigths() {
-				ArrayList<Integer> rights = new ArrayList<Integer>();
+				final ArrayList<Integer> rights = new ArrayList<>();
 				return rights;
-			};
+			}
 		};
 	}
 
 	/**
 	 * Redefine this method in the inherited classes to define the SQL Where clause.
-	 * 
+	 *
 	 * @return String : the Where Clause.
 	 */
 	public abstract String createSelectClause();
+
 	/**
 	 * Redefine this method in the inherited classes to define the specific part of the search editor.
-	 * 
+	 *
 	 * @param parent
 	 *            : the parent composite
 	 */
@@ -266,14 +265,13 @@ public abstract class AbstractSearchComposite extends Composite {
 
 	/**
 	 * Redefine this method in the inherited classes to define the SQL Where clause.
-	 * 
+	 *
 	 * @return String : the Where Clause.
 	 */
 	protected abstract String createSearchClause();
 
 	/**
 	 * Redefine this method in the inherited classes to clean search fields
-	 * 
 	 */
 	public abstract void clearAll();
 
@@ -284,25 +282,26 @@ public abstract class AbstractSearchComposite extends Composite {
 		Date datesup = (Date) beanMap.get(maxDateAttribute);
 		if (dateinf != null) {
 			and = new AndCriteria();
-			Calendar cal = Calendar.getInstance();
+			final Calendar cal = Calendar.getInstance();
 			cal.setTime(dateinf);
 			cal.set(Calendar.HOUR, 0);
 			cal.set(Calendar.MINUTE, 0);
 			cal.set(Calendar.SECOND, 0);
 			dateinf = cal.getTime();
-			GreaterThanCriteria c1 = new GreaterThanCriteria(attribute, dateFormater.format(dateinf));
+			final GreaterThanCriteria c1 = new GreaterThanCriteria(attribute, dateFormater.format(dateinf));
 			and.add(c1);
 		}
 		if ((datesup != null)) {
-			if (and == null)
+			if (and == null) {
 				and = new AndCriteria();
-			Calendar cal = Calendar.getInstance();
+			}
+			final Calendar cal = Calendar.getInstance();
 			cal.setTime(datesup);
 			cal.set(Calendar.HOUR, 23);
 			cal.set(Calendar.MINUTE, 59);
 			cal.set(Calendar.SECOND, 59);
 			datesup = cal.getTime();
-			LowerThanCriteria c2 = new LowerThanCriteria(attribute, dateFormater.format(datesup));
+			final LowerThanCriteria c2 = new LowerThanCriteria(attribute, dateFormater.format(datesup));
 			and.add(c2);
 		}
 		return and;
@@ -312,11 +311,12 @@ public abstract class AbstractSearchComposite extends Composite {
 			boolean defaultValue) {
 		AndCriteria andInProgress = null;
 		boolean inprogress = defaultValue;
-		if (beanMap.get(inProgressAttribute) != null)
+		if (beanMap.get(inProgressAttribute) != null) {
 			inprogress = beanMap.getBoolean(inProgressAttribute);
+		}
 
 		if (inprogress) {
-			IsNullCriteria close = new IsNullCriteria(attribute);
+			final IsNullCriteria close = new IsNullCriteria(attribute);
 			andInProgress = new AndCriteria();
 			andInProgress.add(new NotCriteria(close));
 		}
@@ -325,17 +325,17 @@ public abstract class AbstractSearchComposite extends Composite {
 
 	protected String criteriaToXml(ISearchCriteria[] list) {
 		StringBuilder builder = null;
-		XmlCriteriaStream x = new XmlCriteriaStream();
-		for (int i = 0; i < list.length; i++) {
-			ISearchCriteria c = list[i];
+		final XmlCriteriaStream x = new XmlCriteriaStream();
+		for (final ISearchCriteria c : list) {
 			if (c != null) {
-				if (builder == null)
+				if (builder == null) {
 					builder = new StringBuilder();
+				}
 				builder.append(x.toXML(c));
 			}
 		}
 		if (builder != null) {
-			StringBuilder result = new StringBuilder();
+			final StringBuilder result = new StringBuilder();
 			result.append(AND_TAG);
 			result.append(builder);
 			result.append(AND_END_TAG);
@@ -347,26 +347,26 @@ public abstract class AbstractSearchComposite extends Composite {
 	protected String createOrderClause() {
 		return ""; //$NON-NLS-1$
 	}
-	
+
 	/**
-	 * A user defined error message that will be displayed if an error
-	 * occurred during retrieving data
+	 * A user defined error message that will be displayed if an error occurred during retrieving data
+	 *
 	 * @return an error Message
 	 */
 	protected abstract UserMessage getSearchErrorMessage();
-	
+
 	/**
-	 * Returns the parent bundle used to display the message
-	 * If this reference is null, the internal activator will be used instaed. 
+	 * Returns the parent bundle used to display the message If this reference is null, the internal activator will be
+	 * used instaed.
+	 *
 	 * @return a bunble reference
 	 */
 	protected abstract Bundle getParentBundle();
-	
-	
-	public void search(){
+
+	public void search() {
 		searchAction.run();
 	}
-	
+
 	public ServerConnection getConnection() {
 		return connection;
 	}

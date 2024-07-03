@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -44,34 +44,41 @@ public class HiddenIdInputSWTProvider implements IInputSWTProvider, SelectionLis
 	private class BindedWidget implements IWidgetValue {
 		private List<SelectionListener> listeners;
 
+		@Override
 		public void addSelectionListener(SelectionListener selectionListener) {
-			if (listeners == null)
-				listeners = new ArrayList<SelectionListener>();
+			if (listeners == null) {
+				listeners = new ArrayList<>();
+			}
 			listeners.add(selectionListener);
 		}
 
+		@Override
 		public Object getValue() {
 			return bindedId;
 		}
 
+		@Override
 		public Object getValueType() {
 			return null;
 		}
 
+		@Override
 		public Control getWidget() {
 			return text;
 		}
 
+		@Override
 		public void setValue(Object newValue) {
 			if (newValue instanceof Integer) {
 				bindedId = (Integer) newValue;
-				for (int i = 0; i < listeners.size(); i++) {
-					listeners.get(i).widgetSelected(null);
+				for (final SelectionListener listener : listeners) {
+					listener.widgetSelected(null);
 				}
 			}
 		}
-	};
+	}
 
+	@Override
 	public void create(ISWTRenderer renderer, ILayoutParameters parameters, Element element,
 			MetaDataEntity structure) {
 		internalEditorId = parameters.getParameter(IConstants.INTERNAL_EDITOR_ID);
@@ -83,18 +90,22 @@ public class HiddenIdInputSWTProvider implements IInputSWTProvider, SelectionLis
 		renderer.getRendererBinding().bindElement(element, bindedValue);
 	}
 
+	@Override
 	public void dispose() {
 		// Do nothing
 	}
 
+	@Override
 	public void widgetDefaultSelected(SelectionEvent e) {
 		// Do nothing
 	}
 
+	@Override
 	public void widgetSelected(SelectionEvent e) {
 		if (internalEditorId != null) {
-			if (bindedId > 0)
+			if (bindedId > 0) {
 				renderer.getInternalEditors().loadInternalEditor(internalEditorId, bindedId);
+			}
 		}
 	}
 

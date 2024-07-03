@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -28,18 +28,17 @@ import com.arcadsoftware.editor.swt.IValidatingSubWidgets;
 import com.arcadsoftware.metadata.MetaDataEntity;
 
 /**
- * This class implement a Panels Container SWT Widget provider for the dynamic
- * editors.
- * 
- * Panels container can contain only Panel container
- * 
+ * This class implement a Panels Container SWT Widget provider for the dynamic editors. Panels container can contain
+ * only Panel container
+ *
  * @see PanelSWTProvider
  */
 public class PanelsSWTProvider implements IContainerSWTProvider, IValidatingSubWidgets {
 
+	@Override
 	public void create(ISWTRenderer renderer, ILayoutParameters params, boolean isEmpty, MetaDataEntity structure) {
 		int style = SWT.MULTI;
-		if  (params.getParameterBoolean(IConstants.BORDER)) {
+		if (params.getParameterBoolean(IConstants.BORDER)) {
 			style |= SWT.BORDER;
 		}
 		if (IConstants.BOTTOM.equalsIgnoreCase(params.getParameter(IConstants.ALIGN))) {
@@ -47,11 +46,11 @@ public class PanelsSWTProvider implements IContainerSWTProvider, IValidatingSubW
 		} else {
 			style |= SWT.TOP;
 		}
-		CTabFolder panels = new CTabFolder(renderer.getParent(), style);
+		final CTabFolder panels = new CTabFolder(renderer.getParent(), style);
 		// If there is a parent provider then we must adapt the panels to the
 		// Eclipse Forms style !
 		if (renderer.getParent().getLayout() instanceof GridLayout) {
-			GridData layoutData = new GridData();
+			final GridData layoutData = new GridData();
 			layoutData.horizontalAlignment = GridData.FILL;
 			layoutData.verticalAlignment = GridData.FILL;
 			layoutData.grabExcessHorizontalSpace = true;
@@ -71,16 +70,21 @@ public class PanelsSWTProvider implements IContainerSWTProvider, IValidatingSubW
 		}
 	}
 
-	public void dispose() {}
+	@Override
+	public void dispose() {
+	}
 
+	@Override
 	public boolean acceptDecorator(IDecoratorSWTProvider provider) {
 		return false;
 	}
 
+	@Override
 	public boolean acceptInput(IInputSWTProvider provider) {
 		return false;
 	}
 
+	@Override
 	public boolean acceptSubContainer(IContainerSWTProvider provider) {
 		return provider instanceof PanelSWTProvider;
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -29,22 +29,21 @@ public abstract class AbstractEnumerationSelectorDialog extends AbstractBeanMapL
 
 	@Override
 	public BeanMapList getInput() {
-		ISearchCriteria searchCriteria = getSearchCriteria();
-		if (searchCriteria==null) {			
+		final ISearchCriteria searchCriteria = getSearchCriteria();
+		if (searchCriteria == null) {
 			return helper.getList(getType(), getAttributeList());
 		} else {
-			return helper.getList(getType(), getAttributeList(),searchCriteria);
+			return helper.getList(getType(), getAttributeList(), searchCriteria);
 		}
 	}
 
 	@Override
 	public Point getSize() {
-		return new Point(600,500);
+		return new Point(600, 500);
 	}
-	
-	protected ISearchCriteria getSearchCriteria(){
+
+	protected ISearchCriteria getSearchCriteria() {
 		return null;
 	}
 
-	
 }

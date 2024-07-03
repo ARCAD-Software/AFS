@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -20,14 +20,14 @@ import com.arcadsoftware.rest.console.Category;
 import com.arcadsoftware.rest.console.SectionId;
 
 public class CategoriesWrapper extends ArcadCollection {
-	
-	public CategoriesWrapper(List<Category> list){
-		for(Category c:list){
+
+	public CategoriesWrapper(List<Category> list) {
+		for (final Category c : list) {
 			final CategoryWrapper categoryWrapper = new CategoryWrapper(c);
-			this.add(categoryWrapper);
+			add(categoryWrapper);
 			categoryWrapper.setParent(this);
-			for (SectionId sid:c.getList()){
-				this.add(new CategoryWrapper(sid));
+			for (final SectionId sid : c.getList()) {
+				add(new CategoryWrapper(sid));
 			}
 		}
 	}

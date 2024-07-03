@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -28,102 +28,39 @@ import com.arcadsoftware.metadata.MetaDataEntity;
 
 public class ReferenceObservableValue extends AbstractObservableValue<Object> {
 
-	private Object value;
-	private ReferenceLabelSWTProvider provider;
-	int loading = 0;
-	private String rootType;
-
-	public ReferenceObservableValue(ReferenceLabelSWTProvider provider) {
-		this(Realm.getDefault(), provider);
-	} 
-
-	public ReferenceObservableValue(Realm realm, ReferenceLabelSWTProvider provider) {
-		super(realm);
-		this.provider = provider;
-		MetaDataAttribute a = provider.getRootStructure().getAttribute(provider.getAttributes()[0]);
-		if (a != null) {
-			rootType = a.getType();
-		} else {
-			rootType = null;
-		}
-	}
-
-	@Override
-	protected Object doGetValue() {
-		return value;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.databinding.observable.value.IObservableValue#getValueType()
-	 */
-	public Object getValueType() {
-		return BeanMap.class;
-	}
-
-	@Override
-	protected void doSetValue(Object newValue) {
-		this.value = newValue;
-		if (value instanceof BeanMap) {
-			doRunReferencesLoading((BeanMap) value);
-		}
-	}
-
-	private void doRunReferencesLoading(BeanMap beanMap) {
-		if (rootType == null) {
-			return;
-		}
-		loading++; // sill shutdown any pending currentLoading.
-		provider.resetLabel();
-		provider.getRenderer().loadBeanMap(rootType, beanMap.getId(), new RecursiveLoadingListener(provider, loading));
-	}
-
 	private class RecursiveLoadingListener implements Runnable, IBeanMapListener {
 
-		private int level = 0;
-		private int currentLoading;
-		private ReferenceLabelSWTProvider currentProvider;
+		private int level;
+		private final int currentLoading;
+		private final ReferenceLabelSWTProvider currentProvider;
 		private IBeanMap current;
 
 		public RecursiveLoadingListener(ReferenceLabelSWTProvider provider, int loading) {
-			this.currentLoading = loading;
-			this.currentProvider = provider;
+			currentLoading = loading;
+			currentProvider = provider;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see com.arcadsoftware.utils.IBeanMapListener#changed(com.arcadsoftware.utils.BeanMapEvent)
-		 */
+		@Override
 		public void changed(BeanMapEvent event) {
-			if (ReferenceObservableValue.this.loading == currentLoading) {
+			if (loading == currentLoading) {
 				current = event.getSource();
 				new Thread(this).start();
 			}
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.lang.Runnable#run()
-		 */
+		@Override
 		public void run() {
 			while (!currentProvider.isStructureLoaded()) {
 				try {
 					Thread.sleep(500);
-				}
-				catch (InterruptedException e) {
+				} catch (final InterruptedException e) {
 					MessageManager.addException(e, MessageManager.LEVEL_PRODUCTION);
 				}
-				if (currentProvider.isDisposed()) {
-					return;
-				}
-				if (ReferenceObservableValue.this.loading != currentLoading) {
+				if (currentProvider.isDisposed() || (loading != currentLoading)) {
 					return;
 				}
 			}
-			if (ReferenceObservableValue.this.loading != currentLoading) {
+			if (loading != currentLoading) {
 				return;
 			}
 			if (currentProvider.isReady()) {
@@ -131,16 +68,16 @@ public class ReferenceObservableValue extends AbstractObservableValue<Object> {
 					// last attribute from the chain.
 					currentProvider.format(current);
 				} else {
-					MetaDataEntity s = currentProvider.getStructures()[level];
+					final MetaDataEntity s = currentProvider.getStructures()[level];
 					if (s == null) {
 						return;
 					}
 					level++;
-					MetaDataAttribute a = s.getAttribute(currentProvider.getAttributes()[level]);
+					final MetaDataAttribute a = s.getAttribute(currentProvider.getAttributes()[level]);
 					if (a == null) {
 						return;
 					}
-					Object o = (current).get(a.getCode());
+					final Object o = (current).get(a.getCode());
 					if (o != null) {
 						int i = 0;
 						if (o instanceof Integer) {
@@ -148,7 +85,7 @@ public class ReferenceObservableValue extends AbstractObservableValue<Object> {
 						} else if (o instanceof String) {
 							try {
 								i = Integer.parseInt((String) o);
-							} catch (NumberFormatException e) {
+							} catch (final NumberFormatException e) {
 								MessageManager.addException(e, MessageManager.LEVEL_PRODUCTION);
 							}
 						} else if (o instanceof IIdentifiedBean) {
@@ -163,4 +100,50 @@ public class ReferenceObservableValue extends AbstractObservableValue<Object> {
 		}
 	}
 
+	private Object value;
+	private final ReferenceLabelSWTProvider provider;
+	int loading;
+	private String rootType;
+
+	public ReferenceObservableValue(ReferenceLabelSWTProvider provider) {
+		this(Realm.getDefault(), provider);
+	}
+
+	public ReferenceObservableValue(Realm realm, ReferenceLabelSWTProvider provider) {
+		super(realm);
+		this.provider = provider;
+		final MetaDataAttribute a = provider.getRootStructure().getAttribute(provider.getAttributes()[0]);
+		if (a != null) {
+			rootType = a.getType();
+		} else {
+			rootType = null;
+		}
+	}
+
+	@Override
+	protected Object doGetValue() {
+		return value;
+	}
+
+	@Override
+	public Object getValueType() {
+		return BeanMap.class;
+	}
+
+	@Override
+	protected void doSetValue(Object newValue) {
+		value = newValue;
+		if (value instanceof BeanMap) {
+			doRunReferencesLoading((BeanMap) value);
+		}
+	}
+
+	private void doRunReferencesLoading(BeanMap beanMap) {
+		if (rootType == null) {
+			return;
+		}
+		loading++; // sill shutdown any pending currentLoading.
+		provider.resetLabel();
+		provider.getRenderer().loadBeanMap(rootType, beanMap.getId(), new RecursiveLoadingListener(provider, loading));
+	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -47,8 +47,7 @@ import com.arcadsoftware.editor.swt.ISWTRenderer;
 import com.arcadsoftware.metadata.MetaDataEntity;
 
 /**
- * This class implement a Form Container SWT Widget provider for the dynamic
- * editors.
+ * This class implement a Form Container SWT Widget provider for the dynamic editors.
  */
 public class FormContainerSWTProvider implements IContainerSWTProvider {
 
@@ -62,16 +61,16 @@ public class FormContainerSWTProvider implements IContainerSWTProvider {
 
 		@Override
 		public void linkActivated(HyperlinkEvent e) {
-			String title = e.getLabel();
-			Object href = e.getHref();
-			Point hl = ((Control) e.widget).toDisplay(0, 0);
+			final String title = e.getLabel();
+			final Object href = e.getHref();
+			final Point hl = ((Control) e.widget).toDisplay(0, 0);
 			hl.x += 10;
 			hl.y += 10;
-			Shell shell = new Shell(managedForm.getForm().getShell(), SWT.ON_TOP | SWT.TOOL);
+			final Shell shell = new Shell(managedForm.getForm().getShell(), SWT.ON_TOP | SWT.TOOL);
 			shell.setImage(getImage(managedForm.getForm().getMessageType()));
 			shell.setText(title);
 			shell.setLayout(new FillLayout());
-			FormText text = toolkit.createFormText(shell, true);
+			final FormText text = toolkit.createFormText(shell, true);
 			configureFormText(managedForm.getForm().getForm(), text);
 			if (href instanceof IMessage[]) {
 				text.setText(createFormTextContent((IMessage[]) href), true, false);
@@ -82,11 +81,11 @@ public class FormContainerSWTProvider implements IContainerSWTProvider {
 		}
 
 		private String createFormTextContent(IMessage[] messages) {
-			StringWriter sw = new StringWriter();
-			PrintWriter pw = new PrintWriter(sw);
+			final StringWriter sw = new StringWriter();
+			final PrintWriter pw = new PrintWriter(sw);
 			pw.println("<form>");//$NON-NLS-1$
 			for (int i = 0; i < messages.length; i++) {
-				IMessage message = messages[i];
+				final IMessage message = messages[i];
 				pw.print("<li vspace=\"false\" style=\"image\" indent=\"16\" value=\"");//$NON-NLS-1$
 				switch (message.getMessageType()) {
 				case IMessageProvider.ERROR:
@@ -94,11 +93,11 @@ public class FormContainerSWTProvider implements IContainerSWTProvider {
 					break;
 				case IMessageProvider.WARNING:
 					pw.print("warning"); //$NON-NLS-1$
-					break;					
-				case IMessageProvider.INFORMATION:				
+					break;
+				case IMessageProvider.INFORMATION:
 					pw.print("info"); //$NON-NLS-1$
 					break;
-				default: //Keep looping
+				default: // Keep looping
 				}
 				pw.print("\"> <a href=\"");//$NON-NLS-1$
 				pw.print(i + "");//$NON-NLS-1$
@@ -119,15 +118,15 @@ public class FormContainerSWTProvider implements IContainerSWTProvider {
 				@Override
 				public void linkActivated(HyperlinkEvent e) {
 					try {
-						int index = Integer.parseInt((String) e.getHref());
-						IMessage[] messages = form.getChildrenMessages();
-						IMessage message = messages[index];
-						Control c = message.getControl();
+						final int index = Integer.parseInt((String) e.getHref());
+						final IMessage[] messages = form.getChildrenMessages();
+						final IMessage message = messages[index];
+						final Control c = message.getControl();
 						((FormText) e.widget).getShell().dispose();
 						if (c != null) {
 							c.setFocus();
 						}
-					} catch (NumberFormatException ex) {
+					} catch (final NumberFormatException ex) {
 						// Nothing to do here.
 					}
 				}
@@ -143,23 +142,24 @@ public class FormContainerSWTProvider implements IContainerSWTProvider {
 				return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_ERROR_TSK);
 			case IMessageProvider.WARNING:
 				return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_WARN_TSK);
-			case IMessageProvider.INFORMATION:		
+			case IMessageProvider.INFORMATION:
 				return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_INFO_TSK);
 			default:
 				return null;
-			}			
+			}
 		}
 	}
 
 	private ManagedForm managedForm;
 
+	@Override
 	public void create(ISWTRenderer renderer, ILayoutParameters params, boolean isEmpty, MetaDataEntity structure) {
-		String icon = params.getParameter(IConstants.ICON);
+		final String icon = params.getParameter(IConstants.ICON);
 		ImageDescriptor id = null;
 		if ((icon != null) && (icon.length() > 0)) {
-			id =  renderer.getImageDescriptor(icon);
+			id = renderer.getImageDescriptor(icon);
 		}
-		int cols = params.getParameterInteger(IConstants.COLS, 0);
+		final int cols = params.getParameterInteger(IConstants.COLS, 0);
 		Layout layout;
 		if (cols == 0) {
 			layout = new ColumnLayout();
@@ -167,7 +167,7 @@ public class FormContainerSWTProvider implements IContainerSWTProvider {
 			layout = createGridLayout(cols);
 		}
 		if (params.getParameterBoolean(IConstants.SCROLL)) {
-			ScrolledForm form = renderer.getToolkit().createScrolledForm(renderer.getParent());
+			final ScrolledForm form = renderer.getToolkit().createScrolledForm(renderer.getParent());
 			managedForm = new ManagedForm(renderer.getToolkit(), form);
 			form.getForm().addMessageHyperlinkListener(new MessageHyperlinkAdapter(renderer.getToolkit()));
 			form.getBody().setLayout(layout);
@@ -181,23 +181,23 @@ public class FormContainerSWTProvider implements IContainerSWTProvider {
 			// Il faut rattacher le ManagedForm au renderer pour gérer les sous
 			// bindings et les bindings de tests
 			renderer.createSubContainer(this, managedForm.getMessageManager(), params, form.getBody(), actions);
-			for (IAction action:actions) {
+			for (final IAction action : actions) {
 				form.getToolBarManager().add(action);
 			}
 			form.layout(true, true);
 		} else {
-			Form form = renderer.getToolkit().createForm(renderer.getParent());
+			final Form form = renderer.getToolkit().createForm(renderer.getParent());
 			form.getBody().setLayout(layout);
 			form.setText(getFormattedLabel(params.getParameter(IConstants.LABEL), renderer));
-			
+
 			if (id != null) {
 				form.setImage(id.createImage());
 			}
 			renderer.getToolkit().decorateFormHeading(form);
 			renderer.setFormToolBar(form.getToolBarManager());
-			ArrayList<IAction> actions = new ArrayList<>();
-			renderer.createSubContainer(this, null, params, form.getBody(),actions);
-			for (IAction action:actions) {
+			final ArrayList<IAction> actions = new ArrayList<>();
+			renderer.createSubContainer(this, null, params, form.getBody(), actions);
+			for (final IAction action : actions) {
 				form.getToolBarManager().add(action);
 			}
 			form.layout(true, true);
@@ -205,18 +205,18 @@ public class FormContainerSWTProvider implements IContainerSWTProvider {
 	}
 
 	private String getFormattedLabel(final String labelKey, ISWTRenderer renderer) {
-		String label = renderer.getLocalizedMessage(labelKey);
-		if(label != null && !label.isEmpty()) {
-			StringBuilder result = new StringBuilder(label.length());
+		final String label = renderer.getLocalizedMessage(labelKey);
+		if ((label != null) && !label.isEmpty()) {
+			final StringBuilder result = new StringBuilder(label.length());
 			StringBuilder tagName = null;
-			for (char c: label.toCharArray()) {
+			for (final char c : label.toCharArray()) {
 				if (tagName != null) {
 					if (c == '%') {
 						if ((tagName == null) || (tagName.length() == 0)) {
 							result.append('%');
 						} else {
-							String code = tagName.toString();
-							Object value = renderer.getVirtualValue(code);
+							final String code = tagName.toString();
+							final Object value = renderer.getVirtualValue(code);
 							if (value != null) {
 								result.append(value.toString());
 							} else {
@@ -236,9 +236,9 @@ public class FormContainerSWTProvider implements IContainerSWTProvider {
 		}
 		return label;
 	}
-	
+
 	private GridLayout createGridLayout(int cols) {
-		GridLayout gridLayout = new GridLayout(cols, false);
+		final GridLayout gridLayout = new GridLayout(cols, false);
 		gridLayout.marginBottom = 0;
 		gridLayout.marginHeight = 0;
 		gridLayout.marginLeft = 0;
@@ -248,6 +248,7 @@ public class FormContainerSWTProvider implements IContainerSWTProvider {
 		return gridLayout;
 	}
 
+	@Override
 	public void dispose() {
 		if (managedForm != null) {
 			managedForm.dispose();

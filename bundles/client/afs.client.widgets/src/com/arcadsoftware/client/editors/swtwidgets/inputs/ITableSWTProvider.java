@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -20,18 +20,18 @@ import com.arcadsoftware.editor.swt.ISWTRenderer;
 /**
  * TableSWTProvider interface.
  */
-public interface ITableSWTProvider extends IColumnedViewerSWTProvider{
+public interface ITableSWTProvider extends IColumnedViewerSWTProvider {
 
 	/**
 	 * @return The associated renderer.
 	 */
+	@Override
 	public ISWTRenderer getRenderer();
 
 	/**
-	 * 
 	 * @return the associated Viewer
 	 */
 	public BeanMapTableViewer getViewer();
-	
+
 	public ILayoutParameters getLayoutParameters();
 }

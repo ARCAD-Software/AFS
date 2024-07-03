@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -29,23 +29,24 @@ import com.arcadsoftware.editor.swt.IWidgetValue;
  */
 public class WidgetObservableValue extends AbstractObservableValue<Object> {
 
-	private IWidgetValue widgetValue;
-	private Widget widget;
+	private final IWidgetValue widgetValue;
+	private final Widget widget;
 	Object currentObject;
 	boolean updating = false;
 
 	/**
-	 * Standard constructor for an SWT ObservableValue. Makes sure that the
-	 * observable gets disposed when the SWT widget is disposed.
-	 * 
+	 * Standard constructor for an SWT ObservableValue. Makes sure that the observable gets disposed when the SWT widget
+	 * is disposed.
+	 *
 	 * @param widget
 	 */
 	public WidgetObservableValue(IWidgetValue widgetValue) {
 		super(DisplayRealm.getRealm(widgetValue.getWidget().getDisplay()));
 		this.widgetValue = widgetValue;
-		this.widget = widgetValue.getWidget();
+		widget = widgetValue.getWidget();
 
 		widget.addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				WidgetObservableValue.this.dispose();
 			}
@@ -55,7 +56,7 @@ public class WidgetObservableValue extends AbstractObservableValue<Object> {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (!updating) {
-					Object newObject = WidgetObservableValue.this.doGetValue();
+					final Object newObject = WidgetObservableValue.this.doGetValue();
 					fireValueChange(currentObject, newObject);
 					currentObject = newObject;
 				}
@@ -93,6 +94,7 @@ public class WidgetObservableValue extends AbstractObservableValue<Object> {
 		return widget;
 	}
 
+	@Override
 	public Object getValueType() {
 		return widgetValue.getValueType();
 	}

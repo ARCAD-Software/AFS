@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -16,7 +16,7 @@ package com.arcadsoftware.client.editors.swtwidgets;
 import org.eclipse.core.databinding.observable.Diffs;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.value.AbstractObservableValue;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Widget;
@@ -24,19 +24,19 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 
 public class ExpendableObservableTextValue extends AbstractObservableValue<String> {
 
-	private ExpandableComposite composite;
-	
+	private final ExpandableComposite composite;
+
 	public ExpendableObservableTextValue(ExpandableComposite composite) {
-		this(SWTObservables.getRealm(composite.getDisplay()), composite);
+		this(DisplayRealm.getRealm(composite.getDisplay()), composite);
 	}
 
-	public ExpendableObservableTextValue(Realm realm,ExpandableComposite composite) {
+	public ExpendableObservableTextValue(Realm realm, ExpandableComposite composite) {
 		super(realm);
 		this.composite = composite;
 		composite.addDisposeListener(disposeListener);
 	}
-	
-	private DisposeListener disposeListener = new DisposeListener() {
+
+	private final DisposeListener disposeListener = new DisposeListener() {
 		public void widgetDisposed(DisposeEvent e) {
 			ExpendableObservableTextValue.this.dispose();
 		}
@@ -44,8 +44,8 @@ public class ExpendableObservableTextValue extends AbstractObservableValue<Strin
 
 	@Override
 	protected void doSetValue(String value) {
-		String oldValue = composite.getText();
-		String newValue = value == null ? "" : value.toString(); //$NON-NLS-1$
+		final String oldValue = composite.getText();
+		final String newValue = value == null ? "" : value.toString(); //$NON-NLS-1$
 		composite.setText(newValue);
 		if (!newValue.equals(oldValue)) {
 			fireValueChange(Diffs.createValueDiff(oldValue, newValue));

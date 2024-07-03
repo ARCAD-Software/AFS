@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -30,16 +30,15 @@ public class Activator extends AbstractAFSUIPlugin implements ILocalizationProvi
 	public static final String COLOR_RED = "red";
 	public static final String COLOR_GREEN = "green";
 	public static final String COLOR_YELLOW = "yellow";
-	
+
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.arcadsoftware.afs.client.macro"; //$NON-NLS-1$
-	public static final String BUNDLE_ID = PLUGIN_ID+".resources"; //$NON-NLS-1$
-	public static final String TITLE = ""; //$NON-NLS-1$	
-	
+	public static final String BUNDLE_ID = PLUGIN_ID + ".resources"; //$NON-NLS-1$
+	public static final String TITLE = ""; //$NON-NLS-1$
 
 	// The shared instance
 	private static Activator plugin;
-	
+
 	/**
 	 * The constructor
 	 */
@@ -50,6 +49,7 @@ public class Activator extends AbstractAFSUIPlugin implements ILocalizationProvi
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
+	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
@@ -59,6 +59,7 @@ public class Activator extends AbstractAFSUIPlugin implements ILocalizationProvi
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		super.stop(context);
@@ -70,7 +71,7 @@ public class Activator extends AbstractAFSUIPlugin implements ILocalizationProvi
 		colorRegistry.put(COLOR_YELLOW, new RGB(255, 243, 205));
 		colorRegistry.put(COLOR_GREEN, new RGB(212, 237, 218));
 	}
-	
+
 	/**
 	 * Returns the shared instance
 	 *
@@ -85,7 +86,6 @@ public class Activator extends AbstractAFSUIPlugin implements ILocalizationProvi
 		return BUNDLE_ID;
 	}
 
-
 	public static String resString(String key) {
 		return plugin.getResourceString(key);
 	}
@@ -98,13 +98,12 @@ public class Activator extends AbstractAFSUIPlugin implements ILocalizationProvi
 
 	@Override
 	protected void fillImageRegistry() {
-		
-	}
 
+	}
 
 	@Override
 	protected String getApplicationTitle() {
 		return TITLE;
-	}		
-	
+	}
+
 }

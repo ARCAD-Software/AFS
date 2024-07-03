@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -31,18 +31,18 @@ public final class OpenBeanMapEditor {
 
 	/**
 	 * Open the default dynamic editor associated to this BeanMap.
-	 * 
+	 *
 	 * @param beanMap
 	 *            The BeanMap to be edited.
 	 * @return The created editorPart.
 	 */
 	public static IEditorPart openEditor(BeanMap beanMap) {
-		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		IEditorPart editor = null;
 		try {
 			// TODO [JC] make an editor manager
 			editor = page.openEditor(new BeanMapEditorInput(beanMap), EDITOR_ID);
-		} catch (PartInitException e) {
+		} catch (final PartInitException e) {
 			Activator.getInstance().log(e);
 			page.closeEditor(editor, false);
 		}
@@ -51,7 +51,7 @@ public final class OpenBeanMapEditor {
 
 	/**
 	 * Open the default dynamic editor associated to this BeanMap.
-	 * 
+	 *
 	 * @param beanMap
 	 *            The BeanMap to be edited.
 	 * @param layoutName
@@ -59,13 +59,13 @@ public final class OpenBeanMapEditor {
 	 * @return The created editorPart.
 	 */
 	public static IEditorPart openEditor(BeanMap beanMap, String layoutName) {
-		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		IEditorPart editor = null;
 		try {
-			BeanMapEditorInput input = new BeanMapEditorInput(beanMap, layoutName);
+			final BeanMapEditorInput input = new BeanMapEditorInput(beanMap, layoutName);
 			// TODO [JC] make an editor manager
 			editor = page.openEditor(input, EDITOR_ID);
-		} catch (PartInitException e) {
+		} catch (final PartInitException e) {
 			Activator.getInstance().log(e);
 			page.closeEditor(editor, false);
 		}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -17,46 +17,46 @@ import org.eclipse.swt.widgets.Combo;
 
 import com.arcadsoftware.editor.ElementParameter;
 
-
-
 /**
  * This class implement a Combo SWT Widget provider for the dynamic editors.
  */
 public class FixedStringValueComboSWTProvider extends FixedValueComboSWTProvider {
-	
+
 	protected String[] stringIndexes;
-	
+
 	@Override
 	public void fill(Combo combo) {
-		boolean translate = parameters.getParameterBoolean(TRANSLATE);		
+		final boolean translate = parameters.getParameterBoolean(TRANSLATE);
 		values = parameters.getListElementParameter(ITEM);
 		items = new String[values.size()];
 		stringIndexes = new String[values.size()];
-		int i=0;
+		int i = 0;
 		int defaultIndex = -1;
-		for (ElementParameter element : values) {
+		for (final ElementParameter element : values) {
 			String value = parameters.getElementParameter(element, VALUE);
-			String index = parameters.getElementParameter(element, INDEX);
-			if (parameters.getElementParameterBoolean(element, DEFAULT))
+			final String index = parameters.getElementParameter(element, INDEX);
+			if (parameters.getElementParameterBoolean(element, DEFAULT)) {
 				defaultIndex = i;
+			}
 			if (translate) {
-				value =renderer.getLocalizedMessage(value);		
-			}	
+				value = renderer.getLocalizedMessage(value);
+			}
 			items[i] = value;
 			stringIndexes[i] = index;
 			i++;
 			combo.add(value);
 		}
-		
-		if (defaultIndex != -1)
+
+		if (defaultIndex != -1) {
 			combo.select(defaultIndex);
+		}
 	}
-	
+
 	@Override
 	public int valueToIndex(Object value) {
 		if (value instanceof String) {
-			String val = (String)value;
-			for (int i=0;i<stringIndexes.length;i++) {
+			final String val = (String) value;
+			for (int i = 0; i < stringIndexes.length; i++) {
 				if (stringIndexes[i].equalsIgnoreCase(val)) {
 					return i;
 				}
@@ -67,7 +67,7 @@ public class FixedStringValueComboSWTProvider extends FixedValueComboSWTProvider
 
 	@Override
 	public Object indexToValue(int index) {
-		if ((index>-1) && (index<stringIndexes.length)){
+		if ((index > -1) && (index < stringIndexes.length)) {
 			return stringIndexes[index];
 		} else {
 			return null;

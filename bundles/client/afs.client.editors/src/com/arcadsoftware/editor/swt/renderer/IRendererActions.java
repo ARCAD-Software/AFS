@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -37,7 +37,7 @@ public interface IRendererActions {
 
 	/**
 	 * Add the given action in toolbar.
-	 * 
+	 *
 	 * @param action
 	 *            the action to be added.
 	 */
@@ -45,10 +45,9 @@ public interface IRendererActions {
 
 	/**
 	 * Add the given action in menu.
-	 * 
+	 *
 	 * @param menuLabel
 	 *            the menu label.
-	 * 
 	 * @param action
 	 *            the action to be added.
 	 */

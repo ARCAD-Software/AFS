@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -26,12 +26,11 @@ import com.arcadsoftware.afs.client.core.ui.managers.QueryManager;
 import com.arcadsoftware.metadata.MetaDataEntity;
 
 /**
- * This page can be used to select an entity different from those
- * you currently create
- * @author ARCAD Software
+ * This page can be used to select an entity different from those you currently create
  *
+ * @author ARCAD Software
  */
-public abstract class AbstractConnectedSelectionWizardPage extends AbstractConnectedUserDefinedSelectionWizardPage  {
+public abstract class AbstractConnectedSelectionWizardPage extends AbstractConnectedUserDefinedSelectionWizardPage {
 
 	public AbstractConnectedSelectionWizardPage(ServerConnection connection,
 			String pageName, String title, String description) {
@@ -44,81 +43,86 @@ public abstract class AbstractConnectedSelectionWizardPage extends AbstractConne
 		super(connection, pageName, title, description, selectionRequired);
 	}
 
+	@Override
 	protected AbstractSearchListComposite createSearchComposite(Composite parent,
-			MetaDataEntity entityStructure, ServerConnection connection,boolean displayInformationPanel){
-		
-		AbstractSearchListComposite searchComposite = new ListCompositeAdapter(innerComposite,entity,connection,false)	{		
+			MetaDataEntity entityStructure, ServerConnection connection, boolean displayInformationPanel) {
+
+		final AbstractSearchListComposite searchComposite = new ListCompositeAdapter(innerComposite, entity, connection,
+				false) {
+			@Override
 			protected String createSelectClause() {
 				return getSelectClause();
-				
-			};
-			
+
+			}
+
 			@Override
 			public boolean enableMultiSelection() {
 				return allowMultiSelection();
 			}
-			
+
+			@Override
 			protected String createSearchClause() {
 				return getSearchClause();
-			};
+			}
+
 			@Override
 			public String getViewerIdentifier() {
 				return null;
 			}
+
 			@Override
 			protected Image getElementIcon(Object element) {
 				return getIcon();
 			}
-			
+
 			@Override
-			public boolean defineCount() {	
+			public boolean defineCount() {
 				return true;
 			}
-			
+
 			@Override
 			protected String createOrderClause() {
 				return getOrderClause();
 			}
+
 			@Override
 			protected SimpleDateFormat getDateFormatter() {
-				SimpleDateFormat sdf = 
-						AbstractConnectedSelectionWizardPage.this.getDateFormatter();
-				if (sdf==null) {
+				final SimpleDateFormat sdf = AbstractConnectedSelectionWizardPage.this.getDateFormatter();
+				if (sdf == null) {
 					return super.getDateFormatter();
 				} else {
 					return sdf;
 				}
 			}
-			
+
 			@Override
 			protected QueryManager createQueryManager(
 					ServerConnection connection) {
-				QueryManager qm = AbstractConnectedSelectionWizardPage.this.createQueryManager(connection);
-				if (qm==null) {
+				final QueryManager qm = AbstractConnectedSelectionWizardPage.this.createQueryManager(connection);
+				if (qm == null) {
 					return super.createQueryManager(connection);
 				} else {
 					return qm;
 				}
 			}
-			
+
 			@Override
 			protected void onSelectionChange(IStructuredSelection selection) {
 				AbstractConnectedSelectionWizardPage.this.onSelectionChanged(selection);
 			}
-			
-			
+
 		};
 		return searchComposite;
 	}
-	
+
 	protected QueryManager createQueryManager(ServerConnection connection) {
 		return null;
 	}
-	
-	protected boolean allowMultiSelection(){
+
+	protected boolean allowMultiSelection() {
 		return true;
 	}
-	
-	protected void onSelectionChanged(IStructuredSelection selection){
+
+	protected void onSelectionChanged(IStructuredSelection selection) {
 	}
 }

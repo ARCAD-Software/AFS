@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -14,14 +14,14 @@
 package com.arcadsoftware.client.editors.swtwidgets.inputs;
 
 public class FileInfo {
-	
+
 	private String absoluteFilename;
 	private String relativeFilename;
-	
+
 	public FileInfo() {
 		super();
 	}
-	
+
 	public FileInfo(String absoluteFilename, String relativeFilename) {
 		this();
 		this.absoluteFilename = absoluteFilename;

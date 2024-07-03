@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -21,14 +21,14 @@ import java.util.HashMap;
 public class ColorMapTable {
 
 	static public final ColorMapTable TABLE = new ColorMapTable();
-	
-	private HashMap<String, String> colorNamesMap;
-	
+
+	private final HashMap<String, String> colorNamesMap;
+
 	/**
-	 * 
+	 *
 	 */
 	private ColorMapTable() {
-		colorNamesMap = new HashMap<String, String>(147);		
+		colorNamesMap = new HashMap<>(147);
 		colorNamesMap.put("aliceBlue", "#F0F8FF"); //$NON-NLS-1$ //$NON-NLS-2$
 		colorNamesMap.put("aqua", "#00FFFF"); //$NON-NLS-1$ //$NON-NLS-2$
 		colorNamesMap.put("aquamarine", "#7FFFD4"); //$NON-NLS-1$ //$NON-NLS-2$

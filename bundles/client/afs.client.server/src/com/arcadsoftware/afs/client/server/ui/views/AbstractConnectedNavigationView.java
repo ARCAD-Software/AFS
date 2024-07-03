@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -35,33 +35,32 @@ import com.arcadsoftware.afs.framework.ui.containers.viewer.ContainerTreeViewer;
 import com.arcadsoftware.afs.framework.ui.views.AbstractNavigatorView;
 import com.arcadsoftware.beanmap.BeanMap;
 
+public abstract class AbstractConnectedNavigationView extends AbstractNavigatorView
+		implements ITabbedPropertySheetPageContributor {
 
-public abstract class AbstractConnectedNavigationView extends AbstractNavigatorView 
-implements ITabbedPropertySheetPageContributor {
-	
 	public static final String PROPERTY_CONTRIBUTOR_ID = "com.arcadsoftware.afs.client.server.view.navigation.propertyId"; //$NON-NLS-1$
 	private ServerContainer serverContainer;
-	
+
 	private Action refreshAction;
-	
+
 	@Override
 	public Object[] getRootChildren(Container root) {
-		if(serverContainer == null) {
+		if (serverContainer == null) {
 			serverContainer = getServerContainer(root);
 		}
-		return new Object[]{ serverContainer };
+		return new Object[] { serverContainer };
 	}
-	
-	protected ServerContainer getServerContainer(Container parent){
-		return new ServerContainer(parent, true); 
+
+	protected ServerContainer getServerContainer(Container parent) {
+		return new ServerContainer(parent, true);
 	}
-	
+
 	@Override
 	protected void viewerCreated(ContainerTreeViewer viewer) {
 		getSite().setSelectionProvider(viewer.getViewer());
-		((ColumnedTreeViewer)viewer.getViewer()).expandAll();
+		((ColumnedTreeViewer) viewer.getViewer()).expandAll();
 	}
-	
+
 	@Override
 	protected void defineActions() {
 		refreshAction = new Action() {
@@ -75,22 +74,21 @@ implements ITabbedPropertySheetPageContributor {
 		refreshAction.setToolTipText(Activator.resString("action.refresh.text.tooltip")); //$NON-NLS-1$
 		refreshAction.setImageDescriptor(AFSIcon.REFRESH.imageDescriptor());
 	}
-	
-	
+
 	@Override
 	protected void fillFixedContainerAction(IMenuManager manager) {
 		super.fillFixedContainerAction(manager);
 		manager.add(new Separator());
-		manager.add(refreshAction);		
+		manager.add(refreshAction);
 	}
-	
+
 	@Override
 	protected void doubleClickOnContainer(IContainer o) {
-		if( o instanceof ServerItem) {
-			ServerItem item = ((ServerItem)o); 
+		if (o instanceof ServerItem) {
+			final ServerItem item = ((ServerItem) o);
 			item.connect();
 			if (item.isConnected()) {
-				doOnConnect(item);	
+				doOnConnect(item);
 			}
 		}
 	}
@@ -98,32 +96,34 @@ implements ITabbedPropertySheetPageContributor {
 	@Override
 	protected void containerSelected(IContainer o) {
 		if (o instanceof ISelfSelectionManager) {
-			((ISelfSelectionManager)o).selected();
-		} 
-		if( o instanceof IOpenViewContainer) {
-			IOpenViewContainer c = (IOpenViewContainer)o;
+			((ISelfSelectionManager) o).selected();
+		}
+		if (o instanceof IOpenViewContainer) {
+			final IOpenViewContainer c = (IOpenViewContainer) o;
 			c.OpenManagementView();
-		}		
+		}
 		if (o instanceof BeanMapItem) {
-			BeanMap selected = ((BeanMapItem)o).getBeanMap();
+			final BeanMap selected = ((BeanMapItem) o).getBeanMap();
 			BeanMapSelectionManager.getInstance().fireBeanMapSelection(selected);
 		}
-	}		
-	
+	}
+
+	@Override
 	public String getContributorId() {
 		return PROPERTY_CONTRIBUTOR_ID;
 	}
-	
+
+	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Object getAdapter(Class adapter) {
-        if (adapter == IPropertySheetPage.class)
-            return new TabbedPropertySheetPage(this);
-        return super.getAdapter(adapter);
-    }	
-	
-	
-	public void doOnConnect(ServerItem item){
-		
+		if (adapter == IPropertySheetPage.class) {
+			return new TabbedPropertySheetPage(this);
+		}
+		return super.getAdapter(adapter);
 	}
-	
+
+	public void doOnConnect(ServerItem item) {
+
+	}
+
 }

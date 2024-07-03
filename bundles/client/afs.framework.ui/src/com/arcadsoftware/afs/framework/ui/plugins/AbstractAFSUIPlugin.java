@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -22,6 +22,7 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -47,25 +48,26 @@ import org.osgi.framework.BundleContext;
 import com.arcadsoftware.afs.framework.ui.internal.Activator;
 import com.arcadsoftware.osgi.ILoggedPlugin;
 
-public abstract class AbstractAFSUIPlugin extends AbstractUIPlugin  implements ILoggedPlugin {
+public abstract class AbstractAFSUIPlugin extends AbstractUIPlugin implements ILoggedPlugin {
 
 	protected static final String ICON_PATH = "icons/";
 
 	private class PluginShellProvider implements IShellProvider {
-		
+
 		AbstractAFSUIPlugin plugin;
 
 		public PluginShellProvider(AbstractAFSUIPlugin plugin) {
 			this.plugin = plugin;
 		}
 
+		@Override
 		public Shell getShell() {
 			return plugin.getPluginShell();
 		}
 	}
-	
+
 	private class DecoratorImageDescriptor extends CompositeImageDescriptor {
-		
+
 		ImageData baseImage;
 		ImageData overlay;
 
@@ -90,36 +92,35 @@ public abstract class AbstractAFSUIPlugin extends AbstractUIPlugin  implements I
 			return new Point(16, 16);
 		}
 	}
-	
-	private Hashtable<String,ImageDescriptor> imageDescriptorRegistry = new Hashtable<String,ImageDescriptor>();
+
+	private final Hashtable<String, ImageDescriptor> imageDescriptorRegistry = new Hashtable<>();
 	private ImageRegistry imageRegistry;
 	protected FontRegistry fontRegistry;
 	protected ColorRegistry colorRegistry;
 	protected ResourceBundle resourceBundle;
-	private PluginShellProvider shellProvider = new PluginShellProvider(this);
-	
+	private final PluginShellProvider shellProvider = new PluginShellProvider(this);
+
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		try {
 			resourceBundle = loadResourceBundle(getResourceBundleName(), Locale.getDefault());
-		} catch (MissingResourceException e) {
+		} catch (final MissingResourceException e) {
 			// FIXME Error not logged !
 			resourceBundle = null;
-		}		
+		}
 	}
-	
-	
+
 	/**
 	 * Returns the plugin's resource bundle, can be null.
 	 */
 	public ResourceBundle getResourceBundle() {
 		return resourceBundle;
 	}
-	
+
 	/**
 	 * Return the key associated value into the downloaded properties file.
-	 * 
+	 *
 	 * @param key
 	 *            the key value.
 	 * @return key is the corresponding string is not found.
@@ -127,16 +128,16 @@ public abstract class AbstractAFSUIPlugin extends AbstractUIPlugin  implements I
 
 	public String getResourceString(String key) {
 		try {
-			String value = resourceBundle.getString(key);
+			final String value = resourceBundle.getString(key);
 			if ((value != null) && !value.isEmpty() && (value.charAt(0) == '!')) {
 				return getResourceString(value.substring(1));
 			}
 			return value;
-		} catch (MissingResourceException e) {
+		} catch (final MissingResourceException e) {
 			return key;
 		}
 	}
-	
+
 	public static String getIconPath() {
 		return ICON_PATH;
 	}
@@ -144,9 +145,9 @@ public abstract class AbstractAFSUIPlugin extends AbstractUIPlugin  implements I
 	public String getPluginPath() throws IOException {
 		return new Path(FileLocator.resolve(getBundle().getEntry("/")).getPath()).toOSString(); //$NON-NLS-1$
 	}
-	
+
 	protected ImageDescriptor putImageInRegistry(String id, String fileName) {
-		ImageDescriptor fid = getPluginImage(fileName);
+		final ImageDescriptor fid = getPluginImage(fileName);
 		imageRegistry.put(id, fid);
 		imageDescriptorRegistry.put(id, fid);
 		return fid;
@@ -155,7 +156,7 @@ public abstract class AbstractAFSUIPlugin extends AbstractUIPlugin  implements I
 	public ImageDescriptor getPluginImage(String fileName) {
 		try {
 			return ImageDescriptor.createFromURL(new URL(getBundle().getEntry("/"), fileName)); //$NON-NLS-1$
-		} catch (MalformedURLException e) {
+		} catch (final MalformedURLException e) {
 			// FIXME Error not logged !
 			return null;
 		}
@@ -163,11 +164,11 @@ public abstract class AbstractAFSUIPlugin extends AbstractUIPlugin  implements I
 
 	/**
 	 * Get an image from the JFace Image Registry.
-	 * 
 	 * <p>
 	 * You do not have to dispose this image.
-	 * 
-	 * @param key The image key in the registry.
+	 *
+	 * @param key
+	 *            The image key in the registry.
 	 * @return may return null if the image is not found.
 	 * @see ImageRegistry
 	 */
@@ -181,7 +182,7 @@ public abstract class AbstractAFSUIPlugin extends AbstractUIPlugin  implements I
 		}
 		try {
 			return imageRegistry.get(key);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			log(e);
 			return null;
 		}
@@ -214,7 +215,7 @@ public abstract class AbstractAFSUIPlugin extends AbstractUIPlugin  implements I
 			imageRegistry = JFaceResources.getImageRegistry();
 			fillImageRegistry();
 		}
-		return (ImageDescriptor) imageDescriptorRegistry.get(key);
+		return imageDescriptorRegistry.get(key);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -231,7 +232,7 @@ public abstract class AbstractAFSUIPlugin extends AbstractUIPlugin  implements I
 	}
 
 	public Image getCompositeImage(Image image, String decoKey) {
-		ImageDescriptor imgd = getCompositeImageDescriptor(image, decoKey);
+		final ImageDescriptor imgd = getCompositeImageDescriptor(image, decoKey);
 		if (imgd != null) {
 			return imgd.createImage();
 		}
@@ -241,18 +242,18 @@ public abstract class AbstractAFSUIPlugin extends AbstractUIPlugin  implements I
 	public String getVersion() {
 		return getBundle().getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION);
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	public ImageDescriptor getCompositeImageDescriptor(String key, String decoKey) {
-		String id = key + '_' + decoKey;
+		final String id = key + '_' + decoKey;
 		DecoratorImageDescriptor deco = (DecoratorImageDescriptor) imageDescriptorRegistry.get(id);
 		if (deco == null) {
-			ImageDescriptor main = getImageDescriptor(key);
-			ImageDescriptor overlay = getImageDescriptor(decoKey);
+			final ImageDescriptor main = getImageDescriptor(key);
+			final ImageDescriptor overlay = getImageDescriptor(decoKey);
 			if ((main != null) && (overlay != null)) {
 				deco = new DecoratorImageDescriptor(main.getImageData(), overlay.getImageData());
 				imageDescriptorRegistry.put(id, deco);
-				Image imgd = deco.createImage();
+				final Image imgd = deco.createImage();
 				imageRegistry.put(id, imgd);
 			}
 		}
@@ -274,52 +275,52 @@ public abstract class AbstractAFSUIPlugin extends AbstractUIPlugin  implements I
 
 	protected void initializeColorRegistry() {
 		// Do nothing
-	}	
-	
+	}
+
 	public boolean openConfirm(String message) {
 		return MessageDialog.openConfirm(getPluginShell(), getApplicationTitle(), message);
 	}
-	
+
 	public boolean openConfirm(String title, String message) {
 		return MessageDialog.openConfirm(getPluginShell(), title, message);
 	}
 
 	public boolean openQuestion(String message) {
 		return MessageDialog.openQuestion(getPluginShell(), getApplicationTitle(), message);
-	}	
-	
-	public void openInformation(String message) {		
+	}
+
+	public void openInformation(String message) {
 		MessageDialog.openInformation(getPluginShell(), getApplicationTitle(), message);
 	}
 
-	public void openInformation(String title,String message) {		
+	public void openInformation(String title, String message) {
 		MessageDialog.openInformation(getPluginShell(), title, message);
-	}	
-	
-	public void openWarning(String message) {		
+	}
+
+	public void openWarning(String message) {
 		MessageDialog.openWarning(getPluginShell(), getApplicationTitle(), message);
 	}
 
-	public void openWarning(String title,String message) {		
+	public void openWarning(String title, String message) {
 		MessageDialog.openWarning(getPluginShell(), title, message);
-	}		
-	
+	}
+
 	public void openError(String message) {
 		MessageDialog.openError(getPluginShell(), getApplicationTitle(), message);
-	}	
-	
-	public void openError(String title,String message) {
+	}
+
+	public void openError(String title, String message) {
 		MessageDialog.openError(getPluginShell(), title, message);
-	}		
-	
+	}
+
 	@SuppressWarnings("deprecation")
-	private IWorkbenchPage getPluginPage() {		
+	private IWorkbenchPage getPluginPage() {
 		if (getWorkbench() == null) {
 			return null;
 		}
 		if (getWorkbench().getActiveWorkbenchWindow() != null) {
 			return getWorkbench().getActiveWorkbenchWindow().getActivePage();
-		} 
+		}
 		if (getWorkbench().getWorkbenchWindows().length > 0) {
 			return (getWorkbench().getWorkbenchWindows()[0]).getActivePage();
 		}
@@ -327,7 +328,7 @@ public abstract class AbstractAFSUIPlugin extends AbstractUIPlugin  implements I
 	}
 
 	public IViewPart openView(String ID) {
-		IWorkbenchPage page = getPluginPage();
+		final IWorkbenchPage page = getPluginPage();
 		if (page != null) {
 			return page.findView(ID);
 		}
@@ -335,101 +336,116 @@ public abstract class AbstractAFSUIPlugin extends AbstractUIPlugin  implements I
 	}
 
 	public IViewPart showView(String ID) {
-		IWorkbenchPage page = getPluginPage();
+		final IWorkbenchPage page = getPluginPage();
 		if (page != null) {
 			try {
 				return page.showView(ID, null, IWorkbenchPage.VIEW_ACTIVATE);
-			} catch (PartInitException e) {
+			} catch (final PartInitException e) {
 				error(e.getLocalizedMessage(), e);
 			}
 		}
 		return null;
 	}
-	
+
 	/**
 	 * mode to show view
+	 *
 	 * @param ID
 	 * @param mode
 	 * @return
 	 */
 	public IViewPart showView(String ID, int mode) {
-		IWorkbenchPage page = getPluginPage();
+		final IWorkbenchPage page = getPluginPage();
 		if (page != null) {
 			try {
 				return page.showView(ID, null, mode);
-			} catch (PartInitException e) {
+			} catch (final PartInitException e) {
 				error(e.getLocalizedMessage(), e);
 			}
 		}
 		return null;
 	}
+
 	public IViewPart findView(String ID) {
-		IWorkbenchPage page = getPluginPage();
+		final IWorkbenchPage page = getPluginPage();
 		if (page != null) {
 			return page.findView(ID);
 		}
 		return null;
-	}		
-	
+	}
+
 	public boolean isViewVisible(String ID) {
-		IWorkbenchPage page = getPluginPage();
+		final IWorkbenchPage page = getPluginPage();
 		return (page != null) && page.isPartVisible(findView(ID));
 	}
-	
+
+	@Override
 	public void log(String message) {
-		getLog().log(new Status(Status.INFO,getBundle().getSymbolicName(), message));
+		getLog().log(new Status(IStatus.INFO, getBundle().getSymbolicName(), message));
 	}
-	
+
+	@Override
 	public void log(String message, Throwable e) {
-		getLog().log(new Status(Status.ERROR,getBundle().getSymbolicName(), message, e));
+		getLog().log(new Status(IStatus.ERROR, getBundle().getSymbolicName(), message, e));
 	}
-	
+
+	@Override
 	public void log(Throwable e) {
-		getLog().log(new Status(Status.ERROR,getBundle().getSymbolicName(), e.getLocalizedMessage(), e));
+		getLog().log(new Status(IStatus.ERROR, getBundle().getSymbolicName(), e.getLocalizedMessage(), e));
 	}
-	
+
+	@Override
 	public void warn(String message) {
-		getLog().log(new Status(Status.WARNING,getBundle().getSymbolicName(), message));
+		getLog().log(new Status(IStatus.WARNING, getBundle().getSymbolicName(), message));
 	}
-	
+
+	@Override
 	public void warn(String message, Throwable e) {
-		getLog().log(new Status(Status.WARNING,getBundle().getSymbolicName(), message, e));
+		getLog().log(new Status(IStatus.WARNING, getBundle().getSymbolicName(), message, e));
 	}
-	
+
+	@Override
 	public void debug(String message) {
 		if (isDebugging()) {
-			getLog().log(new Status(Status.INFO,getBundle().getSymbolicName(),Activator.resString("Log.debug") + message)); //$NON-NLS-1$
+			getLog().log(new Status(IStatus.INFO, getBundle().getSymbolicName(),
+					Activator.resString("Log.debug") + message)); //$NON-NLS-1$
 		}
 	}
 
+	@Override
 	public void debug(String message, Throwable e) {
 		if (isDebugging()) {
-			getLog().log(new Status(Status.INFO,getBundle().getSymbolicName(),Activator.resString("Log.debug") + message, e)); //$NON-NLS-1$
+			getLog().log(new Status(IStatus.INFO, getBundle().getSymbolicName(),
+					Activator.resString("Log.debug") + message, e)); //$NON-NLS-1$
 		}
 	}
 
+	@Override
 	public void debug(Throwable e) {
 		if (isDebugging()) {
-			getLog().log(new Status(Status.INFO,getBundle().getSymbolicName(),Activator.resString("Log.debug") + e.getLocalizedMessage(), e)); //$NON-NLS-1$
+			getLog().log(new Status(IStatus.INFO, getBundle().getSymbolicName(),
+					Activator.resString("Log.debug") + e.getLocalizedMessage(), e)); //$NON-NLS-1$
 		}
 	}
-	
+
+	@Override
 	public void error(String message, Throwable e) {
-		getLog().log(new Status(Status.ERROR,getBundle().getSymbolicName(), message, e));
-		
+		getLog().log(new Status(IStatus.ERROR, getBundle().getSymbolicName(), message, e));
+
 	}
-	
+
 	public void error(String message) {
-		getLog().log(new Status(Status.ERROR,getBundle().getSymbolicName(), message));
-		
-	}	
-	
+		getLog().log(new Status(IStatus.ERROR, getBundle().getSymbolicName(), message));
+
+	}
+
 	public abstract String getResourceBundleName();
-	
+
 	protected abstract void fillImageRegistry();
-	
-	protected abstract ResourceBundle loadResourceBundle(String bundleName,Locale local) throws MissingResourceException;
-	
+
+	protected abstract ResourceBundle loadResourceBundle(String bundleName, Locale local)
+			throws MissingResourceException;
+
 	protected abstract String getApplicationTitle();
-	
+
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -33,7 +33,7 @@ import com.arcadsoftware.metadata.MetaDataEntity;
  * This class implement a Combo SWT Widget provider for the dynamic editors.
  */
 public abstract class AbstractFixedValueComboSWTProvider implements IInputSWTProvider {
-	
+
 	private FixedCombo combo;
 	protected ISWTRenderer renderer;
 	protected ILayoutParameters parameters;
@@ -63,21 +63,22 @@ public abstract class AbstractFixedValueComboSWTProvider implements IInputSWTPro
 
 		@Override
 		public Object getType() {
-			return AbstractFixedValueComboSWTProvider.this.getResultType();
+			return getResultType();
 		}
-		
+
 	}
-	
+
+	@Override
 	public void create(ISWTRenderer swtRenderer, ILayoutParameters parameters, Element element,
 			MetaDataEntity structure) {
 		renderer = swtRenderer;
 		this.parameters = parameters;
-		String label = renderer.getLocalizedMessage(parameters.getParameter(LABEL, element.getName()));
+		final String label = renderer.getLocalizedMessage(parameters.getParameter(LABEL, element.getName()));
 		if (label.length() > 0) {
 			renderer.getToolkit().createLabel(renderer.getParent(), label);
 			renderer.getToolkit().createLabel(renderer.getParent(), TWO_POINTS);
 		}
-		int horizontalSpan = (label.length() > 0) ? 1 : 3;
+		final int horizontalSpan = (label.length() > 0) ? 1 : 3;
 		int style = 0;
 		if (parameters.getParameterBoolean("readOnly")) { //$NON-NLS-1$
 			style |= SWT.READ_ONLY;
@@ -89,26 +90,29 @@ public abstract class AbstractFixedValueComboSWTProvider implements IInputSWTPro
 			style |= SWT.DROP_DOWN;
 		}
 		combo = new FixedCombo(renderer.getParent(), style, parameters, renderer, element, horizontalSpan);
-		Combo widget = (Combo) combo.getWidget();
+		final Combo widget = (Combo) combo.getWidget();
 		widget.setEnabled(!element.isReadonly());
-		//widget.setEnabled(true);
-		if (parameters.getParameterBoolean(DEFAULT))
+		// widget.setEnabled(true);
+		if (parameters.getParameterBoolean(DEFAULT)) {
 			widget.setFocus();
-		//TODO RAP
-		//renderer.getToolkit().paintBordersFor(renderer.getParent());		
-		if (parameters.getParameterBoolean(MANDATORY))
+		}
+		// TODO RAP
+		// renderer.getToolkit().paintBordersFor(renderer.getParent());
+		if (parameters.getParameterBoolean(MANDATORY)) {
 			renderer.addMandatoryAttribute(element.getCode());
+		}
 		renderer.getRendererBinding().bindElement(element, combo);
 	}
 
+	@Override
 	public void dispose() {
 	}
-	
+
 	public abstract void fill(Combo combo);
-	
+
 	public abstract int valueToIndex(Object value);
-	
+
 	public abstract Object indexToValue(int index);
-	
+
 	public abstract Object getResultType();
 }

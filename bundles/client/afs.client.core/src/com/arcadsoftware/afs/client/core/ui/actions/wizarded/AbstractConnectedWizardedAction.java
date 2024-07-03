@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -34,21 +34,20 @@ import com.arcadsoftware.beanmap.BeanMap;
 
 /**
  * This class define an action that performs an operation onto a data (BeanMap).
- * 
  * <p>
- * This operation is proceeded into a wizard that will be defined by the implementation of this class.
- * This may be a creation or edition operation generally associated to "Add" or any kind of "Edit" actions.
- *    
+ * This operation is proceeded into a wizard that will be defined by the implementation of this class. This may be a
+ * creation or edition operation generally associated to "Add" or any kind of "Edit" actions.
+ * 
  * @author ARCAD Software
  */
-public abstract class AbstractConnectedWizardedAction extends AbstractSimpleItemWithWizardAction 
-implements ISecuredAction, IActionActivationManager, IDynamicHelpIdProvider {
+public abstract class AbstractConnectedWizardedAction extends AbstractSimpleItemWithWizardAction
+		implements ISecuredAction, IActionActivationManager, IDynamicHelpIdProvider {
 
 	protected BeanMap currentBeanMap;
 	protected ServerConnection connection;
 	protected DataAccessHelper helper;
 	protected ArrayList<AbstractConnectedWizardPage> pageList;
-	protected List<IBeanMapActionListener> listeners = null;
+	protected List<IBeanMapActionListener> listeners;
 
 	public AbstractConnectedWizardedAction(ServerConnection connection) {
 		this.connection = connection;
@@ -58,9 +57,9 @@ implements ISecuredAction, IActionActivationManager, IDynamicHelpIdProvider {
 	/**
 	 * Called before the record operation.
 	 * <p>
-	 * If <code>false</code> is returned then the record operation is cancelled and the
-	 * <code>doAfterSaving()</code> method is not called.
-	 * 
+	 * If <code>false</code> is returned then the record operation is cancelled and the <code>doAfterSaving()</code>
+	 * method is not called.
+	 *
 	 * @param beanmap
 	 * @return
 	 */
@@ -70,22 +69,22 @@ implements ISecuredAction, IActionActivationManager, IDynamicHelpIdProvider {
 
 	/**
 	 * Called after the record operation.
-	 * 
 	 * <p>
 	 * Into standard Wizards the returned value is not used.
-	 * 
+	 *
 	 * @param beanmap
-	 * @return 
+	 * @return
 	 */
 	public boolean doAfterSaving(BeanMap beanmap) {
 		return true;
 	}
-	
+
 	@Override
 	protected void doAfterRun() {
-		if (isRunOk()){
-			if (listeners != null && currentBeanMap != null && getActionType() != IBeanMapActionListener.ACTION_NONE){
-				for (IBeanMapActionListener listener : listeners) {
+		if (isRunOk()) {
+			if ((listeners != null) && (currentBeanMap != null)
+					&& (getActionType() != IBeanMapActionListener.ACTION_NONE)) {
+				for (final IBeanMapActionListener listener : listeners) {
 					listener.actionDone(getActionType(), currentBeanMap);
 				}
 			}
@@ -100,119 +99,116 @@ implements ISecuredAction, IActionActivationManager, IDynamicHelpIdProvider {
 	@Override
 	protected void doInitialize() {
 		super.doInitialize();
-		
+
 	}
-	
+
 	@Override
 	public AbstractSimpleItemWizardPage[] getPages() {
-		pageList = new ArrayList<AbstractConnectedWizardPage>();
+		pageList = new ArrayList<>();
 		addConnectedWizardPages(connection);
-		AbstractSimpleItemWizardPage[] result = new AbstractSimpleItemWizardPage[pageList.size()];
+		final AbstractSimpleItemWizardPage[] result = new AbstractSimpleItemWizardPage[pageList.size()];
 		int i = 0;
-		for (AbstractConnectedWizardPage page:pageList)  {
-			result[i++]=page;
+		for (final AbstractConnectedWizardPage page : pageList) {
+			result[i++] = page;
 		}
 		return result;
-	}	
-	
+	}
+
 	/**
 	 * Use this method to add a wizard page.
-	 * 
 	 * <p>
-	 * The <code>initBeanMap</code> of the page is called as soon as the 
-	 * page is added to the wizard.
-	 * 
+	 * The <code>initBeanMap</code> of the page is called as soon as the page is added to the wizard.
+	 *
 	 * @param page
 	 */
 	public void addConnectedWizardPage(AbstractConnectedWizardPage page) {
 		page.initBeanMap(currentBeanMap);
 		pageList.add(page);
 	}
-	
+
 	/**
 	 * @return the currently data associated to this action execution.
 	 */
-	public BeanMap getCurrentBeanMap(){
+	public BeanMap getCurrentBeanMap() {
 		return currentBeanMap;
 	}
-	
+
 	@Override
 	protected boolean canExecute() {
-		boolean result =  super.canExecute();
+		boolean result = super.canExecute();
 		if (result) {
 			result = isAllowed();
-			if (! result){
-//				LogUITools.logError(Activator.getDefault().getBundle(), 
-//						UserMessageManager.getInstance().getMessage(IACCMessages.ERR_ACTION_NO_RIGHT));
-//				MessageDialog.openError(Activator.getDefault().getPluginShell(), 
-//						getText(),
-//						Activator.resString("msg.error.right.missing")); //$NON-NLS-1$
+			if (!result) {
 				Activator.getDefault().missingRight(getExpectedRigths());
 			}
 		}
 		return result;
 	}
-	
+
+	@Override
 	public boolean isAllowed() {
 		return connection.isAllowed(getExpectedRigths());
 	}
-	
-	protected int getActionType(){
+
+	protected int getActionType() {
 		return IBeanMapActionListener.ACTION_NONE;
 	}
-	
-	public void addActionListener(IBeanMapActionListener listener){
-		if (listeners == null){
-			listeners = new ArrayList<IBeanMapActionListener>();
+
+	public void addActionListener(IBeanMapActionListener listener) {
+		if (listeners == null) {
+			listeners = new ArrayList<>();
 		}
-		if (!listeners.contains(listener)){
+		if (!listeners.contains(listener)) {
 			listeners.add(listener);
 		}
 	}
-	
+
+	@Override
 	public boolean allowMultiSelection() {
 		return true;
 	}
-	
+
+	@Override
 	public boolean isAvailable() {
 		return canExecute();
 	}
 
 	/**
 	 * Get Dynamic Help Id
+	 *
 	 * @return
 	 */
+	@Override
 	public String getDynamicHelpId() {
 		return null;
 	}
-	
-	
-	protected void doAfterWizardCreation(Dialog dialog){
-		if (getDynamicHelpId() != null){
+
+	@Override
+	protected void doAfterWizardCreation(Dialog dialog) {
+		if (getDynamicHelpId() != null) {
 			DynamicHelp.updateContextHelpId(getDynamicHelpId(), dialog.getShell());
 		}
 	}
-	
+
 	/**
-	 * This method is used to initialize the beanMap
-	 * before display the wizard
+	 * This method is used to initialize the beanMap before display the wizard
+	 *
 	 * @param beanmap
 	 */
 	public abstract void initBeanMap(BeanMap beanmap);
-	
+
 	/**
 	 * Override this method to add the pages to the wizard.
-	 * 
 	 * <p>
 	 * To do so use the <code>addConnectedWizardPagew</code> method.
-	 * 
 	 * <p>
 	 * You can use the <code>getCurrentBeanMap()</code> when adding pages.
-	 * 
-	 * @param connexion The current server connexion.
+	 *
+	 * @param connexion
+	 *            The current server connexion.
 	 * @see #addConnectedWizardPage(AbstractConnectedWizardPage)
 	 * @see #getCurrentBeanMap()
 	 */
 	public abstract void addConnectedWizardPages(ServerConnection connexion);
-	
+
 }

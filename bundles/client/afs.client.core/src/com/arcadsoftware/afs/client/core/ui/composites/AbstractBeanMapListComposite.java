@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -122,7 +122,8 @@ public abstract class AbstractBeanMapListComposite extends Composite implements 
 							if (actualColumnIndex == 0) {
 								return getElementIcon(element);
 							}
-							final Image image = AbstractBeanMapListComposite.this.getCustomColumnImage(element, actualColumnIndex);
+							final Image image = AbstractBeanMapListComposite.this.getCustomColumnImage(element,
+									actualColumnIndex);
 							if (image == null) {
 								return super.getActualImage(element, actualColumnIndex);
 							}
@@ -158,7 +159,7 @@ public abstract class AbstractBeanMapListComposite extends Composite implements 
 					return header;
 				}
 				return super.getColumnHeader(attribute);
-			};
+			}
 
 			@Override
 			protected int getColumnSize(String attribute) {
@@ -167,7 +168,7 @@ public abstract class AbstractBeanMapListComposite extends Composite implements 
 					return size;
 				}
 				return super.getColumnSize(attribute);
-			};
+			}
 
 			@Override
 			protected Image getCustomColumnImage(Object element,
@@ -181,7 +182,8 @@ public abstract class AbstractBeanMapListComposite extends Composite implements 
 		};
 	}
 
-	protected void doOnSelection(BeanMap selected) {}
+	protected void doOnSelection(BeanMap selected) {
+	}
 
 	protected AbstractColumnedViewer createTreeViewer(Composite parent) {
 		return new BeanMapListTreeViewer(parent,
@@ -239,7 +241,7 @@ public abstract class AbstractBeanMapListComposite extends Composite implements 
 					return header;
 				}
 				return super.getColumnHeader(AbstractBeanMapListComposite.this.transformColumnHeader(attribute));
-			};
+			}
 
 			@Override
 			protected int getColumnSize(String attribute) {
@@ -248,7 +250,7 @@ public abstract class AbstractBeanMapListComposite extends Composite implements 
 					return size;
 				}
 				return super.getColumnSize(attribute);
-			};
+			}
 
 			@Override
 			protected Image getCustomColumnImage(Object element, int actualColumnIndex) {
@@ -266,9 +268,11 @@ public abstract class AbstractBeanMapListComposite extends Composite implements 
 		return parent;
 	}
 
-	protected void addContentBeforeViewer(Composite parent) {}
+	protected void addContentBeforeViewer(Composite parent) {
+	}
 
-	protected void addContentAfterViewer(Composite parent) {}
+	protected void addContentAfterViewer(Composite parent) {
+	}
 
 	protected boolean getDisplayAsTree() {
 		return false;
@@ -442,7 +446,7 @@ public abstract class AbstractBeanMapListComposite extends Composite implements 
 	 * {@link #transformColumnHeader(String)}.
 	 * </p>
 	 * </p>
-	 * 
+	 *
 	 * @param attribute
 	 * @return
 	 */
@@ -495,7 +499,8 @@ public abstract class AbstractBeanMapListComposite extends Composite implements 
 	 * @param selection
 	 *            The current selection selection
 	 */
-	protected void doOnDoubleClickEvent(IStructuredSelection selection) {}
+	protected void doOnDoubleClickEvent(IStructuredSelection selection) {
+	}
 
 	/**
 	 * Override this method to define your own AbstractColumnedTableLabelProvider

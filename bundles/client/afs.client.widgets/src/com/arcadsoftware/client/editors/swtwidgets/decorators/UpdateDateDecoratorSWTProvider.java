@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -32,34 +32,37 @@ import com.arcadsoftware.editor.swt.IUpdateDateChanged;
 import com.arcadsoftware.metadata.MetaDataEntity;
 
 /**
- * This class implement a Label Decorator SWT Widget provider for the dynamic
- * editors.
+ * This class implement a Label Decorator SWT Widget provider for the dynamic editors.
  */
 public class UpdateDateDecoratorSWTProvider implements IDecoratorSWTProvider, IUpdateDateChanged {
 
 	private DateTime date;
 	private ISWTRenderer renderer;
-	private Calendar calendar = Calendar.getInstance();
+	private final Calendar calendar = Calendar.getInstance();
 
+	@Override
 	public Widget create(ISWTRenderer swtRenderer, ILayoutParameters parameters, MetaDataEntity structure) {
-		this.renderer = swtRenderer;
+		renderer = swtRenderer;
 		renderer.getUpdateDateListeners().addUpdateDateChanged(this);
 		renderer.getToolkit().createLabel(renderer.getParent(),
 				renderer.getLocalizedMessage(parameters.getParameter(LABEL)));
 		renderer.getToolkit().createLabel(renderer.getParent(), TWO_POINTS);
 		date = new DateTime(renderer.getParent(), SWT.DATE);
 		date.setEnabled(false);
-		if (renderer.getParent().getLayout() instanceof GridLayout)
+		if (renderer.getParent().getLayout() instanceof GridLayout) {
 			date.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		}
 		return date;
 	}
 
+	@Override
 	public void dispose() {
 		renderer.getUpdateDateListeners().removeUpdateDateChanged(this);
 	}
 
+	@Override
 	public void updateDateChanged() {
-		Date updateDate = renderer.getUpdateDate();
+		final Date updateDate = renderer.getUpdateDate();
 		if (updateDate != null) {
 			calendar.setTime(updateDate);
 			date

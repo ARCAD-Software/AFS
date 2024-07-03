@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -21,8 +21,7 @@ import org.eclipse.core.runtime.Platform;
 import com.arcadsoftware.editor.implementation.Activator;
 
 /**
- * This class permits to create instance of action defines by
- * com.arcadsoftware.client.editor.action extension point.
+ * This class permits to create instance of action defines by com.arcadsoftware.client.editor.action extension point.
  */
 public class EditorActionFactory {
 
@@ -32,28 +31,30 @@ public class EditorActionFactory {
 	private static final String ID = "id"; //$NON-NLS-1$
 
 	private EditorActionFactory() {
-		//Do nothing
+		// Do nothing
 	}
-	
+
 	/**
 	 * Creates a new instance of action.
-	 * 
+	 *
 	 * @param actionId
 	 *            The action id.
 	 * @return The action instance if actionId is correct; null otherwise.
 	 */
 	public static IEditorAction getEditorAction(String actionId) {
 		IEditorAction action = null;
-		if (actionId == null)
+		if (actionId == null) {
 			throw new NullPointerException();
-		IExtensionRegistry extensionRegistry = Platform.getExtensionRegistry();
-		IConfigurationElement[] configurationElements = extensionRegistry.getConfigurationElementsFor(EXTENSION_POINT_ID);
-		for (IConfigurationElement element: configurationElements) {
+		}
+		final IExtensionRegistry extensionRegistry = Platform.getExtensionRegistry();
+		final IConfigurationElement[] configurationElements = extensionRegistry
+				.getConfigurationElementsFor(EXTENSION_POINT_ID);
+		for (final IConfigurationElement element : configurationElements) {
 			if (ACTION.equals(element.getName()) && actionId.equals(element.getAttribute(ID))) {
 				try {
 					action = (IEditorAction) element.createExecutableExtension(CLASS);
 					break;
-				} catch (CoreException e) {
+				} catch (final CoreException e) {
 					Activator.getInstance().log(e);
 				}
 			}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -42,8 +42,10 @@ import com.arcadsoftware.script.IScriptAction;
 public class LinkTableSWTProvider implements IInputSWTProvider {
 
 	private BeanMapTableViewer viewer;
-	
-	public void create(final ISWTRenderer renderer, ILayoutParameters parameters, Element element, MetaDataEntity structure) {
+
+	@Override
+	public void create(final ISWTRenderer renderer, ILayoutParameters parameters, Element element,
+			MetaDataEntity structure) {
 		if (!(element instanceof MetaDataLink)) {
 			return;
 		}
@@ -59,15 +61,15 @@ public class LinkTableSWTProvider implements IInputSWTProvider {
 					Messages.linkTable_label))) {
 				@Override
 				public void run() {
-					HashMap<String, Object> parameters = new HashMap<String, Object>(3);
+					final HashMap<String, Object> parameters = new HashMap<>(3);
 					parameters.put(IScriptAction.PARAM_ENTITY, entity);
 					parameters.put("list", viewer.getBeanMapList()); //$NON-NLS-1$
 					parameters.put("link", link); //$NON-NLS-1$
-					Object result = renderer.runScriptAction(selectAction, parameters);
+					final Object result = renderer.runScriptAction(selectAction, parameters);
 					if (result instanceof BeanMap) {
 						renderer.addLinkitem(link, (BeanMap) result);
 					} else if (result instanceof BeanMapList) {
-						for(BeanMap bean: (BeanMapList) result) {
+						for (final BeanMap bean : (BeanMapList) result) {
 							renderer.addLinkitem(link, bean);
 						}
 					}
@@ -82,16 +84,17 @@ public class LinkTableSWTProvider implements IInputSWTProvider {
 				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ELCL_REMOVE)) {
 			@Override
 			public void run() {
-				Object o = viewer.getFirstSelectedObject();
+				final Object o = viewer.getFirstSelectedObject();
 				if (o instanceof BeanMap) {
 					// Open Editor for edition...
-					HashMap<String, Object> parameters = new HashMap<String, Object>(2);
+					final HashMap<String, Object> parameters = new HashMap<>(2);
 					parameters.put(IScriptAction.PARAM_ENTITY, entity);
 					parameters.put(IScriptAction.PARAM_PARENT, renderer.getParent());
-					parameters.put(IScriptAction.PARAM_ITEM, (BeanMap) o);
-					renderer.runScriptAction("openEditor", parameters); 
+					parameters.put(IScriptAction.PARAM_ITEM, o);
+					renderer.runScriptAction("openEditor", parameters);
 				}
 			}
+
 			@Override
 			public boolean isEnabled() {
 				return !viewer.getSelection().isEmpty();
@@ -100,15 +103,16 @@ public class LinkTableSWTProvider implements IInputSWTProvider {
 		if (parameters.getParameter(IConstants.ICON) != null) {
 			edit.setImageDescriptor(renderer.getImageDescriptor(parameters.getParameter(IConstants.ICON)));
 		}
-		Action remove = new Action(Messages.linkTable_remove,
+		final Action remove = new Action(Messages.linkTable_remove,
 				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ELCL_REMOVE)) {
 			@Override
 			public void run() {
-				Object o = viewer.getFirstSelectedObject();
+				final Object o = viewer.getFirstSelectedObject();
 				if (o instanceof BeanMap) {
 					renderer.removeLinkitem(link, (BeanMap) o);
 				}
 			}
+
 			@Override
 			public boolean isEnabled() {
 				return !viewer.getSelection().isEmpty();
@@ -132,7 +136,7 @@ public class LinkTableSWTProvider implements IInputSWTProvider {
 			}
 		});
 		if (renderer.getParent().getLayout() instanceof GridLayout) {
-			GridData layoutData = new GridData();
+			final GridData layoutData = new GridData();
 			layoutData.horizontalSpan = 3;
 			if (parameters.getParameterBoolean(IConstants.FILL_HORIZONTAL, true)) {
 				layoutData.horizontalAlignment = GridData.FILL;
@@ -142,8 +146,8 @@ public class LinkTableSWTProvider implements IInputSWTProvider {
 				layoutData.verticalAlignment = GridData.FILL;
 				layoutData.grabExcessVerticalSpace = true;
 			}
-			//Traitement du tag height
-			int height = parameters.getParameterInteger(IConstants.HEIGHT,-1);
+			// Traitement du tag height
+			final int height = parameters.getParameterInteger(IConstants.HEIGHT, -1);
 			if (height > -1) {
 				layoutData.heightHint = height;
 			}
@@ -151,10 +155,12 @@ public class LinkTableSWTProvider implements IInputSWTProvider {
 		}
 		renderer.getToolkit().adapt(viewer.getTable(), true, true);
 		FormToolKitUtils.paintBordersFor(renderer.getToolkit(), renderer.getParent());
-		
+
 		renderer.getRendererBinding().bindElement(element, viewer);
 	}
 
-	public void dispose() {}
+	@Override
+	public void dispose() {
+	}
 
 }

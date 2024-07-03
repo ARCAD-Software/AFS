@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -20,7 +20,6 @@ import com.arcadsoftware.metadata.MetaDataTest;
 /**
  * This event is fired whan a Control test fail. It is fired just the first time the test fail. It is fired a second
  * time when the test is successful again.
- * 
  * <p>
  * If this test is a critical one the the BeanMap will not be saved until the test is successful again.
  */
@@ -28,9 +27,9 @@ public class ControlValidityEvent extends EventObject {
 
 	private static final long serialVersionUID = 7863051522611179630L;
 
-	private boolean valid;
+	private final boolean valid;
 
-	public ControlValidityEvent( MetaDataTest  source, boolean valid) {
+	public ControlValidityEvent(MetaDataTest source, boolean valid) {
 		super(source);
 		this.valid = valid;
 	}
@@ -39,12 +38,11 @@ public class ControlValidityEvent extends EventObject {
 	 * @return the test that has been executed.
 	 */
 	@Override
-	public  MetaDataTest  getSource() {
+	public MetaDataTest getSource() {
 		return (MetaDataTest) super.getSource();
 	}
 
 	/**
-	 * 
 	 * @return True if this test was successful.
 	 */
 	public boolean isValid() {

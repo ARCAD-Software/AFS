@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -13,7 +13,6 @@
  *******************************************************************************/
 package com.arcadsoftware.editor.swt;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,7 +59,7 @@ public class DynamicEditorPart extends EditorPart implements IPersistableEditor,
 
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-		if (renderer != null && renderer.save()) {
+		if ((renderer != null) && renderer.save()) {
 			if ((getEditorInput() instanceof BeanMapEditorInput) && //
 					(((BeanMapEditorInput) getEditorInput()).getId() == 0)) {
 				((BeanMapEditorInput) getEditorInput()).getBeanMap().setId(renderer.getId());
@@ -90,7 +89,7 @@ public class DynamicEditorPart extends EditorPart implements IPersistableEditor,
 			layoutName = ((IBeanMapEditorInput) input).getLayoutName();
 			editorRealm = ((IBeanMapEditorInput) input).getRealm();
 		} else {
-			BeanMap bm = input.getAdapter(BeanMap.class);
+			final BeanMap bm = input.getAdapter(BeanMap.class);
 			if (bm != null) {
 				type = bm.getType();
 				id = bm.getId();
@@ -102,7 +101,7 @@ public class DynamicEditorPart extends EditorPart implements IPersistableEditor,
 		// Create the renderer.
 
 		final Display display = Display.getCurrent();
-		renderer = new SWTRenderer(display,getEditorRealm(), type,false) {
+		renderer = new SWTRenderer(display, getEditorRealm(), type, false) {
 			@Override
 			protected void dataLoaderCreated(SWTRenderer renderer) {
 				initializeDataLoader(renderer);
@@ -112,12 +111,12 @@ public class DynamicEditorPart extends EditorPart implements IPersistableEditor,
 			protected void editorLoaderCreated(SWTRenderer renderer) {
 				initializeEditorLoader(renderer);
 			}
-			
+
 			@Override
 			public void requestSave() {
 				doSave(new NullProgressMonitor());
-			}			
-			
+			}
+
 		};
 		renderer.getLoadingListeners().addLoadingListener(this);
 		renderer.addChangeListener(this);
@@ -128,13 +127,11 @@ public class DynamicEditorPart extends EditorPart implements IPersistableEditor,
 		if (!renderer.load(id)) {
 			throw new PartInitException("Error during loading Data (possible that no connection was available)."); //$NON-NLS-1$
 		}
-		Map<String, Object> virtualValues = getVirtualValues();
+		final Map<String, Object> virtualValues = getVirtualValues();
 		if (virtualValues != null) {
-			Set<String> keySet = virtualValues.keySet();
-			Iterator<String> keys = keySet.iterator();
-			while (keys.hasNext()) {
-				String key = keys.next();
-				Object value = virtualValues.get(key);
+			final Set<String> keySet = virtualValues.keySet();
+			for (final String key : keySet) {
+				final Object value = virtualValues.get(key);
 				renderer.putVirtualValue(key, value);
 			}
 		}
@@ -142,19 +139,19 @@ public class DynamicEditorPart extends EditorPart implements IPersistableEditor,
 	}
 
 	protected void setFixedValues(SWTRenderer renderer) {
-		//to be overriden
+		// to be overriden
 	}
-	
+
 	protected Map<String, Object> getVirtualValues() {
 		return null;
 	}
 
 	protected void initializeEditorLoader(SWTRenderer renderer) {
-		//to be overriden
+		// to be overriden
 	}
 
 	protected void initializeDataLoader(SWTRenderer renderer) {
-		//to be overriden
+		// to be overriden
 	}
 
 	public void addSaveListener(IBeanMapChangedListener listener) {
@@ -199,21 +196,21 @@ public class DynamicEditorPart extends EditorPart implements IPersistableEditor,
 	public void createPartControl(Composite parent) {
 		// Render the Editor.
 		renderer.createPartControl(parent, getLayoutName());
-		Image titleImage = renderer.getTitleImage();
+		final Image titleImage = renderer.getTitleImage();
 		if (titleImage != null) {
 			setTitleImage(titleImage);
 		}
 		// Define the selection provider.
 		getSite().setSelectionProvider(renderer);
 	}
-	
+
 	/**
 	 * Reload content layout, in the same editor
 	 */
 	public void reloadPartControl(String layoutName) {
 		// Render the Editor.
-		Composite parent = renderer.getParent();
-		if (!parent.isDisposed()){
+		final Composite parent = renderer.getParent();
+		if (!parent.isDisposed()) {
 			renderer.reloadPartControl(layoutName);
 			parent.layout();
 		}
@@ -228,16 +225,19 @@ public class DynamicEditorPart extends EditorPart implements IPersistableEditor,
 		renderer.setFocus();
 	}
 
+	@Override
 	public void restoreState(IMemento memento) {
 		renderer.restorState(memento);
 	}
 
+	@Override
 	public void saveState(IMemento memento) {
 		renderer.saveState(memento);
 	}
 
+	@Override
 	public void changed(ISWTRenderer swtRenderer) {
-		boolean d = swtRenderer.isDirty() || swtRenderer.getInternalEditors().internalEditorsAreDirty();
+		final boolean d = swtRenderer.isDirty() || swtRenderer.getInternalEditors().internalEditorsAreDirty();
 		if (d != dirty) {
 			dirty = d;
 			new UIJob("Refresh") { //$NON-NLS-1$
@@ -254,6 +254,7 @@ public class DynamicEditorPart extends EditorPart implements IPersistableEditor,
 		firePropertyChange(IWorkbenchPartConstants.PROP_DIRTY);
 	}
 
+	@Override
 	public void changed(ISWTRenderer renderer, String title) {
 		changeTitle(title);
 	}
@@ -261,7 +262,7 @@ public class DynamicEditorPart extends EditorPart implements IPersistableEditor,
 	public void changeTitle(String title) {
 		setPartName(title);
 	}
-	
+
 	public void changeImage(Image image) {
 		setTitleImage(image);
 	}
@@ -289,6 +290,7 @@ public class DynamicEditorPart extends EditorPart implements IPersistableEditor,
 	/**
 	 * Open a message dialog and close the Editor.
 	 */
+	@Override
 	public void loadingError() {
 		new UIJob(Messages.DynamicEditorPart_LoadingErrorJobTitle) {
 			@Override
@@ -311,16 +313,16 @@ public class DynamicEditorPart extends EditorPart implements IPersistableEditor,
 	}
 
 	private void deleteActions() {
-		Map<String, List<IAction>> actions = getMenuActions();
+		final Map<String, List<IAction>> actions = getMenuActions();
 		if (actions != null) {
-			for (Map.Entry<String, List<IAction>> entry : actions.entrySet()) {
+			for (final Map.Entry<String, List<IAction>> entry : actions.entrySet()) {
 				MenuManager menuBarManager = null;
 				IMenuManager menu = null;
-				IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+				final IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 				if (activeWorkbenchWindow instanceof ApplicationWindow) {
 					menuBarManager = ((ApplicationWindow) activeWorkbenchWindow).getMenuBarManager();
 					if (menuBarManager != null) {
-						for (IContributionItem item : menuBarManager.getItems()) {
+						for (final IContributionItem item : menuBarManager.getItems()) {
 							if ((item instanceof MenuManager)
 									&& ((MenuManager) item).getMenuText().equalsIgnoreCase(entry.getKey())) {
 								menu = (IMenuManager) item;
@@ -330,8 +332,8 @@ public class DynamicEditorPart extends EditorPart implements IPersistableEditor,
 					}
 				}
 				if (menu != null) {
-					for (IAction action : entry.getValue()) {
-						for (IContributionItem item : menu.getItems()) {
+					for (final IAction action : entry.getValue()) {
+						for (final IContributionItem item : menu.getItems()) {
 							if ((item instanceof ActionContributionItem)
 									&& (((ActionContributionItem) item).getAction() == action)) {
 								menu.remove(item);
@@ -355,6 +357,7 @@ public class DynamicEditorPart extends EditorPart implements IPersistableEditor,
 		allowsExternalRefresh = allowed;
 	}
 
+	@Override
 	public void refreshEditorContent(BeanMap beanMap, ISWTRenderer swtRenderer) {
 		if (allowsExternalRefresh || (renderer == swtRenderer)) {
 			renderer.refreshEditorContent(beanMap, swtRenderer);
@@ -365,6 +368,7 @@ public class DynamicEditorPart extends EditorPart implements IPersistableEditor,
 		renderer.refreshEditorContent(renderer.getCurrentBean(), renderer);
 	}
 
+	@Override
 	public boolean isSameRenderer(ISWTRenderer swtRenderer) {
 		return renderer == swtRenderer;
 	}
@@ -372,7 +376,7 @@ public class DynamicEditorPart extends EditorPart implements IPersistableEditor,
 	public BeanMap getEditedBeanMap() {
 		return renderer.getCurrentBean();
 	}
-	
+
 	/**
 	 * Reload Editor Content
 	 */

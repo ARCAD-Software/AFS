@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -13,7 +13,6 @@
  *******************************************************************************/
 package com.arcadsoftware.afs.client.core.ui.dialogs;
 
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
@@ -35,75 +34,81 @@ import com.arcadsoftware.afs.framework.ui.images.ImageManager;
 
 public abstract class AbstractAFSDialog extends ArcadDialog {
 
-	private boolean centered  = true;
+	private boolean centered = true;
 	private boolean resizable = true;
-	
+
 	public AbstractAFSDialog(Shell parentShell, boolean resizable, boolean centered) {
-		this(parentShell,false,resizable,centered);
+		this(parentShell, false, resizable, centered);
 	}
 
-	public AbstractAFSDialog(Shell parentShell, boolean okButtonOnly,boolean resizable,boolean centered) {
-		super(parentShell, okButtonOnly);		
+	public AbstractAFSDialog(Shell parentShell, boolean okButtonOnly, boolean resizable, boolean centered) {
+		super(parentShell, okButtonOnly);
 		if (resizable) {
 			int style = getShellStyle();
 			style = style | SWT.RESIZE | SWT.MAX;
 			setShellStyle(style);
-		}		
+		}
 		this.centered = centered;
 		this.resizable = resizable;
 	}
 
 	@Override
 	protected Control createButtonBar(Composite arg0) {
-		Composite composite = (Composite)super.createButtonBar(arg0);
-		GridLayout l = (GridLayout)composite.getLayout();
+		final Composite composite = (Composite) super.createButtonBar(arg0);
+		final GridLayout l = (GridLayout) composite.getLayout();
 		l.marginHeight = l.marginWidth = 3;
 		return composite;
-	}	
+	}
 
 	@Override
 	protected void configureShell(Shell newShell) {
-		Point size = getSize();
-		int width = size.x;
-		int height = size.y;
+		final Point size = getSize();
+		final int width = size.x;
+		final int height = size.y;
 		super.configureShell(newShell);
 		if (resizable) {
-			newShell.setSize(size);	
+			newShell.setSize(size);
 		} else {
 			newShell.setMinimumSize(size);
 		}
 		newShell.setText(getTitle());
 		if (centered) {
 			Rectangle parentBounds = newShell.getDisplay().getPrimaryMonitor().getBounds();
-			if(getParentShell() != null)
+			if (getParentShell() != null) {
 				parentBounds = getParentShell().getBounds();
-			int x = parentBounds.x + (parentBounds.width - width) / 2;
-			int y = parentBounds.y + (parentBounds.height - height) / 2;
+			}
+			final int x = parentBounds.x + ((parentBounds.width - width) / 2);
+			final int y = parentBounds.y + ((parentBounds.height - height) / 2);
 			newShell.setLocation(x, y);
-		}	
+		}
 		newShell.setImage(getImage());
 	}
-	
+
 	/**
 	 * Get Image: check if application defined an extension for branding image
+	 *
 	 * @return
 	 */
-	public Image getImage(){
+	public Image getImage() {
 		final IExtensionRegistry registry = Platform.getExtensionRegistry();
-		final IConfigurationElement[] elements = registry.getConfigurationElementsFor("com.arcadsoftware.afs.client.branding.dialog.icon");
+		final IConfigurationElement[] elements = registry
+				.getConfigurationElementsFor("com.arcadsoftware.afs.client.branding.dialog.icon"); //$NON-NLS-1$
 		final IConfigurationElement selectElement = Stream.of(elements).findFirst().orElse(null);
 		if (selectElement != null) {
-			final String bundleId = selectElement.getAttribute("bundleid");
-			final String path = selectElement.getAttribute("path");
-			if (StringUtils.isNotBlank(bundleId) && StringUtils.isNotBlank(path)){
-				return Optional.ofNullable(ImageManager.getInstance().getImage(bundleId+":"+path)).orElse(AFSIcon.ARCAD.image());
-			}			
+			final String bundleId = selectElement.getAttribute("bundleid"); //$NON-NLS-1$
+			final String path = selectElement.getAttribute("path"); //$NON-NLS-1$
+			if (StringUtils.isNotBlank(bundleId) && StringUtils.isNotBlank(path)) {
+				Image result = ImageManager.getInstance().getImage(bundleId + ':' + path);
+				if (result != null) {
+					return result;
+				}
+			}
 		}
 		return AFSIcon.ARCAD.image();
 	}
-	
+
 	public abstract Point getSize();
 
 	public abstract String getTitle();
-	
+
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -18,7 +18,9 @@ import java.util.List;
 public interface IRightManagerExtension {
 
 	public List<Integer> getExpectedRights(String action);
+
 	public List<Integer> getExpectedRights(String action, boolean ignoreIfUndefined);
+
 	public void missingRight(List<Integer> expected);
-	
+
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -19,19 +19,16 @@ import com.arcadsoftware.aev.core.ui.composite.AbstractBasicTableManagerComposit
 import com.arcadsoftware.afs.client.core.connection.DataAccessHelper;
 import com.arcadsoftware.afs.client.core.connection.ServerConnection;
 
-public abstract class AbstractConnectedSimpleTableManagerComposite extends AbstractBasicTableManagerComposite{
+public abstract class AbstractConnectedSimpleTableManagerComposite extends AbstractBasicTableManagerComposite {
 
 	protected ServerConnection connection;
 	protected DataAccessHelper helper;
 
-	
 	public AbstractConnectedSimpleTableManagerComposite(Composite parent,
-			int style,ServerConnection serverConnection) {
+			int style, ServerConnection serverConnection) {
 		super(parent, style);
-		this.connection = serverConnection;
-		this.helper = new DataAccessHelper(serverConnection);			
+		connection = serverConnection;
+		helper = new DataAccessHelper(serverConnection);
 	}
-
-	 
 
 }

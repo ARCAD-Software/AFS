@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -14,15 +14,15 @@
 package com.arcadsoftware.afs.client.core.ui.managers;
 
 public class SearchPreferenceManager {
-	
+
 	private static SearchPreferenceManager instance = new SearchPreferenceManager();
 
 	private int resultCount = 1000;
-	
-	private SearchPreferenceManager(){
-		
+
+	private SearchPreferenceManager() {
+
 	}
-	
+
 	public static SearchPreferenceManager getInstance() {
 		return instance;
 	}
@@ -35,6 +35,4 @@ public class SearchPreferenceManager {
 		this.resultCount = resultCount;
 	}
 
-
-	
 }

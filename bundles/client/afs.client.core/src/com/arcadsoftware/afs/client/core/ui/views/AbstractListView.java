@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -25,7 +25,7 @@ import com.arcadsoftware.afs.client.core.ui.composites.BasicResultNotAllowedComp
 import com.arcadsoftware.afs.framework.ui.help.DynamicHelp;
 import com.arcadsoftware.metadata.MetaDataEntity;
 
-public abstract class AbstractListView extends AbstractSecuredView{
+public abstract class AbstractListView extends AbstractSecuredView {
 
 	private Composite parentComposite;
 	private Composite mainComposite;
@@ -50,24 +50,24 @@ public abstract class AbstractListView extends AbstractSecuredView{
 		}
 	}
 
-	private void createContent(Composite parent){
+	private void createContent(Composite parent) {
 		if (mainComposite != null) {
 			mainComposite.dispose();
 		}
-		mainComposite = AFSFormatTools.createComposite(parent,1,false);
+		mainComposite = AFSFormatTools.createComposite(parent, 1, false);
 		if (parent.getLayout() instanceof GridLayout) {
-			GridData gridData = new GridData(GridData.FILL_BOTH);
+			final GridData gridData = new GridData(GridData.FILL_BOTH);
 			gridData.grabExcessHorizontalSpace = true;
 			gridData.grabExcessVerticalSpace = true;
 			mainComposite.setLayoutData(gridData);
 		}
-		GridLayout gd = (GridLayout)mainComposite.getLayout();
+		final GridLayout gd = (GridLayout) mainComposite.getLayout();
 		gd.marginLeft = gd.marginTop = gd.marginRight = gd.marginBottom = 1;
 		gd.marginHeight = gd.marginWidth = 0;
 		if (isAllowed()) {
 			if (entity != null) {
 				listComposite = createListComposite(mainComposite, entity, getConnection());
-				GridData gridData = new GridData(GridData.FILL_BOTH);
+				final GridData gridData = new GridData(GridData.FILL_BOTH);
 				gridData.grabExcessHorizontalSpace = true;
 				gridData.grabExcessVerticalSpace = true;
 				listComposite.setLayoutData(gridData);
@@ -75,36 +75,38 @@ public abstract class AbstractListView extends AbstractSecuredView{
 			}
 		} else {
 			new BasicResultNotAllowedComposite(mainComposite);
-		}		
+		}
 	}
-	
+
 	@Override
 	public void createPartControl(Composite parent) {
-		parentComposite = parent; 
+		parentComposite = parent;
 		DynamicHelp.updateContextHelpId(getDynamicHelpId(), parentComposite);
 	}
 
 	@Override
 	protected void defineLocalToolbar(IToolBarManager manager) {
 		super.defineLocalToolbar(manager);
-		this.toolbarManager = manager;
+		toolbarManager = manager;
 	}
 
 	public MetaDataEntity getStructure() {
 		return entity;
 	}
 
-	protected void fillToolbar(IToolBarManager manager) {}
-	
+	protected void fillToolbar(IToolBarManager manager) {
+	}
+
 	/**
 	 * Redefine this method in the inherited classes to return a string which represents the bean identifier you want to
 	 * manipulate through this search view.
-	 * 
+	 *
 	 * @return String : Bean Identifier.
 	 */
 	public abstract String getType();
 
 	protected abstract void readStructureError();
 
-	protected abstract AbstractSearchListComposite createListComposite(Composite parent, MetaDataEntity entity, ServerConnection connection);
+	protected abstract AbstractSearchListComposite createListComposite(Composite parent, MetaDataEntity entity,
+			ServerConnection connection);
 }

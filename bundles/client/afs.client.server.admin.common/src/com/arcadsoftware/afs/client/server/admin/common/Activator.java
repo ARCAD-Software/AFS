@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -25,14 +25,14 @@ import com.arcadsoftware.afs.framework.ui.plugins.ILocalizationProvider;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends AbstractAFSUIPlugin implements ILocalizationProvider{
-	
+public class Activator extends AbstractAFSUIPlugin implements ILocalizationProvider {
+
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.arcadsoftware.afs.client.server.admin.common"; //$NON-NLS-1$
 	public static final int LOGLVL_FATAL = 3;
 
 	private static Activator instance;
-	
+
 	public static Activator getInstance() {
 		return instance;
 	}
@@ -48,24 +48,23 @@ public class Activator extends AbstractAFSUIPlugin implements ILocalizationProvi
 		super.stop(context);
 		instance = null;
 	}
-	
+
 	@Override
 	protected void fillImageRegistry() {
 	}
-	
+
 	public void log(int errorlevel, String message) {
-		
+
 	}
-	
+
 	public void log(int errorlevel, String message, Throwable e) {
-		
+
 	}
 
 	@Override
 	public String getResourceBundleName() {
 		return "com.arcadsoftware.afs.client.server.admin.common.resources"; //$NON-NLS-1$
 	}
-
 
 	public static String resString(String key) {
 		return instance.getResourceString(key);
@@ -74,12 +73,12 @@ public class Activator extends AbstractAFSUIPlugin implements ILocalizationProvi
 	@Override
 	protected ResourceBundle loadResourceBundle(String bundleName, Locale local)
 			throws MissingResourceException {
-		return ResourceBundle.getBundle(bundleName, Locale.getDefault()); 
+		return ResourceBundle.getBundle(bundleName, Locale.getDefault());
 	}
 
 	@Override
 	protected String getApplicationTitle() {
 		return "ARCAD-Server Setting Admin. Console"; //$NON-NLS-1$
 	}
-	
+
 }

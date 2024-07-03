@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -32,7 +32,7 @@ import com.arcadsoftware.editor.swt.IBeanMapContainerList;
  */
 public class BeanMapContainerObservableList extends AbstractObservableList<BeanMap> {
 
-	private IBeanMapContainerList widget;
+	private final IBeanMapContainerList widget;
 
 	public BeanMapContainerObservableList(IBeanMapContainerList widget) {
 		super();
@@ -57,28 +57,29 @@ public class BeanMapContainerObservableList extends AbstractObservableList<BeanM
 		return getItem(index);
 	}
 
+	@Override
 	public Object getElementType() {
 		return BeanMap.class;
 	}
 
 	@Override
 	public void add(int index, BeanMap element) {
-		widget.addBeanMapToList(index, (BeanMap) element);
+		widget.addBeanMapToList(index, element);
 		fireListChange(Diffs.createListDiff(Diffs.createListDiffEntry(index, true, element)));
 	}
 
 	@Override
 	public BeanMap remove(int index) {
 		currentGetterCalled();
-		int size = doGetSize();
-		if (index < 0 || index > size - 1) {
+		final int size = doGetSize();
+		if ((index < 0) || (index > (size - 1))) {
 			throw new BindingException("Request to remove an element out of the collection bounds"); //$NON-NLS-1$
 		}
-		BeanMap[] newItems = new BeanMap[size - 1];
-		BeanMap oldElement = getItem(index);
+		final BeanMap[] newItems = new BeanMap[size - 1];
+		final BeanMap oldElement = getItem(index);
 		if (newItems.length > 0) {
 			System.arraycopy(getItems(), 0, newItems, 0, index);
-			if (size - 1 > index) {
+			if ((size - 1) > index) {
 				System.arraycopy(getItems(), index + 1, newItems, index, size - index - 1);
 			}
 		}
@@ -89,11 +90,11 @@ public class BeanMapContainerObservableList extends AbstractObservableList<BeanM
 
 	@Override
 	public BeanMap set(int index, BeanMap element) {
-		BeanMap oldElement = getItem(index);
-		setItem(index, (BeanMap) element);
-				
-		if (element instanceof BeanMap){
-			BeanMap elmt = (BeanMap) element;					
+		final BeanMap oldElement = getItem(index);
+		setItem(index, element);
+
+		if (element instanceof BeanMap) {
+			final BeanMap elmt = element;
 			fireListChange(Diffs.createListDiff(Diffs.createListDiffEntry(index, false, oldElement), Diffs
 					.createListDiffEntry(index, true, elmt)));
 		}
@@ -103,19 +104,20 @@ public class BeanMapContainerObservableList extends AbstractObservableList<BeanM
 	@Override
 	public BeanMap move(int oldIndex, int newIndex) {
 		checkRealm();
-		if (oldIndex == newIndex)
+		if (oldIndex == newIndex) {
 			return get(oldIndex);
-		int size = doGetSize();
-		if (oldIndex < 0 || oldIndex >= size) {
+		}
+		final int size = doGetSize();
+		if ((oldIndex < 0) || (oldIndex >= size)) {
 			throw new IndexOutOfBoundsException("oldIndex: " + oldIndex + ", size:" + size); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		if (newIndex < 0 || newIndex >= size) {
+		if ((newIndex < 0) || (newIndex >= size)) {
 			throw new IndexOutOfBoundsException("newIndex: " + newIndex + ", size:" + size); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		BeanMap[] items = getItems();
-		BeanMap[] newItems = new BeanMap[size];
-		BeanMap element = items[oldIndex];
+		final BeanMap[] items = getItems();
+		final BeanMap[] newItems = new BeanMap[size];
+		final BeanMap element = items[oldIndex];
 		if (newItems.length > 0) {
 			System.arraycopy(items, 0, newItems, 0, size);
 			if (oldIndex < newIndex) {
@@ -134,11 +136,11 @@ public class BeanMapContainerObservableList extends AbstractObservableList<BeanM
 	@Override
 	public boolean removeAll(Collection<?> c) {
 		checkRealm();
-		List<BeanMap> oldItems = Arrays.asList(getItems());
-		List<BeanMap> newItems = new ArrayList<BeanMap>(oldItems);
-		boolean removedAll = newItems.removeAll(c);
+		final List<BeanMap> oldItems = Arrays.asList(getItems());
+		final List<BeanMap> newItems = new ArrayList<>(oldItems);
+		final boolean removedAll = newItems.removeAll(c);
 		if (removedAll) {
-			setItems((BeanMap[]) newItems.toArray(new BeanMap[newItems.size()]));
+			setItems(newItems.toArray(new BeanMap[newItems.size()]));
 			fireListChange(Diffs.computeListDiff(oldItems, newItems));
 		}
 		return removedAll;
@@ -147,11 +149,11 @@ public class BeanMapContainerObservableList extends AbstractObservableList<BeanM
 	@Override
 	public boolean retainAll(Collection<?> c) {
 		checkRealm();
-		List<BeanMap> oldItems = Arrays.asList(getItems());
-		List<BeanMap> newItems = new ArrayList<BeanMap>(oldItems);
-		boolean retainedAll = newItems.retainAll(c);
+		final List<BeanMap> oldItems = Arrays.asList(getItems());
+		final List<BeanMap> newItems = new ArrayList<>(oldItems);
+		final boolean retainedAll = newItems.retainAll(c);
 		if (retainedAll) {
-			setItems((BeanMap[]) newItems.toArray(new BeanMap[newItems.size()]));
+			setItems(newItems.toArray(new BeanMap[newItems.size()]));
 			fireListChange(Diffs.computeListDiff(oldItems, newItems));
 		}
 		return retainedAll;
@@ -172,7 +174,7 @@ public class BeanMapContainerObservableList extends AbstractObservableList<BeanM
 		} else {
 			try {
 				list.set(index, element);
-			} catch (IndexOutOfBoundsException e) {
+			} catch (final IndexOutOfBoundsException e) {
 				list.add(element);
 			}
 		}
@@ -180,7 +182,7 @@ public class BeanMapContainerObservableList extends AbstractObservableList<BeanM
 	}
 
 	private BeanMap[] getItems() {
-		BeanMapList list = widget.getBeanMapList();
+		final BeanMapList list = widget.getBeanMapList();
 		if (list == null) {
 			return new BeanMap[] {};
 		}
@@ -188,7 +190,7 @@ public class BeanMapContainerObservableList extends AbstractObservableList<BeanM
 	}
 
 	private BeanMap getItem(int index) {
-		BeanMapList list = widget.getBeanMapList();
+		final BeanMapList list = widget.getBeanMapList();
 		if (list == null) {
 			return null;
 		}

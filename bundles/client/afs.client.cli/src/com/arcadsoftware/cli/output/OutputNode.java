@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -15,25 +15,24 @@ package com.arcadsoftware.cli.output;
 
 public class OutputNode extends AbstractOutputElement {
 
-	
 	private String text;
-	private OutputAttributes attributes;
-	private OutputNodes childNodes;
-	
+	private final OutputAttributes attributes;
+	private final OutputNodes childNodes;
+
 	public OutputNode(String name) {
 		super(name);
 		attributes = new OutputAttributes();
 		childNodes = new OutputNodes();
 	}
-	
+
 	public void setText(String text) {
 		this.text = text;
 	}
-	
+
 	public String getText() {
 		return text;
 	}
-	
+
 	public OutputAttributes getAttributes() {
 		return attributes;
 	}
@@ -43,67 +42,65 @@ public class OutputNode extends AbstractOutputElement {
 	}
 
 	public OutputNode addNode(String name) {
-		OutputNode n = new OutputNode(name);
+		final OutputNode n = new OutputNode(name);
 		childNodes.add(n);
 		return n;
 	}
-	
+
 	public void addNode(OutputNode child) {
 		childNodes.add(child);
 	}
 
 	public OutputNodes getNodes(String name) {
-		OutputNodes result = new OutputNodes();
-		for (OutputNode n : childNodes) {
-			if (n.getName().equalsIgnoreCase(name)){
+		final OutputNodes result = new OutputNodes();
+		for (final OutputNode n : childNodes) {
+			if (n.getName().equalsIgnoreCase(name)) {
 				result.add(n);
 			}
 		}
 		return result;
 	}
-	
+
 	public OutputNode getNode(String name) {
-		for (OutputNode n : childNodes) {
-			if (n.getName().equalsIgnoreCase(name)){
+		for (final OutputNode n : childNodes) {
+			if (n.getName().equalsIgnoreCase(name)) {
 				return n;
 			}
 		}
 		return null;
-	}	
-	
-	
-	
+	}
+
 	public void addAttribute(OutputAttribute attribute) {
 		attributes.add(attribute);
 	}
+
 	public OutputAttribute addAttribute(String name, String value) {
-		OutputAttribute a = new OutputAttribute(name,value);
+		final OutputAttribute a = new OutputAttribute(name, value);
 		attributes.add(a);
 		return a;
-	}	
-	
-	public String getAttributeValue(String attributeKey ){
-		for (OutputAttribute a :attributes) {
-			if (a.getName().equalsIgnoreCase(attributeKey)){
+	}
+
+	public String getAttributeValue(String attributeKey) {
+		for (final OutputAttribute a : attributes) {
+			if (a.getName().equalsIgnoreCase(attributeKey)) {
 				return a.getValue();
 			}
 		}
-		return "";
+		return ""; //$NON-NLS-1$
 	}
-	
+
 	private void printNode(OutputNode n) {
-		System.out.println("NODE : "+n.getName());		
-		for (OutputAttribute a :n.getAttributes()) {
-			System.out.println(a.getName() +" = " +a.getValue());
+		System.out.println("NODE : " + n.getName());
+		for (final OutputAttribute a : n.getAttributes()) {
+			System.out.println(a.getName() + " = " + a.getValue()); //$NON-NLS-1$
 		}
-		for (OutputNode node :n.getChildNodes()) {
+		for (final OutputNode node : n.getChildNodes()) {
 			printNode(node);
 		}
 	}
-	
-	public void print(){
+
+	public void print() {
 		printNode(this);
 	}
-	
-	
+
 }

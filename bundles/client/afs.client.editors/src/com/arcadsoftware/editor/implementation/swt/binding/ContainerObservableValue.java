@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -27,7 +27,7 @@ import com.arcadsoftware.editor.swt.IBeanMapContainerValue;
 
 public class ContainerObservableValue extends AbstractObservableValue<BeanMap> {
 
-	private IBeanMapContainerValue widget;
+	private final IBeanMapContainerValue widget;
 	boolean updating = false;
 	BeanMap currentValue;
 
@@ -42,14 +42,15 @@ public class ContainerObservableValue extends AbstractObservableValue<BeanMap> {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (!updating) {
-					BeanMap newSelection = (BeanMap) ContainerObservableValue.this.doGetValue();
-					BeanMap oldSelection = currentValue;
+					final BeanMap newSelection = ContainerObservableValue.this.doGetValue();
+					final BeanMap oldSelection = currentValue;
 					currentValue = newSelection;
 					fireValueChange(Diffs.createValueDiff(oldSelection, newSelection));
 				}
 			}
 		});
 		widget.getWidget().addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				ContainerObservableValue.this.dispose();
 			}
@@ -59,7 +60,6 @@ public class ContainerObservableValue extends AbstractObservableValue<BeanMap> {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.core.databinding.observable.value.AbstractObservableValue#doGetValue()
 	 */
 	@Override
@@ -69,7 +69,6 @@ public class ContainerObservableValue extends AbstractObservableValue<BeanMap> {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.core.databinding.observable.value.AbstractObservableValue#doSetValue(java.lang.Object)
 	 */
 	@Override
@@ -78,7 +77,7 @@ public class ContainerObservableValue extends AbstractObservableValue<BeanMap> {
 		BeanMap newValue;
 		try {
 			updating = true;
-			newValue = (BeanMap) value;
+			newValue = value;
 			oldValue = widget.getBeanMapValue();
 			widget.setBeanMapValue(newValue);
 			currentValue = newValue;
@@ -90,7 +89,6 @@ public class ContainerObservableValue extends AbstractObservableValue<BeanMap> {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.jface.databinding.swt.ISWTObservable#getWidget()
 	 */
 	public Widget getWidget() {
@@ -99,9 +97,9 @@ public class ContainerObservableValue extends AbstractObservableValue<BeanMap> {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.core.databinding.observable.value.IObservableValue#getValueType()
 	 */
+	@Override
 	public Object getValueType() {
 		return BeanMap.class;
 	}

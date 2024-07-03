@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -17,8 +17,7 @@ import java.util.ArrayList;
 
 import com.arcadsoftware.aev.core.contentproviders.IObjectArrayProvider;
 
-
-public class Servers extends ArrayList<Server> implements IObjectArrayProvider{
+public class Servers extends ArrayList<Server> implements IObjectArrayProvider {
 
 	private static final long serialVersionUID = -5129435433777882698L;
 
@@ -30,6 +29,7 @@ public class Servers extends ArrayList<Server> implements IObjectArrayProvider{
 		super();
 	}
 
+	@Override
 	public Object[] getObjectArray() {
 		return toArray();
 	}

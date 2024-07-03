@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -24,59 +24,59 @@ import com.arcadsoftware.editor.swt.BeanMapEditorInput;
 public class ConnectedBeanMapInput extends BeanMapEditorInput {
 
 	private ServerConnection connection;
-	private Map<String , Object> virtualValues;
-	
-	private IBeanMapModifier modifier; 
-	
-	
-	public ConnectedBeanMapInput(ServerConnection connection,BeanMap beanMap) {
+	private final Map<String, Object> virtualValues;
+
+	private IBeanMapModifier modifier;
+
+	public ConnectedBeanMapInput(ServerConnection connection, BeanMap beanMap) {
 		this(connection, beanMap, null);
 	}
 
-	public ConnectedBeanMapInput(ServerConnection connection,BeanMap beanMap, String layoutName) {
+	public ConnectedBeanMapInput(ServerConnection connection, BeanMap beanMap, String layoutName) {
 		super(beanMap, layoutName);
 		this.connection = connection;
-		this.virtualValues = new Hashtable<>();
+		virtualValues = new Hashtable<>();
 	}
 
 	public ServerConnection getConnection() {
 		return connection;
 	}
-	
+
 	public void setConnection(ServerConnection connection) {
-	    this.connection = connection;
+		this.connection = connection;
 	}
-	
-	public Map<String , Object> getVirtualValues(){
+
+	public Map<String, Object> getVirtualValues() {
 		return virtualValues;
-	}	
-	
-	public void setVirtualValues(Map<String , Object> virtualValues){
-		if (virtualValues!=null) {
+	}
+
+	public void setVirtualValues(Map<String, Object> virtualValues) {
+		if (virtualValues != null) {
 			this.virtualValues.putAll(virtualValues);
 		}
-	}		
-	
-	public void addVirtualValues(String key,String value){
+	}
+
+	public void addVirtualValues(String key, String value) {
 		virtualValues.put(key, value);
 	}
-	
+
 	public IBeanMapModifier getModifier() {
 		return modifier;
 	}
-	
+
 	public void setModifier(IBeanMapModifier modifier) {
 		this.modifier = modifier;
 	}
-	
+
 	@Override
-	public boolean equals(Object obj) {		
-		if (obj instanceof BeanMapEditorInput && (((BeanMapEditorInput)obj).getBeanMap() != null)) {			
-			if (obj instanceof ConnectedBeanMapInput) {			
-				ConnectedBeanMapInput newInput = (ConnectedBeanMapInput)obj;			
-				BeanMap newBeanmap = ((ConnectedBeanMapInput)obj).getBeanMap();
-			
-				if ((newBeanmap!=null) && (getBeanMap()!=null) && (connection!=null) &&(newInput.getConnection()!=null)) {
+	public boolean equals(Object obj) {
+		if ((obj instanceof BeanMapEditorInput) && (((BeanMapEditorInput) obj).getBeanMap() != null)) {
+			if (obj instanceof ConnectedBeanMapInput) {
+				final ConnectedBeanMapInput newInput = (ConnectedBeanMapInput) obj;
+				final BeanMap newBeanmap = ((ConnectedBeanMapInput) obj).getBeanMap();
+
+				if ((newBeanmap != null) && (getBeanMap() != null) && (connection != null)
+						&& (newInput.getConnection() != null)) {
 					if (connection.equals(newInput.getConnection())) {
 						return getBeanMap().equals(newBeanmap);
 					} else {
@@ -84,9 +84,9 @@ public class ConnectedBeanMapInput extends BeanMapEditorInput {
 					}
 				}
 			} else {
-				return ((BeanMapEditorInput)obj).getBeanMap().equals(getBeanMap());
+				return ((BeanMapEditorInput) obj).getBeanMap().equals(getBeanMap());
 			}
 		}
-		return super.equals(obj);		
+		return super.equals(obj);
 	}
 }

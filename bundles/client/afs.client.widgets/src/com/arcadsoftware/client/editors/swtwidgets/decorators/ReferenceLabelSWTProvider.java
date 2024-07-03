@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -44,11 +44,12 @@ public class ReferenceLabelSWTProvider implements IDecoratorSWTProvider {
 	private Thread structuresLoading;
 	private boolean translate;
 
+	@Override
 	public Widget create(ISWTRenderer renderer, ILayoutParameters parameters, MetaDataEntity structure) {
 		this.renderer = renderer;
 		rootStructure = structure;
 		translate = parameters.getParameterBoolean(IConstants.TRANSLATE);
-		String lbx = parameters.getParameter(IConstants.LABEL, ""); //$NON-NLS-1$
+		final String lbx = parameters.getParameter(IConstants.LABEL, ""); //$NON-NLS-1$
 		// Base label
 		if (lbx.length() > 0) {
 			renderer.getToolkit().createLabel(renderer.getParent(), renderer.getLocalizedMessage(lbx));
@@ -56,22 +57,22 @@ public class ReferenceLabelSWTProvider implements IDecoratorSWTProvider {
 		}
 		defaultText = renderer.getLocalizedMessage(parameters.getParameter(IConstants.DEFAULT, "")); //$NON-NLS-1$
 		label = renderer.getToolkit().createLabel(renderer.getParent(), defaultText);
-		
-		boolean fillHorizontal = parameters.getParameterBoolean(IConstants.FILL_HORIZONTAL,true);
-		
+
+		final boolean fillHorizontal = parameters.getParameterBoolean(IConstants.FILL_HORIZONTAL, true);
+
 		if ((renderer.getParent().getLayout() instanceof GridLayout)) {
 			// fill the grid line.
-			int nbCol = ((GridLayout) renderer.getParent().getLayout()).numColumns;
-			GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+			final int nbCol = ((GridLayout) renderer.getParent().getLayout()).numColumns;
+			final GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 			gd.grabExcessHorizontalSpace = fillHorizontal;
-			if (lbx.length() == 0) { 
+			if (lbx.length() == 0) {
 				gd.horizontalSpan = nbCol;
 			}
 			label.setLayoutData(gd);
-//			label.setLayoutData(new GridData(GridData.BEGINNING, GridData.BEGINNING, fillHorizontal, false,
-//					((GridLayout) renderer.getParent().getLayout()).numColumns, 1));
+			// label.setLayoutData(new GridData(GridData.BEGINNING, GridData.BEGINNING, fillHorizontal, false,
+			// ((GridLayout) renderer.getParent().getLayout()).numColumns, 1));
 		}
-		String atts = parameters.getParameter(REFERENCE, ""); //$NON-NLS-1$
+		final String atts = parameters.getParameter(REFERENCE, ""); //$NON-NLS-1$
 		formatString = parameters.getParameter(IConstants.FORMAT, defaultText);
 		// Informations loading
 		if (atts.length() > 0) {
@@ -79,7 +80,7 @@ public class ReferenceLabelSWTProvider implements IDecoratorSWTProvider {
 			if ((attributes == null) || (attributes.length == 0)) {
 				return label;
 			}
-			MetaDataAttribute element = rootStructure.getAttribute(attributes[0]);
+			final MetaDataAttribute element = rootStructure.getAttribute(attributes[0]);
 			if (element == null) {
 				return label;
 			}
@@ -99,13 +100,14 @@ public class ReferenceLabelSWTProvider implements IDecoratorSWTProvider {
 	private void loadStructures() {
 		structures = new MetaDataEntity[attributes.length];
 		structuresLoading = new Thread(new Runnable() {
+			@Override
 			public void run() {
 				// Load Structures list.
 				MetaDataEntity lastStructure = rootStructure;
 				for (int i = 0; i < attributes.length; i++) {
-					MetaDataAttribute element = lastStructure.getAttribute(attributes[i]);
-					MetaDataEntity refEntity = renderer.getStructure(element);
-					if ((element == null) || (refEntity==null) || label.isDisposed()) {
+					final MetaDataAttribute element = lastStructure.getAttribute(attributes[i]);
+					final MetaDataEntity refEntity = renderer.getStructure(element);
+					if ((element == null) || (refEntity == null) || label.isDisposed()) {
 						// The chain do not bring us to a BeanMap chain...
 						structures[0] = null;
 						// We cancel the process.
@@ -134,6 +136,7 @@ public class ReferenceLabelSWTProvider implements IDecoratorSWTProvider {
 				(!label.isDisposed());
 	}
 
+	@Override
 	public void dispose() {
 		// We should tell the loading thread to stop immediately.
 	}
@@ -147,35 +150,33 @@ public class ReferenceLabelSWTProvider implements IDecoratorSWTProvider {
 
 	public void format(IBeanMap value) {
 		if (isReady()) {
-			String key = formatter.format(value);
+			final String key = formatter.format(value);
 			final String s;
 			if (translate) {
 				s = renderer.getLocalizedMessage(key);
 			} else {
 				s = key;
 			}
-			
+
 			label.getDisplay().asyncExec(
-				new Runnable() {
-					public void run() {
-						if (!label.isDisposed()) {
-							label.setText(s);
-							label.pack();
+					new Runnable() {
+						@Override
+						public void run() {
+							if (!label.isDisposed()) {
+								label.setText(s);
+								label.pack();
+							}
 						}
-					}
-				}	
-			);
-			
-			
-			
-//			PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-//				public void run() {
-//					if (!label.isDisposed()) {
-//						label.setText(s);
-//						label.pack();
-//					}
-//				}
-//			});
+					});
+
+			// PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+			// public void run() {
+			// if (!label.isDisposed()) {
+			// label.setText(s);
+			// label.pack();
+			// }
+			// }
+			// });
 		}
 	}
 

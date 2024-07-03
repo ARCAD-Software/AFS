@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -21,14 +21,12 @@ import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.events.IExpansionListener;
 
 /**
- * This class will be notified before and after the expandable control's
- * expansion state changes.
- * 
- * When the expansion state changed, the first scrolled composite parent is
- * refreshed.
+ * This class will be notified before and after the expandable control's expansion state changes. When the expansion
+ * state changed, the first scrolled composite parent is refreshed.
  */
 public class ScrolledCompositeExpansionListener implements IExpansionListener {
 
+	@Override
 	public void expansionStateChanged(ExpansionEvent e) {
 		Composite c = ((Control) e.getSource()).getParent();
 		while (c != null) {
@@ -41,6 +39,7 @@ public class ScrolledCompositeExpansionListener implements IExpansionListener {
 		}
 	}
 
+	@Override
 	public void expansionStateChanging(ExpansionEvent e) {
 		// Do nothing
 	}

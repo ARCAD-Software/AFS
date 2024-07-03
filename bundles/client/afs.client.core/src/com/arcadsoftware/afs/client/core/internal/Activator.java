@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -37,30 +37,6 @@ public class Activator extends AbstractAFSUIPlugin implements ILocalizationProvi
 
 	// The shared instance
 	private static Activator plugin;
-	
-	/**
-	 * The constructor
-	 */
-	public Activator() {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-	 */
-	public void start(BundleContext context) throws Exception {
-		super.start(context);
-		plugin = this;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-	 */
-	public void stop(BundleContext context) throws Exception {
-		plugin = null;
-		super.stop(context);
-	}
 
 	/**
 	 * Returns the shared instance
@@ -72,36 +48,44 @@ public class Activator extends AbstractAFSUIPlugin implements ILocalizationProvi
 	}
 
 	@Override
+	public void start(BundleContext context) throws Exception {
+		super.start(context);
+		plugin = this;
+	}
+
+	@Override
+	public void stop(BundleContext context) throws Exception {
+		plugin = null;
+		super.stop(context);
+	}
+
+	@Override
 	public String getResourceBundleName() {
 		return BUNDLE_ID;
 	}
-
 
 	public static String resString(String key) {
 		return plugin.getResourceString(key);
 	}
 
 	@Override
-	protected ResourceBundle loadResourceBundle(String bundleName, Locale local)
-			{
+	protected ResourceBundle loadResourceBundle(String bundleName, Locale local) {
 		return ResourceBundle.getBundle(bundleName, Locale.getDefault());
 	}
 
 	@Override
-	protected void fillImageRegistry() {
-		
-	}
+	protected void fillImageRegistry() {}
 
 	@Override
 	protected void initializeColorRegistry() {
 		colorRegistry.put("blue", new RGB( 0,200,255));
 	}
 	
-
 	@Override
 	protected String getApplicationTitle() {
 		return TITLE;
-	}		
+	}
+	
 	public void missingRight(List<Integer> expected) {
 		IRightManagerExtension manager = AFSRightManager.getRightManager();
 		if (manager!=null) {

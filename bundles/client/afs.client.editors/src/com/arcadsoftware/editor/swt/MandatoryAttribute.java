@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -14,27 +14,27 @@
 package com.arcadsoftware.editor.swt;
 
 public class MandatoryAttribute {
-	
+
 	public String code;
 	public String conditionedBy;
-	
+
 	public MandatoryAttribute(String code) {
 		this.code = code;
 	}
-	
-	public MandatoryAttribute(String code,String conditionedBy) {
+
+	public MandatoryAttribute(String code, String conditionedBy) {
 		this(code);
 		this.conditionedBy = conditionedBy;
 	}
-	
-	public boolean isConditionned(){
+
+	public boolean isConditionned() {
 		return (conditionedBy != null) && (conditionedBy.length() > 0);
 	}
-	
+
 	public String getCode() {
 		return code;
 	}
-	
+
 	public String getConditionedBy() {
 		return conditionedBy;
 	}

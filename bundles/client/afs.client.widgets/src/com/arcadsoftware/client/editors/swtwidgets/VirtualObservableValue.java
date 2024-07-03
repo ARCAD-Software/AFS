@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -22,15 +22,13 @@ import com.arcadsoftware.client.editors.swtwidgets.decorators.VirtualLabelSWTPro
 public class VirtualObservableValue extends AbstractObservableValue<Object> {
 
 	private Object value;
-	private VirtualLabelSWTProvider provider;
-
+	
 	public VirtualObservableValue(VirtualLabelSWTProvider provider) {
 		this(Realm.getDefault(), provider);
-	} 
+	}
 
 	public VirtualObservableValue(Realm realm, VirtualLabelSWTProvider provider) {
 		super(realm);
-		this.provider = provider;
 	}
 
 	@Override
@@ -38,22 +36,14 @@ public class VirtualObservableValue extends AbstractObservableValue<Object> {
 		return value;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.databinding.observable.value.IObservableValue#getValueType()
-	 */
+	@Override
 	public Object getValueType() {
 		return BeanMap.class;
 	}
 
 	@Override
 	protected void doSetValue(Object newValue) {
-		this.value = newValue;
-		if (value instanceof BeanMap) {
-			//doRunReferencesLoading((BeanMap) value);
-		}
+		value = newValue;
 	}
-
 
 }

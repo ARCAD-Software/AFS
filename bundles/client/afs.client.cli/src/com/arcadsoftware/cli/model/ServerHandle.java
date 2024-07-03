@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -20,145 +20,155 @@ import com.arcadsoftware.afs.client.core.servers.model.BasicServer;
 import com.arcadsoftware.afs.client.core.servers.model.IServer;
 
 /**
- * This class represents a <i>handle</i> to an ARCAD-Anonymizer - Server
+ * This class represents a <i>handle</i> to an Server
  * <p>
- * After defining the connection property, you have to use the {@link #connect()} method
- * the physically connect to the server.
+ * After defining the connection property, you have to use the {@link #connect()} method the physically connect to the
+ * server.
  * </p>
- *  <p>
- *  You can get the connection status using the {@link #isConnected() } method
- *  </p>
- *  <p>
- *  This class also provides a {@link DataAccessHelper} helper Object to execute
- *  data manipulation on the server.
- *  </p>
- 
-   @since 1.0
- 	
- 
+ * <p>
+ * You can get the connection status using the {@link #isConnected() } method
+ * </p>
+ * <p>
+ * This class also provides a {@link DataAccessHelper} helper Object to execute data manipulation on the server.
+ * </p>
+ * 
+ * @since 1.0
  * @author ARCAD Software
- *
  */
 public class ServerHandle {
-	
-	private String url = "";
-	private String login = "";
-	private String password = "";
-	
-	
+
+	private String url = ""; //$NON-NLS-1$
+	private String login = ""; //$NON-NLS-1$
+	private String password = ""; //$NON-NLS-1$
 	private ServerConnection connection;
-	private DataAccessHelper helper; 
-	private boolean connected = false;	
-	
-	private ITrustStoreProvider trustStoreProvider = null;
-	
+	private DataAccessHelper helper;
+	private boolean connected;
+	private ITrustStoreProvider trustStoreProvider;
+
 	/**
-	 * Constructs a new <code>ServerHandle</code> object using the
-	 * given connection properties
-	 * @param url The URL of the ARCAD-Anonymizer - Server including port number
-	 * @param login A valid ARCAD-Anonymizer - Server login
-	 * @param password A related password
+	 * Constructs a new <code>ServerHandle</code> object using the given connection properties
+	 *
+	 * @param url
+	 *            The URL of the Server including port number
+	 * @param login
+	 *            A valid Server login
+	 * @param password
+	 *            A related password
 	 */
 	public ServerHandle(String url, String login, String password) {
 		this.url = url;
 		this.login = login;
 		this.password = password;
 	}
-	
+
 	/**
-	 * Returns the URL of the related ARCAD-Anonymizer - Server
-	 * @return the URL of the related ARCAD-Anonymizer - Server
+	 * Returns the URL of the related Server
+	 *
+	 * @return the URL of the related Server
 	 */
 	public String getUrl() {
 		return url;
 	}
-	
+
 	/**
-	 * Sets the URL of the related ARCAD-Anonymizer - Server you want to reach
-	 * @param url  Sets the URL of the related ARCAD-Anonymizer - Server 
+	 * Sets the URL of the related Server you want to reach
+	 *
+	 * @param url
+	 *            Sets the URL of the related- Server
 	 */
 	public void setUrl(String url) {
 		this.url = url;
 	}
-	
+
 	/**
 	 * Returns the login used to connect the server
-	 * @return - the login used to connect the server
+	 *
+	 * @return the login used to connect the server
 	 */
 	public String getLogin() {
 		return login;
 	}
-	
+
 	/**
 	 * Sets the login used to connect the server
-	 * @param login - A valid ARCAD-Anonymizer - Server login
+	 *
+	 * @param login
+	 *            A valid login
 	 */
 	public void setLogin(String login) {
 		this.login = login;
 	}
-	
+
 	/**
-	 * Gets the related password used to connect the server 
-	 * @return - the related password used to connect the server
+	 * Gets the related password used to connect the server
+	 *
+	 * @return the related password used to connect the server
 	 */
 	public String getPassword() {
 		return password;
 	}
-	
+
 	/**
-	 * Sets the related password used to connect the server 
-	 * @param password - the related password used to connect the server 
+	 * Sets the related password used to connect the server
+	 *
+	 * @param password
+	 *            the related password used to connect the server
 	 */
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
-    private boolean afsConnect(){
-		IServer server = new BasicServer();
-		server.setUrl(url);		
+
+	private boolean afsConnect() {
+		final IServer server = new BasicServer();
+		server.setUrl(url);
 		connection = new ServerConnection(server);
 		connection.setTrustStoreprovider(trustStoreProvider);
-		boolean connected = connection.connect(login, password, true);
+		final boolean connected = connection.connect(login, password, true);
 		if (connected) {
 			helper = new DataAccessHelper(connection);
 			return true;
 		}
 		return false;
-    }
+	}
 
 	/**
 	 * Connects to the AFS Server.
-	 * <p></p>
+	 * <p>
+	 * </p>
+	 *
 	 * @return True if connection succeeds, false otherwise
 	 */
-	public boolean connect() { 
-		connected =  afsConnect();
+	public boolean connect() {
+		connected = afsConnect();
 		return connected;
 	}
-	
+
 	/**
 	 * Returns the connection status
-	 * @return - true if the server is connected, false otherwise.
+	 *
+	 * @return true if the server is connected, false otherwise.
 	 */
 	public boolean isConnected() {
 		return connected;
 	}
-	
+
 	public DataAccessHelper getHelper() {
 		return helper;
 	}
+
 	/**
 	 * Return the server connection
+	 *
 	 * @returnThe related server Connection
 	 */
 	public ServerConnection getConnection() {
 		return connection;
 	}
-	
+
 	public void setTrustStoreProvider(ITrustStoreProvider trustStoreProvider) {
 		this.trustStoreProvider = trustStoreProvider;
 	}
-	
+
 	public ITrustStoreProvider getTrustStoreProvider() {
 		return trustStoreProvider;
 	}

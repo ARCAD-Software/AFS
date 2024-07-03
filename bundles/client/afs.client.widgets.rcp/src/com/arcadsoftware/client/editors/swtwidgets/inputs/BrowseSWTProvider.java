@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -18,22 +18,17 @@ import org.eclipse.swt.widgets.FileDialog;
 
 import com.arcadsoftware.client.editors.swtwidgets.internal.Messages;
 
-
-/**
- * 
- */
 public class BrowseSWTProvider extends AbstractBrowseSWTProvider {
 
 	@Override
 	protected FileInfo getFilename(Composite parent) {
-		FileDialog dialog = new FileDialog(parent.getShell());
+		final FileDialog dialog = new FileDialog(parent.getShell());
 		dialog.setText(Messages.DownloadSWTProvider_FileDialogText);
-		String s =dialog.open();
-		if ((s==null) || (s.length()==0)){		
+		final String s = dialog.open();
+		if ((s == null) || (s.length() == 0)) {
 			return null;
-		} else {
-			return new FileInfo(s,dialog.getFileName());
 		}
+		return new FileInfo(s, dialog.getFileName());
 	}
-	
+
 }

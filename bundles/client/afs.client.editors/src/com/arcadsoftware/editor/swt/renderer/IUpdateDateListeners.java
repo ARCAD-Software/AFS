@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -22,7 +22,7 @@ public interface IUpdateDateListeners {
 
 	/**
 	 * Registers the update date changed listener in renderer.
-	 * 
+	 *
 	 * @param listener
 	 *            The listener.
 	 */
@@ -30,7 +30,7 @@ public interface IUpdateDateListeners {
 
 	/**
 	 * Unregisters the update date changed listener in renderer.
-	 * 
+	 *
 	 * @param listener
 	 *            The listener.
 	 */

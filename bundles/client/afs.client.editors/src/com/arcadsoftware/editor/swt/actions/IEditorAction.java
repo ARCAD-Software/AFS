@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -38,38 +38,33 @@ public interface IEditorAction extends IAction {
 	 *            the renderer to set
 	 */
 	public void setRenderer(ISWTRenderer renderer);
-	
+
 	/**
-	 * 
 	 * @param beanMap
 	 */
 	public void refreshSelector(BeanMap beanMap);
 
 	/**
-	 * 
 	 * @param element
-	 * 			the element to set
+	 *            the element to set
 	 */
 	public void setElement(Element element);
 
 	/**
-	 * 
 	 * @param internalEditorId
-	 * 			the internalEditorId to set
+	 *            the internalEditorId to set
 	 */
 	public void setInternalEditorId(String internalEditorId);
-	
+
 	/**
-	 * 
 	 * @param viewer
-	 * 			the attached BeanMapTableViewer
+	 *            the attached BeanMapTableViewer
 	 */
 	public void setTableViewer(AbstractColumnedTableViewer viewer);
-	
+
 	/**
-	 * 
 	 * @param viewer
-	 * 			the attached BeanMapTreeViewer
+	 *            the attached BeanMapTreeViewer
 	 */
 	public void setTreeViewer(AbstractColumnedTreeViewer viewer);
 

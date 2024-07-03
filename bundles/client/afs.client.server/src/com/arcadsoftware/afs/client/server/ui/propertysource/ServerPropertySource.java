@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -21,9 +21,9 @@ public class ServerPropertySource extends AbstractAFSProperties {
 
 	public static final String PROPERTY_NAME = "server.name"; //$NON-NLS-1$
 	public static final String PROPERTY_URL = "server.url"; //$NON-NLS-1$
-	
+
 	private final Server server;
-	
+
 	public ServerPropertySource(Server server) {
 		this.server = server;
 	}
@@ -34,7 +34,7 @@ public class ServerPropertySource extends AbstractAFSProperties {
 			return server.getUrl();
 		}
 		if (id.equals(PROPERTY_NAME)) {
-			return server.getName();	
+			return server.getName();
 		}
 		return null;
 	}
@@ -42,7 +42,7 @@ public class ServerPropertySource extends AbstractAFSProperties {
 	@Override
 	public void setPropertyValue(Object id, Object value) {
 		if (id.equals(PROPERTY_URL)) {
-			server.setUrl((String)value);
+			server.setUrl((String) value);
 			ServerLoader.getInstance().update(server);
 		}
 	}
@@ -50,5 +50,5 @@ public class ServerPropertySource extends AbstractAFSProperties {
 	public Server getServer() {
 		return server;
 	}
-	
+
 }

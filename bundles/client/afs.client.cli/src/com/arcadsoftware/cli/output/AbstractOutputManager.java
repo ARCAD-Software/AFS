@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -17,7 +17,6 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import com.arcadsoftware.cli.core.services.AbstractService;
 import com.arcadsoftware.cli.logger.LogEntries;
@@ -26,33 +25,28 @@ import com.arcadsoftware.cli.logger.ServiceLogger;
 
 public abstract class AbstractOutputManager {
 
-	public static final String NODE_SERVICE = "service";
-	public static final String ATTR_NAME ="name";
-	public static final String ATTR_RESULT ="result";
-	public static final String ATTR_VALUE="value";
-	public static final String NODE_PARAMETERS = "parameters";
-	public static final String NODE_PARAMETER = "parameter";
-	public static final String NODE_LOGS = "logs";
-	public static final String NODE_LOG = "log";
-	public static final String ATTR_COUNT ="count";		
-		
-	
-	public static final String ATTR_LOGDATE ="logDate";
-	public static final String ATTR_LEVEL ="level";
-	
-	
-	public static final SimpleDateFormat SP = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+	public static final String NODE_SERVICE = "service"; //$NON-NLS-1$
+	public static final String ATTR_NAME = "name"; //$NON-NLS-1$
+	public static final String ATTR_RESULT = "result"; //$NON-NLS-1$
+	public static final String ATTR_VALUE = "value"; //$NON-NLS-1$
+	public static final String NODE_PARAMETERS = "parameters"; //$NON-NLS-1$
+	public static final String NODE_PARAMETER = "parameter"; //$NON-NLS-1$
+	public static final String NODE_LOGS = "logs"; //$NON-NLS-1$
+	public static final String NODE_LOG = "log"; //$NON-NLS-1$
+	public static final String ATTR_COUNT = "count"; //$NON-NLS-1$
+	public static final String ATTR_LOGDATE = "logDate"; //$NON-NLS-1$
+	public static final String ATTR_LEVEL = "level"; //$NON-NLS-1$
+	public static final SimpleDateFormat SP = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS"); //$NON-NLS-1$
 
-	
-	protected File outputFile = null;
-	protected AbstractService service = null;
-	protected OutputNode root = null;
+	protected File outputFile;
+	protected AbstractService service;
+	protected OutputNode root;
 
-	public AbstractOutputManager () {
+	public AbstractOutputManager() {
 		root = new OutputNode(getRootName());
 	}
-	
-	public AbstractOutputManager (AbstractService service , File outputFile) {
+
+	public AbstractOutputManager(AbstractService service, File outputFile) {
 		this.outputFile = outputFile;
 		this.service = service;
 		root = new OutputNode(getRootName());
@@ -62,16 +56,13 @@ public abstract class AbstractOutputManager {
 		return outputFile;
 	}
 
-
 	public void setOutputFile(File outputFile) {
 		this.outputFile = outputFile;
 	}
 
-
 	public AbstractService getService() {
 		return service;
 	}
-
 
 	public void setService(AbstractService service) {
 		this.service = service;
@@ -80,52 +71,46 @@ public abstract class AbstractOutputManager {
 	public String getRootName() {
 		return NODE_SERVICE;
 	}
-	
-	protected boolean isEmpty(String value){
-		return (value==null) || (value.length()==0);
+
+	protected boolean isEmpty(String value) {
+		return (value == null) || (value.length() == 0);
 	}
-	
-	
+
 	public void generateParameterSection(OutputNode parent) {
-		OutputNode parameters = parent.addNode(NODE_PARAMETERS);
-		HashMap<String, ArrayList<String>> params = service.getOptionTable();
-		Iterator<String> it = params.keySet().iterator();
-		while (it.hasNext()) {
-			String id = it.next();
-			String values[] = service.getOptionValues(id);
-			for (int x = 0; x<values.length ;x++) {
-				OutputNode parameter = new OutputNode(NODE_PARAMETER);
+		final OutputNode parameters = parent.addNode(NODE_PARAMETERS);
+		final HashMap<String, ArrayList<String>> params = service.getOptionTable();
+		for (final String id : params.keySet()) {
+			final String values[] = service.getOptionValues(id);
+			for (final String value : values) {
+				final OutputNode parameter = new OutputNode(NODE_PARAMETER);
 				parameters.addNode(parameter);
 				parameter.addAttribute(ATTR_NAME, id);
-				parameter.addAttribute(ATTR_VALUE, values[x]);
-			}			
-		}			
+				parameter.addAttribute(ATTR_VALUE, value);
+			}
+		}
 	}
-	public void generateLogSection(OutputNode parent, LogEntries entries){
-		OutputNode logs = parent.addNode(NODE_LOGS);
+
+	public void generateLogSection(OutputNode parent, LogEntries entries) {
+		final OutputNode logs = parent.addNode(NODE_LOGS);
 		logs.addAttribute(ATTR_COUNT, String.valueOf(entries.size()));
-		for (LogEntry le : entries) {
-			OutputNode log = logs.addNode(NODE_LOG);
+		for (final LogEntry le : entries) {
+			final OutputNode log = logs.addNode(NODE_LOG);
 			log.addAttribute(ATTR_LOGDATE, SP.format(le.getLogDate()));
 			log.addAttribute(ATTR_LEVEL, String.valueOf(le.getLevel()));
-			log.setText(isEmpty(le.getMessage()) ? "" : le.getMessage());		
-		}			
+			log.setText(isEmpty(le.getMessage()) ? "" : le.getMessage());
+		}
 	}
-	
-	
-	
-	public void generateOutput() {	
+
+	public void generateOutput() {
 		root.addAttribute(ATTR_RESULT, String.valueOf(service.getResult()));
 		generateParameterSection(root);
-		LogEntries logs = ((ServiceLogger)service.getLogger()).getLogEntries();
-		generateLogSection(root,logs);
+		final LogEntries logs = ((ServiceLogger) service.getLogger()).getLogEntries();
+		generateLogSection(root, logs);
 		service.outputAdditionalInfo(root);
 	}
-	
+
 	public OutputNode getRoot() {
 		return root;
 	}
-	
-	
 
 }

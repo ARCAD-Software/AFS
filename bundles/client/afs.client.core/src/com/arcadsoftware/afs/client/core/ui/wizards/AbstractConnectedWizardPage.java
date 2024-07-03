@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -23,8 +23,8 @@ public abstract class AbstractConnectedWizardPage extends
 	protected ServerConnection connection;
 	protected BeanMap initalBeanmap;
 	protected DataAccessHelper helper;
-	
-	public AbstractConnectedWizardPage(ServerConnection connection,String pageName, String title,
+
+	public AbstractConnectedWizardPage(ServerConnection connection, String pageName, String title,
 			String description) {
 		super(pageName, title, description);
 		this.connection = connection;
@@ -42,22 +42,22 @@ public abstract class AbstractConnectedWizardPage extends
 	public void initBeanMap(BeanMap beanmap) {
 		initalBeanmap = beanmap;
 	}
-	
+
 	/**
 	 * Get Initial beanMap
+	 *
 	 * @return
 	 */
-	protected BeanMap getInitialBeanMap(){
+	protected BeanMap getInitialBeanMap() {
 		return initalBeanmap;
 	}
 
 	public void screenToBeanMap(BeanMap beanmap) {
-		
-	}
-	
-	public boolean isLinkedToCurrentBeanMap() {
-		return true;		
-	}	
 
-	
+	}
+
+	public boolean isLinkedToCurrentBeanMap() {
+		return true;
+	}
+
 }

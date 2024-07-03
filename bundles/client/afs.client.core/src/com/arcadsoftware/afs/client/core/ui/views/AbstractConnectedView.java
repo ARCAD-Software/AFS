@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -19,12 +19,11 @@ import com.arcadsoftware.afs.framework.ui.help.DynamicHelp;
 import com.arcadsoftware.afs.framework.ui.views.AbstractAFSView;
 
 public class AbstractConnectedView extends AbstractAFSView {
-		
+
 	private ServerConnection connection;
 	private DataAccessHelper helper;
-	
+
 	/**
-	 * 
 	 * @return may return null.
 	 */
 	public ServerConnection getConnection() {
@@ -32,7 +31,6 @@ public class AbstractConnectedView extends AbstractAFSView {
 	}
 
 	/**
-	 * 
 	 * @param connection
 	 */
 	public void setConnection(ServerConnection connection) {
@@ -44,19 +42,22 @@ public class AbstractConnectedView extends AbstractAFSView {
 		}
 		connectionChanged(connection);
 	}
-	
+
 	/**
 	 * This method is called each time {@link #setConnection(ServerConnection)} is called.
-	 * 
-	 * @param connection may be null if the connection is undone.
+	 *
+	 * @param connection
+	 *            may be null if the connection is undone.
 	 */
-	protected void connectionChanged(ServerConnection connection) {}
+	protected void connectionChanged(ServerConnection connection) {
+	}
 
 	/**
 	 * Help Context Id
+	 *
 	 * @return
 	 */
-	protected String getDynamicHelpId(){
+	protected String getDynamicHelpId() {
 		return null;
 	}
 
@@ -68,7 +69,7 @@ public class AbstractConnectedView extends AbstractAFSView {
 
 	/**
 	 * Get access to the connection facade.
-	 * 
+	 *
 	 * @return may be null if no connection is set.
 	 */
 	public DataAccessHelper getHelper() {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -16,11 +16,11 @@ package com.arcadsoftware.afs.framework.messages;
 public class BasicUserMessageManager extends AbstractUserMessageManager {
 
 	private static final BasicUserMessageManager instance = new BasicUserMessageManager();
-	
+
 	public static BasicUserMessageManager getInstance() {
 		return instance;
 	}
-	
+
 	private BasicUserMessageManager() {
 		super(false);
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -15,39 +15,36 @@ package com.arcadsoftware.cli.logger;
 
 import java.util.Date;
 
-
-
 public class LogEntry {
 
 	private int level = IMessageLogger.LOGLVL_INFO;
-	private Date logDate= null;
-	private String message = "";
-	
-	public LogEntry(){
-		
+	private Date logDate;
+	private String message = ""; //$NON-NLS-1$
+
+	public LogEntry() {
+
 	}
-	public LogEntry(int level, String message){
+
+	public LogEntry(int level, String message) {
 		this.level = level;
-		this.message = message;	
-		this.logDate = new Date();
+		this.message = message;
+		logDate = new Date();
 	}
-	
-	
+
 	public int getLevel() {
 		return level;
 	}
-	
+
 	public String getMessage() {
 		return message;
 	}
-	
-	
-	public String print(){
-		return level + " : "+ message;
+
+	public String print() {
+		return level + " : " + message; //$NON-NLS-1$
 	}
-	
+
 	public Date getLogDate() {
 		return logDate;
 	}
-	
+
 }

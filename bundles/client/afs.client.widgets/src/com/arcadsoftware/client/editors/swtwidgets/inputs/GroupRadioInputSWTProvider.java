@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -56,8 +56,9 @@ public class GroupRadioInputSWTProvider implements IInputSWTProvider, IWidgetVal
 	private String type;
 	private Object currentValue;
 	private String attribute;
-	private final List<SelectionListener> listeners = new ArrayList<SelectionListener>();
+	private final List<SelectionListener> listeners = new ArrayList<>();
 
+	@Override
 	public void create(ISWTRenderer swtRenderer, ILayoutParameters parameters, Element element,
 			MetaDataEntity structure) {
 		renderer = swtRenderer;
@@ -69,18 +70,18 @@ public class GroupRadioInputSWTProvider implements IInputSWTProvider, IWidgetVal
 			groupLabel = renderer.getLocalizedMessage(groupLabel);
 		}
 		group = GuiFormatTools.createGroup(renderer.getParent(), groupLabel);
-		List<ElementParameter> elements = parameters.getListElementParameter(ELEMENT_ITEM);
-		buttons = new ArrayList<Button>(elements.size());
+		final List<ElementParameter> elements = parameters.getListElementParameter(ELEMENT_ITEM);
+		buttons = new ArrayList<>(elements.size());
 		Button tmp;
 		int index;
 		String label;
-		int elemntNb = elements.size();
-		for (ElementParameter elementParameter : elements) {
+		final int elemntNb = elements.size();
+		for (final ElementParameter elementParameter : elements) {
 			label = elementParameter.getParameter("label");
 			if ((label != null) && translate) {
 				label = renderer.getLocalizedMessage(label);
 			}
-			index = elementParameter.getParameterInteger(ELEMENT_INDEX,-1);
+			index = elementParameter.getParameterInteger(ELEMENT_INDEX, -1);
 			if ((index > -1) && (index < elemntNb)) {
 				tmp = GuiFormatTools.createRadioButton(group, label);
 				tmp.setData(ELEMENT_VALUE, elementParameter.getParameter(ELEMENT_VALUE));
@@ -94,7 +95,7 @@ public class GroupRadioInputSWTProvider implements IInputSWTProvider, IWidgetVal
 		}
 		group.setEnabled(!element.isReadonly() && !parameters.getParameterBoolean(READ_ONLY));
 		renderer.getRendererBinding().bindElement(element, this);
-		renderer.addLoadListener(new IBeanMapChangedListener() {			
+		renderer.addLoadListener(new IBeanMapChangedListener() {
 			@Override
 			public void changed(BeanMapEvent event) {
 				// force default attribute if not already set
@@ -105,29 +106,35 @@ public class GroupRadioInputSWTProvider implements IInputSWTProvider, IWidgetVal
 		});
 	}
 
+	@Override
 	public void dispose() {
 		listeners.clear();
 	}
-	
+
+	@Override
 	public Control getWidget() {
 		return group;
 	}
-	
-	public Object getValue() {		
+
+	@Override
+	public Object getValue() {
 		return currentValue;
 	}
-	
+
+	@Override
 	public void addSelectionListener(SelectionListener selectionListener) {
 		listeners.add(selectionListener);
 	}
-	
+
+	@Override
 	public void setValue(Object newValue) {
 		if (newValue instanceof Integer) {
-			Button selected = buttons.get((Integer)newValue);
+			final Button selected = buttons.get((Integer) newValue);
 			selected.setSelection(true);
 		}
 	}
 
+	@Override
 	public Object getValueType() {
 		if (type.equals(TYPE_BASIC_INTEGER)) {
 			return Integer.class;
@@ -150,11 +157,11 @@ public class GroupRadioInputSWTProvider implements IInputSWTProvider, IWidgetVal
 	@Override
 	public void widgetSelected(SelectionEvent e) {
 		if ((e.widget instanceof Button) && buttons.contains(e.widget)) {
-			Button w = (Button) e.widget;
+			final Button w = (Button) e.widget;
 			if (w.getSelection()) {
 				currentValue = w.getData(ELEMENT_VALUE);
 				renderer.put(attribute, currentValue);
-				for (SelectionListener listener : listeners) {
+				for (final SelectionListener listener : listeners) {
 					listener.widgetSelected(e);
 				}
 			}

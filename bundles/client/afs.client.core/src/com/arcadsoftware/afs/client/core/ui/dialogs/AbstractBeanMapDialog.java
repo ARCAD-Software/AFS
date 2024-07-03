@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -14,7 +14,6 @@
 package com.arcadsoftware.afs.client.core.ui.dialogs;
 
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.eclipse.jface.window.Window;
@@ -37,22 +36,22 @@ public abstract class AbstractBeanMapDialog extends AbstractAFSDialog {
 	protected BeanMap result;
 	protected ServerConnection connection;
 	protected ConnectedDynamicEditorComposite editor;
-	protected boolean readonly = false;
-	
+	protected boolean readonly;
+
 	private class AttributeChecker implements IEntityAttributeProcessListener {
+		@Override
 		public void processAction(MetaDataAttribute entry) {
 			String msg = Activator.resString("msg.error.attributeismandatory");
 			msg = String.format(msg, entry.getName());
 			Activator.getDefault().openError(msg);
 		}
-		
 	}
-	
-	private AttributeChecker checker = new AttributeChecker();
-	
+
+	private final AttributeChecker checker = new AttributeChecker();
+
 	public AbstractBeanMapDialog(Shell parentShell, ServerConnection connection, boolean resizable,
 			boolean centered) {
-		this(parentShell,connection, resizable,centered, false);
+		this(parentShell, connection, resizable, centered, false);
 	}
 
 	public AbstractBeanMapDialog(Shell parentShell, ServerConnection connection, boolean resizable,
@@ -60,46 +59,42 @@ public abstract class AbstractBeanMapDialog extends AbstractAFSDialog {
 		super(parentShell, resizable, centered);
 		this.connection = connection;
 		this.readonly = readonly;
-	}	
-	
+	}
+
 	public ServerConnection getConnection() {
 		return connection;
 	}
 
 	public void setConnection(ServerConnection connection) {
 		this.connection = connection;
-	}	
-	
+	}
+
 	public void setEditedBeanMap(BeanMap edited) {
-		this.initalBeanmap = edited;
-	}		
-	
+		initalBeanmap = edited;
+	}
+
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		Composite composite = (Composite)super.createDialogArea(parent);
-		GridLayout gl  = (GridLayout)composite.getLayout();
-		gl.marginWidth=gl.marginHeight=gl.marginTop=gl.marginBottom=gl.marginLeft = gl.marginRight = 0;
-		editor = new ConnectedDynamicEditorComposite(getConnection(),composite,0, getType(), getLayoutName(),readonly, false){
+		final Composite composite = (Composite) super.createDialogArea(parent);
+		final GridLayout gl = (GridLayout) composite.getLayout();
+		gl.marginWidth = gl.marginHeight = gl.marginTop = gl.marginBottom = gl.marginLeft = gl.marginRight = 0;
+		editor = new ConnectedDynamicEditorComposite(getConnection(), composite, 0, getType(), getLayoutName(),
+				readonly, false) {
 			@Override
-			protected ServerConnection getConnection() {		
+			protected ServerConnection getConnection() {
 				return connection;
 			}
 		};
-		
-		Hashtable<String, Object> virtualValues = getVirtualValues();
+		final Hashtable<String, Object> virtualValues = getVirtualValues();
 		if (virtualValues != null) {
-			Set<String> keySet = virtualValues.keySet();
-			Iterator<String> keys = keySet.iterator();
-			while (keys.hasNext()) {
-				String key = keys.next();
-				Object value = virtualValues.get(key);
+			final Set<String> keySet = virtualValues.keySet();
+			for (final String key : keySet) {
+				final Object value = virtualValues.get(key);
 				editor.getRenderer().putVirtualValue(key, value);
-				
 			}
-		}			
+		}
 		editor.createPartControl(getLayoutName());
-		
-		GridData gridData = new GridData(GridData.FILL_BOTH);
+		final GridData gridData = new GridData(GridData.FILL_BOTH);
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.grabExcessVerticalSpace = true;
 		gridData.horizontalSpan = 3;
@@ -112,54 +107,52 @@ public abstract class AbstractBeanMapDialog extends AbstractAFSDialog {
 		}
 		return composite;
 	}
-	
+
 	protected Hashtable<String, Object> getVirtualValues() {
 		return null;
 	}
-	
+
 	@Override
 	protected void okPressed() {
 		result = new BeanMap(getType());
-		if (initalBeanmap!=null) {
+		if (initalBeanmap != null) {
 			result.setId(initalBeanmap.getId());
 		}
 		result.addAll(editor.getCurrent());
-		
-		if (editor == null || editor.getRenderer().canSavedEditor(checker)) {		
+		if ((editor == null) || editor.getRenderer().canSavedEditor(checker)) {
 			doBeforeClosing(result);
 			super.okPressed();
 		}
 	}
-	
-	
+
 	public BeanMap getResult() {
 		return result;
 	}
-	
-	protected void doBeforeClosing(BeanMap result){}
-	
+
+	protected void doBeforeClosing(BeanMap result) {}
+
 	public abstract String getType();
+
 	public abstract String getLayoutName();
-	
-	
-	
-	public static BeanMap create(AbstractBeanMapDialog dialog){
-		if (dialog.open()==Window.OK){
+
+	public static BeanMap create(AbstractBeanMapDialog dialog) {
+		if (dialog.open() == Window.OK) {
 			return dialog.getResult();
 		}
 		return null;
 	}
-	public static boolean edit(AbstractBeanMapDialog dialog,BeanMap edited){
+
+	public static boolean edit(AbstractBeanMapDialog dialog, BeanMap edited) {
 		dialog.setEditedBeanMap(edited);
-		if (dialog.open()==Window.OK){
+		if (dialog.open() == Window.OK) {
 			edited.addAll(dialog.getResult());
 			return true;
 		}
 		return false;
-	}	
-	
-	public static void browse(AbstractBeanMapDialog dialog,BeanMap edited){
+	}
+
+	public static void browse(AbstractBeanMapDialog dialog, BeanMap edited) {
 		dialog.setEditedBeanMap(edited);
 		dialog.open();
-	}	
+	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -21,56 +21,60 @@ import com.arcadsoftware.afs.client.core.ui.actions.AbstractContainerConnectedAc
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapFormater;
 
-public abstract class BeanMapItem extends AbstractConnectedContainerProvider 
-implements IBeanMapProvider{
-	
+public abstract class BeanMapItem extends AbstractConnectedContainerProvider
+		implements IBeanMapProvider {
+
 	protected BeanMap beanMap;
 	BeanMapFormater formatter;
-	
-	public BeanMapItem(AbstractConnectedContainer parent,BeanMap beanMap) {
+
+	public BeanMapItem(AbstractConnectedContainer parent, BeanMap beanMap) {
 		this(parent, beanMap, false);
 	}
 
-	public BeanMapItem(AbstractConnectedContainer parent,BeanMap beanMap, boolean fixedFirst) {
-		super(parent,fixedFirst);
+	public BeanMapItem(AbstractConnectedContainer parent, BeanMap beanMap, boolean fixedFirst) {
+		super(parent, fixedFirst);
 		this.beanMap = beanMap;
-		formatter = new BeanMapFormater( getFormatString(),beanMap.getType(),false);
+		formatter = new BeanMapFormater(getFormatString(), beanMap.getType(), false);
 	}
-	
+
+	@Override
 	public String getUniqueKey() {
-		 return getParent().getUniqueKey().concat("/") //$NON-NLS-1$
-		                   .concat(beanMap.getType().toUpperCase()+":"+beanMap.getId());//$NON-NLS-1$
+		return getParent().getUniqueKey().concat("/") //$NON-NLS-1$
+				.concat(beanMap.getType().toUpperCase() + ":" + beanMap.getId());//$NON-NLS-1$
 	}
 
 	public BeanMap getBeanMap() {
 		return beanMap;
 	}
-	
+
+	@Override
 	public String getLabel() {
 		return formatter.format(beanMap);
 	}
 
 	public abstract String getFormatString();
 
+	@Override
 	public BeanMap providedBeanMap() {
 		return getBeanMap();
 	}
-	
-	public void setExtentedActions(){
-		List<ArcadAction> extendedList = getExtentedActions();
-		((AbstractContainerConnectedActions)this.actions).setExtentedActions(extendedList);
+
+	public void setExtentedActions() {
+		final List<ArcadAction> extendedList = getExtentedActions();
+		((AbstractContainerConnectedActions) actions).setExtentedActions(extendedList);
 	}
 
 	public List<ArcadAction> getExtentedActions() {
 		return null;
 	}
-	
+
 	/**
 	 * Method to start BeanMapItem editor.
+	 *
 	 * @return true if editor exists, false otherwise.
 	 */
-	public boolean edit(){
+	public boolean edit() {
 		return false;
 	}
-	
+
 }

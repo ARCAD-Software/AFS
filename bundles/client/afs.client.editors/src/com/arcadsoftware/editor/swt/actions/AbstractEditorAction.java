@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -37,14 +37,16 @@ public abstract class AbstractEditorAction extends ArcadAction implements IEdito
 		return tableViewer;
 	}
 
+	@Override
 	public void setTableViewer(AbstractColumnedTableViewer tableViewer) {
 		this.tableViewer = tableViewer;
 	}
-	
+
 	public AbstractColumnedTreeViewer getTreeViewer() {
 		return treeViewer;
 	}
 
+	@Override
 	public void setTreeViewer(AbstractColumnedTreeViewer treeViewer) {
 		this.treeViewer = treeViewer;
 	}
@@ -56,10 +58,12 @@ public abstract class AbstractEditorAction extends ArcadAction implements IEdito
 		return null;
 	}
 
+	@Override
 	public void setBeanMapSelector(IBeanMapSelector selector) {
 		this.selector = selector;
 	}
 
+	@Override
 	public void setRenderer(ISWTRenderer renderer) {
 		this.renderer = renderer;
 		if (renderer.isReadOnly()) {
@@ -67,22 +71,25 @@ public abstract class AbstractEditorAction extends ArcadAction implements IEdito
 		}
 	}
 
+	@Override
 	public void refreshSelector(BeanMap beanMap) {
 		selector.refreshSelector(beanMap);
 	}
-	
+
+	@Override
 	public void setElement(Element element) {
 		this.element = element;
 	}
-	
+
+	@Override
 	public void setInternalEditorId(String internalEditorId) {
 		this.internalEditorId = internalEditorId;
 	}
-	
+
 	public void selectBeanMap(BeanMap beanMap) {
 		selector.selectBeanMap(beanMap);
 	}
-	
+
 	public IBeanMapSelector getSelector() {
 		return selector;
 	}

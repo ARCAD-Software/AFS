@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -15,7 +15,6 @@ package com.arcadsoftware.cli.output;
 
 public interface IOutputConsts {
 
-	
-	public static final String OUTPUTCLASS_XML = "com.arcadsoftware.cli.output.impl.XmlOutputManager";
-	public static final String OUTPUTCLASS_JSON = "com.arcadsoftware.cli.output.impl.JSonOutputManager";
+	public static final String OUTPUTCLASS_XML = "com.arcadsoftware.cli.output.impl.XmlOutputManager"; //$NON-NLS-1$
+	public static final String OUTPUTCLASS_JSON = "com.arcadsoftware.cli.output.impl.JSonOutputManager"; //$NON-NLS-1$
 }

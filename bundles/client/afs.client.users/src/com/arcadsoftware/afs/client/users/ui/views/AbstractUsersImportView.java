@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -73,10 +73,11 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 
 	/**
 	 * Complete User bean
-	 * 
+	 *
 	 * @param user
 	 */
-	protected void completeUserForImport(final BeanMap user) {}
+	protected void completeUserForImport(final BeanMap user) {
+	}
 
 	@Override
 	protected void connectionChanged(final ServerConnection connection) {
@@ -88,18 +89,19 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 		final Composite optionsComposite = new Composite(parent, SWT.NONE);
 		optionsComposite.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).span(3, 1).create());
 		optionsComposite.setLayout(new GridLayout(2, false));
-		final List<AuthType> possibleImports = new ArrayList<AuthType>();
+		final List<AuthType> possibleImports = new ArrayList<>();
 		try {
 			final String xml = getConnection().getDataAccess().getWebServicesAccess().get("authservices");
 			final XMLInputFactory factory = XMLInputFactory.newFactory();
 			factory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, ""); // Compliant
-			factory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");  // compliant
+			factory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, ""); // compliant
 			final XMLStreamReader reader = factory.createXMLStreamReader(new StringReader(xml));
 			while (reader.hasNext()) {
-				if ((reader.next() == XMLStreamConstants.START_ELEMENT) && reader.getName().getLocalPart().equals("string")) {
-					String text = reader.getElementText();
+				if ((reader.next() == XMLStreamConstants.START_ELEMENT)
+						&& reader.getName().getLocalPart().equals("string")) {
+					final String text = reader.getElementText();
 					if (text != null) {
-						AuthType at = AuthType.fromCode(text);
+						final AuthType at = AuthType.fromCode(text);
 						if ((at != null) && at.importAllowed()) {
 							possibleImports.add(at);
 						}
@@ -107,18 +109,21 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 				}
 			}
 		} catch (final Exception e) {
-			Activator.getDefault().error("Error during loading of Authentication mode available for user import: " + e.getMessage(), e);
+			Activator.getDefault().error(
+					"Error during loading of Authentication mode available for user import: " + e.getMessage(), e);
 		}
-		final Group sourceGroup = GuiFormatTools.createGroup(optionsComposite, Activator.resString("user.action.import.source.group.label"), possibleImports.size());
+		final Group sourceGroup = GuiFormatTools.createGroup(optionsComposite,
+				Activator.resString("user.action.import.source.group.label"), possibleImports.size());
 		sourceGroup.setLayoutData(GridDataFactory.fillDefaults().grab(false, false).create());
-		for (AuthType auth: possibleImports) {
+		for (final AuthType auth : possibleImports) {
 			createAuthButton(sourceGroup, auth);
 		}
 		extendOptionsComposite(optionsComposite);
 	}
 
-	protected void extendOptionsComposite(final Composite optionsComposite) {}
-	
+	protected void extendOptionsComposite(final Composite optionsComposite) {
+	}
+
 	@SuppressWarnings("incomplete-switch")
 	private void createAuthButton(final Group sourceGroup, final AuthType auth) {
 		final Button result = new Button(sourceGroup, SWT.RADIO);
@@ -133,16 +138,16 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 		result.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				AbstractUsersImportView.this.selectedAuth = auth;
+				selectedAuth = auth;
 			}
 		});
 		if (defaultSelected) {
 			result.setSelection(true);
-			this.selectedAuth = auth;
+			selectedAuth = auth;
 		}
 		defaultSelected = false;
 	}
-	
+
 	protected void createButtonBar(final Composite parent) {
 		bImport = new Button(parent, SWT.PUSH);
 		bImport.setText(Activator.resString("users.import.action.text")); //$NON-NLS-1$
@@ -159,7 +164,7 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 
 	/**
 	 * Create Composite for Candidates Viewer
-	 * 
+	 *
 	 * @param parent
 	 * @return
 	 */
@@ -191,7 +196,7 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 
 	/**
 	 * Create Content
-	 * 
+	 *
 	 * @param parent
 	 */
 	protected void createContent(final Composite parent) {
@@ -218,7 +223,7 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 
 	protected IContentProvider createSpecificContentProvider() {
 		return new IStructuredContentProvider() {
-			
+
 			@Override
 			public void dispose() {
 				// Do nothing
@@ -254,13 +259,14 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 		};
 	}
 
-	protected void doAfterImport() {}
-	
+	protected void doAfterImport() {
+	}
+
 	public abstract List<Integer> getExpectedImportRights();
 
 	/**
 	 * Get Import Button
-	 * 
+	 *
 	 * @return
 	 */
 	protected Button getImportButton() {
@@ -268,41 +274,41 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 	}
 
 	private String getUserDefinition(final BeanMap user) {
-		switch(selectedAuth) {		
-			case IBMI:
-				return String.format("%s [%s]",
-						user.getString(IUsersConsts.IBMI_IMPORT_LOGIN), user.getString("description")); 
-			case LDAP:
-				final StringBuilder userDef = new StringBuilder();
-				if (user.contains(IUsersConsts.LDAPIMPORT_LOGIN)) {
-					userDef.append(user.getString(IUsersConsts.LDAPIMPORT_LOGIN) + " ");
-				}
-				if (user.contains(IUsersConsts.PROP_USER_FIRSTNAME)) {
-					userDef.append("[" + user.getString(IUsersConsts.PROP_USER_FIRSTNAME) + "] ");
-				}
-		
-				if (user.contains(IUsersConsts.PROP_USER_LASTNAME)) {
-					userDef.append(user.getString(IUsersConsts.PROP_USER_LASTNAME) + " ");
-				}
-				if (user.contains(IUsersConsts.PROP_USER_EMAIL)) {
-					userDef.append("[" + user.getString(IUsersConsts.PROP_USER_EMAIL) + "]");
-				}
-				return userDef.toString();
-			default:
-				return "";
+		switch (selectedAuth) {
+		case IBMI:
+			return String.format("%s [%s]",
+					user.getString(IUsersConsts.IBMI_IMPORT_LOGIN), user.getString("description"));
+		case LDAP:
+			final StringBuilder userDef = new StringBuilder();
+			if (user.contains(IUsersConsts.LDAPIMPORT_LOGIN)) {
+				userDef.append(user.getString(IUsersConsts.LDAPIMPORT_LOGIN) + " ");
+			}
+			if (user.contains(IUsersConsts.PROP_USER_FIRSTNAME)) {
+				userDef.append("[" + user.getString(IUsersConsts.PROP_USER_FIRSTNAME) + "] ");
+			}
+
+			if (user.contains(IUsersConsts.PROP_USER_LASTNAME)) {
+				userDef.append(user.getString(IUsersConsts.PROP_USER_LASTNAME) + " ");
+			}
+			if (user.contains(IUsersConsts.PROP_USER_EMAIL)) {
+				userDef.append("[" + user.getString(IUsersConsts.PROP_USER_EMAIL) + "]");
+			}
+			return userDef.toString();
+		default:
+			return "";
 		}
 	}
 
 	/**
 	 * Complete User bean
-	 * 
+	 *
 	 * @param user
 	 */
 	protected abstract int[] getUserProfiles(final BeanMap user);
 
 	/**
 	 * Get Viewer
-	 * 
+	 *
 	 * @return
 	 */
 	protected ImportCandidatesCheckViewer getViewer() {
@@ -315,7 +321,7 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 	protected void initActions() {
 		if (importAction == null) {
 			importAction = new AbstractImportAction(getConnection()) {
-				
+
 				@Override
 				protected void completeUserBeanMap(final BeanMap user) {
 					completeUserForImport(user);
@@ -349,7 +355,7 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 				protected Object[] getSelectedItems() {
 					return candidates.getCheckedElements();
 				}
-				
+
 				@Override
 				protected AuthType getSelectedAuthType() {
 					return selectedAuth;
@@ -372,12 +378,12 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 				protected TableViewer getViewer() {
 					return candidates;
 				}
-				
+
 				@Override
-				public List<Integer> getExpectedRigths() {				
+				public List<Integer> getExpectedRigths() {
 					return getExpectedImportRights();
 				}
-				
+
 				@Override
 				protected boolean execute() {
 					importUsers();
@@ -388,31 +394,33 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 	}
 
 	protected abstract void initData();
+
 	protected abstract void initializeSelection();
-	
+
 	private void importUsers() {
 		switch (selectedAuth) {
-			case IBMI:
-				loadIBMiProfiles();
-				break;
-			case LDAP:
-				loadLDAPUsers();
-				break;
-			default:
+		case IBMI:
+			loadIBMiProfiles();
+			break;
+		case LDAP:
+			loadLDAPUsers();
+			break;
+		default:
 		}
-	}	
-	
+	}
+
 	private void loadIBMiProfiles() {
-		try {			
+		try {
 			final String filter = filterNameText.getText().toUpperCase();
-			final Set<String> existingProfiles = new HashSet<String>();
-			for (BeanMap b: getConnection().getDataAccess().getList(AuthType.IBMI.code())) {
+			final Set<String> existingProfiles = new HashSet<>();
+			for (final BeanMap b : getConnection().getDataAccess().getList(AuthType.IBMI.code())) {
 				existingProfiles.add(b.getString("login"));
-			}			
-			final BeanMapList totalList = getConnection().getDataAccess().getList(String.format("/admin/%s/import", AuthType.IBMI.resourceSuffix()), IUsersConsts.ENTITY_USER);
+			}
+			final BeanMapList totalList = getConnection().getDataAccess().getList(
+					String.format("/admin/%s/import", AuthType.IBMI.resourceSuffix()), IUsersConsts.ENTITY_USER);
 			if (totalList != null) {
-				final BeanMapList list = new BeanMapList(totalList.size()); 
-				for (BeanMap b: totalList) {
+				final BeanMapList list = new BeanMapList(totalList.size());
+				for (final BeanMap b : totalList) {
 					final String login = b.getString(IUsersConsts.IBMI_IMPORT_LOGIN);
 					if ((login != null) && (login.toUpperCase().contains(filter)) && existingProfiles.contains(login)) {
 						list.add(b);
@@ -420,23 +428,23 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 				}
 				getViewer().setInput(list);
 			}
-		} catch (Exception e) {			
+		} catch (final Exception e) {
 			Activator.getDefault().error("AbstractUsersImportView::loadIBMiProfiles", e);
-		}		
+		}
 	}
-	
-	
+
 	private void loadLDAPUsers() {
 		// call server
 		final LDAPAccessHelper ldapHelper = new LDAPAccessHelper(getConnection());
 		String filter = null;
 		if (filterNameText.getText().length() > 0) {
 			filter = filterNameText.getText();
-		} 
+		}
 		candidates.setInput(ldapHelper.getImportCandidates(filter));
 	}
 
 	@Override
-	public void setFocus() {}
-	
+	public void setFocus() {
+	}
+
 }

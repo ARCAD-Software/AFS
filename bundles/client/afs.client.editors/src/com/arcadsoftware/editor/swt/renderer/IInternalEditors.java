@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -22,7 +22,7 @@ public interface IInternalEditors {
 
 	/**
 	 * Load the entity in the internal editor.
-	 * 
+	 *
 	 * @param editorId
 	 *            The internal editor id.
 	 * @param entityId
@@ -30,29 +30,28 @@ public interface IInternalEditors {
 	 * @return true if the load is complete, false otherwise.
 	 */
 	public boolean loadInternalEditor(String editorId, int entityId);
-	
+
 	/**
 	 * Load the entity in the internal editor.
-	 * 
+	 *
 	 * @param editorId
 	 *            The internal editor id.
 	 * @param entityId
 	 *            The entity id.
 	 * @return true if the load is complete, false otherwise.
 	 */
-	public boolean loadInternalEditor(String editorId, int entityId,ILoaderCallback callback);	
-	
+	public boolean loadInternalEditor(String editorId, int entityId, ILoaderCallback callback);
 
 	/**
 	 * Returns true if at least one internal editor is dirty, false otherwise.
-	 * 
+	 *
 	 * @return true if at least one internal editor is dirty, false otherwise.
 	 */
 	public boolean internalEditorsAreDirty();
 
 	/**
 	 * Registers the internal editor in renderer.
-	 * 
+	 *
 	 * @param editor
 	 *            The internal editor.
 	 */
@@ -60,7 +59,7 @@ public interface IInternalEditors {
 
 	/**
 	 * Unregisters the internal editor in renderer.
-	 * 
+	 *
 	 * @param editor
 	 *            The internal editor.
 	 */
@@ -69,7 +68,7 @@ public interface IInternalEditors {
 	public boolean isAddForEditorId(String editorId);
 
 	public void setAdd(String editorId);
-	
+
 	public IInternalEditor getInternalEditor(String editorId);
 
 }

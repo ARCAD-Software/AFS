@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -32,62 +32,62 @@ import com.arcadsoftware.mmk.lists.metadata.StoreItem;
 
 public abstract class AbstractXmlListViewer extends AbstractColumnedTableViewer {
 
-	private ListMetaDatas metadatas;
-	
-	private class SimpleBrowser implements IListBrowseListener{
+	private final ListMetaDatas metadatas;
+
+	private class SimpleBrowser implements IListBrowseListener {
 		public int index = 0;
 		public ListMetaDatas metadata;
-		private Object[] reciever;
-		public SimpleBrowser(Object[] reciever,ListMetaDatas metadata) {
+		private final Object[] reciever;
+
+		public SimpleBrowser(Object[] reciever, ListMetaDatas metadata) {
 			this.reciever = reciever;
 			this.metadata = metadata;
 		}
-		
-		
+
+		@Override
 		public void elementBrowsed(StoreItem object) {
-			StoreItem dup = new StoreItem(metadata);
-			String values[] = object.getValues();
-			for (int i=0;i<values.length;i++) {
-				String value = values[i];
-				dup.setValue(i,value);
+			final StoreItem dup = new StoreItem(metadata);
+			final String values[] = object.getValues();
+			for (int i = 0; i < values.length; i++) {
+				final String value = values[i];
+				dup.setValue(i, value);
 			}
-			
-			reciever[index++] = dup;				
-		}				
-	};
-	
-	
+
+			reciever[index++] = dup;
+		}
+	}
+
 	private class XmlListInput implements IObjectArrayProvider {
-		
+
 		private Object[] values;
-		private AbstractXmlList list;
-		
-		public XmlListInput(AbstractXmlList list){
+		private final AbstractXmlList list;
+
+		public XmlListInput(AbstractXmlList list) {
 			this.list = list;
 			populate();
 		}
 
-		public void populate(){
+		public void populate() {
 			list.load(true, false);
 			values = new Object[list.getElementCount()];
-			IListBrowseListener listener = new SimpleBrowser(values,list.getMetadatas());			
+			final IListBrowseListener listener = new SimpleBrowser(values, list.getMetadatas());
 			list.addBrowseListener(listener);
 			try {
 				list.browse();
-			} finally{
+			} finally {
 				list.removeBrowseListener(listener);
-			}	
+			}
 		}
-		
 
+		@Override
 		public Object[] getObjectArray() {
 			return values;
 		}
-		
+
 	}
-	
+
 	public AbstractXmlListViewer(Composite parent, int style, ListMetaDatas metadatas) {
-		super(parent, style,false);
+		super(parent, style, false);
 		this.metadatas = metadatas;
 		init();
 	}
@@ -95,14 +95,14 @@ public abstract class AbstractXmlListViewer extends AbstractColumnedTableViewer 
 	@Override
 	public AbstractColumnedTableLabelProvider createTableLabelProvider(
 			AbstractColumnedViewer viewer) {
-		return new ColumnedDefaultTableLabelProvider(viewer){
+		return new ColumnedDefaultTableLabelProvider(viewer) {
 			@Override
 			protected Image getActualImage(Object element, int actualColumnIndex) {
-				if (actualColumnIndex==0) {
+				if (actualColumnIndex == 0) {
 					return AFSIcon.LIST.image();
 				} else {
-					Image image = getCustomColumnImage(element,actualColumnIndex);
-					if (image==null){
+					final Image image = getCustomColumnImage(element, actualColumnIndex);
+					if (image == null) {
 						return super.getActualImage(element, actualColumnIndex);
 					}
 					return image;
@@ -114,34 +114,34 @@ public abstract class AbstractXmlListViewer extends AbstractColumnedTableViewer 
 	@Override
 	public String getValue(Object element, int columnIndex) {
 		if (element instanceof StoreItem) {
-			StoreItem si = (StoreItem)element;
+			final StoreItem si = (StoreItem) element;
 			return si.getValue(columnIndex);
 		}
 		return "";
 	}
 
-	protected Image getCustomColumnImage(Object element, int actualColumnIndex){
+	protected Image getCustomColumnImage(Object element, int actualColumnIndex) {
 		return null;
 	}
-	
+
 	@Override
 	public ArcadColumns getReferenceColumns() {
-		ArcadColumns refColumns = new ArcadColumns();
-		if (metadatas!=null) {
-			for (int i=0;i<metadatas.count();i++) {
-				ListColumnDef colDefinition = metadatas.getColumnDefAt(i);				
-				ArcadColumn col = new ArcadColumn();
-				String name = colDefinition.getPropertyName();
-				String header = getColumnHeader(name);
+		final ArcadColumns refColumns = new ArcadColumns();
+		if (metadatas != null) {
+			for (int i = 0; i < metadatas.count(); i++) {
+				final ListColumnDef colDefinition = metadatas.getColumnDefAt(i);
+				final ArcadColumn col = new ArcadColumn();
+				final String name = colDefinition.getPropertyName();
+				final String header = getColumnHeader(name);
 				col.setIdentifier(name);
 				col.setName(header);
 				col.setUserName(header);
 				col.setVisible(ArcadColumn.VISIBLE);
 				col.setPosition(i);
 				col.setActualIndex(i);
-				col.setWidth(getColumnSize(name));						
-				refColumns.add(col);			
-			}	
+				col.setWidth(getColumnSize(name));
+				refColumns.add(col);
+			}
 		}
 		return refColumns;
 	}
@@ -150,13 +150,14 @@ public abstract class AbstractXmlListViewer extends AbstractColumnedTableViewer 
 	public String getIdentifier() {
 		return null;
 	}
-	
-	public void setListInput(AbstractXmlList list){
-		XmlListInput xi = new XmlListInput(list);
+
+	public void setListInput(AbstractXmlList list) {
+		final XmlListInput xi = new XmlListInput(list);
 		setInput(xi);
 	}
-	
-	protected abstract String getColumnHeader(String propertyName);	
+
+	protected abstract String getColumnHeader(String propertyName);
+
 	protected abstract int getColumnSize(String propertyName);
-	
+
 }

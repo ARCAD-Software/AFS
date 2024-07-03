@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -13,22 +13,20 @@
  *******************************************************************************/
 package com.arcadsoftware.afs.client.core.servers.model;
 
-
 import com.arcadsoftware.aev.core.model.ArcadEntity;
 
 /**
  * This class is used to describe an ARCAD Foundation Server.<br>
- * It contains all the necessary information to connect to the server
- * located at the defined URL.<br>
- * During the connection, the user can request for saving his login/password
- * to be able to get automatically get them when choosing the server.
- * 
+ * It contains all the necessary information to connect to the server located at the defined URL.<br>
+ * During the connection, the user can request for saving his login/password to be able to get automatically get them
+ * when choosing the server.
+ *
  * @author ARCAD Software
  */
 public class Server extends ArcadEntity implements IServer, Cloneable {
 
 	private final BasicServer internalServer = new BasicServer();
-	
+
 	@Override
 	public String getLabel() {
 		return internalServer.getName();
@@ -65,12 +63,12 @@ public class Server extends ArcadEntity implements IServer, Cloneable {
 	}
 
 	/**
-	 * @see #clo
+	 * @see #clone()
 	 */
 	@Override
 	@Deprecated
 	public Server duplicate() {
-		Server result = new Server();
+		final Server result = new Server();
 		result.setName(getName());
 		result.assign(this);
 		return result;
@@ -82,19 +80,19 @@ public class Server extends ArcadEntity implements IServer, Cloneable {
 	}
 
 	@Override
-	public void assign(IServer source) {		
+	public void assign(IServer source) {
 		setUrl(source.getUrl());
 		setLastLogin(source.getLastLogin());
 		setRememberPassword(source.isRememberPassword());
-		if (source.isRememberPassword()){
+		if (source.isRememberPassword()) {
 			setLastPassword(source.getLastPassword());
 		}
 		setProxyHost(source.getProxyHost());
 		setProxyPort(source.getProxyPort());
 		setProxyLogin(source.getProxyLogin());
 		setProxyPassword(source.getProxyPassword());
-	}	
-	
+	}
+
 	@Override
 	public String getIconID() {
 		return "SERVER"; //$NON-NLS-1$

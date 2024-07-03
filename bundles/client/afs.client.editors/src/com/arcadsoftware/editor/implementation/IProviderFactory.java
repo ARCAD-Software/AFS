@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -22,7 +22,6 @@ import com.arcadsoftware.metadata.Element;
 import com.arcadsoftware.script.IScriptAction;
 
 /**
- * 
  * @author ARCAD Software
  */
 public interface IProviderFactory {
@@ -32,11 +31,12 @@ public interface IProviderFactory {
 
 	public LayoutElement getDecorator(String name, XmlPullParser xpp) throws XmlPullParserException, IOException;
 
-	public LayoutElement getContainer(EditorEngine editorEngine, String name, XmlPullParser xpp) throws XmlPullParserException, IOException;
-	
+	public LayoutElement getContainer(EditorEngine editorEngine, String name, XmlPullParser xpp)
+			throws XmlPullParserException, IOException;
+
 	/**
 	 * Load a IScriptAction defined into the platform.
-	 * 
+	 *
 	 * @param name
 	 * @return
 	 */

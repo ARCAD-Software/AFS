@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -48,62 +48,58 @@ import com.arcadsoftware.metadata.criteria.NotCriteria;
 
 public abstract class AbstractBeanMapListPropertyPage extends AbstractConnectedPropertypage {
 
-	
 	protected MetaDataEntity entity;
 	protected AbstractSearchListComposite composite;
-	//protected BeanMapListTableViewer viewer;
+	// protected BeanMapListTableViewer viewer;
 	protected AbstractColumnedViewer viewer;
 	DataAccessHelper helper;
-	
+
 	private Action editAction;
-	
-	
+
 	public AbstractBeanMapListPropertyPage() {
 		super();
 		noDefaultAndApplyButton();
 	}
 
-
-
 	protected Button createButton(Composite parent,
-			                   String text,
-			                   ImageDescriptor imageDescriptor,
-			                   int anchor,
-			                   int offset,
-			                   int width,
-			                   int height){
-		
-		Button b = new Button(parent,SWT.PUSH);
+			String text,
+			ImageDescriptor imageDescriptor,
+			int anchor,
+			int offset,
+			int width,
+			int height) {
+
+		final Button b = new Button(parent, SWT.PUSH);
 		b.setText(text);
-		
-		FormData fData = new FormData();
-		fData.top = new FormAttachment( 0, 0);
-    	fData.height = height;
-    	fData.width =width;
-    	if (anchor==0) {//left anchor 
-    		fData.left = new FormAttachment( 0, offset);
-    	} else {
-    		fData.left = new FormAttachment( 100, offset);
-    	}
-	    b.setLayoutData(fData);
+
+		final FormData fData = new FormData();
+		fData.top = new FormAttachment(0, 0);
+		fData.height = height;
+		fData.width = width;
+		if (anchor == 0) {// left anchor
+			fData.left = new FormAttachment(0, offset);
+		} else {
+			fData.left = new FormAttachment(100, offset);
+		}
+		b.setLayoutData(fData);
 		b.setImage(imageDescriptor.createImage());
-	    return b;
-	}		
-	
-	protected boolean getDisplayAsTree(){
+		return b;
+	}
+
+	protected boolean getDisplayAsTree() {
 		return false;
 	}
-	
+
 	@Override
 	protected Control createContents(Composite parent) {
-		Control c = super.createContents(parent);
-		if (c!=null) {
+		final Control c = super.createContents(parent);
+		if (c != null) {
 			return c;
 		}
-		
-		helper = new DataAccessHelper(getServerConnection()) ;
+
+		helper = new DataAccessHelper(getServerConnection());
 		entity = helper.getEntity(getType());
-		composite = new AbstractSearchListComposite(parent,entity,getServerConnection(),false) {
+		composite = new AbstractSearchListComposite(parent, entity, getServerConnection(), false) {
 
 			@Override
 			public List<Action> getActions() {
@@ -139,55 +135,55 @@ public abstract class AbstractBeanMapListPropertyPage extends AbstractConnectedP
 			protected Image getElementIcon(Object element) {
 				return AbstractBeanMapListPropertyPage.this.getElementIcon(element);
 			}
-			
+
 			@Override
 			protected Image getCustomColumnImage(Object element,
 					int actualColumnIndex) {
 				return AbstractBeanMapListPropertyPage.this.getCustomColumnImage(element, actualColumnIndex);
 			}
-			
+
 			@Override
 			public AbstractColumnedTableLabelProvider createSpecificTableLabelProvider(
 					AbstractColumnedViewer newViewer) {
 				return AbstractBeanMapListPropertyPage.this.createSpecificTableLabelProvider(newViewer);
 			}
-			
+
 			@Override
-			protected void doOnDoubleClickEvent(IStructuredSelection selection) {		
+			protected void doOnDoubleClickEvent(IStructuredSelection selection) {
 				editAction.run();
 			}
-			
+
 			@Override
-			public String getViewerIdentifier() {			
+			public String getViewerIdentifier() {
 				return null;
 			}
-			
+
 			@Override
 			protected String getDisplayedSelectClause() {
 				return AbstractBeanMapListPropertyPage.this.getDisplayedSelectClause();
 			}
-			
+
 		};
-		
-		
-		editAction = new Action(){
+
+		editAction = new Action() {
+			@Override
 			public void run() {
-				BeanMap updated = composite.getSelectedResult();
-				if (updated!=null) {
+				final BeanMap updated = composite.getSelectedResult();
+				if (updated != null) {
 					if (doUpdate(updated)) {
-						//Check that the code is unique
-						if (!alreadyExists(updated,true)){
-							if (helper.update(updated)) {						
-								composite.search();			
+						// Check that the code is unique
+						if (!alreadyExists(updated, true)) {
+							if (helper.update(updated)) {
+								composite.search();
 							}
 						} else {
 							showViolationMessage(updated);
 						}
 					}
 				}
-			};
+			}
 		};
-		
+
 		viewer = composite.getViewer();
 
 		GridData layoutData = new GridData(GridData.FILL_BOTH);
@@ -195,193 +191,193 @@ public abstract class AbstractBeanMapListPropertyPage extends AbstractConnectedP
 		layoutData.grabExcessVerticalSpace = true;
 		layoutData.grabExcessHorizontalSpace = true;
 		composite.setLayoutData(layoutData);
-		
-		Composite bar = new Composite(composite,SWT.NONE);
+
+		final Composite bar = new Composite(composite, SWT.NONE);
 		layoutData = new GridData(GridData.FILL_HORIZONTAL);
 		layoutData.horizontalSpan = 3;
 		layoutData.grabExcessHorizontalSpace = true;
 		bar.setLayoutData(layoutData);
 		bar.setLayout(new FormLayout());
 
-		Button bAdd = createButton(bar,
-				Activator.resString(isCreateDeleteStyle() ? "button.create.text" : "button.add.text"), 
+		final Button bAdd = createButton(bar,
+				Activator.resString(isCreateDeleteStyle() ? "button.create.text" : "button.add.text"),
 				isCreateDeleteStyle() ? AFSIcon.CREATE.imageDescriptor() : AFSIcon.ADD.imageDescriptor(),
 				1, -100, 100, 25);
 		bAdd.addSelectionListener(
-			new SelectionAdapter() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					BeanMap added = doAdd();
-					if (added!=null) {
-						//Check that the code is unique
-						if (!alreadyExists(added,false)){						
-							if (helper.create(added)) {						
-								composite.search();			
+				new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						final BeanMap added = doAdd();
+						if (added != null) {
+							// Check that the code is unique
+							if (!alreadyExists(added, false)) {
+								if (helper.create(added)) {
+									composite.search();
+								}
+							} else {
+								showViolationMessage(added);
 							}
-						} else {
-							showViolationMessage(added);
 						}
 					}
-				};
-			}
-		);
-		
-		Button bUpdate = createButton(bar, 
-				Activator.resString("button.edit.text"),  
+				});
+
+		final Button bUpdate = createButton(bar,
+				Activator.resString("button.edit.text"),
 				AFSIcon.EDIT.imageDescriptor(),
 				1, -208, 100, 25);
-		bUpdate.addSelectionListener(				
-			new SelectionAdapter() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {					
-					editAction.run();
-				}
-			}
-		);
-		
-		
-		Button bDelete = createButton(bar, 
-				Activator.resString(isCreateDeleteStyle() ? "button.delete.text" : "button.remove.text"), 
+		bUpdate.addSelectionListener(
+				new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						editAction.run();
+					}
+				});
+
+		final Button bDelete = createButton(bar,
+				Activator.resString(isCreateDeleteStyle() ? "button.delete.text" : "button.remove.text"),
 				isCreateDeleteStyle() ? AFSIcon.DELETE.imageDescriptor() : AFSIcon.REMOVE.imageDescriptor(),
 				0, 0, 100, 25);
 		bDelete.addSelectionListener(
-			new SelectionAdapter() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {				
-					
-					if (composite.enableMultiSelection()) {
-						BeanMapList toBeDeleted = composite.getSelectedBeanMap();
-						boolean result = confirmDeletion(null);
-						if (result) {
-							for (BeanMap deleted:toBeDeleted) {
-								doDelete(deleted, false);
-							}
-							composite.search();
-						}
-					} else {					
-						BeanMap deleted = composite.getSelectedResult();
-						if (deleted!=null) {
-							if (doDelete(deleted)) {
+				new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+
+						if (composite.enableMultiSelection()) {
+							final BeanMapList toBeDeleted = composite.getSelectedBeanMap();
+							final boolean result = confirmDeletion(null);
+							if (result) {
+								for (final BeanMap deleted : toBeDeleted) {
+									doDelete(deleted, false);
+								}
 								composite.search();
+							}
+						} else {
+							final BeanMap deleted = composite.getSelectedResult();
+							if (deleted != null) {
+								if (doDelete(deleted)) {
+									composite.search();
+								}
 							}
 						}
 					}
-				};
-			}
-		);
-		
+				});
+
 		additionalButon(bar);
-		
+
 		composite.search();
-		
+
 		return composite;
 	}
 
-	protected void additionalButon(Composite bar){
-		
+	protected void additionalButon(Composite bar) {
+
 	}
-	
-	private void showViolationMessage(BeanMap b){
-		String message = 
-				String.format(Activator.resString("msg.error.code.alreadyExists"),
-						b.getString(getCodeAttribute()));
-		Activator.getDefault().openError(message);		
+
+	private void showViolationMessage(BeanMap b) {
+		final String message = String.format(Activator.resString("msg.error.code.alreadyExists"),
+				b.getString(getCodeAttribute()));
+		Activator.getDefault().openError(message);
 	}
-	
+
 	private boolean alreadyExists(BeanMap b, boolean update) {
 		BeanMapList l;
-		EqualCriteria equalCode = new EqualCriteria(getCodeAttribute(),b.getString(getCodeAttribute()));
+		final EqualCriteria equalCode = new EqualCriteria(getCodeAttribute(), b.getString(getCodeAttribute()));
 		if (update) {
-			//If test is made during update, we also check that
-			//the id is different
-			IdEqualCriteria equalId = new IdEqualCriteria(b.getId());
-			NotCriteria notEqualId = new NotCriteria(equalId);
-			AndCriteria finalCriteria = new AndCriteria();
+			// If test is made during update, we also check that
+			// the id is different
+			final IdEqualCriteria equalId = new IdEqualCriteria(b.getId());
+			final NotCriteria notEqualId = new NotCriteria(equalId);
+			final AndCriteria finalCriteria = new AndCriteria();
 			finalCriteria.add(equalCode);
 			finalCriteria.add(notEqualId);
 			l = helper.getList(getType(), finalCriteria);
 		} else {
 			l = helper.getList(getType(), equalCode);
 		}
-		
-		
+
 		return (!l.isEmpty());
-		
+
 	}
-	
-	protected BeanMap doAdd(){
+
+	protected BeanMap doAdd() {
 		return null;
 	}
-	protected boolean doUpdate(BeanMap updated){
+
+	protected boolean doUpdate(BeanMap updated) {
 		return true;
-	}	
-	protected boolean doDelete(BeanMap deleted){
+	}
+
+	protected boolean doDelete(BeanMap deleted) {
 		return doDelete(deleted, true);
 	}
-	
-	protected boolean doDelete(BeanMap deleted, boolean confirm){
+
+	protected boolean doDelete(BeanMap deleted, boolean confirm) {
 		boolean result = true;
-		if (confirm){
+		if (confirm) {
 			result = confirmDeletion(deleted);
 		}
-		if (result){
+		if (result) {
 			return helper.remove(deleted);
 		}
 		return false;
 	}
-	protected boolean confirmDeletion(BeanMap deleted){
+
+	protected boolean confirmDeletion(BeanMap deleted) {
 		return Activator.getDefault().openConfirm(Activator.resString("msg.question.action.delete.confirmation"));
-	}	
-	
-	protected String getDisplayedSelectClause() {
-		return createSelectClause();		
-	}
-	
-	protected String createSelectClause(){
-		return getCodeAttribute()+" "+getNameAttribute();
 	}
 
-	protected String createSearchClause(){
+	protected String getDisplayedSelectClause() {
+		return createSelectClause();
+	}
+
+	protected String createSelectClause() {
+		return getCodeAttribute() + " " + getNameAttribute();
+	}
+
+	protected String createSearchClause() {
 		return null;
 	}
-	
-	public List<Action> getActions(){
+
+	public List<Action> getActions() {
 		return null;
 	}
-	
-	protected String createOrderClause(){
+
+	protected String createOrderClause() {
 		return getNameAttribute();
 	}
-	
-	public String getCodeAttribute(){return "code";};
-	public String getNameAttribute(){return "name";};
-	
-	
-	public abstract String getType();	
+
+	public String getCodeAttribute() {
+		return "code";
+	}
+
+	public String getNameAttribute() {
+		return "name";
+	}
+
+	public abstract String getType();
 
 	protected Image getCustomColumnImage(Object element,
 			int actualColumnIndex) {
 		return null;
 	}
-	
-	
+
 	public AbstractColumnedTableLabelProvider createSpecificTableLabelProvider(
 			AbstractColumnedViewer newViewer) {
 		return null;
 	}
-	
-	protected DataAccessHelper getHelper(){
+
+	protected DataAccessHelper getHelper() {
 		return helper;
 	}
-	
 
-	protected boolean isCreateDeleteStyle(){
+	protected boolean isCreateDeleteStyle() {
 		return true;
 	}
 
-	
 	protected abstract UserMessage getSearchErrorMessage();
+
 	protected abstract Bundle getParentBundle();
+
 	protected abstract Image getElementIcon(Object element);
-	
+
 }

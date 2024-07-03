@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -59,9 +59,10 @@ public class EditorContainerSWTProvider implements IReadOnlyableContainerSWTProv
 	private Composite composite;
 	ISWTRenderer editorRenderer;
 
+	@Override
 	public void create(ISWTRenderer swtRenderer, ILayoutParameters parameters, boolean isEmpty,
 			MetaDataEntity structure) {
-		this.renderer = swtRenderer;
+		renderer = swtRenderer;
 		if (parameters.getParameterBoolean(IConstants.BORDER)) {
 			composite = renderer.getToolkit().createComposite(renderer.getParent(), SWT.BORDER);
 		} else {
@@ -92,45 +93,52 @@ public class EditorContainerSWTProvider implements IReadOnlyableContainerSWTProv
 		loadErrorMessage = renderer.getLocalizedMessage(parameters.getParameter(IConstants.LOAD_ERROR_MESSAGE));
 		renderer.createSubContainer(this, parameters, composite);
 		renderer.getInternalEditors().addInternalEditor(this);
-		String widgetId = parameters.getParameter(IConstants.WIDGET_ID);
+		final String widgetId = parameters.getParameter(IConstants.WIDGET_ID);
 		if (widgetId != null) {
 			id = widgetId;
 			editorRenderer.addSaveListener(new IBeanMapChangedListener() {
+				@Override
 				public void changed(BeanMapEvent event) {
 					renderer
-							.fireListenedWidgetChanged(EditorContainerSWTProvider.this, editorRenderer.getCurrentBean());
+							.fireListenedWidgetChanged(EditorContainerSWTProvider.this,
+									editorRenderer.getCurrentBean());
 				}
 			});
 		}
 	}
 
 	protected DynamicEditorComposite createEditorComposite(Composite parent, String type, String layoutName) {
-		DynamicEditorComposite dynamicEditorComposite = new DynamicEditorComposite(parent, null, type, layoutName,
+		final DynamicEditorComposite dynamicEditorComposite = new DynamicEditorComposite(parent, null, type, layoutName,
 				renderer.isReadOnly());
 		dynamicEditorComposite.loadEmptyEntity();
-		GridData gridData = new GridData(GridData.FILL_BOTH);
+		final GridData gridData = new GridData(GridData.FILL_BOTH);
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.grabExcessVerticalSpace = true;
 		dynamicEditorComposite.setLayoutData(gridData);
 		return dynamicEditorComposite;
 	}
 
+	@Override
 	public void dispose() {
 		renderer.getInternalEditors().removeInternalEditor(this);
 	}
 
+	@Override
 	public boolean acceptDecorator(IDecoratorSWTProvider provider) {
 		return false;
 	}
 
+	@Override
 	public boolean acceptInput(IInputSWTProvider provider) {
 		return false;
 	}
 
+	@Override
 	public boolean acceptSubContainer(IContainerSWTProvider provider) {
 		return false;
 	}
 
+	@Override
 	public boolean load(int beanMapId) {
 		if (!editorComposite.isEmptyEntity() && editorComposite.isDirty()) {
 			if (MessageDialog.openQuestion(LoggedUIPlugin.getShell(), saveBeforeLoadTitle, saveBeforeLoadMessage)) {
@@ -146,7 +154,7 @@ public class EditorContainerSWTProvider implements IReadOnlyableContainerSWTProv
 			stackLayout.topControl = editorComposite;
 
 		}
-		composite.layout(true);		
+		composite.layout(true);
 		if (!editorComposite.load(beanMapId)) {
 			MessageDialog.openError(LoggedUIPlugin.getShell(), loadErrorTitle, loadErrorMessage);
 			return false;
@@ -154,10 +162,12 @@ public class EditorContainerSWTProvider implements IReadOnlyableContainerSWTProv
 		return true;
 	}
 
+	@Override
 	public void reload() {
 		editorComposite.reload();
 	}
 
+	@Override
 	public boolean save() {
 		if (!editorComposite.isEmptyEntity() && editorComposite.isDirty()) {
 			return editorComposite.save();
@@ -165,36 +175,44 @@ public class EditorContainerSWTProvider implements IReadOnlyableContainerSWTProv
 		return true;
 	}
 
+	@Override
 	public String getInternalEditorId() {
 		return internalEditorId;
 	}
 
+	@Override
 	public void addChangeListener(IEditorChangeListener listener) {
 		editorRenderer.addChangeListener(listener);
 	}
 
+	@Override
 	public void removeChangeListener(IEditorChangeListener listener) {
 		editorRenderer.removeChangeListener(listener);
 	}
 
+	@Override
 	public boolean isDirty() {
 		return editorComposite.isDirty();
 	}
 
+	@Override
 	public String getId() {
 		return id;
 	}
 
+	@Override
 	public boolean canSavedEditor() {
 		return editorRenderer.canSavedEditor();
 	}
 
+	@Override
 	public void refreshEditorContent(BeanMap beanMap, ISWTRenderer swtRenderer) {
 		if (editorRenderer != swtRenderer) {
 			editorRenderer.refreshEditorContent(beanMap, null);
 		}
 	}
 
+	@Override
 	public void setParentRenderer(ISWTRenderer parentRenderer) {
 		editorRenderer.setParentRenderer(parentRenderer);
 	}
@@ -202,17 +220,15 @@ public class EditorContainerSWTProvider implements IReadOnlyableContainerSWTProv
 	public ISWTRenderer getParentRenderer() {
 		return renderer;
 	}
-	
+
+	@Override
 	public ISWTRenderer getRenderer() {
 		return editorRenderer;
 	}
 
+	@Override
 	public void setReadOnly(boolean readOnly) {
 		editorComposite.setEnabled(false);
 	}
 
-	
-
-	
-	
 }

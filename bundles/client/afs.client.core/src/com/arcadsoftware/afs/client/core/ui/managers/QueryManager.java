@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -38,24 +38,23 @@ public class QueryManager {
 	private int total;
 	protected String orderClause = null;
 
-	
 	ServerConnection connection;
 	protected DataAccessHelper helper;
-	
+
 	public QueryManager(ServerConnection connection) {
-		this(connection,null);
+		this(connection, null);
 	}
 
 	public QueryManager(ServerConnection connection,
 			IBeanMapListContentChangedListener resultComposite) {
 		super();
-		this.resultListener = resultComposite;
+		resultListener = resultComposite;
 		this.connection = connection;
 		helper = new DataAccessHelper(connection);
 	}
 
 	public void setResultListener(IBeanMapListContentChangedListener rc) {
-		this.resultListener = rc;
+		resultListener = rc;
 	}
 
 	public IBeanMapListContentChangedListener getResultListener() {
@@ -65,7 +64,7 @@ public class QueryManager {
 	public void setQuery(MetaDataEntity entityStructure, String clause) {
 		this.entityStructure = entityStructure;
 		this.clause = clause;
-		this.selectClause = null;
+		selectClause = null;
 		rank = 0;
 		executeQuery();
 	}
@@ -90,13 +89,13 @@ public class QueryManager {
 	protected void executeQuery() {
 		BeanMapList result = null;
 		if (selectClause == null) {
-			StringBuilder attributes = new StringBuilder();
-			for (MetaDataAttribute attribute : entityStructure.getAttributes().values()) {
+			final StringBuilder attributes = new StringBuilder();
+			for (final MetaDataAttribute attribute : entityStructure.getAttributes().values()) {
 				if (attributes.length() > 0) {
 					attributes.append(' ');
 				}
 				attributes.append(attribute.getCode());
-			}	
+			}
 			selectClause = attributes.toString();
 		}
 		result = getList();
@@ -105,49 +104,51 @@ public class QueryManager {
 				total = ((BeanMapPartialList) result).getTotal();
 				if (resultListener != null) {
 					resultListener.contentChanged(result);
-					resultListener.setElementCount(result.size(), rank / getCountNumber() + 1,
+					resultListener.setElementCount(result.size(), (rank / getCountNumber()) + 1,
 							total != getCountNumber() ? (total / getCountNumber()) + 1 : 1);
-				}		
-			}  else if (result instanceof BeanMapList) {
+				}
+			} else if (result instanceof BeanMapList) {
 				if (resultListener != null) {
 					resultListener.contentChanged(result);
-				}					
+				}
 			}
 		} else {
 			handleError();
 		}
 	}
 
-	protected BeanMapList getList(){
-		return helper.getList(entityStructure.getType(), selectClause, clause,orderClause, rank, getCountNumber(),false);
+	protected BeanMapList getList() {
+		return helper.getList(entityStructure.getType(), selectClause, clause, orderClause, rank, getCountNumber(),
+				false);
 	}
-	
-	
-	protected UserMessage getErrorMessage(){
+
+	protected UserMessage getErrorMessage() {
 		return null;
 	}
-	
-	protected Bundle getBundle(){
+
+	protected Bundle getBundle() {
 		return Activator.getDefault().getBundle();
 	}
-	
-	protected void handleError(){
+
+	protected void handleError() {
 		LogUITools.logError(getBundle(), getErrorMessage());
 	}
-	
+
 	public void executeCurrentQuery() {
 		executeQuery();
 	}
-	
+
 	public void executePreviousQuery() {
-		if (rank >= getCountNumber())
+		if (rank >= getCountNumber()) {
 			rank = rank - getCountNumber();
+		}
 		executeQuery();
 	}
 
 	public void executeNextQuery() {
-		if (total > rank + getCountNumber())
+		if (total > (rank + getCountNumber())) {
 			rank = rank + getCountNumber();
+		}
 		executeQuery();
 	}
 
@@ -156,23 +157,24 @@ public class QueryManager {
 	}
 
 	public boolean canReadNextResults() {
-		return (total > rank + getCountNumber());
+		return (total > (rank + getCountNumber()));
 	}
 
 	public int getCountNumber() {
-		if (isUserDefinedCount() ) {	
+		if (isUserDefinedCount()) {
 			return getUserDefinedCount();
 		} else {
-			int preferredCount = SearchPreferenceManager.getInstance().getResultCount();
+			final int preferredCount = SearchPreferenceManager.getInstance().getResultCount();
 			return (preferredCount > 0) ? preferredCount : DEFAULT_COUNT;
 		}
 	}
 
-	public boolean isUserDefinedCount(){
+	public boolean isUserDefinedCount() {
 		return false;
 	}
-	public int getUserDefinedCount(){
+
+	public int getUserDefinedCount() {
 		return DEFAULT_COUNT;
 	}
-		
+
 }

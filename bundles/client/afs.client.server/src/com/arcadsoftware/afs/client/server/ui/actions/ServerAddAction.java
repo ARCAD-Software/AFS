@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -25,7 +25,7 @@ import com.arcadsoftware.afs.client.server.internals.ui.wizards.ServerAddMainWiz
 import com.arcadsoftware.afs.client.server.internals.ui.wizards.ServerAddWizard;
 
 public class ServerAddAction extends AbstractSimpleItemWithWizardAction {
-	
+
 	private ServerAddMainWizardPage page;
 	private Server addedServer;
 
@@ -45,7 +45,7 @@ public class ServerAddAction extends AbstractSimpleItemWithWizardAction {
 		page = new ServerAddMainWizardPage("main", //$NON-NLS-1$
 				Activator.resString("server.wizard.add.page.title"), //$NON-NLS-1$
 				Activator.resString("server.wizard.add.page.description")); //$NON-NLS-1$
-		return new AbstractSimpleItemWizardPage[] {page};
+		return new AbstractSimpleItemWizardPage[] { page };
 	}
 
 	@Override
@@ -60,20 +60,20 @@ public class ServerAddAction extends AbstractSimpleItemWithWizardAction {
 		addedServer.setUrl(page.getUrl());
 		return registerServer(addedServer);
 	}
-	
+
 	protected boolean registerServer(Server addedServer) {
 		return ServerLoader.getInstance().add(addedServer);
 	}
-	
+
 	@Override
 	public ArcadEntity getItem() {
 		return null;
 	}
-	
-	public Server getAddedServer(){
+
+	public Server getAddedServer() {
 		return addedServer;
 	}
-	
+
 	@Override
 	protected void setInterface() {
 		setText(Activator.resString("server.action.add.text"));//$NON-NLS-1$

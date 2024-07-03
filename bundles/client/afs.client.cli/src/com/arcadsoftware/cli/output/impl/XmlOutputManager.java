@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -27,80 +27,73 @@ import com.arcadsoftware.cli.output.OutputAttributes;
 import com.arcadsoftware.cli.output.OutputNode;
 import com.arcadsoftware.cli.output.OutputNodes;
 
-
 public class XmlOutputManager extends AbstractOutputManager implements IXMLContentProvider {
 
 	public XmlOutputManager() {
-		super();		
+		super();
 	}
-	
+
 	public XmlOutputManager(AbstractService service, File outputFile) {
-		super(service, outputFile);		
+		super(service, outputFile);
 	}
-
-
 
 	@Override
 	public String getEncoding() {
 		return "UTF-8";
 	}
 
-	
 	private void transfer(Document document, Element parent, OutputNode outputNode) {
-		Element xmlnode = document.createElement(outputNode.getName()); 
+		final Element xmlnode = document.createElement(outputNode.getName());
 		parent.appendChild(xmlnode);
-		OutputAttributes attributes = outputNode.getAttributes();
-		for (OutputAttribute attribute : attributes) {
+		final OutputAttributes attributes = outputNode.getAttributes();
+		for (final OutputAttribute attribute : attributes) {
 			xmlnode.setAttribute(attribute.getName(), attribute.getValue());
 		}
-		String text =outputNode.getText(); 
-		if (text!=null) {
+		final String text = outputNode.getText();
+		if (text != null) {
 			xmlnode.setTextContent(text);
 		}
-		OutputNodes nodes = outputNode.getChildNodes();
-		for (OutputNode node : nodes) {
+		final OutputNodes nodes = outputNode.getChildNodes();
+		for (final OutputNode node : nodes) {
 			transfer(document, xmlnode, node);
 		}
-		
 	}
-	
+
 	@Override
 	public void provide(Document document, Element xmlroot) {
-		//Manage root Node
-		xmlroot.setAttribute(ATTR_NAME, root.getAttributeValue(ATTR_NAME));		
+		// Manage root Node
+		xmlroot.setAttribute(ATTR_NAME, root.getAttributeValue(ATTR_NAME));
 		xmlroot.setAttribute(ATTR_RESULT, root.getAttributeValue(ATTR_RESULT));
-		
-		//Manage Parameter Nodes
-		OutputNode parameterNode = root.getNode(NODE_PARAMETERS);
-		OutputNodes parameters = parameterNode.getNodes(NODE_PARAMETER);
-		
-		Element xmlParameters = document.createElement(NODE_PARAMETERS); 
+		// Manage Parameter Nodes
+		final OutputNode parameterNode = root.getNode(NODE_PARAMETERS);
+		final OutputNodes parameters = parameterNode.getNodes(NODE_PARAMETER);
+		final Element xmlParameters = document.createElement(NODE_PARAMETERS);
 		xmlroot.appendChild(xmlParameters);
-		for (OutputNode parameter : parameters) {
-			Element xmlParameter = document.createElement(NODE_PARAMETER); 
+		for (final OutputNode parameter : parameters) {
+			final Element xmlParameter = document.createElement(NODE_PARAMETER);
 			xmlParameters.appendChild(xmlParameter);
 			xmlParameter.setAttribute(ATTR_NAME, parameter.getAttributeValue(ATTR_NAME));
-			xmlParameter.setAttribute(ATTR_VALUE,parameter.getAttributeValue(ATTR_VALUE));
-			
+			xmlParameter.setAttribute(ATTR_VALUE, parameter.getAttributeValue(ATTR_VALUE));
 		}
-		//Manage Log Nodes
-		OutputNode logNode = root.getNode(NODE_LOGS);
-		OutputNodes logs = logNode.getNodes(NODE_LOG);
-		Element xmlLogs = document.createElement(NODE_LOGS); 
+		// Manage Log Nodes
+		final OutputNode logNode = root.getNode(NODE_LOGS);
+		final OutputNodes logs = logNode.getNodes(NODE_LOG);
+		final Element xmlLogs = document.createElement(NODE_LOGS);
 		xmlroot.appendChild(xmlLogs);
-		xmlLogs.setAttribute(ATTR_COUNT, logNode.getAttributeValue(ATTR_COUNT));		
-		for (OutputNode log : logs) {
-			Element xmlLog = document.createElement(NODE_LOG); 
+		xmlLogs.setAttribute(ATTR_COUNT, logNode.getAttributeValue(ATTR_COUNT));
+		for (final OutputNode log : logs) {
+			final Element xmlLog = document.createElement(NODE_LOG);
 			xmlLogs.appendChild(xmlLog);
 			xmlLog.setAttribute(ATTR_LOGDATE, log.getAttributeValue(ATTR_LOGDATE));
-			xmlLog.setAttribute(ATTR_LEVEL,log.getAttributeValue(ATTR_LEVEL));
-			String text = log.getText();
-			xmlLog.setTextContent(isEmpty(text) ? "" : text);			
+			xmlLog.setAttribute(ATTR_LEVEL, log.getAttributeValue(ATTR_LEVEL));
+			final String text = log.getText();
+			xmlLog.setTextContent(isEmpty(text) ? "" : text);
 		}
-		//Manage Additional Information
-		OutputNodes  childs = root.getChildNodes();
-		for (OutputNode child : childs) {
-			if ((!child.getName().equalsIgnoreCase(NODE_PARAMETERS)) && (!child.getName().equalsIgnoreCase(NODE_LOGS))) {
+		// Manage Additional Information
+		final OutputNodes childs = root.getChildNodes();
+		for (final OutputNode child : childs) {
+			if ((!child.getName().equalsIgnoreCase(NODE_PARAMETERS))
+					&& (!child.getName().equalsIgnoreCase(NODE_LOGS))) {
 				transfer(document, xmlroot, child);
 			}
 		}
@@ -109,14 +102,12 @@ public class XmlOutputManager extends AbstractOutputManager implements IXMLConte
 	@Override
 	public void generateOutput() {
 		super.generateOutput();
-		String outputFilename = outputFile.getAbsolutePath();
+		final String outputFilename = outputFile.getAbsolutePath();
 		if (!outputFile.exists()) {
 			outputFile.getParentFile().mkdirs();
 		}
 		try {
 			XMLUtils.createXmlDocument(outputFilename, this);
-		} catch (Exception e) {}
+		} catch (final Exception e) {}
 	}
-	
-	
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -20,41 +20,40 @@ import com.arcadsoftware.afs.client.core.connection.DataAccessHelper;
 import com.arcadsoftware.afs.client.core.connection.ServerConnection;
 import com.arcadsoftware.afs.framework.ui.composites.AbstractAFSComposite;
 import com.arcadsoftware.beanmap.BeanMap;
+
 /**
  * This class provides a composite to display/populate a BeanMap in a connected context.<br>
  * First, Create the composite giving a serverConnection<br>
- * then, call the {@link #init(BeanMap)} method to define the related BeanMap. This method
- * automatically  populates the content of the composite by calling the {@link toComposite()} method.
- * 
- * 
- * @author ARCAD Software
+ * then, call the {@link #init(BeanMap)} method to define the related BeanMap. This method automatically populates the
+ * content of the composite by calling the {@link toComposite()} method.
  *
+ * @author ARCAD Software
  */
 public abstract class AbstractConnectBeanMapComposite extends AbstractAFSComposite {
 
-	private ServerConnection connection;
-	private DataAccessHelper helper;
-	
+	private final ServerConnection connection;
+	private final DataAccessHelper helper;
+
 	public AbstractConnectBeanMapComposite(Composite parent, int style,
 			ServerConnection connection) {
 		super(parent, style);
 		this.connection = connection;
-		this.helper = new DataAccessHelper(connection);		
+		helper = new DataAccessHelper(connection);
 		format();
 		createContent(this);
 	}
-	
-	protected void format(){			 
-		GridLayout gridLayout = new GridLayout(3,false);
-		this.setLayout(gridLayout);		
+
+	protected void format() {
+		final GridLayout gridLayout = new GridLayout(3, false);
+		setLayout(gridLayout);
 	}
 
 	public void init(BeanMap beanmap) {
-		if (beanmap==null) {
+		if (beanmap == null) {
 			toComposite(beanmap);
-		}		
+		}
 	}
-	
+
 	public ServerConnection getConnection() {
 		return connection;
 	}
@@ -65,22 +64,24 @@ public abstract class AbstractConnectBeanMapComposite extends AbstractAFSComposi
 
 	/**
 	 * Creates the content of the composite
-	 * @param parent the composite itself
+	 *
+	 * @param parent
+	 *            the composite itself
 	 */
 	public abstract void createContent(Composite parent);
+
 	/**
-	 * Defines how to transfer the content of the 
-	 * beanmap to the composite childs.
+	 * Defines how to transfer the content of the beanmap to the composite childs.
+	 *
 	 * @param beanmap
 	 */
 	public abstract void toComposite(BeanMap beanmap);
-	
+
 	/**
-	 * Defines how to transfer the content of the composite items
-	 * th the beanMap
+	 * Defines how to transfer the content of the composite items th the beanMap
+	 *
 	 * @param beanmap
 	 */
 	public abstract void fromComposite(BeanMap beanmap);
-		
-	
+
 }

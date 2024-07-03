@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -18,7 +18,6 @@ import java.util.Date;
 import java.util.Map.Entry;
 
 import org.eclipse.ui.IMemento;
-
 
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.editor.implementation.Activator;
@@ -39,7 +38,7 @@ public class MementoSaveBeanMap {
 
 	/**
 	 * Save the <code>beanMap</code> on a <code>memento</code>.
-	 * 
+	 *
 	 * @param memento
 	 *            The memento.
 	 * @param beanMap
@@ -52,7 +51,7 @@ public class MementoSaveBeanMap {
 			if (beanMap.getDate() != null) {
 				memento.putString(DATE, ISODateFormater.toString(beanMap.getDate()));
 			}
-			for (Entry<String, Object> entry : beanMap.entrySet()) {
+			for (final Entry<String, Object> entry : beanMap.entrySet()) {
 				if (entry.getValue() instanceof BeanMap) {
 					memento.putString(entry.getKey(), Integer.toString(((BeanMap) entry.getValue()).getId()));
 				} else if (entry.getValue() instanceof Date) {
@@ -66,7 +65,7 @@ public class MementoSaveBeanMap {
 
 	/**
 	 * Returns the beanMap saved in the given <code>memento</code>.
-	 * 
+	 *
 	 * @param memento
 	 *            The memento.
 	 * @return The saved beanMap.
@@ -74,25 +73,25 @@ public class MementoSaveBeanMap {
 	public static BeanMap load(IMemento memento) {
 		BeanMap beanMap = null;
 		if (memento != null) {
-			String type = memento.getString(TYPETYPE);
-			Integer id = memento.getInteger(IDID);
-			if (type != null && id != null) {
+			final String type = memento.getString(TYPETYPE);
+			final Integer id = memento.getInteger(IDID);
+			if ((type != null) && (id != null)) {
 				beanMap = new BeanMap(type, id.intValue());
-				String dateString = memento.getString(DATE);
+				final String dateString = memento.getString(DATE);
 				if (dateString != null) {
 					try {
-						Date date = ISODateFormater.toDate(dateString);
+						final Date date = ISODateFormater.toDate(dateString);
 						beanMap.setDate(date);
-					} catch (ParseException e) {
+					} catch (final ParseException e) {
 						Activator.getInstance().log(e);
 					}
 				}
-				for (String key: memento.getAttributeKeys()) {
+				for (final String key : memento.getAttributeKeys()) {
 					beanMap.put(key, memento.getString(key));
 				}
 			}
 		}
 		return beanMap;
 	}
-	
+
 }

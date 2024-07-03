@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -20,9 +20,13 @@ import org.eclipse.swt.widgets.Composite;
 
 public interface ISearchListener extends IBeanMapListContentChangedListener {
 	public boolean isAutosearch();
+
 	public void setAutosearch(boolean autosearch);
+
 	public boolean isSearchManagementActivated();
+
 	public Composite getParentComposite();
+
 	public List<Action> getActions();
-		
+
 }

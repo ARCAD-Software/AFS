@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -37,49 +37,49 @@ import com.arcadsoftware.metadata.Element;
 import com.arcadsoftware.metadata.MetaDataEntity;
 
 /**
- * This class implement a CheckBox SWT Widget provider that gets an integer as entry.
- * It is able to manage an integer property as a 2-state property for final User
+ * This class implement a CheckBox SWT Widget provider that gets an integer as entry. It is able to manage an integer
+ * property as a 2-state property for final User
  */
 public class CheckBoxIntInputSWTProvider implements IInputSWTProvider, IWidgetValue {
 
 	ISWTRenderer renderer;
-	private static String ON_MIN_VALUE="onMin";
-	private static String ON_MAX_VALUE="onMax";
-	private static String OFF_MIN_VALUE="offMin";
-	private static String OFF_MAX_VALUE="offMax";	
+	private static String ON_MIN_VALUE = "onMin";
+	private static String ON_MAX_VALUE = "onMax";
+	private static String OFF_MIN_VALUE = "offMin";
+	private static String OFF_MAX_VALUE = "offMax";
 	int onMin;
 	int onMax;
 	int offMin;
 	int offMax;
 	private Button checkBox;
-	
-	public CheckBoxIntInputSWTProvider(){
+
+	public CheckBoxIntInputSWTProvider() {
 		super();
 	}
-	
+
 	@Override
 	public void create(ISWTRenderer renderer, ILayoutParameters parameters, Element element,
 			MetaDataEntity structure) {
 		this.renderer = renderer;
-		
-		// parameters : inclusive limits		
+
+		// parameters : inclusive limits
 		onMin = stringInInt(parameters.getParameter(ON_MIN_VALUE));
 		onMax = stringInInt(parameters.getParameter(ON_MAX_VALUE));
 		offMin = stringInInt(parameters.getParameter(OFF_MIN_VALUE));
 		offMax = stringInInt(parameters.getParameter(OFF_MAX_VALUE));
-		
+
 		// Compute
 		computeIntervals();
-			
-		String label = renderer.getLocalizedMessage(parameters.getParameter(LABEL, element.getName()));
+
+		final String label = renderer.getLocalizedMessage(parameters.getParameter(LABEL, element.getName()));
 		if (label.length() > 0) {
 			renderer.getToolkit().createLabel(renderer.getParent(), label);
 			renderer.getToolkit().createLabel(renderer.getParent(), TWO_POINTS);
 		}
-		
+
 		checkBox = new Button(renderer.getParent(), SWT.CHECK);
 		if (label.length() == 0) {
-			GridData layoutData = new GridData();
+			final GridData layoutData = new GridData();
 			layoutData.horizontalSpan = 3;
 			checkBox.setLayoutData(layoutData);
 		}
@@ -87,18 +87,19 @@ public class CheckBoxIntInputSWTProvider implements IInputSWTProvider, IWidgetVa
 		if (parameters.getParameterBoolean(DEFAULT)) {
 			checkBox.setFocus();
 		}
-		boolean value = parameters.getParameterBoolean(DEFAULT_VALUE,false);
+		final boolean value = parameters.getParameterBoolean(DEFAULT_VALUE, false);
 		checkBox.setSelection(value);
-		
-		//TODO RAP
-		//renderer.getToolkit().paintBordersFor(renderer.getParent());		
+
+		// TODO RAP
+		// renderer.getToolkit().paintBordersFor(renderer.getParent());
 		renderer.getRendererBinding().bindElement(element, this);
 	}
-	
+
 	@Override
 	public void dispose() {
-		if (!checkBox.isDisposed())
+		if (!checkBox.isDisposed()) {
 			checkBox.dispose();
+		}
 		checkBox = null;
 	}
 
@@ -109,8 +110,8 @@ public class CheckBoxIntInputSWTProvider implements IInputSWTProvider, IWidgetVa
 
 	@Override
 	public Object getValue() {
-		boolean select = checkBox.getSelection();
-		if (select){
+		final boolean select = checkBox.getSelection();
+		if (select) {
 			return onMin;
 		} else {
 			return offMin;
@@ -124,11 +125,11 @@ public class CheckBoxIntInputSWTProvider implements IInputSWTProvider, IWidgetVa
 
 	@Override
 	public void setValue(Object newValue) {
-		if (newValue != null && newValue instanceof Integer){
+		if ((newValue != null) && (newValue instanceof Integer)) {
 			boolean check = false;
-			int val = ((Integer)newValue).intValue();
-			if (onMin != -1){ // check ON interval first
-				if (onMin > offMin){
+			final int val = ((Integer) newValue).intValue();
+			if (onMin != -1) { // check ON interval first
+				if (onMin > offMin) {
 					check = val >= onMin;
 				} else {
 					check = val < offMin;
@@ -143,30 +144,33 @@ public class CheckBoxIntInputSWTProvider implements IInputSWTProvider, IWidgetVa
 		return Integer.class;
 	}
 
-	/** 
+	/**
 	 * Load value from Web-Service; the web service returns a single value as a beanMap property
-	 * @param service Formatted as {type}:{url}
-	 * @return 
+	 *
+	 * @param service
+	 *            Formatted as {type}:{url}
+	 * @return
 	 */
 	private int loadValueFromURL(String service) {
 		int result = -1;
 		if (service.contains(":")) { //$NON-NLS-1$
-			String[] split = service.split(":"); //$NON-NLS-1$
+			final String[] split = service.split(":"); //$NON-NLS-1$
 			// load content
-			BeanMap content =  renderer.getDataLoader().loadContent(split[1], split[0]);
-			if (content != null && !content.isEmpty()){
-				Set<Entry<String, Object>> entries = content.entrySet();
+			final BeanMap content = renderer.getDataLoader().loadContent(split[1], split[0]);
+			if ((content != null) && !content.isEmpty()) {
+				final Set<Entry<String, Object>> entries = content.entrySet();
 				// get the first integer key (Note::: we should get only one property here!!! )
-				for (Entry<String, Object> entry : entries) {
-					Object value = entry.getValue();
+				for (final Entry<String, Object> entry : entries) {
+					final Object value = entry.getValue();
 					if (value instanceof Integer) {
-						result = ((Integer)value).intValue();
+						result = ((Integer) value).intValue();
 						break;
 					}
 					try {
 						result = Integer.parseInt(value.toString());
 						break;
-					} catch (NumberFormatException e) {}
+					} catch (final NumberFormatException e) {
+					}
 				}
 			}
 		}
@@ -175,6 +179,7 @@ public class CheckBoxIntInputSWTProvider implements IInputSWTProvider, IWidgetVa
 
 	/**
 	 * Compute intervals. onMin and offMin MUST be computed.
+	 *
 	 * @param onMin
 	 * @param onMax
 	 * @param offMin
@@ -186,14 +191,14 @@ public class CheckBoxIntInputSWTProvider implements IInputSWTProvider, IWidgetVa
 				if (offMin == -1) {
 					onMin = 0;
 					offMin = onMax + 1;
-				} else { //offMin is defined
+				} else { // offMin is defined
 					if (offMin < onMax) {
 						if ((offMax == -1) || (offMax > onMax)) {
 							// ????
 						} else {
 							onMin = offMax + 1;
 						}
-					} else { //offMin >= onMax
+					} else { // offMin >= onMax
 						onMin = 0;
 					}
 				}
@@ -206,15 +211,15 @@ public class CheckBoxIntInputSWTProvider implements IInputSWTProvider, IWidgetVa
 				} else {
 					if (offMin != -1) {
 						onMin = 0;
-						onMax = offMin -1;						
+						onMax = offMin - 1;
 					} // else ???
 				}
 			}
-		} else { //(onMin is defined
+		} else { // (onMin is defined
 			if (onMax != -1) {
 				if (offMin == -1) {
 					if (offMax == -1) {
-						offMin = onMax+1;
+						offMin = onMax + 1;
 					} else if (offMax < onMin) {
 						offMin = 0;
 					} else if (offMax > onMax) {
@@ -223,15 +228,15 @@ public class CheckBoxIntInputSWTProvider implements IInputSWTProvider, IWidgetVa
 						// nothing into interval2
 					}
 					// we get onMin and onMax ... enough
-				} else { //offMin != -1
+				} else { // offMin != -1
 					if (offMax == -1) {
 						if (offMin > onMax) {
 							// ok : onMin, onMax, offMin
 						} else if (offMin < onMin) {
 							offMax = onMin - 1;
 						}
-					}else { //offMax != -1
-						// ... 
+					} else { // offMax != -1
+						// ...
 					}
 				}
 			} else { // OnMax == -1
@@ -253,19 +258,20 @@ public class CheckBoxIntInputSWTProvider implements IInputSWTProvider, IWidgetVa
 
 	/**
 	 * Get int value from String
+	 *
 	 * @param value
 	 * @return
 	 */
 	private int stringInInt(String value) {
 		int result = -1;
 		if (value != null) {
-			try{
+			try {
 				result = Integer.parseInt(value);
-			} catch (NumberFormatException e){
+			} catch (final NumberFormatException e) {
 				// if string, this is URL to get value from server
 				result = loadValueFromURL(value);
 			}
 		}
 		return result;
-	}	
+	}
 }

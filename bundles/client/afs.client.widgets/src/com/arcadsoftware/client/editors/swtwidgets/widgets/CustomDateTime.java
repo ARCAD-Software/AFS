@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -44,12 +44,11 @@ public class CustomDateTime implements IWidgetValue {
 	 * <code>int</code> "|" operator) two or more of those <code>SWT</code> style constants. The class description lists
 	 * the style constants that are applicable to the class. Style bits are also inherited from superclasses.
 	 * </p>
-	 * 
+	 *
 	 * @param parent
 	 *            a composite control which will be the parent of the new instance (cannot be null)
 	 * @param style
 	 *            the style of control to construct
-	 * 
 	 * @exception IllegalArgumentException
 	 *                <ul>
 	 *                <li>ERROR_NULL_ARGUMENT - if the parent is null</li>
@@ -59,7 +58,6 @@ public class CustomDateTime implements IWidgetValue {
 	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the parent</li>
 	 *                <li>ERROR_INVALID_SUBCLASS - if this class is not an allowed subclass</li>
 	 *                </ul>
-	 * 
 	 * @see SWT#DATE
 	 * @see SWT#TIME
 	 * @see SWT#CALENDAR
@@ -74,9 +72,10 @@ public class CustomDateTime implements IWidgetValue {
 		dateTime.addSelectionListener(selectionListener);
 	}
 
+	@Override
 	public Object getValue() {
-		int style = dateTime.getStyle();
-		if ((style & SWT.CALENDAR) != 0 || (style & SWT.DATE) != 0) {
+		final int style = dateTime.getStyle();
+		if (((style & SWT.CALENDAR) != 0) || ((style & SWT.DATE) != 0)) {
 			// Calendar or Date
 			calendar.set(dateTime.getYear(), dateTime.getMonth(), dateTime.getDay(), 0, 0, 0);
 		} else {
@@ -88,20 +87,23 @@ public class CustomDateTime implements IWidgetValue {
 		return calendar.getTime();
 	}
 
+	@Override
 	public Object getValueType() {
 		return Date.class;
 	}
 
+	@Override
 	public Control getWidget() {
 		return dateTime;
 	}
 
+	@Override
 	public void setValue(Object newValue) {
 		if (newValue != null) {
 			calendar.setTime((Date) newValue);
 			// Control 1
-			int style = dateTime.getStyle();
-			if ((style & SWT.CALENDAR) != 0 || (style & SWT.DATE) != 0) {
+			final int style = dateTime.getStyle();
+			if (((style & SWT.CALENDAR) != 0) || ((style & SWT.DATE) != 0)) {
 				// Calendar or Date
 				dateTime.setYear(calendar.get(Calendar.YEAR));
 				dateTime.setMonth(calendar.get(Calendar.MONTH));

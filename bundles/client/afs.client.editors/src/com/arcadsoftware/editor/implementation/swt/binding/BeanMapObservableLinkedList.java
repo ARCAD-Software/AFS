@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -75,21 +75,19 @@ public class BeanMapObservableLinkedList extends ObservableList implements IList
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @seeorg.eclipse.core.databinding.observable.value.IObservableValue#
-	 * addValueChangeListener
+	 * @seeorg.eclipse.core.databinding.observable.value.IObservableValue# addValueChangeListener
 	 * (org.eclipse.core.databinding.observable.value.IValueChangeListener)
 	 */
+	@Override
 	public void addValueChangeListener(IValueChangeListener listener) {
 		addListener(fake.naze(), listener);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.databinding.observable.value.IObservableValue#getValue()
+	 * @see org.eclipse.core.databinding.observable.value.IObservableValue#getValue()
 	 */
+	@Override
 	public Object getValue() {
 		getterCalled();
 		return currentRef;
@@ -97,33 +95,28 @@ public class BeanMapObservableLinkedList extends ObservableList implements IList
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.databinding.observable.value.IObservableValue#getValueType
-	 * ()
+	 * @see org.eclipse.core.databinding.observable.value.IObservableValue#getValueType ()
 	 */
+	@Override
 	public Object getValueType() {
 		return BeanMap.class;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @seeorg.eclipse.core.databinding.observable.value.IObservableValue#
-	 * removeValueChangeListener
+	 * @seeorg.eclipse.core.databinding.observable.value.IObservableValue# removeValueChangeListener
 	 * (org.eclipse.core.databinding.observable.value.IValueChangeListener)
 	 */
+	@Override
 	public void removeValueChangeListener(IValueChangeListener listener) {
 		removeListener(fake.naze(), listener);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.databinding.observable.value.IObservableValue#setValue
-	 * (java.lang.Object)
+	 * @see org.eclipse.core.databinding.observable.value.IObservableValue#setValue (java.lang.Object)
 	 */
+	@Override
 	public void setValue(Object value) {
 		checkRealm();
 		if (value == null) {
@@ -132,8 +125,8 @@ public class BeanMapObservableLinkedList extends ObservableList implements IList
 			currentRef = null;
 			return;
 		}
-		BeanMap beanMap = (BeanMap) value;
-		int id = beanMap.getId();
+		final BeanMap beanMap = (BeanMap) value;
+		final int id = beanMap.getId();
 		// Blindage !
 		if (id <= 0) {
 			updateWrappedList(new BeanMapList());
@@ -142,10 +135,11 @@ public class BeanMapObservableLinkedList extends ObservableList implements IList
 			return;
 		}
 		// Run a delayed populate...
-		int sourceId = renderer.getCurrentBean().getInt(sourceAttribute.getCode());
-		if (sourceId > 0)
+		final int sourceId = renderer.getCurrentBean().getInt(sourceAttribute.getCode());
+		if (sourceId > 0) {
 			renderer.getDataLoader().loadSubList(sourceAttribute.getType(), sourceId, linkCode, attribute.getType(),
 					new BindingListLoadRunnable(getRealm(), this));
+		}
 		// Fire a value change event !
 		fireEvent(new ValueChangeEvent(this, Diffs.createValueDiff(currentRef, beanMap)));
 		currentRef = beanMap;
@@ -153,11 +147,9 @@ public class BeanMapObservableLinkedList extends ObservableList implements IList
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.arcadsoftware.editor.internal.swt.IListContainer#load(com.arcadsoftware
-	 * .utils.BeanMapList)
+	 * @see com.arcadsoftware.editor.internal.swt.IListContainer#load(com.arcadsoftware .utils.BeanMapList)
 	 */
+	@Override
 	public void load(BeanMapList list) {
 		// Delayed list update !
 		updateWrappedList(list);
@@ -171,11 +163,11 @@ public class BeanMapObservableLinkedList extends ObservableList implements IList
 		for (int i = wrappedList.size() - 1; i >= 0; i--) {
 			if (item.getId() == ((BeanMap) wrappedList.get(i)).getId()) {
 				checkRealm();
-				Object oldElement = wrappedList.set(i, item);
-				if (oldElement instanceof BeanMap){
-					BeanMap oldBm = (BeanMap) oldElement;					
-					fireListChange(Diffs.createListDiff(Diffs.createListDiffEntry(i, false, oldBm), 
-							   Diffs.createListDiffEntry(i, true, item)));
+				final Object oldElement = wrappedList.set(i, item);
+				if (oldElement instanceof BeanMap) {
+					final BeanMap oldBm = (BeanMap) oldElement;
+					fireListChange(Diffs.createListDiff(Diffs.createListDiffEntry(i, false, oldBm),
+							Diffs.createListDiffEntry(i, true, item)));
 				}
 				return;
 			}

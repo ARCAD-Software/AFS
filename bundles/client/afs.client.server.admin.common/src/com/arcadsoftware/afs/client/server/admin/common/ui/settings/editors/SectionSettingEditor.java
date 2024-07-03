@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -74,22 +74,22 @@ public class SectionSettingEditor extends AbstractAFSSavedEditorPart {
 			scrolledComposite.setContent(sectionComposite);
 			// Only show vertical scrollbar
 			scrolledComposite.addListener(SWT.Resize, event -> {
-				int width = scrolledComposite.getClientArea().width;
+				final int width = scrolledComposite.getClientArea().width;
 				scrolledComposite.setMinSize(parent.computeSize(width, SWT.DEFAULT));
 			});
 		} else {
-			Composite c = new Composite(parent, SWT.BORDER);
+			final Composite c = new Composite(parent, SWT.BORDER);
 			gl = new GridLayout(2, false);
 			gl.marginHeight = gl.marginWidth = 10;
 			c.setLayout(gl);
-			GridData gridData = new GridData(GridData.FILL_BOTH);
+			final GridData gridData = new GridData(GridData.FILL_BOTH);
 			gridData.grabExcessHorizontalSpace = true;
 			gridData.grabExcessVerticalSpace = true;
 			gridData.horizontalSpan = 3;
 			c.setLayoutData(gridData);
-			Label errorImage = new Label(c, SWT.NONE);
+			final Label errorImage = new Label(c, SWT.NONE);
 			errorImage.setImage(AFSIcon.ERROR.image());
-			Label errorText = new Label(c, SWT.NONE);
+			final Label errorText = new Label(c, SWT.NONE);
 			errorText.setText(Activator.resString("settingseditor.msg.error.loadingError")); //$NON-NLS-1$
 		}
 	}

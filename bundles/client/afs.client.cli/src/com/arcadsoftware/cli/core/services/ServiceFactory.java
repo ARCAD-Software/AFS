@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -24,78 +24,72 @@ import com.arcadsoftware.ae.core.utils.XMLUtils;
 import com.arcadsoftware.cli.logger.ServiceLogger;
 import com.arcadsoftware.cli.model.LoggedObject;
 
+public class ServiceFactory extends LoggedObject implements IXMLContentParser {
 
+	private final HashMap<String, String> registry;
 
-public class ServiceFactory extends LoggedObject implements IXMLContentParser{
-	
-	private HashMap<String,String> registry;
-	
 	private static ServiceFactory instance = new ServiceFactory();
-	
-	
-	private ServiceFactory(){
+
+	private ServiceFactory() {
 		registry = new HashMap<>();
 	}
-	
-	public void initialize(String filename) 
-	throws Throwable {
+
+	public void initialize(String filename)
+			throws Throwable {
 		XMLUtils.loadXmlDocument(filename, this);
 	}
-	
-	public AbstractService createService(String[] args) 
+
+	public AbstractService createService(String[] args)
 			throws Throwable {
 		if (args.length == 0) {
 			return null;
 		}
-		
-		String serviceIdentifier = args[0];	
-		String[] options = new String[args.length-1];
-		System.arraycopy(args,1,options,0,options.length);
-		
-		String className = registry.get(serviceIdentifier);
-		if (className!=null) {		
-			AbstractService service =  (AbstractService) Class.forName(className).newInstance();
-			if (service!=null) {
+		final String serviceIdentifier = args[0];
+		final String[] options = new String[args.length - 1];
+		System.arraycopy(args, 1, options, 0, options.length);
+		final String className = registry.get(serviceIdentifier);
+		if (className != null) {
+			final AbstractService service = (AbstractService) Class.forName(className).newInstance();
+			if (service != null) {
 				service.setServiceName(serviceIdentifier);
 				service.setOptions(options);
 				logger = new ServiceLogger();
 				service.setLogger(logger);
 				return service;
-			} else {
-				throw new Exception("An Error occured during "+className+" instanciation");
 			}
-		} else {
-			throw new Exception("Invalid Service Identifier");
+			throw new Exception("An Error occured during " + className + " instanciation");
 		}
+		throw new Exception("Invalid Service Identifier");
 	}
 
 	@Override
 	public String getRootName() {
-		return "service";
+		return "service"; //$NON-NLS-1$
 	}
-	
+
 	@Override
 	public boolean parse(Element element) {
-		final String identifier = element.getAttribute("id");
-		final String classname = element.getAttribute("class");
+		final String identifier = element.getAttribute("id"); //$NON-NLS-1$
+		final String classname = element.getAttribute("class"); //$NON-NLS-1$
 		registry.put(identifier, classname);
 		return true;
 	}
-	
-	public String getServiceList(){
+
+	public String getServiceList() {
 		final StringBuilder list = new StringBuilder();
-		Set<String> keys = registry.keySet();
-		Iterator<String> it = keys.iterator();
+		final Set<String> keys = registry.keySet();
+		final Iterator<String> it = keys.iterator();
 		while (it.hasNext()) {
-			if (list.length()==0) {
+			if (list.length() == 0) {
 				list.append(it.next());
 			} else {
-				list.append("\n").append(it.next());
-			}				
-		}	
+				list.append('\n');
+				list.append(it.next());
+			}
+		}
 		return list.toString();
 	}
-	
+
 	public static ServiceFactory getInstance() {
 		return instance;
 	}

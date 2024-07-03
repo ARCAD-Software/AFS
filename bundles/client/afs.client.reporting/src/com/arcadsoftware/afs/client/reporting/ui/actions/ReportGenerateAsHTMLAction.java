@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -20,16 +20,16 @@ import com.arcadsoftware.afs.client.core.connection.ServerConnection;
 import com.arcadsoftware.afs.client.reporting.Activator;
 
 public class ReportGenerateAsHTMLAction extends AbstractPreviewAction {
-	
+
 	public ReportGenerateAsHTMLAction(ServerConnection connection) {
 		super(connection);
 	}
 
 	@Override
 	protected void setInterface() {
-		this.setText(Activator.resString("report.action.preview.text")); //$NON-NLS-1$
-		this.setToolTipText(Activator.resString("report.action.preview.text")); //$NON-NLS-1$
-		this.setImageDescriptor(AFSIcon.REPORT_HTML.imageDescriptor());
+		setText(Activator.resString("report.action.preview.text")); //$NON-NLS-1$
+		setToolTipText(Activator.resString("report.action.preview.text")); //$NON-NLS-1$
+		setImageDescriptor(AFSIcon.REPORT_HTML.imageDescriptor());
 	}
 
 	@Override
@@ -38,12 +38,13 @@ public class ReportGenerateAsHTMLAction extends AbstractPreviewAction {
 	}
 
 	@Override
-    public String getViewerExtraParameters(){
-        return "&__svg=false"; //$NON-NLS-1$
-    }
+	public String getViewerExtraParameters() {
+		return "&__svg=false"; //$NON-NLS-1$
+	}
 
+	@Override
 	public List<Integer> getExpectedRigths() {
 		return null;
 	}
-	
+
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -19,13 +19,13 @@ import com.arcadsoftware.afs.client.core.connection.DataAccessHelper;
 import com.arcadsoftware.afs.client.core.connection.ServerConnection;
 
 public abstract class AbstractServerProperties {
-	
+
 	private Properties serverProperties;
-	
+
 	protected AbstractServerProperties() {
 		super();
 	}
-	
+
 	public String resString(final ServerConnection connection, final String key) {
 		if ((connection == null) || (key == null)) {
 			return "";
@@ -36,13 +36,13 @@ public abstract class AbstractServerProperties {
 				return key;
 			}
 		}
-		String value = serverProperties.getProperty(key, key);
+		final String value = serverProperties.getProperty(key, key);
 		if ((value != null) && (value.startsWith("!"))) {
 			return resString(connection, value.substring(1, value.length()));
 		}
 		return value;
-	}		
-	
-	public abstract String getResourceFilename(); 
-	
+	}
+
+	public abstract String getResourceFilename();
+
 }

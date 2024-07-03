@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -72,52 +72,54 @@ import com.arcadsoftware.metadata.MetaDataAttribute;
 import com.arcadsoftware.metadata.MetaDataEntity;
 import com.arcadsoftware.metadata.MetaDataFormater;
 
-public class BeanMapTableViewer extends AbstractColumnedTableViewer implements IBeanMapContainerList, IBeanMapContainerValue, ILoadedListListener {
+public class BeanMapTableViewer extends AbstractColumnedTableViewer
+		implements IBeanMapContainerList, IBeanMapContainerValue, ILoadedListListener {
 
 	private static List<Action> toActionList(Action[] actions) {
-		ArrayList<Action> result = new ArrayList<Action>(actions.length);
-		for(Action action : actions) {
+		final ArrayList<Action> result = new ArrayList<>(actions.length);
+		for (final Action action : actions) {
 			if (action != null) {
 				result.add(action);
 			}
 		}
 		return result;
 	}
-	
+
 	private static final String BEAN_MAP_TABLE_VIEWER = "BeanMapTableViewer"; //$NON-NLS-1$
-	
-	private MetaDataEntity structure;
+
+	private final MetaDataEntity structure;
 	protected ArcadColumns cols;
 	protected BeanMapList list;
 	private SelectionAdapter selectionAdapter;
-	private List<Action> actionsList;
-	private ILayoutParameters parameters;
-	private ISWTRenderer renderer;
+	private final List<Action> actionsList;
+	private final ILayoutParameters parameters;
+	private final ISWTRenderer renderer;
 	private List<ElementParameter> columnElements;
 	protected BeanMap selection;
 	private String attributeList;
 	private String orderList;
 	protected Image defaultImage;
-	private Map<String, Map<Integer, BeanMap>> beanMapsValues = new HashMap<String, Map<Integer, BeanMap>>();
-	protected Map<String, MetaDataEntity> structures = new HashMap<String, MetaDataEntity>();
+	private final Map<String, Map<Integer, BeanMap>> beanMapsValues = new HashMap<>();
+	protected Map<String, MetaDataEntity> structures = new HashMap<>();
 
 	/**
 	 * Default constructor with :
-	 * 
 	 * <ul>
-	 * <li> The renderer parent.
-	 * <li> Default style (single selection and scroll bars). 
+	 * <li>The renderer parent.
+	 * <li>Default style (single selection and scroll bars).
 	 * </ul>
+	 *
 	 * @param renderer
 	 * @param parameters
 	 * @param element
 	 * @param actions
 	 */
 	public BeanMapTableViewer(ISWTRenderer renderer, ILayoutParameters parameters, Element element, Action... actions) {
-		this(renderer.getParent(), SWT.SINGLE | SWT.FULL_SELECTION | SWT.V_SCROLL | SWT.H_SCROLL, renderer, parameters, element, 
+		this(renderer.getParent(), SWT.SINGLE | SWT.FULL_SELECTION | SWT.V_SCROLL | SWT.H_SCROLL, renderer, parameters,
+				element,
 				toActionList(actions));
 	}
-	
+
 	public BeanMapTableViewer(Composite parent, int style, ISWTRenderer renderer, ILayoutParameters parameters,
 			Element element, List<Action> actionsList) {
 		super(parent, style, false);
@@ -131,7 +133,7 @@ public class BeanMapTableViewer extends AbstractColumnedTableViewer implements I
 	}
 
 	private void createDefaultImage() {
-		final String defaultKey = parameters.getParameter(IConstants.ICON, ""); //$NON-NLS-1$ 
+		final String defaultKey = parameters.getParameter(IConstants.ICON, ""); //$NON-NLS-1$
 		if (defaultKey.length() > 0) {
 			final ImageDescriptor desc = renderer.getImageDescriptor(defaultKey);
 			if (desc != null) {
@@ -139,7 +141,7 @@ public class BeanMapTableViewer extends AbstractColumnedTableViewer implements I
 			}
 		}
 	}
-		
+
 	@Override
 	public AbstractColumnedTableLabelProvider createTableLabelProvider(AbstractColumnedViewer viewer) {
 		if (parameters.getParameterBoolean(USE_BOOLEAN_IMAGE)) {
@@ -147,11 +149,12 @@ public class BeanMapTableViewer extends AbstractColumnedTableViewer implements I
 				@Override
 				protected Image getActualImage(Object element, int actualColumnIndex) {
 					Image result = null;
-					String entryKey = cols.items(actualColumnIndex).getIdentifier().replaceAll(BEAN_MAP_TABLE_VIEWER + '.' + structure.getType() + '.', ""); //$NON-NLS-1$
-					MetaDataAttribute attribute = structure.getAttribute(entryKey);
-					if (attribute!=null && MetaDataAttribute.TYPE_BOOLEAN.equals(attribute.getType())) {
-						BeanMapArcadEntity beanMapArcadEntity = (BeanMapArcadEntity) element;
-						Object attributeValue = beanMapArcadEntity.getBeanMap().get(entryKey);
+					final String entryKey = cols.items(actualColumnIndex).getIdentifier()
+							.replaceAll(BEAN_MAP_TABLE_VIEWER + '.' + structure.getType() + '.', ""); //$NON-NLS-1$
+					final MetaDataAttribute attribute = structure.getAttribute(entryKey);
+					if ((attribute != null) && MetaDataAttribute.TYPE_BOOLEAN.equals(attribute.getType())) {
+						final BeanMapArcadEntity beanMapArcadEntity = (BeanMapArcadEntity) element;
+						final Object attributeValue = beanMapArcadEntity.getBeanMap().get(entryKey);
 						if (attributeValue != null) {
 							if (attributeValue instanceof Boolean) {
 								if ((boolean) attributeValue) {
@@ -176,50 +179,50 @@ public class BeanMapTableViewer extends AbstractColumnedTableViewer implements I
 				}
 			};
 		}
-		return new ColumnedDefaultTableLabelProvider(viewer){
-				@Override
-				protected Image getActualImage(Object element, int actualColumnIndex) {
-					Image result = getDefaultImage(actualColumnIndex);
-					if (result==null) {
-						result = getUserDefinedActualImage(element, actualColumnIndex);
-						if (result ==null) {
-							result = super.getActualImage(element, actualColumnIndex);
-						}
+		return new ColumnedDefaultTableLabelProvider(viewer) {
+			@Override
+			protected Image getActualImage(Object element, int actualColumnIndex) {
+				Image result = getDefaultImage(actualColumnIndex);
+				if (result == null) {
+					result = getUserDefinedActualImage(element, actualColumnIndex);
+					if (result == null) {
+						result = super.getActualImage(element, actualColumnIndex);
 					}
-					return result;
 				}
-			};
+				return result;
+			}
+		};
 	}
 
 	protected Image getUserDefinedActualImage(Object element, int actualColumnIndex) {
 		return null;
 	}
-	
+
 	protected Image getDefaultImage(int actualColumnIndex) {
 		if ((actualColumnIndex == 0) && (defaultImage != null)) {
 			return defaultImage;
 		}
 		return null;
 	}
-	
+
 	@Override
 	public String getIdentifier() {
 		final String viewerId = parameters.getParameter(TABLE_VIEWER_ID);
 		if (viewerId == null) {
 			return null;
 		}
-		return super.getIdentifier() + '.' + structure.getType()+ '.' +viewerId;
+		return super.getIdentifier() + '.' + structure.getType() + '.' + viewerId;
 	}
 
 	@Override
 	public ArcadColumns getReferenceColumns() {
 		cols = new ArcadColumns();
-		StringBuilder attributes = new StringBuilder();
+		final StringBuilder attributes = new StringBuilder();
 		columnElements = parameters.getListElementParameter(COLUMN);
 		if ((columnElements != null) && !columnElements.isEmpty()) {
-			for (ElementParameter element : columnElements) {
+			for (final ElementParameter element : columnElements) {
 				String label = renderer.getLocalizedMessage(parameters.getElementParameter(element, LABEL));
-				String key = parameters.getElementParameter(element, ATTRIBUTE);
+				final String key = parameters.getElementParameter(element, ATTRIBUTE);
 				MetaDataAttribute attribute = null;
 				String structureType = null;
 				if (structure != null) {
@@ -236,11 +239,13 @@ public class BeanMapTableViewer extends AbstractColumnedTableViewer implements I
 					if (label == null) {
 						label = attribute.getName();
 					}
-					cols.add(new ArcadColumn(BEAN_MAP_TABLE_VIEWER + '.' + structureType + '.' + key, label, label, visible, cols.count(), 
+					cols.add(new ArcadColumn(BEAN_MAP_TABLE_VIEWER + '.' + structureType + '.' + key, label, label,
+							visible, cols.count(),
 							parameters.getElementParameterInteger(element, IConstants.WIDTH, attribute.getColSize())));
 				} else if (structureType != null) { // We have a reference line (att.att.att)
-					cols.add(new ArcadColumn(BEAN_MAP_TABLE_VIEWER + '.' + structureType + '.' + key, label, label, ArcadColumn.VISIBLE, cols.count(), 
-							parameters.getElementParameterInteger(element, IConstants.WIDTH, 100)));					
+					cols.add(new ArcadColumn(BEAN_MAP_TABLE_VIEWER + '.' + structureType + '.' + key, label, label,
+							ArcadColumn.VISIBLE, cols.count(),
+							parameters.getElementParameterInteger(element, IConstants.WIDTH, 100)));
 				}
 				if (attributes.length() > 0) {
 					attributes.append(' ');
@@ -248,8 +253,8 @@ public class BeanMapTableViewer extends AbstractColumnedTableViewer implements I
 				attributes.append(key);
 			}
 		} else {
-			for (Map.Entry<String, MetaDataAttribute> entry : structure.getAttributes().entrySet()) {
-				MetaDataAttribute attribute = entry.getValue();
+			for (final Map.Entry<String, MetaDataAttribute> entry : structure.getAttributes().entrySet()) {
+				final MetaDataAttribute attribute = entry.getValue();
 				int visible;
 				if (attribute.isVisible()) {
 					visible = ArcadColumn.VISIBLE;
@@ -267,50 +272,51 @@ public class BeanMapTableViewer extends AbstractColumnedTableViewer implements I
 		attributeList = attributes.toString();
 		return cols;
 	}
-	
-	private String getAlternateColumnValue(BeanMap bean,String rawValue, int columnIndex){
-		ElementParameter colElement = columnElements.get(columnIndex);
+
+	private String getAlternateColumnValue(BeanMap bean, String rawValue, int columnIndex) {
+		final ElementParameter colElement = columnElements.get(columnIndex);
 		if (colElement != null) {
-			String id = colElement.getParameter("id"); //$NON-NLS-1$
+			final String id = colElement.getParameter("id"); //$NON-NLS-1$
 			if (colElement.getParameterBoolean("masked")) { //$NON-NLS-1$
-				return formatMaskedValue(bean,rawValue, id);
+				return formatMaskedValue(bean, rawValue, id);
 			}
 			if (id != null) {
-				for (ElementParameter av: parameters.getListElementParameter("alternateValue")) { //$NON-NLS-1$
-					String columndid = av.getParameter("columnid"); //$NON-NLS-1$
-					String value = av.getParameter("value"); //$NON-NLS-1$
-					String altvalue = av.getParameter("altvalue"); //$NON-NLS-1$
-					//No value passed
+				for (final ElementParameter av : parameters.getListElementParameter("alternateValue")) { //$NON-NLS-1$
+					final String columndid = av.getParameter("columnid"); //$NON-NLS-1$
+					final String value = av.getParameter("value"); //$NON-NLS-1$
+					final String altvalue = av.getParameter("altvalue"); //$NON-NLS-1$
+					// No value passed
 					if ((columndid.equalsIgnoreCase(id)) && ((value == null) || (altvalue == null))) {
-						return formatAlternativeValue(bean,rawValue,columndid);
+						return formatAlternativeValue(bean, rawValue, columndid);
 					}
-					if ((columndid.equalsIgnoreCase(id)) && (value.equalsIgnoreCase(rawValue))){						
+					if ((columndid.equalsIgnoreCase(id)) && (value.equalsIgnoreCase(rawValue))) {
 						if (altvalue != null) {
 							return renderer.getLocalizedMessage(altvalue);
 						}
-						return formatAlternativeValue(bean,value,columndid);
+						return formatAlternativeValue(bean, value, columndid);
 					}
 				}
 			}
 		}
 		return rawValue;
 	}
-	
-	protected String formatAlternativeValue(BeanMap bean,String rawValue, String columndid){
+
+	protected String formatAlternativeValue(BeanMap bean, String rawValue, String columndid) {
 		return rawValue;
 	}
-	
-	protected String formatMaskedValue(BeanMap bean,String rawValue, String columndid){
+
+	protected String formatMaskedValue(BeanMap bean, String rawValue, String columndid) {
 		return rawValue;
 	}
-	
+
 	@Override
 	public String getValue(Object element, int columnIndex) {
 		Object value = null;
-		String entryKey = cols.items(columnIndex).getIdentifier().replaceAll(BEAN_MAP_TABLE_VIEWER + '.' + structure.getType() + '.', EMPTY);
-		MetaDataAttribute attribute = structure.getAttribute(entryKey);
-		BeanMapArcadEntity beanMapArcadEntity = (BeanMapArcadEntity) element;
-		Object attributeValue = beanMapArcadEntity.getBeanMap().get(entryKey);
+		final String entryKey = cols.items(columnIndex).getIdentifier()
+				.replaceAll(BEAN_MAP_TABLE_VIEWER + '.' + structure.getType() + '.', EMPTY);
+		final MetaDataAttribute attribute = structure.getAttribute(entryKey);
+		final BeanMapArcadEntity beanMapArcadEntity = (BeanMapArcadEntity) element;
+		final Object attributeValue = beanMapArcadEntity.getBeanMap().get(entryKey);
 		if (attribute != null) {
 			if (MetaDataAttribute.TYPE_BOOLEAN.equals(attribute.getType())) {
 				if ((parameters.getParameterBoolean(USE_BOOLEAN_IMAGE))) {
@@ -324,12 +330,12 @@ public class BeanMapTableViewer extends AbstractColumnedTableViewer implements I
 				}
 			}
 		} else {
-			//If attribute not found, we just try to get a value from the beanMap
-			//Means that this key has not been declared as an official attribute 
+			// If attribute not found, we just try to get a value from the beanMap
+			// Means that this key has not been declared as an official attribute
 			value = beanMapArcadEntity.getBeanMap().getString(entryKey);
 		}
 		if (value == null) {
-			String dateFormat = getColumnDateFormat(columnIndex);
+			final String dateFormat = getColumnDateFormat(columnIndex);
 			if ((dateFormat != null) && (attributeValue instanceof Date)) {
 				value = new SimpleDateFormat(dateFormat).format((Date) attributeValue);
 			} else {
@@ -339,10 +345,10 @@ public class BeanMapTableViewer extends AbstractColumnedTableViewer implements I
 				}
 				if ((format != null) && (attributeValue != null)) {
 					BeanMap beanMap = null;
-					String type = structure.getAttribute(entryKey).getType();
+					final String type = structure.getAttribute(entryKey).getType();
 					Map<Integer, BeanMap> currentType = beanMapsValues.get(type);
 					if (currentType != null) {
-						BeanMap currentBeanMap = currentType.get(attributeValue);
+						final BeanMap currentBeanMap = currentType.get(attributeValue);
 						if (currentBeanMap != null) {
 							beanMap = currentBeanMap;
 						}
@@ -350,7 +356,7 @@ public class BeanMapTableViewer extends AbstractColumnedTableViewer implements I
 					if (beanMap == null) {
 						beanMap = renderer.loadBeanMap(type, ((Integer) attributeValue).intValue());
 						if (currentType == null) {
-							currentType = new HashMap<Integer, BeanMap>();
+							currentType = new HashMap<>();
 							beanMapsValues.put(type, currentType);
 						}
 						currentType.put((Integer) attributeValue, beanMap);
@@ -362,10 +368,10 @@ public class BeanMapTableViewer extends AbstractColumnedTableViewer implements I
 					}
 					value = new MetaDataFormater(format, currentStructure).format(beanMap);
 				} else {
-					//value = attributeValue;
-					BeanMap bean = beanMapArcadEntity.getBeanMap();
+					// value = attributeValue;
+					final BeanMap bean = beanMapArcadEntity.getBeanMap();
 					if (attributeValue != null) {
-						value = getAlternateColumnValue(bean,attributeValue.toString(),columnIndex);
+						value = getAlternateColumnValue(bean, attributeValue.toString(), columnIndex);
 					} else {
 						value = attributeValue;
 					}
@@ -379,7 +385,7 @@ public class BeanMapTableViewer extends AbstractColumnedTableViewer implements I
 	}
 
 	private String getColumnDateFormat(int columnIndex) {
-		String result = parameters.getElementParameter(columnElements.get(columnIndex), DATE_FORMAT);
+		final String result = parameters.getElementParameter(columnElements.get(columnIndex), DATE_FORMAT);
 		if (result == null) {
 			return null;
 		}
@@ -388,38 +394,39 @@ public class BeanMapTableViewer extends AbstractColumnedTableViewer implements I
 			return renderer.getLocalizedMessage(result);
 		}
 		// Load value from Web-Service; the web service returns a single value as a beanMap property
-		String[] split = result.split(":"); //$NON-NLS-1$
-		BeanMap content =  renderer.getDataLoader().loadContent(split[1], split[0]);
+		final String[] split = result.split(":"); //$NON-NLS-1$
+		final BeanMap content = renderer.getDataLoader().loadContent(split[1], split[0]);
 		if ((content == null) || content.isEmpty()) {
 			return null;
 		}
-		Collection<Object> values = content.values();
+		final Collection<Object> values = content.values();
 		if (values.isEmpty()) {
 			return null;
 		}
 		return (String) values.iterator().next();
 	}
-	
+
 	protected String translateValue(String value, int columnIndex) {
 		return value;
 	}
-		
+
 	@SuppressWarnings("deprecation")
 	@Override
 	public Object getTypedValue(Object element, int columnIndex) {
 		Object value = null;
-		String entryKey = cols.items(columnIndex).getIdentifier().replaceAll(BEAN_MAP_TABLE_VIEWER + '.' + structure.getType() + '.', ""); //$NON-NLS-1$
-		Object attributeValue = ((BeanMapArcadEntity) element).getBeanMap().get(entryKey);
+		final String entryKey = cols.items(columnIndex).getIdentifier()
+				.replaceAll(BEAN_MAP_TABLE_VIEWER + '.' + structure.getType() + '.', ""); //$NON-NLS-1$
+		final Object attributeValue = ((BeanMapArcadEntity) element).getBeanMap().get(entryKey);
 		String format = null;
-		if (columnElements != null && !columnElements.isEmpty()) {
+		if ((columnElements != null) && !columnElements.isEmpty()) {
 			format = parameters.getElementParameter(columnElements.get(columnIndex), FORMAT);
 		}
 		if ((format != null) && (attributeValue != null)) {
 			BeanMap beanMap = null;
-			String type = structure.getAttribute(entryKey).getType();
+			final String type = structure.getAttribute(entryKey).getType();
 			Map<Integer, BeanMap> currentType = beanMapsValues.get(type);
 			if (currentType != null) {
-				BeanMap currentBeanMap = currentType.get(attributeValue);
+				final BeanMap currentBeanMap = currentType.get(attributeValue);
 				if (currentBeanMap != null) {
 					beanMap = currentBeanMap;
 				}
@@ -427,7 +434,7 @@ public class BeanMapTableViewer extends AbstractColumnedTableViewer implements I
 			if (beanMap == null) {
 				beanMap = renderer.loadBeanMap(type, ((Integer) attributeValue).intValue());
 				if (currentType == null) {
-					currentType = new HashMap<Integer, BeanMap>();
+					currentType = new HashMap<>();
 					beanMapsValues.put(type, currentType);
 				}
 				currentType.put((Integer) attributeValue, beanMap);
@@ -447,7 +454,7 @@ public class BeanMapTableViewer extends AbstractColumnedTableViewer implements I
 		}
 		return value;
 	}
-	
+
 	private String cleanValue(String value) {
 		if (mustBeCleanValue()) {
 			return value.replace('\n', ' ').replace('\r', ' ');
@@ -461,7 +468,7 @@ public class BeanMapTableViewer extends AbstractColumnedTableViewer implements I
 
 	private String getBooleanValue(Object object) {
 		if (object instanceof Boolean) {
-			if (((Boolean)object).booleanValue()) {
+			if (((Boolean) object).booleanValue()) {
 				return Messages.yes;
 			}
 			return Messages.no;
@@ -472,18 +479,20 @@ public class BeanMapTableViewer extends AbstractColumnedTableViewer implements I
 		return Messages.yes;
 	}
 
+	@Override
 	public BeanMapList getBeanMapList() {
 		return list;
 	}
-	
+
+	@Override
 	public void setBeanMapList(BeanMapList list) {
-		BeanMap newSelection = getBeanMapValue();
+		final BeanMap newSelection = getBeanMapValue();
 		if (newSelection != null) {
 			selection = newSelection;
 		}
 		this.list = list;
-		ArcadCollection collection = new ArcadCollection();
-		for (BeanMap beanMap : list) {
+		final ArcadCollection collection = new ArcadCollection();
+		for (final BeanMap beanMap : list) {
 			collection.add(new BeanMapArcadEntity(beanMap));
 			if (beanMap.equals(selection)) {
 				selection = beanMap;
@@ -496,6 +505,7 @@ public class BeanMapTableViewer extends AbstractColumnedTableViewer implements I
 		}
 	}
 
+	@Override
 	public void addBeanMapToList(int index, BeanMap beanMap) {
 		if (list == null) {
 			list = new BeanMapList();
@@ -503,19 +513,23 @@ public class BeanMapTableViewer extends AbstractColumnedTableViewer implements I
 		list.add(beanMap);
 	}
 
+	@Override
 	public Widget getWidget() {
 		return getViewer().getControl();
 	}
 
+	@Override
 	public void addSelectionListener(SelectionAdapter newSelectionAdapter) {
 		selectionAdapter = newSelectionAdapter;
 		getViewer().addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				selectionAdapter.widgetSelected(null);
 			}
 		});
 	}
 
+	@Override
 	public BeanMap getBeanMapValue() {
 		if (getSelection().isEmpty()) {
 			return null;
@@ -525,17 +539,18 @@ public class BeanMapTableViewer extends AbstractColumnedTableViewer implements I
 
 	@SuppressWarnings("unchecked")
 	public BeanMapList getSelected() {
-		BeanMapList selected = new BeanMapList();
-		Iterator<Object> it = getSelection().iterator();
+		final BeanMapList selected = new BeanMapList();
+		final Iterator<Object> it = getSelection().iterator();
 		while (it.hasNext()) {
-			Object o = it.next();
+			final Object o = it.next();
 			if (o instanceof BeanMapArcadEntity) {
 				selected.add(((BeanMapArcadEntity) o).getBeanMap());
 			}
 		}
 		return selected;
 	}
-	
+
+	@Override
 	public void setBeanMapValue(BeanMap beanMap) {
 		getTable().select(list.indexOf(beanMap));
 		getViewer().setSelection(new StructuredSelection(new BeanMapArcadEntity(beanMap)));
@@ -547,14 +562,14 @@ public class BeanMapTableViewer extends AbstractColumnedTableViewer implements I
 		if (actionsList == null) {
 			actions = super.makeActions();
 		} else {
-			Action[] superActions = super.makeActions();
+			final Action[] superActions = super.makeActions();
 			actions = new Action[superActions.length + actionsList.size()];
 			System.arraycopy(superActions, 0, actions, 0, superActions.length);
 			for (int i = 0; i < actionsList.size(); i++) {
 				actions[superActions.length + i] = actionsList.get(i);
 			}
 		}
-		for (Action action : actions) {
+		for (final Action action : actions) {
 			if (action instanceof IRefreshableAction) {
 				((IRefreshableAction) action).refresh();
 			}
@@ -570,20 +585,24 @@ public class BeanMapTableViewer extends AbstractColumnedTableViewer implements I
 		return structure;
 	}
 
+	@Override
 	public String getListType() {
 		return structure.getType();
 	}
 
+	@Override
 	public void loadedListComplete(ISWTRenderer renderer) {
 		if (list != null) {
 			setBeanMapList(list);
 		}
 	}
-	
+
+	@Override
 	public String getAttributeList() {
 		return attributeList;
 	}
-	
+
+	@Override
 	public String getOrderList() {
 		return orderList;
 	}
@@ -597,21 +616,23 @@ public class BeanMapTableViewer extends AbstractColumnedTableViewer implements I
 		getViewer().setComparator(null);
 		// sort according to due date
 		getViewer().setComparator(new ViewerComparator() {
+			@Override
 			public int compare(Viewer viewer, Object e1, Object e2) {
-				BeanMap b1 =((BeanMapArcadEntity) e1).getBeanMap();
-				BeanMap b2 =((BeanMapArcadEntity) e2).getBeanMap();
+				final BeanMap b1 = ((BeanMapArcadEntity) e1).getBeanMap();
+				final BeanMap b2 = ((BeanMapArcadEntity) e2).getBeanMap();
 				if (desc) {
 					return -b1.compareTo(b2, attribute);
 				}
 				return b1.compareTo(b2, attribute);
-			};
-		}); 
-	}	
+			}
+		});
+	}
 
 	@Override
 	public AbstractInternalColumnedViewer createViewer(Composite viewerParent, int viewerStyle) {
 		// Compare BeanMapArcadEntity content
-		ColumnedTableViewer tableViewer = new ColumnedTableViewer(viewerParent, viewerStyle) {
+		final ColumnedTableViewer tableViewer = new ColumnedTableViewer(viewerParent, viewerStyle) {
+			@Override
 			protected boolean equals(Object a, Object b) {
 				if ((getComparer() == null) && (a instanceof BeanMapArcadEntity) && (b instanceof BeanMapArcadEntity)) {
 					return ((BeanMapArcadEntity) a).getBeanMap().equals(((BeanMapArcadEntity) b).getBeanMap());

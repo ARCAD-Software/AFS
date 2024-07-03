@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -27,24 +27,24 @@ import com.arcadsoftware.osgi.ILoggedPlugin;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class BaseActivator extends Plugin  implements ILoggedPlugin{
+public class BaseActivator extends Plugin implements ILoggedPlugin {
 
 	// The plug-in ID
-	
+
 	public static final String TITLE = ""; //$NON-NLS-1$
 
 	private static final String LOGDEBUG_RESOURCE = "Log.debug";
-	
+
 	// The shared instance
 	private static BaseActivator plugin;
-	
+
 	private ILoggedPlugin logger;
 
 	/**
 	 * The constructor
 	 */
 	public BaseActivator() {
-		logger = this;		
+		logger = this;
 	}
 
 	/*
@@ -54,7 +54,7 @@ public class BaseActivator extends Plugin  implements ILoggedPlugin{
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		plugin = this;		
+		plugin = this;
 	}
 
 	/*
@@ -77,66 +77,78 @@ public class BaseActivator extends Plugin  implements ILoggedPlugin{
 	}
 
 	public void missingRight(List<Integer> expected) {
-		IRightManagerExtension manager = AFSRightManager.getRightManager();
-		if (manager!=null) {
+		final IRightManagerExtension manager = AFSRightManager.getRightManager();
+		if (manager != null) {
 			manager.missingRight(expected);
 		}
 	}
-	
+
 	public static ILoggedPlugin getLogger() {
 		return getDefault().logger;
 	}
-	
+
 	public static void setLogger(ILoggedPlugin logger) {
 		getDefault().logger = logger;
 	}
-		
+
+	@Override
 	public void log(String message) {
-		getLog().log(new Status(IStatus.INFO,getBundle().getSymbolicName(), message));
-	}
-	
-	public void log(String message,Throwable e) {
-		getLog().log(new Status(IStatus.ERROR,getBundle().getSymbolicName(), message, e));
+		getLog().log(new Status(IStatus.INFO, getBundle().getSymbolicName(), message));
 	}
 
+	@Override
+	public void log(String message, Throwable e) {
+		getLog().log(new Status(IStatus.ERROR, getBundle().getSymbolicName(), message, e));
+	}
+
+	@Override
 	public void log(Throwable e) {
-		getLog().log(new Status(IStatus.ERROR,getBundle().getSymbolicName(), e.getLocalizedMessage(), e));
+		getLog().log(new Status(IStatus.ERROR, getBundle().getSymbolicName(), e.getLocalizedMessage(), e));
 	}
 
+	@Override
 	public void warn(String message) {
-		getLog().log(new Status(IStatus.WARNING,getBundle().getSymbolicName(), message));
-	}
-	
-	public void warn(String message,Throwable e) {
-		getLog().log(new Status(IStatus.WARNING,getBundle().getSymbolicName(), message, e));
+		getLog().log(new Status(IStatus.WARNING, getBundle().getSymbolicName(), message));
 	}
 
+	@Override
+	public void warn(String message, Throwable e) {
+		getLog().log(new Status(IStatus.WARNING, getBundle().getSymbolicName(), message, e));
+	}
+
+	@Override
 	public void debug(String message) {
 		if (isDebugging()) {
-			getLog().log(new Status(IStatus.INFO,getBundle().getSymbolicName(),Resources.resString(LOGDEBUG_RESOURCE) + message)); //$NON-NLS-1$
+			getLog().log(new Status(IStatus.INFO, getBundle().getSymbolicName(),
+					Resources.resString(LOGDEBUG_RESOURCE) + message));
 		}
 	}
 
+	@Override
 	public void debug(String message, Throwable e) {
 		if (isDebugging()) {
-			getLog().log(new Status(IStatus.INFO,getBundle().getSymbolicName(), Resources.resString(LOGDEBUG_RESOURCE) + message, e)); //$NON-NLS-1$
+			getLog().log(new Status(IStatus.INFO, getBundle().getSymbolicName(),
+					Resources.resString(LOGDEBUG_RESOURCE) + message, e));
 		}
 	}
 
+	@Override
 	public void debug(Throwable e) {
 		if (isDebugging()) {
-			getLog().log(new Status(IStatus.INFO,getBundle().getSymbolicName(), Resources.resString(LOGDEBUG_RESOURCE) + e.getLocalizedMessage(), e)); //$NON-NLS-1$
+			getLog().log(new Status(IStatus.INFO, getBundle().getSymbolicName(),
+					Resources.resString(LOGDEBUG_RESOURCE) + e.getLocalizedMessage(), e));
 		}
 	}
-	
+
+	@Override
 	public void error(String message, Throwable e) {
-		getLog().log(new Status(IStatus.ERROR,getBundle().getSymbolicName(), message, e));
-		
+		getLog().log(new Status(IStatus.ERROR, getBundle().getSymbolicName(), message, e));
+
 	}
-	
+
 	public void error(String message) {
-		getLog().log(new Status(IStatus.ERROR,getBundle().getSymbolicName(), message));
-		
+		getLog().log(new Status(IStatus.ERROR, getBundle().getSymbolicName(), message));
+
 	}
-	
+
 }

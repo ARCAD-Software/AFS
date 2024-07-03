@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -25,74 +25,71 @@ import com.arcadsoftware.rest.console.ConsoleField;
 import com.arcadsoftware.rest.console.SectionId;
 import com.arcadsoftware.rest.console.XmlConsoleStream;
 
-public class ConsoleConnector extends AbstractConnector{
-	
-	
-	public ConsoleConnector(ServerConnection server){
+public class ConsoleConnector extends AbstractConnector {
+
+	public ConsoleConnector(ServerConnection server) {
 		super(server);
 	}
-	
-	
-	public boolean save(String sectionId, Map<String,Object> values){
+
+	public boolean save(String sectionId, Map<String, Object> values) {
 		try {
-			getDataAccess().getWebServicesAccess().post("/remote/console/"+sectionId+"/save",values); //$NON-NLS-1$ //$NON-NLS-2$
+			getDataAccess().getWebServicesAccess().post("/remote/console/" + sectionId + "/save", values); //$NON-NLS-1$ //$NON-NLS-2$
 			return true;
-		} catch (ServerErrorException e) {
+		} catch (final ServerErrorException e) {
 			manageErrorException(e);
 		}
-		return false;		
+		return false;
 	}
-	
-	
-	public Form performAction(SectionId section, String actionId,Map<String,Object> values){
+
+	public Form performAction(SectionId section, String actionId, Map<String, Object> values) {
 		try {
-			String xml = getDataAccess().getWebServicesAccess().post("/remote/console/"+section.getId()+"/"+actionId,values); //$NON-NLS-1$ //$NON-NLS-2$
+			final String xml = getDataAccess().getWebServicesAccess()
+					.post("/remote/console/" + section.getId() + "/" + actionId, values); //$NON-NLS-1$ //$NON-NLS-2$
 			List<ConsoleField> result;
-			if (!xml.equals("")){ //$NON-NLS-1$
-				XmlConsoleStream xmlStream = new XmlConsoleStream();
+			if (!xml.equals("")) { //$NON-NLS-1$
+				final XmlConsoleStream xmlStream = new XmlConsoleStream();
 				result = xmlStream.getSectionForm(xml);
 			} else {
-				result = new ArrayList<ConsoleField>();
+				result = new ArrayList<>();
 			}
-			return 	new Form(section,result);	
-		} catch (ServerErrorException e) {
-			manageErrorException(e);
-		}
-		return null;		
-	}	
-	
-	
-	public List<Category> getCategories(){
-		try {
-			String xml;			
-			xml = getDataAccess().getWebServicesAccess().get("/remote/console/", true, false); //$NON-NLS-1$
-			XmlConsoleStream xmlStream = new XmlConsoleStream();
-			return xmlStream.getCategories(xml);					
-		} catch (ServerErrorException e) {
+			return new Form(section, result);
+		} catch (final ServerErrorException e) {
 			manageErrorException(e);
 		}
 		return null;
 	}
-	
-	public Form getSection(SectionId section){
+
+	public List<Category> getCategories() {
 		try {
-			String xml;			
-			xml = getDataAccess().getWebServicesAccess().get("/remote/console/"+section.getId(), true, false); //$NON-NLS-1$
-			XmlConsoleStream xmlStream = new XmlConsoleStream();
-			//renvoie des objets
-			
-			//ConsoleSet
-			
-			//Action = save
-			//Pour sauvagarder
-			//dataAccess.getWebServicesAccess().post("/remote/console/<sectionid>/<save>",Map [<id_de_la_property>,<value>))
-			List<ConsoleField> result = xmlStream.getSectionForm(xml); 
-			return 	new Form(section,result);				
-		} catch (ServerErrorException e) {
+			String xml;
+			xml = getDataAccess().getWebServicesAccess().get("/remote/console/", true, false); //$NON-NLS-1$
+			final XmlConsoleStream xmlStream = new XmlConsoleStream();
+			return xmlStream.getCategories(xml);
+		} catch (final ServerErrorException e) {
 			manageErrorException(e);
 		}
 		return null;
-	}		
+	}
 
-	
+	public Form getSection(SectionId section) {
+		try {
+			String xml;
+			xml = getDataAccess().getWebServicesAccess().get("/remote/console/" + section.getId(), true, false); //$NON-NLS-1$
+			final XmlConsoleStream xmlStream = new XmlConsoleStream();
+			// renvoie des objets
+
+			// ConsoleSet
+
+			// Action = save
+			// Pour sauvagarder
+			// dataAccess.getWebServicesAccess().post("/remote/console/<sectionid>/<save>",Map
+			// [<id_de_la_property>,<value>))
+			final List<ConsoleField> result = xmlStream.getSectionForm(xml);
+			return new Form(section, result);
+		} catch (final ServerErrorException e) {
+			manageErrorException(e);
+		}
+		return null;
+	}
+
 }

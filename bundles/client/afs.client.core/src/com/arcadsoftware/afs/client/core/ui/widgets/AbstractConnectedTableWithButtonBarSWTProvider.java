@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -12,9 +12,6 @@
  *     ARCAD Software - initial API and implementation
  *******************************************************************************/
 package com.arcadsoftware.afs.client.core.ui.widgets;
-
-
-
 
 import java.util.List;
 
@@ -34,45 +31,47 @@ import com.arcadsoftware.editor.swt.IBeanMapErrorOnSaveListener;
 import com.arcadsoftware.editor.swt.ISWTDataLoader;
 import com.arcadsoftware.metadata.MetaDataLink;
 
-public abstract class  AbstractConnectedTableWithButtonBarSWTProvider extends TableWithButtonBarSWTProvider 
-implements IBeanMapErrorOnSaveListener, ISecuredAction {
+public abstract class AbstractConnectedTableWithButtonBarSWTProvider extends TableWithButtonBarSWTProvider
+		implements IBeanMapErrorOnSaveListener, ISecuredAction {
 
 	private DataAccessHelper helper = null;
-	
-	public DataAccessHelper getHelper(){
-		if (helper==null) {
-			if (getConnection()!=null) {
+
+	public DataAccessHelper getHelper() {
+		if (helper == null) {
+			if (getConnection() != null) {
 				helper = new DataAccessHelper(getConnection());
 			}
 		}
 		return helper;
-	}	
-	
-	public ServerConnection getConnection(){
-		ISWTDataLoader dataLoader = renderer.getDataLoader();
-		if ( dataLoader instanceof CoreContentLoader) {
-			CoreContentLoader loader = (CoreContentLoader)dataLoader;
-			ServerConnection connection = loader.getConnection();
+	}
+
+	public ServerConnection getConnection() {
+		final ISWTDataLoader dataLoader = renderer.getDataLoader();
+		if (dataLoader instanceof CoreContentLoader) {
+			final CoreContentLoader loader = (CoreContentLoader) dataLoader;
+			final ServerConnection connection = loader.getConnection();
 			return connection;
-		}		
+		}
 		return null;
-	}	
-	
+	}
+
 	@Override
 	protected boolean editBeanMap(BeanMap beanMap) {
-		ServerConnection connection = getConnection();
-		if (connection!=null) {
+		final ServerConnection connection = getConnection();
+		if (connection != null) {
 			if (editionAllowed()) {
-				String layoutName = getEditionLayoutName();
+				final String layoutName = getEditionLayoutName();
 				DynamicEditorPart editor;
-				if (layoutName.length()==0)
-					editor = (DynamicEditorPart)ConnectedDynamicEditor.openConnectedEditor(connection,beanMap);
-				else
-					editor = (DynamicEditorPart)ConnectedDynamicEditor.openConnectedEditor(connection,beanMap,layoutName);
-				
+				if (layoutName.length() == 0) {
+					editor = (DynamicEditorPart) ConnectedDynamicEditor.openConnectedEditor(connection, beanMap);
+				} else {
+					editor = (DynamicEditorPart) ConnectedDynamicEditor.openConnectedEditor(connection, beanMap,
+							layoutName);
+				}
+
 				// listen to save error
 				editor.addErrorOnSaveListener(this);
-				
+
 				if (addAdditionalValues(beanMap)) {
 					editor.refreshEditorContent();
 				}
@@ -83,7 +82,7 @@ implements IBeanMapErrorOnSaveListener, ISecuredAction {
 		}
 		return false;
 	}
-	
+
 	@Override
 	protected void createBeanMap(MetaDataLink link, boolean withOpenEditor) {
 		if (creationAllowed()) {
@@ -92,7 +91,7 @@ implements IBeanMapErrorOnSaveListener, ISecuredAction {
 			missingRight(getExpectedEditRight());
 		}
 	}
-	
+
 	@Override
 	protected void removeBeanMap(MetaDataLink link) {
 		if (deletionAllowed()) {
@@ -101,64 +100,69 @@ implements IBeanMapErrorOnSaveListener, ISecuredAction {
 			missingRight(getExpectedEditRight());
 		}
 	}
-	
-	protected boolean addAdditionalValues(BeanMap beanMap){
+
+	protected boolean addAdditionalValues(BeanMap beanMap) {
 		return false;
 	}
 
-	public void onErrorOnSave(BeanMap beanmap, String errorMessage){
-		MessageDialog.openError(Activator.getDefault().getPluginShell(), 
+	@Override
+	public void onErrorOnSave(BeanMap beanmap, String errorMessage) {
+		MessageDialog.openError(Activator.getDefault().getPluginShell(),
 				"", errorMessage);
 	}
-	
-	public void onErrorOnSave(BeanMap beanmap, UserMessage errorUserMessage){
+
+	@Override
+	public void onErrorOnSave(BeanMap beanmap, UserMessage errorUserMessage) {
 	}
-	
+
+	@Override
 	public boolean isAllowed() {
-		ServerConnection connection = getConnection();
-		if (connection!=null) {
+		final ServerConnection connection = getConnection();
+		if (connection != null) {
 			return connection.isAllowed(getExpectedRigths());
 		}
 		return false;
-	}	
-	
+	}
+
+	@Override
 	public List<Integer> getExpectedRigths() {
 		return getExpectedEditRight();
 	}
-	
-	
-	public boolean editionAllowed(){
-		ServerConnection connection = getConnection();
-		if (connection!=null) {
-			boolean result =  connection.isAllowed(getExpectedEditRight());
-			if(!result) {
+
+	public boolean editionAllowed() {
+		final ServerConnection connection = getConnection();
+		if (connection != null) {
+			final boolean result = connection.isAllowed(getExpectedEditRight());
+			if (!result) {
 				Activator.getDefault().missingRight(getExpectedEditRight());
 			}
 			return result;
 		}
-		return false;		
+		return false;
 	}
-	
-	public boolean creationAllowed(){
-		ServerConnection connection = getConnection();
-		if (connection!=null) {
+
+	public boolean creationAllowed() {
+		final ServerConnection connection = getConnection();
+		if (connection != null) {
 			return connection.isAllowed(getExpectedAddRight());
 		}
-		return false;		
+		return false;
 	}
-	
-	public boolean deletionAllowed(){
-		ServerConnection connection = getConnection();
-		if (connection!=null) {
+
+	public boolean deletionAllowed() {
+		final ServerConnection connection = getConnection();
+		if (connection != null) {
 			return connection.isAllowed(getExpectedDeleteRight());
 		}
-		return false;		
+		return false;
 	}
-	
-	
+
 	public abstract List<Integer> getExpectedEditRight();
-	public abstract List<Integer> getExpectedAddRight();	
+
+	public abstract List<Integer> getExpectedAddRight();
+
 	public abstract List<Integer> getExpectedDeleteRight();
+
 	public abstract void missingRight(List<Integer> expected);
-	
+
 }

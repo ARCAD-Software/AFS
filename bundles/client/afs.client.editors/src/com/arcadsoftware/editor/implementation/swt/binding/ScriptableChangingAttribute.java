@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -20,10 +20,6 @@ import com.arcadsoftware.metadata.MetaDataAttribute;
 
 public class ScriptableChangingAttribute implements IValueChangingListener {
 
-	private static final String VALUE = "value"; //$NON-NLS-1$
-	private static final String OLDVALUE = "oldvalue"; //$NON-NLS-1$
-	private static final String ACCEPT = "accept"; //$NON-NLS-1$
-	private MetaDataAttribute attribute;
 	private boolean updating = false;
 
 	/**
@@ -31,48 +27,46 @@ public class ScriptableChangingAttribute implements IValueChangingListener {
 	 */
 	public ScriptableChangingAttribute(final MetaDataAttribute attribute) {
 		super();
-		this.attribute = attribute;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.databinding.observable.value.IValueChangingListener#handleValueChanging(org.eclipse.core.databinding
-	 * .observable.value.ValueChangingEvent)
+	 * @see org.eclipse.core.databinding.observable.value.IValueChangingListener#handleValueChanging(org.eclipse.core.
+	 * databinding .observable.value.ValueChangingEvent)
 	 */
+	@Override
 	public void handleValueChanging(ValueChangingEvent event) {
 		// If the change has already be cancelled !
 		if (event.veto || updating) {
 			return;
 		}
 		updating = true;
-		//TODO RAP
-//		try {
-//			IScriptEngine engine = Activator.getInstance().openScriptEngine();
-//			if (engine != null) {
-//				try {
-//					engine.bind(ACCEPT, new Boolean(true));
-//					engine.bind(OLDVALUE, event.diff.getOldValue());
-//					engine.bind(VALUE, event.diff.getNewValue());
-//					engine.bind(attribute.getCode(), event.diff.getNewValue());
-//					try {
-//						engine.eval(attribute.getTest());
-//						Object o = engine.getValue(ACCEPT);
-//						if (o instanceof Boolean) {
-//							event.veto = !((Boolean) o).booleanValue();
-//						}
-//					} catch (ScriptExecutionException e) {
-//						Activator.getInstance().debug(
-//								"Error during Script Execution (Validating Attribute Changing Event).", e); //$NON-NLS-1$
-//					}
-//				} finally {
-//					Activator.getInstance().closeStriptEngine(engine);
-//				}
-//			}
-//		} finally {
-//			updating = false;
-//		}
+		// TODO RAP
+		// try {
+		// IScriptEngine engine = Activator.getInstance().openScriptEngine();
+		// if (engine != null) {
+		// try {
+		// engine.bind(ACCEPT, new Boolean(true));
+		// engine.bind(OLDVALUE, event.diff.getOldValue());
+		// engine.bind(VALUE, event.diff.getNewValue());
+		// engine.bind(attribute.getCode(), event.diff.getNewValue());
+		// try {
+		// engine.eval(attribute.getTest());
+		// Object o = engine.getValue(ACCEPT);
+		// if (o instanceof Boolean) {
+		// event.veto = !((Boolean) o).booleanValue();
+		// }
+		// } catch (ScriptExecutionException e) {
+		// Activator.getInstance().debug(
+		// "Error during Script Execution (Validating Attribute Changing Event).", e); //$NON-NLS-1$
+		// }
+		// } finally {
+		// Activator.getInstance().closeStriptEngine(engine);
+		// }
+		// }
+		// } finally {
+		// updating = false;
+		// }
 	}
 
 }

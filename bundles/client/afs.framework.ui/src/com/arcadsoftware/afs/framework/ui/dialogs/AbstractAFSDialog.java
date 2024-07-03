@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -38,12 +38,8 @@ import com.arcadsoftware.aev.core.ui.dialogs.DialogConstantProvider;
 import com.arcadsoftware.afs.client.brands.AFSIcon;
 
 /**
- * @version 1.0.0
- * 
- * Ajoute quelques méthode d'assistance à la création de controles
- * dans la fenetre...
- * 
- * <i> Copryright 2004, Arcad-Software</i>.
+ * @version 1.0.0 Ajoute quelques méthode d'assistance à la création de controles dans la fenetre... <i> Copryright
+ *          2004, Arcad-Software</i>.
  */
 public abstract class AbstractAFSDialog extends Dialog {
 
@@ -70,18 +66,18 @@ public abstract class AbstractAFSDialog extends Dialog {
 
 	@Override
 	protected Control createButtonBar(Composite parent) {
-		Composite composite = (Composite)super.createButtonBar(parent);
-		GridLayout l = (GridLayout)composite.getLayout();
+		final Composite composite = (Composite) super.createButtonBar(parent);
+		final GridLayout l = (GridLayout) composite.getLayout();
 		l.marginHeight = l.marginWidth = 3;
 		return composite;
-	}	
-	
+	}
+
 	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
-		newShell.setImage(getDialogImage()); //$NON-NLS-1$
-		int width = getWidth();
-		int height= getHeight();
+		newShell.setImage(getDialogImage());
+		final int width = getWidth();
+		final int height = getHeight();
 		// Size definition
 		newShell.setSize(width, height);
 		// Title assignment
@@ -89,10 +85,10 @@ public abstract class AbstractAFSDialog extends Dialog {
 		if (isCentered()) {
 			final Rectangle bounds = newShell.getBounds();
 			Monitor activeMonitor = null;
-			for (Monitor monitor : newShell.getDisplay().getMonitors()) {
-			    if (monitor.getBounds().intersects(bounds)) {
-			    	activeMonitor = monitor;
-			    }
+			for (final Monitor monitor : newShell.getDisplay().getMonitors()) {
+				if (monitor.getBounds().intersects(bounds)) {
+					activeMonitor = monitor;
+				}
 			}
 			// Center the dialog in the active monitor
 			Rectangle parentBounds;
@@ -101,19 +97,19 @@ public abstract class AbstractAFSDialog extends Dialog {
 			} else {
 				parentBounds = newShell.getDisplay().getClientArea();
 			}
-			newShell.setLocation(parentBounds.x + (parentBounds.width - width) / 2, //
-					parentBounds.y + (parentBounds.height - height) / 2);			
+			newShell.setLocation(parentBounds.x + ((parentBounds.width - width) / 2), //
+					parentBounds.y + ((parentBounds.height - height) / 2));
 		}
 	}
 
 	protected Image getDialogImage() {
 		return AFSIcon.ARCAD.image();
 	}
-	
+
 	/**
-	 * Méthode permettant d'ajouter un ModifyListener déclenchant la validation
-	 * de la données saisie pour un widget de type Text.
-	 * 
+	 * Méthode permettant d'ajouter un ModifyListener déclenchant la validation de la données saisie pour un widget de
+	 * type Text.
+	 *
 	 * @param c
 	 *            Text : Text à mettre sous contrôle
 	 */
@@ -122,9 +118,9 @@ public abstract class AbstractAFSDialog extends Dialog {
 	}
 
 	/**
-	 * Méthode permettant d'ajouter un ISelectionListener déclenchant la
-	 * validation de la données saisie pour un widget de type Button.
-	 * 
+	 * Méthode permettant d'ajouter un ISelectionListener déclenchant la validation de la données saisie pour un widget
+	 * de type Button.
+	 *
 	 * @param b
 	 *            Button : Button à mettre sous contrôle
 	 */
@@ -138,9 +134,9 @@ public abstract class AbstractAFSDialog extends Dialog {
 	}
 
 	/**
-	 * Méthode permettant d'ajouter un ISelectionListener et un ModifyListener
-	 * déclenchant la validation de la données saisie pour une liste Combo.
-	 * 
+	 * Méthode permettant d'ajouter un ISelectionListener et un ModifyListener déclenchant la validation de la données
+	 * saisie pour une liste Combo.
+	 *
 	 * @param c
 	 *            Combo : Combo à mettre sous contrôle
 	 */
@@ -157,14 +153,11 @@ public abstract class AbstractAFSDialog extends Dialog {
 
 	/**
 	 * Méthode permettant la validation des informations saisies.<br>
-	 * La surcharge de cette mï¿½thode permet de déclarer vos règles de validation
-	 * de saisie.<br>
-	 * Pour intégrer l'appel de cette fonction à vos contrôle de saisie, vous
-	 * pouvez utiliser les mï¿½thodes "addCheckDataListeners()" disponible sur les
-	 * Combo et les Text.
-	 * 
-	 * @return boolean : <b>True</b> si les informations saisies sont valides,
-	 *         <b>false</b> sinon.
+	 * La surcharge de cette mï¿½thode permet de déclarer vos règles de validation de saisie.<br>
+	 * Pour intégrer l'appel de cette fonction à vos contrôle de saisie, vous pouvez utiliser les mï¿½thodes
+	 * "addCheckDataListeners()" disponible sur les Combo et les Text.
+	 *
+	 * @return boolean : <b>True</b> si les informations saisies sont valides, <b>false</b> sinon.
 	 */
 	protected boolean checkDataFromListeners() {
 		return true;
@@ -173,11 +166,11 @@ public abstract class AbstractAFSDialog extends Dialog {
 	protected boolean isCentered() {
 		return true;
 	}
-	
+
 	public abstract int getHeight();
-	
+
 	public abstract int getWidth();
-	
+
 	public abstract String getTitle();
-	
+
 }

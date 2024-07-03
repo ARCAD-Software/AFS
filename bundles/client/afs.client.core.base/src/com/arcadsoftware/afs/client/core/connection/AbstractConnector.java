@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -18,21 +18,21 @@ import com.arcadsoftware.rest.ServerErrorException;
 
 public abstract class AbstractConnector {
 	ServerConnection server;
-	
-	public AbstractConnector(ServerConnection server){
+
+	public AbstractConnector(ServerConnection server) {
 		this.server = server;
 	}
-		
-	public ServerConnection getServerConnection(){
+
+	public ServerConnection getServerConnection() {
 		return server;
 	}
-	
+
 	public void manageErrorException(ServerErrorException e) {
 		server.manageErrorException(e);
 	}
 
-	public DataAccess getDataAccess(){
+	public DataAccess getDataAccess() {
 		return server.getDataAccess();
 	}
-	
+
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -61,13 +61,13 @@ public abstract class AbstractSearchView extends AbstractSecuredView {
 		}
 	}
 
-	private void createContent(Composite parent){
+	private void createContent(Composite parent) {
 		if (mainComposite != null) {
 			mainComposite.dispose();
 		}
 		mainComposite = AFSFormatTools.createComposite(parent, 1, false);
 		if (parent.getLayout() instanceof GridLayout) {
-			GridData gridData = new GridData(GridData.FILL_BOTH);
+			final GridData gridData = new GridData(GridData.FILL_BOTH);
 			gridData.grabExcessHorizontalSpace = true;
 			gridData.grabExcessVerticalSpace = true;
 			mainComposite.setLayoutData(gridData);
@@ -77,11 +77,11 @@ public abstract class AbstractSearchView extends AbstractSecuredView {
 		gd.marginHeight = gd.marginWidth = 0;
 		if (isAllowed()) {
 			if (entity != null) {
-				SashForm listAndEditor = new SashForm(mainComposite, SWT.HORIZONTAL);
+				final SashForm listAndEditor = new SashForm(mainComposite, SWT.HORIZONTAL);
 				GridData gridData = new GridData(GridData.FILL_BOTH);
 				gridData.grabExcessHorizontalSpace = true;
 				gridData.grabExcessVerticalSpace = true;
-				listAndEditor.setLayoutData(gridData);				
+				listAndEditor.setLayoutData(gridData);
 				searchComposite = createSearchComposite(getConnection(), listAndEditor, entity);
 				if (listAndEditor.getLayout() instanceof GridLayout) {
 					gridData = new GridData(GridData.FILL_BOTH);
@@ -89,7 +89,7 @@ public abstract class AbstractSearchView extends AbstractSecuredView {
 					gridData.grabExcessVerticalSpace = true;
 					searchComposite.setLayoutData(gridData);
 				}
-				Composite parentResultComposite = new Composite(listAndEditor, SWT.NONE);
+				final Composite parentResultComposite = new Composite(listAndEditor, SWT.NONE);
 				if (listAndEditor.getLayout() instanceof GridLayout) {
 					gridData = new GridData(GridData.FILL_BOTH);
 					gridData.grabExcessHorizontalSpace = true;
@@ -100,8 +100,10 @@ public abstract class AbstractSearchView extends AbstractSecuredView {
 				gd.marginLeft = gd.marginTop = gd.marginRight = gd.marginBottom = gd.marginHeight = gd.marginWidth = 0;
 				parentResultComposite.setLayout(gd);
 				extended_resultHeaderControl(parentResultComposite);
-				resultComposite = createResultComposite(parentResultComposite, getDisplayedSelectClause(), searchComposite
-						.getQueryManager(), getConnection());
+				resultComposite = createResultComposite(parentResultComposite, getDisplayedSelectClause(),
+						searchComposite
+								.getQueryManager(),
+						getConnection());
 				gridData = new GridData(GridData.FILL_BOTH);
 				gridData.grabExcessHorizontalSpace = true;
 				gridData.grabExcessVerticalSpace = true;
@@ -113,31 +115,33 @@ public abstract class AbstractSearchView extends AbstractSecuredView {
 			}
 		} else {
 			new BasicResultNotAllowedComposite(mainComposite);
-		}		
+		}
 	}
-	
-	public void extended_resultHeaderControl(Composite parent) {}
-	
-	public void extended_resultFooterControl(Composite parent) {}
-	
+
+	public void extended_resultHeaderControl(Composite parent) {
+	}
+
+	public void extended_resultFooterControl(Composite parent) {
+	}
+
 	@Override
 	public void createPartControl(Composite parent) {
-		parentComposite =parent;
+		parentComposite = parent;
 		DynamicHelp.updateContextHelpId(getDynamicHelpId(), parentComposite);
 	}
-	
+
 	protected int[] getWeights() {
-		return new int[] {28, 100};
+		return new int[] { 28, 100 };
 	}
-	
+
 	@Override
 	protected void defineLocalToolbar(IToolBarManager manager) {
-		this.toolbarManager = manager;
-	}	
-	
+		toolbarManager = manager;
+	}
+
 	protected ISearchListener createResultComposite(Composite parent, String selectClause,
-			QueryManager queryManager,ServerConnection connection) {
-		return new BasicResultComposite(parent, entity, selectClause, queryManager,connection);
+			QueryManager queryManager, ServerConnection connection) {
+		return new BasicResultComposite(parent, entity, selectClause, queryManager, connection);
 	}
 
 	public MetaDataEntity getStructure() {
@@ -146,10 +150,10 @@ public abstract class AbstractSearchView extends AbstractSecuredView {
 
 	protected void fillToolbar(IToolBarManager manager) {
 		if (resultComposite.isSearchManagementActivated()) {
-			Action autosearchAction = new Action("", IAction.AS_CHECK_BOX) {
+			final Action autosearchAction = new Action("", IAction.AS_CHECK_BOX) {
 				@Override
-				public void run() {					
-					resultComposite.setAutosearch(this.isChecked());					
+				public void run() {
+					resultComposite.setAutosearch(isChecked());
 				}
 			};
 			autosearchAction.setText(Activator.resString("search.autosearch.action.text"));
@@ -160,20 +164,21 @@ public abstract class AbstractSearchView extends AbstractSecuredView {
 			manager.add(new Separator());
 		}
 	}
-	
+
 	/**
 	 * Redefine this method in the inherited classes to create your own "searchComposite".
-	 * 
+	 *
 	 * @param parent
 	 *            : Composite : The parent composite of the search Editor
 	 * @return AbstractSearchComposite : A composite inherited from AbstractSearchComposite
 	 */
-	public abstract AbstractSearchComposite createSearchComposite(ServerConnection connection, Composite parent, MetaDataEntity newStructure);
+	public abstract AbstractSearchComposite createSearchComposite(ServerConnection connection, Composite parent,
+			MetaDataEntity newStructure);
 
 	/**
 	 * Redefine this method in the inherited classes to return a string which represents the bean identifier you want to
 	 * manipulate through this search view.
-	 * 
+	 *
 	 * @return String : Bean Identifier.
 	 */
 	public abstract String getType();
@@ -181,9 +186,9 @@ public abstract class AbstractSearchView extends AbstractSecuredView {
 	protected String getDisplayedSelectClause() {
 		return searchComposite.createSelectClause();
 	}
-	
+
 	protected abstract void readStructureError();
-	
+
 	public void autosearch() {
 		if ((resultComposite != null) && resultComposite.isSearchManagementActivated()) {
 			if (resultComposite.isAutosearch()) {
@@ -191,7 +196,7 @@ public abstract class AbstractSearchView extends AbstractSecuredView {
 			}
 		}
 	}
-	
+
 	@Override
 	public void activate() {
 		super.activate();

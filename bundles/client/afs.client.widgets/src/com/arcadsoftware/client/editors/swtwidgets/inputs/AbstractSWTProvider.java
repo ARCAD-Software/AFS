@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -12,8 +12,6 @@
  *     ARCAD Software - initial API and implementation
  *******************************************************************************/
 package com.arcadsoftware.client.editors.swtwidgets.inputs;
-
-
 
 import static com.arcadsoftware.client.editors.swtwidgets.IConstants.DEFAULT;
 import static com.arcadsoftware.client.editors.swtwidgets.IConstants.MANDATORY;
@@ -30,34 +28,34 @@ import com.arcadsoftware.metadata.MetaDataEntity;
 
 public abstract class AbstractSWTProvider implements IInputSWTProvider {
 
-	
+	@Override
 	public void create(ISWTRenderer renderer, ILayoutParameters parameters,
 			Element element, MetaDataEntity structure) {
-		IBeanMapContainer container = createContainer(renderer,parameters,element,structure);
-		doAfterCreating(container,renderer,parameters,element,structure);
+		final IBeanMapContainer container = createContainer(renderer, parameters, element, structure);
+		doAfterCreating(container, renderer, parameters, element, structure);
 	}
 
-	
+	@Override
 	public void dispose() {
 	}
-	
-	public void configureWidget(Control widget,ISWTRenderer renderer, ILayoutParameters parameters,Element element){
+
+	public void configureWidget(Control widget, ISWTRenderer renderer, ILayoutParameters parameters, Element element) {
 		widget.setEnabled(!element.isReadonly() || !parameters.getParameterBoolean(READ_ONLY));
-		if (parameters.getParameterBoolean(DEFAULT))
-			widget.setFocus();		
+		if (parameters.getParameterBoolean(DEFAULT)) {
+			widget.setFocus();
+		}
 	}
 
-	
-	
-	public abstract IBeanMapContainer createContainer(ISWTRenderer renderer, ILayoutParameters parameters,	
+	public abstract IBeanMapContainer createContainer(ISWTRenderer renderer, ILayoutParameters parameters,
 			Element element, MetaDataEntity structure);
 
-	public void doAfterCreating(IBeanMapContainer container,ISWTRenderer renderer, ILayoutParameters parameters,
-			Element element, MetaDataEntity structure){
-		//renderer.getToolkit().paintBordersFor(renderer.getParent());		
-		if (parameters.getParameterBoolean(MANDATORY))
+	public void doAfterCreating(IBeanMapContainer container, ISWTRenderer renderer, ILayoutParameters parameters,
+			Element element, MetaDataEntity structure) {
+		// renderer.getToolkit().paintBordersFor(renderer.getParent());
+		if (parameters.getParameterBoolean(MANDATORY)) {
 			renderer.addMandatoryAttribute(element.getCode());
-		renderer.getRendererBinding().bindElement(element, container);		
+		}
+		renderer.getRendererBinding().bindElement(element, container);
 	}
-	
+
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -32,6 +32,7 @@ public abstract class RefreshListAction extends AbstractConnectedBeanMapAction {
 		setToolTipText(Activator.resString("common.action.refresh.tooltip")); //$NON-NLS-1$
 		setImageDescriptor(AFSIcon.REFRESH.imageDescriptor());
 	}
+
 	@Override
 	protected boolean canExecute() {
 		return true;
@@ -39,7 +40,7 @@ public abstract class RefreshListAction extends AbstractConnectedBeanMapAction {
 
 	@Override
 	protected abstract boolean execute();
-	
+
 	protected TableViewer getViewer() {
 		return null;
 	}

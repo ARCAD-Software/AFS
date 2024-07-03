@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -85,22 +85,23 @@ public class ConnectionDialog extends AbstractAFSDialog {
 
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		Composite c = (Composite) super.createDialogArea(parent);
-		GridLayout gl = (GridLayout) c.getLayout();
+		final Composite c = (Composite) super.createDialogArea(parent);
+		final GridLayout gl = (GridLayout) c.getLayout();
 		gl.marginBottom = gl.marginHeight = gl.marginLeft = gl.marginRight = gl.marginTop = gl.marginWidth = 0;
 		createContent(c);
 		return c;
 	}
 
 	private void initSettings() {
-		final IConfigurationElement[] elements = Platform.getExtensionRegistry().getConfigurationElementsFor("com.arcadsoftware.afs.client.branding.splashscreen"); //$NON-NLS-1$
+		final IConfigurationElement[] elements = Platform.getExtensionRegistry()
+				.getConfigurationElementsFor("com.arcadsoftware.afs.client.branding.splashscreen"); //$NON-NLS-1$
 		IConfigurationElement selectElement = null;
 		if ((elements != null) && (elements.length > 0)) {
 			selectElement = elements[0];
 		}
 		if (selectElement != null) {
 			String bundleId = selectElement.getAttribute("bundleid"); //$NON-NLS-1$
-			String path = selectElement.getAttribute("path"); //$NON-NLS-1$
+			final String path = selectElement.getAttribute("path"); //$NON-NLS-1$
 			if ((bundleId == null) || (bundleId.length() == 0)) {
 				bundleId = Activator.getInstance().getBundle().getSymbolicName();
 			}
@@ -149,7 +150,7 @@ public class ConnectionDialog extends AbstractAFSDialog {
 		data.left = new FormAttachment(0, leftPosition);
 		data.right = new FormAttachment(100, rightPosition);
 		data.bottom = new FormAttachment(100, bottomPosition);
-		SelectionListener enterPressedListener = new SelectionAdapter() {
+		final SelectionListener enterPressedListener = new SelectionAdapter() {
 			@Override
 			public void widgetDefaultSelected(SelectionEvent paramSelectionEvent) {
 				doConnect();
@@ -220,7 +221,7 @@ public class ConnectionDialog extends AbstractAFSDialog {
 				}
 			}
 		});
-		Composite buttonBar = new Composite(mainComposite, SWT.NONE);
+		final Composite buttonBar = new Composite(mainComposite, SWT.NONE);
 		if (!isTransparent) {
 			buttonBar.setBackground(mainComposite.getBackground());
 		}
@@ -230,7 +231,7 @@ public class ConnectionDialog extends AbstractAFSDialog {
 		data.left = new FormAttachment(0, 0);
 		data.right = new FormAttachment(100, 0);
 		buttonBar.setLayout(new FormLayout());
-		Button cancelButton = new Button(buttonBar, SWT.PUSH);
+		final Button cancelButton = new Button(buttonBar, SWT.PUSH);
 		cancelButton.setText(Activator.resString("server.connection.dialog.button.cancel")); //$NON-NLS-1$
 		cancelButton.addSelectionListener(
 				new SelectionAdapter() {
@@ -243,7 +244,7 @@ public class ConnectionDialog extends AbstractAFSDialog {
 		cancelButton.setLayoutData(data);
 		data.right = new FormAttachment(100, 0);
 		data.width = 100;
-		Button connectButton = new Button(buttonBar, SWT.PUSH);
+		final Button connectButton = new Button(buttonBar, SWT.PUSH);
 		connectButton.setText(Activator.resString("server.connection.dialog.button.connect")); //$NON-NLS-1$
 		connectButton.addSelectionListener(
 				new SelectionAdapter() {
@@ -272,7 +273,7 @@ public class ConnectionDialog extends AbstractAFSDialog {
 		server.setLastLogin(loginText.getText());
 		server.setLastPassword(passwordText.getText());
 		server.setRememberPassword(savePassword.getSelection());
-		ServerConnection serverConnection = new ServerConnection(server);
+		final ServerConnection serverConnection = new ServerConnection(server);
 		serverConnection.setMessageManager(UserMessageManager.getInstance());
 		serverConnection.setTrustStoreprovider(TrustStoreProviderExtensionManager.getTrustStoreProvider());
 		if (!serverConnection.connect(manageUser, true)) {
@@ -304,8 +305,8 @@ public class ConnectionDialog extends AbstractAFSDialog {
 	}
 
 	public static boolean connect(Server server, boolean manageUser) {
-		Server s = server.duplicate();
-		ConnectionDialog dialog = new ConnectionDialog(Activator.getInstance().getPluginShell(), s, manageUser);
+		final Server s = server.duplicate();
+		final ConnectionDialog dialog = new ConnectionDialog(Activator.getInstance().getPluginShell(), s, manageUser);
 		if (dialog.open() == Window.OK) {
 			server.setLastLogin(s.getLastLogin());
 			server.setLastPassword(s.getLastPassword());

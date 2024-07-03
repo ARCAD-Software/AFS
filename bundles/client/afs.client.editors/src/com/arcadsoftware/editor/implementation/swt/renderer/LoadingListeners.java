@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -25,23 +25,27 @@ public class LoadingListeners implements ILoadingListeners {
 
 	private List<ILoadingListener> loadingListeners;
 
+	@Override
 	public void addLoadingListener(ILoadingListener listener) {
-		if (loadingListeners == null)
-			loadingListeners = new ArrayList<ILoadingListener>();
+		if (loadingListeners == null) {
+			loadingListeners = new ArrayList<>();
+		}
 		loadingListeners.add(listener);
 	}
 
+	@Override
 	public void removeLoadingListener(ILoadingListener listener) {
-		if (loadingListeners != null)
+		if (loadingListeners != null) {
 			loadingListeners.remove(listener);
+		}
 	}
 
 	protected void fireLoadingError() {
 		if (loadingListeners != null) {
-			for (ILoadingListener listener : loadingListeners) {
+			for (final ILoadingListener listener : loadingListeners) {
 				try {
 					listener.loadingError();
-				} catch (RuntimeException e) {
+				} catch (final RuntimeException e) {
 					removeLoadingListener(listener);
 				}
 			}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -24,26 +24,25 @@ import com.arcadsoftware.afs.client.core.ui.composites.ListCompositeAdapter;
 import com.arcadsoftware.metadata.MetaDataEntity;
 
 /**
- * Subclass this class to create a selection dialog on a a BeanMapList 
- * @author ARCAD Software
+ * Subclass this class to create a selection dialog on a a BeanMapList
  *
+ * @author ARCAD Software
  */
 public abstract class AbstractSimpleSearchBeanMapListDialog extends
 		AbstractSearchBeanMapListDialog {
 
 	protected boolean showAll = true;
-	
-	
+
 	/**
 	 * Create the dialog.<br/>
-	 * If the showAll parameter is set to true, then the result list will be
-	 * loaded in one pass. 
+	 * If the showAll parameter is set to true, then the result list will be loaded in one pass.
+	 *
 	 * @param parentShell
 	 * @param connection
-	 * @param showAll 
+	 * @param showAll
 	 */
 	public AbstractSimpleSearchBeanMapListDialog(Shell parentShell,
-			ServerConnection connection,boolean showAll) {
+			ServerConnection connection, boolean showAll) {
 		super(parentShell, connection);
 		this.showAll = showAll;
 	}
@@ -51,139 +50,143 @@ public abstract class AbstractSimpleSearchBeanMapListDialog extends
 	@Override
 	protected AbstractSearchListComposite createListComposite(Composite parent,
 			MetaDataEntity entity, ServerConnection connection) {
-		ListCompositeAdapter adapter = new ListCompositeAdapter (parent,entity,connection,!showAll){
+		final ListCompositeAdapter adapter = new ListCompositeAdapter(parent, entity, connection, !showAll) {
+
+			@Override
 			protected String createSelectClause() {
 				return getSelectClause();
-				
-			};
+
+			}
+
+			@Override
 			protected String createSearchClause() {
 				return getSearchClause();
-			};
-			
-			
+			}
+
 			@Override
-			protected String createOrderClause() {	
+			protected String createOrderClause() {
 				return getOrderClause();
 			}
-			
+
 			@Override
 			public String getViewerIdentifier() {
 				return null;
 			}
+
 			@Override
 			protected Image getElementIcon(Object element) {
 				Image icon = getIcon(element);
-				if (icon == null)
+				if (icon == null) {
 					icon = getIcon();
+				}
 				return icon;
 			}
-			
+
 			@Override
-			public boolean defineCount() {	
+			public boolean defineCount() {
 				return showAll;
 			}
-			
+
 			@Override
-			public boolean enableMultiSelection() {	
+			public boolean enableMultiSelection() {
 				return isMultiSelection();
 			}
-			
+
 			@Override
 			protected void doOnDoubleClickEvent(IStructuredSelection selection) {
 				doOnDbClick(selection);
 			}
-			
+
 			@Override
 			protected String getColumnHeader(String attribute) {
-				String header = getUserDefineColumnHeader(attribute);
-				if (header==null) {
+				final String header = getUserDefineColumnHeader(attribute);
+				if (header == null) {
 					return super.getColumnHeader(attribute);
-				} else {
-					return header;
 				}
+				return header;
 			}
+
 			@Override
 			protected String getDisplayedSelectClause() {
-				String result =  AbstractSimpleSearchBeanMapListDialog.this.getDisplayedSelectClause();
-				if (result==null) {
+				final String result = AbstractSimpleSearchBeanMapListDialog.this.getDisplayedSelectClause();
+				if (result == null) {
 					return super.getDisplayedSelectClause();
-				} else {
-					return result;
 				}
+				return result;
 			}
-			
-			
+
 			@Override
 			protected String getKeySearchAttribute() {
 				return getSearchKeyAttribute();
 			}
 		};
-
-		
-		
 		return adapter;
 	}
 
 	/**
 	 * Returns the select clause
+	 *
 	 * @return
 	 */
 	public String getSearchKeyAttribute() {
 		return null;
 	}
-	
-	/**
-	 * Override this method to return the Image icon of the element
-	 * of the list.
-	 * @return
-	 */
-	protected Image getIcon(){
-		return null;
-	}	
 
 	/**
-	 * Override this method to return the Image icon for a specific element
-	 * of the list.
-	 * @param element 
+	 * Override this method to return the Image icon of the element of the list.
+	 *
 	 * @return
 	 */
-	protected Image getIcon(Object element){
+	protected Image getIcon() {
 		return null;
 	}
-	
+
 	/**
-	 * Returns a blank separated list of the attributes that will defined the
-	 * column headers of the list.
+	 * Override this method to return the Image icon for a specific element of the list.
+	 *
+	 * @param element
+	 * @return
+	 */
+	protected Image getIcon(Object element) {
+		return null;
+	}
+
+	/**
+	 * Returns a blank separated list of the attributes that will defined the column headers of the list.
+	 *
 	 * @return
 	 */
 	public abstract String getSearchClause();
-	
+
 	/**
 	 * Returns the select clause
+	 *
 	 * @return
 	 */
 	public abstract String getSelectClause();
 
 	/**
 	 * Returns the order clause
+	 *
 	 * @return
 	 */
 	protected String getOrderClause() {
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 
 	/**
 	 * Returns the order clause
+	 *
 	 * @return
 	 */
 	protected String getDisplayedSelectClause() {
 		return null;
-	}	
-	
-	protected void doOnDbClick(IStructuredSelection selection){
+	}
+
+	protected void doOnDbClick(IStructuredSelection selection) {
 		okPressed();
 	}
-	
+
 	protected String getUserDefineColumnHeader(String attribute) {
 		return null;
 	}

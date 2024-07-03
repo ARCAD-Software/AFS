@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -22,22 +22,21 @@ import com.arcadsoftware.beanmap.BeanMap;
  */
 public interface IBeanMapContainerValue extends IBeanMapContainer {
 
-	
 	/**
 	 * @return the BeanMap value.
 	 */
 	public BeanMap getBeanMapValue();
-	
+
 	/**
 	 * Set the BeanMap Value;
-	 * 
+	 *
 	 * @param beanMap
 	 */
 	public void setBeanMapValue(BeanMap beanMap);
 
 	/**
 	 * Listener to the value change operation.
-	 * 
+	 *
 	 * @param selectionAdapter
 	 */
 	public void addSelectionListener(SelectionAdapter selectionAdapter);

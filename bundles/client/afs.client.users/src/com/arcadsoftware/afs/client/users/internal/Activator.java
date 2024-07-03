@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -31,7 +31,7 @@ public class Activator extends AbstractAFSUIPlugin {
 	public static final String TITLE = ""; //$NON-NLS-1$
 	// The shared instance
 	private static Activator plugin;
-	
+
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
@@ -63,18 +63,18 @@ public class Activator extends AbstractAFSUIPlugin {
 	}
 
 	@Override
-	protected ResourceBundle loadResourceBundle(String bundleName, Locale local){
+	protected ResourceBundle loadResourceBundle(String bundleName, Locale local) {
 		return ResourceBundle.getBundle(bundleName, Locale.getDefault());
 	}
 
 	@Override
 	protected void fillImageRegistry() {
-		//nothing to load
+		// nothing to load
 	}
 
 	@Override
 	protected String getApplicationTitle() {
 		return TITLE;
-	}	
+	}
 
 }

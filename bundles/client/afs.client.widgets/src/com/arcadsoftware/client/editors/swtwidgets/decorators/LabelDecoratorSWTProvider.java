@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 ARCAD Software.
+ * Copyright (c) 2024 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -26,13 +26,13 @@ import com.arcadsoftware.editor.swt.ISWTRenderer;
 import com.arcadsoftware.metadata.MetaDataEntity;
 
 /**
- * This class implement a Label Decorator SWT Widget provider for the dynamic
- * editors.
+ * This class implement a Label Decorator SWT Widget provider for the dynamic editors.
  */
 public class LabelDecoratorSWTProvider implements IDecoratorSWTProvider {
 
+	@Override
 	public Widget create(ISWTRenderer renderer, ILayoutParameters parameters, MetaDataEntity structure) {
-		Label label = renderer.getToolkit().createLabel(renderer.getParent(),
+		final Label label = renderer.getToolkit().createLabel(renderer.getParent(),
 				renderer.getLocalizedMessage(parameters.getParameter(LABEL)));
 		if (renderer.getParent().getLayout() instanceof GridLayout) {
 			label.setLayoutData(new GridData(GridData.BEGINNING, GridData.BEGINNING, false, false, 3, 1));
@@ -40,6 +40,7 @@ public class LabelDecoratorSWTProvider implements IDecoratorSWTProvider {
 		return label;
 	}
 
+	@Override
 	public void dispose() {
 		// Do nothing
 	}
