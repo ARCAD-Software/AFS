@@ -33,6 +33,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.IAdaptable;
 
 import com.arcadsoftware.beanmap.internal.BeanMapIterator;
+import com.arcadsoftware.beanmap.xml.JSonBeanMapStream;
 import com.arcadsoftware.beanmap.xml.XmlBeanMapStream;
 
 /**
@@ -104,13 +105,13 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	/**
 	 * Helper method.
 	 * 
-	 * Load a BeanMap from an XML fragment string.
+	 * Load a BeanMap list from an XML fragment string.
 	 * 
 	 * @param type
-	 *            the desired type of the BeanMap.
+	 *            the desired type of the BeanMap, may be null.
 	 * @param xml
 	 *            the XML fragment.
-	 * @return null if the XML fragment does not conform to
+	 * @return null if the XML fragment does not conform to the expect format.
 	 */
 	static public BeanMapList loadFromXml(String type, String xml) {
 		Object result = null;
@@ -121,7 +122,53 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 				result = new XmlBeanMapStream().fromXML(xml);
 			}
 		} catch (Exception e) {
-			// e.printStackTrace();
+			return null;
+		}
+		if (result instanceof BeanMapList) {
+			return (BeanMapList) result;
+		}
+		if (result instanceof IAdaptable) {
+			result = ((IAdaptable) result).getAdapter(BeanMapList.class);
+			if (result instanceof BeanMapList) {
+				return (BeanMapList) result;
+			}
+		}
+		if (result instanceof List<?>) {
+			BeanMapList list = new BeanMapList(((List<?>) result).size());
+			for (Object o: (List<?>) result) {
+				if (o instanceof BeanMap) {
+					list.add((BeanMap) o);
+				} else {
+					try {
+						list.add(new BeanMap(o));
+					} catch (IntrospectionException e) {}
+				}
+			}
+			return list;
+		}
+		return null;
+	}
+	
+	/**
+	 * Helper method.
+	 * 
+	 * Load a BeanMap list from an JSON document string.
+	 * 
+	 * @param type
+	 *            the desired type of the BeanMap, may be null.
+	 * @param xml
+	 *            the XML fragment.
+	 * @return null if the JSon document does not conform to the expect format.
+	 */
+	static public BeanMapList loadFromJSon(String type, String xml) {
+		Object result = null;
+		try {
+			if (type != null) {
+				result = new JSonBeanMapStream().fromXML(type, xml);
+			} else {
+				result = new JSonBeanMapStream().fromXML(xml);
+			}
+		} catch (Exception e) {
 			return null;
 		}
 		if (result instanceof BeanMapList) {
@@ -701,11 +748,21 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	}
 	
 	/**
-	 * TODO To Document !!!!!
+	 * Return an XML representation of this list.
+	 * 
 	 * @return
 	 */
 	public String toXML() {
 		return new XmlBeanMapStream().toXML(this);
+	}
+	
+	/**
+	 * Return an JSON representation of this list.
+	 * 
+	 * @return
+	 */
+	public String toJSon() {
+		return new JSonBeanMapStream().toXML(this);
 	}
 	
 	/**
