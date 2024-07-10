@@ -225,6 +225,35 @@ public abstract class AbstractConfiguredActivator extends AbstractActivator {
 			return defaultValue;
 		}
 	}
+	
+	/**
+	 * Try to parse an float number (double) configuration parameter. Support Float, Integer and Strings
+	 * representations of this value.
+	 *  
+	 * @param param
+	 * @param defaultValue
+	 * @return
+	 */
+	public double parseDoubleParameter(Object param, double defaultValue) {
+		if (param == null) {
+			return defaultValue; 
+		}
+		if (param instanceof Double) {
+			return (Double) param;
+		}
+		if (param instanceof Float) {
+			return (Double) param;
+		}
+		if (param instanceof Integer) {
+			return (Double) param;
+		}
+		try {
+			return Double.parseDouble(param.toString());
+		} catch (NumberFormatException e) {
+			debug(Messages.getString("osgi.NotAnInteger") + param); //$NON-NLS-1$
+			return defaultValue;
+		}
+	}
 
 	/**
 	 * Try to parse a boolean parameter.
