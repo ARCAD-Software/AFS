@@ -156,7 +156,7 @@ public abstract class AbstractFileRepositoryActivator extends AbstractConfigured
 	 *  the repository base directory. It can be in a sub-directory. 
 	 *  It nust not use a postfix (e.g. "_en") nor file extension (e.g. ".xml").
 	 * 
-	 * @param filekey The base file name into the repository.
+	 * @param filename a file patch into the file repository. The path must start with a '/'.
 	 * @param langcode the desired language code (e.g. "en", "fr")
 	 * @param fileLastModification return the real file last date of modification (depending on the location of the file).
 	 * @return
@@ -177,7 +177,7 @@ public abstract class AbstractFileRepositoryActivator extends AbstractConfigured
 	 * <li>for an internal file: the last modification of the bundle.
 	 * </ul>
 	 * 
-	 * @param filename a file patch into the file repository.
+	 * @param filename a file patch into the file repository. The path must start with a '/'.
 	 * @param fileLastModification return the last modification date (if the file exist).
 	 * @return null if the file does not exist into the external and the internal repository.
 	 */
@@ -200,7 +200,7 @@ public abstract class AbstractFileRepositoryActivator extends AbstractConfigured
 	/**
 	 * Return a File into the repository corresponding to the given filename. 
 	 * 
-	 * @param filename a file patch into the file repository.
+	 * @param filename a file patch into the file repository. The path must start with a '/'.
 	 * @return null if the file does not exist.
 	 * @see com.arcadsoftware.osgi.AbstractFileRepositoryActivator#getFile(String,java.util.Calendar)
 	 */
@@ -223,7 +223,7 @@ public abstract class AbstractFileRepositoryActivator extends AbstractConfigured
 	/**
 	 * Return the internal repository version of the given file.
 	 * 
-	 * @param filename a file patch into the file repository.
+	 * @param filename a file patch into the file repository. The path must start with a '/'.
 	 * @param fileLastModification return the last modification date (if the file exist).
 	 * @return null if the file does not exist into the internal repository.
 	 */
