@@ -39,6 +39,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.IAdaptable;
 import org.restlet.data.Form;
 
+import com.arcadsoftware.beanmap.xml.JSonBeanMapStream;
 import com.arcadsoftware.beanmap.xml.XmlBeanMapStream;
 import com.arcadsoftware.osgi.ISODateFormater;
 import com.thoughtworks.xstream.converters.ConversionException;
@@ -72,6 +73,81 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 					"EEE MMM dd HH:mm:ss zzz yyyy" }); //$NON-NLS-1$;
 
 	private static final int NEW_BEAN_MAP_ID = 0;
+	
+	/**
+	 * Helper method.
+	 * 
+	 * Load a BeanMap from an XML fragment string.
+	 * 
+	 * @param type
+	 *            the desired type of the BeanMap, may be null.
+	 * @param xml
+	 *            the XML fragment.
+	 * @return null if the XML fragment does not conform to the expected format.
+	 */
+	static public BeanMap loadFromXml(String type, String xml) {
+		XmlBeanMapStream xs = new XmlBeanMapStream();
+		if (type != null) {
+			xs.alias(type, BeanMap.class);
+		}
+		Object result = null;
+		try {
+			result = xs.fromXML(xml);
+		} catch (Exception e) {
+			return null;
+		}
+		if (result instanceof BeanMap) {
+			return (BeanMap) result;
+		}
+		if (result instanceof IAdaptable) {
+			result = ((IAdaptable) result).getAdapter(BeanMap.class);
+			if (result instanceof BeanMap) {
+				return (BeanMap) result;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Helper method.
+	 * 
+	 * Load a BeanMap from an JSON document string.
+	 * 
+	 * @param type
+	 *            the desired type of the BeanMap, may be null.
+	 * @param json
+	 *            the JSon document.
+	 * @return null if the XML fragment does not conform to the expected format.
+	 */
+	static public BeanMap loadFromJSon(String type, String json) {
+		JSonBeanMapStream xs = new JSonBeanMapStream();
+		if (type != null) {
+			xs.alias(type, BeanMap.class);
+		}
+		Object result = null;
+		try {
+			result = xs.fromXML(json);
+		} catch (Exception e) {
+			return null;
+		}
+		if (result == null) {
+			return null;
+		}
+		if (result instanceof BeanMap) {
+			return (BeanMap) result;
+		}
+		if (result instanceof IAdaptable) {
+			result = ((IAdaptable) result).getAdapter(BeanMap.class);
+			if (result instanceof BeanMap) {
+				return (BeanMap) result;
+			}
+		}
+		try {
+			return new BeanMap(result);
+		} catch (IntrospectionException e) {
+			return null;
+		}
+	}
 
 	// Technical attributes :
 	private int id = NEW_BEAN_MAP_ID;
@@ -1415,39 +1491,6 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 			}
 		}
 	}
-	
-	/**
-	 * Helper method.
-	 * 
-	 * Load a BeanMap from an XML fragment string.
-	 * 
-	 * @param type
-	 *            the desired type of the BeanMap.
-	 * @param xml
-	 *            the XML fragment.
-	 * @return null if the XML fragment does not conform to
-	 */
-	static public BeanMap loadFromXml(String type, String xml) {
-		XmlBeanMapStream xs = new XmlBeanMapStream();
-		xs.alias(type, BeanMap.class);
-		Object result = null;
-		try {
-			result = xs.fromXML(xml);
-		} catch (Exception e) {
-			// FIXME Journalizer l'erreur quand on est en debug !
-			return null;
-		}
-		if (result instanceof BeanMap) {
-			return (BeanMap) result;
-		}
-		if (result instanceof IAdaptable) {
-			result = ((IAdaptable) result).getAdapter(BeanMap.class);
-			if (result instanceof BeanMap) {
-				return (BeanMap) result;
-			}
-		}
-		return null;
-	}
 
 	/**
 	 * Create a new BeanMap with same id.
@@ -1808,7 +1851,25 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 		}
 		return bean;
 	}
-
+	
+	/**
+	 * Return an XML representation of this BeanMap.
+	 * 
+	 * @return
+	 */
+	public String toXML() {
+		return new XmlBeanMapStream().toXML(this);
+	}
+	
+	/**
+	 * Return an JSON representation of this BeanMap.
+	 * 
+	 * @return
+	 */
+	public String toJSon() {
+		return new JSonBeanMapStream().toXML(this);
+	}
+	
 	/**
 	 * Returns <tt>true</tt> if this BeanMap contains a mapping for the specified key.
 	 * 
