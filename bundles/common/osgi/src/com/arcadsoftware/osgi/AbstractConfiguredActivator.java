@@ -250,7 +250,7 @@ public abstract class AbstractConfiguredActivator extends AbstractActivator {
 		try {
 			return Double.parseDouble(param.toString());
 		} catch (NumberFormatException e) {
-			debug(Messages.getString("osgi.NotAnInteger") + param); //$NON-NLS-1$
+			debug(Messages.getString("osgi.NotADouble") + param); //$NON-NLS-1$
 			return defaultValue;
 		}
 	}
