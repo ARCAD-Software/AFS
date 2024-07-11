@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: AFS - Client List
 Bundle-SymbolicName: com.arcadsoftware.afs.client.list;singleton:=true
 Bundle-Vendor: ARCAD Software
-Bundle-Version: 1.3.2.qualifier
+Bundle-Version: 1.3.3
 Bundle-Activator: com.arcadsoftware.afs.client.list.internal.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui;resolution:=optional,
