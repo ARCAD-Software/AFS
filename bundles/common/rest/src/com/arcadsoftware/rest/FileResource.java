@@ -197,11 +197,25 @@ public class FileResource extends UserLinkedResource {
 		}
 		return p;
 	}
+
+	/**
+	 * Override this method to set that the files sent to the client (through GET HTTP method should be deleted after communication.
+	 *  
+	 * @return Default implementation return false.
+	 */
+	public boolean isAutoDeleting() {
+		return false;
+	}
 	
 	@Override
 	public Representation get(Variant variant) throws ResourceException {
 		if ((file != null) && file.isFile()) {
-			return new FileRepresentation(file, variant.getMediaType());
+			FileRepresentation frep = new FileRepresentation(file, variant.getMediaType());
+			if (isAutoDeleting()) {
+				frep.setAutoDeleting(true);
+				frep.setExpirationDate(new Date(System.currentTimeMillis() + 3600000)); // one hour !
+			}
+			return frep;
 		}
 		return null;
 	}
