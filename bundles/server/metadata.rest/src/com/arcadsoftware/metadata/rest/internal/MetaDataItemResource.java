@@ -14,11 +14,13 @@
 package com.arcadsoftware.metadata.rest.internal;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 import org.restlet.data.Form;
 import org.restlet.data.Language;
+import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
@@ -99,6 +101,106 @@ public class MetaDataItemResource extends DataItemResource {
 				setExisting(false);
 			}
 		}
+		if (isExisting() && Method.HEAD.equals(getMethod()) && (linkeds == null) && //
+				(((link == null) && hasUpdateDate(getEntity())) || //
+						((link != null) && hasUpdateDate(linkEntity)))) {
+			computeLastModificationDate();
+		}
+	}
+
+	private boolean hasUpdateDate(MetaDataEntity entity) {
+		return (entity != null) && (entity.getMetadata().getBoolean(MetaDataEntity.METADATA_UPDATABLE) || //
+				(entity.getMetadata().get("updateCol") != null)); //$NON-NLS-1$;
+	}
+
+	private void computeLastModificationDate() {
+		Form form = getRequestForm();
+		MetaDataEntity entity = getEntity();
+		final BeanMapList result;
+		if (link != null) {
+			int page = getFirst(form);
+			int limit = getPageCount(form, page);
+			// check other parameters... 
+			boolean deleted = isParameter(form, "deleted"); //$NON-NLS-1$
+			boolean distinct = isParameter(form, "distincts"); //$NON-NLS-1$
+			ISearchCriteria criteria = getCriteria(form);
+			if (ConstantCriteria.TRUE.equals(criteria) || (criteria == null)) {
+				criteria = link.getRightList(true);
+			} else {
+				ISearchCriteria rc = link.getRightList(true);
+				if ((rc != null) && !ConstantCriteria.TRUE.equals(rc)) {
+					criteria = new AndCriteria(criteria, rc);
+				}
+			}
+			result = new BeanMapPartialList();
+			for (BeanMap item: getItems()) {
+				int count = getEntity().getMapper().linkCount(link, item.getId(), deleted, criteria, distinct, getUser());
+				// select when needed. (fusion of results).
+				if ((page < count) && (limit != 0)) {
+					// Select...
+					BeanMapList list = getEntity().getMapper().linkSelection(link, item.getId(), new ArrayList<ReferenceLine>(), deleted, criteria, distinct, null, getUser(), page, limit);
+					if (list != null) {
+						result.addAll(list);
+					}
+					// if we get less result than expected we decrement the number of desired results.
+					if ((limit > 0) && (result.size() < limit)) {
+						limit = limit - result.size();
+						page = 0;
+					} else {
+						limit = 0;
+					}
+				}
+				// Decrement the first result needed.
+				if (page > 0) {
+					page = page - count;
+					if (page < 0) { // Blindage
+						page = 0;
+					}
+				}
+			}
+			entity = linkEntity;
+		} else {
+			ISearchCriteria criteria = getCriteria(form);
+			if (ConstantCriteria.TRUE.equals(criteria) || (criteria == null)) {
+				criteria = entity.getRightRead();
+			} else {
+				ISearchCriteria rc = entity.getRightRead();
+				if ((rc != null) && !ConstantCriteria.TRUE.equals(rc)) {
+					criteria = new AndCriteria(criteria, rc);
+				}
+			}
+			OrCriteria or = new OrCriteria();
+			for (BeanMap item: getItems()) {
+				or.add(new IdEqualCriteria(item.getId()));
+			}
+			if (criteria instanceof AndCriteria) {
+				((AndCriteria) criteria).add(or);
+			} else {
+				criteria = new AndCriteria(criteria, or);
+			}
+			// Get the result offset.
+			int first = getFirst(form);
+			int number = getPageCount(form, first);
+			// check other parameters... 
+			boolean deleted = isParameter(form, "deleted"); //$NON-NLS-1$
+			boolean distincts = isParameter(form, "distincts"); //$NON-NLS-1$
+			// Execution de la sélection proprement dite.
+			result = entity.dataSelection(new ArrayList<ReferenceLine>(), deleted, criteria, distincts, null, getUser(), first, number);
+		}
+		Date date = new Date(0l);
+		// Return EPOCH for empty results...
+		if (result.size() > 0) {
+			for (IMetaDataSelectionListener listener: Activator.getInstance().getSelectionListener(entity.getType())) {
+				listener.onSelection(entity, result, getUser(), Language.ENGLISH_US);
+			}
+			for (BeanMap b: result) {
+				Date d = b.getDate();
+				if ((d != null) && date.before(d)) {
+					date = d;
+				}
+			}
+		}
+		setLastModification(date);
 	}
 
 	private void doInitAttributesLine() {
