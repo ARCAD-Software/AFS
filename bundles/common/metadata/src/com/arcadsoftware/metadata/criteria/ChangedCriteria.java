@@ -77,7 +77,9 @@ public class ChangedCriteria extends AbstractSearchCriteria {
 
 	@Override
 	public ISearchCriteria reduce(ICriteriaContext context) {
-		if (context.getEntity().isReadOnly() || !context.getEntity().getMetadata().getBoolean(MetaDataEntity.METADATA_UPDATABLE)) {
+		if (context.getEntity().isReadOnly() || //
+				!context.getEntity().getMetadata().getBoolean(MetaDataEntity.METADATA_UPDATABLE) || // 
+				(context.getEntity().getMetadata().get("updateCol") == null)) { //$NON-NLS-1$
 			return ConstantCriteria.FALSE;
 		}
 		return this; // objet non modifié...

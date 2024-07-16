@@ -343,16 +343,11 @@ public abstract class OSGiResource extends BaseResource {
      * Returns a representation whose metadata will be returned to the client.
      * This method is only invoked if content negotiation has been disabled as
      * indicated by the {@link #isNegotiated()}, otherwise the
-     * {@link #head(Variant)} method is invoked.<br>
-     * <br>
-     * The default behavior is to set the response status to
-     * {@link Status#CLIENT_ERROR_METHOD_NOT_ALLOWED}.
+     * {@link #head(Variant)} method is invoked.
      * 
      * @return The resource's representation.
      * @throws ResourceException
-     * @see <a
-     *      href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.3">HTTP
-     *      GET method</a>
+     * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.3
      */
 	@Override
 	public final Representation head() {

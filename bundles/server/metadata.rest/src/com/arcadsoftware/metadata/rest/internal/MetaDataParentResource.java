@@ -14,6 +14,7 @@
 package com.arcadsoftware.metadata.rest.internal;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -23,7 +24,6 @@ import org.restlet.data.Language;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
-import org.restlet.representation.EmptyRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.representation.Variant;
@@ -185,7 +185,46 @@ public class MetaDataParentResource extends DataParentResource {
 		super.doInit();
 		if (isExisting()) {
 			getAllowedMethods().add(Method.PUT);
+			if (Method.HEAD.equals(getMethod()) && // 
+					(getEntity().getMetadata().getBoolean(MetaDataEntity.METADATA_UPDATABLE) || //
+							(getEntity().getMetadata().get("updateCol") != null))) { //$NON-NLS-1$
+				computeLastModificationDate();
+			}
 		}
+	}
+
+	private void computeLastModificationDate() {
+		final Form form = getRequestForm();
+		ISearchCriteria criteria = getCriteria(form);
+		if (ConstantCriteria.TRUE.equals(criteria) || (criteria == null)) {
+			criteria = getEntity().getRightList();
+		} else {
+			ISearchCriteria rc = getEntity().getRightList();
+			if ((rc != null) && !ConstantCriteria.TRUE.equals(rc)) {
+				criteria = new AndCriteria(criteria, rc);
+			}
+		}
+		// Get the result offset.
+		int first = getFirst(form);
+		int number = getPageCount(form, first);
+		// check other parameters... 
+		boolean deleted = isParameter(form, "deleted"); //$NON-NLS-1$
+		boolean distincts = isParameter(form, "distincts"); //$NON-NLS-1$
+		BeanMapList result = getEntity().dataSelection(new ArrayList<ReferenceLine>(), deleted, criteria, distincts, null, getUser(), first, number);
+		Date date = new Date(0l);
+		// Return EPOCH for empty lists...
+		if (result.size() > 0) {
+			for (IMetaDataSelectionListener listener: Activator.getInstance().getSelectionListener(getEntity().getType())) {
+				listener.onSelection(getEntity(), result, getUser(), Language.ENGLISH_US);
+			}
+			for (BeanMap b: result) {
+				Date d = b.getDate();
+				if ((d != null) && date.before(d)) {
+					date = d;
+				}
+			}
+		}
+		setLastModification(date);
 	}
 
 	@Override
@@ -193,7 +232,7 @@ public class MetaDataParentResource extends DataParentResource {
 		// The default implementation is to switch to a "GET" request.
 		// If a true "multi update" method is required we can add a required field to identify and "update".
 		// For instance "order" may identify a selection (but this is optional parameter).
-		return list(representation, variant);
+		return list(variant);
 	}
 
 	@Override
@@ -201,20 +240,12 @@ public class MetaDataParentResource extends DataParentResource {
 		if (isXSD(variant)) {
 			return getXSDFileRepresentation(getEntity(), getClientPreferedLanguage());
 		}
-		return list(getRequestEntity(), variant);
+		return list(variant);
 	}
 
-	protected Representation list(Representation representation, Variant variant) {
-		Language language = getClientPreferedLanguage();
-		Form form;
-		if ((representation != null) && representation.isAvailable() && !(representation instanceof EmptyRepresentation)) {
-			form = new Form(representation);
-			if ("none".equals(form.getFirstValue("_empty_"))) { //$NON-NLS-1$ //$NON-NLS-2$
-				form = getRequest().getResourceRef().getQueryAsForm();
-			}
-		} else {
-			form = getRequest().getResourceRef().getQueryAsForm();
-		}
+	protected Representation list(Variant variant) {
+		final Language language = getClientPreferedLanguage();
+		final Form form = getRequestForm();
 		// Build the requested attribute list.
 		String atts = getColumns(form, "attributes"); //$NON-NLS-1$ 
 		List<ReferenceLine> attributes;
