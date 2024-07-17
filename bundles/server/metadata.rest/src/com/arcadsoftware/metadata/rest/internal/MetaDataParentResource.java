@@ -47,13 +47,16 @@ import com.arcadsoftware.metadata.rest.DataParentResource;
 import com.arcadsoftware.metadata.xml.XmlCriteriaStream;
 
 /*
- * Gestion des données :
+ * Data management resource:
  * 
- * /data/{type}
- * - GET: Sélection de tout ou parties des données. Supporte tous les paramètres de sélection (dont le critère et les jointures sur attributs).
- * - POST: Création d'une nouvelle données. renvoie cette données telle qu'elle a été créée.
- * - PUT: subtitution de GET.
- * 
+ * <p><b>/data/{type}</b>
+ * <ul>
+ * <li> HEAD: if-changed-since support.
+ * <li> GET: Selection of all or parts of the data. Supports all selection parameters (including criterion and attribute joins).
+ * <li> POST: Creation of new data. returns this data as it was created.
+ * <li> PUT: subtitution of GET method.
+ * <li> DELETE: multi selection deletion.
+ * </ul>
  */
 public class MetaDataParentResource extends DataParentResource {
 
