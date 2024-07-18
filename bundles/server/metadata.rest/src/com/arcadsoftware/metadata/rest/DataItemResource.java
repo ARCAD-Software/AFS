@@ -31,6 +31,7 @@ import org.restlet.resource.ResourceException;
 
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
+import com.arcadsoftware.beanmap.IDatedBean;
 import com.arcadsoftware.beanmap.xml.HTMLSimpleFormater;
 import com.arcadsoftware.beanmap.xml.JSonBeanMapStream;
 import com.arcadsoftware.beanmap.xml.XmlBeanMapStream;
@@ -413,7 +414,23 @@ public class DataItemResource extends UserLinkedResource {
 	 * @return
 	 */
 	protected Representation getXMLRepresentation(Object object, Language language) {
-		return new XMLRepresentation(new XmlBeanMapStream().toXML(object), language);
+		Date lm = null;
+		if (object instanceof IDatedBean) {
+			lm = ((IDatedBean) object).getDate();
+			if ((lm == null) && (object instanceof BeanMapList)) {
+				for (BeanMap b: (BeanMapList) object) {
+					Date d = b.getDate();
+					if ((d != null) && ((lm == null) || d.after(lm))) {
+						lm = d;
+					}
+				}
+			}
+		}
+		XMLRepresentation rep = new XMLRepresentation(new XmlBeanMapStream().toXML(object), language);
+		if (lm != null) {
+			rep.setModificationDate(lm);
+		}
+		return rep;
 	}
 
 	/**
@@ -424,7 +441,23 @@ public class DataItemResource extends UserLinkedResource {
 	 * @return
 	 */
 	protected Representation getJSONRepresentation(Object object, Language language) {
-		return new JSONRepresentation(new JSonBeanMapStream().toXML(object), language);
+		Date lm = null;
+		if (object instanceof IDatedBean) {
+			lm = ((IDatedBean) object).getDate();
+			if ((lm == null) && (object instanceof BeanMapList)) {
+				for (BeanMap b: (BeanMapList) object) {
+					Date d = b.getDate();
+					if ((d != null) && ((lm == null) || d.after(lm))) {
+						lm = d;
+					}
+				}
+			}
+		}
+		JSONRepresentation rep = new JSONRepresentation(new JSonBeanMapStream().toXML(object), language);
+		if (lm != null) {
+			rep.setModificationDate(lm);
+		}
+		return rep;
 	}
 	
 	/**
@@ -477,7 +510,18 @@ public class DataItemResource extends UserLinkedResource {
 			}
 		};
 		f.append(list);
-		return new StringRepresentation(f.toString(), MediaType.APPLICATION_XHTML, language, CharacterSet.UTF_8);
+		Date lm = null;
+		for (BeanMap b: list) {
+			Date d = b.getDate();
+			if ((d != null) && ((lm == null) || d.after(lm))) {
+				lm = d;
+			}
+		}
+		StringRepresentation rep = new StringRepresentation(f.toString(), MediaType.APPLICATION_XHTML, language, CharacterSet.UTF_8);
+		if (lm != null) {
+			rep.setModificationDate(lm);
+		}
+		return rep;
 	}
 
 	/**
@@ -510,7 +554,11 @@ public class DataItemResource extends UserLinkedResource {
 			}
 		};
 		f.append(bean);
-		return new StringRepresentation(f.toString(), MediaType.APPLICATION_XHTML, language, CharacterSet.UTF_8);
+		StringRepresentation rep = new StringRepresentation(f.toString(), MediaType.APPLICATION_XHTML, language, CharacterSet.UTF_8);
+		if (bean.getDate() != null) {
+			rep.setModificationDate(bean.getDate());
+		}
+		return rep;
 	}
 	
 	/**
