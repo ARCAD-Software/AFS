@@ -114,7 +114,9 @@ public class MetaDataParentResource extends DataParentResource {
 				Activator.getMessage("xsd.annotation.total", language), //$NON-NLS-1$
 				Activator.getMessage("xsd.annotation.date", language))); //$NON-NLS-1$
 		generateEntityXSD(sb, type, entity, language);
-		return new StringRepresentation(sb, MediaType.APPLICATION_W3C_SCHEMA, language, CharacterSet.UTF_8);
+		StringRepresentation rep = new StringRepresentation(sb, MediaType.APPLICATION_W3C_SCHEMA, language, CharacterSet.UTF_8);
+		rep.setModificationDate(entity.getDate());
+		return rep;
 	}
 	
 	/**
