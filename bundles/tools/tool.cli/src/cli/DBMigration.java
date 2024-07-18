@@ -102,7 +102,10 @@ public final class DBMigration extends DataSourceCommand {
 		// Manage missing parameters
 		String url = getArgument(0);
 		if ((url == null) || !url.toLowerCase().startsWith("jdbc:")) { //$NON-NLS-1$
-			url = read("Type the PostgreSQL JDBC URL (jdbc:postgresql:[//<host>[:<port>]/]<database>): ");
+			println("You nee to specify a JDBC database URL as follow:");
+			println("For PostgreSQL JDBC URL: jdbc:postgresql:[//<host>[:<port>]/]<database>");
+			println("For IBM DB2i JDBC URL: jdbc:jt400://<host>[;libraries=<library name>]");
+			url = read("Type the JDBC URL of your database: ");
 			if (!url.toLowerCase().startsWith("jdbc:")) { //$NON-NLS-1$
 				printError("Invalid URL: " + url);
 				return ERROR_WRONG_PARAMETER;
@@ -110,11 +113,11 @@ public final class DBMigration extends DataSourceCommand {
 		}
 		String login = getArgumentValue(new String[] {"-l", "-login"}, (String) null); //$NON-NLS-1$ //$NON-NLS-2$
 		if (login == null) {
-			login = read("Type the PostgreSQL database login: ");
+			login = read("Type the database login: ");
 		}
 		char[] pwd = getArgumentValue(new String[] {"-p", "-pwd", "-password"}, (char[]) null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		if (pwd == null) {
-			pwd = readSecret("Type the PostgreSQL database password: ");
+			pwd = readSecret("Type the database password: ");
 		}
 		// Test the PostgreSQL connection and get a connection !!!
 		Connection pgconnection = null;
@@ -127,7 +130,7 @@ public final class DBMigration extends DataSourceCommand {
 				pgconnection = DriverManager.getConnection(url);
 			}
 		} catch (SQLException e) {
-			printError("ERROR: Unable to connect to the PostgreSQL database: " + e.getLocalizedMessage());
+			printError("ERROR: Unable to connect to the target database: " + e.getLocalizedMessage());
 			return ERROR_WRONG_PARAMETER;
 		}
 		// Test the target database Version !
@@ -140,15 +143,15 @@ public final class DBMigration extends DataSourceCommand {
 		}
 		int vpg = getDBVersion(pgconnection);
 		if (vpg < 0) {
-			printError("The PostgreSQL Database is not accessible, empty, or not installed at the required version level.");
-			printError("Check the postgreSQL database.");
+			printError("The target Database is not accessible, empty, or not installed at the required version level.");
+			printError("Check the target database.");
 			return ERROR_INVALID_CONFIGURATION;
 		}
 		if (vh2 != vpg) {
-			printError(String.format("The Databases version of H2 and PostgreSQL are not equals, the migration process can only be performed fron the same database versions (H2 %d != %d PG).", vh2, vpg));
+			printError(String.format("The Databases version of H2 and target one are not equals, the migration process can only be performed fron the same database versions (H2 %d != %d target).", vh2, vpg));
 			return ERROR_INVALID_CONFIGURATION;
 		}
-		println(String.format("The Databases version are compatibles (H2 = %d, PostGreSQL = %d).", vh2, vpg));
+		println(String.format("The Databases version are compatibles (H2 = %d, target = %d).", vh2, vpg));
 		// H2 database Backup.
 		if (!isArgument("-nb", "-nobackup")) { //$NON-NLS-1$ //$NON-NLS-2$
 			File backupFile = new File(String.format("./database/backup/migration_%1$tY%1$tm%1$td_%1$tH%1$tM%1$tS.zip", new Date())); //$NON-NLS-1$
@@ -171,6 +174,7 @@ public final class DBMigration extends DataSourceCommand {
 		}
 		// Remove the Constraints.
 		try {
+			// TODO ADD support do JT400...
 			runscript(pgconnection, new File("./database/migrate/drop_fk_constraints.sql"), true); //$NON-NLS-1$
 		} catch (Exception e) {
 			printError("Internal Error durin execution of \"drop_fk_constraints.sql\": " + e.getLocalizedMessage());
@@ -185,7 +189,7 @@ public final class DBMigration extends DataSourceCommand {
 			migrate(connection, pgconnection);
 		} catch (Exception e) {
 			printError("Error during migration: " + e.getLocalizedMessage());
-			printError("There may be an unexpected difference between the H2 Database and the PostgreSQL one...");
+			printError("There may be an unexpected difference between the H2 Database and the target one...");
 			printError("You may try to alter the Databases and retry the automatic migration, try the manual migration process or contact the ARCAD-Software support.");
 			return ERROR_INTERNAL_ERROR;
 		}
@@ -193,7 +197,7 @@ public final class DBMigration extends DataSourceCommand {
 		try {
 			runscript(pgconnection, new File("./database/migrate/set_sequences.sql"), true); //$NON-NLS-1$
 		} catch (Exception e) {
-			printError("Internal Error durin execution of \"set_sequences.sql\": " + e.getLocalizedMessage());
+			printError("Internal Error during execution of \"set_sequences.sql\": " + e.getLocalizedMessage());
 			if (isArgument("-debug")) { //$NON-NLS-1$
 				e.printStackTrace();
 			}
@@ -204,7 +208,7 @@ public final class DBMigration extends DataSourceCommand {
 		try {
 			runscript(pgconnection, new File("./database/migrate/create_fk_constraints.sql"), true); //$NON-NLS-1$
 		} catch (Exception e) {
-			printError("Internal Error durin execution of \"create_fk_constraints.sql\": " + e.getLocalizedMessage());
+			printError("Internal Error during execution of \"create_fk_constraints.sql\": " + e.getLocalizedMessage());
 			if (isArgument("-debug")) { //$NON-NLS-1$
 				e.printStackTrace();
 			}
@@ -228,7 +232,7 @@ public final class DBMigration extends DataSourceCommand {
 		}
 		println("The Application server configuration is updated to the new database connection. You can restart it.");
 		println();
-		println("Note that the old H1 database is not deleted, you can archive it, the database is a file stored");
+		println("Note that the old H2 database is not deleted, you can archive it, the database is a file stored");
 		println("into the \"database\" sub-folder, with the .mv.db extension.");
 		return 0;
 	}
@@ -287,10 +291,12 @@ public final class DBMigration extends DataSourceCommand {
 	}
 
 	private void migrate(Connection h2Connection, Connection postgresqlConnection) throws Exception {
+		// FIXME this may be not required for jt400
 		String catalog = postgresqlConnection.getCatalog();
 		if (catalog == null) {
-			throw new Exception("The catalog name of the PostgreSQL database must be set.");
+			throw new Exception("The library/catalog name of the target database must be set.");
 		}
+		// FIXME this may be not required for jt400
 		String schema = postgresqlConnection.getSchema();
 		if (schema == null) {
 			throw new Exception("The schema name of the PostgreSQL database must be set.");

@@ -13,6 +13,7 @@
  *******************************************************************************/
 package cli;
 
+import java.lang.reflect.Constructor;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -122,6 +123,31 @@ public final class ChangeDBPassword extends DataSourceCommand {
 				ps.executeUpdate();
 			} catch (SQLException e) {
 				printError("ERROR Unable to change PostGreSQL database password: " + e.getLocalizedMessage());
+				return ERROR_DATABASE_CORRUPTED;
+			}
+		} else if ("jt400".equalsIgnoreCase(dataSourceType)) { //$NON-NLS-1$
+			// call: new com.ibm.as400.access.AS400().changePassword(char[], char[])
+			try {
+				final Class<?> clazz = getClass().getClassLoader().loadClass("com.ibm.as400.access.AS400");
+				final Object as400;
+				if (url.startsWith("jdbc:jt400://localhost")) {
+					as400 = clazz.newInstance();
+				} else {
+					String server = url.substring(13);
+					int i = server.indexOf('/');
+					if (i > -1) {
+						server = server.substring(0, i);
+					}
+					i = server.indexOf(';');
+					if (i > -1) {
+						server = server.substring(0, i);
+					}
+					Constructor<?> cons = clazz.getConstructor(String.class, String.class, char[].class);
+					as400 = cons.newInstance(server, login, ((String) connectionProperties.get("user")).toCharArray());
+				}
+				clazz.getMethod("changePassword", char[].class, char[].class).invoke(as400, ((String) connectionProperties.get("user")).toCharArray(), pwd.toCharArray());
+			} catch (Exception e) {
+				printError("ERROR Unable to change BD2i database password: " + e.getLocalizedMessage());
 				return ERROR_DATABASE_CORRUPTED;
 			}
 		} else {

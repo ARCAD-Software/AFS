@@ -191,6 +191,11 @@ public final class DBUpdate extends DataSourceCommand {
 				if (isArgument("-debug")) { //$NON-NLS-1$
 					println("Starting PostgreSQL database upgrade...");
 				}
+			} else if ("jt400".equals(dataSourceType)) { //$NON-NLS-1$
+				typ = "db2i"; //$NON-NLS-1$
+				if (isArgument("-debug")) { //$NON-NLS-1$
+					println("Starting IBM DB2i database upgrade...");
+				}
 			} else if (isArgument("-debug")) { //$NON-NLS-1$
 				println("Starting H2 database upgrade...");
 			}

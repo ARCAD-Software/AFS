@@ -43,7 +43,8 @@ public abstract class DataSourceCommand extends Command {
 
 	static {
 		safeLoadDriver("org.h2.Driver");
-		safeLoadDriver("org.postgresql.Driver");		
+		safeLoadDriver("org.postgresql.Driver");
+		safeLoadDriver("com.ibm.as400.access.AS400JDBCDriver");
 	}
 	
 	private static void safeLoadDriver(final String driverClass) {
@@ -163,8 +164,12 @@ public abstract class DataSourceCommand extends Command {
 							}
 						}					
 						Properties cnp = new Properties();
-						cnp.put("user", login);
-						cnp.put("password", pwd);
+						if (login != null) {
+							cnp.put("user", login);
+						}
+						if (pwd != null) {
+							cnp.put("password", pwd);
+						}
 						String dbidp = dbid + '.';
 						for (Entry<String, Object> e: props.entrySet()) {
 							String k = e.getKey();
@@ -174,6 +179,15 @@ public abstract class DataSourceCommand extends Command {
 									 && !k.equals(dbid + KEY_DATABASEPOOLMAX) && !k.equals(dbid + KEY_DATABASETIMEOUT)
 									 && !k.equals(dbid + KEY_DATABASEDESC) && !k.equals(dbid + KEY_DATABASEDIALECT)) {
 								cnp.put(k.substring(dbidp.length()), e.getValue());
+							}
+						}
+						if (("jt400".equals(dbtype) || "db2400".equalsIgnoreCase(dbtype) || "db2i".equalsIgnoreCase(dbtype)) && //
+								((url == null) || !url.startsWith("jdbc:jt400:"))) {
+							dbtype = "jt400";
+							if (url != null) {
+								url = "jdbc:jt400://" + url;
+							} else {
+								url = "jdbc:jt400://localhost";
 							}
 						}
 						if (dslogin != null) {
