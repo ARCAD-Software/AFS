@@ -22,12 +22,12 @@ import com.arcadsoftware.crypt.Crypto;
  */
 public class BinariesKey {
 
-	private Date limit;
-	private int id;
-	private String category;
-	private int hc;
-	private String keyString;
-	private boolean readOnly;
+	private final Date limit;
+	private final int id;
+	private final String category;
+	private final int hc;
+	private final String keyString;
+	private final boolean readOnly;
 
 	/**
 	 * @param limit
@@ -56,17 +56,11 @@ public class BinariesKey {
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode() {
 		return hc;
 	}
 	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(Object obj) {
 		return (obj instanceof BinariesKey) && keyString.equals(((BinariesKey)obj).getKey());
