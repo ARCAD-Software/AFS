@@ -14,6 +14,8 @@
 package com.arcadsoftware.osgi.internal;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 
 import org.eclipse.osgi.framework.console.CommandInterpreter;
@@ -32,14 +34,15 @@ public class SystemCommands implements CommandProvider {
 
 	@Override
 	public String getHelp() {
-		return " ---Misc System Commands---\n" +
-				"\tstartAll - start all bundles that are currently not started.";
+		return " ---Misc AFS System Commands---\n" +
+				"\tstartAll - start all bundles that are currently not started.\n" +
+				"\tlistDuplicated - start all duplicated bundles (with same symbolic names and different versions).\n";
 	}
 
 	public void _startAll(CommandInterpreter ci) throws Exception {
 		final ArrayList<Bundle> bundles = new ArrayList<Bundle>();
 		boolean work = false;
-		for(Bundle bundle:context.getBundles()) {
+		for (Bundle bundle:context.getBundles()) {
 			if (!context.getBundle().getSymbolicName().equals(bundle.getSymbolicName()) &&
 					(bundle.getState() != Bundle.ACTIVE) &&
 					(bundle.getState() != Bundle.STARTING)) {
@@ -71,4 +74,37 @@ public class SystemCommands implements CommandProvider {
 		}
 	}
 	
+	public void _listDuplicated(CommandInterpreter ci) throws Exception {
+		Bundle[] bundles = context.getBundles();
+		if (bundles != null) {
+			HashSet<Bundle> doubles = new HashSet<>();
+			for (Bundle b: bundles) {
+				for (Bundle d: bundles) {
+					if (b.getSymbolicName().equals(d.getSymbolicName()) && !b.getVersion().equals(d.getVersion())) {
+						doubles.add(b);
+						break;
+					}
+				}
+			}
+			if (doubles.isEmpty()) {
+				ci.println("There is no duplicated bundle in this platform.");
+			} else {
+				HashSet<String> sn = new HashSet<>();
+				for (Bundle b: doubles) {
+					sn.add(b.getSymbolicName());
+				}
+				ArrayList<String> list = new ArrayList<String>(sn);
+				Collections.sort(list);
+				for (String name: list) {
+					ci.println(name + ":");
+					for (Bundle b: doubles) {
+						if (name.equals(b.getSymbolicName())) {
+							ci.println("  " + b.getBundleId() + " version " + b.getVersion());
+						}
+					}
+					ci.println();
+				}
+			}
+		}
+	}
 }
