@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -310,5 +311,15 @@ public abstract class AbstractConfiguredActivator extends AbstractActivator {
 			}
 		}
 		return result;
+	}
+	
+	/**
+	 * This method return true if at least one OSGI ConfigurationAdmin service is active.
+	 *  
+	 * @return
+	 */
+	public boolean isConfigAdminStarted() {
+		final ServiceReference<ConfigurationAdmin>[] sr = configTracker.getServiceReferences();
+		return (sr != null) && (sr.length > 0);
 	}
 }
