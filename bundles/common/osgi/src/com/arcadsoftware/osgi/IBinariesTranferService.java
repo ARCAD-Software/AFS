@@ -51,6 +51,9 @@ public interface IBinariesTranferService {
 	/**
 	 * Create a new file entry into the file repository.
 	 * 
+	 * <p>
+	 * This method may return a negative number if the BinariesTranfertService is not correctly configured.
+	 * 
 	 * @param category
 	 * @return the new created ID.
 	 */
@@ -64,7 +67,7 @@ public interface IBinariesTranferService {
 	 * @param id
 	 * @return
 	 */
-	public int newFileId(String newCategory,String oldCategory, int id);
+	public int newFileId(String newCategory, String oldCategory, int id);
 	
 	/**
 	 * Put the given file into the repository.
@@ -95,7 +98,7 @@ public interface IBinariesTranferService {
 	 * @param id
 	 * @return zero if the operation can not be completed.
 	 */
-	public int moveFileId(String newCategory,String oldCategory, int id);
+	public int moveFileId(String newCategory, String oldCategory, int id);
 	
 	/**
 	 * Definitively remove a file from the repository.

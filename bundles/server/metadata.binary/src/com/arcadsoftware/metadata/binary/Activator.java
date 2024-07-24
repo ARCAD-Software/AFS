@@ -51,17 +51,19 @@ public class Activator extends AbstractActivator {
 		registerService(EventHandler.class, new MetaDataEventHandler(this) {
 			@Override
 			public void handleEvent(Event event) {
-				MetaDataEntity entity = getEntity(event);
-				BeanMap item = getBeanMap(event);
+				final MetaDataEntity entity = getEntity(event);
+				final BeanMap item = getBeanMap(event);
 				if ((entity != null) && (item != null)) {
-					String category = entity.getMetadata().getString("binary"); //$NON-NLS-1$
+				final String category = entity.getMetadata().getString("binary"); //$NON-NLS-1$
 					if ((category != null) && !category.isEmpty()) {
 						Object o = event.getProperty(MetaDataEventHandler.EVENT_PROP_HARDDELETE);
 						if ((o instanceof Boolean) && ((Boolean) o)) {
 							IBinariesTranferService bin = Activator.this.getService(IBinariesTranferService.class);
 							if (bin != null) {
 								for (String c: category.split(" ")) { //$NON-NLS-1$
-									bin.removeFile(c, item.getId());
+									if (bin.removeFile(c, item.getId())) {
+										debug(String.format("Attached file to %s/%d deleted in category: %s.", entity.getType(), item.getId(), c));
+									}
 								}
 							}
 						}

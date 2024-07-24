@@ -100,7 +100,6 @@ public class BinariesTranferService implements IBinariesTranferService {
 	 * @return
 	 */
 	private File getNewFileName(String category, int id, File file) {
-		activator.test(category, id);
 		String name = file.getName();
 		int i = name.indexOf('_') + 1;
 		if ((i > 0) && (i < (name.length() - 1))) {
@@ -108,8 +107,8 @@ public class BinariesTranferService implements IBinariesTranferService {
 		} else {
 			name = ""; //$NON-NLS-1$
 		}
-		File result = new File(activator.getFileNamePrefix(category, id) + name);
-		// Test a directory path trasversal attack...
+		File result = new File(activator.getSubDir(category, id), Integer.toString(id) + '_' + name); //$NON-NLS-1$
+		// Test a directory path traversal attack...
 		try {
 			if (!result.getCanonicalPath().startsWith(activator.getPath().getCanonicalPath())) {
 				activator.error("Invalid Path name : '" + result.getAbsolutePath() + "' does apears to be contained in: " + activator.getPath().getAbsolutePath());
@@ -128,13 +127,12 @@ public class BinariesTranferService implements IBinariesTranferService {
 
 	@Override
 	public String generateKey(String category, int id, boolean readOnly) {
-		activator.test(category, id);
 		return activator.store(category, id, readOnly);
 	}
 
 	@Override
 	public List<Integer> listCategory(String category) {
-		File dir = new File(activator.getDirName(category));
+		File dir = activator.getDir(category);
 		ArrayList<Integer> result = new ArrayList<Integer>();
 		if (dir.isDirectory()) {
 			for (File sdir : dir.listFiles()) {
@@ -168,11 +166,13 @@ public class BinariesTranferService implements IBinariesTranferService {
 		File source = activator.getFile(oldCategory, id);
 		if ((source != null) && source.isFile()) {
 			int nid = activator.getNewFileId(newCategory);
-			File target = getNewFileName(newCategory, nid, source);
-			if ((target != null) && source.renameTo(target)) {
-				activator.fileEventDel(oldCategory, id, source);
-				activator.fileEventNew(newCategory, nid, target);
-				return nid;
+			if (nid >= 0) {
+				File target = getNewFileName(newCategory, nid, source);
+				if ((target != null) && source.renameTo(target)) {
+					activator.fileEventDel(oldCategory, id, source);
+					activator.fileEventNew(newCategory, nid, target);
+					return nid;
+				}
 			}
 		}
 		return 0;
@@ -183,10 +183,12 @@ public class BinariesTranferService implements IBinariesTranferService {
 		File source = activator.getFile(oldCategory, id);
 		if ((source != null) && source.isFile()) {
 			int nid = activator.getNewFileId(newCategory);
-			File target = getNewFileName(newCategory, nid, source);
-			if ((target != null) && copy(source, target)) {
-				activator.fileEventNew(newCategory, nid, target);
-				return nid;
+			if (nid >= 0) {
+				File target = getNewFileName(newCategory, nid, source);
+				if ((target != null) && copy(source, target)) {
+					activator.fileEventNew(newCategory, nid, target);
+					return nid;
+				}
 			}
 		}
 		return 0;
@@ -221,9 +223,8 @@ public class BinariesTranferService implements IBinariesTranferService {
 			if (activator.removeFiles(category, id)) {
 				activator.fileEventDel(category, id, null);
 			}
-			activator.test(category, id);
 			if (file.isFile()) {
-				File target = new File(activator.getFileNamePrefix(category, id) + file.getName());
+				File target = new File(activator.getSubDir(category, id), Integer.toString(id) + '_' + file.getName());
 				// Test a directory path trasversal attack...
 				try {
 					if (!target.getCanonicalPath().startsWith(activator.getPath().getCanonicalPath())) {
@@ -257,9 +258,8 @@ public class BinariesTranferService implements IBinariesTranferService {
 			if (activator.removeFiles(category, id)) {
 				activator.fileEventDel(category, id, null);
 			}
-			activator.test(category, id);
 			try {
-				File target = new File(activator.getFileNamePrefix(category, id) + filename);
+				File target = new File(activator.getSubDir(category, id), Integer.toString(id) + '_' + filename);
 				// Test a directory path trasversal attack...
 				try {
 					if (!target.getCanonicalPath().startsWith(activator.getPath().getCanonicalPath())) {

@@ -82,7 +82,6 @@ public class BinResource extends OSGiResource {
 			setStatus(Status.CLIENT_ERROR_METHOD_NOT_ALLOWED);
 			return null;
 		}
-		Activator.getInstance().test(category, id);
 		if ((entity == null) || (entity instanceof EmptyRepresentation)) {
 			// POST request with no entity.
 			setStatus(Status.CLIENT_ERROR_BAD_REQUEST, "The server has retreived an empty body. Creating null binaries files is not allowed.");
@@ -104,7 +103,7 @@ public class BinResource extends OSGiResource {
 			if ((name.indexOf('/') > -1) || (name.indexOf('\\') > -1)) {
 				name = new File(name).getName();
 			}
-			file = new File(Activator.getInstance().getFileNamePrefix(category, id) + name);
+			file = new File(Activator.getInstance().getSubDir(category, id), Integer.toString(id) + '_' + name);
 			// Test a directory path trasversal attack...
 			try {
 				if (!file.getCanonicalPath().startsWith(Activator.getInstance().getPath().getCanonicalPath())) {
@@ -185,7 +184,7 @@ public class BinResource extends OSGiResource {
 			//factory.setSizeThreshold(1000240);
 			int maxFileSize = Activator.getInstance().getMaxFileSize();
 			factory.setSizeThreshold(maxFileSize);
-			factory.setRepository(new File(Activator.getInstance().getDirName("_tempdir"))); //$NON-NLS-1$
+			factory.setRepository(Activator.getInstance().getDir("_tempdir")); //$NON-NLS-1$
 			// 2/ Create a new file upload handler based on the Restlet
 			// FileUpload extension that will parse Restlet requests and
 			// generates FileItems.
@@ -214,7 +213,7 @@ public class BinResource extends OSGiResource {
 					} else if ((name.indexOf('/') > -1) || (name.indexOf('\\') > -1)) {
 						name = new File(name).getName();
 					}
-					file = new File(Activator.getInstance().getFileNamePrefix(category, id) + name);
+					file = new File(Activator.getInstance().getSubDir(category, id), Integer.toString(id) + '_' + name);
 					// Test a directory path trasversal attack...
 					try {
 						if (!file.getCanonicalPath().startsWith(Activator.getInstance().getPath().getCanonicalPath())) {

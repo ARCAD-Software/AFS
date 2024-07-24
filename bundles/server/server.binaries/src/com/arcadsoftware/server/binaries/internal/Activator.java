@@ -15,15 +15,18 @@ package com.arcadsoftware.server.binaries.internal;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.Map.Entry;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.event.Event;
@@ -46,29 +49,25 @@ public class Activator extends AbstractConfiguredActivator {
 	private static final String CONF_KEYLIMITDATE = "limit"; //$NON-NLS-1$
 	private static final String CONF_KEYPATH = "path"; //$NON-NLS-1$
 	private static final String CONF_KEYSERVER = "server.address"; //$NON-NLS-1$
-	private static final String CONF_KEYCATEGORY = "category."; //$NON-NLS-1$
 	private static final String CONF_KEYMAXSIZE = "maxFileSize"; //$NON-NLS-1$
 	private static final int CONF_KEYMAXSIZE_DEFAULT = 10240000; 
-	private static final String DEFAULTPATH = "./files/bin/"; //$NON-NLS-1$
-		
-	private final HashMap<String, Integer> categories = new HashMap<String, Integer>();
-	private Hashtable<String, BinariesKey> cache = new Hashtable<String, BinariesKey>();
-	private int timeKeyDuration = 9000000; //150 minutes
-	private Timer timer;
-	private String serverAdress = "http://localhost"; //$NON-NLS-1$
-	private File path = new File(DEFAULTPATH);
-	private boolean categoriesUpdated;
-	@SuppressWarnings("rawtypes")
-	private ServiceTracker eventTracker;
-	private BinariesTranferService binTransfer;
-	
-	private int maxFileSize = CONF_KEYMAXSIZE_DEFAULT; //10 Mo
+	private static final String DEFAULTPATH = "./files/bin"; //$NON-NLS-1$
 
 	private static Activator instance;
 	
 	public static Activator getInstance() {
 		return instance;
 	}
+	
+	private Hashtable<String, BinariesKey> cache = new Hashtable<String, BinariesKey>();
+	private int timeKeyDuration = 9000000; //150 minutes
+	private Timer timer;
+	private String serverAdress = "http://localhost"; //$NON-NLS-1$
+	private File path = new File(DEFAULTPATH);
+	@SuppressWarnings("rawtypes")
+	private ServiceTracker eventTracker;
+	private BinariesTranferService binTransfer;
+	private int maxFileSize = CONF_KEYMAXSIZE_DEFAULT; //10 Mo
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
@@ -77,7 +76,6 @@ public class Activator extends AbstractConfiguredActivator {
 		instance = this;
 		eventTracker = new ServiceTracker(context,EventAdmin.class.getName(),null);
 		eventTracker.open();
-		categoriesUpdated = false;
 		binTransfer = new BinariesTranferService(this);
 		registerService(IBinariesTranferService.clazz, binTransfer);
 		registerService(Branch.clazz, new Branch(), Branch.properties(Branch.ROOTBRANCH));
@@ -133,7 +131,7 @@ public class Activator extends AbstractConfiguredActivator {
 		if (properties != null) {
 			Object o = properties.get(CONF_KEYLIMITDATE);
 			if (o instanceof Integer) {
-				timeKeyDuration = ((Integer)o).intValue();
+				timeKeyDuration = ((Integer) o).intValue();
 			} else if (o != null) {
 				try {
 					timeKeyDuration = Integer.parseInt(o.toString());
@@ -173,46 +171,7 @@ public class Activator extends AbstractConfiguredActivator {
 					}
 				}
 			}
-			Enumeration<?> keys = properties.keys();
-			while (keys.hasMoreElements()) {
-				String key = (String) keys.nextElement();
-				if (key.startsWith(CONF_KEYCATEGORY)) {
-					Object value = properties.get(key);
-					String category = key.substring(CONF_KEYCATEGORY.length()); 
-					Integer ivalue = null;
-					if (value instanceof Integer) {
-						ivalue = (Integer) value;
-					} else if (value instanceof String) {
-						try {
-							ivalue = Integer.parseInt((String) value);
-						} catch (NumberFormatException e) {}
-					}
-					if (ivalue != null) {
-						synchronized(categories) {
-							Integer oldvalue = categories.get(category); 
-							if ((oldvalue == null) || (oldvalue < ivalue)) {
-								categories.put(category, ivalue);
-							}
-						}
-					}
-				}
-			}
 		}
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public boolean finalizeConfiguration(@SuppressWarnings("rawtypes") Dictionary properties) {
-		if (categoriesUpdated) {
-			synchronized (categories) {
-				for(Entry<String, Integer> entry:categories.entrySet()) {
-					properties.put(CONF_KEYCATEGORY + entry.getKey(), entry.getValue());
-				}
-			}
-			categoriesUpdated = false;
-			return true;
-		}
-		return false;
 	}
 
 	/**
@@ -221,7 +180,7 @@ public class Activator extends AbstractConfiguredActivator {
 	 * Threadsafe.
 	 */
 	protected String store(String category, int id, boolean readonly) {
-		BinariesKey key = new BinariesKey(getCurrentLimit(),id,category, readonly);
+		BinariesKey key = new BinariesKey(getCurrentLimit(), id, category, readonly);
 		cache.put(key.getKey(), key);
 		return serverAdress  + "/bin/" + key.getKey(); //$NON-NLS-1$
 	}
@@ -231,14 +190,10 @@ public class Activator extends AbstractConfiguredActivator {
 	 */
 	protected BinariesKey find(String key) {
 		BinariesKey result = cache.get(key);
-		if (result == null) {
-			return null;
-		}
-		if (result.getLimit().after(new Date())) {
+		if ((result == null) || result.getLimit().after(new Date())) {
 			return result;
-		} else {
-			cache.remove(key);
 		}
+		cache.remove(key);
 		return null;
 	}
 	
@@ -246,42 +201,136 @@ public class Activator extends AbstractConfiguredActivator {
 		return new Date(System.currentTimeMillis() + timeKeyDuration);
 	}
 	
-	protected int getNewFileId(String category) {
-		//TODO On ne devrait pas servir de nouvel Id tant que la config n'a pas été chargée...
-		categoriesUpdated = true;
-		Integer value;
-		synchronized (categories) {
-			value = categories.get(category);
-			if (value == null) {
-				value = new Integer(1);
-			} else {
-				value = new Integer(value.intValue() + 1);
-			}
-			categories.put(category, value);
+	protected synchronized int getNewFileId(String category) {
+		// We should be sure that the configuration is already loaded when this method is called.
+		// (If not we may create a false file which may lead to a security breach.)
+		if (!isConfigAdminStarted()) {
+			return -1;
 		}
-		return value.intValue();
-	}
-
-	protected void test(String category, int id) {
-		synchronized (categories) {
-			Integer value = categories.get(category);
-			if ((value == null) || (value.intValue() < id)) {
-				categoriesUpdated = true;
-				categories.put(category, new Integer(id));
+		// Check accessibility of the repository folder.
+		final File dir = getDir(category);
+		if (!dir.isDirectory()) {
+			dir.mkdirs();
+			if (!dir.isDirectory()) {
+				throw new RuntimeException("The Binaries File Transfert Service does not have write access to: " + path.getAbsolutePath());
 			}
+		}
+		File counter = new File (dir, ".counter");
+		boolean newCounter = false;
+		if (!counter.exists()) {
+			try {
+				if (counter.createNewFile()) {
+					newCounter = true;
+				}
+			} catch (IOException e) {
+				if (!counter.exists()) {
+					error("The Binaries File Transfert Service can not create files into: " + path.getAbsolutePath(), e);
+					return -1;
+				}				
+			}
+		}
+		try (RandomAccessFile file = new RandomAccessFile(counter, "rw")) { //$NON-NLS-1$
+			try (FileChannel fc = file.getChannel()) {
+				FileLock lock = getLock(fc);
+				if (lock == null) {
+					return -1;
+				}
+				try {
+					long size = fc.size();
+					if (size > 128l) {
+						throw new IOException(String.format("Invalid %s/.counter file size.", category));
+					}
+					ByteBuffer buf = ByteBuffer.allocate((int) size);
+					int c = 0;
+					if (fc.read(buf) > 0) {
+						// convert to int...
+						c = buf.getInt(0);
+					} else if (newCounter) {
+						File dirMax = null;
+						int dm = -1;
+						for (File f: dir.listFiles()) {
+							if (f.isDirectory()) {
+								String name = f.getName().toLowerCase();
+								if (name.startsWith("dir")) {
+									try {
+										int i = Integer.parseInt(name.substring(3));
+										if (i > dm) {
+											dm = i;
+											dirMax = f;
+										}
+									} catch (NumberFormatException e) {}
+								}
+							}
+						}
+						if (dirMax != null) {
+							c = dm * 1000;
+							for (File f: dir.listFiles()) {
+								if (f.isFile()) {
+									String name = f.getName();
+									int i = name.indexOf('_');
+									if (i > 0) {
+										try  {
+											i = Integer.parseInt(name.substring(0, i));
+											if (i > c) {
+												c = i;
+											}
+										} catch (NumberFormatException e) {}
+									}
+								}
+							}
+						}
+					}
+					c++;
+					// write back the new value...
+					fc.position(0);
+					fc.truncate(Integer.BYTES);
+					buf = ByteBuffer.allocate(Integer.BYTES);
+					buf.putInt(c);
+					buf.flip();
+					while (buf.hasRemaining()) {
+						fc.write(buf);
+					}
+					fc.force(true);
+					return c;
+				} finally {
+					lock.close();
+				}
+			}
+		} catch (IOException e1) {
+			error(e1);
+			return -1;
 		}
 	}
 	
-	public File getPath() {
+	private FileLock getLock(FileChannel channel) throws IOException {
+		FileLock lock = channel.tryLock();
+		if (lock == null) {
+			try {
+				// Wait up to 5 seconds...
+				for (int i = 1; i < 10; i++) {
+					Thread.sleep(500);
+					lock = channel.tryLock();
+					if (lock != null) {
+						break;
+					}
+				}
+			} catch (InterruptedException e) {
+				throw new IOException("Interrupted lock acquisition.", e);
+			}
+		}
+		return lock;
+	}
+	
+	protected File getPath() {
 		return path;
 	}
 	
-	protected String getDirName(String category) {
-		return path.getAbsolutePath() + category.replace('.', '_');
+	protected File getDir(String category) {
+		return new File(path, category.replace('.', '_'));
 	}
-	
-	protected String getFileNamePrefix(String category, int id) {
-		return path.getAbsolutePath() + category.replace('.', '_') + getSubDir(id) + '/' + id + '_';
+
+	protected File getSubDir(String category, int id) {
+		return new File (getDir(category), "dir" + Integer.toString(id / 1000)); //$NON-NLS-1$
 	}
 
 	private void fileEvent(Event event) {
@@ -293,9 +342,8 @@ public class Activator extends AbstractConfiguredActivator {
 		}
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private Event newEvent(String type, String category, int id, File file) {
-		Properties props = new Properties();
+		HashMap<String, Object> props = new HashMap<>();
 		props.put(FILE_EVENT_TYPE, type);
 		if (file != null) {
 			props.put(FILE_EVENT_FILENAME, file.getAbsolutePath());
@@ -303,31 +351,31 @@ public class Activator extends AbstractConfiguredActivator {
 		}
 		props.put(FILE_EVENT_CATEGORY, category);
 		props.put(FILE_EVENT_ID, id);
-		return new Event(FILE_EVENT_TOPIC, (Dictionary) props);
+		return new Event(FILE_EVENT_TOPIC, props);
 	}
 	
 	/**
 	 * Post an event after deleting a File.
 	 */
-	public void fileEventDel(String category, int id,File file) {
+	protected void fileEventDel(String category, int id,File file) {
 		fileEvent(newEvent(FILE_EVENT_TYPE_DELETE, category, id, file));
 	}
 
 	/**
 	 * Post an event after creating of modifying a File.
 	 */
-	public void fileEventNew(String category, int id, File file) {
+	protected void fileEventNew(String category, int id, File file) {
 		fileEvent(newEvent(FILE_EVENT_TYPE_CHANGE, category, id, file));
 	}
 
 	/**
 	 * Look up for the corresponding file into the repository.
 	 */
-	public File getFile(String category, int id) {
+	protected File getFile(String category, int id) {
 		final String sid = Integer.toString(id) + '_';
-		File parent = new File(getDirName(category) + getSubDir(id));
+		File parent = getSubDir(category, id);
 		if ((parent != null) && parent.isDirectory()) {
-			for(File file: parent.listFiles(new FilenameFilter() {
+			for (File file: parent.listFiles(new FilenameFilter() {
 				public boolean accept(File dir, String name) {
 					return name.startsWith(sid);
 				}
@@ -336,14 +384,14 @@ public class Activator extends AbstractConfiguredActivator {
 					return file;
 				}
 			}
-		}		
+		}
 		return null;
 	}
 
-	public boolean removeFiles(String category, int id) {
+	protected boolean removeFiles(String category, int id) {
 		final String sid = Integer.toString(id) + '_';
+		final File parent = getSubDir(category, id);
 		boolean deleted = false;
-		File parent = new File(getDirName(category) + getSubDir(id));
 		if ((parent != null) && parent.isDirectory()) {
 			for (File file: parent.listFiles(new FilenameFilter() {
 				public boolean accept(File dir, String name) {
@@ -361,20 +409,16 @@ public class Activator extends AbstractConfiguredActivator {
 		}		
 		return deleted;
 	}
-
-	private String getSubDir(int id) {
-		return "/dir" + Integer.toString(id / 1000); //$NON-NLS-1$
-	}
 	
-	public BinariesTranferService getBinTransfer() {
+	protected BinariesTranferService getBinTransfer() {
 		return binTransfer;
 	}
 
-	public int getMaxFileSize() {
+	protected int getMaxFileSize() {
 		return maxFileSize;
 	}
 
-	public void setMaxFileSize(int maxFileSize) {
+	private void setMaxFileSize(int maxFileSize) {
 		this.maxFileSize = maxFileSize;
 	}
 	
