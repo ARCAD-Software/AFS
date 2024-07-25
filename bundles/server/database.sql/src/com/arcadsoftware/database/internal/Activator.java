@@ -17,8 +17,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -486,5 +488,17 @@ public class Activator extends AbstractConfiguredActivator {
 			}
 		}
 		return null;
+	}
+
+	public Map<String, DataSource> getDataSources() {
+		HashMap<String, DataSource> result = new HashMap<>(currentDataSources.size());
+		for (ServiceRegistration<DataSource> serviceRegistration: currentDataSources) {
+			final ServiceReference<DataSource> r = serviceRegistration.getReference();
+			DataSource ds = getContext().getService(r);
+			if (ds != null) {
+				result.put((String) r.getProperty(DatabaseTracker.DatabaseID), ds);
+			}
+		}
+		return result;
 	}
 }
