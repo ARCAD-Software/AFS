@@ -14,11 +14,16 @@
 package com.arcadsoftware.groovy.security;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.Timer;
 
 import org.codehaus.groovy.ast.expr.Expression;
 import org.codehaus.groovy.ast.expr.MethodPointerExpression;
@@ -70,10 +75,11 @@ public class SecuredCompilerConfiguration extends CompilerConfiguration {
 	private static final List<String> NONE = new ArrayList<String>();
 	private static final List<String> DISALLOWEDRECEIVERS = Arrays.asList(System.class.getName(), Class.class.getName(),
 			Thread.class.getName(), ThreadDeath.class.getName(), ThreadGroup.class.getName(), ClassLoader.class.getName(),
-			ThreadLocal.class.getName(), Runtime.class.getName(), InternalError.class.getName(),
+			ThreadLocal.class.getName(), Runtime.class.getName(), InternalError.class.getName(), Timer.class.getName(),
 			InterruptedException.class.getName(), IllegalThreadStateException.class.getName(),
 			InheritableThreadLocal.class.getName(), IllegalAccessError.class.getName(), IllegalAccessException.class.getName(),
 			Void.class.getName(), Script.class.getName(), GroovyShell.class.getName(), Eval.class.getName(),
+			InputStream.class.getName(), FileInputStream.class.getName(), OutputStream.class.getName(), FileOutputStream.class.getName(),
 			File.class.getName(), GroovyClassLoader.class.getName(), Binding.class.getName(), GroovyObjectSupport.class.getName());
 	//  Object.class.getName(), -> necessary for all basic manipulation of objects.
 	private static final List<Class<? extends Expression>> DISALLOWEDEXPRESSIONS = Arrays.asList(StaticMethodCallExpression.class,
