@@ -15,6 +15,7 @@ package com.arcadsoftware.database.sql;
 
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.ServiceLoader;
 
 import javax.naming.InitialContext;
@@ -95,7 +96,7 @@ public class DataSourceFactory {
 			}
 		}
 		if (activator instanceof AbstractActivator) {
-			for(IDataSourceProvider p: ((AbstractActivator) activator).getServices(IDataSourceProvider.class)) {
+			for (IDataSourceProvider p: ((AbstractActivator) activator).getServices(IDataSourceProvider.class)) {
 				if (p.acceptDatabaseType(parameters.getType())) {
 					try {
 						return p.createDataSource(parameters);
@@ -123,7 +124,7 @@ public class DataSourceFactory {
 	}
 
 	/**
-	 * Get a running OSGi Service Datasource.
+	 * Get a running OSGi Service DataSource.
 	 * 
 	 * @param activator
 	 * @param name
@@ -131,5 +132,14 @@ public class DataSourceFactory {
 	 */
 	public static DataSource getDataSource(String name) {
 		return Activator.getInstance().getDataSource(name);
+	}
+	
+	/**
+	 * Get all data sources currently declared on this platform.
+	 * 
+	 * @return never return null.
+	 */
+	public static Map<String, DataSource> getDatasources() {
+		return Activator.getInstance().getDataSources();
 	}
 }

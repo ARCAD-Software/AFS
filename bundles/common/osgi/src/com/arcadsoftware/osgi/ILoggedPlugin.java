@@ -1,5 +1,3 @@
-package com.arcadsoftware.osgi;
-
 /*******************************************************************************
  * Copyright (c) 2024 ARCAD Software.
  *
@@ -13,6 +11,13 @@ package com.arcadsoftware.osgi;
  * Contributors:
  *     ARCAD Software - initial API and implementation
  *******************************************************************************/
+package com.arcadsoftware.osgi;
+
+/**
+ * 
+ * 
+ * @author ARCAD Software
+ */
 public interface ILoggedPlugin {
 
 	/**
