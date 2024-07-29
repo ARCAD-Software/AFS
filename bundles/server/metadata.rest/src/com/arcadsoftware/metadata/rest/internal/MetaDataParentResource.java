@@ -245,7 +245,7 @@ public class MetaDataParentResource extends DataParentResource {
 		return list(variant);
 	}
 
-	protected Representation list(Representation representation, Variant variant) {
+	protected Representation list(Variant variant) {
 		Language language = getClientPreferedLanguage();
 		final Form form = getRequestForm();
 		// Build the requested attribute list.
