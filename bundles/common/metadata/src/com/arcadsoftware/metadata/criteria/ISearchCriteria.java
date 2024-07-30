@@ -33,9 +33,11 @@ public interface ISearchCriteria {
 	public boolean test(BeanMap bean, IConnectionUserBean currentUser);
 	
 	/**
-	 * Run a local selection.
+	 * Filter the given list according to the condition expressed by the ISearchCriteria.
 	 * 
-	 * @param list the selectables objects.
+	 * @param list the list of objects to filter.
+	 * @param currentUser may be null, but if the criteria require a user this one will be used to perform the test.
+	 * 
 	 * @return the list of selected objects.
 	 */
 	public BeanMapList select(BeanMapList list, IConnectionUserBean currentUser);
