@@ -421,6 +421,17 @@ public abstract class DataSourceCommand extends Command {
 	 * @param verbose if true print a success message.
 	 */
 	protected void runscript(Connection connection, File fileSQL, boolean verbose) throws Exception {
+		runscript(connection, fileSQL, verbose, false);
+	}
+	
+	/**
+	 * Allow to execute a SQL script if an error occurs it print an error message and rethrow the exception.
+	 *  
+	 * @param connection the database connection.
+	 * @param fileSQL the file to run
+	 * @param verbose if true print a success message.
+	 */
+	protected void runscript(Connection connection, File fileSQL, boolean verbose, boolean nopublic) throws Exception {
 		if (fileSQL == null) {
 			throw new FileNotFoundException("Internal error NULL File !!!");
 		}
@@ -438,6 +449,9 @@ public abstract class DataSourceCommand extends Command {
 		            String sql = sr.readStatement();
 					while (sql != null) {
 			            if (!StringUtils.isWhitespaceOrEmpty(sql)) {
+			            	if (nopublic) {
+			            		sql = sql.replace("public.", ""); //$NON-NLS-1$ //$NON-NLS-2$
+			            	}
 				            try {
 				            	st.execute(sql);
 				            } catch (SQLException e) {

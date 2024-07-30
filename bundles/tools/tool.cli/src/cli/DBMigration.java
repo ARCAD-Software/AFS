@@ -62,20 +62,20 @@ public final class DBMigration extends DataSourceCommand {
 
 	@Override
 	protected String getCommandDescription() {
-		return "This command allow to migrate the application Database from H2 to PostgreSQL. To do so, the H2 database must have be updated to the latest version and the Postgre database installed with the current installation script.";
+		return "This command allow to migrate the application Database from H2 to PostgreSQL or DB2i. To do so, the H2 database must have be updated to the latest version and the target database installed with the current installation scripts. Refer to the application installation documentation for details.";
 	}
 
 	@Override
 	protected Map<String, String> getArgumentsDescription() {
 		Map<String, String> result = super.getArgumentsDescription();
 		result.put("[<url>]", //$NON-NLS-1$
-				"Specify the PostgreSQL JDBC URL to the new database. This database must be created and be initialized with the current version of the database. If not provided the URL will be prompted.");
+				"Specify the target JDBC URL to the new database. This database must be created and be initialized with the current version of the database. If not provided the URL will be prompted.");
 		result.put("[-l|-login <login>]", //$NON-NLS-1$
-				"Specify the PostgreSQL database login. This login must the one which will be used by the application. If not provided the login will be prompted.");
+				"Specify the target database login. This login must the one which will be used by the application. If not provided the login will be prompted.");
 		result.put("[-p|-password <password>]", //$NON-NLS-1$
-				"Specify the PostgreSQL database paswword. If not provided the password will be prompted.");
+				"Specify the target database paswword. If not provided the password will be prompted.");
 		result.put("[-nb|-nobackup]", //$NON-NLS-1$
-				"If used this parameter disabled the backup of the source database before to process to the migration.");
+				"If used this parameter disabled the backup of the source H2 database before to process to the migration.");
 		return result;
 	}
 
@@ -96,7 +96,7 @@ public final class DBMigration extends DataSourceCommand {
 	@Override
 	protected int runDataSourceCommand(String dataSourceID, String dataSourceType, Connection connection, String h2url, Properties connectionProperties) {
 		if (!dataSourceType.toLowerCase().startsWith("h2")) { //$NON-NLS-1$
-			println("The data source \"" + dataSourceID + "\" [" + dataSourceType + "] can not be migrated to PostgreSQL.");
+			println("The data source \"" + dataSourceID + "\" [" + dataSourceType + "] can not be migrated to PostgreSQL nor to DB2i.");
 			return 0;
 		}
 		// Manage missing parameters
@@ -111,6 +111,7 @@ public final class DBMigration extends DataSourceCommand {
 				return ERROR_WRONG_PARAMETER;
 			}
 		}
+		boolean isDB2i = url.toLowerCase().startsWith("jdbc:jt400:"); //$NON-NLS-1$
 		String login = getArgumentValue(new String[] {"-l", "-login"}, (String) null); //$NON-NLS-1$ //$NON-NLS-2$
 		if (login == null) {
 			login = read("Type the database login: ");
@@ -148,7 +149,7 @@ public final class DBMigration extends DataSourceCommand {
 			return ERROR_INVALID_CONFIGURATION;
 		}
 		if (vh2 != vpg) {
-			printError(String.format("The Databases version of H2 and target one are not equals, the migration process can only be performed fron the same database versions (H2 %d != %d target).", vh2, vpg));
+			printError(String.format("The Databases version of H2 and target databases are not equals, the migration process can only be performed fron the same database versions (H2 %d != %d target).", vh2, vpg));
 			return ERROR_INVALID_CONFIGURATION;
 		}
 		println(String.format("The Databases version are compatibles (H2 = %d, target = %d).", vh2, vpg));
@@ -174,8 +175,7 @@ public final class DBMigration extends DataSourceCommand {
 		}
 		// Remove the Constraints.
 		try {
-			// TODO ADD support do JT400...
-			runscript(pgconnection, new File("./database/migrate/drop_fk_constraints.sql"), true); //$NON-NLS-1$
+			runscript(pgconnection, new File("./database/migrate/drop_fk_constraints.sql"), true, true); //$NON-NLS-1$
 		} catch (Exception e) {
 			printError("Internal Error durin execution of \"drop_fk_constraints.sql\": " + e.getLocalizedMessage());
 			if (isArgument("-debug")) { //$NON-NLS-1$
@@ -186,7 +186,7 @@ public final class DBMigration extends DataSourceCommand {
 		println("The Relation constraint are disabled during migration.");
 		// Truncate tables and migrate Data.
 		try {
-			migrate(connection, pgconnection);
+			migrate(connection, pgconnection, isDB2i);
 		} catch (Exception e) {
 			printError("Error during migration: " + e.getLocalizedMessage());
 			printError("There may be an unexpected difference between the H2 Database and the target one...");
@@ -194,19 +194,28 @@ public final class DBMigration extends DataSourceCommand {
 			return ERROR_INTERNAL_ERROR;
 		}
 		// Upgrade the sequences.
-		try {
-			runscript(pgconnection, new File("./database/migrate/set_sequences.sql"), true); //$NON-NLS-1$
-		} catch (Exception e) {
-			printError("Internal Error during execution of \"set_sequences.sql\": " + e.getLocalizedMessage());
-			if (isArgument("-debug")) { //$NON-NLS-1$
-				e.printStackTrace();
+		if (isDB2i) {
+			// FIXME find a way to reset the sequences on DB2i !
+			// FIXME find a way to reset the sequences on DB2i !
+			// FIXME find a way to reset the sequences on DB2i !
+			// FIXME find a way to reset the sequences on DB2i !
+			// FIXME find a way to reset the sequences on DB2i !
+			// FIXME find a way to reset the sequences on DB2i !
+		} else {
+			try {
+				runscript(pgconnection, new File("./database/migrate/set_sequences.sql"), true); //$NON-NLS-1$
+			} catch (Exception e) {
+				printError("Internal Error during execution of \"set_sequences.sql\": " + e.getLocalizedMessage());
+				if (isArgument("-debug")) { //$NON-NLS-1$
+					e.printStackTrace();
+				}
+				return ERROR_INTERNAL_ERROR;
 			}
-			return ERROR_INTERNAL_ERROR;
 		}
 		println("The Sequence next value are updated to the new database content.");
 		// Restore contraints.
 		try {
-			runscript(pgconnection, new File("./database/migrate/create_fk_constraints.sql"), true); //$NON-NLS-1$
+			runscript(pgconnection, new File("./database/migrate/create_fk_constraints.sql"), true, isDB2i); //$NON-NLS-1$
 		} catch (Exception e) {
 			printError("Internal Error during execution of \"create_fk_constraints.sql\": " + e.getLocalizedMessage());
 			if (isArgument("-debug")) { //$NON-NLS-1$
@@ -262,7 +271,7 @@ public final class DBMigration extends DataSourceCommand {
 				while (rsQuery.next()) {
 					for (int i = 1; i <= columnCount; i++) {
 						pstmtInsert.setObject(i, rsQuery.getObject(i));
-						// TODO Manage NULL value (Cast to the right type (VARCHAR does not work on Oracle !)
+						// TODO Manage NULL value, Cast to the right type (VARCHAR does not work on Oracle !)
 					}
 					pstmtInsert.addBatch();
 					nbRead++;
@@ -290,16 +299,14 @@ public final class DBMigration extends DataSourceCommand {
 		}
 	}
 
-	private void migrate(Connection h2Connection, Connection postgresqlConnection) throws Exception {
-		// FIXME this may be not required for jt400
+	private void migrate(Connection h2Connection, Connection postgresqlConnection, boolean isDB2i) throws Exception {
 		String catalog = postgresqlConnection.getCatalog();
-		if (catalog == null) {
+		if ((catalog == null) && !isDB2i) {
 			throw new Exception("The library/catalog name of the target database must be set.");
 		}
-		// FIXME this may be not required for jt400
 		String schema = postgresqlConnection.getSchema();
-		if (schema == null) {
-			throw new Exception("The schema name of the PostgreSQL database must be set.");
+		if ((schema == null) && !isDB2i) {
+			throw new Exception("The library/schema name of the target database must be set.");
 		}
 		DatabaseMetaData dbMeta = postgresqlConnection.getMetaData();
 		try (ResultSet rs = dbMeta.getTables(catalog, schema, null, new String[] { "TABLE" })) { //$NON-NLS-1$
