@@ -609,6 +609,33 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	}
 
 	/**
+	 * Get a new list containing all the BeanMap with the given attribute value.
+	 * 
+	 * @param attribute
+	 *            and attribute key.
+	 * @param value
+	 *            the desired value, can be null.
+	 * @return a non null BeanMapList.
+	 */
+	public BeanMapList get(String attribute, Object value) {
+		BeanMapList result = new BeanMapList(size());
+		if (value == null) {
+			for (BeanMap bm : this) {
+				if ((bm != null) && (bm.get(attribute) == null)) {
+					result.add(bm);
+				}
+			}
+		} else {
+			for (BeanMap bm : this) {
+				if ((bm != null) && value.equals(bm.get(attribute))) {
+					result.add(bm);
+				}
+			}
+		}
+		return result;
+	}
+	
+	/**
 	 * <p>
 	 * Returns an iterator over the elements in this list in proper sequence.
 	 * </p>

@@ -27,8 +27,8 @@ public class BeanMapPartialList extends BeanMapList {
 
 	private static final long serialVersionUID = 7288767312461587015L;
 
-	private int total = 0;
-	private int rank = 0;
+	private int total;
+	private int rank;
 	
 	/**
 	 * Construct an empty list with an initial capacity of 12.

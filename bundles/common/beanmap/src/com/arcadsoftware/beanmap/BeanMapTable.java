@@ -67,7 +67,7 @@ public class BeanMapTable implements Serializable {
 	 * @param secKeyCode Define the secondary Key mapping code.
 	 * @param initialCapacity the initial capacity. 
 	 */
-	public BeanMapTable(String secKeyCode,int initialCapacity) {
+	public BeanMapTable(String secKeyCode, int initialCapacity) {
 		this(initialCapacity);
 		this.secKeyCode = secKeyCode;
 		createSecTable(initialCapacity);

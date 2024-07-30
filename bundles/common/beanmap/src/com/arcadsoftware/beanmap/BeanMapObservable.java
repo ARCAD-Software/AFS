@@ -30,10 +30,9 @@ import java.util.Set;
  */
 public class BeanMapObservable implements Map<String,Object>, IBeanMap, IIdentifiedBean, ITypedBean, IDatedBean, Cloneable {
 
-	private BeanMap bm;
-	
-	private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
-	private VetoableChangeSupport vcs = new VetoableChangeSupport(this);
+	private final BeanMap bm;
+	private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+	private final VetoableChangeSupport vcs = new VetoableChangeSupport(this);
 
 	public BeanMapObservable(BeanMap warped) {
 		super();
