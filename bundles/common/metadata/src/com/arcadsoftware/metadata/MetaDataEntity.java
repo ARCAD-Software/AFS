@@ -14,9 +14,6 @@
 package com.arcadsoftware.metadata;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -43,7 +40,6 @@ import com.arcadsoftware.metadata.criteria.ISearchCriteria;
 import com.arcadsoftware.metadata.internal.Activator;
 import com.arcadsoftware.metadata.internal.Messages;
 import com.arcadsoftware.metadata.xml.XmlCriteriaStream;
-import com.arcadsoftware.osgi.ISODateFormater;
 import com.arcadsoftware.rest.connection.IConnectionUserBean;
 
 /**
@@ -1973,7 +1969,7 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Execute the conversion in one step. First, build the attributes list corresponding to the codes used into the Form.
 	 * Second, create a BeanMap to store the converted attributes values according to the attributes types.
@@ -1985,185 +1981,71 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 	 * @param form
 	 *            an Request form.
 	 * @param attributes
-	 *            the list to store the attributes used into the given form.
+	 *            the list to store the attributes of this entity used into the given form.
 	 * @return a BeanMap containing the attributes converted values and the other properties that do not correspond to
 	 *         attributes.
 	 */
 	public BeanMap formToBean(Form form, List<MetaDataAttribute> attributes) {
+		return formToBean(form, attributes, false, false, false);
+	}
+	
+	/**
+	 * Execute the conversion in one step. First, build the attributes list corresponding to the codes used into the Form.
+	 * Second, create a BeanMap to store the converted attributes values according to the attributes types.
+	 * 
+	 * @param form
+	 *            an Request form.
+	 * @param attributes
+	 *            the list to store the attributes of this entity used into the given form.
+	 * @param references
+	 *            If true the references lines are merged into a sub BeanMap stored in the result.
+	 * @param readonly
+	 *            If true the read-only attributes are included in the result.
+	 * @param tranlatable
+	 *            If true the translatable attributes are included in the result.
+	 * @return a BeanMap containing the attributes converted values and the other properties that do not correspond to
+	 *         attributes.
+	 */
+	public BeanMap formToBean(Form form, List<MetaDataAttribute> attributes, boolean references, boolean readOnly, boolean translatable) {
 		BeanMap result = new BeanMap(getType());
 		for (String code : form.getNames()) {
 			MetaDataAttribute att = getAttribute(code);
 			String value = form.getFirstValue(code);
 			if (att == null) {
+				if (references) {
+					int i = code.indexOf('.');
+					if (i > 0) {
+						String acode = code.substring(0, i);
+						att = getAttribute(acode);
+						if (att != null) {
+							ReferenceLine rl = getAttributeLine(code);
+							if ((rl != null) && (rl.getLastAttribute() != null)) {
+								BeanMap sbm = result.getBeanMap(acode);
+								if (sbm == null) {
+									sbm = new BeanMap(att.getType());
+									result.put(acode, sbm);
+								}
+								sbm.put(code.substring(i + 1), rl.getLastAttribute().convertValue(value));
+								continue;
+							}
+						}
+					}
+				}
 				// We insert parameter that are not attributes into the beanmap.
 				// This allow further procedure to get some additional parameter that will
 				// not be taken into account of insertion (based on the returned MetaData).
-				result.put(code, value);
-			} else if ((!att.isReadonly()) && //
+				if (att == null) {
+					result.put(code, value);
+				}
+			} else if (((!att.isReadonly()) || readOnly) && //
 					(code.indexOf('.') == -1) && //
-					(!att.isTranslatable())) {
+					((!att.isTranslatable()) || translatable)) {
 				// We ignore read-only attributes (plus any composed attribute that is
 				// not explicitly declared as read-only).
 				if (attributes != null) {
 					attributes.add(att);
 				}
-				// FIXME As the Form may come from a JSON object conversion "null" values should be supported...
-				if (value == null) {
-					value = ""; //$NON-NLS-1$
-				}
-				if (MetaDataAttribute.TYPE_BOOLEAN.equals(att.getType())) {
-					if ("true".equalsIgnoreCase(value) || //$NON-NLS-1$
-							"yes".equalsIgnoreCase(value) || //$NON-NLS-1$
-							"1".equalsIgnoreCase(value)) { //$NON-NLS-1$
-						result.put(code, 1);
-					} else {
-						result.put(code, 0);
-					}
-					continue;
-				}
-				if (MetaDataAttribute.TYPE_REALBOOLEAN.equals(att.getType())) {
-					if ("true".equalsIgnoreCase(value) || //$NON-NLS-1$
-							"yes".equalsIgnoreCase(value) || //$NON-NLS-1$
-							"1".equalsIgnoreCase(value)) { //$NON-NLS-1$
-						result.put(code, true);
-					} else {
-						result.put(code, false);
-					}
-					continue;
-				}
-				if (MetaDataAttribute.TYPE_DATE.equals(att.getType())) {
-					if (value.isEmpty()) {
-						// Support null dates.
-						result.put(code, null);
-						continue;
-					} else if (ISODateFormater.mayIsoDate(value)) {
-						try {
-							result.put(code, ISODateFormater.toDate(value));
-							continue;
-						} catch (ParseException e) {}// nothing to do.
-					}
-				}
-				if (MetaDataAttribute.TYPE_INTEGER.equals(att.getType()) ||
-						MetaDataAttribute.TYPE_INT.equals(att.getType())) { 
-					int i = 0;
-					try {
-						i = Integer.parseInt(value);
-					} catch (NumberFormatException e) {}
-					if (att.getLength() != 0) {
-						if (i > att.getLength()) {
-							i = att.getLength();
-						}
-					}
-					result.put(code, i);
-					continue;
-				}
-				if (MetaDataAttribute.TYPE_LONG.equals(att.getType())) { 
-					long l = 0;
-					try {
-						l = Long.parseLong(value);
-					} catch (NumberFormatException e) {}
-					if (att.getLength() != 0) {
-						if (l > att.getLength()) {
-							l = att.getLength();
-						}
-					}
-					result.put(code, l);
-					continue;
-				}
-				if (MetaDataAttribute.TYPE_ICON.equals(att.getType())) { 
-					int i = 0;
-					try {
-						i = Integer.parseInt(value);
-					} catch (NumberFormatException e) {}
-					if (i <= 0) {
-						result.put(code, null);
-					} else {
-						result.put(code, i);
-					}
-					continue;
-				}
-				if (MetaDataAttribute.TYPE_RANGE.equals(att.getType())) { 
-					int i = 0;
-					try {
-						i = Integer.parseInt(value);
-					} catch (NumberFormatException e) {}
-					if (att.getLength() > att.getPrecision()) {
-						if (i > att.getLength()) {
-							i = att.getLength();
-						} else if (i < att.getPrecision()) {
-							i = att.getPrecision();
-						}
-					}
-					result.put(code, i);
-					continue;
-				}
-				// Range and scale Float value
-				if (MetaDataAttribute.TYPE_FLOAT.equals(att.getType())) {
-					double f = 0;
-					try {
-						f = Double.parseDouble(value);
-					} catch (NumberFormatException e) {}
-					if ((att.getLength() > 0) && (f > att.getLength())) {
-						f = att.getLength();
-					}
-					if (att.getPrecision() > 0) {
-						f = new BigDecimal(f).setScale(att.getPrecision(), BigDecimal.ROUND_HALF_UP).doubleValue();
-					}
-					result.put(code, f);
-					continue;
-				}
-				if (MetaDataAttribute.TYPE_BIGINTEGER.equals(att.getType())) {
-					BigInteger bi = new BigInteger(new byte[] {0});
-					try {
-						bi = new BigInteger(value);
-					} catch (NumberFormatException e) {}
-					result.put(code, bi);
-					continue;
-				}
-				// Truncate the strings.
-				if (MetaDataAttribute.TYPE_STRING.equals(att.getType()) && (att.getLength() > 0)) { 
-					if (value.length() > att.getLength()) {
-						value = value.substring(0, att.getLength());
-					}
-					result.put(code, value);
-					continue;
-				}
-				if (att.isReference()) {
-					int ref = 0;
-					try {
-						ref = Integer.parseInt(value);
-					} catch (NumberFormatException e) {}
-					if (ref <= 0) {
-						// Support null references.
-						result.put(code, null);
-					} else {
-						result.put(code, ref);
-					}
-					continue;
-				}
-				// Types divers...
-				// Tout attribut dont Presicion > 0 est un entier de type "Range" si Length > Presicion...
-				if (att.getPrecision() > 0) {
-					int i = 0;
-					try {
-						i = Integer.parseInt(value);
-					} catch (NumberFormatException e) {}
-					if ((att.getLength() > att.getPrecision()) && (i > att.getLength())) {
-						i = att.getLength();
-					}
-					if (i < att.getPrecision()) {
-						i = att.getPrecision();
-					}
-					result.put(code, i);
-					continue;
-				}
-				// Tout attribut dont la longueur est > 0 est considéré comme une string.
-				if (att.getLength() > 0) {
-					if (value.length() > att.getLength()) {
-						value = value.substring(0, att.getLength());
-					}
-				}
-				result.put(code, value);
+				result.put(code, att.convertValue(value));
 			}
 		}
 		return result;

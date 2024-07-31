@@ -537,7 +537,10 @@ public class MetaDataParentResource extends DataParentResource {
 		}
 		
 		// TODO Detect any relative data and cascade the creation
-		// (for instance user.firstname = "x" create a user with firstname = "x" and link it through with user = id)
+		// TODO (for instance user.firstname = "x" create a user with firstname = "x" and link it through with user = id)
+		// TODO Use getEntity().formToBean(form, list, true, false false);
+		// TODO And then look for sub BeanMap in the result BeanMap...
+		// TODO Process each of then (recursively, as it may include property like "subcode.subsubcode")  
 		
 		// Création de l'élément.
 		result = getMapper().create(getEntity(),list,getEntity().getValues(list,result));

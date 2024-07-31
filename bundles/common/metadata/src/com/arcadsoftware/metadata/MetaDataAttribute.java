@@ -13,12 +13,17 @@
  *******************************************************************************/
 package com.arcadsoftware.metadata;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.text.ParseException;
+
 import org.restlet.data.Language;
 
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.IIdentifiedBean;
 import com.arcadsoftware.metadata.criteria.ISearchCriteria;
 import com.arcadsoftware.metadata.internal.Activator;
+import com.arcadsoftware.osgi.ISODateFormater;
 
 public class MetaDataAttribute extends Element {
 
@@ -351,5 +356,153 @@ public class MetaDataAttribute extends Element {
 			return getCode();
 		}
 		return n;
+	}
+	
+	/**
+	 * Convert any string representation of this attribute value into a more specific Object, that may be suitable for a database mapping.
+	 * 
+	 * @param value
+	 * @return a converted value, may be null even if the value parameter is not null.
+	 */
+	public Object convertValue(String value) {
+		if (MetaDataAttribute.TYPE_BOOLEAN.equals(getType())) {
+			if ("true".equalsIgnoreCase(value) || //$NON-NLS-1$
+					"yes".equalsIgnoreCase(value) || //$NON-NLS-1$
+					"1".equalsIgnoreCase(value)) { //$NON-NLS-1$
+				return new Integer(1);
+			}
+			return new Integer(0);
+		}
+		if (MetaDataAttribute.TYPE_REALBOOLEAN.equals(getType())) {
+			if ("true".equalsIgnoreCase(value) || //$NON-NLS-1$
+					"yes".equalsIgnoreCase(value) || //$NON-NLS-1$
+					"1".equalsIgnoreCase(value)) { //$NON-NLS-1$
+				return Boolean.TRUE;
+			}
+			return Boolean.FALSE;
+		}
+		// FIXME As the original Form may come from a JSON object conversion "null" values should be supported...
+		if (value == null) {
+			value = ""; //$NON-NLS-1$
+		}
+		if (MetaDataAttribute.TYPE_DATE.equals(getType())) {
+			if (value.isEmpty()) {
+				// Support null dates.
+				return null;
+			}
+			if (ISODateFormater.mayIsoDate(value)) {
+				try {
+					return ISODateFormater.toDate(value);
+				} catch (ParseException e) {}// nothing to do.
+			}
+		}
+		if (MetaDataAttribute.TYPE_INTEGER.equals(getType()) ||
+				MetaDataAttribute.TYPE_INT.equals(getType())) { 
+			int i = 0;
+			try {
+				i = Integer.parseInt(value);
+			} catch (NumberFormatException e) {}
+			if ((length != 0) && (i > length)) {
+				return new Integer(length);
+			}
+			return new Integer(i);
+		}
+		if (MetaDataAttribute.TYPE_LONG.equals(getType())) { 
+			long l = 0;
+			try {
+				l = Long.parseLong(value);
+			} catch (NumberFormatException e) {}
+			if ((length != 0) && (l > length)) {
+				return new Long(length);
+			}
+			return new Long(l);
+		}
+		if (MetaDataAttribute.TYPE_ICON.equals(getType())) { 
+			int i = 0;
+			try {
+				i = Integer.parseInt(value);
+			} catch (NumberFormatException e) {}
+			if (i <= 0) {
+				return null;
+			}
+			return new Integer(i);
+		}
+		if (MetaDataAttribute.TYPE_RANGE.equals(getType())) { 
+			int i = 0;
+			try {
+				i = Integer.parseInt(value);
+			} catch (NumberFormatException e) {}
+			if (length > precision) {
+				if (i > length) {
+					return new Integer(length);
+				}
+				if (i < precision) {
+					return new Integer(precision);
+				}
+			}
+			return new Integer(i);
+		}
+		// Range and scale Float value
+		if (MetaDataAttribute.TYPE_FLOAT.equals(getType())) {
+			double f = 0;
+			try {
+				f = Double.parseDouble(value);
+			} catch (NumberFormatException e) {}
+			if ((length > 0) && (f > length)) {
+				return new Double(length);
+			}
+			if (precision > 0) {
+				f = new BigDecimal(f).setScale(precision, BigDecimal.ROUND_HALF_UP).doubleValue();
+			}
+			return new Double(f);
+		}
+		if (MetaDataAttribute.TYPE_BIGINTEGER.equals(getType())) {
+			try {
+				return new BigInteger(value);
+			} catch (NumberFormatException e) {
+				return new BigInteger(new byte[] {0});
+			}
+		}
+		// Truncate the strings.
+		if (MetaDataAttribute.TYPE_STRING.equals(getType()) && (length > 0)) { 
+			if (value.length() > length) {
+				value = value.substring(0, length);
+			}
+			return value;
+		}
+		if (isReference()) {
+			int ref = 0;
+			try {
+				ref = Integer.parseInt(value);
+			} catch (NumberFormatException e) {}
+			if (ref <= 0) {
+				// Support null references.
+				return null;
+			}
+			return new Integer(ref);
+		}
+		// misc. types...
+		// Any attribute with Precision > 0 is an integer of type "Range"...
+		// if length is lower than precision then "precision" is a lower limit.
+		if (precision > 0) {
+			int i = 0;
+			try {
+				i = Integer.parseInt(value);
+			} catch (NumberFormatException e) {}
+			if ((length > precision) && (i > length)) {
+				return new Integer(length);
+			}
+			if (i < precision) {
+				return new Integer(precision);
+			}
+			return new Integer(i);
+		}
+		// Any Attribute if Length > 0 (and precision = 0, see above) is assumed to be a string.
+		if (length > 0) {
+			if (value.length() > length) {
+				value = value.substring(0, length);
+			}
+		}
+		return value;
 	}
 }
