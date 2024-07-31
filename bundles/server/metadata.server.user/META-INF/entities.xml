@@ -104,7 +104,7 @@
 			<metadata>
 				<sourceCol>UPF_USR_ID</sourceCol>
 				<destCol>UPF_PRF_ID</destCol>
-				<table>USER_PROFILES </table>
+				<table>USER_PROFILES</table>
 				<logLink>The user "%fullname%" has been associated with the profile "%code%".</logLink>
 				<logUnlink>The user "%fullname%" is not associated to the profile "%code%" anymore.</logUnlink>
 			</metadata>
