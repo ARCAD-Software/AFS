@@ -329,6 +329,10 @@ public class MetaDataItemResource extends DataItemResource {
 
 	@Override
 	protected Representation delete(Variant variant) throws ResourceException {
+		if (!isExisting()) {
+			setStatus(Status.SUCCESS_NO_CONTENT);
+			return null;
+		}
 		Language language = getClientPreferedLanguage();
 		Form form = getRequestForm();
 		if (linkeds != null) {
@@ -638,6 +642,10 @@ public class MetaDataItemResource extends DataItemResource {
 
 	@Override
 	protected Representation put(Representation representation, Variant variant) throws ResourceException {
+		if (!isExisting()) {
+			setStatus(Status.CLIENT_ERROR_NOT_FOUND);
+			return null;
+		}
 		Language language = getClientPreferedLanguage();		
 		Form form = getRequestForm();
 		if (link != null) {
