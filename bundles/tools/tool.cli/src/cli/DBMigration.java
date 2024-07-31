@@ -195,12 +195,14 @@ public final class DBMigration extends DataSourceCommand {
 		}
 		// Upgrade the sequences.
 		if (isDB2i) {
+			
 			// FIXME find a way to reset the sequences on DB2i !
 			// FIXME find a way to reset the sequences on DB2i !
 			// FIXME find a way to reset the sequences on DB2i !
 			// FIXME find a way to reset the sequences on DB2i !
 			// FIXME find a way to reset the sequences on DB2i !
 			// FIXME find a way to reset the sequences on DB2i !
+			
 		} else {
 			try {
 				runscript(pgconnection, new File("./database/migrate/set_sequences.sql"), true); //$NON-NLS-1$

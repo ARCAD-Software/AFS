@@ -536,6 +536,10 @@ public class MetaDataParentResource extends DataParentResource {
 				}
 			}
 		}
+		
+		// TODO Detect any relative data and cascade the creation
+		// (for instance user.firstname = "x" create a user with firstname = "x" and link it through with user = id)
+		
 		// Création de l'élément.
 		result = getMapper().create(getEntity(),list,getEntity().getValues(list,result));
 		if ((result == null) || (result.getId() == 0)) {
