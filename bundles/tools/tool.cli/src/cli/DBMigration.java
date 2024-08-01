@@ -195,14 +195,7 @@ public final class DBMigration extends DataSourceCommand {
 		}
 		// Upgrade the sequences.
 		if (isDB2i) {
-			
-			// FIXME find a way to reset the sequences on DB2i !
-			// FIXME find a way to reset the sequences on DB2i !
-			// FIXME find a way to reset the sequences on DB2i !
-			// FIXME find a way to reset the sequences on DB2i !
-			// FIXME find a way to reset the sequences on DB2i !
-			// FIXME find a way to reset the sequences on DB2i !
-			
+			resetDB2iSequences(connection, pgconnection);
 		} else {
 			try {
 				runscript(pgconnection, new File("./database/migrate/set_sequences.sql"), true); //$NON-NLS-1$
@@ -248,9 +241,73 @@ public final class DBMigration extends DataSourceCommand {
 		return 0;
 	}
 
+	private void resetDB2iSequences(Connection connection, Connection connectioni) {
+		try {
+			// Get the list of tables...
+			String catalog = connection.getCatalog();
+			String schema = connection.getSchema();
+			DatabaseMetaData dbMeta = connection.getMetaData();
+			try (ResultSet rs = dbMeta.getTables(catalog, schema, null, new String[] { "TABLE" })) { //$NON-NLS-1$
+				while (rs.next()) {
+					String table = rs.getString("TABLE_NAME");
+					// Get the PK of each table...
+					String pkname = null;
+					try (ResultSet crs = dbMeta.getColumns(catalog, schema, table, null)) {
+						while (crs.next()) {
+							// IS_AUTOINCREMENT String => Indicates whether this column is auto incremented
+							//   YES --- if the column is auto incremented
+							//   NO --- if the column is not auto incremented
+							//   empty string --- if it cannot be determined whether the column is auto incremented
+							if ("YES".equalsIgnoreCase(crs.getString("IS_AUTOINCREMENT"))) {
+								pkname = crs.getString("COLUMN_NAME"); //$NON-NLS-1$
+								break;
+							}
+						}
+					} catch (SQLException e) {
+						println("Unable to get Table metadata: " + table);
+						if (isArgument("-debug")) { //$NON-NLS-1$
+							e.printStackTrace();
+						}
+						continue;
+					}
+					if (pkname == null) {
+						if (isArgument("-debug")) {
+							println("No Auto increment column find for table: " + table);
+						}
+					} else {
+						try (PreparedStatement ps = connection.prepareStatement("select max(" + pkname + ") from " + table);
+								ResultSet mrs = ps.executeQuery()) {
+							if (mrs.next()) {
+								int max = mrs.getInt(1);
+								if (max > 0) {
+									max++;
+									try (PreparedStatement rps = connectioni.prepareStatement("alter table " + table + " alter column " + pkname + " restart with ?")) {
+										rps.setInt(1, max);
+										rps.execute();
+									}
+								}
+							}
+						} catch (SQLException e) {
+							printError("Unable to reset the Prinary Key sequence value for the table: " + table);
+							if (isArgument("-debug")) { //$NON-NLS-1$
+								e.printStackTrace();
+							}
+						}
+					}
+				}
+			}
+			
+		} catch (SQLException e) {
+			printError("Unable to reset the Primary keys identity next value: " + e.getLocalizedMessage());
+			if (isArgument("-debug")) { //$NON-NLS-1$
+				e.printStackTrace();
+			}
+		}
+	}
+
 	private int copy(String catalog, String schemaName, String tableName, Connection h2Connection, Connection postgresqlConnection) throws SQLException {
 		List<String> columns = new ArrayList<>();
-		DatabaseMetaData dbMeta = postgresqlConnection.getMetaData();
+		DatabaseMetaData dbMeta = h2Connection.getMetaData();
 		int columnCount = 0;
 		try (ResultSet rs = dbMeta.getColumns(catalog, schemaName, tableName, null)) {
 			while (rs.next()) {
@@ -263,6 +320,7 @@ public final class DBMigration extends DataSourceCommand {
 		String sqlQuery = "SELECT " + queryColumns + " FROM " + tableName; //$NON-NLS-1$ //$NON-NLS-2$
 		try (PreparedStatement pstmtQuery = h2Connection.prepareStatement(sqlQuery);
 				ResultSet rsQuery = pstmtQuery.executeQuery()) {
+
 			String sqlTruncate = "TRUNCATE TABLE " + tableName; //$NON-NLS-1$
 			String sqlInsert = "INSERT INTO " + tableName + " (" + queryColumns + ") VALUES (" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					columns.stream().map(c -> "?").collect(Collectors.joining(", ")) + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -302,15 +360,9 @@ public final class DBMigration extends DataSourceCommand {
 	}
 
 	private void migrate(Connection h2Connection, Connection postgresqlConnection, boolean isDB2i) throws Exception {
-		String catalog = postgresqlConnection.getCatalog();
-		if ((catalog == null) && !isDB2i) {
-			throw new Exception("The library/catalog name of the target database must be set.");
-		}
-		String schema = postgresqlConnection.getSchema();
-		if ((schema == null) && !isDB2i) {
-			throw new Exception("The library/schema name of the target database must be set.");
-		}
-		DatabaseMetaData dbMeta = postgresqlConnection.getMetaData();
+		String catalog = h2Connection.getCatalog();
+		String schema = h2Connection.getSchema();
+		DatabaseMetaData dbMeta = h2Connection.getMetaData();
 		try (ResultSet rs = dbMeta.getTables(catalog, schema, null, new String[] { "TABLE" })) { //$NON-NLS-1$
 			int tbcount = 0;
 			int lncount = 0;
