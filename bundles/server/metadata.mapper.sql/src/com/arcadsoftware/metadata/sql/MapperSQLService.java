@@ -1011,10 +1011,10 @@ public class MapperSQLService extends AbstractMapperService {
 			String dateCol = DEFAULT_TABLEALIAS + fg.prefix + entityInfo.updateCol;
 			result.append(fg.parin);
 			result.append(String.format(fg.greater,dateCol,
-					String.format(fg.datefunction, sdf.format(((BetweenCriteria) criteria).getAfterCalendar().getTime()))));
+					String.format(fg.datefunction, sdf.format(((ChangedCriteria) criteria).getAfterCalendar().getTime()))));
 			result.append(fg.and);
 			result.append(String.format(fg.lower,dateCol,
-					String.format(fg.datefunction, sdf.format(((BetweenCriteria) criteria).getBeforeCalendar().getTime()))));			
+					String.format(fg.datefunction, sdf.format(((ChangedCriteria) criteria).getBeforeCalendar().getTime()))));			
 			result.append(fg.parout);
 		} else {
 			Activator.getInstance().debug(String.format(Messages.MapperSQLService_UnknownCriteria, criteria.toString(), criteria.getClass().getName()));
