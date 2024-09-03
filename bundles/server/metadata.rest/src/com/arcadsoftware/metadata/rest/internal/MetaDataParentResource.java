@@ -277,7 +277,7 @@ public class MetaDataParentResource extends DataParentResource {
 		if (attributes.size() > 0) {
 			orders = getEntity().getPublicAttributeLines(getColumns(form, "orders")); //$NON-NLS-1$
 			itt = orders.iterator();
-			while(itt.hasNext()) {
+			while (itt.hasNext()) {
 				ReferenceLine att = itt.next();
 				if (att.isEmpty()) {
 					itt.remove();
