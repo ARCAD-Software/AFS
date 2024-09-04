@@ -215,7 +215,25 @@ public class MetaDataParentResource extends DataParentResource {
 		// check other parameters... 
 		boolean deleted = isParameter(form, "deleted"); //$NON-NLS-1$
 		boolean distincts = isParameter(form, "distincts"); //$NON-NLS-1$
-		BeanMapList result = getEntity().dataSelection(new ArrayList<ReferenceLine>(), deleted, criteria, distincts, null, getUser(), first, number);
+		List<ReferenceLine> orders = getEntity().getPublicAttributeLines(getColumns(form, "orders")); //$NON-NLS-1$
+		Iterator<ReferenceLine> itt = orders.iterator();
+		while (itt.hasNext()) {
+			ReferenceLine att = itt.next();
+			if (att.isEmpty()) {
+				itt.remove();
+			} else {
+				MetaDataAttribute a = att.getLastAttribute();
+				if ((a != null) && (a.getRightRead(false) != null)) {
+					// TODO Ce test devrait être complété par un test sur la jointure !
+					MetaDataEntity e = (MetaDataEntity) a.getParent();
+					if (!e.getMapper().test(e, a.getRightRead(false), getUser())) {
+						itt.remove();
+						continue;
+					}
+				}
+			}
+		}
+		BeanMapList result = getEntity().dataSelection(orders, deleted, criteria, distincts, orders, getUser(), first, number);
 		Date date = new Date(0l);
 		// Return EPOCH for empty lists...
 		if (result.size() > 0) {
@@ -266,9 +284,9 @@ public class MetaDataParentResource extends DataParentResource {
 				itt.remove();
 			} else {
 				MetaDataAttribute a = att.getLastAttribute();
-				// TODO Ce test devrait être complété par un test sur toute la jointure !
-				if (a.getRightRead(false) != null) {
-					MetaDataEntity e = (MetaDataEntity)a.getParent();
+				// 
+				if ((a != null) && (a.getRightRead(false) != null)) {
+					MetaDataEntity e = (MetaDataEntity) a.getParent();
 					if (!e.getMapper().test(e, a.getRightRead(false), getUser())) {
 						itt.remove();
 					}
@@ -280,13 +298,13 @@ public class MetaDataParentResource extends DataParentResource {
 		if (attributes.size() > 0) {
 			orders = getEntity().getPublicAttributeLines(getColumns(form, "orders")); //$NON-NLS-1$
 			itt = orders.iterator();
-			while(itt.hasNext()) {
+			while (itt.hasNext()) {
 				ReferenceLine att = itt.next();
 				if (att.isEmpty()) {
 					itt.remove();
 				} else {
 					MetaDataAttribute a = att.getLastAttribute();
-					if (a.getRightRead(false) != null) {
+					if ((a != null) && (a.getRightRead(false) != null)) {
 						// TODO Ce test devrait être complété par un test sur la jointure !
 						MetaDataEntity e = (MetaDataEntity) a.getParent();
 						if (!e.getMapper().test(e, a.getRightRead(false), getUser())) {
