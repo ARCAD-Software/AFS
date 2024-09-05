@@ -26,7 +26,6 @@ Export-Package: com.arcadsoftware.database.sql;version="1.4.0";uses:="com.arcads
 Bundle-ClassPath: .
 Automatic-Module-Name: com.arcadsoftware.database.sql
 Eclipse-ExtensibleAPI: true
-Bundle-ActivationPolicy: lazy
 Bundle-License: https://www.eclipse.org/legal/epl-2.0
 Bundle-License-Name: Eclipse Public License Version 2.0
 Bundle-DocURL: https://github.com/ARCAD-Software/AFS/wiki
