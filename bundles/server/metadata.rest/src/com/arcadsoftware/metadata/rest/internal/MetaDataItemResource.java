@@ -30,6 +30,7 @@ import org.restlet.resource.ResourceException;
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
 import com.arcadsoftware.beanmap.BeanMapPartialList;
+import com.arcadsoftware.metadata.IByPassListener;
 import com.arcadsoftware.metadata.IMetaDataDeleteListener;
 import com.arcadsoftware.metadata.IMetaDataLinkingListener;
 import com.arcadsoftware.metadata.IMetaDataModifyListener;
@@ -362,17 +363,23 @@ public class MetaDataItemResource extends DataItemResource {
 					continue;
 				}
 				boolean cnt = false;
+				boolean bypass = false;
 				for(IMetaDataDeleteListener listener: listeners) {
 					if (!listener.testDeletion(entity, item, getUser(), language)) {
 						cnt = true;
 						break;
+					}
+					if (listener instanceof IByPassListener) {
+						bypass = true;
 					}
 				}
 				if (cnt) {
 					continue;
 				}
 				broadcastUserAction("logDelete", item); //$NON-NLS-1$
-				entity.getMapper().delete(item, hardelete);
+				if (!bypass) {
+					entity.getMapper().delete(item, hardelete);
+				}
 				item.setDeleted(true);
 				Activator.getInstance().test(MetaDataTest.EVENTCODE_AFTERDELETE, entity, item, getUser(), language);
 				for(IMetaDataDeleteListener listener: listeners) {
@@ -406,33 +413,37 @@ public class MetaDataItemResource extends DataItemResource {
 			// select linked items
 			BeanMapList linkedItems = getEntity().getMapper().linkSelection(link, item.getId());
 			if (linkedItems != null) {
-				boolean doit = true;
-				boolean fireEvent = false;
 				for (BeanMap linkedItem: linkedItems) {
 					if (!linkEntity.getMapper().test(linkedItem, link.getRightCreate(true), getUser())) {
 						// TODO les tests de droits sur les associations devrait pouvoir être appliqué aussi à la source !!!
 						errors = true;
 					} else {
-						doit = true;
-						fireEvent = false;
+						boolean doit = true;
+						boolean byPass = false;
 						for (IMetaDataLinkingListener listener: listeners) {
 							if (!listener.testUnlink(link, item, linkedItem, getUser(), language)) {
 								doit = false;
 								errors = true;
 								break;
 							}
+							if (listener instanceof IByPassListener) {
+								byPass = true;
+							}
 						}
 						if (doit) {
 							broadcastUserAction(link, "logUnlink", item, linkedItem); //$NON-NLS-1$
+							boolean fireEvent = byPass;
 							if (deleteitems) {
 								broadcastUserAction("logDelete", item); //$NON-NLS-1$
-								getEntity().getMapper().delete(linkedItem, hardelete);
-								// check if cascade deletion also removed the link.
-								if (!getEntity().getMapper().linkTest(link, item.getId(), linkedItem.getId())) {
-									fireEvent = true;
+								if (!byPass) {
+									getEntity().getMapper().delete(linkedItem, hardelete);
+									// check if cascade deletion also removed the link.
+									if (!getEntity().getMapper().linkTest(link, item.getId(), linkedItem.getId())) {
+										fireEvent = true;
+									}
 								}
 							}
-							if (getEntity().getMapper().linkRemove(link, item.getId(), linkedItem.getId())) {
+							if ((!byPass) && getEntity().getMapper().linkRemove(link, item.getId(), linkedItem.getId())) {
 								fireEvent = true;
 							}
 							if (fireEvent) {
@@ -733,42 +744,48 @@ public class MetaDataItemResource extends DataItemResource {
 				item.remove(att.getCode());
 			}
 		}
-		if (!doUpdateTest(listeners, item, values, attlistex, language)) {
+		switch (doUpdateTest(listeners, item, values, attlistex, language)) {
+		case 0:
 			getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST, Activator.getMessage("error.missingattributes", language)); //$NON-NLS-1$
 			return null;
-		}
-		// Check "unique" values constraints
-		if (!undelete) {
-			// Already done if undelete is true (see above !)
-			ISearchCriteria invariantCriteria = new NotCriteria(new IdEqualCriteria(item.getId()));
-			for (MetaDataAttribute attribute: attlist) {
-				if (attribute.getMetadata().getBoolean(MetaDataEntity.METADATA_UNIQUE)) {
-					Object value = values.get(attribute.getCode());
-					if ((value != null) && (value.toString().length() > 0)) { // ignore null values...
-						// Retire l'élément courant de la sélection (évite les updates sur même valeur).
-						EqualCriteria codeEqual = new EqualCriteria();
-						codeEqual.setAttribute(attribute.getCode());
-						if (MetaDataAttribute.TYPE_INTEGER.equals(attribute.getType()) || MetaDataAttribute.TYPE_INT.equals(attribute.getType())) {
-							try {
-								codeEqual.setIntval(new Integer(value.toString()));
-							} catch (NumberFormatException e) {
+		case -1:
+			values.forceId(item.getId());
+			values.setDeleted(item.isDeleted());
+			break;
+		case 1:
+			// Check "unique" values constraints
+			if (!undelete) {
+				// Already done if undelete is true (see above !)
+				ISearchCriteria invariantCriteria = new NotCriteria(new IdEqualCriteria(item.getId()));
+				for (MetaDataAttribute attribute: attlist) {
+					if (attribute.getMetadata().getBoolean(MetaDataEntity.METADATA_UNIQUE)) {
+						Object value = values.get(attribute.getCode());
+						if ((value != null) && (value.toString().length() > 0)) { // ignore null values...
+							// Removes the current element from the selection (avoids updates on the same value)
+							EqualCriteria codeEqual = new EqualCriteria();
+							codeEqual.setAttribute(attribute.getCode());
+							if (MetaDataAttribute.TYPE_INTEGER.equals(attribute.getType()) || MetaDataAttribute.TYPE_INT.equals(attribute.getType())) {
+								try {
+									codeEqual.setIntval(new Integer(value.toString()));
+								} catch (NumberFormatException e) {
+									codeEqual.setValue(value.toString());
+								}
+							} else {
 								codeEqual.setValue(value.toString());
 							}
-						} else {
-							codeEqual.setValue(value.toString());
-						}
-						if (getEntity().dataCount(false, new AndCriteria(invariantCriteria , codeEqual), false, getUser()) > 0) {
-							throw new ResourceException(Status.CLIENT_ERROR_PRECONDITION_FAILED, //
-									String.format(Activator.getMessage("error.uniqueattribute.update", language), //$NON-NLS-1$ 
-											attribute.getName(language), value, attribute.getCode()));
+							if (getEntity().dataCount(false, new AndCriteria(invariantCriteria , codeEqual), false, getUser()) > 0) {
+								throw new ResourceException(Status.CLIENT_ERROR_PRECONDITION_FAILED, //
+										String.format(Activator.getMessage("error.uniqueattribute.update", language), //$NON-NLS-1$ 
+												attribute.getName(language), value, attribute.getCode()));
+							}
 						}
 					}
 				}
 			}
+			values.forceId(item.getId());
+			values.setDeleted(item.isDeleted());
+			getMapper().update(values);
 		}
-		values.forceId(item.getId());
-		values.setDeleted(item.isDeleted());
-		getMapper().update(values);
 		if (values.getId() == 0) {
 			getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST, Activator.getMessage("error.badattributes", language)); //$NON-NLS-1$
 			return null;
@@ -777,14 +794,24 @@ public class MetaDataItemResource extends DataItemResource {
 		return values;
 	}
 
-	private boolean doUpdateTest(List<IMetaDataModifyListener> listeners, BeanMap oldValue, BeanMap result, ArrayList<MetaDataAttribute> list, Language language) {
+	private int doUpdateTest(List<IMetaDataModifyListener> listeners, BeanMap oldValue, BeanMap result, ArrayList<MetaDataAttribute> list, Language language) {
 		MetaDataEntity entity = getEntity();
+		boolean bypass = false;
 		for (IMetaDataModifyListener listener: listeners) {
 			if (!listener.testModification(entity, oldValue, result, list, getUser(), language)) {
-				return false;
+				return 0;
+			}
+			if (listener instanceof IByPassListener) {
+				bypass = true;
 			}
 		}
-		return Activator.getInstance().test(MetaDataTest.EVENTCODE_BEFOREUPDATE, entity, oldValue, result, list, getUser(), language);
+		if (!Activator.getInstance().test(MetaDataTest.EVENTCODE_BEFOREUPDATE, entity, oldValue, result, list, getUser(), language)) {
+			return 0;
+		}
+		if (bypass) {
+			return -1;
+		}
+		return 1;
 	}
 
 	private void doPostUpdateTreatment(List<IMetaDataModifyListener> listeners, BeanMap oldValue, BeanMap result, ArrayList<MetaDataAttribute> list, Language language) {
@@ -811,23 +838,27 @@ public class MetaDataItemResource extends DataItemResource {
 		List<IMetaDataLinkingListener> listeners = Activator.getInstance().getLinkingListener(link);
 		boolean errors = false;
 		boolean deleted = false;
-		for (BeanMap item:getItems()) {
-			for (BeanMap linked:linkeds) {
+		for (BeanMap item: getItems()) {
+			for (BeanMap linked: linkeds) {
 				if (!linkEntity.getMapper().test(linked, link.getRightCreate(true), getUser())) {
 					// TODO les tests de droits sur les associations devrait pouvoir être appliqué aussi à la source !!!
 					errors = true;
 				} else {
 					boolean doit = true;
-					for(IMetaDataLinkingListener listener: listeners) {
+					boolean bypass = false;
+					for (IMetaDataLinkingListener listener: listeners) {
 						if (!listener.testUnlink(link, item, linked, getUser(), language)) {
 							doit = false;
 							errors = true;
 							break;
 						}
+						if (listener instanceof IByPassListener) {
+							bypass = true;
+						}
 					}
 					if (doit) {
 						broadcastUserAction(link, "logUnlink", item, linked); //$NON-NLS-1$
-						if (getEntity().getMapper().linkRemove(link, item.getId(), linked.getId())) {
+						if (bypass || getEntity().getMapper().linkRemove(link, item.getId(), linked.getId())) {
 							deleted = true;
 							Activator.getInstance().fireUnlinkEvent(getEntity(), link, item, linked, getUser());
 						}
