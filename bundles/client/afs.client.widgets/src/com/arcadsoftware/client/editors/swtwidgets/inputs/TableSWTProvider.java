@@ -84,23 +84,20 @@ import com.arcadsoftware.metadata.MetaDataLink;
 public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBeanMapSelector, ITableSWTProvider {
 
 	private BeanMapTableViewer list;
+	private String internalEditorId;
+	private ILayoutParameters parameters;
+	private ToolBarManager toolbarManager;
+	private boolean storeViewerState = true;
+	private String attributeList;
+	private String orderList;
+	private boolean enableMultiselection;
+	private String subEditionAttribute;
+	private String subEditionType;
+	protected MetaDataLink element;
 	protected Action editAction;
 	protected Action addAction;
 	protected Action removeAction;
-
-	private String internalEditorId;
 	protected ISWTRenderer renderer;
-	private ILayoutParameters parameters;
-	protected MetaDataLink element;
-	private ToolBarManager toolbarManager;
-	private boolean storeViewerState = true;
-	private String attributeList = null;
-	private String orderList = null;
-
-	private boolean enableMultiselection = false;
-
-	private String subEditionAttribute = null;
-	private String subEditionType = null;
 
 	@Override
 	public void create(ISWTRenderer swtRenderer, ILayoutParameters layoutParameters, Element Element,
@@ -109,25 +106,20 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 		setParameters(layoutParameters);
 		element = (MetaDataLink) Element;
 		setInternalEditorId(getLayoutParameters().getParameter(INTERNAL_EDITOR_ID));
-
 		attributeList = getLayoutParameters().getParameter(IConstants.ATTRIBUTE_LIST);
 		orderList = getLayoutParameters().getParameter(IConstants.ORDER_LIST);
 		subEditionAttribute = parameters.getParameter(IConstants.EDITION_ATTRIBUTE);
 		subEditionType = parameters.getParameter(IConstants.EDITION_TYPE);
-
 		// This method is called to let descendant classes having their own action manager
 		manageActions(layoutParameters);
 		createToolBarEditorActions();
-
 		final List<Action> actions = new ArrayList<>();
-
 		final List<Action> previousActions = getPreviousActions();
 		if (previousActions != null) {
 			for (final Action action : previousActions) {
 				actions.add(action);
 			}
 		}
-
 		if (getLayoutParameters().getParameterBoolean(ADD_ACTION)) {
 			addAction = createAddAction(getLayoutParameters().getParameterBoolean(ADD_EDITOR), element, renderer
 					.getLocalizedMessage(getLayoutParameters().getParameter(ADD_ACTION_LABEL)));
@@ -146,47 +138,35 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 			removeAction.setEnabled(!renderer.isReadOnly());
 			actions.add(removeAction);
 		}
-
 		final List<Action> nextActions = getNextActions();
 		if (nextActions != null) {
 			for (final Action action : nextActions) {
 				actions.add(action);
 			}
 		}
-
 		createControlPart(actions);
-
 		final List<ElementParameter> widgetListened = getLayoutParameters().getListElementParameter(WIDGET_LISTENED);
 		if (widgetListened != null) {
 			for (final ElementParameter elementParameter : widgetListened) {
-				renderer.addListenerWidget(this,
-						getLayoutParameters().getElementParameter(elementParameter, WIDGET_ID));
+				renderer.addListenerWidget(this, getLayoutParameters().getElementParameter(elementParameter, WIDGET_ID));
 			}
 		}
 	}
 
-	protected void manageActions(ILayoutParameters layoutParameters) {
-
-	}
+	protected void manageActions(ILayoutParameters layoutParameters) {}
 
 	protected void createControlPart(List<Action> actions) {
 		createControl(renderer.getParent(), actions);
 	}
 
 	protected void createControl(Composite parent, List<Action> actions) {
-
 		final boolean multiSelection = getLayoutParameters().getParameterBoolean(IConstants.MULTI);
-
-		int style = 0;
+		int style = SWT.SINGLE;
 		if (multiSelection) {
 			style = SWT.MULTI;
 			enableMultiselection = true;
-		} else {
-			style = SWT.SINGLE;
 		}
-
 		style = style | SWT.FULL_SELECTION | SWT.V_SCROLL | SWT.H_SCROLL;
-
 		if (getLayoutParameters().getParameter(IConstants.STORE_VIEWER_STATE) != null) {
 			storeViewerState = getLayoutParameters().getParameterBoolean(IConstants.STORE_VIEWER_STATE);
 		} else {
@@ -196,9 +176,7 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 				getLayoutParameters().getParameterBoolean(IConstants.BORDER)) {
 			style = style | SWT.BORDER;
 		}
-
 		createControlBeforeTable(renderer.getParent());
-
 		if (getInternalEditorId() == null) {
 			setList(createBeanMapTableViewerWithoutInternalEditorId(parent, style, actions));
 		} else {
@@ -207,15 +185,11 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 			}
 			setList(createBeanMapTableViewerWithInternalEditorId(parent, style, actions));
 		}
-		// TODO RAP
-		// renderer.getToolkit().paintBordersFor(renderer.getParent());
-
+		// TODO RAP  renderer.getToolkit().paintBordersFor(renderer.getParent());
 		final Table listWidget = (Table) getList().getWidget();
-
 		if (getLayoutParameters().getParameterBoolean(DEFAULT)) {
 			listWidget.setFocus();
 		}
-
 		if (renderer.getParent().getLayout() instanceof GridLayout) {
 			final GridData layoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
 			final int hspan = getLayoutParameters().getParameterInteger(IConstants.COLSPAN, 1);
@@ -236,7 +210,6 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 				layout.marginWidth = 0;
 			}
 		}
-
 		renderer.getRendererBinding().bindElement(element, getList(), parameters);
 		createEditorActions();
 		createControlAfterTable(renderer.getParent());
@@ -249,13 +222,9 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 		renderer.getRendererBinding().bindElement(element, getList());
 	}
 
-	protected void createControlBeforeTable(Composite parent) {
+	protected void createControlBeforeTable(Composite parent) {}
 
-	}
-
-	protected void createControlAfterTable(Composite parent) {
-
-	}
+	protected void createControlAfterTable(Composite parent) {}
 
 	protected boolean mustBeCleanValue() {
 		return false;
@@ -276,7 +245,10 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 			@Override
 			public AbstractColumnedLabelProviderAdapter createLabelProvider(AbstractColumnedViewer viewer) {
 				final AbstractColumnedLabelProviderAdapter specific = createSpecificLabelProvider(viewer);
-				return specific == null ? super.createLabelProvider(viewer) : specific;
+				if (specific == null) {
+					return super.createLabelProvider(viewer);
+				}
+				return specific;
 			}
 
 			@Override
@@ -288,9 +260,8 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 			public String getIdentifier() {
 				if (storeViewerState) {
 					return super.getIdentifier();
-				} else {
-					return null;
 				}
+				return null;
 			}
 
 			@Override
@@ -437,12 +408,10 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 
 	private void createEditorActions() {
 		final List<ElementParameter> elements = getLayoutParameters().getListElementParameter(EDITOR_ACTION);
-
 		for (final ElementParameter elementParameter : elements) {
 			final String label = renderer
 					.getLocalizedMessage(getLayoutParameters().getElementParameter(elementParameter, LABEL));
 			final String icon = getLayoutParameters().getElementParameter(elementParameter, ICON);
-
 			final IEditorAction action = EditorActionFactory.getEditorAction(getLayoutParameters().getElementParameter(
 					elementParameter, ACTION));
 			if (action != null) {
@@ -459,10 +428,7 @@ public class TableSWTProvider implements IInputSWTProvider, IListenerWidget, IBe
 				if (getLayoutParameters().getElementParameterBoolean(elementParameter, IN_TOOL_BAR)) {
 					renderer.getRendererActions().addToolBarAction(action);
 				}
-
-				final String menuLabel = renderer
-						.getLocalizedMessage(getLayoutParameters().getElementParameter(elementParameter,
-								MENU_LABEL));
+				final String menuLabel = renderer.getLocalizedMessage(getLayoutParameters().getElementParameter(elementParameter, MENU_LABEL));
 				if (menuLabel != null) {
 					renderer.getRendererActions().addMenuAction(menuLabel, action);
 				}
