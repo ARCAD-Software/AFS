@@ -32,6 +32,7 @@ import org.restlet.resource.ResourceException;
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
 import com.arcadsoftware.beanmap.BeanMapPartialList;
+import com.arcadsoftware.metadata.IByPassListener;
 import com.arcadsoftware.metadata.IMetaDataDeleteListener;
 import com.arcadsoftware.metadata.IMetaDataModifyListener;
 import com.arcadsoftware.metadata.IMetaDataSelectionListener;
@@ -281,7 +282,7 @@ public class MetaDataParentResource extends DataParentResource {
 				itt.remove();
 			} else {
 				MetaDataAttribute a = att.getLastAttribute();
-				// 
+				// TODO Test all attributes from the line... 
 				if ((a != null) && (a.getRightRead(false) != null)) {
 					MetaDataEntity e = (MetaDataEntity) a.getParent();
 					if (!e.getMapper().test(e, a.getRightRead(false), getUser())) {
@@ -532,37 +533,38 @@ public class MetaDataParentResource extends DataParentResource {
 		// Phase de test des attributs et des valeurs qui leur sont affectées.
 		// A. Application des listeners et des contraintes de type Mandatory.
 		List<IMetaDataModifyListener> listeners = Activator.getInstance().getModifyListener(getType());
-		if (!doCreateTest(listeners, result, list, language)) {
+		switch (doCreateTest(listeners, result, list, language)) {
+		case 0:
 			// Contraintes de type "Mandatory" non respectées, ou echec des listener ou du Script de test.
-			// if this item already exist, just return it to sender... ???
+			// if this item already exist, just return it to sender...
 			if (result.getId() > 0) {
 				removeHiddenAttributes(result);
 				return getRepresentation(variant, form, result, language);
 			}
 			getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST, Activator.getMessage("error.missingattributes", language)); //$NON-NLS-1$
 			return null;
-		}
-		// B. Validation de l'unicité des valeurs.
-		for (MetaDataAttribute attribute: list) {
-			if (attribute.getMetadata().getBoolean(MetaDataEntity.METADATA_UNIQUE)) {
-				Object value = result.get(attribute.getCode());
-				if ((value != null) && (value.toString().length() > 0) && // On ignore les affectation à null.
-						(getEntity().dataCount(false, attribute.getCode(), value) > 0)) {
-					throw new ResourceException(Status.CLIENT_ERROR_PRECONDITION_FAILED, //
-							String.format(Activator.getMessage("error.uniqueattribute.create", language), //$NON-NLS-1$ 
-									attribute.getName(language), value, attribute.getCode()));
+		case 1:
+			// B. Validation de l'unicité des valeurs.
+			for (MetaDataAttribute attribute: list) {
+				if (attribute.getMetadata().getBoolean(MetaDataEntity.METADATA_UNIQUE)) {
+					Object value = result.get(attribute.getCode());
+					if ((value != null) && (value.toString().length() > 0) && // On ignore les affectation à null.
+							(getEntity().dataCount(false, attribute.getCode(), value) > 0)) {
+						throw new ResourceException(Status.CLIENT_ERROR_PRECONDITION_FAILED, //
+								String.format(Activator.getMessage("error.uniqueattribute.create", language), //$NON-NLS-1$ 
+										attribute.getName(language), value, attribute.getCode()));
+					}
 				}
 			}
+			// TODO Detect any relative data and cascade the creation
+			// TODO (for instance user.firstname = "x" create a user with firstname = "x" and link it through with user = id)
+			// TODO Use getEntity().formToBean(form, list, true, false false);
+			// TODO And then look for sub BeanMap in the result BeanMap...
+			// TODO Process each of then (recursively, as it may include property like "subcode.subsubcode")  
+			
+			// Item creation.
+			result = getMapper().create(getEntity(),list,getEntity().getValues(list,result));
 		}
-		
-		// TODO Detect any relative data and cascade the creation
-		// TODO (for instance user.firstname = "x" create a user with firstname = "x" and link it through with user = id)
-		// TODO Use getEntity().formToBean(form, list, true, false false);
-		// TODO And then look for sub BeanMap in the result BeanMap...
-		// TODO Process each of then (recursively, as it may include property like "subcode.subsubcode")  
-		
-		// Création de l'élément.
-		result = getMapper().create(getEntity(),list,getEntity().getValues(list,result));
 		if ((result == null) || (result.getId() == 0)) {
 			// Echec de la création.
 			getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST, Activator.getMessage("error.badattributes", language)); //$NON-NLS-1$
@@ -588,28 +590,52 @@ public class MetaDataParentResource extends DataParentResource {
 		}
 	}
 
-	private boolean doCreateTest(List<IMetaDataModifyListener> listeners, BeanMap result, ArrayList<MetaDataAttribute> list, Language language) {
+	/**
+	 * Return 0 if the operation must be aborted, +1 if the operation can by proceeded or -1 if the operation must be ignored.
+	 * 
+	 * @param listeners
+	 * @param result
+	 * @param list
+	 * @param language
+	 * @return
+	 */
+	private int doCreateTest(List<IMetaDataModifyListener> listeners, BeanMap result, ArrayList<MetaDataAttribute> list, Language language) {
 		MetaDataEntity entity = getEntity();
 		// Avant tout, appel des Listeners qui peuvent rétablir une situation non conforme.
+		boolean byPass = false;
 		for (IMetaDataModifyListener listener: listeners) {
 			if (!listener.testModification(entity, null, result, list, getUser(), language)) {
-				return false;
+				return 0;
+			}
+			if (listener instanceof IByPassListener) {
+				byPass = true;
 			}
 		}
 		// Appel du script de test de validité de l'Entity.
-		if (!Activator.getInstance().test(MetaDataTest.EVENTCODE_BEFORECREATE, entity, result, list, getUser(), language)) {
-			// Ce script peut soit déclencher une ResourceException
-			// Soit renvoyer false pour signifier un problème de type "mandatory" !  
-			return false;
-		}
-		// Mandatory and Unique attributes...
-		for (MetaDataAttribute a:entity.getAttributes().values()) {
-			// Un Mandatory absent termine le test.
-			if (a.isMandatory() && (list.indexOf(a) < 0)) {
-				return false;
+		try {
+			if (!Activator.getInstance().test(MetaDataTest.EVENTCODE_BEFORECREATE, entity, result, list, getUser(), language)) {
+				// Ce script peut soit déclencher une ResourceException
+				// Soit renvoyer false pour signifier un problème de type "mandatory" !  
+				return 0;
+			}
+		} catch (ResourceException e) {
+			if (e.getStatus().equals(Status.SUCCESS_OK)) {
+				byPass = true;
+			} else {
+				throw e;
 			}
 		}
-		return true;
+		// Mandatory and Unique attributes...
+		for (MetaDataAttribute a: entity.getAttributes().values()) {
+			// Un Mandatory absent termine le test.
+			if (a.isMandatory() && (list.indexOf(a) < 0)) {
+				return 0;
+			}
+		}
+		if (byPass) {
+			return -1;
+		}
+		return 1;
 	}
 
 	private void doPostCreateTreatment(List<IMetaDataModifyListener> listeners, BeanMap result, ArrayList<MetaDataAttribute> list, Language language) throws Exception {
@@ -639,7 +665,7 @@ public class MetaDataParentResource extends DataParentResource {
 		BeanMapList items = getEntity().getMapper().selection(entity, (List<ReferenceLine>) null, hardelete, criteria, false, null, getUser(), 0, -1);
 		boolean noerrors = true;
 		List<IMetaDataDeleteListener> listeners = Activator.getInstance().getDeleteListener(entity.getType());
-		for(BeanMap item: items) {
+		for (BeanMap item: items) {
 			if (!Activator.getInstance().test(MetaDataTest.EVENTCODE_BEFOREDELETE, entity, item, getUser(), language)) {
 				if (noerrors) {
 					setStatus(Status.CLIENT_ERROR_FORBIDDEN, Activator.getMessage("right.nodelete", language)); //$NON-NLS-1$
@@ -648,17 +674,23 @@ public class MetaDataParentResource extends DataParentResource {
 				continue;
 			}
 			boolean cnt = false;
-			for(IMetaDataDeleteListener listener: listeners) {
+			boolean byPass = false;
+			for (IMetaDataDeleteListener listener: listeners) {
 				if (!listener.testDeletion(entity, item, getUser(), language)) {
 					cnt = true;
 					break;
+				}
+				if (listener instanceof IByPassListener) {
+					byPass = true;
 				}
 			}
 			if (cnt) {
 				continue;
 			}
 			broadcastUserAction("logDelete", item); //$NON-NLS-1$
-			entity.getMapper().delete(item, hardelete);
+			if (!byPass) {
+				entity.getMapper().delete(item, hardelete);
+			}
 			item.setDeleted(true);
 			Activator.getInstance().test(MetaDataTest.EVENTCODE_AFTERDELETE, entity, item, getUser(), language);
 			for(IMetaDataDeleteListener listener: listeners) {
