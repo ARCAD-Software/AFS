@@ -64,11 +64,6 @@ public class Activator extends AbstractConfiguredActivator implements ServiceTra
 	public static final String PROP_MAPPERALIAS = "alias."; //$NON-NLS-1$
 
 	private static Activator instance;
-	private static MultiLanguageMessages messages = new MultiLanguageMessages("com.arcadsoftware.metadata.internal.usermessages",Activator.class.getClassLoader()); //$NON-NLS-1$
-
-	public static String getMessage(String key, Language language) {
-		return messages.get(key, language);
-	}
 
 	public static Activator getInstance() {
 		return instance;
