@@ -60,10 +60,12 @@ public class Fragments {
 	public String insert_hard; 
 	public String update;
 	public String delete;
+	public String delete_update;
 	public String deleteex;
 	public String delete_hard;
 	public String delete_hardex;
 	public String undelete;
+	public String undelete_update;
 	public String dateformat;
 	public String greater;
 	public String datefunction;
