@@ -583,8 +583,8 @@ public class MapperSQLService extends AbstractMapperService {
 	 * Generate an alias from a code, prefix (if code is null) and suffix.
 	 * 
 	 * @param code
-	 * @param defaultPrefix
-	 * @param suffix
+	 * @param defaultPrefix used only if code is null.
+	 * @param suffix optional added to the code or to the defaultPrefix
 	 * @return
 	 */
 	private String getAlias(String code, String defaultPrefix, String suffix) {
@@ -898,11 +898,11 @@ public class MapperSQLService extends AbstractMapperService {
 			}
 			result.append(String.format(fg.notintoselect, attcn, l.sourceCol, l.table, condition.toString()));
 		} else if (criteria instanceof LinkEqualCriteria) {
-			// On construit une jointure vers l'entité cible, au travers de la table d'association.
-			// Puis on suit les jointures des attributs jusqu'à l'attribut à tester.
+			// We build a join to the target entity, through the association table.
+			// Then we follow the joins of the attributes up to the attribute to be tested.
 			MetaDataLink link;
-			LinkInfo l; // = informations SQL relative à l'association.
-			String alias; // = alias utilisé pour l'association.
+			LinkInfo l; // = SQL information about the association.
+			String alias; // = alias used for the association.
 			String refcn = colNames.get(((LinkEqualCriteria) criteria).getReference());
 			String lc = ((LinkEqualCriteria) criteria).getLinkCode();
 			if (refcn == null) {
@@ -922,11 +922,12 @@ public class MapperSQLService extends AbstractMapperService {
 				}
 			}
 			EntityInfo ei = getEntityInfo(link.getRefEntity());
+			// Specific alias for this reference table.
 			String refalias = "d_" + alias; //$NON-NLS-1$
-			if (joinMap.doNotExists(alias)) {
+			if (joinMap.doNotExists(refalias)) {
 				joinMap.add(refalias, String.format(fg.joinref, ei.table, refalias, ei.idCol, alias, l.destCol));
 			}
-			// prise en compte des association avec suppression logique.
+			// Taking into account associations with logical deletion.
 			if ((l.deleteCol != null) || (ei.deleteCol != null)) {
 				result.append(fg.parin);
 			}
