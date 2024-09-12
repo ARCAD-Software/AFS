@@ -24,9 +24,12 @@ import com.arcadsoftware.beanmap.ITransientAttribute;
  * This class wrap a BeanMapFormater to be able to format string related to a MetaDataLink.
  * 
  * <p>
- * The attributes code used into the format string can be either from the Source or the target kinked entity.
+ * The attributes code used into the format string can be either from the Source or the Target linked entity.
  * In case of name conflict you can prefix them with the corresponding entity type, or with "source." for
  * the source entity and "target." for the referenced one.
+ * 
+ * <p>
+ * The tag %source.id% and %target.id% may be used to respectively get the Source of Target internal ID.
  * 
  * @author ARCAD Software
  * @see BeanMapFormater
@@ -72,6 +75,9 @@ public class MetaDataLinkFormater implements ITransientAttribute {
 	protected String getAttributeCode(String code) {
 		if (code != null) {
 			String clc = code.toLowerCase();
+			if (clc.equals("source.id") || clc.equals("target.id") || clc.equals("source.type") || clc.equals("target.type")) {
+				return clc;
+			}
 			if (clc.startsWith("source.")) { //$NON-NLS-1$
 				ReferenceLine rl = link.getParent().getReferenceLine(code.substring(7));
 				if (rl != null) {
@@ -145,6 +151,10 @@ public class MetaDataLinkFormater implements ITransientAttribute {
 		bean.addAll("source.", source); //$NON-NLS-1$
 		bean.addAll(targetPrefix, target);
 		bean.addAll(sourcePrefix, source);
+		bean.put("source.id", source.getId());
+		bean.put("target.id", target.getId());
+		bean.put("source.type", source.getType());
+		bean.put("target.type", target.getType());
 		return formater.format(bean);
 	}
 	
@@ -293,4 +303,5 @@ public class MetaDataLinkFormater implements ITransientAttribute {
 		}
 		return true;
 	}
+
 }
