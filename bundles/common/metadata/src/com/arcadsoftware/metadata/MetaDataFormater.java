@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.arcadsoftware.beanmap.BeanMapFormater;
+import com.arcadsoftware.beanmap.IBeanMap;
 import com.arcadsoftware.beanmap.ITransientAttribute;
 import com.arcadsoftware.metadata.internal.Activator;
 
@@ -42,6 +43,9 @@ import com.arcadsoftware.metadata.internal.Activator;
  * a potential attribute text.
  * <li>%|% will be replaced by the pipe character.
  * </ul>
+ * 
+ * <p>
+ * "%id%" may be used to be replaced by the BeanMap internal ID.
  * 
  * <p>
  * For instance theses strings are valid formats :
@@ -76,6 +80,9 @@ public class MetaDataFormater extends BeanMapFormater implements ITransientAttri
 	protected String getAttributeCode(String code) {
 		code = super.getAttributeCode(code);
 		if (code != null) {
+			if (code.equalsIgnoreCase("id") || code.equalsIgnoreCase("type")) {
+				return code;
+			}
 			ReferenceLine rl = entity.getReferenceLine(code);
 			if (rl == null) {
 				Activator.getInstance().info(String.format("The format code \"%s\" does not resolve as an Entity attribute.", code));
@@ -138,4 +145,17 @@ public class MetaDataFormater extends BeanMapFormater implements ITransientAttri
 		}
 		return sb.toString();
 	}
+
+	@Override
+	protected String convertValue(IBeanMap item, String code, Object value, int limit, int completed) {
+		if (code.equalsIgnoreCase("id")) {
+			return Integer.toString(item.getId());
+		}
+		if (code.equalsIgnoreCase("type")) {
+			return item.getType();
+		}
+		return super.convertValue(item, code, value, limit, completed);
+	}
+	
+	
 }
