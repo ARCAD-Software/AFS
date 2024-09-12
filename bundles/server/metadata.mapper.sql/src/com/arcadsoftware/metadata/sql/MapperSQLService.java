@@ -92,8 +92,14 @@ import com.arcadsoftware.osgi.ISODateFormater;
 import com.arcadsoftware.rest.connection.IConnectionUserBean;
 
 /**
- * Mapper provider may extends this class to implement specifics SQL dynamic mapping facilities.  
+ * This class define an Entity <---> SQL relational Database mapping using the specific metadata 
+ * defined in the entities. This <strong>mapper</strong> use a limited/generic SQL syntax which is
+ * adapted depending to the targeted database type.
  * 
+ * <p>
+ * Any mapper provider may extends this class to implement specifics SQL dynamic mapping facilities.  
+ * 
+ * <p>
  * Creation Date: 2011-2-3
  */
 public class MapperSQLService extends AbstractMapperService {
@@ -1277,10 +1283,16 @@ public class MapperSQLService extends AbstractMapperService {
 			}
 			return update(e.sql_harddelete, new Object[] {itemId}) > 0;
 		}
-		if (e.sql_delete == null) {
-			e.sql_delete = String.format(fg.delete, e.table, e.deleteCol, e.idCol);
+		if (e.updateCol == null) {
+			if (e.sql_delete == null) {
+				e.sql_delete = String.format(fg.delete, e.table, e.deleteCol, e.idCol);
+			}
+			return update(e.sql_delete, new Object[] {itemId}) > 0;
 		}
-		return update(e.sql_delete, new Object[] {itemId}) > 0;
+		if (e.sql_delete == null) {
+			e.sql_delete = String.format(fg.delete_update, e.table, e.deleteCol, e.idCol, e.updateCol);
+		}
+		return update(e.sql_delete, new Object[] {new Timestamp(System.currentTimeMillis()), itemId}) > 0;
 	}
 
 	@Override
@@ -1318,8 +1330,22 @@ public class MapperSQLService extends AbstractMapperService {
 			BeanMapList list = doSelection(new ArrayList<ReferenceLine>(), false, criteria, false, null, 0, -1, context);
 			Activator.getInstance().debug(String.format(Messages.MapperSQLService_Info_MultiUpdateWithComplexCriteria,list.size(),context.getEntity().getType()));
 			int result = 0;
+			Object[] vals;
+			int idx = 0;
+			if (e.updateCol == null) {
+				vals = new Object[] {0};
+				if (e.sql_delete == null) {
+					e.sql_delete = String.format(fg.delete, e.table, e.deleteCol, e.idCol);
+				}
+			} else {
+				vals = new Object[] {new Timestamp(System.currentTimeMillis()), 0};
+				if (e.sql_delete == null) {
+					e.sql_delete = String.format(fg.delete_update, e.table, e.deleteCol, e.idCol, e.updateCol);
+				}
+			}
 			for (BeanMap bean: list) {
-				result += update(String.format(fg.delete, e.table, e.deleteCol, e.idCol), new Object[] {bean.getId()});
+				vals[idx] = bean.getId();
+				result += update(e.sql_delete, vals);
 			}
 			return result;
 		}
@@ -1332,8 +1358,14 @@ public class MapperSQLService extends AbstractMapperService {
 				criteria = null;
 			}
 		}
-		Object[] vals = new Object[] {fg.delete_val};
+		Object[] vals;
 		String lcols = DEFAULT_TABLEALIAS + '.' + e.deleteCol + fg.paramset;
+		if (e.updateCol == null) {
+			vals = new Object[] {fg.delete_val};
+		} else {
+			vals = new Object[] {fg.delete_val, new Timestamp(System.currentTimeMillis())};
+			lcols += fg.columnsep + DEFAULT_TABLEALIAS + '.' + e.updateCol + fg.paramset;
+		}
 		if (criteria == null) {
 			return update(String.format(fg.updateex, e.table, lcols, fg.true_cond), vals);
 		}
@@ -1387,8 +1419,22 @@ public class MapperSQLService extends AbstractMapperService {
 			BeanMapList list = doSelection(new ArrayList<ReferenceLine>(), true, criteria, false, null, 0, -1, context);
 			Activator.getInstance().debug(String.format(Messages.MapperSQLService_Info_MultiUpdateWithComplexCriteria,list.size(),context.getEntity().getType()));
 			int result = 0;
+			Object[] vals;
+			int idx = 0;
+			if (e.updateCol == null) {
+				vals = new Object[] {0};
+				if (e.sql_undelete == null) {
+					e.sql_undelete = String.format(fg.undelete, e.table, e.deleteCol, e.idCol);
+				}
+			} else {
+				vals = new Object[] {new Timestamp(System.currentTimeMillis()), 0};
+				if (e.sql_undelete == null) {
+					e.sql_undelete = String.format(fg.undelete_update, e.table, e.deleteCol, e.idCol, e.updateCol);
+				}
+			}
 			for (BeanMap bean: list) {
-				result += update(String.format(fg.undelete, e.table, e.deleteCol, e.idCol), new Object[] {bean.getId()});
+				vals[idx] = bean.getId();
+				result += update(e.sql_undelete, vals);
 			}
 			return result;
 		}
@@ -1401,8 +1447,14 @@ public class MapperSQLService extends AbstractMapperService {
 				criteria = null;
 			}
 		}
-		Object[] vals = new Object[] {fg.undelete_val};
+		Object[] vals;
 		String lcols = DEFAULT_TABLEALIAS + '.' + e.deleteCol + fg.paramset;
+		if (e.updateCol == null) {
+			vals = new Object[] {fg.undelete_val};
+		} else {
+			vals = new Object[] {fg.undelete_val, new Timestamp(System.currentTimeMillis())};
+			lcols += fg.columnsep + DEFAULT_TABLEALIAS + '.' + e.updateCol + fg.paramset;
+		}
 		if (criteria == null) {
 			return update(String.format(fg.updateex, e.table, lcols, fg.true_cond), vals);
 		}
@@ -1435,10 +1487,16 @@ public class MapperSQLService extends AbstractMapperService {
 		if ((e == null) || (e.deleteCol == null)) {
 			return false;
 		}
-		if (e.sql_undelete == null) {
-			e.sql_undelete = String.format(fg.undelete, e.table, e.deleteCol, e.idCol);
+		if (e.updateCol == null) {
+			if (e.sql_undelete == null) {
+				e.sql_undelete = String.format(fg.undelete, e.table, e.deleteCol, e.idCol);
+			}
+			return update(e.sql_undelete, new Object[]{itemId}) > 0;
 		}
-		return update(e.sql_undelete, new Object[]{itemId}) > 0;
+		if (e.sql_undelete == null) {
+			e.sql_undelete = String.format(fg.undelete_update, e.table, e.deleteCol, e.idCol, e.updateCol);
+		}
+		return update(e.sql_undelete, new Object[]{new Timestamp(System.currentTimeMillis()), itemId}) > 0;
 	}
 
 	@Override
