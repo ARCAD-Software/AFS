@@ -106,8 +106,8 @@ public class JSonBeanMapStream extends JsonStreamCompact {
 	 */
 	public JSonBeanMapStream(BeanMapList listToUpdate) {
 		super();
-		alias(TAG_LIST,listToUpdate.getClass());
-		alias(TAG_BEAN,BeanMap.class);
+		alias(TAG_LIST, listToUpdate.getClass());
+		alias(TAG_BEAN, BeanMap.class);
 		BeanMapConverter beanConverter = new BeanMapConverter(getMapper(), true, false);
 		beanConverter.setListConverter(new BeanMapListConverter(beanConverter, getMapper(), true, false));
 		registerConverter(beanConverter);
