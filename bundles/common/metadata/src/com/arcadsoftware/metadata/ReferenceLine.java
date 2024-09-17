@@ -189,8 +189,8 @@ public class ReferenceLine extends ArrayList<Element> implements Comparable<Refe
 		return sb.toString();
 	}
 	
-	private Boolean multiLink;
-	private Boolean link;
+	private boolean multiLink;
+	private boolean link;
 	private String code;
 	private boolean flaged;
 	
@@ -361,14 +361,10 @@ public class ReferenceLine extends ArrayList<Element> implements Comparable<Refe
 	 * @return true if this line contains one or more Link association references.
 	 */
 	public boolean isLinkList() {
-		if (link != null) {
-			return link;
-		} else if (multiLink != null) {
-			if (multiLink) {
-				return true;
-			}
+		if (link || multiLink) {
+			return true;
 		}
-		for(Element e:this) {
+		for (Element e: this) {
 			if (e instanceof MetaDataLink) {
 				return true;
 			}
@@ -380,16 +376,11 @@ public class ReferenceLine extends ArrayList<Element> implements Comparable<Refe
 	 * @return true if this line contains more than one association references.
 	 */
 	public boolean isMultiLinkList() {
-		if (link != null) {
-			if (!link) {
-				return false;
-			}
-		}
-		if (multiLink != null) {
-			return multiLink;
+		if (link && multiLink) {
+			return true;
 		}
 		int res = 0;
-		for(Element e:this) {
+		for (Element e: this) {
 			if (e instanceof MetaDataLink) {
 				res++;
 				if (res > 1) {
@@ -404,12 +395,10 @@ public class ReferenceLine extends ArrayList<Element> implements Comparable<Refe
 	 * @return true if this list contains only EntityAttributes references.
 	 */
 	public boolean isAttributeList() {
-		if (link != null) {
-			return !link;
-		} else if (multiLink != null) {
-			return !multiLink;
+		if (link || multiLink) {
+			return false;
 		}
-		for(Element e:this) {
+		for (Element e: this) {
 			if (e instanceof MetaDataLink) {
 				return false;
 			}
@@ -485,7 +474,7 @@ public class ReferenceLine extends ArrayList<Element> implements Comparable<Refe
 			return code;
 		}
 		StringBuilder sb = new StringBuilder();
-		for(Element element:this) {
+		for (Element element: this) {
 			if (sb.length() > 0) {
 				sb.append('.');
 			}
@@ -498,14 +487,14 @@ public class ReferenceLine extends ArrayList<Element> implements Comparable<Refe
 	/**
 	 * @param multiLink the multiLink to set
 	 */
-	public void setIsMultiLink(Boolean multiLink) {
+	public void setIsMultiLink(boolean multiLink) {
 		this.multiLink = multiLink;
 	}
 
 	/**
 	 * @param link the link to set
 	 */
-	public void setIsLink(Boolean link) {
+	public void setIsLink(boolean link) {
 		this.link = link;
 	}
 
@@ -775,6 +764,44 @@ public class ReferenceLine extends ArrayList<Element> implements Comparable<Refe
 			return null;
 		}
 		return result;
+	}
+
+	public String getFirstLinkCode() {
+		for (Element element: this) {
+			if (element instanceof MetaDataLink) {
+				return element.getCode();
+			}
+		}
+		return null;
+	}
+
+	public String getPreLinkCodes() {
+		StringBuilder sb = new StringBuilder();
+		for (Element element: this) {
+			if (element instanceof MetaDataLink) {
+				break;
+			}
+			if (sb.length() > 0) {
+				sb.append('.');
+			}
+			sb.append(element.getCode());
+		}
+		return sb.toString();
+	}
+
+	public String getPostLinkCodes() {
+		StringBuilder sb = new StringBuilder();
+		for (int i = size() - 1; i >= 0; i--) {
+			Element element = get(i);
+			if (element instanceof MetaDataLink) {
+				break;
+			}
+			if (sb.length() > 0) {
+				sb.insert(0, '.');
+			}
+			sb.insert(0, element.getCode());
+		}
+		return sb.toString();
 	}
 	
 }

@@ -57,7 +57,7 @@ public class EqualICCriteria extends AbstractSearchCriteria implements Cloneable
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
-		return new EqualICCriteria(attribute,value);
+		return new EqualICCriteria(attribute, value);
 	}
 
 	@Override

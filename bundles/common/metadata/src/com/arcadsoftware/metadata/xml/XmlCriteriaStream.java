@@ -13,6 +13,7 @@
  *******************************************************************************/
 package com.arcadsoftware.metadata.xml;
 
+import com.arcadsoftware.metadata.criteria.AbstractLinkTestCriteria;
 import com.arcadsoftware.metadata.criteria.AfterCriteria;
 import com.arcadsoftware.metadata.criteria.AndCriteria;
 import com.arcadsoftware.metadata.criteria.AttributeEqualsCriteria;
@@ -36,8 +37,13 @@ import com.arcadsoftware.metadata.criteria.IdInListCriteria;
 import com.arcadsoftware.metadata.criteria.InGroupCriteria;
 import com.arcadsoftware.metadata.criteria.IsNullCriteria;
 import com.arcadsoftware.metadata.criteria.IsTrueCriteria;
+import com.arcadsoftware.metadata.criteria.LinkContainCriteria;
 import com.arcadsoftware.metadata.criteria.LinkCriteria;
+import com.arcadsoftware.metadata.criteria.LinkEndCriteria;
 import com.arcadsoftware.metadata.criteria.LinkEqualCriteria;
+import com.arcadsoftware.metadata.criteria.LinkGreaterStrictCriteria;
+import com.arcadsoftware.metadata.criteria.LinkGreaterThanCriteria;
+import com.arcadsoftware.metadata.criteria.LinkStartCriteria;
 import com.arcadsoftware.metadata.criteria.LowerStrictCriteria;
 import com.arcadsoftware.metadata.criteria.LowerThanCriteria;
 import com.arcadsoftware.metadata.criteria.NotCriteria;
@@ -59,19 +65,19 @@ public class XmlCriteriaStream extends XStreamCompact {
 
 	protected static XStreamCompact initialize(XStreamCompact xs) {
 		// Build all the necessary aliases...
-		xs.alias("or",OrCriteria.class); //$NON-NLS-1$
+		xs.alias("or", OrCriteria.class); //$NON-NLS-1$
 		xs.addImplicitCollection(OrCriteria.class, "criterias"); //$NON-NLS-1$
-		xs.alias("and",AndCriteria.class); //$NON-NLS-1$
+		xs.alias("and", AndCriteria.class); //$NON-NLS-1$
 		xs.addImplicitCollection(AndCriteria.class, "criterias"); //$NON-NLS-1$
-		xs.alias("not",NotCriteria.class); //$NON-NLS-1$
+		xs.alias("not", NotCriteria.class); //$NON-NLS-1$
 		xs.registerConverter(new NotCriteriaConverter(xs.getMapper()));
-		xs.alias("true",ConstantCriteria.class); //$NON-NLS-1$
-		xs.alias("false",ConstantCriteria.class); //$NON-NLS-1$
-		xs.alias("constant",ConstantCriteria.class); //$NON-NLS-1$
+		xs.alias("true", ConstantCriteria.class); //$NON-NLS-1$
+		xs.alias("false", ConstantCriteria.class); //$NON-NLS-1$
+		xs.alias("constant", ConstantCriteria.class); //$NON-NLS-1$
 		xs.registerConverter(new ConstantCriteriaConverter());
-		xs.alias("isnull",IsNullCriteria.class); //$NON-NLS-1$
+		xs.alias("isnull", IsNullCriteria.class); //$NON-NLS-1$
 		xs.useAttributeFor(IsNullCriteria.class, "attribute"); //$NON-NLS-1$
-		xs.alias("equals",EqualCriteria.class); //$NON-NLS-1$
+		xs.alias("equals", EqualCriteria.class); //$NON-NLS-1$
 		xs.useAttributeFor(EqualCriteria.class, "attribute"); //$NON-NLS-1$
 		xs.useAttributeFor(EqualCriteria.class, "value"); //$NON-NLS-1$
 		xs.useAttributeFor(EqualCriteria.class, "intval"); //$NON-NLS-1$
@@ -89,12 +95,15 @@ public class XmlCriteriaStream extends XStreamCompact {
 		xs.useAttributeFor(GreaterStrictCriteria.class, "value"); //$NON-NLS-1$
 		xs.alias("contains", ContainCriteria.class); //$NON-NLS-1$
 		xs.useAttributeFor(ContainCriteria.class, "attribute"); //$NON-NLS-1$
+		xs.useAttributeFor(ContainCriteria.class, "value"); //$NON-NLS-1$
 		xs.aliasAttribute(ContainCriteria.class, "casesensitive", "case"); //$NON-NLS-1$ //$NON-NLS-2$
 		xs.alias("starts", StartCriteria.class); //$NON-NLS-1$
 		xs.useAttributeFor(StartCriteria.class, "attribute"); //$NON-NLS-1$
+		xs.useAttributeFor(StartCriteria.class, "value"); //$NON-NLS-1$
 		xs.aliasAttribute(StartCriteria.class, "casesensitive", "case"); //$NON-NLS-1$ //$NON-NLS-2$
 		xs.alias("ends", EndCriteria.class); //$NON-NLS-1$
 		xs.useAttributeFor(EndCriteria.class, "attribute"); //$NON-NLS-1$
+		xs.useAttributeFor(EndCriteria.class, "value"); //$NON-NLS-1$
 		xs.aliasAttribute(EndCriteria.class, "casesensitive", "case"); //$NON-NLS-1$ //$NON-NLS-2$
 		xs.alias("linkto", LinkCriteria.class); //$NON-NLS-1$ // Changed from "link" to "linkto" in version 2.0.0
 		xs.useAttributeFor(LinkCriteria.class, "attribute"); //$NON-NLS-1$
@@ -144,9 +153,6 @@ public class XmlCriteriaStream extends XStreamCompact {
 		xs.useAttributeFor(IsTrueCriteria.class, "attribute"); //$NON-NLS-1$
 		xs.alias("linkEquals", LinkEqualCriteria.class); //$NON-NLS-1$
 		xs.alias("linkequals", LinkEqualCriteria.class); //$NON-NLS-1$
-		xs.useAttributeFor(LinkEqualCriteria.class, "linkCode"); //$NON-NLS-1$
-		xs.useAttributeFor(LinkEqualCriteria.class, "attribute"); //$NON-NLS-1$
-		xs.useAttributeFor(LinkEqualCriteria.class, "value"); //$NON-NLS-1$
 		xs.alias("equalsIC", EqualICCriteria.class); //$NON-NLS-1$
 		xs.alias("equalsic", EqualICCriteria.class); //$NON-NLS-1$
 		xs.useAttributeFor(EqualICCriteria.class, "attribute"); //$NON-NLS-1$
@@ -208,6 +214,34 @@ public class XmlCriteriaStream extends XStreamCompact {
 		xs.useAttributeFor(UnlinkCriteria.class, "id"); //$NON-NLS-1$
 		// New criteria of version 1.5.1
 		xs.useAttributeFor(CurrentUserCriteria.class, "linkCode"); //$NON-NLS-1$
+		// New criteria of version 1.6.0
+		xs.useAttributeFor(AbstractLinkTestCriteria.class, "linkCode"); //$NON-NLS-1$
+		xs.useAttributeFor(AbstractLinkTestCriteria.class, "attribute"); //$NON-NLS-1$
+		xs.useAttributeFor(AbstractLinkTestCriteria.class, "value"); //$NON-NLS-1$
+		xs.aliasAttribute(LinkEqualCriteria.class, "casesensitive", "case"); //$NON-NLS-1$ //$NON-NLS-2$
+		xs.alias("linkStarts", LinkStartCriteria.class); //$NON-NLS-1$
+		xs.alias("linkstarts", LinkStartCriteria.class); //$NON-NLS-1$
+		xs.aliasAttribute(LinkStartCriteria.class, "casesensitive", "case"); //$NON-NLS-1$ //$NON-NLS-2$
+		xs.alias("linkEnds", LinkEndCriteria.class); //$NON-NLS-1$
+		xs.alias("linkends", LinkEndCriteria.class); //$NON-NLS-1$
+		xs.aliasAttribute(LinkEndCriteria.class, "casesensitive", "case"); //$NON-NLS-1$ //$NON-NLS-2$
+		xs.alias("linkContains", LinkContainCriteria.class); //$NON-NLS-1$
+		xs.alias("linkcontains", LinkContainCriteria.class); //$NON-NLS-1$
+		xs.aliasAttribute(LinkContainCriteria.class, "casesensitive", "case"); //$NON-NLS-1$ //$NON-NLS-2$
+		xs.alias("linkgreaterstrict", LinkGreaterStrictCriteria.class); //$NON-NLS-1$
+		xs.alias("linkgreaterthan", LinkGreaterThanCriteria.class); //$NON-NLS-1$
+		xs.useAttributeFor(EqualCriteria.class, "casesensitive"); //$NON-NLS-1$
+		xs.aliasAttribute(EqualCriteria.class, "casesensitive", "case"); //$NON-NLS-1$ //$NON-NLS-2$
+		xs.aliasAttribute(EqualCriteria.class, "casesensitive", "cs"); //$NON-NLS-1$ //$NON-NLS-2$
+		xs.aliasAttribute(StartCriteria.class, "casesensitive", "cs"); //$NON-NLS-1$ //$NON-NLS-2$
+		xs.aliasAttribute(EndCriteria.class, "casesensitive", "cs"); //$NON-NLS-1$ //$NON-NLS-2$
+		xs.aliasAttribute(ContainCriteria.class, "casesensitive", "cs"); //$NON-NLS-1$ //$NON-NLS-2$
+		xs.aliasAttribute(LinkEqualCriteria.class, "casesensitive", "cs"); //$NON-NLS-1$ //$NON-NLS-2$
+		xs.aliasAttribute(LinkStartCriteria.class, "casesensitive", "cs"); //$NON-NLS-1$ //$NON-NLS-2$
+		xs.aliasAttribute(LinkEndCriteria.class, "casesensitive", "cs"); //$NON-NLS-1$ //$NON-NLS-2$
+		xs.aliasAttribute(LinkContainCriteria.class, "casesensitive", "cs"); //$NON-NLS-1$ //$NON-NLS-2$
+		xs.useAttributeFor(AttributeEqualsCriteria.class, "casesensitive"); //$NON-NLS-1$
+		xs.aliasAttribute(AttributeEqualsCriteria.class, "casesensitive", "cs"); //$NON-NLS-1$ //$NON-NLS-2$
 		return xs;
 	}
 	

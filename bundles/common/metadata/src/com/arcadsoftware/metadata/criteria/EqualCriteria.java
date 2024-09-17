@@ -15,6 +15,7 @@ package com.arcadsoftware.metadata.criteria;
 
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.metadata.ReferenceLine;
+import com.arcadsoftware.metadata.internal.Activator;
 import com.arcadsoftware.metadata.internal.Messages;
 import com.arcadsoftware.rest.connection.IConnectionUserBean;
 
@@ -31,6 +32,7 @@ public class EqualCriteria extends AbstractSearchCriteria implements Cloneable, 
 	private String attribute;
 	private String value;
 	private Integer intval;
+	private Boolean casesensitive; // Note that this option is not compatible with the intval one.
 
 	/**
 	 * 
@@ -61,33 +63,73 @@ public class EqualCriteria extends AbstractSearchCriteria implements Cloneable, 
 		this.intval = value;
 	}
 	
+	public EqualCriteria(String attribute, int intval, String value, Boolean casesensitive) {
+		this();
+		this.attribute = attribute;
+		this.intval = intval;
+		this.value = value;
+		this.casesensitive = casesensitive;
+	}
+	
 	@Override
 	public ISearchCriteria reduce(ICriteriaContext context) {
-		ReferenceLine attributeRef = context.getEntity().getAttributeLine(attribute);
-		if (attributeRef != null) {
-			context.useReference(attributeRef);
-			if ((value == null) && (intval == null)) {
-				return new IsNullCriteria(attribute);
-			}
-			return this;
+		ReferenceLine refline = context.getEntity().getReferenceLine(attribute);
+		if (refline == null) {
+			return ConstantCriteria.FALSE;
 		}
-		return ConstantCriteria.FALSE;
+		if (refline.isMultiLinkList()) {
+			Activator.getInstance().warn("Equals Criteria with multi-link references is not supported: " + toString());
+			return ConstantCriteria.FALSE;
+		}
+		if (refline.isLinkList()) {
+			String preLinkCode = refline.getPreLinkCodes();
+			if (preLinkCode.isEmpty()) {
+				preLinkCode = null;
+			}
+			String postLinkCode = refline.getPostLinkCodes();
+			if (postLinkCode.isEmpty()) {
+				int i = 0;
+				if (intval != null) {
+					i = intval;
+				} else if (value != null) {
+					try {
+						i = Integer.parseInt(value);
+					} catch (NumberFormatException e) {
+						Activator.getInstance().warn("Invalid Equals Criteria with terminal link reference: " + toString());
+					}
+				}
+				return new LinkCriteria(i, refline.getFirstLinkCode(), preLinkCode).reduce(context);
+			}
+			LinkEqualCriteria lec;
+			if (intval != null) {
+				lec = new LinkEqualCriteria(preLinkCode, refline.getFirstLinkCode(), postLinkCode, null, intval.toString(), (casesensitive == null) || casesensitive);
+			} else {
+				lec = new LinkEqualCriteria(preLinkCode, refline.getFirstLinkCode(), postLinkCode, null, value, (casesensitive == null) || casesensitive);
+			}
+			return lec.reduce(context);
+		}
+		context.useReference(refline);
+		if ((value == null) && (intval == null)) {
+			return new IsNullCriteria(attribute);
+		}
+		if (!isCasesensitive()) {
+			return new EqualICCriteria(attribute, value);
+		}
+		return this;
 	}
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
-		if (intval != null) {
-			return new EqualCriteria(attribute,intval);
-		}
-		return new EqualCriteria(attribute,value);
+		return new EqualCriteria(attribute, intval, value, casesensitive);
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		return (obj instanceof EqualCriteria) &&
-			nullsOrEquals(attribute,((EqualCriteria)obj).attribute) &&
-			nullsOrEquals(intval,((EqualCriteria)obj).intval) &&
-			nullsOrEquals(value,((EqualCriteria)obj).value);
+			nullsOrEquals(attribute, ((EqualCriteria) obj).attribute) &&
+			nullsOrEquals(intval, ((EqualCriteria) obj).intval) &&
+			nullsOrEquals(value, ((EqualCriteria) obj).value) &&
+			nullsOrEquals(casesensitive, ((EqualCriteria) obj).casesensitive);
 	}
 
 	
@@ -98,7 +140,10 @@ public class EqualCriteria extends AbstractSearchCriteria implements Cloneable, 
 		if ((value == null) || (value.length() == 0)) {
 			return bean.get(attribute) == null;
 		}
-		return value.equals(bean.getString(attribute));
+		if (isCasesensitive()) {
+			return value.equals(bean.getString(attribute));
+		}
+		return value.equalsIgnoreCase(bean.getString(attribute));
 	}
 
 	public String getAttribute() {
@@ -142,5 +187,13 @@ public class EqualCriteria extends AbstractSearchCriteria implements Cloneable, 
 			sb.append(Messages.Criteria_IsNull);
 		}
 		return sb.toString();
+	}
+
+	public boolean isCasesensitive() {
+		return (casesensitive == null) || casesensitive;
+	}
+
+	public void setCasesensitive(boolean casesensitive) {
+		this.casesensitive = casesensitive;
 	}
 }

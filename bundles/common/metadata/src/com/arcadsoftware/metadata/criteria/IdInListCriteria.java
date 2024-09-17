@@ -53,12 +53,12 @@ public class IdInListCriteria extends AbstractSearchCriteria implements Cloneabl
 	public boolean equals(Object obj) {
 		if (obj instanceof IdInListCriteria)  {
 			if ((ids == null) || ids.isEmpty()) {
-				return (((IdInListCriteria)obj).ids == null) || ((IdInListCriteria)obj).ids.isEmpty();
+				return (((IdInListCriteria) obj).ids == null) || ((IdInListCriteria) obj).ids.isEmpty();
 			}
-			if ((((IdInListCriteria)obj).ids == null) || ((IdInListCriteria)obj).ids.isEmpty()) { 
+			if ((((IdInListCriteria) obj).ids == null) || ((IdInListCriteria) obj).ids.isEmpty()) { 
 				return false;
 			}
-			return ((IdInListCriteria)obj).ids.equals(ids);
+			return ((IdInListCriteria) obj).ids.equals(ids);
 		}
 		return false;
 	}
@@ -69,6 +69,23 @@ public class IdInListCriteria extends AbstractSearchCriteria implements Cloneabl
 
 	public Set<Integer> getIds() {
 		return ids;
+	}
+
+	public String getIds(String separator) {
+		if (ids.size() == 0) {
+			return ""; //$NON-NLS-1$
+		}
+		StringBuilder sb = new StringBuilder(ids.size() * (separator.length() + 1));
+		boolean first = true;
+		for (Integer i: ids) {
+			if (first) {
+				first = false;
+			} else {
+				sb.append(separator);
+			}
+			sb.append(i);
+		}
+		return sb.toString();
 	}
 	
 	public void add(int... id) {
@@ -87,11 +104,15 @@ public class IdInListCriteria extends AbstractSearchCriteria implements Cloneabl
 		if (ids.size() == 1) {
 			return new IdEqualCriteria(ids.iterator().next());
 		}
-		OrCriteria or = new OrCriteria();
-		for(int i: ids) {
-			or.add(new IdEqualCriteria(i));
+		if (ids.size() <= 100) {
+			OrCriteria or = new OrCriteria();
+			for(int i: ids) {
+				or.add(new IdEqualCriteria(i));
+			}
+			return or;
 		}
-		return or;
+		// Bigger set must be handler in another way !
+		return this;
 	}
 
 	@Override
