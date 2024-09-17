@@ -15,6 +15,7 @@ package com.arcadsoftware.metadata.criteria;
 
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.metadata.ReferenceLine;
+import com.arcadsoftware.metadata.internal.Activator;
 import com.arcadsoftware.metadata.internal.Messages;
 import com.arcadsoftware.rest.connection.IConnectionUserBean;
 
@@ -50,12 +51,27 @@ public class ContainCriteria extends AbstractSearchCriteria implements Cloneable
 		if (value == null) {
 			return ConstantCriteria.TRUE;
 		}
-		ReferenceLine attributeRef = context.getEntity().getAttributeLine(attribute);
-		if (attributeRef != null) {
-			context.useReference(attributeRef);
-			return this;
+		ReferenceLine refline = context.getEntity().getReferenceLine(attribute);
+		if (refline == null) {
+			return ConstantCriteria.FALSE;
+		}			
+		if (refline.isMultiLinkList()) {
+			Activator.getInstance().warn("\"Contains\" Criteria with multi-link references is not supported: " + toString());
+			return ConstantCriteria.FALSE;
 		}
-		return ConstantCriteria.FALSE;
+		if (refline.isLinkList()) {
+			String preLinkCode = refline.getPreLinkCodes();
+			if (preLinkCode.isEmpty()) {
+				preLinkCode = null;
+			}
+			String postLinkCode = refline.getPostLinkCodes();
+			if (postLinkCode.isEmpty()) {
+				Activator.getInstance().warn("Invalid \"Contains\" Criteria with terminal link reference: " + toString());
+			}
+			return new LinkContainCriteria(preLinkCode, refline.getFirstLinkCode(), postLinkCode, value, casesensitive).reduce(context);
+		}
+		context.useReference(refline);
+		return this;
 	}
 
 	@Override

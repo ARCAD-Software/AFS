@@ -44,6 +44,7 @@ import com.arcadsoftware.metadata.MetaDataAttribute;
 import com.arcadsoftware.metadata.MetaDataEntity;
 import com.arcadsoftware.metadata.MetaDataLink;
 import com.arcadsoftware.metadata.ReferenceLine;
+import com.arcadsoftware.metadata.criteria.AbstractLinkTestCriteria;
 import com.arcadsoftware.metadata.criteria.AfterCriteria;
 import com.arcadsoftware.metadata.criteria.AndCriteria;
 import com.arcadsoftware.metadata.criteria.AttributeEqualsCriteria;
@@ -66,13 +67,19 @@ import com.arcadsoftware.metadata.criteria.ISearchCriteria;
 import com.arcadsoftware.metadata.criteria.IdEqualCriteria;
 import com.arcadsoftware.metadata.criteria.IdGreaterStrictCriteria;
 import com.arcadsoftware.metadata.criteria.IdGreaterThanCriteria;
+import com.arcadsoftware.metadata.criteria.IdInListCriteria;
 import com.arcadsoftware.metadata.criteria.IdLowerStrictCriteria;
 import com.arcadsoftware.metadata.criteria.IdLowerThanCriteria;
 import com.arcadsoftware.metadata.criteria.InGroupCriteria;
 import com.arcadsoftware.metadata.criteria.IsNullCriteria;
 import com.arcadsoftware.metadata.criteria.IsTrueCriteria;
+import com.arcadsoftware.metadata.criteria.LinkContainCriteria;
 import com.arcadsoftware.metadata.criteria.LinkCriteria;
+import com.arcadsoftware.metadata.criteria.LinkEndCriteria;
 import com.arcadsoftware.metadata.criteria.LinkEqualCriteria;
+import com.arcadsoftware.metadata.criteria.LinkGreaterStrictCriteria;
+import com.arcadsoftware.metadata.criteria.LinkGreaterThanCriteria;
+import com.arcadsoftware.metadata.criteria.LinkStartCriteria;
 import com.arcadsoftware.metadata.criteria.LowerStrictCriteria;
 import com.arcadsoftware.metadata.criteria.LowerThanCriteria;
 import com.arcadsoftware.metadata.criteria.NotCriteria;
@@ -708,9 +715,15 @@ public class MapperSQLService extends AbstractMapperService {
 						esc.escape(((EndCriteria) criteria).getValue().toLowerCase())));
 			}
 		} else if (criteria instanceof AttributeEqualsCriteria) {
-			result.append(String.format(fg.equal,
-					colNames.get(((AttributeEqualsCriteria) criteria).getAttribute()),
-					colNames.get(((AttributeEqualsCriteria) criteria).getSecondAttribute())));
+			if (((AttributeEqualsCriteria) criteria).isCasesensitive()) {			
+				result.append(String.format(fg.equal,
+						colNames.get(((AttributeEqualsCriteria) criteria).getAttribute()),
+						colNames.get(((AttributeEqualsCriteria) criteria).getSecondAttribute())));
+			} else {
+				result.append(String.format(fg.equal,
+						String.format(fg.lowercase,colNames.get(((AttributeEqualsCriteria) criteria).getAttribute())),
+								String.format(fg.lowercase,colNames.get(((AttributeEqualsCriteria) criteria).getSecondAttribute()))));
+			}
 		} else if (criteria instanceof AttributeLowerCriteria) {
 			result.append(String.format(fg.lower,
 					colNames.get(((AttributeLowerCriteria) criteria).getAttribute()),
@@ -897,14 +910,14 @@ public class MapperSQLService extends AbstractMapperService {
 				condition.append(fg.true_cond);
 			}
 			result.append(String.format(fg.notintoselect, attcn, l.sourceCol, l.table, condition.toString()));
-		} else if (criteria instanceof LinkEqualCriteria) {
+		} else if (criteria instanceof AbstractLinkTestCriteria) {
 			// We build a join to the target entity, through the association table.
 			// Then we follow the joins of the attributes up to the attribute to be tested.
 			MetaDataLink link;
 			LinkInfo l; // = SQL information about the association.
 			String alias; // = alias used for the association.
-			String refcn = colNames.get(((LinkEqualCriteria) criteria).getReference());
-			String lc = ((LinkEqualCriteria) criteria).getLinkCode();
+			String refcn = colNames.get(((AbstractLinkTestCriteria) criteria).getReference());
+			String lc = ((AbstractLinkTestCriteria) criteria).getLinkCode();
 			if (refcn == null) {
 				alias = getAlias(lc, null, "_a"); //$NON-NLS-1$
 				l = entityInfo.links.get(lc);
@@ -913,8 +926,8 @@ public class MapperSQLService extends AbstractMapperService {
 					joinMap.add(alias, String.format(fg.joinref, l.table, alias, l.sourceCol, DEFAULT_TABLEALIAS, entityInfo.idCol));
 				}
 			} else {
-				alias = getAlias(((LinkEqualCriteria) criteria).getReference(), lc, "_a"); //$NON-NLS-1$
-				MetaDataEntity refEntity = context.getReference(((LinkEqualCriteria) criteria).getReference()).getLastAttribute().getRefEntity();
+				alias = getAlias(((AbstractLinkTestCriteria) criteria).getReference(), lc, "_a"); //$NON-NLS-1$
+				MetaDataEntity refEntity = context.getReference(((AbstractLinkTestCriteria) criteria).getReference()).getLastAttribute().getRefEntity();
 				link = (MetaDataLink) refEntity.getLink(lc);
 				l = getEntityInfo(refEntity).links.get(lc);
 				if (joinMap.doNotExists(alias)) {
@@ -931,22 +944,70 @@ public class MapperSQLService extends AbstractMapperService {
 			if ((l.deleteCol != null) || (ei.deleteCol != null)) {
 				result.append(fg.parin);
 			}
-			String attcn = buildAttributeColName(ei, context.getReference(link, ((LinkEqualCriteria) criteria).getAttribute()), joinMap, refalias);
-			if (link.getRefEntity().getAttribute(((LinkEqualCriteria) criteria).getAttribute()).isNumeric()) {
-				try {
-					Integer.parseInt(((LinkEqualCriteria) criteria).getValue());
-					result.append(String.format(fg.equal,
-							attcn,
-							((LinkEqualCriteria) criteria).getValue()));
-				} catch (NumberFormatException e) {
-					result.append(String.format(fg.equal,
-							attcn,
-							enquote(((LinkEqualCriteria) criteria).getValue())));
+			String attcn = buildAttributeColName(ei, context.getReference(link, ((AbstractLinkTestCriteria) criteria).getAttribute()), joinMap, refalias);
+			// Implement the actual SQL test depending on the real criteria type...
+			if (criteria instanceof LinkEqualCriteria) {
+				if (((LinkEqualCriteria) criteria).getSecondAttribute() != null) {
+					if (((LinkEqualCriteria) criteria).isCasesensitive()) {
+						result.append(String.format(fg.equal, attcn, colNames.get(((LinkEqualCriteria) criteria).getSecondAttribute())));
+					} else {
+						result.append(String.format(fg.equal, String.format(fg.lowercase, attcn),
+								String.format(fg.lowercase, colNames.get(((LinkEqualCriteria) criteria).getSecondAttribute()))));
+					}
+				} else if (context.getReference(link, ((LinkEqualCriteria) criteria).getAttribute()).isNumericType()) {
+					try {
+						Integer.parseInt(((LinkEqualCriteria) criteria).getValue());
+						result.append(String.format(fg.equal, attcn, ((LinkEqualCriteria) criteria).getValue()));
+					} catch (NumberFormatException e) {
+						result.append(String.format(fg.equal, attcn, enquote(((LinkEqualCriteria) criteria).getValue())));
+					}
+				} else if (((LinkEqualCriteria) criteria).isCasesensitive()) {
+					result.append(String.format(fg.equal, attcn, enquote(((LinkEqualCriteria) criteria).getValue())));
+				} else {
+					result.append(String.format(fg.equalignorecase, attcn, enquote(((EqualICCriteria) criteria).getValue().toUpperCase())));
 				}
-			} else {
-				result.append(String.format(fg.equal,
-						attcn,
-						enquote(((LinkEqualCriteria) criteria).getValue())));
+			} else if (criteria instanceof LinkContainCriteria) {
+				if (((LinkContainCriteria) criteria).isCasesensitive()) {
+					result.append(String.format(fg.contain, attcn, esc.escape(((LinkContainCriteria) criteria).getValue())));
+				} else {
+					result.append(String.format(fg.contain, String.format(fg.lowercase, attcn),
+							esc.escape(((LinkContainCriteria) criteria).getValue().toLowerCase())));
+				}
+			} else if (criteria instanceof LinkEndCriteria) {
+				if (((LinkEndCriteria) criteria).isCasesensitive()) {
+					result.append(String.format(fg.endwith, attcn, esc.escape(((LinkEndCriteria) criteria).getValue())));
+				} else {
+					result.append(String.format(fg.endwith, String.format(fg.lowercase, attcn),
+							esc.escape(((LinkEndCriteria) criteria).getValue().toLowerCase())));
+				}
+			} else if (criteria instanceof LinkGreaterStrictCriteria) {
+				if (context.getReference(link, ((LinkGreaterStrictCriteria) criteria).getAttribute()).isNumericType()) {
+					try {
+						Integer.parseInt(((LinkGreaterStrictCriteria) criteria).getValue());
+						result.append(String.format(fg.greater, attcn, ((LinkGreaterStrictCriteria) criteria).getValue()));
+					} catch (NumberFormatException e) {
+						result.append(String.format(fg.greater, attcn, enquote(((LinkGreaterStrictCriteria) criteria).getValue())));
+					}
+				} else {
+					result.append(String.format(fg.greater, attcn, enquote(((LinkGreaterStrictCriteria) criteria).getValue())));
+				}
+			} else if (criteria instanceof LinkGreaterThanCriteria) {
+				if (context.getReference(link, ((LinkGreaterThanCriteria) criteria).getAttribute()).isNumericType()) {
+					try {
+						Integer.parseInt(((LinkGreaterThanCriteria) criteria).getValue());
+						result.append(String.format(fg.greaterorequal, attcn, ((LinkGreaterThanCriteria) criteria).getValue()));
+					} catch (NumberFormatException e) {
+						result.append(String.format(fg.greaterorequal, attcn, enquote(((LinkGreaterThanCriteria) criteria).getValue())));
+					}
+				} else {
+					result.append(String.format(fg.greaterorequal, attcn, enquote(((LinkGreaterThanCriteria) criteria).getValue())));
+				}
+			} else if (criteria instanceof LinkStartCriteria) {
+				if (((LinkStartCriteria) criteria).isCasesensitive()) {
+					result.append(String.format(fg.startwith, attcn, esc.escape(((LinkStartCriteria) criteria).getValue())));
+				} else {
+					result.append(String.format(fg.startwith, String.format(fg.lowercase, attcn), esc.escape(((LinkStartCriteria) criteria).getValue().toLowerCase())));
+				}
 			}
 			if (ei.deleteCol != null) {
 				result.append(fg.and);
@@ -1023,6 +1084,9 @@ public class MapperSQLService extends AbstractMapperService {
 			result.append(String.format(fg.lower,dateCol,
 					String.format(fg.datefunction, sdf.format(((ChangedCriteria) criteria).getBeforeCalendar().getTime()))));			
 			result.append(fg.parout);
+		} else if (criteria instanceof IdInListCriteria) {
+			String col = DEFAULT_TABLEALIAS + fg.prefix + entityInfo.idCol;
+			result.append(String.format(fg.inset,  col, ((IdInListCriteria) criteria).getIds(fg.columnsep)));	
 		} else {
 			Activator.getInstance().debug(String.format(Messages.MapperSQLService_UnknownCriteria, criteria.toString(), criteria.getClass().getName()));
 		}

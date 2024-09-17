@@ -15,6 +15,7 @@ package com.arcadsoftware.metadata.criteria;
 
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.metadata.ReferenceLine;
+import com.arcadsoftware.metadata.internal.Activator;
 import com.arcadsoftware.metadata.internal.Messages;
 import com.arcadsoftware.rest.connection.IConnectionUserBean;
 
@@ -35,6 +36,7 @@ public class StartCriteria extends AbstractSearchCriteria implements Cloneable, 
 	}
 	
 	/**
+	 * 
 	 * @param attribute 
 	 * @param string
 	 * @param generator associated generator.
@@ -45,22 +47,44 @@ public class StartCriteria extends AbstractSearchCriteria implements Cloneable, 
 		this.value = value;
 	}
 
+	public StartCriteria(String attribute, String value, boolean casesensitive) {
+		super();
+		this.attribute = attribute;
+		this.value = value;
+		this.casesensitive = casesensitive;
+	}
+
 	@Override
 	public ISearchCriteria reduce(ICriteriaContext context) {
 		if (value == null) {
 			return ConstantCriteria.TRUE;
 		}
-		ReferenceLine attributeRef = context.getEntity().getAttributeLine(attribute);
-		if (attributeRef != null) {
-			context.useReference(attributeRef);
-			return new StartCriteria(attribute,value);
+		ReferenceLine refline = context.getEntity().getReferenceLine(attribute);
+		if (refline == null) {
+			return ConstantCriteria.FALSE;
+		}			
+		if (refline.isMultiLinkList()) {
+			Activator.getInstance().warn("\"Starts\" Criteria with multi-link references is not supported: " + toString());
+			return ConstantCriteria.FALSE;
 		}
-		return ConstantCriteria.FALSE;
+		if (refline.isLinkList()) {
+			String preLinkCode = refline.getPreLinkCodes();
+			if (preLinkCode.isEmpty()) {
+				preLinkCode = null;
+			}
+			String postLinkCode = refline.getPostLinkCodes();
+			if (postLinkCode.isEmpty()) {
+				Activator.getInstance().warn("Invalid \"Starts\" Criteria with terminal link reference: " + toString());
+			}
+			return new LinkStartCriteria(preLinkCode, refline.getFirstLinkCode(), postLinkCode, value, casesensitive).reduce(context);
+		}
+		context.useReference(refline);
+		return new StartCriteria(attribute,value);
 	}
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
-		return new StartCriteria(attribute,value);
+		return new StartCriteria(attribute, value, casesensitive);
 	}
 
 	@Override

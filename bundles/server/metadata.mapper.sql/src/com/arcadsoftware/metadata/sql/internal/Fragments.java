@@ -102,6 +102,7 @@ public class Fragments {
 	public String update_join;
 	public String delete_val;
 	public String notintoselect;
+	public String inset;
 	
 	public Fragments(String name) {
 		// Reset this class...

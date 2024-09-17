@@ -15,6 +15,7 @@ package com.arcadsoftware.metadata.criteria;
 
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.metadata.ReferenceLine;
+import com.arcadsoftware.metadata.internal.Activator;
 import com.arcadsoftware.metadata.internal.Messages;
 import com.arcadsoftware.rest.connection.IConnectionUserBean;
 
@@ -34,6 +35,7 @@ public class AttributeEqualsCriteria extends AbstractSearchCriteria implements I
 
 	private String attribute;
 	private String secondAttribute;
+	private Boolean casesensitive;
 
 	public AttributeEqualsCriteria() {
 		super();
@@ -53,15 +55,47 @@ public class AttributeEqualsCriteria extends AbstractSearchCriteria implements I
 		if (attribute.equals(secondAttribute)) {
 			return ConstantCriteria.TRUE;
 		}
-		ReferenceLine attributeRef = context.getEntity().getAttributeLine(attribute);
+		ReferenceLine attributeRef = context.getEntity().getReferenceLine(attribute);
 		if (attributeRef == null) {
 			return ConstantCriteria.FALSE;
 		}
+		ReferenceLine secondRef = context.getEntity().getReferenceLine(secondAttribute);
+		if (secondRef == null) {
+			return ConstantCriteria.FALSE;
+		}
+		if (attributeRef.isMultiLinkList() || secondRef.isMultiLinkList()) {
+			Activator.getInstance().warn("Equals Criteria between multi-link references is not supported: " + toString());
+			return ConstantCriteria.FALSE;
+		}
+		if (attributeRef.isLinkList()) {
+			if (secondRef.isLinkList()) {
+				Activator.getInstance().warn("Equals Criteria using two link references is not supported: " + toString());
+				return ConstantCriteria.FALSE;
+			}
+			String preLinkCode = attributeRef.getPreLinkCodes();
+			if (preLinkCode.isEmpty()) {
+				preLinkCode = null;
+			}
+			String postLinkCode = attributeRef.getPostLinkCodes();
+			if (postLinkCode.isEmpty()) {
+				Activator.getInstance().warn("Equals Criteria using direct link references compared to an attribute value is not supported: " + toString());
+				return ConstantCriteria.FALSE;
+			}
+			return new LinkEqualCriteria(preLinkCode, attributeRef.getFirstLinkCode(), postLinkCode, secondAttribute, null, (casesensitive != null) && casesensitive).reduce(context);
+		}
+		if (secondRef.isLinkList()) {
+			String preLinkCode = secondRef.getPreLinkCodes();
+			if (preLinkCode.isEmpty()) {
+				preLinkCode = null;
+			}
+			String postLinkCode = secondRef.getPostLinkCodes();
+			if (postLinkCode.isEmpty()) {
+				Activator.getInstance().warn("Equals Criteria using direct link references compared to an attribute value is not supported: " + toString());
+				return ConstantCriteria.FALSE;
+			}
+			return new LinkEqualCriteria(preLinkCode, secondRef.getFirstLinkCode(), postLinkCode, attribute, null, (casesensitive == null) || casesensitive).reduce(context);
+		}		
 		context.useReference(attributeRef);
-		attributeRef = context.getEntity().getAttributeLine(secondAttribute);
-		if (attributeRef == null) {
-			return ConstantCriteria.FALSE;
-		}
 		context.useReference(attributeRef);
 		return this;
 	}
@@ -74,22 +108,35 @@ public class AttributeEqualsCriteria extends AbstractSearchCriteria implements I
 	@Override
 	public boolean equals(Object obj) {
 		return (obj instanceof AttributeEqualsCriteria) && //
-				((nullsOrEquals(attribute, ((AttributeEqualsCriteria)obj).attribute) && //
-				  nullsOrEquals(secondAttribute, ((AttributeEqualsCriteria)obj).secondAttribute)) ||
-				 (nullsOrEquals(secondAttribute, ((AttributeEqualsCriteria)obj).attribute) && //
-				  nullsOrEquals(attribute, ((AttributeEqualsCriteria)obj).secondAttribute)));
+				((nullsOrEquals(attribute, ((AttributeEqualsCriteria) obj).attribute) && //
+				nullsOrEquals(casesensitive, ((AttributeEqualsCriteria) obj).casesensitive) &&
+				  nullsOrEquals(secondAttribute, ((AttributeEqualsCriteria) obj).secondAttribute)) ||
+				 (nullsOrEquals(secondAttribute, ((AttributeEqualsCriteria) obj).attribute) && //
+				  nullsOrEquals(attribute, ((AttributeEqualsCriteria) obj).secondAttribute)));
 	}
 	
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder(attribute);
 		sb.append(Messages.Criteria_Equal);
+		if ((casesensitive == null) || casesensitive) {
+			sb.append(Messages.Criteria_CaseSensitive);
+		}
 		sb.append(secondAttribute);
 		return sb.toString();
 	}
 
 	public boolean test(BeanMap bean, IConnectionUserBean currentUser) {
-		return nullsOrEquals(bean.get(attribute), bean.get(secondAttribute));
+		Object v1 = bean.get(attribute);
+		Object v2 = bean.get(secondAttribute);
+		if (v1 == null) {
+			return v2 == null;
+		}
+		if ((casesensitive == null) || casesensitive) {
+			return v1.equals(v2);
+		} else {
+			return (v2 != null) && v1.toString().equalsIgnoreCase(v2.toString());
+		}
 	}
 
 	public void setAttribute(String code) {
@@ -106,6 +153,14 @@ public class AttributeEqualsCriteria extends AbstractSearchCriteria implements I
 
 	public String getSecondAttribute() {
 		return secondAttribute;
+	}
+
+	public boolean isCasesensitive() {
+		return (casesensitive == null) || casesensitive;
+	}
+
+	public void setCasesensitive(boolean casesensitive) {
+		this.casesensitive = casesensitive;
 	}
 
 }

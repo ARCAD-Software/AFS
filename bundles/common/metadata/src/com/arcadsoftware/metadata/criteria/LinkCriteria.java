@@ -46,14 +46,14 @@ public class LinkCriteria extends AbstractSearchCriteria implements Cloneable, I
 	private String linkCode;
 	private int id;
 	
-	public LinkCriteria(int id, String type) {
+	public LinkCriteria(int id, String linkCode) {
 		this();
 		this.id = id;
-		this.linkCode = type;
+		this.linkCode = linkCode;
 	}
 	
-	public LinkCriteria(int id, String type, String attribute) {
-		this(id, type);
+	public LinkCriteria(int id, String linkCode, String attribute) {
+		this(id, linkCode);
 		this.attribute = attribute;
 	}
 
