@@ -135,41 +135,41 @@ public class Activator extends AbstractActivator {
 				// Check Entity accessibility...
 				MetaDataEntity profiles = MetaDataEntity.loadEntity(TYPE_PROFILE);
 				if (profiles == null) {
-					debug("Entity Profile not yet declared.");
+					debug("ALL Rigths Profile update: Entity Profile not yet declared.");
 					return;
 				}
 				if (profiles.getMapper() == null) {
-					debug("Entity Profile mapper not activated.");
+					debug("ALL Rigths Profile update: Entity Profile mapper not activated.");
 					return;
 				}
 				MetaDataEntity profileRights = MetaDataEntity.loadEntity(TYPE_PROFILERIGHT);
 				if (profileRights == null) {
-					debug("Entity Profileright not yet declared.");
+					debug("ALL Rigths Profile update: Entity Profileright not yet declared.");
 					return;
 				}
 				if (profileRights.getMapper() == null) {
-					debug("Entity Profileright mapper not activated.");
+					debug("ALL Rigths Profile update: Entity Profileright mapper not activated.");
 					return;
 				}
 				MetaDataEntity rights = MetaDataEntity.loadEntity(TYPE_RIGHT);
 				if (rights == null) {
-					debug("Entity Right not yet declared.");
+					debug("ALL Rigths Profile update: Entity Right not yet declared.");
 					return;
 				}
 				if (rights.getMapper() == null) {
-					debug("Entity Right mapper not activated.");
+					debug("ALL Rigths Profile update: Entity Right mapper not activated.");
 					return;
 				}
 				final BeanMap p = profiles.dataSelectionFirst("", false, "code", "ALL"); //$NON-NLS-1 //$NON-NLS-2$$
 				if ((p == null) || (p.getId() <= 0)) {
-					debug("Profile \"ALL\" not found in database, abort process.");
+					warn("ALL Rigths Profile update: The profile code \"ALL\" not found in database, abort process.");
 					return;
 				}
 				int changed = 0;
 				BeanMapList prs = profileRights.dataSelection("right", false, "profile", p.getId());
-				debug(String.format("The profile \"ALL\" (id:%d) currently contain %d Rights.", p.getId(), prs.size()));
+				debug(String.format("ALL Rigths Profile update: The profile \"ALL\" (id:%d) currently contain %d Rights.", p.getId(), prs.size()));
 				BeanMapList list = rights.dataSelection();
-				debug(String.format("There is %d Rights to test.", list.size()));
+				debug(String.format("ALL Rigths Profile update: There is %d Rights to test.", list.size()));
 				for (BeanMap r: list) {
 					if ((r.getId() > 0) && (prs.getFirst("right", r.getId()) == null)) {
 						synchronized (Activator.this) {
@@ -181,9 +181,9 @@ public class Activator extends AbstractActivator {
 						}
 					}
 				}
-				debug(String.format("Profile updated. %d Rights added to Profile \"ALL\".", changed));
 				if (changed > 0) {
-					debug("Purge connection cache after Profile \"ALL\" update.");
+					info(String.format("ALL Rigths Profile update: Profile updated. %d Rights added to Profile \"ALL\".", changed));
+					debug("ALL Rigths Profile update: Purge connection cache after Profile \"ALL\" update.");
 					for (IConnectionCache cache: Activator.this.getServices(IConnectionCache.class)) {
 						if (cache != null) {
 							cache.purgeAll(Activator.TYPE_USER);

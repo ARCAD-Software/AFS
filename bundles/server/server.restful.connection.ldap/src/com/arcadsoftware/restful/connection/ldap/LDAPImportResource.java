@@ -63,7 +63,20 @@ public class LDAPImportResource extends LDAPUserLinkedResource {
 	protected void doInit() throws ResourceException {
 		super.doInit();
 		setExisting((getLdapAuthentificationService() != null) && getLdapAuthentificationService().isUserImportEnabled());
-		if (hasRight(31)) { // = User Create
+		if (isExisting()) {
+			StringBuilder sb = new StringBuilder();
+			if (!hasRight(30)) { // = User listing
+				sb.append(" The Right to list Users.");
+			}
+			if (!hasRight(31)) { // = User Create
+				sb.append(" The Right to create Users.");
+			}
+			if (!hasRight(38)) { // = Login Create
+				sb.append(" The Right to manage Users' logins.");
+			}
+			if (sb.length() > 0) {
+				throw new ResourceException(Status.CLIENT_ERROR_FORBIDDEN, "You must have the following Right(s) to be able to import users from the LDAP Database:" + sb.toString());
+			}
 			getAllowedMethods().add(Method.GET);
 			getAllowedMethods().add(Method.POST);
 			getAllowedMethods().add(Method.PUT);
@@ -142,6 +155,7 @@ public class LDAPImportResource extends LDAPUserLinkedResource {
 					profiles.add(Integer.decode(i));
 				} catch (NumberFormatException e) {}
 			}
+			getActivator().debug("LDAP Import starting with a Profile list: " + profiles.toString());
 		}
 		if (!profiles.isEmpty() && !hasRight(37)) {
 			throw new ResourceException(Status.CLIENT_ERROR_FORBIDDEN, "You do not own the suffisent access right to link users to specifics profiles, retry without assignating any profile to the imported user or contact an administrator.");
@@ -153,6 +167,7 @@ public class LDAPImportResource extends LDAPUserLinkedResource {
 		userModel.remove("limit.time"); //$NON-NLS-1$
 		userModel.remove("limit.count"); //$NON-NLS-1$
 		userModel.removePrefix("map.", true); //$NON-NLS-1$
+		getActivator().debug("LDAP Import starting with user model: " + userModel.prettyprint());
 		MetaDataEntity uentity = MetaDataEntity.loadEntity(Activator.TYPE_USER);
 		MetaDataEntity lentity = MetaDataEntity.loadEntity(Activator.LDAPAUTH);
 		StringBuilder errors = new StringBuilder();
@@ -161,19 +176,22 @@ public class LDAPImportResource extends LDAPUserLinkedResource {
 		if (searchPattern != null) {
 			BeanMapList users = selectableLDAPUsers();
 			if ((users == null) || (users.size() == 0)) {
+				getActivator().debug("LDAP Import nothing was selected in the LDAP base with following search pattern: " + searchPattern);
 				return null;
 			} else {
 				errors = new StringBuilder();
+				getActivator().debug("LDAP Import " + users.size() + " user preselected to be imported with the given search pattern: " + searchPattern);
+				int uc = 0;
 				for(String login: getLogins(form)) {
 					BeanMap user = users.getFirst("ldap.login", login); //$NON-NLS-1$
 					if (user == null) {
 						continue;
 					}
-					users.remove(user);
 					user.addAll(userModel);
 					user.remove("ldap.login"); //$NON-NLS-1$
 					int uid = createUser(uentity, user);
 					if (uid > 0) {
+						uc++;
 						added = true;
 						users.remove(user);
 						createLogin(lentity, login, uid);
@@ -184,7 +202,7 @@ public class LDAPImportResource extends LDAPUserLinkedResource {
 						errors.append(String.format(Messages.LDAPImportResource_ERROR_UserLoginError, login));
 					}
 				}
-				for(Integer id:getIds(form)) {
+				for (Integer id: getIds(form)) {
 					BeanMap user = users.getFirst(id);
 					if (user == null) {
 						continue;
@@ -197,6 +215,7 @@ public class LDAPImportResource extends LDAPUserLinkedResource {
 					user.remove("ldap.login"); //$NON-NLS-1$
 					int uid = createUser(uentity, user);
 					if (uid > 0) {
+						uc++;
 						added = true;
 						users.remove(user);
 						createLogin(lentity, login, uid);
@@ -206,9 +225,11 @@ public class LDAPImportResource extends LDAPUserLinkedResource {
 					} else {
 						errors.append(String.format(Messages.LDAPImportResource_ERROR_UserIdError, id));
 					}
-				}				
+				}
+				getActivator().debug("LDAP Import " + uc + " users effectivelly imported into the application database.");
 			}
 		} else {
+			getActivator().debug("LDAP import of a unique user.");
 			final String login = form.getFirstValue("ldap.login"); //$NON-NLS-1$
 			int uid = createUser(uentity, userModel);
 			if (uid > 0) {

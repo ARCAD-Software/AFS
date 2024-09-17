@@ -491,7 +491,12 @@ public class MetaDataParentResource extends DataParentResource {
 			return ConstantCriteria.TRUE;
 		}
 		XmlCriteriaStream xs = new XmlCriteriaStream();
-		return (ISearchCriteria) xs.fromXML(result);
+		try {
+			return (ISearchCriteria) xs.fromXML(result);
+		} catch (Exception e) {
+			Activator.getInstance().warn("Invalid Selection Criteria received: " + result);
+			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "The given selection criteria is invalid: " + result);
+		}
 	}
 	
 	protected String getColumns(Form form, String key) {
