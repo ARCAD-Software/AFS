@@ -28,7 +28,10 @@ import com.arcadsoftware.metadata.internal.xml.TestConverter;
  * JSon Streamer specialized to the serialization of MetaData objects.
  * 
  * <p>
- * This class can be used to serialize BeanMaps.
+ * This class can be used to serialize BeanMaps too.
+ * 
+ * <p>
+ * <b>This serialized can not transform JSON into Entity classe.</b>
  * 
  * @author ARCAD Software
  */

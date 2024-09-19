@@ -24,9 +24,9 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
  * 
  * <p>The <code>linkcode</code> is applied to the selected entity from witch a column is tested.  
  */
-public class LinkEqualCriteria extends AbstractLinkTestCriteria implements Cloneable {
+public class LinkEqualCriteria extends AbstractLinkTestCriteria implements Cloneable, IAttributesCriteria {
 
-	private boolean casesensitive = true;
+	private Boolean casesensitive;
 	private String secondAttribute;
 
 	/**
@@ -59,7 +59,7 @@ public class LinkEqualCriteria extends AbstractLinkTestCriteria implements Clone
 	 * @param value the constant value to test.
 	 * @param casesensitive
 	 */
-	public LinkEqualCriteria(String reference, String linkCode, String attribute, String secondAttribute, String value, boolean casesensitive) {
+	public LinkEqualCriteria(String reference, String linkCode, String attribute, String secondAttribute, String value, Boolean casesensitive) {
 		super(reference, linkCode, attribute, value);
 		this.secondAttribute = secondAttribute;
 		this.casesensitive = casesensitive;
@@ -129,7 +129,7 @@ public class LinkEqualCriteria extends AbstractLinkTestCriteria implements Clone
 		if (attributeValue == null) {
 			return value.toString().length() == 0;
 		}
-		if (casesensitive) {
+		if (isCasesensitive()) {
 			return value.equals(attributeValue);
 		}
 		return value.toString().equalsIgnoreCase(attributeValue.toString());
@@ -154,14 +154,14 @@ public class LinkEqualCriteria extends AbstractLinkTestCriteria implements Clone
 
 	@Override
 	protected String getTestString() {
-		if (casesensitive) {
+		if (isCasesensitive()) {
 			return Messages.Criteria_Equal + Messages.Criteria_CaseSensitive;
 		}
 		return Messages.Criteria_Equal;
 	}
 
 	public boolean isCasesensitive() {
-		return casesensitive;
+		return (casesensitive == null) || casesensitive.booleanValue();
 	}
 
 	public void setCasesensitive(boolean casesensitive) {

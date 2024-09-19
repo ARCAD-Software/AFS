@@ -63,7 +63,7 @@ public class EqualCriteria extends AbstractSearchCriteria implements Cloneable, 
 		this.intval = value;
 	}
 	
-	public EqualCriteria(String attribute, int intval, String value, Boolean casesensitive) {
+	public EqualCriteria(String attribute, Integer intval, String value, Boolean casesensitive) {
 		this();
 		this.attribute = attribute;
 		this.intval = intval;
@@ -183,6 +183,9 @@ public class EqualCriteria extends AbstractSearchCriteria implements Cloneable, 
 			sb.append(Messages.Criteria_EqualString);
 			sb.append(value);
 			sb.append('"');
+			if (isCasesensitive()) {
+				sb.append(Messages.Criteria_CaseSensitive);
+			}
 		} else {
 			sb.append(Messages.Criteria_IsNull);
 		}

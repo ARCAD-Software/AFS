@@ -33,7 +33,11 @@ import com.arcadsoftware.metadata.criteria.GreaterStrictCriteria;
 import com.arcadsoftware.metadata.criteria.GreaterThanCriteria;
 import com.arcadsoftware.metadata.criteria.HasRightCriteria;
 import com.arcadsoftware.metadata.criteria.IdEqualCriteria;
+import com.arcadsoftware.metadata.criteria.IdGreaterStrictCriteria;
+import com.arcadsoftware.metadata.criteria.IdGreaterThanCriteria;
 import com.arcadsoftware.metadata.criteria.IdInListCriteria;
+import com.arcadsoftware.metadata.criteria.IdLowerStrictCriteria;
+import com.arcadsoftware.metadata.criteria.IdLowerThanCriteria;
 import com.arcadsoftware.metadata.criteria.InGroupCriteria;
 import com.arcadsoftware.metadata.criteria.IsNullCriteria;
 import com.arcadsoftware.metadata.criteria.IsTrueCriteria;
@@ -62,7 +66,7 @@ import com.arcadsoftware.rest.XStreamCompact;
  * XStream serializer specialized to Criteria.
  */
 public class XmlCriteriaStream extends XStreamCompact {
-
+	
 	protected static XStreamCompact initialize(XStreamCompact xs) {
 		// Build all the necessary aliases...
 		xs.alias("or", OrCriteria.class); //$NON-NLS-1$
@@ -96,15 +100,15 @@ public class XmlCriteriaStream extends XStreamCompact {
 		xs.alias("contains", ContainCriteria.class); //$NON-NLS-1$
 		xs.useAttributeFor(ContainCriteria.class, "attribute"); //$NON-NLS-1$
 		xs.useAttributeFor(ContainCriteria.class, "value"); //$NON-NLS-1$
-		xs.aliasAttribute(ContainCriteria.class, "casesensitive", "case"); //$NON-NLS-1$ //$NON-NLS-2$
+		xs.useAttributeFor(ContainCriteria.class, "casesensitive"); //$NON-NLS-1$
 		xs.alias("starts", StartCriteria.class); //$NON-NLS-1$
 		xs.useAttributeFor(StartCriteria.class, "attribute"); //$NON-NLS-1$
 		xs.useAttributeFor(StartCriteria.class, "value"); //$NON-NLS-1$
-		xs.aliasAttribute(StartCriteria.class, "casesensitive", "case"); //$NON-NLS-1$ //$NON-NLS-2$
+		xs.useAttributeFor(StartCriteria.class, "casesensitive"); //$NON-NLS-1$
 		xs.alias("ends", EndCriteria.class); //$NON-NLS-1$
 		xs.useAttributeFor(EndCriteria.class, "attribute"); //$NON-NLS-1$
 		xs.useAttributeFor(EndCriteria.class, "value"); //$NON-NLS-1$
-		xs.aliasAttribute(EndCriteria.class, "casesensitive", "case"); //$NON-NLS-1$ //$NON-NLS-2$
+		xs.useAttributeFor(EndCriteria.class, "casesensitive"); //$NON-NLS-1$
 		xs.alias("linkto", LinkCriteria.class); //$NON-NLS-1$ // Changed from "link" to "linkto" in version 2.0.0
 		xs.useAttributeFor(LinkCriteria.class, "attribute"); //$NON-NLS-1$
 		xs.useAttributeFor(LinkCriteria.class, "linkCode"); //$NON-NLS-1$
@@ -218,30 +222,41 @@ public class XmlCriteriaStream extends XStreamCompact {
 		xs.useAttributeFor(AbstractLinkTestCriteria.class, "linkCode"); //$NON-NLS-1$
 		xs.useAttributeFor(AbstractLinkTestCriteria.class, "attribute"); //$NON-NLS-1$
 		xs.useAttributeFor(AbstractLinkTestCriteria.class, "value"); //$NON-NLS-1$
-		xs.aliasAttribute(LinkEqualCriteria.class, "casesensitive", "case"); //$NON-NLS-1$ //$NON-NLS-2$
+		xs.useAttributeFor(LinkEqualCriteria.class, "casesensitive"); //$NON-NLS-1$
+		xs.useAttributeFor(LinkEqualCriteria.class, "secondAttribute"); //$NON-NLS-1$
 		xs.alias("linkStarts", LinkStartCriteria.class); //$NON-NLS-1$
 		xs.alias("linkstarts", LinkStartCriteria.class); //$NON-NLS-1$
-		xs.aliasAttribute(LinkStartCriteria.class, "casesensitive", "case"); //$NON-NLS-1$ //$NON-NLS-2$
+		xs.useAttributeFor(LinkStartCriteria.class, "casesensitive"); //$NON-NLS-1$
 		xs.alias("linkEnds", LinkEndCriteria.class); //$NON-NLS-1$
 		xs.alias("linkends", LinkEndCriteria.class); //$NON-NLS-1$
-		xs.aliasAttribute(LinkEndCriteria.class, "casesensitive", "case"); //$NON-NLS-1$ //$NON-NLS-2$
+		xs.useAttributeFor(LinkEndCriteria.class, "casesensitive"); //$NON-NLS-1$
 		xs.alias("linkContains", LinkContainCriteria.class); //$NON-NLS-1$
 		xs.alias("linkcontains", LinkContainCriteria.class); //$NON-NLS-1$
-		xs.aliasAttribute(LinkContainCriteria.class, "casesensitive", "case"); //$NON-NLS-1$ //$NON-NLS-2$
+		xs.useAttributeFor(LinkContainCriteria.class, "casesensitive"); //$NON-NLS-1$
 		xs.alias("linkgreaterstrict", LinkGreaterStrictCriteria.class); //$NON-NLS-1$
 		xs.alias("linkgreaterthan", LinkGreaterThanCriteria.class); //$NON-NLS-1$
 		xs.useAttributeFor(EqualCriteria.class, "casesensitive"); //$NON-NLS-1$
-		xs.aliasAttribute(EqualCriteria.class, "casesensitive", "case"); //$NON-NLS-1$ //$NON-NLS-2$
-		xs.aliasAttribute(EqualCriteria.class, "casesensitive", "cs"); //$NON-NLS-1$ //$NON-NLS-2$
-		xs.aliasAttribute(StartCriteria.class, "casesensitive", "cs"); //$NON-NLS-1$ //$NON-NLS-2$
-		xs.aliasAttribute(EndCriteria.class, "casesensitive", "cs"); //$NON-NLS-1$ //$NON-NLS-2$
-		xs.aliasAttribute(ContainCriteria.class, "casesensitive", "cs"); //$NON-NLS-1$ //$NON-NLS-2$
-		xs.aliasAttribute(LinkEqualCriteria.class, "casesensitive", "cs"); //$NON-NLS-1$ //$NON-NLS-2$
-		xs.aliasAttribute(LinkStartCriteria.class, "casesensitive", "cs"); //$NON-NLS-1$ //$NON-NLS-2$
-		xs.aliasAttribute(LinkEndCriteria.class, "casesensitive", "cs"); //$NON-NLS-1$ //$NON-NLS-2$
-		xs.aliasAttribute(LinkContainCriteria.class, "casesensitive", "cs"); //$NON-NLS-1$ //$NON-NLS-2$
 		xs.useAttributeFor(AttributeEqualsCriteria.class, "casesensitive"); //$NON-NLS-1$
-		xs.aliasAttribute(AttributeEqualsCriteria.class, "casesensitive", "cs"); //$NON-NLS-1$ //$NON-NLS-2$
+		xs.aliasAttribute("a", "attribute"); //$NON-NLS-1$ //$NON-NLS-2$
+		xs.aliasAttribute("sa", "secondAttribute"); //$NON-NLS-1$ //$NON-NLS-2$
+		xs.aliasAttribute("secondattribute", "secondAttribute"); //$NON-NLS-1$ //$NON-NLS-2$
+		xs.aliasAttribute("v", "value"); //$NON-NLS-1$ //$NON-NLS-2$
+		xs.aliasAttribute("caseSensitive", "casesensitive"); //$NON-NLS-1$ //$NON-NLS-2$
+		xs.aliasAttribute("cs", "casesensitive"); //$NON-NLS-1$ //$NON-NLS-2$
+		xs.aliasAttribute("case", "casesensitive"); //$NON-NLS-1$ //$NON-NLS-2$
+		xs.alias("idgreater", IdGreaterStrictCriteria.class); //$NON-NLS-1$
+		xs.alias("idgreaterstrict", IdGreaterStrictCriteria.class); //$NON-NLS-1$
+		xs.useAttributeFor(IdGreaterStrictCriteria.class, "id"); //$NON-NLS-1$
+		xs.alias("idgreaterorequals", IdGreaterThanCriteria.class); //$NON-NLS-1$
+		xs.alias("idgreaterthan", IdGreaterThanCriteria.class); //$NON-NLS-1$
+		xs.useAttributeFor(IdGreaterThanCriteria.class, "id"); //$NON-NLS-1$
+		xs.alias("idlower", IdLowerStrictCriteria.class); //$NON-NLS-1$
+		xs.alias("idlowerstrict", IdLowerStrictCriteria.class); //$NON-NLS-1$
+		xs.useAttributeFor(IdLowerStrictCriteria.class, "id"); //$NON-NLS-1$
+		xs.alias("idlowerorequals", IdLowerThanCriteria.class); //$NON-NLS-1$
+		xs.alias("idlowerthan", IdLowerThanCriteria.class); //$NON-NLS-1$
+		xs.useAttributeFor(IdLowerThanCriteria.class, "id"); //$NON-NLS-1$
+		// For upcomming declarations, do not forget to add the dedicated mapping in the JsonCriteriaStream class.
 		return xs;
 	}
 	

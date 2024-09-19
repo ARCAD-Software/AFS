@@ -13,6 +13,8 @@
  *******************************************************************************/
 package com.arcadsoftware.rest;
 
+import org.codehaus.jettison.mapped.Configuration;
+
 import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
 
 /**
@@ -27,13 +29,17 @@ import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
  * @author ARCAD Software
  * @since 2022.01
  */
-public class JettisonSreamCompact extends XStreamCompact {
+public class JettisonStreamCompact extends XStreamCompact {
 
-	public JettisonSreamCompact() {
+	public JettisonStreamCompact() {
 		this((ClassLoader) null);
 	}
 
-	public JettisonSreamCompact(ClassLoader classLoader) {
+	public JettisonStreamCompact(ClassLoader classLoader) {
 		super(classLoader, new JettisonMappedXmlDriver());
+	}
+
+	public JettisonStreamCompact(ClassLoader classLoader, Configuration config, boolean useSerializeAsArray) {
+		super(classLoader, new JettisonMappedXmlDriver(config, useSerializeAsArray));
 	}
 }

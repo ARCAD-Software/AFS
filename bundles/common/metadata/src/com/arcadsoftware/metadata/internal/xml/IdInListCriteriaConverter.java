@@ -47,6 +47,7 @@ public class IdInListCriteriaConverter implements Converter {
 	public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
 		String value = reader.getAttribute("ids"); //$NON-NLS-1$
 		if ((value == null) || value.isEmpty()) {
+			
 			return new IdInListCriteria();
 		}
 		ArrayList<Integer> ids = new ArrayList<Integer>();

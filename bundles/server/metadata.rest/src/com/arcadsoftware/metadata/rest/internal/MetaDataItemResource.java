@@ -48,7 +48,7 @@ import com.arcadsoftware.metadata.criteria.IdEqualCriteria;
 import com.arcadsoftware.metadata.criteria.NotCriteria;
 import com.arcadsoftware.metadata.criteria.OrCriteria;
 import com.arcadsoftware.metadata.rest.DataItemResource;
-import com.arcadsoftware.metadata.xml.XmlCriteriaStream;
+import com.arcadsoftware.metadata.rest.DataParentResource;
 
 /*
  * Gestion des données :
@@ -124,7 +124,7 @@ public class MetaDataItemResource extends DataItemResource {
 			// check other parameters... 
 			boolean deleted = isParameter(form, "deleted"); //$NON-NLS-1$
 			boolean distinct = isParameter(form, "distincts"); //$NON-NLS-1$
-			ISearchCriteria criteria = getCriteria(form);
+			ISearchCriteria criteria = DataParentResource.getCriteria(this, form);
 			if (ConstantCriteria.TRUE.equals(criteria) || (criteria == null)) {
 				criteria = link.getRightList(true);
 			} else {
@@ -161,7 +161,7 @@ public class MetaDataItemResource extends DataItemResource {
 			}
 			entity = linkEntity;
 		} else {
-			ISearchCriteria criteria = getCriteria(form);
+			ISearchCriteria criteria = DataParentResource.getCriteria(this, form);
 			if (ConstantCriteria.TRUE.equals(criteria) || (criteria == null)) {
 				criteria = entity.getRightRead();
 			} else {
@@ -510,7 +510,7 @@ public class MetaDataItemResource extends DataItemResource {
 		}
 		// Build the search criteria
 		boolean nocriteria = false;
-		ISearchCriteria criteria = getCriteria(form);
+		ISearchCriteria criteria = DataParentResource.getCriteria(this, form);
 		if (ConstantCriteria.TRUE.equals(criteria) || (criteria == null)) {
 			nocriteria = true;
 			criteria = entity.getRightRead();
@@ -635,20 +635,6 @@ public class MetaDataItemResource extends DataItemResource {
 			} catch (NumberFormatException e) {}
 		}
 		return 0;
-	}
-
-	protected ISearchCriteria getCriteria(Form form) {
-		String result = form.getFirstValue("criteria"); //$NON-NLS-1$
-		if (result == null) {
-			result = getAttribute("criteria"); //$NON-NLS-1$
-		}
-		if ((result == null) || //
-				result.equalsIgnoreCase("all") ||  //$NON-NLS-1$
-				result.equalsIgnoreCase("<all/>")) { //$NON-NLS-1$
-			return ConstantCriteria.TRUE;
-		}
-		XmlCriteriaStream xs = new XmlCriteriaStream();
-		return (ISearchCriteria) xs.fromXML(result);
 	}
 
 	@Override
@@ -907,7 +893,7 @@ public class MetaDataItemResource extends DataItemResource {
 				}
 			}
 		}
-		ISearchCriteria criteria = getCriteria(form);
+		ISearchCriteria criteria = DataParentResource.getCriteria(this, form);
 		if (ConstantCriteria.TRUE.equals(criteria) || (criteria == null)) {
 			criteria = link.getRightList(true);
 		} else {

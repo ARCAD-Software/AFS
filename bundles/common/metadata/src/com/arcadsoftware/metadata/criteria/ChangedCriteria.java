@@ -313,4 +313,56 @@ public class ChangedCriteria extends AbstractSearchCriteria {
 		return sb.toString();
 	}
 
+	public void setAfter(Date after) {
+		this.after = after;
+	}
+
+	public void setBefore(Date before) {
+		this.before = before;
+	}
+
+	public void setTrunc(boolean trunc) {
+		this.trunc = trunc;
+	}
+
+	public void setAfteryears(int afteryears) {
+		this.afteryears = afteryears;
+	}
+
+	public void setAftermonths(int aftermonths) {
+		this.aftermonths = aftermonths;
+	}
+
+	public void setAfterdays(int afterdays) {
+		this.afterdays = afterdays;
+	}
+
+	public void setAfterhours(int afterhours) {
+		this.afterhours = afterhours;
+	}
+
+	public void setAfterminuts(int afterminuts) {
+		this.afterminuts = afterminuts;
+	}
+
+	public void setBeforeyears(int beforeyears) {
+		this.beforeyears = beforeyears;
+	}
+
+	public void setBeforemonths(int beforemonths) {
+		this.beforemonths = beforemonths;
+	}
+
+	public void setBeforedays(int beforedays) {
+		this.beforedays = beforedays;
+	}
+
+	public void setBeforehours(int beforehours) {
+		this.beforehours = beforehours;
+	}
+
+	public void setBeforeminuts(int beforeminuts) {
+		this.beforeminuts = beforeminuts;
+	}
+
 }

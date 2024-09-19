@@ -22,6 +22,7 @@ import org.restlet.data.Form;
 import org.restlet.data.Language;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
+import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.representation.Variant;
@@ -37,7 +38,11 @@ import com.arcadsoftware.metadata.IMapperService;
 import com.arcadsoftware.metadata.MetaDataEntity;
 import com.arcadsoftware.metadata.MetaDataFormater;
 import com.arcadsoftware.metadata.ReferenceLine;
+import com.arcadsoftware.metadata.criteria.ConstantCriteria;
+import com.arcadsoftware.metadata.criteria.ISearchCriteria;
 import com.arcadsoftware.metadata.rest.internal.Activator;
+import com.arcadsoftware.metadata.xml.JsonCriteriaStream;
+import com.arcadsoftware.metadata.xml.XmlCriteriaStream;
 import com.arcadsoftware.rest.UserLinkedResource;
 import com.arcadsoftware.rest.JSONRepresentation;
 import com.arcadsoftware.rest.XMLRepresentation;
@@ -58,6 +63,102 @@ public class DataParentResource extends UserLinkedResource {
 
 	public static final String PARAMETER_TYPE = "type"; // //$NON-NLS-1$
 
+
+	public static ISearchCriteria getCriteria(UserLinkedResource resource, Form form) {
+		String[] values = form.getValuesArray("criteria"); //$NON-NLS-1$
+		if ((values == null) || (values.length == 0)) {
+			String c = resource.getAttribute("criteria"); //$NON-NLS-1$
+			if (c != null) {
+				values = new String[] {c};
+			}
+		}
+		if ((values == null) || (values.length == 0)) {
+			return ConstantCriteria.TRUE;
+		}
+		for (int i = values.length - 1; i >= 0; i--) {
+			values[i] = values[i].trim();
+		}
+		// Support XML format:
+		if (values[0].charAt(0) == '<') {
+			for (String v: values) {
+				if (v.equalsIgnoreCase("<all/>")) { //$NON-NLS-1$
+					return ConstantCriteria.TRUE;
+				}
+			}
+			String result;
+			if (values.length > 1) {
+				StringBuilder sb = new StringBuilder("<and>"); //$NON-NLS-1$
+				for (String v: values) {
+					sb.append(v);
+				}
+				result = sb.append("</and>").toString(); //$NON-NLS-1$
+			} else {
+				result = values[0];
+			}
+			try {
+				return (ISearchCriteria) new XmlCriteriaStream().fromXML(result);
+			} catch (Exception e) {
+				Activator.getInstance().warn("Invalid XML Selection Criteria received: " + result);
+				throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "The given XML selection criteria is invalid: " + result);
+			}
+		}
+		// Support JSON format:
+		if (values[0].charAt(0) == '{') {
+			for (String v: values) {
+				if (v.startsWith("{\"all\"")) { //$NON-NLS-1$
+					return ConstantCriteria.TRUE;
+				}
+			}
+			// We must handle multiple criteria differently in JSON !
+			String result;
+			if (values.length > 1) {
+				StringBuilder sb = new StringBuilder("{\"or\":["); //$NON-NLS-1$
+				boolean first = true;
+				for (String v: values) {
+					if (first) {
+						first = false;
+					} else {
+						sb.append(',');
+					}
+					sb.append(v);
+				}
+				result = sb.append("]}").toString(); //$NON-NLS-1$
+			} else {
+				result = values[0];
+			}
+			ISearchCriteria r = new JsonCriteriaStream().read(result);
+			if (r != null) {
+				return r;
+			}
+			Activator.getInstance().warn("Invalid JSON Selection Criteria received: " + result);
+			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "The given JSON selection criteria is invalid: " + result);
+		}
+		for (String v: values) {
+			if (v.equalsIgnoreCase("all")) { //$NON-NLS-1$
+				return ConstantCriteria.TRUE;
+			}
+		}
+		String result;
+		if (values.length > 1) {
+			StringBuilder sb = new StringBuilder();
+			boolean first = true;
+			for (String v: values) {
+				if (first) {
+					first = false;
+				} else {
+					sb.append(" and "); //$NON-NLS-1$
+				}
+				sb.append(v);
+			}
+			result = sb.toString(); //$NON-NLS-1$
+		} else {
+			result = values[0];
+		}
+		// TODO Support "human mathematical expired format"
+		Activator.getInstance().warn("Invalid Selection Criteria received: " + result);
+		throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Invalid selection criteria format: " + result);
+	}
+	
 	private MetaDataEntity entity;
 	
 	@Override
