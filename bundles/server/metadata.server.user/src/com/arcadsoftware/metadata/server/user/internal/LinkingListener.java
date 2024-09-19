@@ -14,6 +14,7 @@
 package com.arcadsoftware.metadata.server.user.internal;
 
 import org.restlet.data.Language;
+import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 
 import com.arcadsoftware.beanmap.BeanMap;
@@ -42,6 +43,9 @@ public class LinkingListener implements IMetaDataLinkingListener {
 	@Override
 	public boolean testUnlink(MetaDataLink link, BeanMap sourceItem, BeanMap destItem, IConnectionUserBean user,
 			Language language) throws ResourceException {
+		if (Activator.PROTECTADMINUSER && (sourceItem.getId() == 1) && (destItem.getId() == 1)) {
+			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "The System Adminitrator can not be unlinked to the \"All Rights\" profile. The operation is aborted.");
+		}
 		purgeCache(sourceItem);
 		purgeCache(destItem);
 		return true;
@@ -56,5 +60,4 @@ public class LinkingListener implements IMetaDataLinkingListener {
 			}
 		}
 	}
-
 }

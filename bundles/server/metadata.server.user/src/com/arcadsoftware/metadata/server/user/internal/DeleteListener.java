@@ -19,6 +19,7 @@ import com.arcadsoftware.metadata.MetaDataEntity;
 import com.arcadsoftware.rest.connection.IConnectionCache;
 import com.arcadsoftware.rest.connection.IConnectionUserBean;
 import org.restlet.data.Language;
+import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 
 public class DeleteListener implements IMetaDataDeleteListener {
@@ -32,6 +33,13 @@ public class DeleteListener implements IMetaDataDeleteListener {
 
 	@Override
 	public boolean testDeletion(MetaDataEntity entity, BeanMap originalItem, IConnectionUserBean user, Language language) throws ResourceException {
+		// Test if user.id == 1 -> Exception with explicit message !
+		if (Activator.PROTECTADMINUSER && Activator.TYPE_USER.equals(entity.getType()) && (originalItem.getId() == 1)) {
+			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "The System Administrator User can not be deleted. Operation aborted.");
+		}
+		if (Activator.UPDATEALLRIGHTPROFILE && Activator.TYPE_PROFILERIGHT.equals(entity.getType()) && (originalItem.getInt("profile") == 1)) {
+			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "The profile \"All Rights\" can not be modified.");
+		}
 		return true;
 	}
 

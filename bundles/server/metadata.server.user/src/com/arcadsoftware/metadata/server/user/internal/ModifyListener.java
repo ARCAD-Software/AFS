@@ -16,6 +16,7 @@ package com.arcadsoftware.metadata.server.user.internal;
 import java.util.List;
 
 import org.restlet.data.Language;
+import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 
 import com.arcadsoftware.beanmap.BeanMap;
@@ -53,7 +54,13 @@ public class ModifyListener implements IMetaDataModifyListener {
 					}
 				}
 			} else {
-				// Other modification may be to ara to relate to users so we purge the whole cache.
+				if (Activator.TYPE_PROFILERIGHT.equals(entity.getType()) && (originalItem.getInt("profile") == 1)) {
+					Object v = modifiedItem.get("profile");
+					if ((v != null) && !v.equals(1)) {
+						throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "The Profile \"All Rights\" can not be modified.");
+					}
+				}
+				// Other modification may relate to some users so we purge the whole cache.
 				for (IConnectionCache cache: activator.getServices(IConnectionCache.class)) {
 					if (cache != null) {
 						cache.purgeAll(Activator.TYPE_USER);
