@@ -22,9 +22,7 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
  */
 public abstract class AbstractSearchCriteria implements ISearchCriteria {
 
-	/* (non-Javadoc)
-	 * @see com.arcadsoftware.server.system.criteria.ISearchCriteria#reduce(com.arcadsoftware.server.system.criteria.ICriteriaContext)
-	 */
+	@Override
 	public ISearchCriteria reduce(ICriteriaContext context) {
 		return this;
 	}
@@ -41,13 +39,14 @@ public abstract class AbstractSearchCriteria implements ISearchCriteria {
 	public Object clone() throws CloneNotSupportedException {
 		return super.clone();
 	}
-	
+
+	@Override
 	public BeanMapList select(BeanMapList list, IConnectionUserBean user) {
 		if (list == null) {
 			return new BeanMapList();
 		}
 		BeanMapList result = new BeanMapList(list.size());
-		for(BeanMap bean:list) {
+		for (BeanMap bean: list) {
 			if (test(bean, user)) {
 				result.add(bean);
 			}

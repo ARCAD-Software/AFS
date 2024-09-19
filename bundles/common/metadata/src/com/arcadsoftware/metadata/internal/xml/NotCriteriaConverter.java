@@ -25,7 +25,7 @@ import com.thoughtworks.xstream.mapper.Mapper;
 
 public class NotCriteriaConverter implements Converter {
 
-	private Mapper mapper;
+	private final Mapper mapper;
 	
 	public NotCriteriaConverter(Mapper mapper) {
 		super();

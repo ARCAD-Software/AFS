@@ -20,7 +20,7 @@ import com.arcadsoftware.rest.internal.JSonCompactDriver;
  * 
  * <p>This serializer can be used to convert BeanMaps to JSon but can not <b>deserialize</b>.
  * 
- * @see JettisonSreamCompact
+ * @see JettisonStreamCompact
  */
 public class JsonStreamCompact extends XStreamCompact {
 

@@ -14,7 +14,6 @@
 package com.arcadsoftware.metadata.criteria;
 
 import com.arcadsoftware.beanmap.BeanMap;
-import com.arcadsoftware.metadata.ReferenceLine;
 import com.arcadsoftware.metadata.internal.Messages;
 import com.arcadsoftware.rest.connection.IConnectionUserBean;
 
@@ -44,15 +43,7 @@ public class EqualICCriteria extends AbstractSearchCriteria implements Cloneable
 
 	@Override
 	public ISearchCriteria reduce(ICriteriaContext context) {
-		ReferenceLine attributeRef = context.getEntity().getAttributeLine(attribute);
-		if (attributeRef != null) {
-			context.useReference(attributeRef);
-			if (value == null) {
-				return new IsNullCriteria(attribute);
-			}
-			return this;
-		}
-		return ConstantCriteria.FALSE;
+		return new EqualCriteria(attribute, null, value, Boolean.FALSE).reduce(context);
 	}
 
 	@Override

@@ -45,7 +45,6 @@ import com.arcadsoftware.metadata.criteria.AndCriteria;
 import com.arcadsoftware.metadata.criteria.ConstantCriteria;
 import com.arcadsoftware.metadata.criteria.ISearchCriteria;
 import com.arcadsoftware.metadata.rest.DataParentResource;
-import com.arcadsoftware.metadata.xml.XmlCriteriaStream;
 
 /*
  * Data management resource:
@@ -201,7 +200,7 @@ public class MetaDataParentResource extends DataParentResource {
 
 	private void computeLastModificationDate() {
 		final Form form = getRequestForm();
-		ISearchCriteria criteria = getCriteria(form);
+		ISearchCriteria criteria = getCriteria(this, form);
 		if (ConstantCriteria.TRUE.equals(criteria) || (criteria == null)) {
 			criteria = getEntity().getRightList();
 		} else {
@@ -323,7 +322,7 @@ public class MetaDataParentResource extends DataParentResource {
 			orders = new ArrayList<ReferenceLine>();
 		}
 		// Build the search criteria
-		ISearchCriteria criteria = getCriteria(form);
+		ISearchCriteria criteria = getCriteria(this, form);
 		if (ConstantCriteria.TRUE.equals(criteria) || (criteria == null)) {
 			criteria = getEntity().getRightList();
 		} else {
@@ -478,25 +477,6 @@ public class MetaDataParentResource extends DataParentResource {
 			} catch (NumberFormatException e) {}
 		}
 		return 0;
-	}
-
-	protected ISearchCriteria getCriteria(Form form) {
-		String result = form.getFirstValue("criteria"); //$NON-NLS-1$
-		if (result == null) {
-			result = getAttribute("criteria"); //$NON-NLS-1$
-		}
-		if ((result == null) || 
-				result.equalsIgnoreCase("all") ||  //$NON-NLS-1$
-				result.equalsIgnoreCase("<all/>")) { //$NON-NLS-1$
-			return ConstantCriteria.TRUE;
-		}
-		XmlCriteriaStream xs = new XmlCriteriaStream();
-		try {
-			return (ISearchCriteria) xs.fromXML(result);
-		} catch (Exception e) {
-			Activator.getInstance().warn("Invalid Selection Criteria received: " + result);
-			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "The given selection criteria is invalid: " + result);
-		}
 	}
 	
 	protected String getColumns(Form form, String key) {
@@ -664,7 +644,7 @@ public class MetaDataParentResource extends DataParentResource {
 		}
 		final Form form = getRequestForm();
 		final boolean hardelete = isParameter(form, "harddelete"); //$NON-NLS-1$
-		ISearchCriteria criteria = new AndCriteria(entity.getRightDelete(), getCriteria(form));
+		ISearchCriteria criteria = new AndCriteria(entity.getRightDelete(), getCriteria(this, form));
 		// Faire une primosélection (criteria + right delete)
 		BeanMapList items = getEntity().getMapper().selection(entity, (List<ReferenceLine>) null, hardelete, criteria, false, null, getUser(), 0, -1);
 		boolean noerrors = true;
