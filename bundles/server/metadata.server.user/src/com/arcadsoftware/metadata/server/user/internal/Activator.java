@@ -42,12 +42,14 @@ import com.arcadsoftware.rest.connection.IConnectionCache;
 public class Activator extends AbstractActivator {
 
 	protected static final boolean UPDATEALLRIGHTPROFILE = !Boolean.getBoolean("com.arcadsoftware.profile.allrights.disabled");
+	protected static final boolean PROTECTADMINUSER = !Boolean.getBoolean("com.arcadsoftware.user.noadmin");
 	
 	protected static final String TYPE_USER = "user"; //$NON-NLS-1$
 	protected static final String TYPE_PROFILE = "profile"; //$NON-NLS-1$
 	protected static final String TYPE_PROFILERIGHT = "profileRight"; //$NON-NLS-1$
 	protected static final String TYPE_RIGHT = "right"; //$NON-NLS-1$
 	protected static final String LINK_PROFILES = "profiles"; //$NON-NLS-1$
+	protected static final String LINK_PROFILERIGHTS = "profilerights"; //$NON-NLS-1$
 	protected static final String LINK_USERS = "users"; //$NON-NLS-1$
 	protected static final String ALIAS_USERDB = "alias.userdb"; //$NON-NLS-1$
 	protected static final String METADATAPID = "com.arcadsoftware.metadata"; //$NON-NLS-1$
@@ -71,6 +73,12 @@ public class Activator extends AbstractActivator {
 		registerService(IMetaDataLinkingListener.class, new LinkingListener(this), props);
 		registerService(IMetaDataModifyListener.class, new ModifyListener(this), IMetaDataModifyListener.PROP_TYPE, TYPE_USER);
 		registerService(IMetaDataModifyListener.class, new ModifyListener(this), IMetaDataModifyListener.PROP_TYPE, TYPE_PROFILERIGHT);
+		props = new Hashtable<String, Object>();
+		props.put(IMetaDataLinkingListener.PROP_TYPE, TYPE_PROFILE);
+		props.put(IMetaDataLinkingListener.PROP_LINK, LINK_PROFILERIGHTS);
+		registerService(IMetaDataLinkingListener.class, new LinkingProfileListener(), props);
+
+		
 		// Check if any Mapper is not already started...
 		Collection<ServiceReference<IMapperService>> msrs = bundleContext.getServiceReferences(IMapperService.class, null);
 		if (msrs != null) {
