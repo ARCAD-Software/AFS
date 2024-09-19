@@ -400,9 +400,7 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 						parameters.add("needClientAuthentication", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 						//parameters.add("wantClientAuthentication", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
-					// Add other parameters specification
-					parameters.add("http.requestHeaderSize", Integer.getInteger("com.arcadsoftware.httprequestheaderlimit", 16384).toString()); //$NON-NLS-1$ //$NON-NLS-2$
-					parameters.add("http.responseHeaderSize", Integer.getInteger("com.arcadsoftware.httpresponseheaderlimit", 16384).toString()); //$NON-NLS-1$ //$NON-NLS-2$
+					jettyServerFineTuning(parameters);
 				} else if (serverProps.getPortssl() > 0) {
 					error("The HTTPS Server is not correctly configured and can not be started.");
 				}
@@ -413,10 +411,7 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 						throw new ServerConfigurationException("The HTTP Server connector is not available. Please check the server configuration, some bundles may be absent or not started, correct the error and refresh this bundle.");
 					}
 					component.getServers().add(server);
-					// Add other parameters specification
-					Series<Parameter> parameters = server.getContext().getParameters();
-					parameters.add("http.requestHeaderSize", Integer.getInteger("com.arcadsoftware.httprequestheaderlimit", 16384).toString()); //$NON-NLS-1$ //$NON-NLS-2$
-					parameters.add("http.responseHeaderSize", Integer.getInteger("com.arcadsoftware.httpresponseheaderlimit", 16384).toString()); //$NON-NLS-1$ //$NON-NLS-2$
+					jettyServerFineTuning(server.getContext().getParameters());
 					warn("Using an HTTP Server on production environment is a security breach. Change the Server configuration to use only an HTTPS server.");
 				}
 				component.getClients().add(Protocol.HTTP);
@@ -506,6 +501,92 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 					}
 				}
 			}
+		}
+	}
+
+	private void jettyServerFineTuning(Series<Parameter> parameters) {
+		// Jetty HTTP Server fine tuning:
+		// parameters specification from https://javadocs.restlet.talend.com/2.4/jse/ext/org/restlet/ext/jetty/JettyServerHelper.html
+		parameters.add("http.requestHeaderSize", Integer.getInteger("com.arcadsoftware.httprequestheaderlimit", 16384).toString()); //$NON-NLS-1$ //$NON-NLS-2$
+		parameters.add("http.responseHeaderSize", Integer.getInteger("com.arcadsoftware.httpresponseheaderlimit", 16384).toString()); //$NON-NLS-1$ //$NON-NLS-2$
+		Integer i = Integer.getInteger("com.arcadsoftware.threadPoolminThreads"); //$NON-NLS-1$
+		if (i != null) {
+			parameters.add("threadPool.minThreads", i.toString()); //$NON-NLS-1$			
+		}
+		i = Integer.getInteger("com.arcadsoftware.threadPool.maxThreads"); //$NON-NLS-1$
+		if (i != null) {
+			parameters.add("threadPool.maxThreads", i.toString()); //$NON-NLS-1$			
+		}
+		i = Integer.getInteger("com.arcadsoftware.threadPool.threadsPriority"); //$NON-NLS-1$
+		if (i != null) {
+			parameters.add("threadPool.threadsPriority", i.toString()); //$NON-NLS-1$			
+		}
+		i = Integer.getInteger("com.arcadsoftware.threadPool.idleTimeout"); //$NON-NLS-1$
+		if (i != null) {
+			parameters.add("threadPool.idleTimeout", i.toString()); //$NON-NLS-1$			
+		}
+		i = Integer.getInteger("com.arcadsoftware.threadPool.stopTimeout"); //$NON-NLS-1$
+		if (i != null) {
+			parameters.add("threadPool.stopTimeout", i.toString()); //$NON-NLS-1$			
+		}
+		i = Integer.getInteger("com.arcadsoftware.connector.acceptors"); //$NON-NLS-1$
+		if (i != null) {
+			parameters.add("connector.acceptors", i.toString()); //$NON-NLS-1$			
+		}
+		i = Integer.getInteger("com.arcadsoftware.connector.selectors"); //$NON-NLS-1$
+		if (i != null) {
+			parameters.add("connector.selectors", i.toString()); //$NON-NLS-1$			
+		}
+		i = Integer.getInteger("com.arcadsoftware.connector.acceptQueueSize"); //$NON-NLS-1$
+		if (i != null) {
+			parameters.add("connector.acceptQueueSize", i.toString()); //$NON-NLS-1$			
+		}
+		i = Integer.getInteger("com.arcadsoftware.connector.idleTimeout"); //$NON-NLS-1$
+		if (i != null) {
+			parameters.add("connector.idleTimeout", i.toString()); //$NON-NLS-1$			
+		}
+		i = Integer.getInteger("com.arcadsoftware.connector.soLingerTime"); //$NON-NLS-1$
+		if (i != null) {
+			parameters.add("connector.soLingerTime", i.toString()); //$NON-NLS-1$			
+		}
+		i = Integer.getInteger("com.arcadsoftware.connector.stopTimeout"); //$NON-NLS-1$
+		if (i != null) {
+			parameters.add("connector.stopTimeout", i.toString()); //$NON-NLS-1$			
+		}
+		i = Integer.getInteger("com.arcadsoftware.http.headerCacheSize"); //$NON-NLS-1$
+		if (i != null) {
+			parameters.add("http.headerCacheSize", i.toString()); //$NON-NLS-1$			
+		}
+		i = Integer.getInteger("com.arcadsoftware.http.outputBufferSize"); //$NON-NLS-1$
+		if (i != null) {
+			parameters.add("http.outputBufferSize", i.toString()); //$NON-NLS-1$			
+		}
+		i = Integer.getInteger("com.arcadsoftware.lowResource.period"); //$NON-NLS-1$
+		if (i != null) {
+			parameters.add("lowResource.period", i.toString()); //$NON-NLS-1$			
+		}
+		i = Integer.getInteger("com.arcadsoftware.lowResource.threads"); //$NON-NLS-1$
+		if (i != null) {
+			parameters.add("lowResource.threads", i.toString()); //$NON-NLS-1$			
+		}
+		i = Integer.getInteger("com.arcadsoftware.lowResource.maxMemory"); //$NON-NLS-1$
+		if (i != null) {
+			parameters.add("lowResource.maxMemory", i.toString()); //$NON-NLS-1$			
+		}
+		i = Integer.getInteger("com.arcadsoftware.lowResource.maxConnections"); //$NON-NLS-1$
+		if (i != null) {
+			parameters.add("lowResource.maxConnections", i.toString()); //$NON-NLS-1$			
+		}
+		i = Integer.getInteger("com.arcadsoftware.lowResource.idleTimeout"); //$NON-NLS-1$
+		if (i != null) {
+			parameters.add("lowResource.idleTimeout", i.toString()); //$NON-NLS-1$			
+		}
+		i = Integer.getInteger("com.arcadsoftware.lowResource.stopTimeout"); //$NON-NLS-1$
+		if (i != null) {
+			parameters.add("lowResource.stopTimeout", i.toString()); //$NON-NLS-1$			
+		}
+		if (Boolean.getBoolean("com.arcadsoftware.useForwardedForHeader")) { //$NON-NLS-1$
+			parameters.add("useForwardedForHeader", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
