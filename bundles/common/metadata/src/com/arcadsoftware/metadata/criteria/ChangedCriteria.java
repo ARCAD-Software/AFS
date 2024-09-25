@@ -19,6 +19,7 @@ import java.util.GregorianCalendar;
 
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.metadata.MetaDataEntity;
+import com.arcadsoftware.metadata.ReferenceLine;
 import com.arcadsoftware.metadata.internal.Messages;
 import com.arcadsoftware.rest.connection.IConnectionUserBean;
 
@@ -28,8 +29,9 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
  * TODO Add support for referenced entity (attribut parameter).
  *
  */
-public class ChangedCriteria extends AbstractSearchCriteria {
+public class ChangedCriteria extends AbstractSearchCriteria implements IAttributeCriteria {
 
+	private String attribute;
 	private Date after;
 	private Date before;
 	private boolean trunc;
@@ -74,13 +76,31 @@ public class ChangedCriteria extends AbstractSearchCriteria {
 		this.beforeminuts = beforeminuts;
 	}
 
+	public ChangedCriteria(String attribute, Date after, Date before, boolean trunc, int afteryears, int aftermonths,
+			int afterdays, int afterhours, int afterminuts, int beforeyears, int beforemonths, int beforedays,
+			int beforehours, int beforeminuts) {
+		this(after, before, trunc, afteryears, aftermonths, afterdays, afterhours, afterminuts, beforeyears, beforemonths, beforedays, beforehours, beforeminuts);
+		this.attribute = attribute;
+	}
 
 	@Override
 	public ISearchCriteria reduce(ICriteriaContext context) {
-		if (context.getEntity().isReadOnly() || //
-				!context.getEntity().getMetadata().getBoolean(MetaDataEntity.METADATA_UPDATABLE) || // 
-				(context.getEntity().getMetadata().get("updateCol") == null)) { //$NON-NLS-1$
+		MetaDataEntity e = context.getEntity();
+		ReferenceLine rl = null;
+		if ((attribute != null) && !attribute.isEmpty()) {
+			rl = e.getAttributeLine(attribute);
+			if ((rl == null) || (rl.getLastEntity() == null)) {
+				return ConstantCriteria.FALSE;
+			}
+			e = rl.getLastEntity();
+		}
+		if (e.isReadOnly() || //
+				!e.getMetadata().getBoolean(MetaDataEntity.METADATA_UPDATABLE) || // 
+				(e.getMetadata().get("updateCol") == null)) { //$NON-NLS-1$
 			return ConstantCriteria.FALSE;
+		}
+		if (rl != null) {
+			context.useReference(rl);
 		}
 		return this; // objet non modifié...
 	}
@@ -126,18 +146,22 @@ public class ChangedCriteria extends AbstractSearchCriteria {
 	
 	public boolean test(BeanMap bean, IConnectionUserBean currentUser) {
 		Date date = bean.getDate();
+		if ((attribute != null) && !attribute.isEmpty()) {
+			BeanMap b = bean.getBeanMap(attribute);
+			if (b == null) {
+				return false;
+			}
+			date = b.getDate();
+		}
 		if (date == null) {
 			return true;
 		}
-		if (date.before(getBeforeCalendar().getTime())) {
-			return date.after(getAfterCalendar().getTime());
-		}
-		return false;
+		return date.before(getBeforeCalendar().getTime()) && date.after(getAfterCalendar().getTime());
 	}
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
-		return new ChangedCriteria(after, before, trunc, afteryears, aftermonths, afterdays, 
+		return new ChangedCriteria(attribute, after, before, trunc, afteryears, aftermonths, afterdays, 
 				afterhours, afterminuts, beforeyears, beforemonths, beforedays, beforehours, beforeminuts);
 	}
 
@@ -145,19 +169,20 @@ public class ChangedCriteria extends AbstractSearchCriteria {
 	public boolean equals(Object obj) {
 		// TODO Test truncated dates only !
 		return (obj instanceof ChangedCriteria) &&
-		nullsOrEquals(before,((ChangedCriteria)obj).before) &&
-		nullsOrEquals(after,((ChangedCriteria)obj).after) &&
-		(trunc == ((ChangedCriteria)obj).trunc) &&
-		(afterminuts == ((ChangedCriteria)obj).afterminuts) &&
-		(afterhours == ((ChangedCriteria)obj).afterhours) &&
-		(afterdays == ((ChangedCriteria)obj).afterdays) &&
-		(aftermonths == ((ChangedCriteria)obj).aftermonths) &&
-		(afteryears == ((ChangedCriteria)obj).afteryears) &&
-		(beforeminuts == ((ChangedCriteria)obj).beforeminuts) &&
-		(beforehours == ((ChangedCriteria)obj).beforehours) &&
-		(beforedays == ((ChangedCriteria)obj).beforedays) &&
-		(beforemonths == ((ChangedCriteria)obj).beforemonths) &&
-		(beforeyears == ((ChangedCriteria)obj).beforeyears);
+				nullsOrEquals(attribute,((ChangedCriteria)obj).attribute) &&
+				nullsOrEquals(before,((ChangedCriteria)obj).before) &&
+				nullsOrEquals(after,((ChangedCriteria)obj).after) &&
+				(trunc == ((ChangedCriteria)obj).trunc) &&
+				(afterminuts == ((ChangedCriteria)obj).afterminuts) &&
+				(afterhours == ((ChangedCriteria)obj).afterhours) &&
+				(afterdays == ((ChangedCriteria)obj).afterdays) &&
+				(aftermonths == ((ChangedCriteria)obj).aftermonths) &&
+				(afteryears == ((ChangedCriteria)obj).afteryears) &&
+				(beforeminuts == ((ChangedCriteria)obj).beforeminuts) &&
+				(beforehours == ((ChangedCriteria)obj).beforehours) &&
+				(beforedays == ((ChangedCriteria)obj).beforedays) &&
+				(beforemonths == ((ChangedCriteria)obj).beforemonths) &&
+				(beforeyears == ((ChangedCriteria)obj).beforeyears);
 	}
 
 	public Date getAfter() {
@@ -215,7 +240,11 @@ public class ChangedCriteria extends AbstractSearchCriteria {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Changed between ["); //$NON-NLS-1$
+		if ((attribute != null) && !attribute.isEmpty()) {
+			sb.append(attribute);
+			sb.append(" has "); //$NON-NLS-1$
+		}
+		sb.append("changed between ["); //$NON-NLS-1$
 		if (after == null) {
 			if (trunc) {
 				sb.append(Messages.Criteria_CurrentDate);
@@ -363,6 +392,16 @@ public class ChangedCriteria extends AbstractSearchCriteria {
 
 	public void setBeforeminuts(int beforeminuts) {
 		this.beforeminuts = beforeminuts;
+	}
+
+	@Override
+	public void setAttribute(String code) {
+		attribute = code;
+	}
+
+	@Override
+	public String getAttribute() {
+		return attribute;
 	}
 
 }

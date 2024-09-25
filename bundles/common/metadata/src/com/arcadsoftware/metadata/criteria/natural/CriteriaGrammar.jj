@@ -1,0 +1,612 @@
+options {
+  IGNORE_CASE = true;
+  JDK_VERSION = "1.5";
+  STATIC = false;
+  UNICODE_INPUT = true;
+  ERROR_REPORTING = true;
+  DEBUG_TOKEN_MANAGER = false;
+  DEBUG_PARSER = false;
+  DEBUG_LOOKAHEAD = false;
+}
+
+PARSER_BEGIN(BaseCriteriaParser)
+
+package com.arcadsoftware.metadata.criteria.natural;
+
+import java.util.Date;
+import java.util.ArrayList;
+
+import com.arcadsoftware.metadata.internal.AbstractCriteriaParser;
+import com.arcadsoftware.metadata.criteria.ISearchCriteria;
+
+@SuppressWarnings({ "unused", "serial", "rawtypes", "unchecked" })
+public abstract class BaseCriteriaParser extends AbstractCriteriaParser {
+  // All pure java code is in AbstractCriteriaParser this is better for debugging !
+}
+PARSER_END(BaseCriteriaParser)
+
+SKIP:
+{ " "
+| "\t"
+| "\u00a0" // Non-breaking Space
+| "\u1680" // Ogham Space Mark
+| "\u2000" // EN Quad
+| "\u2001" // EM Quad
+| "\u2002" // EN Space
+| "\u2003" // EM Space
+| "\u2004" // Three-per-EM Space
+| "\u2005" // Four-per-EM Space
+| "\u2006" // Six-per-EM Space
+| "\u2007" // Figure Space
+| "\u2008" // Punctation Space
+| "\u2009" // Thin Space
+| "\u200a" // Hair Space
+| "\u202f" // Narrow Non-breaking Space 
+| "\u205f" // Medium Mathematical Space
+| "\u3000" // Ideographic Space
+| "\uFFF9" // Unicode Special characters https://www.compart.com/fr/unicode/block/U+FFF0
+| "\uFFFA"
+| "\uFFFB"
+| "\uFFFC"
+| "\uFFFD"
+| < LINE_SEPARATOR: ("\n" | "\r" | "\r\n" | "\n\r") >
+}
+
+SPECIAL_TOKEN: // Comments
+{ < COMMENT: "//"(~["\r","\n"])*>
+| < MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
+}
+
+TOKEN: // keywords
+{ < TRUE: "true" | "yes" >
+| < FALSE: "false" | "no" >
+| < ALL: "all" >
+| < NOT: "not" >
+| < AND: "and" >
+| < OR: "or" >
+| < IS: "is" >
+| < IN: "in" >
+| < NULL: "null" | "nul" >
+| < Y: "y" >
+| < M: "m" >
+| < D: "d" >
+| < H: "h" >
+| < N: "n" >
+| < ID: "@id" >
+| < USER: "@user" >
+| < UPDATE: "@date" >
+| < DELETED: "@deleted" >
+}
+
+TOKEN: // Operators
+{ < _NOT: "!" >
+| < _AND: "&" >
+| < _OR: "|" >
+| < _EQUAL: "=" >
+| < _EQUAL2: "==" >
+| < _LOWER: "<" >
+| < _GREATER: ">" >
+| < _LOWEREQUAL: "<=" >
+| < _GREATEREQUAL: ">=" >
+| < _CONTAIN: ":" >
+| < _START: "!:" >
+| < _END: ":!" >
+| < _CONTAINEQUAL: "::" >
+| < _STARTEQUAL: "!::" >
+| < _ENDEQUAL: "::!" >
+| < _BEFORE: "<<" >
+| < _AFTER: ">>" >
+| < _BEFORETRUNC: "<</" >
+| < _AFTERTRUNC: ">>/" >
+| < _BEFOREEQUAL: "<<=" >
+| < _AFTEREQUAL: ">>=" >
+| < _BEFORETRUNCEQUAL: "<<=/" >
+| < _AFTERTRUNCEQUAL: ">>=/" >
+| < _LINK: "->" >
+| < _UNLINK: "!>" >
+| < _RIGHT: "?>" >
+| < _DEL: "%" >
+| < PLUS: "+" >
+| < MINUS: "-" >
+| < DOT: "." >
+| < SHARP: "#" >
+| < COLON: "," >
+}
+
+TOKEN:
+{ < #LETTER:
+      ["\u0040"-"\u005b",
+       "\u005f", // underscore
+       "\u0061"-"\u007c",
+       "\u00a3", "\u00a5", "\u00a7",
+       "\u00c0"-"\u00d6", // Accent Capitals...
+       "\u00d8"-"\u00f6",
+       "\u00f8"-"\u00ff",// ... and accent small letters
+       "\u0100"-"\u1fff",
+       "\u3040"-"\u318f",
+       "\u3300"-"\u337f",
+       "\u3400"-"\u3d2d",
+       "\u4e00"-"\u9fff",
+       "\uf900"-"\ufaff"
+      ]
+  >
+| < #DIGIT:
+      [
+       "\u0030"-"\u0039", // 0 - 9
+       "\u0660"-"\u0669",
+       "\u06f0"-"\u06f9",
+       "\u0966"-"\u096f",
+       "\u09e6"-"\u09ef",
+       "\u0a66"-"\u0a6f",
+       "\u0ae6"-"\u0aef",
+       "\u0b66"-"\u0b6f",
+       "\u0be7"-"\u0bef",
+       "\u0c66"-"\u0c6f",
+       "\u0ce6"-"\u0cef",
+       "\u0d66"-"\u0d6f",
+       "\u0e50"-"\u0e59",
+       "\u0ed0"-"\u0ed9",
+       "\u1040"-"\u1049"
+      ]
+  >
+| < BRACE: "{" (~["}"])* "}" >
+| < DOUBLEQUOTED_STRING: "\"" (~["\""])* "\"" ("\"" (~["\""])* "\"")* >
+| < QUOTED_STRING: "'" (~["'"])* "'" ("'" (~["'"])* "'")* >
+| < DATE: < DIGIT > < DIGIT > < DIGIT > < DIGIT > < MINUS >  < DIGIT > < DIGIT > < MINUS > < DIGIT > < DIGIT >
+            ( "t" < DIGIT > < DIGIT > < _CONTAIN > < DIGIT > < DIGIT >
+            ( < _CONTAIN > < DIGIT > < DIGIT > ( (< COLON > | < DOT >)  < DIGIT > < DIGIT > < DIGIT > < DIGIT > )?
+            )?
+        )? "z" >
+| < INTEGER: (< MINUS >)? (< DIGIT >)+ >
+| < CODE: < LETTER > ( < DIGIT > | < LETTER >)* >
+| < REFLINE: < CODE > (< DOT >  < CODE > )+ >
+}
+
+ISearchCriteria criteria():
+{ ISearchCriteria c;
+}
+{ c = composedCriteria()
+  { return c; }
+}
+
+ISearchCriteria composedCriteria():
+{ ISearchCriteria c, cc;
+}
+{ ( ( < NOT > | < _NOT > ) c = criteria() { c = not(c); }
+  | c = simpleCriteria()
+    [ ( < OR > | < _OR > )
+      cc = criteria()
+      { c = or(c, cc); }
+    | ( < AND > | < _AND > )
+      cc = criteria()
+      { c = and(c, cc); }
+    ]
+  )
+  { return c; }
+}
+
+ISearchCriteria simpleCriteria():
+{ ISearchCriteria c, cc;
+}
+{ ( LOOKAHEAD(2) c = equalsCriteria()
+  | LOOKAHEAD(2) c = compCriteria()
+  | LOOKAHEAD(2) c = isCriteria()
+  | LOOKAHEAD(2) c = stringsCriteria()
+  | LOOKAHEAD(2) c = linksCriteria()
+  | LOOKAHEAD(2) c = unlinkCriteria()
+  | LOOKAHEAD(3) c = idCriteria()
+  | LOOKAHEAD(2) c = hasRightCriteria()
+  | LOOKAHEAD(2) c = deletedCriteria()
+  | LOOKAHEAD(lookaheaddateCriteria()) c = dateCriteria()
+  | c = currentUserCriteria()
+  | c = constantCriteria()
+  | c = pregenCriteria()
+  | c = substCriteria()
+  | "(" c = criteria() ")"
+  )
+  { return c; }
+}
+
+Token refline():
+{ Token t = null;
+}
+{ ( t = < CODE >
+  | t = < REFLINE >
+  )
+  { return t; }
+}
+
+ISearchCriteria isCriteria():
+{ Token rl;
+}
+{ rl = refline() < IS >
+  ( < NULL > { return isnull(rl); }
+  | < TRUE > { return istrue(rl); }
+  | < FALSE > { return not(istrue(rl)); }
+  )
+}
+
+ISearchCriteria stringsCriteria():
+{ Token rl, t;
+  boolean cs = false;
+  int o = 0; 
+}
+{ ( rl = refline()
+    ( < _CONTAIN >
+    | < _START > { o = 1; }
+    | < _END > { o = 2; }
+    | < _CONTAINEQUAL > { cs = true; }
+    | < _STARTEQUAL > { o = 1; cs = true; }
+    | < _ENDEQUAL > { o = 1; cs = true; }
+    )
+    ( ( t = < INTEGER >
+      | t = < QUOTED_STRING >
+      | t = < DOUBLEQUOTED_STRING >
+      )
+      { return strcmp(o, rl, string(t), cs); }
+    | t = < DATE >
+      { return strcmp(o, rl, dateString(t), cs); }
+    )
+  | ( t = < INTEGER >
+    | t = < QUOTED_STRING >
+    | t = < DOUBLEQUOTED_STRING >
+    )
+    ( < _CONTAIN >
+    | < _START > { o = 1; }
+    | < _END > { o = 2; }
+    | < _CONTAINEQUAL > { cs = true; }
+    | < _STARTEQUAL > { o = 1; cs = true; }
+    | < _ENDEQUAL > { o = 1; cs = true; }
+    )
+    rl = refline()
+    { return strcmp(o, rl, string(t), cs); }
+  | t = < DATE >
+    ( < _CONTAIN >
+    | < _START > { o = 1; }
+    | < _END > { o = 2; }
+    | < _CONTAINEQUAL > { cs = true; }
+    | < _STARTEQUAL > { o = 1; cs = true; }
+    | < _ENDEQUAL > { o = 1; cs = true; }
+    )
+    rl = refline()
+    { return strcmp(o, rl, dateString(t), cs); }
+  )
+}
+
+ISearchCriteria equalsCriteria():
+{ Token rl, t;
+  boolean cs = false; 
+}
+{ ( rl = refline()
+    ( ( < _EQUAL > | < _EQUAL2 > { cs = true; } ) 
+      ( t = < INTEGER > { return equals(rl, integer(t)); }
+      | t = < QUOTED_STRING > { return equals(rl, string(t), cs); }
+      | t = < DOUBLEQUOTED_STRING > { return equals(rl, string(t), cs); }
+      | t = < DATE > { return equals(rl, date(t)); }
+      | t = refline() { return equals(rl, t, cs); }
+      )
+    | < IN >
+      { ArrayList vals = new ArrayList(); }
+      t = < INTEGER >
+      { vals.add(integer(t)); }
+      ( < COLON > 
+        t = < INTEGER >
+        { vals.add(integer(t)); }
+      )*
+      { return isin(rl, vals); }
+    )
+  | t = < INTEGER >
+    ( < _EQUAL > | < _EQUAL2 > )
+    rl = refline()
+    { return equals(rl, integer(t)); }
+  | ( t = < QUOTED_STRING >
+    | t = < DOUBLEQUOTED_STRING >
+    )
+    ( < _EQUAL > | < _EQUAL2 > { cs = true; } ) 
+    rl = refline()
+    { return equals(rl, string(t), cs); }
+  | t = < DATE >
+    ( < _EQUAL > | < _EQUAL2 > )
+    rl = refline()
+    { return equals(rl, date(t)); } 
+  )
+}
+
+ISearchCriteria compCriteria():
+{ Token rl, t;
+  int o = 0;
+}
+{ ( rl = refline()
+    ( < _LOWER > | < _GREATER > { o = 1; } | < _LOWEREQUAL > { o = 2; } | < _GREATEREQUAL > { o = 3; } ) 
+    ( ( t = < INTEGER >
+      | t = < QUOTED_STRING >
+      | t = < DOUBLEQUOTED_STRING >
+      )
+      { return comp(o, rl, string(t)); }
+    | t = < DATE > 
+      { return comp(o, rl, dateString(t)); }
+    | t = refline()
+      { return comp(o, rl, t); }
+    )
+  | ( t = < QUOTED_STRING >
+    | t = < DOUBLEQUOTED_STRING >
+    | t = < INTEGER >
+    )
+    ( < _LOWER > { o = 1; } | < _GREATER > | < _LOWEREQUAL > { o = 3; } | < _GREATEREQUAL > { o = 2; } ) 
+    rl = refline()
+    { return comp(o, rl, string(t)); }
+  | t = < DATE >
+    ( < _LOWER > { o = 1; } | < _GREATER > | < _LOWEREQUAL > { o = 3; } | < _GREATEREQUAL > { o = 2; } ) 
+    rl = refline()
+    { return comp(o, rl, dateString(t)); }
+  )
+}
+
+ISearchCriteria dateCriteria():
+{ Token rl = null, t;
+  Date x = null, xx = null;
+  boolean u = false, l = false;
+  int o = 0, y = 0, m = 0, d = 0, h = 0, n = 0;
+  int yy = 0, mm = 0, dd = 0, hh = 0, nn = 0;
+}
+{ ( rl = refline()
+    ( < _BEFORE >
+    | < _AFTER > { o = 1; }
+    | < _BEFORETRUNC > { u = true; }
+    | < _AFTERTRUNC > { o = 1; u = true; }
+    | < _BEFOREEQUAL > { l = true; }
+    | < _AFTEREQUAL > { o = 1; l = true; }
+    | < _BEFORETRUNCEQUAL > { u = true; l = true; }
+    | < _AFTERTRUNCEQUAL > { o = 1; u = true; l = true; }
+    )
+    ( t = < DATE > { x = date(t); }
+    | t = < QUOTED_STRING > { x = date(string(t)); }
+    | t = < DOUBLEQUOTED_STRING > { x = date(string(t)); }
+    )
+    [LOOKAHEAD([< PLUS >] < INTEGER > < Y >)
+      [< PLUS >] t = < INTEGER > < Y >
+      { y = integer(t); }
+    ]
+    [LOOKAHEAD([< PLUS >] < INTEGER > < M >)
+      [< PLUS >] t = < INTEGER > < M >
+      { m = integer(t); }
+    ]
+    [LOOKAHEAD([< PLUS >] < INTEGER > < D >)
+      [< PLUS >] t = < INTEGER > < D >
+      { d = integer(t); }
+    ]
+    [LOOKAHEAD([< PLUS >] < INTEGER > < H >)
+      [< PLUS >] t = < INTEGER > < H >
+      { h = integer(t); }
+    ]
+    [LOOKAHEAD([< PLUS >] < INTEGER > < N >)
+      [< PLUS >] t = < INTEGER > < N >
+      { n = integer(t); }
+    ]
+  | ( t = < DATE > { x = date(t); }
+    | t = < QUOTED_STRING > { x = date(string(t)); }
+    | t = < DOUBLEQUOTED_STRING > { x = date(string(t)); }
+    )
+    [LOOKAHEAD([< PLUS >] < INTEGER > < Y >)
+      [< PLUS >] t = < INTEGER > < Y >
+      { y = integer(t); }
+    ]
+    [LOOKAHEAD([< PLUS >] < INTEGER > < M >)
+      [< PLUS >] t = < INTEGER > < M >
+      { m = integer(t); }
+    ]
+    [LOOKAHEAD([< PLUS >] < INTEGER > < D >)
+      [< PLUS >] t = < INTEGER > < D >
+      { d = integer(t); }
+    ]
+    [LOOKAHEAD([< PLUS >] < INTEGER > < H >)
+      [< PLUS >] t = < INTEGER > < H >
+      { h = integer(t); }
+    ]
+    [LOOKAHEAD([< PLUS >] < INTEGER > < N >)
+      [< PLUS >] t = < INTEGER > < N >
+      { n = integer(t); }
+    ]
+    ( < _BEFORE > { o = 1; }
+    | < _AFTER >
+    | < _BEFORETRUNC > { o = 1; u = true; }
+    | < _AFTERTRUNC > { u = true; }
+    | < _BEFOREEQUAL > { o = 1; l = true; }
+    | < _AFTEREQUAL > { l = true; }
+    | < _BEFORETRUNCEQUAL > { o = 1; u = true; l = true; }
+    | < _AFTERTRUNCEQUAL > { u = true; l = true; }
+    )
+    [ rl = refline() ]
+    [ [ < DOT > ] < UPDATE > { o -= 2; } ]
+    [ // TODO Should test that this operator is really the same as the first one !
+      ( < _BEFORE >
+      | < _AFTER >
+      | < _BEFORETRUNC >
+      | < _AFTERTRUNC >
+      | < _BEFOREEQUAL >
+      | < _AFTEREQUAL >
+      | < _BEFORETRUNCEQUAL >
+      | < _AFTERTRUNCEQUAL >
+      )
+      ( t = < DATE > { xx = date(t); }
+      | t = < QUOTED_STRING > { xx = date(string(t)); }
+      | t = < DOUBLEQUOTED_STRING > { xx = date(string(t)); }
+      )
+      [LOOKAHEAD([< PLUS >] < INTEGER > < Y >)
+        [< PLUS >] t = < INTEGER > < Y >
+        { yy = integer(t); }
+      ]
+      [LOOKAHEAD([< PLUS >] < INTEGER > < M >)
+        [< PLUS >] t = < INTEGER > < M >
+        { mm = integer(t); }
+      ]
+      [LOOKAHEAD([< PLUS >] < INTEGER > < D >)
+        [< PLUS >] t = < INTEGER > < D >
+        { dd = integer(t); }
+      ]
+      [LOOKAHEAD([< PLUS >] < INTEGER > < H >)
+        [< PLUS >] t = < INTEGER > < H >
+        { hh = integer(t); }
+      ]
+      [LOOKAHEAD([< PLUS >] < INTEGER > < N >)
+        [< PLUS >] t = < INTEGER > < N >
+        { nn = integer(t); }
+      ]
+      { return datecmp(o, rl, x, u, l, y, m, d, h, n, xx, yy, mm, dd, hh, nn); }
+    ]
+  )
+  { return datecmp(o, rl, x, u, y, m, d, h, n); }
+}
+
+void lookaheaddateCriteria():
+{}
+{ ( ( < REFLINE > | < CODE > )
+    ( < _BEFORE > | < _AFTER > | < _BEFORETRUNC > | < _AFTERTRUNC > )
+  | ( < DATE > | < QUOTED_STRING > | < DOUBLEQUOTED_STRING > )
+    ( < PLUS > | < INTEGER > | < _BEFORE > | < _AFTER > | < _BEFORETRUNC > | < _AFTERTRUNC > )
+  )
+}
+
+ISearchCriteria unlinkCriteria():
+{ Token rl = null, l, i;
+}
+{ [ rl = refline() ]
+  < _UNLINK >
+  l = < CODE >
+  < _EQUAL >
+  i = < INTEGER >
+  { return unlink(l.image, rl, integer(i)); }
+}
+
+ISearchCriteria linksCriteria():
+{ Token rl = null, l, i, al;
+  boolean cs = false;
+  int o = 0;
+}
+{ [ rl = refline() ]
+  < _LINK >
+  l = < CODE >
+  ( < _EQUAL > 
+    i = < INTEGER >
+    { return link(l.image, rl, integer(i)); }
+  | al = refline()
+    ( < _EQUAL >
+    | < _EQUAL2 > { cs = true; }
+    | < _GREATER > { o = 1; }
+    | < _GREATEREQUAL > { o = 2; }
+    | < _CONTAIN > { o = 3; }
+    | < _START > { o = 4; }
+    | < _END > { o = 5; }
+    | < _CONTAINEQUAL > { o = 3; cs = true; }
+    | < _STARTEQUAL > { o = 4; cs = true; }
+    | < _ENDEQUAL > { o = 5; cs = true; }
+    )
+    ( i = < INTEGER >
+    | i = < QUOTED_STRING >
+    | i = < DOUBLEQUOTED_STRING >
+    | i = < DATE >
+    | i = refline()
+      { return link(o, l.image, rl, al, i, null, cs); }
+    )
+    { return link(o, l.image, rl, al, null, string(i), cs); }
+  )
+}
+
+ISearchCriteria idCriteria():
+{ Token t = null;
+  int o = 0;
+  ArrayList vals = new ArrayList(); 
+}
+{ ( < ID >
+    ( ( < _EQUAL >
+      | < _GREATER > { o = 1; }
+      | < _GREATEREQUAL > { o = 2; }
+      | < _LOWER > { o = 3; }
+      | < _LOWEREQUAL > { o = 4; }
+      )
+      t = < INTEGER >
+    | < IN >
+      t = < INTEGER >
+      { vals.add(integer(t)); }
+      ( < COLON >         t = < INTEGER >
+        { vals.add(integer(t)); }
+      )*
+      { return isin(vals); }
+    )
+  | t = < INTEGER >
+    ( < _EQUAL >
+    | < _GREATER > { o = 3; }
+    | < _GREATEREQUAL > { o = 4; }
+    | < _LOWER > { o = 1; }
+    | < _LOWEREQUAL > { o = 2; }
+    )
+    < ID >
+  )
+  { return id(o, integer(t)); }
+}
+
+ISearchCriteria hasRightCriteria():
+{ Token t, p = null;
+  String v = null;
+}
+{ [ < DOT > { v = "."; }
+  | t = refline() {  v = t.image; }
+  ]
+  < _RIGHT >
+  t = < INTEGER >
+  [ < _CONTAIN >
+    p = < INTEGER >
+  ]
+  { return hasRight(v, t, p); }
+}
+
+ISearchCriteria currentUserCriteria():
+{ Token rl = null, t = null, l = null;
+}
+{ < USER >
+  [ rl = refline() ]
+  ( < _EQUAL >
+    t = refline()
+  | < _LINK >
+    l = < CODE >
+    < _EQUAL >
+    t = refline()  )
+  { return currentUser(rl, l, t); }
+}
+
+ISearchCriteria deletedCriteria():
+{ Token t = null;
+}
+{ ( < _DEL > t = refline()
+  | < DELETED >
+  | t = refline() < DELETED >
+  )
+ { return deleted(t); }
+}
+
+ISearchCriteria pregenCriteria():
+{ Token t;
+}
+{ t = < BRACE >
+  { return pregen(t.image); }
+}
+
+ISearchCriteria substCriteria():
+{ Token t;
+}
+{ < SHARP >
+  t = refline()
+  < SHARP >
+  { return subst(t.image); }
+}
+
+ISearchCriteria constantCriteria():
+{ Token t;
+}
+{ < TRUE > { return constant(true); }
+| < ALL > { return constant(true); }
+| < FALSE > { return constant(false); }
+| < Y > { return constant(true); }
+| < N > { return constant(false); }
+| t = < INTEGER > { return constant(integer(t) != 0); }
+}

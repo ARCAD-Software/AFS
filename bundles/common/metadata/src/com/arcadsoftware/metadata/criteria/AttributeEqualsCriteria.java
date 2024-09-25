@@ -42,9 +42,14 @@ public class AttributeEqualsCriteria extends AbstractSearchCriteria implements I
 	}
 
 	public AttributeEqualsCriteria(String attribute1, String attribute2) {
-		super();
+		this();
 		this.attribute = attribute1;
 		this.secondAttribute = attribute2;
+	}
+
+	public AttributeEqualsCriteria(String attribute1, String attribute2, boolean casesensitive) {
+		this(attribute1, attribute2);
+		this.casesensitive = casesensitive;
 	}
 	
 	@Override

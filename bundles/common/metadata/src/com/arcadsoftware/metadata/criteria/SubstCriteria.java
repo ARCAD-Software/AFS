@@ -137,9 +137,13 @@ public class SubstCriteria extends AbstractSearchCriteria implements Cloneable {
 	
 	public boolean test(BeanMap bean, IConnectionUserBean currentUser) {
 		if (criteria == null) {
-			criteria = calcCriteria();
-			if (criteria == null) {
-				return false;
+			synchronized (this) {
+				if (criteria == null) {
+					criteria = calcCriteria();
+					if (criteria == null) {
+						return false;
+					}
+				}
 			}
 		}
 		return criteria.test(bean, currentUser);

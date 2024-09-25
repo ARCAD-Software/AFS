@@ -35,7 +35,7 @@ import com.arcadsoftware.metadata.criteria.HasRightCriteria;
 import com.arcadsoftware.metadata.criteria.IdEqualCriteria;
 import com.arcadsoftware.metadata.criteria.IdGreaterStrictCriteria;
 import com.arcadsoftware.metadata.criteria.IdGreaterThanCriteria;
-import com.arcadsoftware.metadata.criteria.IdInListCriteria;
+import com.arcadsoftware.metadata.criteria.InListCriteria;
 import com.arcadsoftware.metadata.criteria.IdLowerStrictCriteria;
 import com.arcadsoftware.metadata.criteria.IdLowerThanCriteria;
 import com.arcadsoftware.metadata.criteria.InGroupCriteria;
@@ -57,7 +57,7 @@ import com.arcadsoftware.metadata.criteria.StartCriteria;
 import com.arcadsoftware.metadata.criteria.SubstCriteria;
 import com.arcadsoftware.metadata.criteria.UnlinkCriteria;
 import com.arcadsoftware.metadata.internal.xml.ConstantCriteriaConverter;
-import com.arcadsoftware.metadata.internal.xml.IdInListCriteriaConverter;
+import com.arcadsoftware.metadata.internal.xml.InListCriteriaConverter;
 import com.arcadsoftware.metadata.internal.xml.NotCriteriaConverter;
 import com.arcadsoftware.metadata.internal.xml.PregeneratedCriteriaConverter;
 import com.arcadsoftware.rest.XStreamCompact;
@@ -208,9 +208,9 @@ public class XmlCriteriaStream extends XStreamCompact {
 		xs.alias("deleted", DeletedCriteria.class); //$NON-NLS-1$
 		xs.useAttributeFor(DeletedCriteria.class, "attribute"); //$NON-NLS-1$
 		// New criteria of version 1.0.2
-		xs.alias("isIn", IdInListCriteria.class); //$NON-NLS-1$
-		xs.alias("isin", IdInListCriteria.class); //$NON-NLS-1$
-		xs.registerConverter(new IdInListCriteriaConverter());
+		xs.alias("isIn", InListCriteria.class); //$NON-NLS-1$
+		xs.alias("isin", InListCriteria.class); //$NON-NLS-1$
+		xs.registerConverter(new InListCriteriaConverter());
 		// New criteria of version 1.0.3
 		xs.alias("unlinkto", UnlinkCriteria.class); //$NON-NLS-1$ // Changed from "link" to "linkto" in version 2.0.0
 		xs.useAttributeFor(UnlinkCriteria.class, "attribute"); //$NON-NLS-1$
@@ -256,6 +256,7 @@ public class XmlCriteriaStream extends XStreamCompact {
 		xs.alias("idlowerorequals", IdLowerThanCriteria.class); //$NON-NLS-1$
 		xs.alias("idlowerthan", IdLowerThanCriteria.class); //$NON-NLS-1$
 		xs.useAttributeFor(IdLowerThanCriteria.class, "id"); //$NON-NLS-1$
+		xs.useAttributeFor(ChangedCriteria.class, "attribute"); //$NON-NLS-1$
 		// For upcomming declarations, do not forget to add the dedicated mapping in the JsonCriteriaStream class.
 		return xs;
 	}
