@@ -67,7 +67,7 @@ import com.arcadsoftware.metadata.criteria.ISearchCriteria;
 import com.arcadsoftware.metadata.criteria.IdEqualCriteria;
 import com.arcadsoftware.metadata.criteria.IdGreaterStrictCriteria;
 import com.arcadsoftware.metadata.criteria.IdGreaterThanCriteria;
-import com.arcadsoftware.metadata.criteria.IdInListCriteria;
+import com.arcadsoftware.metadata.criteria.InListCriteria;
 import com.arcadsoftware.metadata.criteria.IdLowerStrictCriteria;
 import com.arcadsoftware.metadata.criteria.IdLowerThanCriteria;
 import com.arcadsoftware.metadata.criteria.InGroupCriteria;
@@ -130,7 +130,7 @@ public class MapperSQLService extends AbstractMapperService {
 	 */
 	protected class JoinsMap {
 		
-		private HashMap<String,String> keys;
+		private HashMap<String, String> keys;
 		private StringBuilder joins;
 		
 		/**
@@ -171,7 +171,6 @@ public class MapperSQLService extends AbstractMapperService {
 		public String toString() {
 			return joins.toString();
 		}
-		
 	}
 	
 	private final DataSource ds;
@@ -1076,7 +1075,22 @@ public class MapperSQLService extends AbstractMapperService {
 		} else if (criteria instanceof SubstCriteria) {
 			Activator.getInstance().debug(Messages.MapperSQLService_InternalError_CriteriaNotReduced, new ResourceException(Status.SERVER_ERROR_INTERNAL));
 		} else if (criteria instanceof ChangedCriteria) {
-			String dateCol = DEFAULT_TABLEALIAS + fg.prefix + entityInfo.updateCol;
+			String dateCol;
+			String attribute = ((ChangedCriteria) criteria).getAttribute();
+			if (attribute == null) {
+				dateCol = DEFAULT_TABLEALIAS + fg.prefix + entityInfo.updateCol;
+			} else {
+				EntityInfo ae = getEntityInfo(context.getReference(attribute).getLastAttribute().getRefEntity());
+				if (ae.updateCol == null) {
+					result.append(fg.false_cond);
+					return result;
+				}
+				String alias = getAlias(attribute, "ud", "_u"); //$NON-NLS-1$ //$NON-NLS-2$
+				if (joinMap.doNotExists(alias)) {
+					joinMap.add(alias, String.format(fg.join, ae.table, alias, ae.idCol, colNames.get(attribute)));
+				}
+				dateCol = alias + fg.prefix + ae.updateCol;
+			}
 			result.append(fg.parin);
 			result.append(String.format(fg.greater,dateCol,
 					String.format(fg.datefunction, sdf.format(((ChangedCriteria) criteria).getAfterCalendar().getTime()))));
@@ -1084,9 +1098,14 @@ public class MapperSQLService extends AbstractMapperService {
 			result.append(String.format(fg.lower,dateCol,
 					String.format(fg.datefunction, sdf.format(((ChangedCriteria) criteria).getBeforeCalendar().getTime()))));			
 			result.append(fg.parout);
-		} else if (criteria instanceof IdInListCriteria) {
-			String col = DEFAULT_TABLEALIAS + fg.prefix + entityInfo.idCol;
-			result.append(String.format(fg.inset,  col, ((IdInListCriteria) criteria).getIds(fg.columnsep)));	
+		} else if (criteria instanceof InListCriteria) {
+			String col;
+			if (((InListCriteria) criteria).getAttribute() == null) {
+				col = DEFAULT_TABLEALIAS + fg.prefix + entityInfo.idCol;
+			} else {
+				col = colNames.get(((InListCriteria) criteria).getAttribute());
+			}
+			result.append(String.format(fg.inset,  col, ((InListCriteria) criteria).getIds(fg.columnsep)));	
 		} else {
 			Activator.getInstance().debug(String.format(Messages.MapperSQLService_UnknownCriteria, criteria.toString(), criteria.getClass().getName()));
 		}
@@ -1447,13 +1466,13 @@ public class MapperSQLService extends AbstractMapperService {
 			String col = e.attributesCols.get(code);
 			if (col != null) {
 				if (col.contains(COLUMNPREFIX_PLACEHOLDERS)) {
-					col = col.replace(COLUMNPREFIX_PLACEHOLDERS, "");
+					col = col.replace(COLUMNPREFIX_PLACEHOLDERS, ""); //$NON-NLS-1$
 				}
 				colNames.put(code, col);
 			}
 		}
 		return update(String.format(fg.updateex, e.table, lcols, //
-				generateCriteria(e, criteria, context, colNames, new JoinsMap(null), new StringBuilder()).toString()),//
+				generateCriteria(e, criteria, context, colNames, new JoinsMap(""), new StringBuilder()).toString()), //$NON-NLS-1$
 				vals);
 	}
 

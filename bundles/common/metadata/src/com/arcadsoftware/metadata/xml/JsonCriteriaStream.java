@@ -49,7 +49,7 @@ import com.arcadsoftware.metadata.criteria.ISearchCriteria;
 import com.arcadsoftware.metadata.criteria.IdEqualCriteria;
 import com.arcadsoftware.metadata.criteria.IdGreaterStrictCriteria;
 import com.arcadsoftware.metadata.criteria.IdGreaterThanCriteria;
-import com.arcadsoftware.metadata.criteria.IdInListCriteria;
+import com.arcadsoftware.metadata.criteria.InListCriteria;
 import com.arcadsoftware.metadata.criteria.IdLowerStrictCriteria;
 import com.arcadsoftware.metadata.criteria.IdLowerThanCriteria;
 import com.arcadsoftware.metadata.criteria.InGroupCriteria;
@@ -117,8 +117,14 @@ public class JsonCriteriaStream  {
 			result.put("isnull", ((IsNullCriteria) criteria).getAttribute());
 		} else if (criteria instanceof IsTrueCriteria) {
 			result.put("istrue", ((IsTrueCriteria) criteria).getAttribute());
-		} else if (criteria instanceof IdInListCriteria) {
-			result.put("isin", convertSet(((IdInListCriteria) criteria).getIds()));
+		} else if (criteria instanceof InListCriteria) {
+			if (((InListCriteria) criteria).getAttribute() == null) {
+				result.put("isin", convertSet(((InListCriteria) criteria).getIds()));
+			} else {
+				JSONObject sub = convertAttribute(criteria);
+				sub.put("ids", convertSet(((InListCriteria) criteria).getIds()));
+				result.put("isin", sub);
+			}
 		} else if (criteria instanceof IdGreaterStrictCriteria) {
 			result.put("idgreater", ((IdGreaterStrictCriteria) criteria).getId());
 		} else if (criteria instanceof IdGreaterThanCriteria) {
@@ -499,8 +505,18 @@ public class JsonCriteriaStream  {
 			return new IdLowerThanCriteria((String) value);
 		case "isin":
 		case "idin":
-			IdInListCriteria result = new IdInListCriteria();
-			if (value instanceof JSONArray) {
+		case "in":
+			InListCriteria result = new InListCriteria();
+			JSONArray ids = null;
+			if (value instanceof JSONObject) {
+				fill(result, (JSONObject) value);
+				try {
+					ids = ((JSONObject) value).getJSONArray("ids");
+				} catch (JSONException e) {}
+			} else if (value instanceof JSONArray) {
+				ids = (JSONArray) value;
+			}
+			if (ids != null) {
 				int l = ((JSONArray) value).length();
 				for (int i = 0; i < l; i++) {
 					Object o = ((JSONArray) value).get(i);

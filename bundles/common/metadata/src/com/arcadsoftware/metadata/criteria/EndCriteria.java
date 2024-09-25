@@ -45,6 +45,18 @@ public class EndCriteria extends AbstractSearchCriteria implements Cloneable, IA
 		this.attribute = attribute;
 		this.value = value;
 	}
+	
+	/**
+	 * @param attribute 
+	 * @param string
+	 * @param generator associated generator.
+	 */
+	public EndCriteria(String attribute, String value, boolean cs) {
+		super();
+		this.attribute = attribute;
+		this.value = value;
+		this.casesensitive = cs;
+	}
 
 	@Override
 	public ISearchCriteria reduce(ICriteriaContext context) {
@@ -76,7 +88,7 @@ public class EndCriteria extends AbstractSearchCriteria implements Cloneable, IA
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
-		return new EndCriteria(attribute,value);
+		return new EndCriteria(attribute, value, casesensitive);
 	}
 
 	@Override

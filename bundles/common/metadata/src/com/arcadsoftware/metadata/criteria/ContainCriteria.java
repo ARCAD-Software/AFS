@@ -45,6 +45,18 @@ public class ContainCriteria extends AbstractSearchCriteria implements Cloneable
 		this.attribute = attribute;
 		this.value = value;
 	}
+	
+	/**
+	 * @param attribute 
+	 * @param string
+	 * @param generator associated generator.
+	 */
+	public ContainCriteria(String attribute, String value, boolean cs) {
+		super();
+		this.attribute = attribute;
+		this.value = value;
+		this.casesensitive = cs;
+	}
 
 	@Override
 	public ISearchCriteria reduce(ICriteriaContext context) {
@@ -76,7 +88,7 @@ public class ContainCriteria extends AbstractSearchCriteria implements Cloneable
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
-		return new ContainCriteria(attribute,value);
+		return new ContainCriteria(attribute, value, casesensitive);
 	}
 
 	@Override

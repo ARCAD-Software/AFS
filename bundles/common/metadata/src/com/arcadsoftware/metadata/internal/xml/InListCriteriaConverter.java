@@ -15,24 +15,27 @@ package com.arcadsoftware.metadata.internal.xml;
 
 import java.util.ArrayList;
 
-import com.arcadsoftware.metadata.criteria.IdInListCriteria;
+import com.arcadsoftware.metadata.criteria.InListCriteria;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
-public class IdInListCriteriaConverter implements Converter {
+public class InListCriteriaConverter implements Converter {
 	
 	public boolean canConvert(@SuppressWarnings("rawtypes") Class type) {
-		return IdInListCriteria.class.equals(type);
+		return InListCriteria.class.equals(type);
 	}
 
 	public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
+		if (((InListCriteria) source).getAttribute() != null) {
+			writer.addAttribute("attribute", ((InListCriteria) source).getAttribute()); //$NON-NLS-1$
+		}
 		StringBuilder value = new StringBuilder();
-		if (((IdInListCriteria) source).getIds() != null) {
+		if (((InListCriteria) source).getIds() != null) {
 			boolean first = true; 
-			for(int i: ((IdInListCriteria) source).getIds()) {
+			for(int i: ((InListCriteria) source).getIds()) {
 				if (first) {
 					first = false;
 				} else {
@@ -47,8 +50,7 @@ public class IdInListCriteriaConverter implements Converter {
 	public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
 		String value = reader.getAttribute("ids"); //$NON-NLS-1$
 		if ((value == null) || value.isEmpty()) {
-			
-			return new IdInListCriteria();
+			return new InListCriteria();
 		}
 		ArrayList<Integer> ids = new ArrayList<Integer>();
 		for(String s: value.split(",")) { //$NON-NLS-1$
@@ -56,7 +58,7 @@ public class IdInListCriteriaConverter implements Converter {
 				ids.add(Integer.valueOf(s));
 			} catch (NumberFormatException e) {}
 		}
-		return new IdInListCriteria(ids);
+		return new InListCriteria(reader.getAttribute("attribute"), ids); //$NON-NLS-1$
 	}
 
 }

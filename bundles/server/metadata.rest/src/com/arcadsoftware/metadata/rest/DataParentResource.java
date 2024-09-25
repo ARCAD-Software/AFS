@@ -40,6 +40,7 @@ import com.arcadsoftware.metadata.MetaDataFormater;
 import com.arcadsoftware.metadata.ReferenceLine;
 import com.arcadsoftware.metadata.criteria.ConstantCriteria;
 import com.arcadsoftware.metadata.criteria.ISearchCriteria;
+import com.arcadsoftware.metadata.criteria.natural.CriteriaParser;
 import com.arcadsoftware.metadata.rest.internal.Activator;
 import com.arcadsoftware.metadata.xml.JsonCriteriaStream;
 import com.arcadsoftware.metadata.xml.XmlCriteriaStream;
@@ -146,7 +147,7 @@ public class DataParentResource extends UserLinkedResource {
 				if (first) {
 					first = false;
 				} else {
-					sb.append(" and "); //$NON-NLS-1$
+					sb.append(" & "); //$NON-NLS-1$
 				}
 				sb.append(v);
 			}
@@ -154,9 +155,13 @@ public class DataParentResource extends UserLinkedResource {
 		} else {
 			result = values[0];
 		}
-		// TODO Support "human mathematical expired format"
-		Activator.getInstance().warn("Invalid Selection Criteria received: " + result);
-		throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Invalid selection criteria format: " + result);
+		// Support "human mathematical expired format"
+		try {
+			return CriteriaParser.parse(result);
+		} catch (ResourceException e) {
+			Activator.getInstance().warn("Invalid Selection Criteria received: " + result);
+			throw e;
+		}
 	}
 	
 	private MetaDataEntity entity;

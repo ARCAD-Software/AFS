@@ -112,7 +112,7 @@ public class BetweenCriteria extends AbstractSearchCriteria implements Cloneable
 			//return new BetweenCriteria(attribute, after, before, trunc, afteryears, aftermonths, afterdays, 
 			//		afterhours, afterminuts, beforeyears, beforemonths, beforedays, beforehours, beforeminuts);
 		}
-		return ConstantCriteria.FALSE;
+		return new ChangedCriteria(after, before, trunc, afteryears, aftermonths, afterdays, afterhours, afterminuts, beforeyears, beforemonths, beforedays, beforehours, beforeminuts).reduce(context);
 	}
 
 	public Calendar getAfterCalendar() {
