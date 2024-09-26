@@ -113,7 +113,7 @@ public class EqualCriteria extends AbstractSearchCriteria implements Cloneable, 
 		if ((value == null) && (intval == null)) {
 			return new IsNullCriteria(attribute);
 		}
-		if (!isCasesensitive()) {
+		if ((value != null) && (intval == null) && !isCasesensitive()) {
 			return new EqualICCriteria(attribute, value);
 		}
 		return this;
