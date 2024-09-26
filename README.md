@@ -1,12 +1,11 @@
 # AFS-OS release version 2023.7.29.
 
+
 Release date Tue Sep 03 17:12:52 CEST 2024.
 
 Link to the update site of [Version 2023.7.29](https://github.com/ARCAD-Software/AFS/releases/download/2023.7.29/).
 
 3 Bundles modified in this release.
-
-
 
 ### List of bundles from group **client**
 
@@ -33,7 +32,6 @@ Bundle Symbolic Name | Modification | Version
 [com.arcadsoftware.afs.framework.application.rcp](bundles/client/afs.framework.application.rcp) | Not changed | 1.3.4
 [com.arcadsoftware.afs.framework.help](bundles/client/afs.framework.help) | Not changed | 1.2.3
 [com.arcadsoftware.afs.framework.ui](bundles/client/afs.framework.ui) | Not changed | 1.4.3
-
 
 
 ### List of bundles from group **common**
