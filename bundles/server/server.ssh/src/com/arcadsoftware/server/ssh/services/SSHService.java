@@ -153,7 +153,7 @@ public class SSHService {
 
 	private void generateKeyPair(final SSHKey sshKey) throws IOException, GeneralSecurityException {
 		final SSHKeyType keyType = sshKey.getType();
-		final KeyPairGenerator generator = KeyPairGenerator.getInstance(keyType.getAlgorithm());
+		final KeyPairGenerator generator = KeyPairGenerator.getInstance(keyType.getAlgorithm(), keyType.getProvider());
 		if (sshKey.getLength() > 0) {
 			generator.initialize(sshKey.getLength());
 		}
