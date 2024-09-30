@@ -59,7 +59,7 @@ public class SSHService {
 
 	private static final String PRIVATE_KEY_FILE = "private_key";
 	private static final String KEYSTORE_DIRECTORY = "./ssh/keystore";
-	private static final HashSet<PosixFilePermission> CHMOD_600 = new HashSet<PosixFilePermission>(2);
+	private static final HashSet<PosixFilePermission> CHMOD_600 = new HashSet<>(2);
 	
 	static {
 		CHMOD_600.add(PosixFilePermission.OWNER_READ);
@@ -121,7 +121,7 @@ public class SSHService {
 			generateKeyPair(newSSHKey);
 		} catch (IOException | GeneralSecurityException e) {
 			delete(newSSHKey);
-			throw new SSHException("Error occurred while creation new SSH key", e);
+			throw new SSHException("Error occurred while creating new SSH key: " + e, e);
 		}
 		return newSSHKey;
 	}
@@ -153,7 +153,7 @@ public class SSHService {
 
 	private void generateKeyPair(final SSHKey sshKey) throws IOException, GeneralSecurityException {
 		final SSHKeyType keyType = sshKey.getType();
-		final KeyPairGenerator generator = KeyPairGenerator.getInstance(keyType.getAlgorithm());
+		final KeyPairGenerator generator = KeyPairGenerator.getInstance(keyType.getAlgorithm(), keyType.getProvider());
 		if (sshKey.getLength() > 0) {
 			generator.initialize(sshKey.getLength());
 		}

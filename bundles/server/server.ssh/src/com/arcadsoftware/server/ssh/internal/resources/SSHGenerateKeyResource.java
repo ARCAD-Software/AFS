@@ -62,7 +62,7 @@ public class SSHGenerateKeyResource extends BeanMapItemResource {
 			bean.addAll(sshKey.getBeanMap());
 			bean.forceId(sshKey.getId());
 		} catch (final SSHException e) {
-			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, e);
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e.getMessage(), e);
 		}
 	}
 }

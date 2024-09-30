@@ -61,7 +61,7 @@ public class SSHKeyAddAction extends AbstractConnectedWizardedAddAction {
 
 	@Override
 	public UserMessage getErrorMessage() {
-		return null;
+		return helper.getLastMessage();
 	}
 
 	@Override
@@ -110,9 +110,14 @@ public class SSHKeyAddAction extends AbstractConnectedWizardedAddAction {
 		}
 
 		if (sshKey.isEncrypted()) {
-			sshKey.setPassphrase(Crypto.fog(sshKey.getPassphrase().toCharArray()));
+			sshKey.setPassphrase(Crypto.fog(sshKey.getPassphrase(), StandardCharsets.UTF_8));
 		}
-		return helper.put(SSHRoutes.GENERATE_KEY, sshKey.getBeanMap());
+		final boolean result = helper.put(SSHRoutes.GENERATE_KEY, sshKey.getBeanMap());
+		if(!result) {
+			MessageDialog.openError(Activator.getDefault().getPluginShell(),
+					"ARCAD Software", helper.getLastMessage().toString());
+		}
+		return result;
 	}
 
 	@Override

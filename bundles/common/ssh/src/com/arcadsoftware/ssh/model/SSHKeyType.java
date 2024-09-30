@@ -15,9 +15,9 @@ package com.arcadsoftware.ssh.model;
 
 public enum SSHKeyType {
 	
-	UNKNOWN("", 0, "", ""), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	RSA("RSA", 4096, "id_rsa", "id_rsa.pub"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	EDDSA("EdDSA", 0, "id_ed25519", "id_ed25519.pub"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	UNKNOWN("", 0, "", "", ""), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	RSA("RSA", 4096, "id_rsa", "id_rsa.pub", "BC"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	EDDSA("EdDSA", 0, "id_ed25519", "id_ed25519.pub", "EdDSA"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 	public static SSHKeyType fromAlgorithm(final String algo) {
 		if ((algo != null) && ! algo.isEmpty()) {
@@ -34,12 +34,14 @@ public enum SSHKeyType {
 	private final int length;
 	private final String privateKeyName;
 	private final String publicKeyName;
+	private final String provider;
 
-	SSHKeyType(final String algorithm, final int length, final String privateKeyName, final String publicKeyName) {
+	SSHKeyType(final String algorithm, final int length, final String privateKeyName, final String publicKeyName, final String provider) {
 		this.algorithm = algorithm;
 		this.length = length;
 		this.privateKeyName = privateKeyName;
 		this.publicKeyName = publicKeyName;
+		this.provider = provider;
 	}
 
 	public String getAlgorithm() {
@@ -56,5 +58,9 @@ public enum SSHKeyType {
 
 	public String getPublicKeyName() {
 		return publicKeyName;
+	}
+	
+	public String getProvider() {
+		return provider;
 	}
 }

@@ -119,7 +119,7 @@ public class SSHKeyImportAction extends AbstractConnectedWizardedAddAction {
 			keyUpload.setPrivateKey(privateKey);	
 			final String s = keyUpload.getPassphrase();
 			if((s != null) && !s.isEmpty()) {
-				keyUpload.setPassphrase(Crypto.fog(s.toCharArray()));				
+				keyUpload.setPassphrase(Crypto.fog(s, StandardCharsets.UTF_8));				
 			}
 			final BeanMap uploadResult = helper.getConnection().getDataAccess().post(SSHRoutes.IMPORT_KEY, keyUpload.getBeanmap());
 			if (uploadResult == null) {
