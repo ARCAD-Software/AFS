@@ -13,6 +13,10 @@
  *******************************************************************************/
 package com.arcadsoftware.metadata.criteria;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+
 import org.restlet.data.Language;
 
 import com.arcadsoftware.beanmap.BeanMap;
@@ -22,6 +26,7 @@ import com.arcadsoftware.metadata.ReferenceLine;
 import com.arcadsoftware.metadata.internal.Activator;
 import com.arcadsoftware.metadata.internal.Messages;
 import com.arcadsoftware.rest.connection.IConnectionUserBean;
+import com.arcadsoftware.rest.connection.Right;
 
 /**
  * Test Access Right :
@@ -31,14 +36,12 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
  * <li> attribute = "." test that the current user possess the given right and param.
  * <li> attibute = "anycode" test the attribute value is an User that possess the given right and param.
  * </ul>
- * 
- * TODO Implement paramAttribute to compare the param value to an attribute value.
  */
 public class HasRightCriteria extends AbstractSearchCriteria implements Cloneable, IAttributeCriteria {
 	
 	private String attribute;
 	private Integer right;
-	private Integer param;
+	private String param;
 	private transient ReferenceLine attributeRef;
 	
 	public HasRightCriteria() {
@@ -50,11 +53,23 @@ public class HasRightCriteria extends AbstractSearchCriteria implements Cloneabl
 	 * @param right
 	 * @param param
 	 */
-	public HasRightCriteria(String attribute, Integer right, Integer param) {
+	public HasRightCriteria(String attribute, Integer right, String param) {
 		super();
 		this.attribute = attribute;
 		this.right = right;
 		this.param = param;
+	}
+
+	/**
+	 * @param attribute
+	 * @param right
+	 * @param param
+	 */
+	public HasRightCriteria(String attribute, Integer right, int param) {
+		super();
+		this.attribute = attribute;
+		this.right = right;
+		this.param = Integer.toString(param);
 	}
 
 	@Override
@@ -73,23 +88,56 @@ public class HasRightCriteria extends AbstractSearchCriteria implements Cloneabl
 			// Test the currently connected user (Immediate resolution).
 			if (context.getCurrentUser() == null) {
 				return ConstantCriteria.TRUE;
-			}			
-			if (right == null) {
-				if (context.getCurrentUser().getProfile().hasRight(-1,param)) {
-					return ConstantCriteria.TRUE;
-				}
-			} else if (param == null) {
+			}
+			if (param == null) {
 				if (context.getCurrentUser().getProfile().hasRight(right)) {
 					return ConstantCriteria.TRUE;
 				}
-			} else if (context.getCurrentUser().getProfile().hasRight(right,param)) {
-				return ConstantCriteria.TRUE;
+			} else {
+				try {
+					int p = Integer.parseInt(param);
+					if (right == null) {
+						if (context.getCurrentUser().getProfile().hasRight(-1, p)) {
+							return ConstantCriteria.TRUE;
+						}
+					} else if (context.getCurrentUser().getProfile().hasRight(right, p)) {
+						return ConstantCriteria.TRUE;
+					}
+				} catch (NumberFormatException e) {
+					Collection<Right> params;
+					if (right == null) {
+						params = context.getCurrentUser().getProfile().getParams();
+					} else {
+						params = context.getCurrentUser().getProfile().getParams(right);
+					}
+					if ((params == null) || params.isEmpty()) {
+						return ConstantCriteria.FALSE;
+					}
+					HashSet<Integer> ids = new HashSet<>(params.size());
+					for (Right r: params) {
+						int p = r.getParam();
+						if (p != 0) {
+							ids.add(r.getParam());
+						}
+					}
+					if (param.equals(".")) {
+						return new InListCriteria(ids).reduce(context);
+					}
+					return new InListCriteria(param, ids).reduce(context);
+				}
 			}
 			return ConstantCriteria.FALSE;
 		}
 		ReferenceLine attributeRef = context.getEntity().getAttributeLine(attribute);
 		if (attributeRef != null) {
 			context.useReference(attributeRef);
+			if (param != null) {
+				ReferenceLine paramRef = context.getEntity().getAttributeLine(param);
+				if (paramRef == null) {
+					return new HasRightCriteria(attribute, right, null);
+				}
+				context.useReference(paramRef);
+			}
 			return this;
 		}
 		return ConstantCriteria.FALSE;
@@ -120,7 +168,7 @@ public class HasRightCriteria extends AbstractSearchCriteria implements Cloneabl
 		return right;
 	}
 
-	public Integer getParam() {
+	public String getParam() {
 		return param;
 	}
 		
@@ -132,7 +180,7 @@ public class HasRightCriteria extends AbstractSearchCriteria implements Cloneabl
 		this.right = right;
 	}
 
-	public void setParam(Integer param) {
+	public void setParam(String param) {
 		this.param = param;
 	}
 
@@ -145,41 +193,45 @@ public class HasRightCriteria extends AbstractSearchCriteria implements Cloneabl
 		if ((param == null) && (right == null)) {
 			return true;
 		}
+		// The user to be tested...
+		IConnectionUserBean user = null;
 		if (attribute == null) {
 			// Test the selected user.
 			if (bean.getType().equals("user")) { //$NON-NLS-1$
-				IConnectionUserBean user = Activator.getInstance().getConnectionUser(bean.getId());
-				if (user == null) {
-					return false;
-				}
-				if (right == null) {
-					return user.getProfile().hasRight(-1,param);
-				}
-				if (param == null) {
-					return user.getProfile().hasRight(right);
-				}
-				return user.getProfile().hasRight(right,param);
+				user = Activator.getInstance().getConnectionUser(bean.getId());
 			}
+		} else if (attribute.equals(".")) { //$NON-NLS-1$
+			// Test the currently connected user (Immediate resolution).
+			user = currentUser;
+		} else {
+			int attval = bean.getInt(attribute);
+			if (attval > 0) {
+				user = Activator.getInstance().getConnectionUser(bean.getId());
+			}
+		}
+		if (user == null) {
 			return false;
 		}
-		if (attribute.equals(".")) { //$NON-NLS-1$
-			// Test the currently connected user (Immediate resolution).
-			if (currentUser == null) {
-				return true;
-			}			
-			if (right == null) {
-				return currentUser.getProfile().hasRight(-1,param);
+		// Compute the parameter to be tested.
+		int p = 0;
+		if (param != null) {
+			if (param.equals(".")) { //$NON-NLS-1$
+				p = bean.getId();
+			} else {
+				try {
+					p = Integer.parseInt(param);
+				} catch (NumberFormatException e) {
+					p = bean.getInt(param);
+				}
 			}
-			if (param == null) {
-				return currentUser.getProfile().hasRight(right);
-			}
-			return currentUser.getProfile().hasRight(right,param);
 		}
-		int attval = bean.getInt(attribute);
 		if (right == null) {
-			return currentUser.getProfile().hasRight(-1,attval);
+			return user.getProfile().hasRight(-1, p);
 		}
-		return currentUser.getProfile().hasRight(right,attval);
+		if (param == null) {
+			return user.getProfile().hasRight(right);
+		}
+		return user.getProfile().hasRight(right, p);
 	}
 
 	@Override

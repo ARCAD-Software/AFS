@@ -215,7 +215,7 @@ public class Activator extends AbstractConfiguredActivator {
 				throw new RuntimeException("The Binaries File Transfert Service does not have write access to: " + path.getAbsolutePath());
 			}
 		}
-		File counter = new File (dir, ".counter");
+		File counter = new File(dir, ".counter");
 		boolean newCounter = false;
 		if (!counter.exists()) {
 			try {
@@ -330,7 +330,7 @@ public class Activator extends AbstractConfiguredActivator {
 	}
 
 	protected File getSubDir(String category, int id) {
-		return new File (getDir(category), "dir" + Integer.toString(id / 1000)); //$NON-NLS-1$
+		return new File(getDir(category), "dir" + Integer.toString(id / 1000)); //$NON-NLS-1$
 	}
 
 	private void fileEvent(Event event) {
@@ -343,7 +343,7 @@ public class Activator extends AbstractConfiguredActivator {
 	}
 
 	private Event newEvent(String type, String category, int id, File file) {
-		HashMap<String, Object> props = new HashMap<>();
+		HashMap<String, Object> props = new HashMap<>(5);
 		props.put(FILE_EVENT_TYPE, type);
 		if (file != null) {
 			props.put(FILE_EVENT_FILENAME, file.getAbsolutePath());

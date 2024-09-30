@@ -803,7 +803,7 @@ public class MapperSQLService extends AbstractMapperService {
 			}
 			if (((HasRightCriteria) criteria).getParam() != null) {
 				suffix.append('p');
-				suffix.append(Integer.toHexString(((HasRightCriteria) criteria).getParam()));
+				suffix.append(Integer.toHexString(((HasRightCriteria) criteria).getParam().hashCode()));
 			}
 			String alias = getAlias(((HasRightCriteria) criteria).getAttribute(), "r", suffix.toString()); //$NON-NLS-1$
 			String col;
@@ -824,9 +824,20 @@ public class MapperSQLService extends AbstractMapperService {
 				if (((HasRightCriteria) criteria).getRight() != null) {
 					result.append(fg.and);
 				}
-				result.append(String.format(fg.equal, alias + fg.prefix + "URI_PARAM", ((HasRightCriteria) criteria).getParam().toString())); //$NON-NLS-1$
+				// Param could be an integer, "." or a referenceline.
+				if (((HasRightCriteria) criteria).getParam().equals(".")) { //$NON-NLS-1$
+					result.append(String.format(fg.equal, alias + fg.prefix + "URI_PARAM", DEFAULT_TABLEALIAS + fg.prefix + entityInfo.idCol)); //$NON-NLS-1$
+				} else {
+					col = colNames.get(((HasRightCriteria) criteria).getParam());
+					if (col == null) {
+						// assume that the parameter value is an integer !
+						result.append(String.format(fg.equal, alias + fg.prefix + "URI_PARAM", ((HasRightCriteria) criteria).getParam())); //$NON-NLS-1$
+					} else {
+						result.append(String.format(fg.equal, alias + fg.prefix + "URI_PARAM", col)); //$NON-NLS-1$
+					}
+				}
 			}
-			result.append(fg.parout);			
+			result.append(fg.parout);
 		} else if (criteria instanceof IdEqualCriteria) {
 			String col = DEFAULT_TABLEALIAS + fg.prefix + entityInfo.idCol;
 			result.append(String.format(fg.equal,  col, ((IdEqualCriteria) criteria).getId()));
