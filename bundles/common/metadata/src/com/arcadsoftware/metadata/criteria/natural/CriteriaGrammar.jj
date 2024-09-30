@@ -104,7 +104,7 @@ TOKEN: // Operators
 | < _AFTERTRUNCEQUAL: ">>=/" >
 | < _LINK: "->" >
 | < _UNLINK: "!>" >
-| < _RIGHT: "?>" >
+| < _RIGHT: "?" >
 | < _DEL: "%" >
 | < PLUS: "+" >
 | < MINUS: "-" >
@@ -555,7 +555,10 @@ ISearchCriteria hasRightCriteria():
   < _RIGHT >
   t = < INTEGER >
   [ < _CONTAIN >
-    p = < INTEGER >
+    ( p = < INTEGER >
+    | p = < DOT >
+    | p = refline()
+    )
   ]
   { return hasRight(v, t, p); }
 }

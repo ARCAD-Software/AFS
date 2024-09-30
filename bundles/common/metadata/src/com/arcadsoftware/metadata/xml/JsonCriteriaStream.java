@@ -784,9 +784,8 @@ public class JsonCriteriaStream  {
 						break;
 					case "param":
 					case "p":
-						i = getInteger(o);
 						if (criteria instanceof HasRightCriteria) {
-							((HasRightCriteria) criteria).setParam(i);
+							((HasRightCriteria) criteria).setParam(o.toString());
 						}
 						break;
 					case "right":
