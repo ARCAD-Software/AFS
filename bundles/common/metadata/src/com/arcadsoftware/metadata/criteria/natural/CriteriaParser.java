@@ -8,6 +8,7 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 
 import com.arcadsoftware.metadata.criteria.ISearchCriteria;
+import com.arcadsoftware.metadata.internal.Activator;
 
 public class CriteriaParser extends BaseCriteriaParser {
 
@@ -18,6 +19,11 @@ public class CriteriaParser extends BaseCriteriaParser {
 		try (StringReader sr = new StringReader(criteria)) {
 			return new CriteriaParser(sr).criteria();
 		} catch (Exception e) {
+			if (Activator.getInstance() != null) {
+				Activator.getInstance().error(e);
+			} else {
+				e.printStackTrace();
+			}
 			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, e.getLocalizedMessage());
 		}
 	}

@@ -284,11 +284,14 @@ public abstract class AbstractCriteriaParser {
 		if (r != null) {
 			right = integer(r);
 		}
-		Integer param = null;
-		if (p != null) {
-			param = integer(p);
+		if (p == null) {
+			return new HasRightCriteria(att, right, null);
 		}
-		return new HasRightCriteria(att, right, param);
+		try {
+			return new HasRightCriteria(att, right, Integer.parseInt(p.image));
+		} catch (NumberFormatException e) {
+			return new HasRightCriteria(att, right, p.image);
+		}
 	}
 	
 	protected ISearchCriteria currentUser(Token rl, Token l, Token t) {

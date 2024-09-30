@@ -13,7 +13,6 @@
  *******************************************************************************/
 package com.arcadsoftware.metadata.criteria;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -246,18 +245,22 @@ public class HasRightCriteria extends AbstractSearchCriteria implements Cloneabl
 		}
 		sb.append(Messages.Criteria_HasRight);
 		if (right != null) {
-			MetaDataEntity re = Activator.getInstance().getEntity("right"); //$NON-NLS-1$
-			if (re == null) {
-				sb.append(right);
-			} else {
-				MetaDataAttribute att = re.getAttribute("name"); //$NON-NLS-1$
-				if (att == null) {
+			if (Activator.getInstance() != null) {
+				MetaDataEntity re = Activator.getInstance().getEntity("right"); //$NON-NLS-1$
+				if (re == null) {
 					sb.append(right);
 				} else {
-					BeanMap bm = new BeanMap("right", right); //$NON-NLS-1$
-					att.translate(bm , Language.DEFAULT);
-					sb.append(bm.get("name",right)); //$NON-NLS-1$
+					MetaDataAttribute att = re.getAttribute("name"); //$NON-NLS-1$
+					if (att == null) {
+						sb.append(right);
+					} else {
+						BeanMap bm = new BeanMap("right", right); //$NON-NLS-1$
+						att.translate(bm , Language.DEFAULT);
+						sb.append(bm.get("name", right)); //$NON-NLS-1$
+					}
 				}
+			} else {
+				sb.append(right);
 			}
 			if (param != null) {
 				sb.append(" ["); //$NON-NLS-1$
