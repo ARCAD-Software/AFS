@@ -109,8 +109,8 @@ public class SSHKeyAddAction extends AbstractConnectedWizardedAddAction {
 			sshKey.setType(SSHKeyType.EDDSA);
 		}
 
-		if (sshKey.isEncrypted()) {
-			sshKey.setPassphrase(Crypto.fog(sshKey.getPassphrase()));
+		if (sshKey.isEncrypted() && (sshKey.getPassphrase() != null)) {
+			sshKey.setPassphrase(Crypto.fog(sshKey.getPassphrase().toCharArray()));
 		}
 		final boolean result = helper.put(SSHRoutes.GENERATE_KEY, sshKey.getBeanMap());
 		if(!result) {
