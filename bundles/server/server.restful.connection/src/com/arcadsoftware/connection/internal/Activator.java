@@ -26,6 +26,7 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.util.tracker.ServiceTracker;
 import org.restlet.Request;
 import org.restlet.data.Language;
+import org.restlet.resource.ResourceException;
 
 import com.arcadsoftware.osgi.AbstractConfiguredActivator;
 import com.arcadsoftware.rest.MultiLanguageMessages;
@@ -36,6 +37,7 @@ import com.arcadsoftware.rest.connection.IConnectionCache;
 import com.arcadsoftware.rest.connection.IConnectionCredential;
 import com.arcadsoftware.rest.connection.IConnectionInfoService;
 import com.arcadsoftware.rest.connection.IConnectionUserBean;
+import com.arcadsoftware.rest.connection.IConnectionUserCheck;
 import com.arcadsoftware.rest.connection.IConnectionUserRepository;
 
 /**
@@ -68,11 +70,11 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 	private static final int CACHE_DURATION = 30; // in seconds
 
 	private int cacheDuration = CACHE_DURATION;
-
 	private ConnectionCache cache;
 	private ServiceTracker<IAuthentificationService, IAuthentificationService> secTracker;
 	private ServiceTracker<IConnectionInfoService, IConnectionInfoService> userTracker;
-	private boolean inactivate = false;
+	private ServiceTracker<IConnectionUserCheck, IConnectionUserCheck> checkTracker;
+	private boolean inactivate;
 	private MultiLanguageMessages messages;
 	private String realm = "arcad-evolution"; //$NON-NLS-1$
 	private ServiceRegistration<?> breg;
@@ -88,6 +90,8 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 		secTracker.open();
 		userTracker = new ServiceTracker<IConnectionInfoService, IConnectionInfoService>(context, IConnectionInfoService.clazz, null);
 		userTracker.open();
+		checkTracker = new ServiceTracker<IConnectionUserCheck, IConnectionUserCheck>(context, IConnectionUserCheck.class, null);
+		checkTracker.open();
 		// Add a secure branch, each authentification scheme must add a new secure branch.
 		breg = registerService(SecureBranch.clazz, new SecureBranch(this), SecureBranch.properties("/")); //$NON-NLS-1$
 		// Propose the Connection cache as a OSGi service.
@@ -109,6 +113,8 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 		secTracker = null;
 		userTracker.close();
 		userTracker = null;
+		checkTracker.close();
+		checkTracker = null;
 		super.stop(context);
 	}
 
@@ -326,4 +332,14 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 		return result;
 	}
 	
+	protected void checkUserConnection(IConnectionUserBean user) throws ResourceException {
+		Object[] services = checkTracker.getServices();
+		if (services != null) {
+			for (Object service: services) {
+				if (service instanceof IConnectionUserCheck) {
+					((IConnectionUserCheck) service).check(user);
+				}
+			}
+		}
+	}
 }

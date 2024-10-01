@@ -31,6 +31,7 @@ import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.data.Form;
 import org.restlet.data.Status;
+import org.restlet.resource.ResourceException;
 import org.restlet.security.Authenticator;
 
 import com.arcadsoftware.rest.BaseResource;
@@ -102,18 +103,20 @@ public class CachedAuthentificator extends Authenticator {
         	return basicCachedAuthenticate(services, request, response, timing);
         }
         // utilisation d'un autre schema.
+        boolean manage_error = true;
 		for (Object o: services) {
 			try {
 				if (o instanceof IWWWAuthentificationService) {
 					IConnectionUserBean user = ((IWWWAuthentificationService) o).checkCredential(request, response);
 					if (user != null) {
 						request.getAttributes().put(ConnectionUserBean.CONNECTED_USER, user);
+						activator.checkUserConnection(user);
 						broadcastSuccess(user);
 						updateConnectionTiming(timing);
 						return true;
 					}
 				}
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				long t = System.currentTimeMillis();
 				if ((t - lastErrorService) > LASTERROR_LATENCY) {
 					activator.error("Error during authentification, some services are not correctly configured.", e);
@@ -121,11 +124,17 @@ public class CachedAuthentificator extends Authenticator {
 				} else {
 					activator.debug("Error during authentification, some services are not correctly configured.", e);
 				}
+				if (e instanceof ResourceException) {
+					manage_error = false;
+					response.setStatus(((ResourceException) e).getStatus());
+				}
 			}
 		}
 		// pour des raison de sécurités on ne distingue pas un login incorrect d'une autre cause de refus.
-		response.setStatus(Status.CLIENT_ERROR_FORBIDDEN, translateMessage(request, "wrong")); //$NON-NLS-1$
-        response.getChallengeRequests().addAll(getAcceptedChanllenges(request, services));
+		if (manage_error) {
+			response.setStatus(Status.CLIENT_ERROR_FORBIDDEN, translateMessage(request, "wrong")); //$NON-NLS-1$
+	        response.getChallengeRequests().addAll(getAcceptedChanllenges(request, services));
+		}
         broadcastFail(request);
         waitConnectionTiming(timing);
 		return false;
@@ -288,6 +297,15 @@ public class CachedAuthentificator extends Authenticator {
 	            waitConnectionTiming(timing);
 	            return false;
 			}
+		}
+		// Check if the application accept this connection.
+		try {
+			activator.checkUserConnection(clonedUser);
+		} catch (ResourceException e) {
+			response.setStatus(e.getStatus());
+			broadcastFail(request);
+			waitConnectionTiming(timing);
+			return false;
 		}
 		broadcastSuccess(clonedUser);
 		updateConnectionTiming(timing);
