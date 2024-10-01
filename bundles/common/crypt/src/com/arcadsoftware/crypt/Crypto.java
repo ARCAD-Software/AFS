@@ -1117,7 +1117,7 @@ public final class Crypto {
 				clear(key);
 			}
 		}
-		return new char[0];
+		return string.toCharArray();
 	}
 	
 	/**
