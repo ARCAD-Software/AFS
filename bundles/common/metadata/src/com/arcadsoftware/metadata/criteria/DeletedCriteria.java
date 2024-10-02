@@ -77,7 +77,7 @@ public class DeletedCriteria extends AbstractSearchCriteria implements IAttribut
 	
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder(attribute);
+		StringBuilder sb = new StringBuilder();
 		if ((attribute == null) || (attribute.length() == 0)) {
 			sb.append("The item");
 		} else {

@@ -299,6 +299,7 @@ public class CachedAuthentificator extends Authenticator {
 			}
 		}
 		// Check if the application accept this connection.
+		// TODO use the connection cache to avoid recall...
 		try {
 			activator.checkUserConnection(clonedUser);
 		} catch (ResourceException e) {
