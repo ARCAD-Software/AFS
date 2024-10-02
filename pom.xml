@@ -231,14 +231,6 @@
 					<artifactId>tycho-compiler-plugin</artifactId>
 					<version>${tycho.version}</version>
 					<configuration>
-					<!-- 
-					Force usage of JDK as defined in the Bundle-RequiredExecutionEnvironment (BREE) in the manifest of the bundle 
-					Here Maven runs on Java 17 but we need to compile using Java 8. A matching toolchain designating a corresponding JVM needs to be defined.
-					The deriveReleaseCompilerArgumentFromTargetLevel argument is a workaround for a regression in Tycho regarding the
-					compilation of Java 8 code. Note : Java 8 compilation is not maintained in Tycho from version 3.0.
-					For more information : https://github.com/eclipse-tycho/tycho/wiki/Compiling-code-for-older-java-releases
-					-->
-						<useJDK>BREE</useJDK>
 						<deriveReleaseCompilerArgumentFromTargetLevel>false</deriveReleaseCompilerArgumentFromTargetLevel>
 					</configuration>
 				</plugin>
@@ -254,7 +246,7 @@
 								<version>2023.10.0-SNAPSHOT</version>
 							</artifact>
 						</target>
-						<executionEnvironment>JavaSE-1.8</executionEnvironment>
+						<executionEnvironment>JavaSE-17</executionEnvironment>
 						<pomDependencies>consider</pomDependencies>
 					</configuration>
 				</plugin>
