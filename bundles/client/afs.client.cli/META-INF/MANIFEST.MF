@@ -7,7 +7,7 @@ Bundle-Vendor: ARCAD Software
 Require-Bundle: com.arcadsoftware.aev.core.services;bundle-version="11.0.4",
  com.arcadsoftware.afs.client.core.base;bundle-version="1.4.3",
  xstream;bundle-version="1.4.201"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
 Automatic-Module-Name: com.arcadsoftware.afs.logger.bridge
 Export-Package: com.arcadsoftware.cli,

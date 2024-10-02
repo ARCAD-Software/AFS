@@ -6,7 +6,7 @@ Bundle-Version: 2.4.301.qualifier
 Bundle-Vendor: Restlet
 Fragment-Host: org.restlet.base;bundle-version="2.4.300"
 Automatic-Module-Name: org.restlet.server
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-Description: Repackaging of Restlet with minimal dependencies for REST Server usage. 
 Bundle-Copyright: Restlet SAS
 Bundle-License: license.txt

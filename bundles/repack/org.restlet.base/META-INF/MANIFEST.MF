@@ -7,7 +7,7 @@ Automatic-Module-Name: org.restlet
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.restlet.engine.internal.Activator
 Eclipse-BundleShape: jar
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Import-Package: com.sun.net.httpserver;resolution:=optional,
  javax.net.ssl,
  javax.security.auth,

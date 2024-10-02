@@ -5,7 +5,7 @@ Bundle-SymbolicName: com.arcadsoftware.tool.cli
 Bundle-Version: 2.1.0.qualifier
 Bundle-Vendor: ARCAD Software
 Automatic-Module-Name: com.arcadsoftware.tool.cli
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Import-Package: com.arcadsoftware.cli;version="[1.0.0,2.0.0)",
  com.arcadsoftware.cm.simple;version="[1.2.0,2.0.0)",
  com.arcadsoftware.crypt;version="[1.3.0,2.0.0)",

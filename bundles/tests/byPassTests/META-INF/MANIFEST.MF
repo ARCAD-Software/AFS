@@ -5,7 +5,7 @@ Bundle-SymbolicName: byPassTests
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: bypasstests.Activator
 Bundle-Vendor: ARCAD Software
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Automatic-Module-Name: byPassTests
 Import-Package: com.arcadsoftware.beanmap;version="2.1.0",
  com.arcadsoftware.metadata;version="1.2.0",

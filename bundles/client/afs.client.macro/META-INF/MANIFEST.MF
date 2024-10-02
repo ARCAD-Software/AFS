@@ -21,7 +21,7 @@ Require-Bundle: org.eclipse.ui;resolution:=optional,
  com.arcadsoftware.aev.core.ui;bundle-version="11.0.0",
  xstream;bundle-version="1.4.17"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Export-Package: com.arcadsoftware.afs.client.macro;version="1.0.0",
  com.arcadsoftware.afs.client.macro.internal;x-internal:=true,
  com.arcadsoftware.afs.client.macro.internal.ui.viewers;x-internal:=true,

@@ -7,7 +7,7 @@ Bundle-Vendor: Restlet
 Fragment-Host: org.restlet.base;bundle-version="2.4.300"
 Automatic-Module-Name: org.restlet.server.jmx
 Bundle-ClassPath: libs/jetty-jmx.jar
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Import-Package: javax.management,
  javax.management.modelmbean,
  javax.management.remote,

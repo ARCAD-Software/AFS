@@ -5,7 +5,7 @@ Bundle-SymbolicName: com.arcadsoftware.metadata
 Bundle-Version: 1.6.0.qualifier
 Bundle-Activator: com.arcadsoftware.metadata.internal.Activator
 Bundle-Vendor: ARCAD Software
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Import-Package: com.arcadsoftware.beanmap;version="[2.0.0,3.0.0)",
  com.arcadsoftware.beanmap.xml;version="[2.1.0,3.0.0)",
  com.arcadsoftware.osgi;version="[1.2.1,2.0.0)",

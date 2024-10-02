@@ -11,7 +11,7 @@ Bundle-SymbolicName: com.arcadsoftware.server.restful;singleton:=true
 Bundle-Version: 3.1.1.qualifier
 Bundle-Activator: com.arcadsoftware.restful.internal.Activator
 Bundle-Vendor: ARCAD Software
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Import-Package: com.arcadsoftware.crypt;version="[1.0.0,2.0.0)",
  com.arcadsoftware.osgi;version="[1.1.2,2.0.0)",
  com.arcadsoftware.rest;version="[3.0.0,4.0.0)",

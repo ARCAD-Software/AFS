@@ -19,4 +19,4 @@
 /releng/.*
 /releng/*/.*
 /releng/*/target
-
+/**/.polyglot.META-INF
