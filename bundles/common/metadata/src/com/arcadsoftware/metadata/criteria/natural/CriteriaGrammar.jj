@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.ArrayList;
 
 import com.arcadsoftware.metadata.internal.AbstractCriteriaParser;
+import com.arcadsoftware.metadata.internal.DateUnitList;
 import com.arcadsoftware.metadata.criteria.ISearchCriteria;
 
 @SuppressWarnings({ "unused", "serial", "rawtypes", "unchecked" })
@@ -67,11 +68,6 @@ TOKEN: // keywords
 | < IS: "is" >
 | < IN: "in" >
 | < NULL: "null" | "nul" >
-| < Y: "y" >
-| < M: "m" >
-| < D: "d" >
-| < H: "h" >
-| < N: "n" >
 | < ID: "@id" >
 | < USER: "@user" >
 | < UPDATE: "@date" >
@@ -115,7 +111,7 @@ TOKEN: // Operators
 
 TOKEN:
 { < #LETTER:
-      ["\u0040"-"\u005b",
+      ["\u0041"-"\u005b", // @ (= u0040) in not accepted as a code.
        "\u005f", // underscore
        "\u0061"-"\u007c",
        "\u00a3", "\u00a5", "\u00a7",
@@ -152,14 +148,19 @@ TOKEN:
 | < BRACE: "{" (~["}"])* "}" >
 | < DOUBLEQUOTED_STRING: "\"" (~["\""])* "\"" ("\"" (~["\""])* "\"")* >
 | < QUOTED_STRING: "'" (~["'"])* "'" ("'" (~["'"])* "'")* >
-| < DATE: < DIGIT > < DIGIT > < DIGIT > < DIGIT > < MINUS >  < DIGIT > < DIGIT > < MINUS > < DIGIT > < DIGIT >
-            ( "t" < DIGIT > < DIGIT > < _CONTAIN > < DIGIT > < DIGIT >
-            ( < _CONTAIN > < DIGIT > < DIGIT > ( (< COLON > | < DOT >)  < DIGIT > < DIGIT > < DIGIT > < DIGIT > )?
-            )?
-        )? "z" >
+| < DATE: < DIGIT > < DIGIT > < DIGIT > < DIGIT > < MINUS > < DIGIT > < DIGIT > < MINUS > < DIGIT > < DIGIT >
+        ( "t" < DIGIT > < DIGIT > < _CONTAIN > < DIGIT > < DIGIT >
+          ( < _CONTAIN > < DIGIT > < DIGIT >
+            ( (< COLON > | < DOT >)  < DIGIT > < DIGIT > < DIGIT > < DIGIT > )?
+          )?
+        )? ( "z" )? >
 | < INTEGER: (< MINUS >)? (< DIGIT >)+ >
+| < INCREMENT: < PLUS > <INTEGER > >
 | < CODE: < LETTER > ( < DIGIT > | < LETTER >)* >
 | < REFLINE: < CODE > (< DOT >  < CODE > )+ >
+| < REFLINEUPDATE: < CODE > (< DOT >  < CODE > )* < DOT > < UPDATE > >
+| < REFLINEDELETED: < CODE > (< DOT >  < CODE > )* < DOT > < DELETED > >
+| < UNIT_INCREMENT : (< INCREMENT > | < INTEGER >) < CODE > >
 }
 
 ISearchCriteria criteria():
@@ -343,11 +344,11 @@ ISearchCriteria compCriteria():
 }
 
 ISearchCriteria dateCriteria():
-{ Token rl = null, t;
+{ Token rl = null, t = null, tu = null;
   Date x = null, xx = null;
   boolean u = false, l = false;
-  int o = 0, y = 0, m = 0, d = 0, h = 0, n = 0;
-  int yy = 0, mm = 0, dd = 0, hh = 0, nn = 0;
+  DateUnitList a = new DateUnitList(), b = new DateUnitList();
+  int o = 0;
 }
 { ( rl = refline()
     ( < _BEFORE >
@@ -359,54 +360,21 @@ ISearchCriteria dateCriteria():
     | < _BEFORETRUNCEQUAL > { u = true; l = true; }
     | < _AFTERTRUNCEQUAL > { o = 1; u = true; l = true; }
     )
-    ( t = < DATE > { x = date(t); }
+    [ t = < DATE > { x = date(t); }
     | t = < QUOTED_STRING > { x = date(string(t)); }
     | t = < DOUBLEQUOTED_STRING > { x = date(string(t)); }
-    )
-    [LOOKAHEAD([< PLUS >] < INTEGER > < Y >)
-      [< PLUS >] t = < INTEGER > < Y >
-      { y = integer(t); }
     ]
-    [LOOKAHEAD([< PLUS >] < INTEGER > < M >)
-      [< PLUS >] t = < INTEGER > < M >
-      { m = integer(t); }
-    ]
-    [LOOKAHEAD([< PLUS >] < INTEGER > < D >)
-      [< PLUS >] t = < INTEGER > < D >
-      { d = integer(t); }
-    ]
-    [LOOKAHEAD([< PLUS >] < INTEGER > < H >)
-      [< PLUS >] t = < INTEGER > < H >
-      { h = integer(t); }
-    ]
-    [LOOKAHEAD([< PLUS >] < INTEGER > < N >)
-      [< PLUS >] t = < INTEGER > < N >
-      { n = integer(t); }
-    ]
+	( t = < INTEGER > tu = < CODE > { a.add(t, tu); }
+    | t = < INCREMENT > tu = < CODE > { a.add(t, tu); }
+    | t = < UNIT_INCREMENT > { a.add(t); }	)*
   | ( t = < DATE > { x = date(t); }
     | t = < QUOTED_STRING > { x = date(string(t)); }
     | t = < DOUBLEQUOTED_STRING > { x = date(string(t)); }
     )
-    [LOOKAHEAD([< PLUS >] < INTEGER > < Y >)
-      [< PLUS >] t = < INTEGER > < Y >
-      { y = integer(t); }
-    ]
-    [LOOKAHEAD([< PLUS >] < INTEGER > < M >)
-      [< PLUS >] t = < INTEGER > < M >
-      { m = integer(t); }
-    ]
-    [LOOKAHEAD([< PLUS >] < INTEGER > < D >)
-      [< PLUS >] t = < INTEGER > < D >
-      { d = integer(t); }
-    ]
-    [LOOKAHEAD([< PLUS >] < INTEGER > < H >)
-      [< PLUS >] t = < INTEGER > < H >
-      { h = integer(t); }
-    ]
-    [LOOKAHEAD([< PLUS >] < INTEGER > < N >)
-      [< PLUS >] t = < INTEGER > < N >
-      { n = integer(t); }
-    ]
+	( t = < INTEGER > tu = < CODE > { a.add(t, tu); }
+    | t = < INCREMENT > tu = < CODE > { a.add(t, tu); }
+    | t = < UNIT_INCREMENT > { a.add(t); }
+	)*
     ( < _BEFORE > { o = 1; }
     | < _AFTER >
     | < _BEFORETRUNC > { o = 1; u = true; }
@@ -416,8 +384,11 @@ ISearchCriteria dateCriteria():
     | < _BEFORETRUNCEQUAL > { o = 1; u = true; l = true; }
     | < _AFTERTRUNCEQUAL > { u = true; l = true; }
     )
-    [ rl = refline() ]
-    [ [ < DOT > ] < UPDATE > { o -= 2; } ]
+    { o -= 2; }
+    [ rl = < REFLINEUPDATE >
+    | rl = refline()  { o += 2; } 
+    | < UPDATE >
+    ]
     [ // TODO Should test that this operator is really the same as the first one !
       ( < _BEFORE >
       | < _AFTER >
@@ -428,42 +399,64 @@ ISearchCriteria dateCriteria():
       | < _BEFORETRUNCEQUAL >
       | < _AFTERTRUNCEQUAL >
       )
-      ( t = < DATE > { xx = date(t); }
+      [ t = < DATE > { xx = date(t); }
       | t = < QUOTED_STRING > { xx = date(string(t)); }
       | t = < DOUBLEQUOTED_STRING > { xx = date(string(t)); }
+      ]
+      ( t = < INTEGER > tu = < CODE > { b.add(t, tu); }
+      | t = < INCREMENT > tu = < CODE > { b.add(t, tu); }
+      | t = < UNIT_INCREMENT > { b.add(t); }
+	  )*
+      { return datecmp(o, rl, x, u, l, a, xx, b); }
+    ]
+  | ( t = < INTEGER > tu = < CODE > { a.add(t, tu); }
+    | t = < INCREMENT > tu = < CODE > { a.add(t, tu); }
+    | t = < UNIT_INCREMENT > { a.add(t); }
+	)+
+    ( < _BEFORE > { o = 1; }
+    | < _AFTER >
+    | < _BEFORETRUNC > { o = 1; u = true; }
+    | < _AFTERTRUNC > { u = true; }
+    | < _BEFOREEQUAL > { o = 1; l = true; }
+    | < _AFTEREQUAL > { l = true; }
+    | < _BEFORETRUNCEQUAL > { o = 1; u = true; l = true; }
+    | < _AFTERTRUNCEQUAL > { u = true; l = true; }
+    )
+    { o -= 2; }
+    [ rl = < REFLINEUPDATE >
+    | rl = refline()  { o += 2; } 
+    | < UPDATE >
+    ]
+    [ // TODO Should test that this operator is really the same as the first one !
+      ( < _BEFORE >
+      | < _AFTER >
+      | < _BEFORETRUNC >
+      | < _AFTERTRUNC >
+      | < _BEFOREEQUAL >
+      | < _AFTEREQUAL >
+      | < _BEFORETRUNCEQUAL >
+      | < _AFTERTRUNCEQUAL >
       )
-      [LOOKAHEAD([< PLUS >] < INTEGER > < Y >)
-        [< PLUS >] t = < INTEGER > < Y >
-        { yy = integer(t); }
+      [ t = < DATE > { xx = date(t); }
+      | t = < QUOTED_STRING > { xx = date(string(t)); }
+      | t = < DOUBLEQUOTED_STRING > { xx = date(string(t)); }
       ]
-      [LOOKAHEAD([< PLUS >] < INTEGER > < M >)
-        [< PLUS >] t = < INTEGER > < M >
-        { mm = integer(t); }
-      ]
-      [LOOKAHEAD([< PLUS >] < INTEGER > < D >)
-        [< PLUS >] t = < INTEGER > < D >
-        { dd = integer(t); }
-      ]
-      [LOOKAHEAD([< PLUS >] < INTEGER > < H >)
-        [< PLUS >] t = < INTEGER > < H >
-        { hh = integer(t); }
-      ]
-      [LOOKAHEAD([< PLUS >] < INTEGER > < N >)
-        [< PLUS >] t = < INTEGER > < N >
-        { nn = integer(t); }
-      ]
-      { return datecmp(o, rl, x, u, l, y, m, d, h, n, xx, yy, mm, dd, hh, nn); }
+      ( t = < INTEGER > tu = < CODE > { b.add(t, tu); }
+      | t = < INCREMENT > tu = < CODE > { b.add(t, tu); }
+      | t = < UNIT_INCREMENT > { b.add(t); }
+	  )*
+      { return datecmp(o, rl, x, u, l, a, xx, b); }
     ]
   )
-  { return datecmp(o, rl, x, u, y, m, d, h, n); }
+  { return datecmp(o, rl, x, u, a); }
 }
 
 void lookaheaddateCriteria():
 {}
 { ( ( < REFLINE > | < CODE > )
     ( < _BEFORE > | < _AFTER > | < _BEFORETRUNC > | < _AFTERTRUNC > )
-  | ( < DATE > | < QUOTED_STRING > | < DOUBLEQUOTED_STRING > )
-    ( < PLUS > | < INTEGER > | < _BEFORE > | < _AFTER > | < _BEFORETRUNC > | < _AFTERTRUNC > )
+  | [ < DATE > | < QUOTED_STRING > | < DOUBLEQUOTED_STRING > ]
+    ( < INTEGER > | < INCREMENT > | < UNIT_INCREMENT > | < _BEFORE > | < _AFTER > | < _BEFORETRUNC > | < _AFTERTRUNC > )
   )
 }
 
@@ -582,7 +575,7 @@ ISearchCriteria deletedCriteria():
 }
 { ( < _DEL > t = refline()
   | < DELETED >
-  | t = refline() < DELETED >
+  | t = < REFLINEDELETED >
   )
  { return deleted(t); }
 }
@@ -609,7 +602,5 @@ ISearchCriteria constantCriteria():
 { < TRUE > { return constant(true); }
 | < ALL > { return constant(true); }
 | < FALSE > { return constant(false); }
-| < Y > { return constant(true); }
-| < N > { return constant(false); }
 | t = < INTEGER > { return constant(integer(t) != 0); }
 }

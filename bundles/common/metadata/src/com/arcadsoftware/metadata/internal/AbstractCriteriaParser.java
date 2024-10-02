@@ -191,30 +191,36 @@ public abstract class AbstractCriteriaParser {
 		return new IsTrueCriteria(rl.image);
 	}
 	
-	protected ISearchCriteria datecmp(int op, Token rl, Date x, boolean u, int y, int m, int d, int h, int n) {
+	protected ISearchCriteria datecmp(int op, Token rl, Date x, boolean u, DateUnitList d) {
 		switch (op) {
 		case 0: // before
-			return new BeforeCriteria(rl.image, x, u, y, m, d, h, n);
+			return new BeforeCriteria(rl.image, x, u, d.getYear(), d.getMonth(), d.getDay(), d.getHour(), d.getMinute());
 		case 1: // after
-			return new AfterCriteria(rl.image, x, u, y, m, d, h, n);
+			return new AfterCriteria(rl.image, x, u, d.getYear(), d.getMonth(), d.getDay(), d.getHour(), d.getMinute());
 		}
 		throw new RuntimeException("Criteria Parsing Error: Unknown date comparison operator.");
 	}
 	
-	protected ISearchCriteria datecmp(int op, Token rl, Date x, boolean u, boolean l, int y, int m, int d, int h, int n, Date z, int yy, int mm, int dd, int hh, int nn) {
+	protected ISearchCriteria datecmp(int op, Token rl, Date x, boolean u, boolean l, DateUnitList a, Date z, DateUnitList b) {
 		String ref = null;
 		if (rl != null) {
 			ref = rl.image;
 		}
 		switch(op ) {
 		case 0:
-			return new BetweenCriteria(ref, z, x, u, l, yy, mm, dd, hh, nn, y, m, d, h, n);
+			return new BetweenCriteria(ref, z, x, u, l, b.getYear(), b.getMonth(), b.getDay(), b.getHour(), b.getMinute(), a.getYear(), a.getMonth(), a.getDay(), a.getHour(), a.getMinute());
 		case 1:
-			return new BetweenCriteria(ref, x, z, u, l, y, m, d, h, n, yy, mm, dd, hh, nn);
+			return new BetweenCriteria(ref, x, z, u, l, a.getYear(), a.getMonth(), a.getDay(), a.getHour(), a.getMinute(), b.getYear(), b.getMonth(), b.getDay(), b.getHour(), b.getMinute());
 		case -1:
-			return new ChangedCriteria(x, z, u, y, m, d, h, n, yy, mm, dd, hh, nn);
+			if (ref != null) {
+				return new ChangedCriteria(ref.substring(0, ref.length() - 6), x, z, u, a.getYear(), a.getMonth(), a.getDay(), a.getHour(), a.getMinute(), b.getYear(), b.getMonth(), b.getDay(), b.getHour(), b.getMinute());
+			}
+			return new ChangedCriteria(x, z, u, a.getYear(), a.getMonth(), a.getDay(), a.getHour(), a.getMinute(), b.getYear(), b.getMonth(), b.getDay(), b.getHour(), b.getMinute());
 		case -2:
-			return new ChangedCriteria(z, x, u,yy, mm, dd, hh, nn, y, m, d, h, n);
+			if (ref != null) {
+				return new ChangedCriteria(ref.substring(0, ref.length() - 6), z, x, u, b.getYear(), b.getMonth(), b.getDay(), b.getHour(), b.getMinute(), a.getYear(), a.getMonth(), a.getDay(), a.getHour(), a.getMinute());
+			}
+			return new ChangedCriteria(z, x, u, b.getYear(), b.getMonth(), b.getDay(), b.getHour(), b.getMinute(), a.getYear(), a.getMonth(), a.getDay(), a.getHour(), a.getMinute());
 		}
 		throw new RuntimeException("Criteria Parsing Error: Unknown date comparison operator.");
 	}
@@ -326,7 +332,11 @@ public abstract class AbstractCriteriaParser {
 	
 	protected ISearchCriteria deleted(Token rl) {
 		if (rl != null) {
-			return new DeletedCriteria(rl.image);
+			String ref = rl.image;
+			if (ref.toLowerCase().endsWith(".@deleted")) {
+				ref = ref.substring(0, ref.length() - 9);
+			}
+			return new DeletedCriteria(ref);
 		}
 		return new DeletedCriteria();
 	}
