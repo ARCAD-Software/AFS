@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Arcad Generic Database Interface
 Bundle-SymbolicName: com.arcadsoftware.database.sql
-Bundle-Version: 2.3.8.qualifier
+Bundle-Version: 2.3.9
 Bundle-Activator: com.arcadsoftware.database.internal.Activator
 Bundle-Vendor: ARCAD Software
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
