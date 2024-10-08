@@ -15,6 +15,7 @@ package com.arcadsoftware.metadata.internal.xml;
 
 import java.util.ArrayList;
 
+import com.arcadsoftware.metadata.criteria.IdInListCriteria;
 import com.arcadsoftware.metadata.criteria.InListCriteria;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
@@ -22,10 +23,11 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
+@SuppressWarnings("deprecation")
 public class InListCriteriaConverter implements Converter {
 	
 	public boolean canConvert(@SuppressWarnings("rawtypes") Class type) {
-		return InListCriteria.class.equals(type);
+		return InListCriteria.class.equals(type) || IdInListCriteria.class.equals(type);
 	}
 
 	public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
@@ -49,16 +51,20 @@ public class InListCriteriaConverter implements Converter {
 	
 	public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
 		String value = reader.getAttribute("ids"); //$NON-NLS-1$
+		String att = reader.getAttribute("attribute"); //$NON-NLS-1$
+		if ((value == null) || value.isEmpty()) {
+			value = reader.getValue();
+		}
 		if ((value == null) || value.isEmpty()) {
 			return new InListCriteria();
 		}
 		ArrayList<Integer> ids = new ArrayList<Integer>();
 		for(String s: value.split(",")) { //$NON-NLS-1$
 			try {
-				ids.add(Integer.valueOf(s));
+				ids.add(Integer.valueOf(s.trim()));
 			} catch (NumberFormatException e) {}
 		}
-		return new InListCriteria(reader.getAttribute("attribute"), ids); //$NON-NLS-1$
+		return new InListCriteria(att, ids);
 	}
 
 }

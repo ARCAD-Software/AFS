@@ -19,7 +19,7 @@ import java.util.Collection;
 /**
  * 
  * @author ARCAD Software
- * @deprecated use {@link IdInListCriteria}
+ * @deprecated use {@link InListCriteria}
  */
 public class IdInListCriteria extends InListCriteria {
 
