@@ -33,7 +33,7 @@ public class InListCriteria extends AbstractSearchCriteria implements Cloneable,
 	public InListCriteria(int... id) {
 		super();
 		ids = new TreeSet<Integer>();
-		for(int i: id) {
+		for (int i: id) {
 			ids.add(i);
 		}
 	}
@@ -46,7 +46,7 @@ public class InListCriteria extends AbstractSearchCriteria implements Cloneable,
 	public InListCriteria(Collection<Integer> ids) {
 		super();
 		this.ids = new TreeSet<Integer>();
-		for(int i: ids) {
+		for (int i: ids) {
 			this.ids.add(i);
 		}
 	}
