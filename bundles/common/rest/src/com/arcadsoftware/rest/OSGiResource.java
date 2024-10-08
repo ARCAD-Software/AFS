@@ -32,7 +32,11 @@ import org.osgi.service.event.EventAdmin;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
+import org.restlet.engine.header.DateWriter;
+import org.restlet.engine.header.HeaderConstants;
+import org.restlet.engine.header.HeaderUtils;
 import org.restlet.engine.util.DateUtils;
+import org.restlet.representation.EmptyRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.representation.RepresentationInfo;
 import org.restlet.representation.Variant;
@@ -358,7 +362,7 @@ public abstract class OSGiResource extends BaseResource {
 			Date date = getRequest().getConditions().getModifiedSince();
 			if (date != null) {
 				if (DateUtils.before(lastModification, date)) {
-					getResponse().setStatus(Status.SUCCESS_OK);
+					getResponse().setStatus(Status.SUCCESS_NO_CONTENT);
 				} else {
 					getResponse().setStatus(Status.REDIRECTION_NOT_MODIFIED);
 				}
@@ -367,15 +371,21 @@ public abstract class OSGiResource extends BaseResource {
 				if ((date != null) && DateUtils.before(lastModification, date)) {
 					getResponse().setStatus(Status.CLIENT_ERROR_PRECONDITION_FAILED);
 				} else {
-					getResponse().setStatus(Status.SUCCESS_OK);
+					getResponse().setStatus(Status.SUCCESS_NO_CONTENT);
 				}
 			}
-		} else if ((getRequest().getConditions().getModifiedSince() != null) ||
+			// Add the current last-modification date in  the response, for information...
+			EmptyRepresentation er = new EmptyRepresentation();
+			er.setModificationDate(lastModification);
+			return er;
+		}
+		if ((getRequest().getConditions().getModifiedSince() != null) ||
 				(getRequest().getConditions().getUnmodifiedSince() != null)) {
 			// We certainly need to compute the body to answer to the question.
 			return get();
+			// Restlet will manage the conditionnal when generatig the status of the response.
 		} else {
-			getResponse().setStatus(Status.SUCCESS_OK);
+			getResponse().setStatus(Status.SUCCESS_NO_CONTENT);
 		}
 		return null;
 	}
