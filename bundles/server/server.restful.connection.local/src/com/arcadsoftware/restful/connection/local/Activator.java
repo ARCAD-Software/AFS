@@ -318,7 +318,7 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 			if (i > 0) {
 				entity.dataUpdate(i, //
 						AbstractMapperService.list(entity.getAttribute(LOCALAUTH_LOCKED),entity.getAttribute(LOCALAUTH_PWDUPDATE)), //
-						AbstractMapperService.list((Object)new Integer(0),(Object)getPwdNextLimitDate()));
+						AbstractMapperService.list((Object) Integer.valueOf(0),(Object)getPwdNextLimitDate()));
 				ci.println(Messages.Activator_User_Id+i+Messages.Activator_unlocked);
 			} else {
 				BeanMapList list = entity.dataSelection(LOCALAUTH_LOCKED, false, LOCALAUTH_LOGIN, option);
@@ -326,7 +326,7 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 					for (BeanMap map : list) {
 						entity.dataUpdate(map.getId(), //
 								AbstractMapperService.list(entity.getAttribute(LOCALAUTH_LOCKED), entity.getAttribute(LOCALAUTH_PWDUPDATE)), //
-								AbstractMapperService.list((Object) new Integer(0), (Object) getPwdNextLimitDate()));
+								AbstractMapperService.list((Object) Integer.valueOf(0), (Object) getPwdNextLimitDate()));
 					}
 				}
 				ci.println(Messages.Activator_User_Login+option+Messages.Activator_unlocked);
@@ -519,7 +519,7 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 			MetaDataEntity entity = MetaDataEntity.loadEntity(LOCALAUTH);
 			if ((entity != null) && (entity.getMapper() != null)) {
 				entity.dataUpdate(AbstractMapperService.list(entity.getAttribute(LOCALAUTH_LOCKED)), //
-						AbstractMapperService.list((Object) new Integer(0)), //
+						AbstractMapperService.list((Object) Integer.valueOf(0)), //
 						new EqualCriteria(LOCALAUTH_USERID, uid));
 				return;
 			}

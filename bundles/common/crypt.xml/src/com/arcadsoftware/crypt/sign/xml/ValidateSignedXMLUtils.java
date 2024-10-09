@@ -88,7 +88,7 @@ public class ValidateSignedXMLUtils {
 		// document containing the XMLSignature
 		String providerName = System.getProperty("jsr105Provider", XMLDSigRI.class.getName()); //$NON-NLS-1$
 		XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM", //$NON-NLS-1$
-				(Provider) Class.forName(providerName).newInstance());
+				(Provider) Class.forName(providerName).getConstructor().newInstance());
 		// Create a DOMValidateContext and specify a KeyValue KeySelector
 		// and document context
 		DOMValidateContext valContext = new DOMValidateContext(new KeyValueKeySelector(), nl.item(0));

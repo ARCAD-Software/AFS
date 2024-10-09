@@ -49,7 +49,6 @@ import com.arcadsoftware.metadata.RegistryServiceTracker;
 import com.arcadsoftware.metadata.client.DataAccess;
 import com.arcadsoftware.osgi.AbstractConfiguredActivator;
 import com.arcadsoftware.rest.ITranslationService;
-import com.arcadsoftware.rest.MultiLanguageMessages;
 import com.arcadsoftware.rest.connection.ConnectionUserBean;
 import com.arcadsoftware.rest.connection.IConnectionInfoService;
 import com.arcadsoftware.rest.connection.IConnectionUserBean;

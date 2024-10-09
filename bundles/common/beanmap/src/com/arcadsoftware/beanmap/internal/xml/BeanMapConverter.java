@@ -274,7 +274,7 @@ public class BeanMapConverter implements Converter {
 				!lname.contains("version")) { //$NON-NLS-1$
 			// Tentative de détection d'un integer...
 			try {
-				return new Integer(value);
+				return Integer.valueOf(value);
 			} catch (NumberFormatException e) {}
 		}
 		// Renvois d'une String...

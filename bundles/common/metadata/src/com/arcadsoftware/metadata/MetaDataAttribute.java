@@ -15,6 +15,7 @@ package com.arcadsoftware.metadata;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.text.ParseException;
 
 import org.restlet.data.Language;
@@ -369,9 +370,9 @@ public class MetaDataAttribute extends Element {
 			if ("true".equalsIgnoreCase(value) || //$NON-NLS-1$
 					"yes".equalsIgnoreCase(value) || //$NON-NLS-1$
 					"1".equalsIgnoreCase(value)) { //$NON-NLS-1$
-				return new Integer(1);
+				return Integer.valueOf(1);
 			}
-			return new Integer(0);
+			return Integer.valueOf(0);
 		}
 		if (MetaDataAttribute.TYPE_REALBOOLEAN.equals(getType())) {
 			if ("true".equalsIgnoreCase(value) || //$NON-NLS-1$
@@ -403,9 +404,9 @@ public class MetaDataAttribute extends Element {
 				i = Integer.parseInt(value);
 			} catch (NumberFormatException e) {}
 			if ((length != 0) && (i > length)) {
-				return new Integer(length);
+				return Integer.valueOf(length);
 			}
-			return new Integer(i);
+			return Integer.valueOf(i);
 		}
 		if (MetaDataAttribute.TYPE_LONG.equals(getType())) { 
 			long l = 0;
@@ -413,9 +414,9 @@ public class MetaDataAttribute extends Element {
 				l = Long.parseLong(value);
 			} catch (NumberFormatException e) {}
 			if ((length != 0) && (l > length)) {
-				return new Long(length);
+				return Long.valueOf(length);
 			}
-			return new Long(l);
+			return Long.valueOf(l);
 		}
 		if (MetaDataAttribute.TYPE_ICON.equals(getType())) { 
 			int i = 0;
@@ -425,7 +426,7 @@ public class MetaDataAttribute extends Element {
 			if (i <= 0) {
 				return null;
 			}
-			return new Integer(i);
+			return Integer.valueOf(i);
 		}
 		if (MetaDataAttribute.TYPE_RANGE.equals(getType())) { 
 			int i = 0;
@@ -434,13 +435,13 @@ public class MetaDataAttribute extends Element {
 			} catch (NumberFormatException e) {}
 			if (length > precision) {
 				if (i > length) {
-					return new Integer(length);
+					return Integer.valueOf(length);
 				}
 				if (i < precision) {
-					return new Integer(precision);
+					return Integer.valueOf(precision);
 				}
 			}
-			return new Integer(i);
+			return Integer.valueOf(i);
 		}
 		// Range and scale Float value
 		if (MetaDataAttribute.TYPE_FLOAT.equals(getType())) {
@@ -449,12 +450,12 @@ public class MetaDataAttribute extends Element {
 				f = Double.parseDouble(value);
 			} catch (NumberFormatException e) {}
 			if ((length > 0) && (f > length)) {
-				return new Double(length);
+				return Double.valueOf(length);
 			}
 			if (precision > 0) {
-				f = new BigDecimal(f).setScale(precision, BigDecimal.ROUND_HALF_UP).doubleValue();
+				f = new BigDecimal(f).setScale(precision, RoundingMode.HALF_UP).doubleValue();
 			}
-			return new Double(f);
+			return Double.valueOf(f);
 		}
 		if (MetaDataAttribute.TYPE_BIGINTEGER.equals(getType())) {
 			try {
@@ -479,7 +480,7 @@ public class MetaDataAttribute extends Element {
 				// Support null references.
 				return null;
 			}
-			return new Integer(ref);
+			return Integer.valueOf(ref);
 		}
 		// misc. types...
 		// Any attribute with Precision > 0 is an integer of type "Range"...
@@ -490,12 +491,12 @@ public class MetaDataAttribute extends Element {
 				i = Integer.parseInt(value);
 			} catch (NumberFormatException e) {}
 			if ((length > precision) && (i > length)) {
-				return new Integer(length);
+				return Integer.valueOf(length);
 			}
 			if (i < precision) {
-				return new Integer(precision);
+				return Integer.valueOf(precision);
 			}
-			return new Integer(i);
+			return Integer.valueOf(i);
 		}
 		// Any Attribute if Length > 0 (and precision = 0, see above) is assumed to be a string.
 		if (length > 0) {

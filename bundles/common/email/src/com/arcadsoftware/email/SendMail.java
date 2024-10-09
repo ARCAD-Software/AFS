@@ -386,6 +386,7 @@ public class SendMail implements ISendMail {
 	 * @param charset the character set used to encode the message, null if default used.
 	 * @return true if the email has been sent.
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public boolean sendEmail(String transport, Properties serverprops, String login, String pwd, String fromEmail, String replyToEmail, String fromName, String to, String cc, String bcc, String subject, String body, String charset, List<Attachment> attachments, boolean htmlMail) {
 		try {
 			if ((charset == null) || (charset.length() == 0)) {
@@ -405,9 +406,7 @@ public class SendMail implements ISendMail {
 			// Force the verification of the SMTP server host name.
 			if (TRANSPORT_SMTPS.equals(transport)) {
 				serverprops.put("mail.smtps.ssl.checkserveridentity", "true"); //$NON-NLS-1$ //$NON-NLS-1$
-				
-				Dictionary<String, Object> props = (Dictionary) serverprops;
-				context = new ConfiguredSSLContext(props);
+				context = new ConfiguredSSLContext((Dictionary) serverprops);
 				if (context != null && context.getSocketFactory() != null) {
 					serverprops.put("mail.smtps.ssl.socketFactory", context.getSocketFactory());
 				}
@@ -423,9 +422,7 @@ public class SendMail implements ISendMail {
 				if (startTls != null && startTls.equals("true")) {
 					// If start TLS is activated, setup the socket factory
 					serverprops.put("mail.smtp.ssl.checkserveridentity", "true"); //$NON-NLS-1$ //$NON-NLS-1$
-					
-					Dictionary<String, Object> props = (Dictionary) serverprops;
-					context = new ConfiguredSSLContext(props);
+					context = new ConfiguredSSLContext((Dictionary) serverprops);
 					if (context != null) {
 						serverprops.put("mail.smtp.ssl.socketFactory", context.getSocketFactory());
 					}

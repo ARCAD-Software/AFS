@@ -125,7 +125,6 @@ public abstract class ProgressMonitoredRestlet extends Restlet implements Closea
 	public ProgressMonitoredRestlet(final ILoggedPlugin activator, final Context context, final long cacheduration, final boolean keepTaskTrace) {
 		super(context);
 		threads = new ThreadGroup("Rest Operation manager");
-		threads.setDaemon(false);
 		lastId = new AtomicInteger(0);
 		this.activator = activator;
 		this.keepTaskTrace = keepTaskTrace;

@@ -905,7 +905,7 @@ public abstract class AbstractMapperService implements IMapperService {
 		if ((att == null) || !link.getParent().equals(att.getRefEntity())) {
 			return false;
 		}
-		return e.getMapper().update(e, destId, list(att), list((Object) new Integer(sourceId)));
+		return e.getMapper().update(e, destId, list(att), list((Object) Integer.valueOf(sourceId)));
 	}
 
 	/**

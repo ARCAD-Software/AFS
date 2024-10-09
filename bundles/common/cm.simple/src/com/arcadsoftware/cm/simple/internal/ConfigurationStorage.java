@@ -52,9 +52,9 @@ public class ConfigurationStorage extends AbstractConfigurationStorage {
 	public synchronized String newPid(String factoryPid) {
 		Integer i = factoryCount.get(factoryPid);
 		if (i == null) {
-			i = new Integer(1);
+			i = Integer.valueOf(1);
 		} else {
-			i = new Integer(i.intValue() + 1);
+			i = Integer.valueOf(i.intValue() + 1);
 		}
 		factoryCount.put(factoryPid, i);
 		return factoryPid + '.' + i;
