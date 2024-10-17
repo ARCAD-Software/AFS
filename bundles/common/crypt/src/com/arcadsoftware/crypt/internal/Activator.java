@@ -79,9 +79,6 @@ public class Activator implements BundleActivator {
 							if (!p.containsKey("com.arcadsoftware.salt.min.size")) { //$NON-NLS-1$
 								p.put("com.arcadsoftware.salt.min.size", Integer.toString(Crypto.SALTMINSIZE)); //$NON-NLS-1$
 							}
-							if (!p.containsKey("com.arcadsoftware.iv.min.size")) { //$NON-NLS-1$
-								p.put("com.arcadsoftware.iv.min.size", Integer.toString(Crypto.IVMINSIZE)); //$NON-NLS-1$
-							}
 							if (!p.containsKey("com.arcadsoftware.hash.min.iterations")) { //$NON-NLS-1$
 								p.put("com.arcadsoftware.hash.min.iterations", Integer.toString(Crypto.HASHMINITERATIONS)); //$NON-NLS-1$
 							}

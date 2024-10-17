@@ -139,14 +139,13 @@ public final class Crypto {
 	private static final String ALPHANUM = ALPHA + DIGITS;
 	public static final int SALTMINSIZE;
 	private static final int SALTVARIATION;
-	public static final int IVMINSIZE;
-	private static final int IVVARIATION;
+	private static final int IVMINSIZE;
 	public static final int HASHMINITERATIONS;
 	private static final int HASHITERATIONSVARIATION;
 	public static final int CIPHERMINITERATIONS;
 	private static final int CIPHERITERATIONSVARIATION;
 	private static final int HASH_ALGORITHM = 3;
-	private static final int ENCRYPT_ALGORITHM = 2;
+	private static final int ENCRYPT_ALGORITHM = 3;
 	private static final char[] DEFAULTMASTERK;
 	private static final SecureRandom SECURERANDOM;
 	private static int srcount = 0;
@@ -177,6 +176,7 @@ public final class Crypto {
 			}
 		} catch (NumberFormatException e) {}
 		SALTVARIATION = i;
+		// Unused parameter only here for ascendent compatibility. 
 		i = 10;
 		try {
 			i = Integer.parseInt(System.getProperty("com.arcadsoftware.iv.min.size", Integer.toString(i))); //$NON-NLS-1$
@@ -189,18 +189,6 @@ public final class Crypto {
 			i = 16;
 		}
 		IVMINSIZE = i;
-		i = 6;
-		try {
-			i = Integer.parseInt(System.getProperty("com.arcadsoftware.iv.size.variation", Integer.toString(i))); //$NON-NLS-1$
-			if (i < 2) {
-				i = 2;
-			}
-		} catch (NumberFormatException e) {}
-		// CTR/SIC mode requires IV no greater than: 16 bytes.
-		if ((i + IVMINSIZE) > 16) {
-			i = 16 - IVMINSIZE;
-		}
-		IVVARIATION = i;
 		i = 11675;
 		try {
 			i = Integer.parseInt(System.getProperty("com.arcadsoftware.hash.min.iterations", Integer.toString(i))); //$NON-NLS-1$
@@ -679,7 +667,7 @@ public final class Crypto {
 	public static String encrypt(char[] text, char[] masterkey, int algorithm) throws NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, InvalidKeySpecException {
         byte[] salt = new byte[SALTMINSIZE + SECURERANDOM.nextInt(SALTVARIATION)];
         SECURERANDOM.nextBytes(salt);
-		byte[] iv = new byte[IVMINSIZE + SECURERANDOM.nextInt(IVVARIATION)];
+		byte[] iv = new byte[16];
 		SECURERANDOM.nextBytes(iv);
 		srcount += 2;
 		int itterations = CIPHERMINITERATIONS + SECURERANDOM.nextInt(CIPHERITERATIONSVARIATION);
@@ -711,6 +699,7 @@ public final class Crypto {
 				}
 				break;
 			case 2:
+			case 3:
 				try {
 					f = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256", BouncyCastleProvider.PROVIDER_NAME); //$NON-NLS-1$
 				} catch (NoSuchProviderException | SecurityException e1) {
@@ -743,7 +732,7 @@ public final class Crypto {
 		        setIntByte(result, 0, algorithm);
 		        if (algorithm >= 2) {
 			        setIntByte(result, 4, salt.length - SALTMINSIZE);
-			        setIntByte(result, 8, iv.length - IVMINSIZE);
+			        setIntByte(result, 8, 0);
 			        setIntByte(result, 12, itterations - CIPHERMINITERATIONS);
 		        } else {
 			        setIntByte(result, 4, salt.length);
@@ -823,10 +812,14 @@ public final class Crypto {
 			iterations = getIntByte(buffer, 12);
 			if (algorithm > 1) {
 				saltsize += SALTMINSIZE;
-				ivsize += IVMINSIZE;
+				if (ivsize == 0) { // algorithm >= 3 ...
+					ivsize = 16;
+				} else {
+					ivsize += IVMINSIZE;
+				}
 				iterations += CIPHERMINITERATIONS;
 			}
-			if ((algorithm > 2) || (saltsize < 4) || (ivsize < 4) || (iterations < 1)) {
+			if ((algorithm > ENCRYPT_ALGORITHM) || (saltsize < 4) || (ivsize < 4) || (iterations < 1)) {
 				return decodeXE256(text).toCharArray();
 			}
 			iv = new byte[ivsize];
@@ -866,6 +859,7 @@ public final class Crypto {
 				}
 				break;
 			case 2:
+			case 3:
 				try {
 					f = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256", BouncyCastleProvider.PROVIDER_NAME); //$NON-NLS-1$
 				} catch (NoSuchProviderException | SecurityException e1) {
