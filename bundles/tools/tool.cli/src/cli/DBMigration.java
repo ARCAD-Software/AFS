@@ -37,7 +37,7 @@ import com.arcadsoftware.tool.cli.DataSourceCommand;
 public final class DBMigration extends DataSourceCommand {
 
 	public static void main(String[] args) {
-		new DBMigration(args).exec();
+		System.exit(new DBMigration(args).exec());
 	}
 
 	private final Hashtable<String, Object> confChanged = new Hashtable<String, Object>();

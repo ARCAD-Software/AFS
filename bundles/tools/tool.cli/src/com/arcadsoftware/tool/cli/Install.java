@@ -22,6 +22,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -81,6 +82,7 @@ public class Install {
 				System.out.println("Platform used: /build/" + platform);
 			}
 			try {
+				extractFiles("/build/common", target, plugins, debug); //$NON-NLS-1$
 				extractFiles("/build/" + platform, target, plugins, debug); //$NON-NLS-1$
 				System.out.println("Tools Installation completed.");
 			} catch (Exception e) {
@@ -153,7 +155,11 @@ public class Install {
 		URI uri = Install.class.getResource(path).toURI();
         Path dirPath;
         if (uri.getScheme().equals("jar")) { //$NON-NLS-1$
-            dirPath = FileSystems.newFileSystem(uri, Collections.<String, Object>emptyMap()).getPath(path);
+        	try {
+        		dirPath = FileSystems.getFileSystem(uri).getPath(path);
+        	} catch (FileSystemNotFoundException e) {
+        		dirPath = FileSystems.newFileSystem(uri, Collections.<String, Object> emptyMap()).getPath(path);
+        	}
         } else {
         	dirPath = Paths.get(uri);
         }
@@ -165,6 +171,14 @@ public class Install {
 		        	File tf = new File(target, name);
 		        	if (debug) {
 		        		System.out.println("Extracting file: " + p.toString() + " to " + tf.getAbsolutePath());
+		        	}
+		        	if (tf.isFile()) {
+			        	if (debug) {
+			        		System.out.println("Target file already exist... remove it.");
+			        		if (!tf.delete()) {
+			        			System.out.println("Unable to delete old file: " + tf.getName());
+			        		}
+			        	}
 		        	}
 		        	byte[] buffer = java.nio.file.Files.readAllBytes(p);
 		            try (FileOutputStream o = new FileOutputStream(tf)) {

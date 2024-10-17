@@ -28,7 +28,7 @@ import com.arcadsoftware.tool.cli.Command;
 public class TestHTTP extends Command {
 
 	public static void main(String[] args) {
-		new TestHTTP(args).exec();
+		System.exit(new TestHTTP(args).exec());
 	}
 	
 	public TestHTTP() {

@@ -24,7 +24,7 @@ import com.arcadsoftware.tool.cli.EquinoxConfigurations;
 public class ConfMigration extends Command {
 
 	public static void main(String[] args) {
-		new ConfMigration(args).exec();
+		System.exit(new ConfMigration(args).exec());
 	}
 	
 	public ConfMigration() {

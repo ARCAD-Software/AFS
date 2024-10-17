@@ -70,7 +70,7 @@ public class TestLDAP extends Command {
 	private static final int BINDTYPE_SCRAMSHA512 = 7;
 
 	public static void main(String[] args) {
-		new TestLDAP(args).exec();
+		System.exit(new TestLDAP(args).exec());
 	}
 
 	public TestLDAP() {

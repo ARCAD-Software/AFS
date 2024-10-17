@@ -27,7 +27,7 @@ import com.arcadsoftware.tool.cli.Command;
 public class UpdateConfigIni extends Command {
 
 	public static void main(String[] args) {
-		new UpdateConfigIni(args).exec();
+		System.exit(new UpdateConfigIni(args).exec());
 	}
 
 	private HashSet<String> osgikeys = new HashSet<String>();

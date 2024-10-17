@@ -31,7 +31,7 @@ import com.arcadsoftware.tool.cli.DataSourceCommand;
 public final class ChangeDBPassword extends DataSourceCommand {
 
 	public static void main(String[] args) {
-		new ChangeDBPassword(args).exec();
+		System.exit(new ChangeDBPassword(args).exec());
 	}
 
 	private final HashMap<String, Object> confChanged = new HashMap<String, Object>();
@@ -131,7 +131,7 @@ public final class ChangeDBPassword extends DataSourceCommand {
 				final Class<?> clazz = getClass().getClassLoader().loadClass("com.ibm.as400.access.AS400");
 				final Object as400;
 				if (url.startsWith("jdbc:jt400://localhost")) {
-					as400 = clazz.newInstance();
+					as400 = clazz.getConstructor().newInstance();
 				} else {
 					String server = url.substring(13);
 					int i = server.indexOf('/');

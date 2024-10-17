@@ -27,7 +27,7 @@ import com.arcadsoftware.tool.cli.DataSourceCommand;
 public final class DBH2Restore extends DataSourceCommand {
 
 	public static void main(String[] args) {
-		new DBH2Restore(args).exec();
+		System.exit(new DBH2Restore(args).exec());
 	}
 	
 	public DBH2Restore() {
@@ -100,17 +100,21 @@ public final class DBH2Restore extends DataSourceCommand {
 					e.printStackTrace();
 				}
 			}
+			StringBuilder extensions = new StringBuilder();
+			if (isArgument("-fromx1")) { //$NON-NLS-1$
+				extensions.append(" FROM_1X"); //$NON-NLS-1$
+			}
 			// Recreate the database connection:
 			try (Connection cn = DriverManager.getConnection(url, connectionProperties)) {
 				try {
 					if ((pwd != null) && !pwd.isEmpty()) {
-						try (PreparedStatement ps = cn.prepareStatement("runscript from ? compression deflate cipher AES password ?")) { //$NON-NLS-1$
+						try (PreparedStatement ps = cn.prepareStatement("runscript from ? compression deflate cipher AES password ?" + extensions.toString())) { //$NON-NLS-1$
 							ps.setString(1, backupFile.getAbsolutePath());
 							ps.setString(2, pwd);
 							ps.execute();
 						}
 					} else {
-						try (PreparedStatement ps = cn.prepareStatement("runscript from 1 compression deflate")) { //$NON-NLS-1$
+						try (PreparedStatement ps = cn.prepareStatement("runscript from ? compression deflate" + extensions.toString())) { //$NON-NLS-1$
 							ps.setString(1, backupFile.getAbsolutePath());
 							ps.execute();
 						}

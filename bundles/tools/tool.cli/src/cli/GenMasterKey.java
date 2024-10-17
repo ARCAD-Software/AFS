@@ -24,7 +24,7 @@ import com.arcadsoftware.tool.cli.Command;
 public class GenMasterKey extends Command {
 	
 	public static void main(String[] args) {
-		new GenMasterKey(args).exec();
+		System.exit(new GenMasterKey(args).exec());
 	}
 
 	public GenMasterKey() {

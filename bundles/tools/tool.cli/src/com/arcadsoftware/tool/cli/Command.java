@@ -57,6 +57,7 @@ public abstract class Command {
 	protected static final int ERROR_MISSING_HOMMEDIR = 33;
 	protected static final int ERROR_INVALID_CONFIGINI = 34;
 	protected static final int ERROR_INVALID_CONFIGURATION = 35;
+	protected static final int ERROR_INVALID_CLASSPATH = 36;
 	protected static final int ERROR_MISSING_PARAMETER = 40;
 	protected static final int ERROR_WRONG_PARAMETER = 41;
 	protected static final int ERROR_MISSING_FILE = 42;
@@ -116,11 +117,13 @@ public abstract class Command {
 			print(getCommandFullName());
 			print(" version ");
 			println(getVersion());
-			System.exit(0);
+			error = -999;
+			return;
 		}
 		if (isArgument("-h", "-help", "--help")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			printHelp();
-			System.exit(0);
+			error = -999;
+			return;
 		}
 		if (isArgument("-debug")) { //$NON-NLS-1$
 			System.setProperty("com.arcadsoftware.masterkey.trace", "true"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -135,7 +138,8 @@ public abstract class Command {
 		}
 		appHomeDir = initHomeDirectory();
 		if (appHomeDir == null) {
-			System.exit(ERROR_MISSING_HOMMEDIR);
+			error = ERROR_MISSING_HOMMEDIR;
+			return;
 		}
 		configini = initConfigIni();
 		initMasterKey();
@@ -204,18 +208,37 @@ public abstract class Command {
 		println();
 	}
 	
-	public final void exec() {
+	public final int exec() {
 		if (error != 0) {
-			System.exit(error);
+			if (error == -999) {
+				return 0;
+			}
+			return error;
 		}
 		try {
-			System.exit(run());
-		} catch (Throwable e) {
-			System.err.println("INTERNAL ERROR [" + e.getClass().getSimpleName() + "]: " + e.getLocalizedMessage());
-			if (isArgument("-debug")) { //$NON-NLS-1$
-				e.printStackTrace();
+			int result = run();
+			if (result != 0) {
+				setErrorStatus(result);
 			}
-			System.exit(ERROR_INTERNAL_ERROR);
+			if (error != 0) {
+				return error;
+			}
+			return result;
+		} catch (Throwable e) {
+			System.err.println("UNEXPECTED INTERNAL ERROR [" + e.getClass().getSimpleName() + "]: " + e.getLocalizedMessage());
+			if (isArgument("-debug")) { //$NON-NLS-1$
+				while (e != null) {
+					System.err.println(e);
+					for (StackTraceElement ste : e.getStackTrace()) {
+						System.err.println("\tat " + ste);
+					}
+					e = e.getCause();
+					if (e != null) {
+						System.err.print("Caused by: ");
+					}
+				}
+			}
+			return ERROR_INTERNAL_ERROR;
 		}
 	}
 	
@@ -535,19 +558,19 @@ public abstract class Command {
 	}
 	
 	protected String getArgumentValue(String arg, String defaultValue) {
-		for(int i = 0; i < arguments.length; i++) {
+		for (int i = 0; i < arguments.length; i++) {
 			if (arguments[i].equalsIgnoreCase(arg) && (i + 1 < arguments.length)) {
 				return arguments[i + 1];
 			}
 		}
 		String ae = arg.toLowerCase() + '=';
-		for(String a: arguments) {
+		for (String a: arguments) {
 			if (a.toLowerCase().startsWith(ae)) {
 				return a.substring(ae.length());
 			}
 		}
 		ae = arg.toLowerCase() + ':';
-		for(String a: arguments) {
+		for (String a: arguments) {
 			if (a.toLowerCase().startsWith(ae)) {
 				return a.substring(ae.length());
 			}
@@ -856,5 +879,21 @@ public abstract class Command {
 		}
 		return c.readPassword(text.toString());
 	}
+
+	protected void addArgument(String... arg) {
+		if ((arg != null) && (arg.length > 0)) {
+			ArrayList<String> args = new ArrayList<>(arguments.length + arg.length);
+			for (String a: arguments) {
+				args.add(a);
+			}
+			for (String a: arg) {
+				args.add(a);
+			}
+			arguments = args.toArray(new String[0]);
+		}
+	}
 	
+	protected String[] getArguments() {
+		return arguments;
+	}
 }

@@ -27,7 +27,7 @@ import com.arcadsoftware.tool.cli.DataSourceCommand;
 public class ConfigAdminUser extends DataSourceCommand {
 
 	public static void main(String[] args) {
-		new ConfigAdminUser(args).exec();
+		System.exit(new ConfigAdminUser(args).exec());
 	}
 	
 	public ConfigAdminUser() {

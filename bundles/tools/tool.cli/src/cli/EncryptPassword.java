@@ -33,7 +33,7 @@ public class EncryptPassword extends Command {
 	}
 	
 	public static void main(String[] args) {
-		new EncryptPassword(args).exec();
+		System.exit(new EncryptPassword(args).exec());
 	}
 
 	public EncryptPassword() {

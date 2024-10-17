@@ -24,7 +24,7 @@ import com.arcadsoftware.tool.cli.DataSourceCommand;
 public class TestDB extends DataSourceCommand {
 
 	public static void main(String[] args) {
-		new TestDB(args).exec();
+		System.exit(new TestDB(args).exec());
 	}
 
 	public TestDB() {

@@ -5,7 +5,6 @@ encoding//build/win/dbpwd.bat=US-ASCII
 encoding//build/win/dbupdate.bat=US-ASCII
 encoding//build/win/encrypt.bat=US-ASCII
 encoding//build/win/h2backup.bat=US-ASCII
-encoding//build/win/h2console.bat=US-ASCII
 encoding//build/win/h2restore.bat=US-ASCII
 encoding//build/win/masterkey.bat=US-ASCII
 encoding//build/win/selfcerts.bat=US-ASCII

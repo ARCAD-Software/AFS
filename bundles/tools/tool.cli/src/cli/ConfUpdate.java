@@ -9,7 +9,7 @@ import com.arcadsoftware.tool.cli.Command;
 public class ConfUpdate extends Command {
 
 	public static void main(String[] args) {
-		new ConfUpdate(args).exec();
+		System.exit(new ConfUpdate(args).exec());
 	}
 
 	public ConfUpdate() {

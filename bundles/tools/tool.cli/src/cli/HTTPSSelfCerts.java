@@ -67,7 +67,7 @@ import com.arcadsoftware.tool.cli.Command;
 public class HTTPSSelfCerts extends Command {
 
 	public static void main(String[] args) {
-		new HTTPSSelfCerts(args).exec();
+		System.exit(new HTTPSSelfCerts(args).exec());
 	}
 
 	public HTTPSSelfCerts() {

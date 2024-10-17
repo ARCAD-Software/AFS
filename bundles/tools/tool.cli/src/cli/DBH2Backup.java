@@ -24,10 +24,10 @@ import java.util.Properties;
 
 import com.arcadsoftware.tool.cli.DataSourceCommand;
 
-public final class DBH2Backup extends DataSourceCommand {
+public class DBH2Backup extends DataSourceCommand {
 
 	public static void main(String[] args) {
-		new DBH2Backup(args).exec();
+		System.exit(new DBH2Backup(args).exec());
 	}
 	
 	public DBH2Backup() {

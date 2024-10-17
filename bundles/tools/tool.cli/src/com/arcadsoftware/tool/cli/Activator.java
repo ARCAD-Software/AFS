@@ -21,14 +21,20 @@ import com.arcadsoftware.cli.ICommandLineService;
 import com.arcadsoftware.osgi.AbstractActivator;
 
 import cli.ChangeDBPassword;
+import cli.ConfMigration;
+import cli.ConfUpdate;
 import cli.ConfigAdminUser;
+import cli.DBH2Backup;
+import cli.DBH2Restore;
 import cli.DBMigration;
 import cli.DBUpdate;
 import cli.EncryptPassword;
+import cli.GenMasterKey;
 import cli.HTTPSSelfCerts;
 import cli.TestDB;
 import cli.TestHTTP;
 import cli.TestLDAP;
+import cli.UpdateConfigIni;
 
 public class Activator extends AbstractActivator {
 
@@ -37,13 +43,19 @@ public class Activator extends AbstractActivator {
 		super.start(context);
 		registerCommand(new ChangeDBPassword());
 		registerCommand(new ConfigAdminUser());
+		registerCommand(new ConfMigration());
+		registerCommand(new ConfUpdate());
+		registerCommand(new DBH2Backup());
+		registerCommand(new DBH2Restore());
 		registerCommand(new DBMigration());
 		registerCommand(new DBUpdate());
 		registerCommand(new EncryptPassword());
+		registerCommand(new GenMasterKey());
 		registerCommand(new HTTPSSelfCerts());
 		registerCommand(new TestDB());
 		registerCommand(new TestHTTP());
 		registerCommand(new TestLDAP());
+		registerCommand(new UpdateConfigIni());
 	}
 
 	private void registerCommand(Command command) {

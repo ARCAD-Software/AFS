@@ -53,16 +53,16 @@ public abstract class DataSourceCommand extends Command {
 		} catch (Exception e) {}
 	}
 	
-	private static final String KEY_DATABASEID = ".dbid"; //$NON-NLS-1$
+	protected static final String KEY_DATABASEID = ".dbid"; //$NON-NLS-1$
 	protected static final String KEY_DATABASETYPE = ".type"; //$NON-NLS-1$
 	protected static final String KEY_DATABASEURL = ".url"; //$NON-NLS-1$
 	protected static final String KEY_DATABASELOGIN = ".login"; //$NON-NLS-1$
 	protected static final String KEY_DATABASEPWD = ".password"; //$NON-NLS-1$
-	private static final String KEY_DATABASEPOOLMIN = ".poolmin"; //$NON-NLS-1$
-	private static final String KEY_DATABASEPOOLMAX = ".poolmax"; //$NON-NLS-1$
-	private static final String KEY_DATABASETIMEOUT = ".timeout"; //$NON-NLS-1$
-	private static final String KEY_DATABASEDESC = ".desc"; //$NON-NLS-1$
-	private static final String KEY_DATABASEDIALECT = ".dialect"; //$NON-NLS-1$
+	protected static final String KEY_DATABASEPOOLMIN = ".poolmin"; //$NON-NLS-1$
+	protected static final String KEY_DATABASEPOOLMAX = ".poolmax"; //$NON-NLS-1$
+	protected static final String KEY_DATABASETIMEOUT = ".timeout"; //$NON-NLS-1$
+	protected static final String KEY_DATABASEDESC = ".desc"; //$NON-NLS-1$
+	protected static final String KEY_DATABASEDIALECT = ".dialect"; //$NON-NLS-1$
 
 	private Server h2TCPServer;
 	
@@ -89,6 +89,7 @@ public abstract class DataSourceCommand extends Command {
 				dspwd = new String(pwdc);
 			}
 			Hashtable<String, Object> props = getOSGiConfiguration("com.arcadsoftware.database.sql");
+			// FIXME this algorithm is really tricky... It need to be reworked to avoid multiple execution on the same data source !!!
 			if (props != null) {
 				Enumeration<String> keys = props.keys();
 				while (keys.hasMoreElements()) {
@@ -152,6 +153,7 @@ public abstract class DataSourceCommand extends Command {
 						if (props.get(dbid + KEY_DATABASEPWD) != null) {
 							pwd = new String(Crypto.decrypt(props.get(dbid + KEY_DATABASEPWD).toString()));
 						}
+						// Mimic all production default rules for H2...
 						if (dbtype.startsWith("h2")) {
 							checkH2ServerConfiguration();
 							if (url == null) {
@@ -181,6 +183,7 @@ public abstract class DataSourceCommand extends Command {
 								cnp.put(k.substring(dbidp.length()), e.getValue());
 							}
 						}
+						// Mimic all production default rules for DB2i...
 						if (("jt400".equals(dbtype) || "db2400".equalsIgnoreCase(dbtype) || "db2i".equalsIgnoreCase(dbtype)) && //
 								((url == null) || !url.startsWith("jdbc:jt400:"))) {
 							dbtype = "jt400";
@@ -194,8 +197,8 @@ public abstract class DataSourceCommand extends Command {
 							Connection cn = null;
 							try {
 								Properties cnp2 = new Properties(cnp);
-								cnp.put("user", dslogin);
-								cnp.put("password", dspwd);
+								cnp2.put("user", dslogin);
+								cnp2.put("password", dspwd);
 								try {
 									println("Try to connect to the Data Source \"" + dbid + "\" with user \"" + dslogin + "\".");
 									cn = DriverManager.getConnection(url, cnp2);
@@ -207,7 +210,7 @@ public abstract class DataSourceCommand extends Command {
 									printWarn("Unable to connect to \"" + dbid + "\" with user \"" + dslogin + "\", trying with default user...");
 								}
 								if (cn != null) {
-									int result = runDataSourceCommand(dbid, dbtype, cn, url, cnp);
+									int result = runDataSourceCommand(dbid, dbtype, cn, url, cnp2);
 									if (result != 0) {
 										return result;
 									}
@@ -253,14 +256,11 @@ public abstract class DataSourceCommand extends Command {
 			}
 			return 0;
 		} finally {
-			if (h2TCPServer != null) {
-				h2TCPServer.stop();
-				println("H2 Database Server stopped.");
-			}
+			stopH2Server();
 		}
 	}
 	
-	private void checkH2ServerConfiguration() {
+	protected void checkH2ServerConfiguration() {
 		if (h2TCPServer == null) {
 			Hashtable<String, Object> props = getOSGiConfiguration("com.arcadsoftware.h2");
 			if (getProperty(props, "autostart", false)) {
@@ -289,6 +289,13 @@ public abstract class DataSourceCommand extends Command {
 		}
 	}
 
+	protected void stopH2Server() {
+		if (h2TCPServer != null) {
+			h2TCPServer.stop();
+			println("H2 Database Server stopped.");
+		}
+	}
+	
 	@Override
 	protected Map<String, String> getArgumentsDescription() {
 		HashMap<String, String> result = new HashMap<String, String>();
