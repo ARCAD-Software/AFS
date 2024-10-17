@@ -34,17 +34,17 @@ import com.arcadsoftware.osgi.SysOutLogged;
 
 import java.util.TimerTask;
 
-import javax.mail.AuthenticationFailedException;
-import javax.mail.Flags;
-import javax.mail.Folder;
-import javax.mail.FolderNotFoundException;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.NoSuchProviderException;
-import javax.mail.Part;
-import javax.mail.Session;
-import javax.mail.Store;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.AuthenticationFailedException;
+import jakarta.mail.Flags;
+import jakarta.mail.Folder;
+import jakarta.mail.FolderNotFoundException;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.NoSuchProviderException;
+import jakarta.mail.Part;
+import jakarta.mail.Session;
+import jakarta.mail.Store;
+import jakarta.mail.internet.MimeMessage;
 
 import org.bouncycastle.cms.RecipientId;
 import org.bouncycastle.cms.RecipientInformation;

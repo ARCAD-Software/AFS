@@ -26,8 +26,10 @@ import com.arcadsoftware.metadata.registry.XmlRegistry;
 
 public class RegistryBundleListener implements BundleListener {
 
+	// FIXME the directive avoiding the process of the following bundle is in fact "DynamicImport-Package: *" a more acurate filter should test the presence of this directive in the Manifest of the bundle instead of its symbolic name !
 	private static final String GROOVY = "groovy"; //$NON-NLS-1$
 	private static final String ORG_CODEHAUS_GROOVY = "org.codehaus.groovy"; //$NON-NLS-1$
+	private static final String JAKARTAACTIVATION = "com.sun.activation.jakarta.activation"; //$NON-NLS-1$
 	private static final String DEFAULTENTITYFILENAME = "/META-INF/entities.xml"; //$NON-NLS-1$
 	private static final String AUXILIARY_DEFAULTENTITYFILENAME = "/META-INF/Entities.xml"; //$NON-NLS-1$
 	private static final String ENITIESHEADER = "Arcad-Entities"; //$NON-NLS-1$
@@ -49,6 +51,7 @@ public class RegistryBundleListener implements BundleListener {
 		if (activator.getContext() != null) {
 			for (Bundle bundle: activator.getContext().getBundles()) {
 				if ((bundle.getState() == Bundle.ACTIVE) && // 
+						(!JAKARTAACTIVATION.equals(bundle.getSymbolicName())) && //
 						(!ORG_CODEHAUS_GROOVY.equals(bundle.getSymbolicName())) && //
 						(!GROOVY.equals(bundle.getSymbolicName()))) {
 					addBundle(bundle);
@@ -81,6 +84,7 @@ public class RegistryBundleListener implements BundleListener {
 		case BundleEvent.STARTED:
 			// Suppression du bundle de Groovy qui a accès aux resources des autres bundles...
 			if ((!ORG_CODEHAUS_GROOVY.equals(bundle.getSymbolicName())) && //
+					(!JAKARTAACTIVATION.equals(bundle.getSymbolicName())) && //
 					(!GROOVY.equals(bundle.getSymbolicName()))) {
 				if (EQUINOX_COMMON.equals(event.getBundle().getSymbolicName())) {
 					//Thread.sleep(100);

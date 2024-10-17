@@ -28,6 +28,11 @@
 		<unit id="com.sun.jna" version="4.5.1.v20190425-1842"/>
 		<unit id="com.sun.jna.platform" version="4.5.1.v20190425-1842"/>
 	</location>
+	<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="false" type="InstallableUnit">
+		<repository location="https://github.com/ARCAD-Software/h2database-light/releases/download/2.3.232.1/"/>
+		<unit id="com.h2database.light" version="0.0.0"/>
+		<unit id="org.locationtech.jts.jts-core" version="0.0.0"/>
+	</location>
 	<location includeDependencyDepth="infinite" includeDependencyScopes="import" includeSource="true" missingManifest="generate" type="Maven">
 		<dependencies>
 			<dependency> <!-- https://mvnrepository.com/artifact/org.apache.sshd/sshd-osgi -->
@@ -37,36 +42,46 @@
 			</dependency>
 	
 			<!-- Cryptography libraries -->
-			<dependency>
-				<groupId>org.bouncycastle</groupId>
-				<artifactId>bcmail-jdk15to18</artifactId>
-				<version>1.76</version>
-			</dependency>
-			<dependency>
-				<groupId>org.bouncycastle</groupId>
-				<artifactId>bcpg-jdk15to18</artifactId>
-				<version>1.76</version>
-			</dependency>
-			<dependency>
-				<groupId>org.bouncycastle</groupId>
-				<artifactId>bcpkix-jdk15to18</artifactId>
-				<version>1.76</version>
-			</dependency>
-			<dependency>
-				<groupId>org.bouncycastle</groupId>
-				<artifactId>bcprov-jdk15to18</artifactId>
-				<version>1.76</version>
-			</dependency>
-			<dependency>
-				<groupId>org.bouncycastle</groupId>
-				<artifactId>bcutil-jdk15to18</artifactId>
-				<version>1.76</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.santuario</groupId>
-				<artifactId>xmlsec</artifactId>
-				<version>2.3.0</version>
-			</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcjmail-jdk18on</artifactId>
+			<version>1.79.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcpg-jdk18on</artifactId>
+			<version>1.79.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcpkix-jdk18on</artifactId>
+			<version>1.79.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk18on</artifactId>
+			<version>1.79.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcutil-jdk18on</artifactId>
+			<version>1.79.0</version>
+		</dependency>
+
+		<!-- XML SEC -->
+		<!-- https://mvnrepository.com/artifact/jakarta.xml.bind/jakarta.xml.bind-api -->
+		<dependency>
+		    <groupId>jakarta.xml.bind</groupId>
+		    <artifactId>jakarta.xml.bind-api</artifactId>
+		    <version>4.0.2</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.santuario/xmlsec -->
+		<dependency>
+		    <groupId>org.apache.santuario</groupId>
+		    <artifactId>xmlsec</artifactId>
+		    <version>4.0.2</version>
+		</dependency>
+
 			<!-- Restlet -->
 			<dependency>
 				<groupId>commons-fileupload</groupId>
@@ -78,24 +93,27 @@
 				<artifactId>commons-io</artifactId>
 				<version>2.13.0</version>
 			</dependency>
+			
 			<!-- LDAP Connection -->
 			<dependency> <!-- https://mvnrepository.com/artifact/com.unboundid/unboundid-ldapsdk -->
 				<groupId>com.unboundid</groupId>
 				<artifactId>unboundid-ldapsdk</artifactId>
 				<version>6.0.5</version>
 			</dependency>
+
 			<!-- Java Mail -->
-			<!-- https://mvnrepository.com/artifact/com.sun.activation/javax.activation -->
-			<dependency>
-			    <groupId>com.sun.activation</groupId>
-			    <artifactId>javax.activation</artifactId>
-			    <version>1.2.0</version>
-			</dependency>
-			<dependency>
-				<groupId>com.sun.mail</groupId>
-				<artifactId>javax.mail</artifactId>
-				<version>1.6.2</version>
-			</dependency>
+		<!-- https://mvnrepository.com/artifact/com.sun.activation/jakarta.activation -->
+		<dependency>
+		    <groupId>com.sun.activation</groupId>
+		    <artifactId>jakarta.activation</artifactId>
+		    <version>2.0.1</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.sun.mail/jakarta.mail -->
+		<dependency>
+		    <groupId>com.sun.mail</groupId>
+		    <artifactId>jakarta.mail</artifactId>
+		    <version>2.0.1</version>
+		</dependency>
 			
 			<!-- JDBC and Databases -->
 			<dependency> <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
@@ -113,13 +131,7 @@
 			<dependency> <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
 				<groupId>org.postgresql</groupId>
 				<artifactId>postgresql</artifactId>
-				<version>42.5.1</version>
-			</dependency>
-	
-			<dependency>
-				<groupId>com.h2database</groupId>
-				<artifactId>h2</artifactId>
-				<version>1.4.199</version>
+				<version>42.5.5</version>
 			</dependency>
 	
 			<dependency>
@@ -132,22 +144,24 @@
 				<artifactId>commons-dbutils</artifactId>
 				<version>1.6</version>
 			</dependency>
+			
 			<!-- Groovy -->
 			<dependency>
 				<groupId>org.codehaus.groovy</groupId>
 				<artifactId>groovy</artifactId>
 				<version>3.0.8</version>
 			</dependency>
+			
 			<!-- Logger -->
 			<dependency>
 				<groupId>org.ops4j.pax.logging</groupId>
 				<artifactId>pax-logging-api</artifactId>
-				<version>1.12.5</version>
+				<version>1.12.10</version>
 			</dependency>
 			<dependency>
 				<groupId>org.ops4j.pax.logging</groupId>
 				<artifactId>pax-logging-log4j2</artifactId>
-				<version>1.12.5</version>
+				<version>1.12.10</version>
 			</dependency>
 		</dependencies>
 	</location>
