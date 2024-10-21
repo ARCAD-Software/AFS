@@ -36,17 +36,17 @@ public class EntityInfo {
 	 */
 	protected static final String METADATA_TABLE = "table"; //$NON-NLS-1$
 	protected static final String METADATA_DELETECOL = "deleteCol"; //$NON-NLS-1$
+	protected static final String METADATA_COLNAME = "col"; //$NON-NLS-1$
+	protected static final String METADATA_IDCOL = "idCol"; //$NON-NLS-1$
+	protected static final String METADATA_SOURCECOL = "sourceCol"; //$NON-NLS-1$
+	protected static final String METADATA_DESTCOL = "destCol"; //$NON-NLS-1$
 	private static final String METADATA_COLPREFIX = "colPrefix"; //$NON-NLS-1$
-	private static final String METADATA_COLNAME = "col"; //$NON-NLS-1$
-	private static final String METADATA_IDCOL = "idCol"; //$NON-NLS-1$
 	private static final String METADATA_UPDATECOL = "updateCol"; //$NON-NLS-1$
 	private static final String METADATA_LOCKCOL = "lockCol"; //$NON-NLS-1$
 	private static final String METADATA_LOCKDATECOL = "lockDateCol"; //$NON-NLS-1$
 	private static final String METADATA_GROUPTABLE = "groupTable"; //$NON-NLS-1$
 	private static final String METADATA_GROUPMINCOL = "groupMinCol"; //$NON-NLS-1$
 	private static final String METADATA_GROUPMAXCOL = "groupMaxCol"; //$NON-NLS-1$
-	protected static final String METADATA_SOURCECOL = "sourceCol"; //$NON-NLS-1$
-	protected static final String METADATA_DESTCOL = "destCol"; //$NON-NLS-1$
 
 	public String table;
 	public String idCol;
