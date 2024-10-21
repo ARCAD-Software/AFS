@@ -157,7 +157,11 @@ public class DataItemResource extends UserLinkedResource {
 		String atts = getColumns(getRequestForm(), "attributes"); //$NON-NLS-1$
 		List<ReferenceLine> attributes;
 		if (atts != null) {
-			attributes = entity.getPublicAttributeLines(atts);
+			if ((atts.length() == 1) && "*".equals(atts)) {
+				attributes = entity.getAllAttributes();
+			} else {
+				attributes = entity.getPublicAttributeLines(atts);
+			}
 		} else if (listable) {
 			attributes = entity.getListables();
 		} else {

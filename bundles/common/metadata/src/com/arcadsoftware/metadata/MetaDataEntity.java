@@ -1724,7 +1724,7 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 		for (MetaDataAttribute att : attributes.values()) {
 			result.add(new ReferenceLine(att));
 		}
-		for(String code: codes) {
+		for (String code: codes) {
 			result.add(getReferenceLine(code));
 		}
 		return result;

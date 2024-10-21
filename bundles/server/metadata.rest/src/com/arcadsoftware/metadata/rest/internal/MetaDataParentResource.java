@@ -274,6 +274,8 @@ public class MetaDataParentResource extends DataParentResource {
 		List<ReferenceLine> attributes;
 		if (atts == null) {
 			attributes = getEntity().getListables();
+		} else if ((atts.length() == 1) && "*".equals(atts)) {
+			attributes = getEntity().getAllAttributes();
 		} else {
 			attributes = getEntity().getPublicAttributeLines(atts);
 		}

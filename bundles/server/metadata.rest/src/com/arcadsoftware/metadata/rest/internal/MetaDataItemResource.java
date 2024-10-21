@@ -35,6 +35,7 @@ import com.arcadsoftware.metadata.IMetaDataDeleteListener;
 import com.arcadsoftware.metadata.IMetaDataLinkingListener;
 import com.arcadsoftware.metadata.IMetaDataModifyListener;
 import com.arcadsoftware.metadata.IMetaDataSelectionListener;
+import com.arcadsoftware.metadata.IMetaDataUndeleteListener;
 import com.arcadsoftware.metadata.MetaDataAttribute;
 import com.arcadsoftware.metadata.MetaDataEntity;
 import com.arcadsoftware.metadata.MetaDataLink;
@@ -659,14 +660,16 @@ public class MetaDataItemResource extends DataItemResource {
 		ArrayList<MetaDataAttribute> attlist = new ArrayList<MetaDataAttribute>();
 		BeanMap values = entity.formToBean(form, attlist);
 		List<IMetaDataModifyListener> listeners = Activator.getInstance().getModifyListener(getType());
+		List<IMetaDataUndeleteListener> udlisteners = null;
 		BeanMapList list = new BeanMapList(getItems().size());
 		final boolean undelete = isParameter(form, "undelete"); //$NON-NLS-1$
 		if (undelete) {
+			udlisteners = Activator.getInstance().getUndeleteListener(getType());
 			// Undelete is not an attribute...
 			values.remove("undelete"); //$NON-NLS-1$
 		}
 		for (BeanMap item: getItems()) {
-			BeanMap result = put(variant, form, entity, item, values, attlist, language, listeners, undelete);
+			BeanMap result = put(variant, form, entity, item, values, attlist, language, listeners, udlisteners);
 			if (result != null) {
 				broadcastUserAction("logUpdate", result); //$NON-NLS-1$
 				list.add(result);
@@ -689,35 +692,46 @@ public class MetaDataItemResource extends DataItemResource {
 	}
 
 	private BeanMap put(Variant variant, Form form, MetaDataEntity entity, BeanMap item, BeanMap values,
-			ArrayList<MetaDataAttribute> attlist, Language language, List<IMetaDataModifyListener> listeners, boolean undelete) {
-		if (!hasRightUpdate(entity, item, undelete, true, language)) {
+			ArrayList<MetaDataAttribute> attlist, Language language, List<IMetaDataModifyListener> listeners, 
+			List<IMetaDataUndeleteListener> undeleteListeners) {
+		if (!hasRightUpdate(entity, item, undeleteListeners != null, true, language)) {
 			setStatus(Status.CLIENT_ERROR_FORBIDDEN, Activator.getMessage("right.noupdate", language)); //$NON-NLS-1$
 			return null;
 		}
 		// Support undelete !
-		if (undelete) {
+		if (undeleteListeners != null) {
 			if (!item.isDeleted()) {
 				// Just log a message, this operation is idempotent !
 				Activator.getInstance().warn("Undeleting an already not deleted data: " + item.getType() + '/' + item.getId());
 			}
-			// Check that the undeleted values go against an "unique value" constraint...
-			// FIXME We should call the Entity Groovy test before this test because it may alter the values !!!
-			for (MetaDataAttribute attribute: entity.getAttributes().values()) {
-				if (attribute.getMetadata().getBoolean(MetaDataEntity.METADATA_UNIQUE)) {
-					Object value = values.get(attribute.getCode());
-					if (value == null) {
-						value = item.get(attribute.getCode());
-					}
-					if ((value != null) && (value.toString().length() > 0) &&  // ignore null values...
-							(getEntity().dataCount(false, attribute.getCode(), value) > 0)) {
-						throw new ResourceException(Status.CLIENT_ERROR_PRECONDITION_FAILED, //
-								String.format(Activator.getMessage("error.uniqueattribute.undelete", language), //$NON-NLS-1$ 
-										attribute.getName(language), value, attribute.getCode()));
+			switch (doUndeleteTest(undeleteListeners, item, values, attlist, language)) {
+			case 0:
+				getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST, Activator.getMessage("error.undeletionfail", language)); //$NON-NLS-1$
+				return null;
+			case 1:
+				// Check that the undeleted values go against an "unique value" constraint...
+				for (MetaDataAttribute attribute: entity.getAttributes().values()) {
+					if (attribute.getMetadata().getBoolean(MetaDataEntity.METADATA_UNIQUE)) {
+						Object value = values.get(attribute.getCode());
+						if (value == null) {
+							value = item.get(attribute.getCode());
+						}
+						if ((value != null) && (value.toString().length() > 0) &&  // ignore null values...
+								(getEntity().dataCount(false, attribute.getCode(), value) > 0)) {
+							throw new ResourceException(Status.CLIENT_ERROR_PRECONDITION_FAILED, //
+									String.format(Activator.getMessage("error.uniqueattribute.undelete", language), //$NON-NLS-1$ 
+											attribute.getName(language), value, attribute.getCode()));
+						}
 					}
 				}
+				entity.getMapper().undelete(item);
+			case -1: // bypass...
+				item.setDeleted(false);
 			}
-			entity.getMapper().undelete(item);
-			item.setDeleted(false);
+			for (IMetaDataUndeleteListener listener: undeleteListeners) {
+				listener.postUndeletion(entity, item, getUser(), language);
+			}
+			Activator.getInstance().test(MetaDataTest.EVENTCODE_AFTERUNDELETE, entity, item, values, attlist, getUser(), language);
 			Activator.getInstance().fireUndeleteEvent(getEntity(), item, getUser());
 		}
 		// attlist must not be changed (it is used by others updates...)
@@ -740,7 +754,7 @@ public class MetaDataItemResource extends DataItemResource {
 			break;
 		case 1:
 			// Check "unique" values constraints
-			if (!undelete) {
+			if (undeleteListeners == null) {
 				// Already done if undelete is true (see above !)
 				ISearchCriteria invariantCriteria = new NotCriteria(new IdEqualCriteria(item.getId()));
 				for (MetaDataAttribute attribute: attlist) {
@@ -800,10 +814,30 @@ public class MetaDataItemResource extends DataItemResource {
 		return 1;
 	}
 
+	private int doUndeleteTest(List<IMetaDataUndeleteListener> listeners, BeanMap oldValue, BeanMap result, ArrayList<MetaDataAttribute> list, Language language) {
+		MetaDataEntity entity = getEntity();
+		boolean bypass = false;
+		for (IMetaDataUndeleteListener listener: listeners) {
+			if (!listener.testUndeletion(entity, oldValue, getUser(), language)) {
+				return 0;
+			}
+			if (listener instanceof IByPassListener) {
+				bypass = true;
+			}
+		}
+		if (!Activator.getInstance().test(MetaDataTest.EVENTCODE_BEFOREUNDELETE, entity, oldValue, result, list, getUser(), language)) {
+			return 0;
+		}
+		if (bypass) {
+			return -1;
+		}
+		return 1;
+	}
+
 	private void doPostUpdateTreatment(List<IMetaDataModifyListener> listeners, BeanMap oldValue, BeanMap result, ArrayList<MetaDataAttribute> list, Language language) {
 		// TODO translate !?!??!! (en théorie les attributs translate ne sont pas modifiés !
 		MetaDataEntity entity = getEntity();
-		for (IMetaDataModifyListener listener:listeners) {
+		for (IMetaDataModifyListener listener: listeners) {
 			listener.postModification(entity, oldValue, result, list, getUser(), language);
 		}
 		Activator.getInstance().test(MetaDataTest.EVENTCODE_AFTERUPDATE, entity, oldValue, result, list, getUser(), language);
