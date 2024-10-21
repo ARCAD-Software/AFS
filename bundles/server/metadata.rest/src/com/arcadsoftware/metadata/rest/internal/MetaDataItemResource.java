@@ -752,7 +752,7 @@ public class MetaDataItemResource extends DataItemResource {
 							codeEqual.setAttribute(attribute.getCode());
 							if (MetaDataAttribute.TYPE_INTEGER.equals(attribute.getType()) || MetaDataAttribute.TYPE_INT.equals(attribute.getType())) {
 								try {
-									codeEqual.setIntval(new Integer(value.toString()));
+									codeEqual.setIntval(Integer.valueOf(value.toString()));
 								} catch (NumberFormatException e) {
 									codeEqual.setValue(value.toString());
 								}
