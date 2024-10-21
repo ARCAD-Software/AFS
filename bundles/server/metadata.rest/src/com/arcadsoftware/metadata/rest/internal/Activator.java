@@ -31,6 +31,7 @@ import com.arcadsoftware.metadata.IMetaDataDeleteListener;
 import com.arcadsoftware.metadata.IMetaDataLinkingListener;
 import com.arcadsoftware.metadata.IMetaDataModifyListener;
 import com.arcadsoftware.metadata.IMetaDataSelectionListener;
+import com.arcadsoftware.metadata.IMetaDataUndeleteListener;
 import com.arcadsoftware.metadata.MetaDataAttribute;
 import com.arcadsoftware.metadata.MetaDataEntity;
 import com.arcadsoftware.metadata.MetaDataEventHandler;
@@ -62,6 +63,7 @@ public class Activator extends AbstractActivator implements IEntityTesterService
 	private BeanMapEventTracker eventTracker;
 	private ServiceTracker<IMetaDataModifyListener, Object> modifyTracker;
 	private ServiceTracker<IMetaDataDeleteListener, Object> deleteTracker;
+	private ServiceTracker<IMetaDataUndeleteListener, Object> undeleteTracker;
 	private ServiceTracker<IMetaDataLinkingListener, Object> linkingTracker;
 	private ServiceTracker<IMetaDataSelectionListener, Object> selectionTracker;
 
@@ -79,6 +81,8 @@ public class Activator extends AbstractActivator implements IEntityTesterService
 		linkingTracker.open();
 		selectionTracker = new ServiceTracker<IMetaDataSelectionListener, Object>(bundleContext, IMetaDataSelectionListener.clazz, null);
 		selectionTracker.open();
+		undeleteTracker = new ServiceTracker<IMetaDataUndeleteListener, Object>(bundleContext, IMetaDataSelectionListener.clazz, null);
+		undeleteTracker.open();
 	}
 
 	@Override
@@ -94,6 +98,8 @@ public class Activator extends AbstractActivator implements IEntityTesterService
 		linkingTracker = null;
 		selectionTracker.close();
 		selectionTracker = null;
+		undeleteTracker.close();
+		undeleteTracker = null;
 		instance = null;
 	}
 
@@ -129,10 +135,24 @@ public class Activator extends AbstractActivator implements IEntityTesterService
 		ArrayList<IMetaDataDeleteListener> result = new ArrayList<IMetaDataDeleteListener>();
 		ServiceReference<IMetaDataDeleteListener>[] refs = deleteTracker.getServiceReferences();
 		if (refs != null) {
-			for(ServiceReference<IMetaDataDeleteListener> ref:refs) {
+			for (ServiceReference<IMetaDataDeleteListener> ref: refs) {
 				Object o = ref.getProperty(IMetaDataDeleteListener.PROP_TYPE);
 				if ((o == null) || (type == null) || type.equals(o)) {
 					result.add((IMetaDataDeleteListener) deleteTracker.getService(ref));
+				}
+			}
+		}
+		return result;
+	}
+
+	public List<IMetaDataUndeleteListener> getUndeleteListener(String type) {
+		ArrayList<IMetaDataUndeleteListener> result = new ArrayList<IMetaDataUndeleteListener>();
+		ServiceReference<IMetaDataUndeleteListener>[] refs = undeleteTracker.getServiceReferences();
+		if (refs != null) {
+			for (ServiceReference<IMetaDataUndeleteListener> ref: refs) {
+				Object o = ref.getProperty(IMetaDataDeleteListener.PROP_TYPE);
+				if ((o == null) || (type == null) || type.equals(o)) {
+					result.add((IMetaDataUndeleteListener) undeleteTracker.getService(ref));
 				}
 			}
 		}
