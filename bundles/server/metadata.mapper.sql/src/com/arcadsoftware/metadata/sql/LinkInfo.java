@@ -14,6 +14,7 @@
 package com.arcadsoftware.metadata.sql;
 
 import com.arcadsoftware.beanmap.BeanMap;
+import com.arcadsoftware.metadata.MetaDataAttribute;
 import com.arcadsoftware.metadata.MetaDataEntity;
 import com.arcadsoftware.metadata.MetaDataLink;
 
@@ -28,7 +29,6 @@ public class LinkInfo {
 	public String sourceCol;
 	public String destCol;
 	public String deleteCol;
-
 	// SQL Cache
 	public String sql_add;
 	public String sql_test;
@@ -37,7 +37,7 @@ public class LinkInfo {
 	public LinkInfo(final MetaDataEntity entity, final MetaDataLink link) {
 		super();
 		BeanMap md = link.getMetadata();
-		// Gestion des autolink, on inverse le lien destination.
+		// Auto-link management, we reverse the targetted link.
 		String autolinkCode = md.getString(MetaDataEntity.METADATA_AUTOLINK);
 		if ((autolinkCode != null) && (autolinkCode.length() > 0)) {
 			MetaDataEntity le = link.getRefEntity();
@@ -54,21 +54,35 @@ public class LinkInfo {
 				}
 			}
 		} else {
-			table = md.getString(EntityInfo.METADATA_TABLE);
-			if ((table != null) && (table.length() == 0)) {
-				table = null;
-			}
-			sourceCol = md.getString(EntityInfo.METADATA_SOURCECOL);
-			if ((sourceCol != null) && (sourceCol.length() == 0)) {
-				sourceCol = null;
-			}
-			destCol = md.getString(EntityInfo.METADATA_DESTCOL);
-			if ((destCol != null) && (destCol.length() == 0)) {
-				destCol = null;
-			}
-			deleteCol = md.getString(EntityInfo.METADATA_DELETECOL);
-			if ((deleteCol != null) && (deleteCol.length() == 0)) {
-				deleteCol = null;
+			// Reverse-Link management, we use the targetted entity as a link table.
+			String code = md.getString(MetaDataEntity.METADATA_REVERSELINK);
+			if (code != null) {
+				MetaDataEntity le = link.getRefEntity();
+				md = le.getMetadata();
+				table = md.getString(EntityInfo.METADATA_TABLE);
+				destCol = md.getString(EntityInfo.METADATA_IDCOL);
+				deleteCol = md.getString(EntityInfo.METADATA_DELETECOL);
+				MetaDataAttribute att = le.getAttribute(code);
+				if (att != null) {
+					sourceCol = att.getMetadata().getString(EntityInfo.METADATA_COLNAME);
+				}
+			} else {
+				table = md.getString(EntityInfo.METADATA_TABLE);
+				if ((table != null) && (table.length() == 0)) {
+					table = null;
+				}
+				sourceCol = md.getString(EntityInfo.METADATA_SOURCECOL);
+				if ((sourceCol != null) && (sourceCol.length() == 0)) {
+					sourceCol = null;
+				}
+				destCol = md.getString(EntityInfo.METADATA_DESTCOL);
+				if ((destCol != null) && (destCol.length() == 0)) {
+					destCol = null;
+				}
+				deleteCol = md.getString(EntityInfo.METADATA_DELETECOL);
+				if ((deleteCol != null) && (deleteCol.length() == 0)) {
+					deleteCol = null;
+				}
 			}
 		}
 	}

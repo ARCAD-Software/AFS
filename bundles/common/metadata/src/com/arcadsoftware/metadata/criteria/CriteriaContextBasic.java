@@ -91,7 +91,7 @@ public class CriteriaContextBasic implements ICriteriaContext {
 			refs = new HashMap<String, ReferenceLine>();
 			linksmap.put(link, refs);
 		}
-		if (reference != null){
+		if (reference != null) {
 			refs.put(reference.getCode(), reference);
 		}
 	}

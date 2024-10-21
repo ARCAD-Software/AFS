@@ -912,10 +912,10 @@ public abstract class AbstractMapperService implements IMapperService {
 	 * Process of link creation.
 	 * 
 	 * <p>
-	 * Resersed references are <b>not</b> proceeded by this method.
+	 * "Reversed references" are <b>not</b> proceeded by this method.
 	 * 
 	 * <p>
-	 * But "autolink" must be taken into account. Autolink are link automatically created from inversed links the value
+	 * But "Auto Links" must be taken into account. Auto-links are links automatically created from reversed links, the value
 	 * of this Metadata tag is the corresponding link code into the target entity.
 	 * 
 	 * @param link
@@ -958,10 +958,10 @@ public abstract class AbstractMapperService implements IMapperService {
 	 * Perform a link test.
 	 * 
 	 * <p>
-	 * Resersed references are <b>not</b> proceeded by this method.
+	 * "Reversed references" are <b>not</b> proceeded by this method.
 	 * 
 	 * <p>
-	 * But "autolink" must be taken into account. Autolink are link automatically created from inversed links the value
+	 * But "auto links" must be taken into account. Auto-links are links automatically created from reversed links, the value
 	 * of this Metadata tag is the corresponding link code into the target entity.
 	 * 
 	 * @param link
@@ -999,6 +999,21 @@ public abstract class AbstractMapperService implements IMapperService {
 		return e.getMapper().update(e, destId, list(att), list((Object) null));
 	}
 
+	/**
+	 * Perform 	a link deletion between two entities.
+	 * 
+	 * <p>
+	 * "Reversed references" are <b>not</b> proceeded by this method.
+	 * 
+	 * <p>
+	 * But "auto links" must be taken into account. Auto-links are links automatically created from reversed links, the value
+	 * of this Metadata tag is the corresponding link code into the target entity.
+	 * 
+	 * @param link
+	 * @param sourceId
+	 * @param destId
+	 * @return
+	 */
 	protected abstract boolean doLinkRemove(MetaDataLink link, int sourceId, int destId);
 
 	public final BeanMapList linkSelection(String sourceType, String linkCode, int sourceId) {

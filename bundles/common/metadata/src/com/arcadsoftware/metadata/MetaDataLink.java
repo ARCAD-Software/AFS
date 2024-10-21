@@ -184,7 +184,7 @@ public class MetaDataLink extends Element {
 	 */
 	public boolean isLocal() {
 		MetaDataEntity ref = getRefEntity();
-		return (ref != null) && ref.sameMapper((MetaDataEntity)getParent());
+		return (ref != null) && ref.sameMapper((MetaDataEntity) getParent());
 	}
 
 	/**
