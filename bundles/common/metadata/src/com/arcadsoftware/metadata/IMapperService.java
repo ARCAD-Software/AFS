@@ -1486,44 +1486,4 @@ public interface IMapperService {
 	public int linkCount(MetaDataLink link, int sourceId, boolean deleted, ISearchCriteria criteria, boolean distinct,
 			IConnectionUserBean currentUser);
 
-	public boolean groupAdd(BeanMap group, int itemId);
-
-	public boolean groupAdd(String groupType, int groupId, int itemId);
-
-	public boolean groupAdd(MetaDataEntity groupEntity, int groupId, int itemId);
-
-	public boolean groupTest(BeanMap group, int itemId);
-
-	public boolean groupTest(String groupType, int groupId, int itemId);
-
-	public boolean groupTest(MetaDataEntity groupEntity, int groupId, int itemId);
-
-	public boolean groupRemove(BeanMap group, int itemId);
-
-	public boolean groupRemove(String groupType, int groupId, int itemId);
-
-	public boolean groupRemove(MetaDataEntity groupEntity, int groupId, int itemId);
-
-	public BeanMapList groupSelection(BeanMap group);
-
-	public BeanMapList groupSelection(String groupType, int groupId);
-
-	public BeanMapList groupSelection(MetaDataEntity groupEntity, int groupId);
-
-	public BeanMapList groupSelection(String groupType, int groupId, String attributes, boolean deleted,
-			String attributeTest, Object value);
-
-	public BeanMapList groupSelection(MetaDataEntity groupEntity, int groupId, String attributes, boolean deleted,
-			String attributeTest, Object value);
-
-	public BeanMapList groupSelection(MetaDataEntity groupEntity, int groupId, List<ReferenceLine> attributes,
-			boolean deleted, ReferenceLine attributeTest, Object value);
-
-	public BeanMapList groupSelection(String groupType, int groupId, String attributes, boolean deleted,
-			String criteria, boolean distinct, String orders, IConnectionUserBean currentUser, int page, int limit);
-
-	public BeanMapList groupSelection(MetaDataEntity groupEntity, int groupId, List<ReferenceLine> attributes,
-			boolean deleted, ISearchCriteria criteria, boolean distinct, List<ReferenceLine> orders,
-			IConnectionUserBean currentUser, int page, int limit);
-
 }

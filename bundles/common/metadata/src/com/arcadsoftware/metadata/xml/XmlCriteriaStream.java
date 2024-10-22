@@ -39,7 +39,6 @@ import com.arcadsoftware.metadata.criteria.IdInListCriteria;
 import com.arcadsoftware.metadata.criteria.InListCriteria;
 import com.arcadsoftware.metadata.criteria.IdLowerStrictCriteria;
 import com.arcadsoftware.metadata.criteria.IdLowerThanCriteria;
-import com.arcadsoftware.metadata.criteria.InGroupCriteria;
 import com.arcadsoftware.metadata.criteria.IsNullCriteria;
 import com.arcadsoftware.metadata.criteria.IsTrueCriteria;
 import com.arcadsoftware.metadata.criteria.LinkContainCriteria;
@@ -114,10 +113,6 @@ public class XmlCriteriaStream extends XStreamCompact {
 		xs.useAttributeFor(LinkCriteria.class, "attribute"); //$NON-NLS-1$
 		xs.useAttributeFor(LinkCriteria.class, "linkCode"); //$NON-NLS-1$
 		xs.useAttributeFor(LinkCriteria.class, "id"); //$NON-NLS-1$
-		xs.alias("ingroup",InGroupCriteria.class); //$NON-NLS-1$
-		xs.useAttributeFor(InGroupCriteria.class, "type"); //$NON-NLS-1$
-		xs.useAttributeFor(InGroupCriteria.class, "item"); //$NON-NLS-1$
-		xs.useAttributeFor(InGroupCriteria.class, "group"); //$NON-NLS-1$
 		xs.alias("idequal", IdEqualCriteria.class); //$NON-NLS-1$
 		xs.useAttributeFor(IdEqualCriteria.class, "id"); //$NON-NLS-1$
 		xs.alias("before", BeforeCriteria.class); //$NON-NLS-1$

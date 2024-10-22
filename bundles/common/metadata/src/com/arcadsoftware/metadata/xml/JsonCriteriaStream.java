@@ -52,7 +52,6 @@ import com.arcadsoftware.metadata.criteria.IdGreaterThanCriteria;
 import com.arcadsoftware.metadata.criteria.InListCriteria;
 import com.arcadsoftware.metadata.criteria.IdLowerStrictCriteria;
 import com.arcadsoftware.metadata.criteria.IdLowerThanCriteria;
-import com.arcadsoftware.metadata.criteria.InGroupCriteria;
 import com.arcadsoftware.metadata.criteria.IsNullCriteria;
 import com.arcadsoftware.metadata.criteria.IsTrueCriteria;
 import com.arcadsoftware.metadata.criteria.LinkContainCriteria;
@@ -177,11 +176,6 @@ public class JsonCriteriaStream  {
 			result.put("linkto", convertAttribute(criteria)
 					.put("linkCode", ((LinkCriteria) criteria).getLinkCode())
 					.put("id", ((LinkCriteria) criteria).getId()));
-		} else if (criteria instanceof InGroupCriteria) {
-			result.put("ingroup", convertAttribute(criteria)
-					.put("type", ((InGroupCriteria) criteria).getType())
-					.put("item", ((InGroupCriteria) criteria).getItem())
-					.put("group", ((InGroupCriteria) criteria).getGroup()));
 		} else if (criteria instanceof BeforeCriteria) {
 			JSONObject sub = convertAttribute(criteria);
 			if (((BeforeCriteria) criteria).getValue() != null) {
@@ -571,8 +565,6 @@ public class JsonCriteriaStream  {
 		case "link":
 		case "lto":
 			return fill(new LinkCriteria(), (JSONObject) value);
-		case "ingroup":
-			return fill(new InGroupCriteria(), (JSONObject) value);
 		case "before":
 			return fill(new BeforeCriteria(), (JSONObject) value);
 		case "after":
@@ -751,21 +743,6 @@ public class JsonCriteriaStream  {
 							((LinkCriteria) criteria).setId(i);
 						} else if (criteria instanceof UnlinkCriteria) {
 							((UnlinkCriteria) criteria).setId(i);
-						}
-						break;
-					case "type":
-						if (criteria instanceof InGroupCriteria) {
-							((InGroupCriteria) criteria).setType(o.toString());
-						}
-						break;
-					case "item":
-						if (criteria instanceof InGroupCriteria) {
-							((InGroupCriteria) criteria).setItem(o.toString());
-						}
-						break;
-					case "group":
-						if (criteria instanceof InGroupCriteria) {
-							((InGroupCriteria) criteria).setGroup(o.toString());
 						}
 						break;
 					case "trunc":

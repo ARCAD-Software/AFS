@@ -70,7 +70,6 @@ import com.arcadsoftware.metadata.criteria.IdGreaterThanCriteria;
 import com.arcadsoftware.metadata.criteria.InListCriteria;
 import com.arcadsoftware.metadata.criteria.IdLowerStrictCriteria;
 import com.arcadsoftware.metadata.criteria.IdLowerThanCriteria;
-import com.arcadsoftware.metadata.criteria.InGroupCriteria;
 import com.arcadsoftware.metadata.criteria.IsNullCriteria;
 import com.arcadsoftware.metadata.criteria.IsTrueCriteria;
 import com.arcadsoftware.metadata.criteria.LinkContainCriteria;
@@ -853,8 +852,6 @@ public class MapperSQLService extends AbstractMapperService {
 		} else if (criteria instanceof IdLowerStrictCriteria) {
 			String col = DEFAULT_TABLEALIAS + fg.prefix + entityInfo.idCol;
 			result.append(String.format(fg.lower,  col, ((IdLowerStrictCriteria) criteria).getId()));				
-		} else if (criteria instanceof InGroupCriteria) {
-			// TODO Implement the groups/set managements !!!
 		} else if (criteria instanceof IsNullCriteria) {
 			result.append(String.format(fg.isnull, colNames.get(((IsNullCriteria) criteria).getAttribute())));
 		} else if (criteria instanceof IsTrueCriteria) {
@@ -1982,7 +1979,7 @@ public class MapperSQLService extends AbstractMapperService {
 		if (l == null) {
 			return new BeanMapPartialList();
 		}
-		JoinsMap joins = new JoinsMap(String.format(fg.tablealias,l.table, DEFAULT_LINKTABLEALIAS));
+		JoinsMap joins = new JoinsMap(String.format(fg.tablealias, l.table, DEFAULT_LINKTABLEALIAS));
 		StringBuilder where = new StringBuilder(String.format(fg.equal, DEFAULT_LINKTABLEALIAS + fg.prefix + l.sourceCol, fg.param));
 		StringBuilder cols = new StringBuilder();
 		if (distinct) {
@@ -2182,40 +2179,6 @@ public class MapperSQLService extends AbstractMapperService {
 			}
 		}
 		return count(String.format(fg.select, col, joins.toString(), where.toString()), new Object[] {sourceId});
-	}
-
-	@Override
-	public boolean groupAdd(MetaDataEntity groupEntity, int groupId, int itemId) {
-		// TODO Implement the Group management (5 times here... see bellow) !!!
-		return super.groupAdd(groupEntity, groupId, itemId);
-	}
-
-	@Override
-	public boolean groupTest(MetaDataEntity groupEntity, int groupId, int itemId) {
-		// Implement the Group management !!!
-		return super.groupTest(groupEntity, groupId, itemId);
-	}
-
-	@Override
-	public boolean groupRemove(MetaDataEntity groupEntity, int groupId, int itemId) {
-		// Implement the Group management !!!
-		return super.groupRemove(groupEntity, groupId, itemId);
-	}
-
-	@Override
-	public BeanMapList groupSelection(MetaDataEntity groupEntity, int groupId, List<ReferenceLine> attributes,
-			boolean deleted, ReferenceLine attributeTest, Object value) {
-		// Implement the Group management !!!
-		return super.groupSelection(groupEntity, groupId, attributes, deleted, attributeTest, value);
-	}
-
-	@Override
-	protected BeanMapList doGroupSelection(MetaDataEntity groupEntity, int groupId, List<ReferenceLine> attributes,
-			boolean deleted, ISearchCriteria criteria, boolean distinct, List<ReferenceLine> orders, int page,
-			int limit, ICriteriaContext context) {
-		// Implement the Group management !!!
-		return super.doGroupSelection(groupEntity, groupId, attributes, deleted, criteria, distinct, orders, page, limit,
-				context);
 	}
 
 	/**

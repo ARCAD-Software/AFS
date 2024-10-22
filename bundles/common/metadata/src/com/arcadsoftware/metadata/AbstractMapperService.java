@@ -37,7 +37,6 @@ import com.arcadsoftware.metadata.criteria.IAttributesCriteria;
 import com.arcadsoftware.metadata.criteria.ICriteriaContext;
 import com.arcadsoftware.metadata.criteria.ISearchCriteria;
 import com.arcadsoftware.metadata.criteria.IdEqualCriteria;
-import com.arcadsoftware.metadata.criteria.InGroupCriteria;
 import com.arcadsoftware.metadata.criteria.IsNullCriteria;
 import com.arcadsoftware.metadata.criteria.IsTrueCriteria;
 import com.arcadsoftware.metadata.criteria.LinkEqualCriteria;
@@ -52,7 +51,6 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
 /**
  * This implementation provide default implementation of all trivial operations to minimize the number of operation to
  * implements.
- * 
  * <p>
  * Theses trivial operations are :
  * <ul>
@@ -63,10 +61,8 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
  * <li>Processing of reversed link (transforms theses link operation into operation onto target entity, and its mapper).
  * <li>Ensure that empty or null ISearchCriteria are associated to a TRUE condition.
  * </ul>
- * 
  * <p>
  * This class also propose some useful tools for extender classes.
- * 
  */
 public abstract class AbstractMapperService implements IMapperService {
 
@@ -77,10 +73,9 @@ public abstract class AbstractMapperService implements IMapperService {
 
 	/**
 	 * Define the mapper properties.
-	 * 
 	 * <p>
 	 * Most of theses properties are informational.
-	 * 
+	 *
 	 * @param domainMame
 	 *            the Mapper domain name.
 	 * @param softdeletion
@@ -103,7 +98,7 @@ public abstract class AbstractMapperService implements IMapperService {
 	 */
 	public static Dictionary<String, ?> mapperProperties(String domainMame, boolean softdeletion, boolean pagination,
 			boolean multilink, boolean extrarefs, boolean groups) {
-		Hashtable<String, Object> props = new Hashtable<String, Object>();
+		final Hashtable<String, Object> props = new Hashtable<>();
 		props.put(PROP_DOMAINNAME, domainMame);
 		props.put(PROP_SUPPORT_SOFTDELETION, softdeletion);
 		props.put(PROP_SUPPORT_PAGINATION, pagination);
@@ -119,7 +114,7 @@ public abstract class AbstractMapperService implements IMapperService {
 	public AbstractMapperService() {
 		super();
 		xsCriteria = new XmlCriteriaStream();
-		domains = new ArrayList<String>();
+		domains = new ArrayList<>();
 	}
 
 	@Override
@@ -129,17 +124,17 @@ public abstract class AbstractMapperService implements IMapperService {
 
 	@Override
 	public boolean sameDomain(MetaDataEntity entity) {
-		for (String domain: domains) {
+		for (final String domain : domains) {
 			if (domain.equalsIgnoreCase(entity.getDomain())) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
+
 	@Override
 	public boolean sameDomain(String domain) {
-		for (String d: domains) {
+		for (final String d : domains) {
 			if (d.equalsIgnoreCase(domain)) {
 				return true;
 			}
@@ -148,14 +143,14 @@ public abstract class AbstractMapperService implements IMapperService {
 	}
 
 	/**
-	 * Return true if this element (MetaDataAttribute) possess an 
-	 * Encryption meda data that must be handled by the mapper. 
-	 *  
+	 * Return true if this element (MetaDataAttribute) possess an Encryption meda data that must be handled by the
+	 * mapper.
+	 * 
 	 * @param element
 	 * @return
 	 */
 	protected boolean isEncrypted(Element element) {
-		String s = element.getMetadata().getString(MetaDataEntity.METADATA_CRYPT);
+		final String s = element.getMetadata().getString(MetaDataEntity.METADATA_CRYPT);
 		return (s != null) && //
 				("mapper".equalsIgnoreCase(s) || //$NON-NLS-1$
 						"database".equalsIgnoreCase(s) || //$NON-NLS-1$
@@ -164,16 +159,15 @@ public abstract class AbstractMapperService implements IMapperService {
 
 	/**
 	 * Facility method return the entity associated to the given type.
-	 * 
 	 * <p>
 	 * This implementation never return null.
-	 * 
+	 *
 	 * @return can return null if the OSGi Service is not implemented.
 	 * @throws MapperException
 	 *             if the bundle is not started or non registry implementation is ready.
 	 */
 	protected MetaDataEntity getEntity(String type) {
-		Activator activator = Activator.getInstance();
+		final Activator activator = Activator.getInstance();
 		if (activator == null) {
 			throw new MapperException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE,
 					Messages.AbstractMapperService_Error_InitializationFailed);
@@ -183,13 +177,13 @@ public abstract class AbstractMapperService implements IMapperService {
 
 	/**
 	 * This method transform an XML string representation of a criteria into and Java Object.
-	 * 
+	 *
 	 * @param criteria
 	 * @return Criteria True is the given string is not a criteria representation.
 	 */
 	protected ISearchCriteria getCriteria(String criteria) {
 		if ((criteria != null) && !criteria.isEmpty()) {
-			Object c = xsCriteria.fromXML(criteria);
+			final Object c = xsCriteria.fromXML(criteria);
 			if (c instanceof ISearchCriteria) {
 				return (ISearchCriteria) c;
 			}
@@ -199,7 +193,7 @@ public abstract class AbstractMapperService implements IMapperService {
 
 	/**
 	 * Get a list of "T".
-	 * 
+	 *
 	 * @param <T>
 	 *            The type of the result.
 	 * @param o
@@ -208,14 +202,14 @@ public abstract class AbstractMapperService implements IMapperService {
 	 */
 	@SafeVarargs
 	public static final <T> List<T> list(T... o) {
-		ArrayList<T> list = new ArrayList<T>();
+		final ArrayList<T> list = new ArrayList<>();
 		Collections.addAll(list, o);
 		return list;
 	}
 
 	/**
 	 * Get the list of selected objects.
-	 * 
+	 *
 	 * @param entity
 	 * @param attributes
 	 * @return
@@ -229,7 +223,7 @@ public abstract class AbstractMapperService implements IMapperService {
 
 	/**
 	 * Get the list of selected objects.
-	 * 
+	 *
 	 * @param entity
 	 * @param attributes
 	 * @return
@@ -245,15 +239,15 @@ public abstract class AbstractMapperService implements IMapperService {
 	 * Filter the BenaMap columns.
 	 * <p>
 	 * Return a new instance of the BeanMap object.
-	 * 
+	 *
 	 * @param bean
 	 * @param attributes
 	 * @return
 	 */
 	protected BeanMap filterBean(BeanMap bean, List<ReferenceLine> attributes) {
-		BeanMap result = bean.duplicate();
+		final BeanMap result = bean.duplicate();
 		if (attributes != null) {
-			for (ReferenceLine ref : attributes) {
+			for (final ReferenceLine ref : attributes) {
 				result.put(ref.getCode(), bean.get(ref.getCode()));
 			}
 		}
@@ -282,10 +276,9 @@ public abstract class AbstractMapperService implements IMapperService {
 
 	/**
 	 * This method is called to build Criteria context just before criteria reduction.
-	 * 
 	 * <p>
 	 * Implementor can override this method to get their own context Object.
-	 * 
+	 *
 	 * @param entity
 	 * @param currentUser
 	 * @return
@@ -296,7 +289,7 @@ public abstract class AbstractMapperService implements IMapperService {
 
 	/**
 	 * This method process to selection of foreign attributes (references line that goes to other domains).
-	 * 
+	 *
 	 * @param attributes
 	 * @param result
 	 * @return
@@ -307,7 +300,7 @@ public abstract class AbstractMapperService implements IMapperService {
 		if (attributes.size() == 0) {
 			return result;
 		}
-		Map<ReferenceLine, List<ReferenceLine>> refs = ReferenceLine.fillDomainReferences(attributes);
+		final Map<ReferenceLine, List<ReferenceLine>> refs = ReferenceLine.fillDomainReferences(attributes);
 		if (refs == null) {
 			return result;
 		}
@@ -315,14 +308,14 @@ public abstract class AbstractMapperService implements IMapperService {
 			Activator.getInstance().info(
 					String.format(Messages.AbstractMapperService_Info_ComplexSelection, refs.size()));
 		}
-		for (Entry<ReferenceLine, List<ReferenceLine>> e : refs.entrySet()) {
-			HashMap<Integer, BeanMap> cache = new HashMap<Integer, BeanMap>();
-			for (BeanMap bean : result) {
-				Integer id = bean.get(e.getKey().getCode(), Integer.class);
+		for (final Entry<ReferenceLine, List<ReferenceLine>> e : refs.entrySet()) {
+			final HashMap<Integer, BeanMap> cache = new HashMap<>();
+			for (final BeanMap bean : result) {
+				final Integer id = bean.get(e.getKey().getCode(), Integer.class);
 				if (id != null) {
 					BeanMap ref = cache.get(id);
 					if (ref == null) {
-						MetaDataEntity entity = e.getKey().getLastAttribute().getRefEntity();
+						final MetaDataEntity entity = e.getKey().getLastAttribute().getRefEntity();
 						if (entity != null) {
 							ref = entity.getMapper().selection(entity, id, e.getValue(), true);
 						}
@@ -340,7 +333,7 @@ public abstract class AbstractMapperService implements IMapperService {
 
 	/**
 	 * This method process to selection of foreign attributes (references line that goes to other domains).
-	 * 
+	 *
 	 * @param attributes
 	 * @param result
 	 * @return
@@ -351,7 +344,7 @@ public abstract class AbstractMapperService implements IMapperService {
 		if ((attributes.size() == 0) || (result == null)) {
 			return result;
 		}
-		Map<ReferenceLine, List<ReferenceLine>> refs = ReferenceLine.fillDomainReferences(attributes);
+		final Map<ReferenceLine, List<ReferenceLine>> refs = ReferenceLine.fillDomainReferences(attributes);
 		if (refs == null) {
 			return result;
 		}
@@ -359,10 +352,10 @@ public abstract class AbstractMapperService implements IMapperService {
 			Activator.getInstance().info(
 					String.format(Messages.AbstractMapperService_Info_ComplexSelection, refs.size()));
 		}
-		for (Entry<ReferenceLine, List<ReferenceLine>> e : refs.entrySet()) {
-			Integer id = result.get(e.getKey().getCode(), Integer.class);
+		for (final Entry<ReferenceLine, List<ReferenceLine>> e : refs.entrySet()) {
+			final Integer id = result.get(e.getKey().getCode(), Integer.class);
 			if (id != null) {
-				MetaDataEntity entity = e.getKey().getLastAttribute().getRefEntity();
+				final MetaDataEntity entity = e.getKey().getLastAttribute().getRefEntity();
 				if (entity != null) {
 					result.addAll(e.getKey().getCode() + '.',
 							entity.getMapper().selection(entity, id, e.getValue(), true));
@@ -375,17 +368,14 @@ public abstract class AbstractMapperService implements IMapperService {
 	/**
 	 * This method transform the criteria to a domain local criteria. It replace the foreign part of the criteria with
 	 * pre-selected datas.
-	 * 
 	 * <p>
 	 * This implementation is limited to few sub-selection.
-	 * 
 	 * <p>
 	 * The context is updated to be usable with the new Criteria. By the way its remains usable with the old criteria,
 	 * who may be the same.
-	 * 
 	 * <p>
 	 * This method may return a ConstantCriteria that should be tested to quickly resolve the
-	 * 
+	 *
 	 * @param criteria
 	 *            The criteria to make local. It need to be reduced first.
 	 * @param context
@@ -418,7 +408,7 @@ public abstract class AbstractMapperService implements IMapperService {
 		// Bien sur ce traitement entraîne des performances dégradées dans le cas d'un usage massif
 		// de requêtes multi-domaines.
 		//
-		Map<String, ReferenceLine> foreigners = ReferenceLine.extraDomainReferences(context.getReferences());
+		final Map<String, ReferenceLine> foreigners = ReferenceLine.extraDomainReferences(context.getReferences());
 		if ((foreigners == null) || (foreigners.size() == 0)) {
 			return criteria;
 		}
@@ -431,14 +421,6 @@ public abstract class AbstractMapperService implements IMapperService {
 		}
 		if (criteria instanceof NotCriteria) {
 			return new NotCriteria(completeForeignCriteria(((NotCriteria) criteria).getCriteria(), context));
-		}
-		if (criteria instanceof InGroupCriteria) {
-			if ((foreigners.get(((InGroupCriteria) criteria).getGroup()) != null) || //
-					(foreigners.get(((InGroupCriteria) criteria).getItem()) != null)) {
-				throw new ResourceException(Status.SERVER_ERROR_NOT_IMPLEMENTED,
-						Messages.AbstractMapperService_Error_NoMultidomainForInGroupCriteria);
-			}
-			return criteria;
 		}
 		if (criteria instanceof LinkEqualCriteria) {
 			if ((foreigners.get(((LinkEqualCriteria) criteria).getReference()) != null) || //
@@ -458,13 +440,13 @@ public abstract class AbstractMapperService implements IMapperService {
 	 */
 	private ISearchCriteria convertForeignCriterion(List<ISearchCriteria> criterias, boolean andParent,
 			ICriteriaContext context, Map<String, ReferenceLine> foreigners) {
-		ArrayList<ISearchCriteria> result = new ArrayList<ISearchCriteria>();
-		HashMap<ReferenceLine, List<ISearchCriteria>> fcriterion = new HashMap<ReferenceLine, List<ISearchCriteria>>();
+		final ArrayList<ISearchCriteria> result = new ArrayList<>();
+		final HashMap<ReferenceLine, List<ISearchCriteria>> fcriterion = new HashMap<>();
 		// 1. construction des conditions de sous-sélection.
 		for (ISearchCriteria criteria : criterias) {
 			if (criteria instanceof IAttributesCriteria) {
-				ReferenceLine lref = foreigners.get(((IAttributesCriteria) criteria).getAttribute());
-				ReferenceLine lsref = foreigners.get(((IAttributesCriteria) criteria).getSecondAttribute());
+				final ReferenceLine lref = foreigners.get(((IAttributesCriteria) criteria).getAttribute());
+				final ReferenceLine lsref = foreigners.get(((IAttributesCriteria) criteria).getSecondAttribute());
 				if ((lref == null) && (lsref == null)) {
 					result.add(criteria);
 				} else {
@@ -479,12 +461,12 @@ public abstract class AbstractMapperService implements IMapperService {
 					}
 					List<ISearchCriteria> fc = fcriterion.get(lref);
 					if (fc == null) {
-						fc = new ArrayList<ISearchCriteria>();
+						fc = new ArrayList<>();
 						fcriterion.put(lref, fc);
 					}
 					try {
 						criteria = (ISearchCriteria) criteria.clone();
-					} catch (CloneNotSupportedException e) {
+					} catch (final CloneNotSupportedException e) {
 						Activator.getInstance().debug(e);
 					}
 					((IAttributesCriteria) criteria).setAttribute(((IAttributesCriteria) criteria).getAttribute()
@@ -494,18 +476,18 @@ public abstract class AbstractMapperService implements IMapperService {
 					fc.add(criteria);
 				}
 			} else if (criteria instanceof IAttributeCriteria) {
-				ReferenceLine lref = foreigners.get(((IAttributeCriteria) criteria).getAttribute());
+				final ReferenceLine lref = foreigners.get(((IAttributeCriteria) criteria).getAttribute());
 				if (lref == null) {
 					result.add(criteria);
 				} else {
 					List<ISearchCriteria> fc = fcriterion.get(lref);
 					if (fc == null) {
-						fc = new ArrayList<ISearchCriteria>();
+						fc = new ArrayList<>();
 						fcriterion.put(lref, fc);
 					}
 					try {
 						criteria = (ISearchCriteria) criteria.clone();
-					} catch (CloneNotSupportedException e) {
+					} catch (final CloneNotSupportedException e) {
 						Activator.getInstance().debug(e);
 					}
 					((IAttributeCriteria) criteria).setAttribute(((IAttributeCriteria) criteria).getAttribute()
@@ -513,7 +495,7 @@ public abstract class AbstractMapperService implements IMapperService {
 					fc.add(criteria);
 				}
 			} else {
-				ISearchCriteria c = completeForeignCriteria(criteria, context);
+				final ISearchCriteria c = completeForeignCriteria(criteria, context);
 				if (ConstantCriteria.FALSE.equals(c)) {
 					if (andParent) {
 						return c;
@@ -528,28 +510,28 @@ public abstract class AbstractMapperService implements IMapperService {
 			}
 		}
 		// 2. Exécution des sous-sélections.
-		for (Entry<ReferenceLine, List<ISearchCriteria>> e : fcriterion.entrySet()) {
+		for (final Entry<ReferenceLine, List<ISearchCriteria>> e : fcriterion.entrySet()) {
 			ISearchCriteria c;
 			if (andParent) {
 				c = new AndCriteria(e.getValue());
 			} else {
 				c = new OrCriteria(e.getValue());
 			}
-			MetaDataEntity entity = e.getKey().getLastEntity();
-			BeanMapList list = entity.getMapper().selection(entity, false, c, true, context.getCurrentUser(), 0,
+			final MetaDataEntity entity = e.getKey().getLastEntity();
+			final BeanMapList list = entity.getMapper().selection(entity, false, c, true, context.getCurrentUser(), 0,
 					EXTRADOMAINCONDITION_MAXIMUM + 1);
 			if (list == null) {
 				continue;
 			}
-			String code = e.getKey().getCode();
+			final String code = e.getKey().getCode();
 			if (list.size() > EXTRADOMAINCONDITION_MAXIMUM) {
-				String message = String.format(Messages.AbstractMapperService_Error_TooLargeSelection, code);
+				final String message = String.format(Messages.AbstractMapperService_Error_TooLargeSelection, code);
 				Activator.getInstance().debug(message);
 				throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, message);
 			}
 			// 3. Ajout des résultats à la condition locale
 			context.useReference(e.getKey());
-			for (BeanMap bean : list) {
+			for (final BeanMap bean : list) {
 				result.add(new EqualCriteria(code, bean.getId()));
 			}
 		}
@@ -568,31 +550,36 @@ public abstract class AbstractMapperService implements IMapperService {
 		return new OrCriteria(result);
 	}
 
+	@Override
 	public final BeanMap create(BeanMap item) {
-		MetaDataEntity entity = getEntity(item.getType());
+		final MetaDataEntity entity = getEntity(item.getType());
 		if (entity == null) {
 			return null;
 		}
-		List<MetaDataAttribute> attlist = new ArrayList<MetaDataAttribute>();
+		final List<MetaDataAttribute> attlist = new ArrayList<>();
 		return create(entity, attlist, entity.getValues(item, attlist));
 	}
 
+	@Override
 	public final BeanMap create(String type, String attributes, List<Object> values) {
-		MetaDataEntity entity = getEntity(type);
+		final MetaDataEntity entity = getEntity(type);
 		if (entity == null) {
 			return null;
 		}
 		return create(entity, entity.getAttributes(attributes), values);
 	}
 
+	@Override
 	public BeanMap create(MetaDataEntity entity, String attributes, Object... values) {
 		return create(entity, entity.getAttributes(attributes), list(values));
 	}
 
+	@Override
 	public final BeanMap create(MetaDataEntity entity, String attributes, List<Object> values) {
 		return create(entity, entity.getAttributes(attributes), values);
 	}
 
+	@Override
 	public final BeanMap create(MetaDataAttribute attribute, Object value) {
 		if (attribute == null) {
 			return null;
@@ -600,6 +587,7 @@ public abstract class AbstractMapperService implements IMapperService {
 		return create(attribute.getParent(), list(attribute), list(value));
 	}
 
+	@Override
 	public final BeanMap create(List<MetaDataAttribute> attributes, List<Object> values) {
 		if ((attributes == null) || (attributes.size() == 0)) {
 			return null;
@@ -607,63 +595,72 @@ public abstract class AbstractMapperService implements IMapperService {
 		return create(attributes.get(0).getParent(), attributes, values);
 	}
 
+	@Override
 	public final boolean delete(BeanMap item, boolean hardDelete) {
-		MetaDataEntity entity = getEntity(item.getType());
+		final MetaDataEntity entity = getEntity(item.getType());
 		if (entity == null) {
 			return false;
 		}
 		return delete(entity, item.getId(), hardDelete);
 	}
 
+	@Override
 	public final boolean delete(String type, int itemId, boolean hardDelete) {
-		MetaDataEntity entity = getEntity(type);
+		final MetaDataEntity entity = getEntity(type);
 		if (entity == null) {
 			return false;
 		}
 		return delete(entity, itemId, hardDelete);
 	}
 
+	@Override
 	public final boolean undelete(BeanMap item) {
-		MetaDataEntity entity = getEntity(item.getType());
+		final MetaDataEntity entity = getEntity(item.getType());
 		if (entity == null) {
 			return false;
 		}
 		return undelete(entity, item.getId());
 	}
 
+	@Override
 	public final boolean undelete(String type, int itemId) {
-		MetaDataEntity entity = getEntity(type);
+		final MetaDataEntity entity = getEntity(type);
 		if (entity == null) {
 			return false;
 		}
 		return undelete(entity, itemId);
 	}
 
+	@Override
 	public final boolean update(BeanMap item) {
-		MetaDataEntity entity = getEntity(item.getType());
+		final MetaDataEntity entity = getEntity(item.getType());
 		if (entity == null) {
 			return false;
 		}
-		List<MetaDataAttribute> attributes = new ArrayList<MetaDataAttribute>();
+		final List<MetaDataAttribute> attributes = new ArrayList<>();
 		return update(entity, item.getId(), attributes, entity.getValues(item, attributes));
 	}
 
+	@Override
 	public final boolean update(String type, int itemId, String attributes, List<Object> values) {
-		MetaDataEntity entity = getEntity(type);
+		final MetaDataEntity entity = getEntity(type);
 		if (entity == null) {
 			return false;
 		}
 		return update(entity, itemId, entity.getAttributes(attributes), values);
 	}
 
+	@Override
 	public final boolean update(MetaDataEntity entity, int itemId, String attributes, List<Object> values) {
 		return update(entity, itemId, entity.getAttributes(attributes), values);
 	}
 
+	@Override
 	public boolean update(MetaDataEntity entity, int itemId, String attributes, Object... values) {
 		return update(entity, itemId, entity.getAttributes(attributes), list(values));
 	}
 
+	@Override
 	public final boolean update(int itemId, MetaDataAttribute attribute, Object value) {
 		if (attribute == null) {
 			return false;
@@ -671,18 +668,21 @@ public abstract class AbstractMapperService implements IMapperService {
 		return update(attribute.getParent(), itemId, list(attribute), list(value));
 	}
 
+	@Override
 	public final boolean update(String type, String attributes, List<Object> values, String criteria) {
-		MetaDataEntity entity = getEntity(type);
+		final MetaDataEntity entity = getEntity(type);
 		if (entity == null) {
 			return false;
 		}
 		return update(entity, entity.getAttributes(attributes), values, getCriteria(criteria));
 	}
 
+	@Override
 	public final boolean update(MetaDataEntity entity, String[] attributes, List<Object> values, String criteria) {
 		return update(entity, entity.getAttributes(attributes), values, getCriteria(criteria));
 	}
 
+	@Override
 	public final boolean update(int itemId, List<MetaDataAttribute> attributes, List<Object> values) {
 		if ((attributes == null) || (attributes.size() == 0)) {
 			return false;
@@ -690,9 +690,10 @@ public abstract class AbstractMapperService implements IMapperService {
 		return update(attributes.get(0).getParent(), itemId, attributes, values);
 	}
 
+	@Override
 	public final BeanMap selectionFirst(String type, String attributes, boolean deleted, String attributeTest,
 			Object value) {
-		MetaDataEntity entity = getEntity(type);
+		final MetaDataEntity entity = getEntity(type);
 		if (entity == null) {
 			return null;
 		}
@@ -700,39 +701,45 @@ public abstract class AbstractMapperService implements IMapperService {
 				value);
 	}
 
+	@Override
 	public final BeanMap selectionFirst(MetaDataEntity entity, String attributes, boolean deleted,
 			String attributeTest, Object value) {
 		return selectionFirst(getAttributesList(entity, attributes), deleted, entity.getAttributeLine(attributeTest),
 				value);
 	}
 
+	@Override
 	public final BeanMap selectionFirst(MetaDataEntity entity, String attributes, boolean deleted,
 			ReferenceLine attributeTest, Object value) {
 		return selectionFirst(getAttributesList(entity, attributes), deleted, attributeTest, value);
 	}
 
+	@Override
 	public final boolean test(BeanMap item, ISearchCriteria criteria, IConnectionUserBean user) {
-		MetaDataEntity entity = getEntity(item.getType());
+		final MetaDataEntity entity = getEntity(item.getType());
 		if (entity == null) {
 			return false;
 		}
 		return test(entity, item.getId(), criteria, user);
 	}
 
+	@Override
 	public final int count(String type) {
-		MetaDataEntity entity = getEntity(type);
+		final MetaDataEntity entity = getEntity(type);
 		if (entity == null) {
 			return 0;
 		}
 		return count(entity, false, ConstantCriteria.TRUE, false, null);
 	}
 
+	@Override
 	public final int count(MetaDataEntity entity) {
 		return count(entity, false, ConstantCriteria.TRUE, false, null);
 	}
 
+	@Override
 	public final int count(String type, boolean deleted, String attributeTest, Object value) {
-		MetaDataEntity entity = getEntity(type);
+		final MetaDataEntity entity = getEntity(type);
 		if (entity == null) {
 			return 0;
 		}
@@ -740,8 +747,9 @@ public abstract class AbstractMapperService implements IMapperService {
 	}
 
 	@Override
-	public final int count(String type, boolean deleted, String criteria, boolean distinct, IConnectionUserBean currentUser) {
-		MetaDataEntity entity = getEntity(type);
+	public final int count(String type, boolean deleted, String criteria, boolean distinct,
+			IConnectionUserBean currentUser) {
+		final MetaDataEntity entity = getEntity(type);
 		if (entity == null) {
 			return 0;
 		}
@@ -750,7 +758,7 @@ public abstract class AbstractMapperService implements IMapperService {
 
 	@Override
 	public final BeanMap selection(BeanMap item, boolean deleted) {
-		MetaDataEntity entity = getEntity(item.getType());
+		final MetaDataEntity entity = getEntity(item.getType());
 		if (entity == null) {
 			return null;
 		}
@@ -759,7 +767,7 @@ public abstract class AbstractMapperService implements IMapperService {
 
 	@Override
 	public final BeanMap selection(String type, int itemId, String attributes, boolean deleted) {
-		MetaDataEntity entity = getEntity(type);
+		final MetaDataEntity entity = getEntity(type);
 		if (entity == null) {
 			return null;
 		}
@@ -771,12 +779,14 @@ public abstract class AbstractMapperService implements IMapperService {
 		return selection(entity, itemId, entity.getAllAttributes(), false);
 	}
 
+	@Override
 	public final BeanMap selection(MetaDataEntity entity, int itemId, String attributes, boolean deleted) {
 		return selection(entity, itemId, getAllAttributesList(entity, attributes), deleted);
 	}
 
+	@Override
 	public final BeanMapList selection(String type) {
-		MetaDataEntity entity = getEntity(type);
+		final MetaDataEntity entity = getEntity(type);
 		if (entity == null) {
 			return new BeanMapList();
 		}
@@ -784,18 +794,20 @@ public abstract class AbstractMapperService implements IMapperService {
 				new ArrayList<ReferenceLine>(), null, 0, -1);
 	}
 
+	@Override
 	public final BeanMapList selection(MetaDataEntity entity) {
 		return selection(entity, entity.getListables(), false, ConstantCriteria.TRUE, false,
 				new ArrayList<ReferenceLine>(), null, 0, -1);
 	}
 
+	@Override
 	public final BeanMapList selection(MetaDataEntity entity, List<ReferenceLine> attributes, boolean deleted,
 			ISearchCriteria criteria, boolean distinct, List<ReferenceLine> orders, IConnectionUserBean currentUser,
 			int page, int limit) {
 		if (attributes == null) {
 			attributes = entity.getListables();
 		}
-		CriteriaContextBasic context = new CriteriaContextBasic(entity, currentUser);
+		final CriteriaContextBasic context = new CriteriaContextBasic(entity, currentUser);
 		if (criteria == null) {
 			criteria = ConstantCriteria.TRUE;
 		} else {
@@ -807,6 +819,7 @@ public abstract class AbstractMapperService implements IMapperService {
 		return doSelection(attributes, deleted, criteria, distinct, orders, page, limit, context);
 	}
 
+	@Override
 	public final BeanMapList selection(MetaDataEntity entity, String attributes) {
 		if (entity == null) {
 			return new BeanMapList();
@@ -815,28 +828,31 @@ public abstract class AbstractMapperService implements IMapperService {
 				new ArrayList<ReferenceLine>(), 0, -1, new CriteriaContextBasic(entity, null));
 	}
 
+	@Override
 	public final BeanMapList selection(String type, String attributes, boolean deleted, String attributeTest,
 			Object value) {
-		MetaDataEntity entity = getEntity(type);
+		final MetaDataEntity entity = getEntity(type);
 		if (entity == null) {
 			return new BeanMapList();
 		}
 		return selection(getAttributesList(entity, attributes), deleted, entity.getAttributeLine(attributeTest), value);
 	}
 
+	@Override
 	public final BeanMapList selection(MetaDataEntity entity, String attributes, boolean deleted, String attributeTest,
 			Object value) {
 		return selection(getAttributesList(entity, attributes), deleted, entity.getAttributeLine(attributeTest), value);
 	}
 
+	@Override
 	public final BeanMapList selection(String type, String attributes, boolean deleted, String criteria,
 			boolean distinct, String orders, IConnectionUserBean currentUser, int page, int limit) {
-		MetaDataEntity entity = getEntity(type);
+		final MetaDataEntity entity = getEntity(type);
 		if (entity == null) {
 			return new BeanMapList();
 		}
-		CriteriaContextBasic context = new CriteriaContextBasic(entity, currentUser);
-		ISearchCriteria ctr = getCriteria(criteria).reduce(context);
+		final CriteriaContextBasic context = new CriteriaContextBasic(entity, currentUser);
+		final ISearchCriteria ctr = getCriteria(criteria).reduce(context);
 		if (ConstantCriteria.FALSE.equals(ctr)) {
 			return new BeanMapList();
 		}
@@ -844,10 +860,11 @@ public abstract class AbstractMapperService implements IMapperService {
 				entity.getAttributeLines(orders), page, limit, context);
 	}
 
+	@Override
 	public final BeanMapList selection(MetaDataEntity entity, String attributes, boolean deleted,
 			ISearchCriteria criteria, boolean distinct, String orders, IConnectionUserBean currentUser, int page,
 			int limit) {
-		CriteriaContextBasic context = new CriteriaContextBasic(entity, currentUser);
+		final CriteriaContextBasic context = new CriteriaContextBasic(entity, currentUser);
 		criteria = criteria.reduce(context);
 		if (ConstantCriteria.FALSE.equals(criteria)) {
 			return new BeanMapList();
@@ -856,52 +873,56 @@ public abstract class AbstractMapperService implements IMapperService {
 				entity.getAttributeLines(orders), page, limit, context);
 	}
 
+	@Override
 	public final boolean linkAdd(BeanMap source, String linkCode, int destId) {
-		MetaDataEntity entity = getEntity(source.getType());
+		final MetaDataEntity entity = getEntity(source.getType());
 		if (entity == null) {
 			return false;
 		}
-		MetaDataLink link = entity.getLink(linkCode);
+		final MetaDataLink link = entity.getLink(linkCode);
 		if (link == null) {
 			return false;
 		}
 		return linkAdd(link, source.getId(), destId);
 	}
 
+	@Override
 	public final boolean linkAdd(BeanMap source, String linkCode, BeanMap dest) {
-		MetaDataEntity entity = getEntity(source.getType());
+		final MetaDataEntity entity = getEntity(source.getType());
 		if (entity == null) {
 			return false;
 		}
-		MetaDataLink link = entity.getLink(linkCode);
+		final MetaDataLink link = entity.getLink(linkCode);
 		if (link == null) {
 			return false;
 		}
 		return linkAdd(link, source.getId(), dest.getId());
 	}
 
+	@Override
 	public final boolean linkAdd(String sourceType, String linkCode, int sourceId, int destId) {
-		MetaDataEntity entity = getEntity(sourceType);
+		final MetaDataEntity entity = getEntity(sourceType);
 		if (entity == null) {
 			return false;
 		}
-		MetaDataLink link = entity.getLink(linkCode);
+		final MetaDataLink link = entity.getLink(linkCode);
 		if (link == null) {
 			return false;
 		}
 		return linkAdd(link, sourceId, destId);
 	}
 
+	@Override
 	public final boolean linkAdd(MetaDataLink link, int sourceId, int destId) {
-		String code = link.getMetadata().getString(MetaDataEntity.METADATA_REVERSELINK);
+		final String code = link.getMetadata().getString(MetaDataEntity.METADATA_REVERSELINK);
 		if (code == null) {
 			return doLinkAdd(link, sourceId, destId);
 		}
-		MetaDataEntity e = link.getRefEntity();
+		final MetaDataEntity e = link.getRefEntity();
 		if (e == null) {
 			return false;
 		}
-		MetaDataAttribute att = e.getAttribute(code);
+		final MetaDataAttribute att = e.getAttribute(code);
 		if ((att == null) || !link.getParent().equals(att.getRefEntity())) {
 			return false;
 		}
@@ -910,14 +931,12 @@ public abstract class AbstractMapperService implements IMapperService {
 
 	/**
 	 * Process of link creation.
-	 * 
 	 * <p>
 	 * "Reversed references" are <b>not</b> proceeded by this method.
-	 * 
 	 * <p>
-	 * But "Auto Links" must be taken into account. Auto-links are links automatically created from reversed links, the value
-	 * of this Metadata tag is the corresponding link code into the target entity.
-	 * 
+	 * But "Auto Links" must be taken into account. Auto-links are links automatically created from reversed links, the
+	 * value of this Metadata tag is the corresponding link code into the target entity.
+	 *
 	 * @param link
 	 *            the link metadate object.
 	 * @param sourceId
@@ -926,28 +945,30 @@ public abstract class AbstractMapperService implements IMapperService {
 	 */
 	protected abstract boolean doLinkAdd(MetaDataLink link, int sourceId, int destId);
 
+	@Override
 	public final boolean linkTest(String sourceType, String linkCode, int sourceId, int destId) {
-		MetaDataEntity entity = getEntity(sourceType);
+		final MetaDataEntity entity = getEntity(sourceType);
 		if (entity == null) {
 			return false;
 		}
-		MetaDataLink link = entity.getLink(linkCode);
+		final MetaDataLink link = entity.getLink(linkCode);
 		if (link == null) {
 			return false;
 		}
 		return linkTest(link, sourceId, destId);
 	}
 
+	@Override
 	public final boolean linkTest(MetaDataLink link, int sourceId, int destId) {
-		String code = link.getMetadata().getString(MetaDataEntity.METADATA_REVERSELINK);
+		final String code = link.getMetadata().getString(MetaDataEntity.METADATA_REVERSELINK);
 		if (code == null) {
 			return doLinkTest(link, sourceId, destId);
 		}
-		MetaDataEntity e = link.getRefEntity();
+		final MetaDataEntity e = link.getRefEntity();
 		if (e == null) {
 			return false;
 		}
-		MetaDataAttribute att = e.getAttribute(code);
+		final MetaDataAttribute att = e.getAttribute(code);
 		if ((att == null) || !link.getParent().equals(att.getRefEntity())) {
 			return false;
 		}
@@ -956,14 +977,12 @@ public abstract class AbstractMapperService implements IMapperService {
 
 	/**
 	 * Perform a link test.
-	 * 
 	 * <p>
 	 * "Reversed references" are <b>not</b> proceeded by this method.
-	 * 
 	 * <p>
-	 * But "auto links" must be taken into account. Auto-links are links automatically created from reversed links, the value
-	 * of this Metadata tag is the corresponding link code into the target entity.
-	 * 
+	 * But "auto links" must be taken into account. Auto-links are links automatically created from reversed links, the
+	 * value of this Metadata tag is the corresponding link code into the target entity.
+	 *
 	 * @param link
 	 * @param sourceId
 	 * @param destId
@@ -971,28 +990,30 @@ public abstract class AbstractMapperService implements IMapperService {
 	 */
 	protected abstract boolean doLinkTest(MetaDataLink link, int sourceId, int destId);
 
+	@Override
 	public final boolean linkRemove(String sourceType, String linkCode, int sourceId, int destId) {
-		MetaDataEntity entity = getEntity(sourceType);
+		final MetaDataEntity entity = getEntity(sourceType);
 		if (entity == null) {
 			return false;
 		}
-		MetaDataLink link = entity.getLink(linkCode);
+		final MetaDataLink link = entity.getLink(linkCode);
 		if (link == null) {
 			return false;
 		}
 		return linkRemove(link, sourceId, destId);
 	}
 
+	@Override
 	public final boolean linkRemove(MetaDataLink link, int sourceId, int destId) {
-		String code = link.getMetadata().getString(MetaDataEntity.METADATA_REVERSELINK);
+		final String code = link.getMetadata().getString(MetaDataEntity.METADATA_REVERSELINK);
 		if (code == null) {
 			return doLinkRemove(link, sourceId, destId);
 		}
-		MetaDataEntity e = link.getRefEntity();
+		final MetaDataEntity e = link.getRefEntity();
 		if (e == null) {
 			return false;
 		}
-		MetaDataAttribute att = e.getAttribute(code);
+		final MetaDataAttribute att = e.getAttribute(code);
 		if ((att == null) || !link.getParent().equals(att.getRefEntity())) {
 			return false;
 		}
@@ -1000,15 +1021,13 @@ public abstract class AbstractMapperService implements IMapperService {
 	}
 
 	/**
-	 * Perform 	a link deletion between two entities.
-	 * 
+	 * Perform a link deletion between two entities.
 	 * <p>
 	 * "Reversed references" are <b>not</b> proceeded by this method.
-	 * 
 	 * <p>
-	 * But "auto links" must be taken into account. Auto-links are links automatically created from reversed links, the value
-	 * of this Metadata tag is the corresponding link code into the target entity.
-	 * 
+	 * But "auto links" must be taken into account. Auto-links are links automatically created from reversed links, the
+	 * value of this Metadata tag is the corresponding link code into the target entity.
+	 *
 	 * @param link
 	 * @param sourceId
 	 * @param destId
@@ -1016,12 +1035,13 @@ public abstract class AbstractMapperService implements IMapperService {
 	 */
 	protected abstract boolean doLinkRemove(MetaDataLink link, int sourceId, int destId);
 
+	@Override
 	public final BeanMapList linkSelection(String sourceType, String linkCode, int sourceId) {
 		MetaDataEntity entity = getEntity(sourceType);
 		if (entity == null) {
 			return new BeanMapList();
 		}
-		MetaDataLink link = entity.getLink(linkCode);
+		final MetaDataLink link = entity.getLink(linkCode);
 		if (link == null) {
 			return new BeanMapList();
 		}
@@ -1033,8 +1053,9 @@ public abstract class AbstractMapperService implements IMapperService {
 				new ArrayList<ReferenceLine>(), null, 0, -1);
 	}
 
+	@Override
 	public final BeanMapList linkSelection(MetaDataLink link, int sourceId) {
-		MetaDataEntity entity = link.getRefEntity();
+		final MetaDataEntity entity = link.getRefEntity();
 		if (entity == null) {
 			return new BeanMapList();
 		}
@@ -1042,13 +1063,14 @@ public abstract class AbstractMapperService implements IMapperService {
 				new ArrayList<ReferenceLine>(), null, 0, -1);
 	}
 
+	@Override
 	public final BeanMapList linkSelection(String sourceType, String linkCode, int sourceId, String attributes,
 			boolean deleted, String attributeTest, Object value) {
 		MetaDataEntity entity = getEntity(sourceType);
 		if (entity == null) {
 			return new BeanMapList();
 		}
-		MetaDataLink link = entity.getLink(linkCode);
+		final MetaDataLink link = entity.getLink(linkCode);
 		if (link == null) {
 			return new BeanMapList();
 		}
@@ -1060,9 +1082,10 @@ public abstract class AbstractMapperService implements IMapperService {
 				entity.getAttributeLine(attributeTest), value);
 	}
 
+	@Override
 	public final BeanMapList linkSelection(MetaDataLink link, int sourceId, String attributes, boolean deleted,
 			String attributeTest, Object value) {
-		MetaDataEntity entity = link.getRefEntity();
+		final MetaDataEntity entity = link.getRefEntity();
 		if (entity == null) {
 			return new BeanMapList();
 		}
@@ -1070,6 +1093,7 @@ public abstract class AbstractMapperService implements IMapperService {
 				entity.getAttributeLine(attributeTest), value);
 	}
 
+	@Override
 	public final BeanMapList linkSelection(String sourceType, String linkCode, int sourceId, String attributes,
 			boolean deleted, String criteria, boolean distinct, String orders, IConnectionUserBean currentUser,
 			int page, int limit) {
@@ -1077,7 +1101,7 @@ public abstract class AbstractMapperService implements IMapperService {
 		if (entity == null) {
 			return new BeanMapList();
 		}
-		MetaDataLink link = entity.getLink(linkCode);
+		final MetaDataLink link = entity.getLink(linkCode);
 		if (link == null) {
 			return new BeanMapList();
 		}
@@ -1089,138 +1113,13 @@ public abstract class AbstractMapperService implements IMapperService {
 				distinct, entity.getAttributeLines(orders), currentUser, page, limit);
 	}
 
-	public final boolean groupAdd(BeanMap group, int itemId) {
-		MetaDataEntity entity = getEntity(group.getType());
-		if (entity == null) {
-			return false;
-		}
-		return groupAdd(entity, group.getId(), itemId);
-	}
-
-	public final boolean groupAdd(String groupType, int groupId, int itemId) {
-		MetaDataEntity entity = getEntity(groupType);
-		if (entity == null) {
-			return false;
-		}
-		return groupAdd(entity, groupId, itemId);
-	}
-
-	public final boolean groupTest(BeanMap group, int itemId) {
-		MetaDataEntity entity = getEntity(group.getType());
-		if (entity == null) {
-			return false;
-		}
-		return groupTest(entity, group.getId(), itemId);
-	}
-
-	public final boolean groupTest(String groupType, int groupId, int itemId) {
-		MetaDataEntity entity = getEntity(groupType);
-		if (entity == null) {
-			return false;
-		}
-		return groupTest(entity, groupId, itemId);
-	}
-
-	public final boolean groupRemove(BeanMap group, int itemId) {
-		MetaDataEntity entity = getEntity(group.getType());
-		if (entity == null) {
-			return false;
-		}
-		return groupRemove(entity, group.getId(), itemId);
-	}
-
-	public final boolean groupRemove(String groupType, int groupId, int itemId) {
-		MetaDataEntity entity = getEntity(groupType);
-		if (entity == null) {
-			return false;
-		}
-		return groupRemove(entity, groupId, itemId);
-	}
-
-	public final BeanMapList groupSelection(BeanMap group) {
-		MetaDataEntity entity = getEntity(group.getType());
-		if (entity == null) {
-			return new BeanMapList();
-		}
-		MetaDataEntity ge = getEntity(entity.getGroupType());
-		if (ge == null) {
-			return new BeanMapList();
-		}
-		return groupSelection(entity, group.getId(), ge.getListables(), false, ConstantCriteria.TRUE, false,
-				new ArrayList<ReferenceLine>(), null, 0, -1);
-	}
-
-	public final BeanMapList groupSelection(String groupType, int groupId) {
-		MetaDataEntity entity = getEntity(groupType);
-		if (entity == null) {
-			return new BeanMapList();
-		}
-		MetaDataEntity ge = getEntity(entity.getGroupType());
-		if (ge == null) {
-			return new BeanMapList();
-		}
-		return groupSelection(entity, groupId, ge.getListables(), false, ConstantCriteria.TRUE, false,
-				new ArrayList<ReferenceLine>(), null, 0, -1);
-	}
-
-	public final BeanMapList groupSelection(MetaDataEntity groupEntity, int groupId) {
-		MetaDataEntity ge = getEntity(groupEntity.getGroupType());
-		if (ge == null) {
-			return new BeanMapList();
-		}
-		return groupSelection(groupEntity, groupId, ge.getListables(), false, ConstantCriteria.TRUE, false,
-				new ArrayList<ReferenceLine>(), null, 0, -1);
-	}
-
-	public final BeanMapList groupSelection(String groupType, int groupId, String attributes, boolean deleted,
-			String attributeTest, Object value) {
-		MetaDataEntity entity = getEntity(groupType);
-		if (entity == null) {
-			return new BeanMapList();
-		}
-		MetaDataEntity ge = getEntity(entity.getGroupType());
-		if (ge == null) {
-			return new BeanMapList();
-		}
-		List<ReferenceLine> attlist;
-		if (attributes == null) {
-			attlist = ge.getListables();
-		} else {
-			attlist = ge.getAttributeLines(attributes);
-		}
-		return groupSelection(entity, groupId, attlist, false, ge.getAttributeLine(attributeTest), value);
-	}
-
-	public final BeanMapList groupSelection(MetaDataEntity groupEntity, int groupId, String attributes,
-			boolean deleted, String attributeTest, Object value) {
-		MetaDataEntity entity = getEntity(groupEntity.getGroupType());
-		if (entity == null) {
-			return new BeanMapList();
-		}
-		return groupSelection(groupEntity, groupId, getAttributesList(entity, attributes), false,
-				entity.getAttributeLine(attributeTest), value);
-	}
-
-	public final BeanMapList groupSelection(String groupType, int groupId, String attributes, boolean deleted,
-			String criteria, boolean distinct, String orders, IConnectionUserBean currentUser, int page, int limit) {
-		MetaDataEntity entity = getEntity(groupType);
-		if (entity == null) {
-			return new BeanMapList();
-		}
-		MetaDataEntity ge = getEntity(entity.getGroupType());
-		if (ge == null) {
-			return new BeanMapList();
-		}
-		return groupSelection(entity, groupId, getAttributesList(ge, attributes), deleted, getCriteria(criteria),
-				distinct, ge.getAttributeLines(orders), currentUser, page, limit);
-	}
-
+	@Override
 	public final boolean update(List<MetaDataAttribute> attributes, List<Object> values, ISearchCriteria criteria) {
 		if ((attributes == null) || (attributes.size() == 0) || (values == null)
 				|| (values.size() != attributes.size()) || (criteria == null)) {
 			return false;
 		}
-		ICriteriaContext context = getContext((MetaDataEntity) attributes.get(0).getParent(), null);
+		final ICriteriaContext context = getContext(attributes.get(0).getParent(), null);
 		criteria = criteria.reduce(context);
 		if (ConstantCriteria.FALSE.equals(criteria)) {
 			return false;
@@ -1228,9 +1127,10 @@ public abstract class AbstractMapperService implements IMapperService {
 		return doUpdate(attributes, values, criteria, context);
 	}
 
+	@Override
 	public final boolean update(MetaDataEntity entity, List<MetaDataAttribute> attributes, List<Object> values,
 			ISearchCriteria criteria) {
-		ICriteriaContext context = getContext(entity, null);
+		final ICriteriaContext context = getContext(entity, null);
 		if (criteria == null) {
 			criteria = ConstantCriteria.TRUE;
 		} else {
@@ -1245,12 +1145,13 @@ public abstract class AbstractMapperService implements IMapperService {
 	protected abstract boolean doUpdate(List<MetaDataAttribute> attributes, List<Object> values,
 			ISearchCriteria criteria, ICriteriaContext context);
 
+	@Override
 	public final BeanMapList selection(List<ReferenceLine> attributes, boolean deleted, ISearchCriteria criteria,
 			boolean distinct, List<ReferenceLine> orders, IConnectionUserBean currentUser, int page, int limit) {
 		if ((page < 0) || (limit == 0) || (attributes == null) || (attributes.size() == 0)) {
 			return new BeanMapList();
 		}
-		ICriteriaContext context = getContext(attributes.get(0).getOriginEntity(), currentUser);
+		final ICriteriaContext context = getContext(attributes.get(0).getOriginEntity(), currentUser);
 		if (criteria == null) {
 			criteria = ConstantCriteria.TRUE;
 		} else {
@@ -1262,12 +1163,13 @@ public abstract class AbstractMapperService implements IMapperService {
 		return doSelection(attributes, deleted, criteria, distinct, orders, page, limit, context);
 	}
 
+	@Override
 	public final BeanMapList selection(MetaDataEntity entity, boolean deleted, ISearchCriteria criteria,
 			boolean distinct, IConnectionUserBean currentUser, int page, int limit) {
 		if ((page < 0) || (limit == 0) || (entity == null)) {
 			return new BeanMapList();
 		}
-		ICriteriaContext context = getContext(entity, currentUser);
+		final ICriteriaContext context = getContext(entity, currentUser);
 		if (criteria == null) {
 			criteria = ConstantCriteria.TRUE;
 		} else {
@@ -1282,7 +1184,7 @@ public abstract class AbstractMapperService implements IMapperService {
 
 	/**
 	 * Process to a paged selection.
-	 * 
+	 *
 	 * @param attributes
 	 *            can be empty. then no attributes must be returned.
 	 * @param deleted
@@ -1298,9 +1200,10 @@ public abstract class AbstractMapperService implements IMapperService {
 			ISearchCriteria criteria, boolean distinct, List<ReferenceLine> orders, int page, int limit,
 			ICriteriaContext context);
 
+	@Override
 	public final int count(MetaDataEntity entity, boolean deleted, ISearchCriteria criteria, boolean distinct,
 			IConnectionUserBean currentUser) {
-		ICriteriaContext context = getContext(entity, currentUser);
+		final ICriteriaContext context = getContext(entity, currentUser);
 		if (criteria == null) {
 			criteria = ConstantCriteria.TRUE;
 		} else {
@@ -1313,32 +1216,34 @@ public abstract class AbstractMapperService implements IMapperService {
 	}
 
 	/**
-	 * Process to a "count" operation. 
-	 * 
+	 * Process to a "count" operation.
+	 *
 	 * @param deleted
 	 * @param criteria
 	 * @param distinct
 	 * @param context
 	 * @return
 	 */
-	protected abstract int doCount(boolean deleted, ISearchCriteria criteria, boolean distinct, ICriteriaContext context);
+	protected abstract int doCount(boolean deleted, ISearchCriteria criteria, boolean distinct,
+			ICriteriaContext context);
 
+	@Override
 	public final BeanMapList linkSelection(MetaDataLink link, int sourceId, List<ReferenceLine> attributes,
 			boolean deleted, ISearchCriteria criteria, boolean distinct, List<ReferenceLine> orders,
 			IConnectionUserBean currentUser, int page, int limit) {
 		if ((page < 0) || (limit == 0)) {
 			return new BeanMapList();
 		}
-		MetaDataEntity entity = link.getRefEntity();
+		final MetaDataEntity entity = link.getRefEntity();
 		if (entity == null) {
 			return new BeanMapList();
 		}
-		String code = link.getMetadata().getString(MetaDataEntity.METADATA_REVERSELINK);
+		final String code = link.getMetadata().getString(MetaDataEntity.METADATA_REVERSELINK);
 		if (code == null) {
 			if (attributes == null) {
 				attributes = entity.getListables();
 			}
-			ICriteriaContext context = getContext(entity, currentUser);
+			final ICriteriaContext context = getContext(entity, currentUser);
 			if (criteria == null) {
 				criteria = ConstantCriteria.TRUE;
 			} else {
@@ -1347,14 +1252,16 @@ public abstract class AbstractMapperService implements IMapperService {
 					return new BeanMapList();
 				}
 			}
-			return doLinkSelection(link, sourceId, attributes, deleted, criteria, distinct, orders, page, limit, context);
+			return doLinkSelection(link, sourceId, attributes, deleted, criteria, distinct, orders, page, limit,
+					context);
 		}
-		MetaDataAttribute att = entity.getAttribute(code);
+		final MetaDataAttribute att = entity.getAttribute(code);
 		if ((att == null) || !link.getParent().equals(att.getRefEntity())) {
 			return new BeanMapList();
 		}
 		// Send the "reversed selection" to the correct mapper !
-		return entity.getMapper().selection(entity, attributes, deleted, new AndCriteria(new EqualCriteria(att.getCode(), sourceId), criteria),
+		return entity.getMapper().selection(entity, attributes, deleted,
+				new AndCriteria(new EqualCriteria(att.getCode(), sourceId), criteria),
 				distinct, orders, currentUser, page, limit);
 	}
 
@@ -1362,11 +1269,12 @@ public abstract class AbstractMapperService implements IMapperService {
 			boolean deleted, ISearchCriteria criteria, boolean distinct, List<ReferenceLine> orders, int page,
 			int limit, ICriteriaContext context);
 
+	@Override
 	public final int linkCount(MetaDataLink link, int sourceId, boolean deleted, ISearchCriteria criteria,
 			boolean distinct, IConnectionUserBean currentUser) {
-		String code = link.getMetadata().getString(MetaDataEntity.METADATA_REVERSELINK);
+		final String code = link.getMetadata().getString(MetaDataEntity.METADATA_REVERSELINK);
 		if (code == null) {
-			ICriteriaContext context = getContext(link.getRefEntity(), currentUser);
+			final ICriteriaContext context = getContext(link.getRefEntity(), currentUser);
 			if (criteria == null) {
 				criteria = ConstantCriteria.TRUE;
 			} else {
@@ -1377,11 +1285,11 @@ public abstract class AbstractMapperService implements IMapperService {
 			}
 			return doLinkCount(link, sourceId, deleted, criteria, distinct, context);
 		}
-		MetaDataEntity e = link.getRefEntity();
+		final MetaDataEntity e = link.getRefEntity();
 		if (e == null) {
 			return 0;
 		}
-		MetaDataAttribute att = e.getAttribute(code);
+		final MetaDataAttribute att = e.getAttribute(code);
 		if ((att == null) || !link.getParent().equals(att.getRefEntity())) {
 			return 0;
 		}
@@ -1392,11 +1300,12 @@ public abstract class AbstractMapperService implements IMapperService {
 	protected abstract int doLinkCount(MetaDataLink link, int sourceId, boolean deleted, ISearchCriteria criteria,
 			boolean distinct, ICriteriaContext context);
 
+	@Override
 	public final boolean test(MetaDataEntity entity, ISearchCriteria criteria, IConnectionUserBean currentUser) {
 		if (criteria == null) {
 			return true;
 		}
-		ICriteriaContext context = getContext(entity, currentUser);
+		final ICriteriaContext context = getContext(entity, currentUser);
 		criteria = criteria.reduce(context);
 		if (ConstantCriteria.FALSE.equals(criteria)) {
 			return false;
@@ -1408,8 +1317,9 @@ public abstract class AbstractMapperService implements IMapperService {
 	}
 
 	@Override
-	public boolean test(MetaDataEntity entity, int itemId, ISearchCriteria criteria, boolean deleted, IConnectionUserBean currentUser) {
-		ICriteriaContext context = getContext(entity, currentUser);
+	public boolean test(MetaDataEntity entity, int itemId, ISearchCriteria criteria, boolean deleted,
+			IConnectionUserBean currentUser) {
+		final ICriteriaContext context = getContext(entity, currentUser);
 		if (criteria == null) {
 			criteria = new IdEqualCriteria(itemId);
 		} else {
@@ -1428,52 +1338,61 @@ public abstract class AbstractMapperService implements IMapperService {
 		return doCount(deleted, criteria, false, context) > 0;
 	}
 
-	public final boolean test(MetaDataEntity entity, int itemId, ISearchCriteria criteria, IConnectionUserBean currentUser) {
+	@Override
+	public final boolean test(MetaDataEntity entity, int itemId, ISearchCriteria criteria,
+			IConnectionUserBean currentUser) {
 		return test(entity, itemId, criteria, false, currentUser);
 	}
 
+	@Override
 	public final BeanMapList selection(List<ReferenceLine> attributes, boolean deleted, ReferenceLine attributeTest,
 			Object value) {
 		if (attributeTest == null) {
 			return new BeanMapList();
 		}
-		ICriteriaContext context = getContext(attributeTest.getOriginEntity(), null);
-		return doSelection(attributes, deleted, getTestCriteria(attributeTest, value, context), false, null, 0, -1, context);
+		final ICriteriaContext context = getContext(attributeTest.getOriginEntity(), null);
+		return doSelection(attributes, deleted, getTestCriteria(attributeTest, value, context), false, null, 0, -1,
+				context);
 	}
 
+	@Override
 	public final int count(MetaDataEntity entity, boolean deleted, ReferenceLine attributeTest, Object value) {
-		ICriteriaContext context = getContext(entity, null);
+		final ICriteriaContext context = getContext(entity, null);
 		return doCount(deleted, getTestCriteria(attributeTest, value, context), false, context);
 	}
 
-	public final BeanMap selectionFirst(List<ReferenceLine> attributes, boolean deleted, ReferenceLine attributeTest, Object value) {
+	@Override
+	public final BeanMap selectionFirst(List<ReferenceLine> attributes, boolean deleted, ReferenceLine attributeTest,
+			Object value) {
 		if (attributeTest == null) {
 			return null;
 		}
-		ICriteriaContext context = getContext(attributeTest.getOriginEntity(), null);
+		final ICriteriaContext context = getContext(attributeTest.getOriginEntity(), null);
 		return doSelectionFirst(attributes, deleted, getTestCriteria(attributeTest, value, context), context);
 	}
 
+	@Override
 	public final BeanMap selectionFirst(String type, String attributes, boolean deleted, String criteria,
 			IConnectionUserBean currentUser) {
-		MetaDataEntity entity = getEntity(type);
+		final MetaDataEntity entity = getEntity(type);
 		if (entity == null) {
 			return null;
 		}
-		ICriteriaContext context = getContext(entity, currentUser);
-		ISearchCriteria ctr = getCriteria(criteria).reduce(context);
+		final ICriteriaContext context = getContext(entity, currentUser);
+		final ISearchCriteria ctr = getCriteria(criteria).reduce(context);
 		if (ConstantCriteria.FALSE.equals(ctr)) {
 			return null;
 		}
 		return doSelectionFirst(getAttributesList(entity, attributes), deleted, ctr, context);
 	}
 
+	@Override
 	public final BeanMap selectionFirst(List<ReferenceLine> attributes, boolean deleted, ISearchCriteria criteria,
 			IConnectionUserBean currentUser) {
 		if ((attributes == null) || (attributes.size() == 0)) {
 			return null;
 		}
-		ICriteriaContext context = getContext(attributes.get(0).getOriginEntity(), currentUser);
+		final ICriteriaContext context = getContext(attributes.get(0).getOriginEntity(), currentUser);
 		if (criteria == null) {
 			criteria = ConstantCriteria.TRUE;
 		} else {
@@ -1485,9 +1404,10 @@ public abstract class AbstractMapperService implements IMapperService {
 		return doSelectionFirst(attributes, deleted, criteria, context);
 	}
 
+	@Override
 	public final BeanMap selectionFirst(MetaDataEntity entity, List<ReferenceLine> attributes, boolean deleted,
 			ISearchCriteria criteria, IConnectionUserBean currentUser) {
-		ICriteriaContext context = getContext(entity, currentUser);
+		final ICriteriaContext context = getContext(entity, currentUser);
 		if (criteria == null) {
 			criteria = ConstantCriteria.TRUE;
 		} else {
@@ -1502,16 +1422,17 @@ public abstract class AbstractMapperService implements IMapperService {
 	protected abstract BeanMap doSelectionFirst(List<ReferenceLine> attributes, boolean deleted,
 			ISearchCriteria criteria, ICriteriaContext context);
 
+	@Override
 	public final BeanMapList linkSelection(MetaDataLink link, int sourceId, List<ReferenceLine> attributes,
 			boolean deleted, ReferenceLine attributeTest, Object value) {
 		if (attributeTest == null) {
 			return new BeanMapList();
 		}
-		MetaDataEntity entity = link.getRefEntity();
+		final MetaDataEntity entity = link.getRefEntity();
 		if (entity == null) {
 			return new BeanMapList();
 		}
-		String code = link.getMetadata().getString(MetaDataEntity.METADATA_REVERSELINK);
+		final String code = link.getMetadata().getString(MetaDataEntity.METADATA_REVERSELINK);
 		if (code == null) {
 			if ((attributes == null) || (attributes.size() == 0)) {
 				attributes = entity.getAllAttributes();
@@ -1519,65 +1440,25 @@ public abstract class AbstractMapperService implements IMapperService {
 					return new BeanMapList();
 				}
 			}
-			ICriteriaContext context = getContext(entity, null);
+			final ICriteriaContext context = getContext(entity, null);
 			return doLinkSelection(link, sourceId, attributes, deleted, getTestCriteria(attributeTest, value, context),
 					false, null, 0, -1, context);
 		}
-		MetaDataAttribute att = entity.getAttribute(code);
+		final MetaDataAttribute att = entity.getAttribute(code);
 		if ((att == null) || !link.getParent().equals(att.getRefEntity())) {
 			return new BeanMapList();
 		}
-		return entity.getMapper().selection(attributes, deleted, new AndCriteria(new EqualCriteria(att.getCode(), sourceId), 
-				new EqualCriteria(attributeTest.getCode(), value.toString())),
+		return entity.getMapper().selection(attributes, deleted,
+				new AndCriteria(new EqualCriteria(att.getCode(), sourceId),
+						new EqualCriteria(attributeTest.getCode(), value.toString())),
 				false, null, null, 0, -1);
 	}
 
 	// Default Implementations...
 
+	@Override
 	public boolean undelete(MetaDataEntity entity, int itemId) {
 		return false;
-	}
-
-	public boolean groupAdd(MetaDataEntity groupEntity, int groupId, int itemId) {
-		return false;
-	}
-
-	public boolean groupTest(MetaDataEntity groupEntity, int groupId, int itemId) {
-		return false;
-	}
-
-	public boolean groupRemove(MetaDataEntity groupEntity, int groupId, int itemId) {
-		return false;
-	}
-
-	public BeanMapList groupSelection(MetaDataEntity groupEntity, int groupId, List<ReferenceLine> attributes,
-			boolean deleted, ReferenceLine attributeTest, Object value) {
-		return new BeanMapList();
-	}
-
-	public final BeanMapList groupSelection(MetaDataEntity groupEntity, int groupId, List<ReferenceLine> attributes,
-			boolean deleted, ISearchCriteria criteria, boolean distinct, List<ReferenceLine> orders,
-			IConnectionUserBean currentUser, int page, int limit) {
-		if ((page < 0) || (limit == 0) || (attributes == null) || (attributes.size() == 0)) {
-			return new BeanMapList();
-		}
-		ICriteriaContext context = getContext(groupEntity, currentUser);
-		if (criteria == null) {
-			criteria = ConstantCriteria.TRUE;
-		} else {
-			criteria = criteria.reduce(context);
-			if (ConstantCriteria.FALSE.equals(criteria)) {
-				return new BeanMapList();
-			}
-		}
-		return doGroupSelection(groupEntity, groupId, attributes, deleted, criteria, distinct, orders, page, limit,
-				context);
-	}
-
-	protected BeanMapList doGroupSelection(MetaDataEntity groupEntity, int groupId, List<ReferenceLine> attributes,
-			boolean deleted, ISearchCriteria criteria, boolean distinct, List<ReferenceLine> orders, int page,
-			int limit, ICriteriaContext context) {
-		return new BeanMapList();
 	}
 
 }
