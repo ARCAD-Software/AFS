@@ -23,6 +23,7 @@ import org.restlet.data.Language;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.data.Status;
+import org.restlet.engine.header.DateWriter;
 import org.restlet.representation.Representation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
@@ -107,6 +108,9 @@ public class MetaDataItemResource extends DataItemResource {
 				(((link == null) && hasUpdateDate(getEntity())) || //
 						((link != null) && hasUpdateDate(linkEntity)))) {
 			computeLastModificationDate();
+			if (getLastModification() != null) {
+				getResponse().getHeaders().add("Last-Modified", DateWriter.write(getLastModification()));
+			}
 		}
 	}
 
@@ -587,8 +591,16 @@ public class MetaDataItemResource extends DataItemResource {
 			// Empty list...
 			return getRepresentation(variant, form, result, language, false);
 		case 1:
+			Representation er = postProcessConditionalHeaders(result);
+			if (er != null) {
+				return er;
+			}
 			return getRepresentation(variant, form, result.get(0), language, false);
 		default: 
+			er = postProcessConditionalHeaders(result);
+			if (er != null) {
+				return er;
+			}
 			return getRepresentation(variant, form, result, language, false);
 		}
 	}
@@ -998,6 +1010,10 @@ public class MetaDataItemResource extends DataItemResource {
 		}
 		for (IMetaDataSelectionListener listener: Activator.getInstance().getSelectionListener(linkEntity.getType())) {
 			listener.onSelection(linkEntity, result, getUser(), language);
+		}
+		Representation er = postProcessConditionalHeaders(result);
+		if (er != null) {
+			return er;
 		}
 		return getRepresentation(variant, form, result, language, true);
 	}
