@@ -19,12 +19,12 @@ import java.util.Properties;
 
 public class Preferences {
 	
-	public static final String BOOL_ACTIVE = "cleanup.active";
-	public static final String INT_RETENTION_DAYS = "cleanup.retention.days";
-	public static final String INT_FREQUENCE = "cleanup.frequence";
-	public static final String BOOL_IGNORE_CONDITIONS = "cleanup.ignore.conditions";
-	public static final String BOOL_FOLLOW_SYMLINKS = "cleanup.follow.symlinks";
-	public static final String STRING_LOGFILE_PATH = "cleanup.logfile.path";
+	public static final String BOOL_ACTIVE = "cleanup.active"; //$NON-NLS-1$
+	public static final String INT_RETENTION_DAYS = "cleanup.retention.days"; //$NON-NLS-1$
+	public static final String INT_FREQUENCE = "cleanup.frequence"; //$NON-NLS-1$
+	public static final String BOOL_IGNORE_CONDITIONS = "cleanup.ignore.conditions"; //$NON-NLS-1$
+	public static final String BOOL_FOLLOW_SYMLINKS = "cleanup.follow.symlinks"; //$NON-NLS-1$
+	public static final String STRING_LOGFILE_PATH = "cleanup.logfile.path"; //$NON-NLS-1$
 
 	private final Properties cleanupPreferences;
 	private final CleanupManager cleanupManager;
@@ -40,12 +40,12 @@ public class Preferences {
 	}
 
 	protected void loadDefaultValues() {
-		cleanupPreferences.setProperty(BOOL_ACTIVE, "true");
-		cleanupPreferences.setProperty(INT_FREQUENCE, "1440");
-		cleanupPreferences.setProperty(INT_RETENTION_DAYS, "14");
+		cleanupPreferences.setProperty(BOOL_ACTIVE, "true"); //$NON-NLS-1$
+		cleanupPreferences.setProperty(INT_FREQUENCE, "1440"); //$NON-NLS-1$
+		cleanupPreferences.setProperty(INT_RETENTION_DAYS, "14"); //$NON-NLS-1$
 		cleanupPreferences.setProperty(BOOL_IGNORE_CONDITIONS, Boolean.FALSE.toString());
 		cleanupPreferences.setProperty(BOOL_FOLLOW_SYMLINKS, Boolean.FALSE.toString());
-		cleanupPreferences.setProperty(STRING_LOGFILE_PATH, "");
+		cleanupPreferences.setProperty(STRING_LOGFILE_PATH, ""); //$NON-NLS-1$
 	}
 
 	public Properties getAllPreferences() {
@@ -68,11 +68,11 @@ public class Preferences {
 	}
 
 	public String getStringPreference(String key) {
-		return getPreference(key, "");
+		return getPreference(key, ""); //$NON-NLS-1$
 	}
 
 	public boolean getBooleanPreference(String key) {
-		return Boolean.parseBoolean(getPreference(key, "false"));
+		return Boolean.parseBoolean(getPreference(key, "false")); //$NON-NLS-1$
 	}
 
 	public int getIntPreference(String key) {

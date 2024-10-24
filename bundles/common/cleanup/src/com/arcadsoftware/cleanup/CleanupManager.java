@@ -35,7 +35,7 @@ public class CleanupManager implements Runnable {
 	 * <p>
 	 * This thread is unique in the platform it will periodically run all declared operation (like a Timer).
 	 */
-	public static final String SERVICE_NAME = "AFS-Cleanup"; //$NON-NLS-1$
+	public static final String SERVICE_NAME = "APP-Cleanup"; //$NON-NLS-1$
 
 	private static class CleanupManagerHolder {
 		private static final CleanupManager cleanupManagerSingleton = new CleanupManager();

@@ -16,6 +16,7 @@ package com.arcadsoftware.cleanup.operation;
 import com.arcadsoftware.cleanup.CleanupManager;
 
 public abstract class AbstractCleanOperation {
+	
 	protected CleanupManager cleanupManager;
 	protected String id;
 
@@ -39,6 +40,6 @@ public abstract class AbstractCleanOperation {
 		if ((className == null) || className.isEmpty()) {
 			className = "Customized CleanOperation";
 		}
-		return String.format("[%1$s] %2$s", className, id);
+		return String.format("[%1$s] %2$s", className, id); //$NON-NLS-1$
 	}
 }
