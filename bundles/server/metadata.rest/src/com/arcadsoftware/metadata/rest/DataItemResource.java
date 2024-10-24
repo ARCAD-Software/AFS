@@ -24,6 +24,9 @@ import org.restlet.data.Language;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
+import org.restlet.data.Status;
+import org.restlet.engine.util.DateUtils;
+import org.restlet.representation.EmptyRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.representation.Variant;
@@ -563,6 +566,66 @@ public class DataItemResource extends UserLinkedResource {
 			rep.setModificationDate(bean.getDate());
 		}
 		return rep;
+	}
+	
+	/**
+	 * This method allow to manage the HTTP conditional headers after the GET process.
+	 * 
+	 * <p>
+	 * Call this method just before to return the Representation of the result, if it return a representation then 
+	 * this representation must be returned. If it return "null" then the actual representation of the result must be sent. 
+	 * (the status of the response has been set to 304.)
+	 * 
+	 * @param result a list of results.
+	 * @return  null if the Representation associated to this result must be sent.
+	 */
+	protected Representation postProcessConditionalHeaders(BeanMapList result) {
+		if ((result == null) || result.isEmpty()) {
+			return null;
+		}
+		Date date = getRequest().getConditions().getModifiedSince();
+		if (date != null) {
+			Date lm = null;
+			for (BeanMap bean: result) {
+				Date d = bean.getDate();
+				if ((d != null) && ((lm == null) || DateUtils.before(d, lm))) {
+					lm = d;
+				}
+			}
+			if (lm == null) {
+				return null;
+			}
+			setLastModification(lm);
+			if (!DateUtils.before(lm, date)) {
+				getResponse().setStatus(Status.REDIRECTION_NOT_MODIFIED);
+				// Add the current last-modification date in  the response, for information...
+				EmptyRepresentation er = new EmptyRepresentation();
+				er.setModificationDate(lm);
+				return er;
+			}
+		} else {
+			date = getRequest().getConditions().getUnmodifiedSince();
+			if (date != null) {
+				Date lm = null;
+				for (BeanMap bean: result) {
+					Date d = bean.getDate();
+					if ((d != null) && ((lm == null) || DateUtils.before(lm, d))) {
+						lm = d;
+					}
+				}
+				if (lm == null) {
+					return null;
+				}
+				if (DateUtils.before(lm, date)) {
+					getResponse().setStatus(Status.CLIENT_ERROR_PRECONDITION_FAILED);
+					// Add the current last-modification date in  the response, for information...
+					EmptyRepresentation er = new EmptyRepresentation();
+					er.setModificationDate(lm);
+					return er;
+				}
+			}
+		}
+		return null;
 	}
 	
 	/**

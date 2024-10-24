@@ -389,6 +389,10 @@ public class MetaDataParentResource extends DataParentResource {
 			for (IMetaDataSelectionListener listener: Activator.getInstance().getSelectionListener(getEntity().getType())) {
 				listener.onSelection(getEntity(), result, getUser(), language);
 			}
+			Representation er = postProcessConditionalHeaders(result);
+			if (er != null) {
+				return er;
+			}
 		}
 		// Format the resulting response.
 		return getRepresentation(variant, form, result, language);
