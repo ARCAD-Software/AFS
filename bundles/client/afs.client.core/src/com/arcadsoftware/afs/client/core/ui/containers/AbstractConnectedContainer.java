@@ -22,16 +22,12 @@ import com.arcadsoftware.afs.client.core.connection.ServerConnection;
 import com.arcadsoftware.afs.framework.ui.views.AFSRootContainerInput;
 
 public abstract class AbstractConnectedContainer extends Container
-		implements ISelfSelectionManager {
+		implements ISelfSelectionManager, Comparable<AbstractConnectedContainer> {
 
-	private ServerConnection connection = null;
-
-	private String containerId = null;
-	private int order = 0;
-	private Properties props = null;
-
-	// private ArrayList<AbstractConnectedContainerProvider> childContainerProviders;
-	// private ArrayList<AbstractConnectedContainer> childContainers;
+	private ServerConnection connection;
+	private String containerId;
+	private int order;
+	private Properties props;
 	private ArrayList<IContainer> childContainers;
 
 	public AbstractConnectedContainer(AbstractConnectedContainerProvider parent) {
@@ -40,7 +36,6 @@ public abstract class AbstractConnectedContainer extends Container
 			setServerConnection(parent.getServerConnection());
 			loadContainers();
 		}
-
 	}
 
 	public void setParent(AbstractConnectedContainer parent) {
@@ -68,22 +63,15 @@ public abstract class AbstractConnectedContainer extends Container
 	}
 
 	@Override
-	public void selected() {
-
-	}
+	public void selected() {}
 
 	private void loadContainers() {
 		String parentViewId = null;
 		if (getRootContainerInput() instanceof AFSRootContainerInput) {
 			parentViewId = ((AFSRootContainerInput) getRootContainerInput()).getParentViewId();
 		}
-		// childContainerProviders = new ArrayList<AbstractConnectedContainerProvider>();
 		childContainers = new ArrayList<>();
 		ConnectedContainerExtensionManager.getInstance().createChildContainers(this, childContainers, parentViewId);
-
-		// childContainers = new ArrayList<AbstractConnectedContainer>();
-		// ConnectedContainerExtensionManager.getInstance().createChildContainers(
-		// (AbstractConnectedContainerProvider)this.getParent(), childContainers, getContainerId(), parentViewId);
 	}
 
 	public void setContainerId(String containerId) {
@@ -98,8 +86,7 @@ public abstract class AbstractConnectedContainer extends Container
 		if (kids == null) {
 			kids = new Object[0];
 		}
-		// Object[] supers = childContainerProviders.toArray();
-		Object[] containers;
+		final Object[] containers;
 		if (childContainers != null) {
 			containers = childContainers.toArray();
 		} else {
@@ -110,7 +97,6 @@ public abstract class AbstractConnectedContainer extends Container
 			return new Object[0];
 		} else {
 			final Object[] result = new Object[kids.length + containers.length];
-			// System.arraycopy(supers, 0, result, 0, supers.length);
 			System.arraycopy(kids, 0, result, 0, kids.length);
 			System.arraycopy(containers, 0, result, kids.length, containers.length);
 			return result;
@@ -143,6 +129,11 @@ public abstract class AbstractConnectedContainer extends Container
 			return props.getProperty(key);
 		}
 		return null;
+	}
+
+	@Override
+	public int compareTo(AbstractConnectedContainer o) {
+		return order - o.order;
 	}
 
 	public abstract Object[] getFixedChildren();

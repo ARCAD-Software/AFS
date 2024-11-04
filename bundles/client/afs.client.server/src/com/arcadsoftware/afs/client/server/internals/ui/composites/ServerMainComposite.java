@@ -29,14 +29,12 @@ import com.arcadsoftware.afs.framework.ui.composites.AbstractAFSStandardComposit
 
 public class ServerMainComposite extends AbstractAFSStandardComposite {
 
-	private static final String DEFAULT_URL = "http://localhost:" + System.getProperty("afs.default.port", "5252"); //$NON-NLS-1$
+	private static final String DEFAULT_URL = "https://localhost:" + System.getProperty("afs.default.port", "5252"); //$NON-NLS-1$
 
 	private Text nameText;
-
 	private Text addressText;
 	private Spinner port;
 	private Button useHTTPS;
-
 	private final Server server;
 
 	public ServerMainComposite(final Composite parent, final int style, final Server server) {
@@ -49,14 +47,11 @@ public class ServerMainComposite extends AbstractAFSStandardComposite {
 	public void createControlPage() {
 		nameText = AFSFormatTools.createLabelledText(this, Activator.resString("server.wizard.add.name.label")); //$NON-NLS-1$
 		addressText = GuiFormatTools.createLabelledText(this, Activator.resString("server.wizard.add.address.label")); //$NON-NLS-1$
-		port = GuiFormatTools.createLabelledSpinner(this, Activator.resString("server.wizard.add.port.label"));
+		port = GuiFormatTools.createLabelledSpinner(this, Activator.resString("server.wizard.add.port.label")); //$NON-NLS-1$
 		port.setMinimum(1);
 		port.setMaximum(65535);
-		useHTTPS = AFSFormatTools.createLabelledCheckbox(this, Activator.resString("server.wizard.add.use.https.label"),
-				false);
-
+		useHTTPS = AFSFormatTools.createLabelledCheckbox(this, Activator.resString("server.wizard.add.use.https.label"), false); //$NON-NLS-1$
 		loadFields();
-
 		addCheckDataListeners(nameText);
 		addCheckDataListeners(addressText);
 		addCheckDataListeners(port);
@@ -71,10 +66,13 @@ public class ServerMainComposite extends AbstractAFSStandardComposite {
 				nameText.setText(server.getName());
 				url = new URL(server.getUrl());
 			}
-
 			addressText.setText(url.getHost());
-			port.setSelection(url.getPort() > -1 ? url.getPort() : url.getDefaultPort());
-			useHTTPS.setSelection(url.getProtocol().equalsIgnoreCase("https"));
+			if (url.getPort() > -1) {
+				port.setSelection(url.getPort());
+			} else {
+				port.setSelection(url.getDefaultPort());
+			}
+			useHTTPS.setSelection(url.getProtocol().equalsIgnoreCase("https")); //$NON-NLS-1$
 		} catch (final Exception e) {
 			Activator.getInstance().log(e);
 		}
@@ -118,7 +116,15 @@ public class ServerMainComposite extends AbstractAFSStandardComposite {
 	}
 
 	private URL buildURL() throws MalformedURLException {
-		return new URL((useHTTPS.getSelection() ? "https" : "http") + "://" + addressText.getText() + ":"
-				+ port.getSelection());
+		if (useHTTPS.getSelection()) {
+			if (port.getSelection() != 443) {
+				return new URL("https://" + addressText.getText() + ':' + port.getSelection()); //$NON-NLS-1$
+			}
+			return new URL("https://" + addressText.getText()); //$NON-NLS-1$
+		}
+		if (port.getSelection() != 80) {
+			return new URL("http://" + addressText.getText() + ':' + port.getSelection()); //$NON-NLS-1$
+		}
+		return new URL("http://" + addressText.getText()); //$NON-NLS-1$
 	}
 }

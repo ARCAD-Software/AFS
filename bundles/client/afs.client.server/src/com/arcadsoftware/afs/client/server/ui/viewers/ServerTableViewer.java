@@ -105,7 +105,7 @@ public class ServerTableViewer extends AbstractColumnedTableViewer {
 		final Action[] additionalActions = getViewerActions();
 		final Action[] actions = new Action[superActions.length + additionalActions.length];
 		System.arraycopy(superActions, 0, actions, 0, superActions.length);
-		// Ajout de l'action d'affichage de l'éditeur de tris
+		// Added sort editor display action
 		for (int i = 0; i < additionalActions.length; i++) {
 			actions[superActions.length + i] = additionalActions[i];
 		}

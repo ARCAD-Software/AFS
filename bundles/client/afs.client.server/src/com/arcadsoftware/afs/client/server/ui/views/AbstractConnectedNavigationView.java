@@ -39,8 +39,8 @@ public abstract class AbstractConnectedNavigationView extends AbstractNavigatorV
 		implements ITabbedPropertySheetPageContributor {
 
 	public static final String PROPERTY_CONTRIBUTOR_ID = "com.arcadsoftware.afs.client.server.view.navigation.propertyId"; //$NON-NLS-1$
-	private ServerContainer serverContainer;
 
+	private ServerContainer serverContainer;
 	private Action refreshAction;
 
 	@Override
@@ -122,8 +122,6 @@ public abstract class AbstractConnectedNavigationView extends AbstractNavigatorV
 		return super.getAdapter(adapter);
 	}
 
-	public void doOnConnect(ServerItem item) {
-
-	}
+	public void doOnConnect(ServerItem item) {}
 
 }
