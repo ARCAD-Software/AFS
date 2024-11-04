@@ -19,6 +19,5 @@ public interface ISRVIconConsts {
 
 	public static final String LOCALID = Activator.getDefault().getBundle().getSymbolicName();
 	public static final String LOCALPATH = LOCALID + ":icons/";//$NON-NLS-1$
-
 	public static final String SPLASH = LOCALPATH + "splash/arcad.png"; //$NON-NLS-1$
 }

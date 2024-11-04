@@ -37,14 +37,13 @@ public class ServerView extends AbstractAFSView {
 
 	public static final String ID = "com.arcadsoftware.afs.client.server.ui.views.ServerView"; //$NON-NLS-1$
 
-	ServerAddAction addAction;
-	ServerDeleteAction deleteAction;
-	ServerManageAction manageAction;
-	ServerPropertiesAction propertiesAction;
-	Action refreshAction;
+	private ServerAddAction addAction;
+	private ServerDeleteAction deleteAction;
+	private ServerManageAction manageAction;
+	private ServerPropertiesAction propertiesAction;
+	private Action refreshAction;
 	private Servers servers;
-
-	ServerTableViewer serverTableViewer;
+	private ServerTableViewer serverTableViewer;
 
 	public ServerView() {
 		super();
@@ -67,7 +66,6 @@ public class ServerView extends AbstractAFSView {
 			protected Action[] getViewerActions() {
 				return ServerView.this.getViewerActions();
 			}
-
 		};
 		serverTableViewer.setInput(servers);
 		super.createPartControl(parent);
@@ -75,7 +73,6 @@ public class ServerView extends AbstractAFSView {
 
 	@Override
 	protected void defineActions() {
-
 		addAction = new ServerAddAction() {
 			@Override
 			protected void doAfterRun() {

@@ -40,11 +40,16 @@ import com.arcadsoftware.afs.framework.ui.dialogs.AbstractAFSDialog;
 import com.arcadsoftware.crypt.CertificateInformation;
 
 public class SSLSettingsDialog extends AbstractAFSDialog {
+
+	public static void update(ITrustStoreProvider provider) {
+		final SSLSettingsDialog dialog = new SSLSettingsDialog(Activator.getInstance().getPluginShell(), provider);
+		dialog.open();
+	}
+
 	private Text trustStorePathText;
 	private Text keyStorePathText;
 	private Text trustStorePasswordText;
 	private Text keyStorePasswordText;
-
 	private final ITrustStoreProvider provider;
 	private Button importCertificateButton;
 
@@ -65,7 +70,7 @@ public class SSLSettingsDialog extends AbstractAFSDialog {
 
 	@Override
 	public String getTitle() {
-		return Activator.resString("sslsettings.dialog.title");
+		return Activator.resString("sslsettings.dialog.title"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -75,30 +80,26 @@ public class SSLSettingsDialog extends AbstractAFSDialog {
 		gl.numColumns = 3;
 		gl.makeColumnsEqualWidth = false;
 		gl.marginHeight = gl.marginWidth = 5;
-
-		final Group gTS = GuiFormatTools.createGroup(c, Activator.resString("sslsettings.dialog.truststore.group"));
-		trustStorePathText = GuiFormatTools.createLabelledTextWithFileSelector(
-				gTS,
-				Activator.resString("sslsettings.dialog.file.name"), false,
-				Activator.resString("sslsettings.dialog.file.selector"),
-				new String[] { "*.*" });
+		final Group gTS = GuiFormatTools.createGroup(c, Activator.resString("sslsettings.dialog.truststore.group")); //$NON-NLS-1$
+		trustStorePathText = GuiFormatTools.createLabelledTextWithFileSelector( //
+				gTS, //
+				Activator.resString("sslsettings.dialog.file.name"), false, //$NON-NLS-1$
+				Activator.resString("sslsettings.dialog.file.selector"), //$NON-NLS-1$
+				new String[] { "*.*" }); //$NON-NLS-1$
 		trustStorePathText.addModifyListener(this::trustStoreFieldsModified);
-
-		trustStorePasswordText = GuiFormatTools.createLabelledText(gTS,
-				Activator.resString("sslsettings.dialog.file.password"));
+		trustStorePasswordText = GuiFormatTools.createLabelledText(gTS, //
+				Activator.resString("sslsettings.dialog.file.password")); //$NON-NLS-1$
 		trustStorePasswordText.setEchoChar('*');
 		trustStorePasswordText.addModifyListener(this::trustStoreFieldsModified);
-
-		final Group gKS = GuiFormatTools.createGroup(c, Activator.resString("sslsettings.dialog.keystore.group"));
-		keyStorePathText = GuiFormatTools.createLabelledTextWithFileSelector(
-				gKS, Activator.resString("sslsettings.dialog.file.name"),
-				false,
-				Activator.resString("sslsettings.dialog.file.selector"),
-				new String[] { "*.*" });
-		keyStorePasswordText = GuiFormatTools.createLabelledText(gKS,
-				Activator.resString("sslsettings.dialog.file.password"));
+		final Group gKS = GuiFormatTools.createGroup(c, Activator.resString("sslsettings.dialog.keystore.group")); //$NON-NLS-1$
+		keyStorePathText = GuiFormatTools.createLabelledTextWithFileSelector( //
+				gKS, Activator.resString("sslsettings.dialog.file.name"), //$NON-NLS-1$
+				false, //
+				Activator.resString("sslsettings.dialog.file.selector"), //$NON-NLS-1$
+				new String[] { "*.*" }); //$NON-NLS-1$
+		keyStorePasswordText = GuiFormatTools.createLabelledText(gKS, //
+				Activator.resString("sslsettings.dialog.file.password"));  //$NON-NLS-1$
 		keyStorePasswordText.setEchoChar('*');
-
 		final Composite bar = new Composite(c, SWT.NONE);
 		final GridLayout layout = new GridLayout(3, false);
 		bar.setLayout(layout);
@@ -106,11 +107,9 @@ public class SSLSettingsDialog extends AbstractAFSDialog {
 		final GridData gd = new GridData(GridData.FILL_BOTH);
 		gd.horizontalSpan = 3;
 		bar.setLayoutData(gd);
-
 		importCertificateButton = new Button(gTS, SWT.PUSH);
-		importCertificateButton.setText(Activator.resString("sslsettings.dialog.button.import.certificate"));
+		importCertificateButton.setText(Activator.resString("sslsettings.dialog.button.import.certificate")); //$NON-NLS-1$
 		importCertificateButton.setLayoutData(GridDataFactory.swtDefaults().span(3, 1).create());
-
 		importCertificateButton.addSelectionListener(
 				new SelectionAdapter() {
 					@Override
@@ -124,29 +123,26 @@ public class SSLSettingsDialog extends AbstractAFSDialog {
 									.select(certificates);
 							if (certificateInformation != null) {
 								if (!manager.trustCertificate(certificateInformation)) {
-									MessageDialog.openError(getShell(),
-											Activator.resString("sslsettings.dialog.button.import.error"),
-											Activator.resString("sslsettings.dialog.button.import.error.detail",
+									MessageDialog.openError(getShell(), //
+											Activator.resString("sslsettings.dialog.button.import.error"), //$NON-NLS-1$
+											Activator.resString("sslsettings.dialog.button.import.error.detail", //$NON-NLS-1$
 													manager.getLastError(), manager.getLastException()));
 								}
 							}
 						}
 					}
 				});
-
 		final Label t = new Label(bar, SWT.NONE);
 		GridData gdata = new GridData(GridData.FILL_HORIZONTAL);
 		gdata.grabExcessHorizontalSpace = true;
 		gdata.horizontalAlignment = GridData.FILL_HORIZONTAL;
 		t.setLayoutData(gdata);
-
 		final Button setDefaultButton = new Button(bar, SWT.PUSH);
-		setDefaultButton.setText(Activator.resString("sslsettings.dialog.button.reset"));
+		setDefaultButton.setText(Activator.resString("sslsettings.dialog.button.reset")); //$NON-NLS-1$
 		gdata = new GridData();
 		gdata.horizontalAlignment = GridData.END;
 		gdata.widthHint = 120;
 		setDefaultButton.setLayoutData(gdata);
-
 		setDefaultButton.addSelectionListener(
 				new SelectionAdapter() {
 					@Override
@@ -154,20 +150,15 @@ public class SSLSettingsDialog extends AbstractAFSDialog {
 						provider.resetToDefault();
 						trustStorePathText.setText(provider.getTrustStorePath());
 						trustStorePasswordText.setText(new String(provider.getTrustStorePassword()));
-
 						keyStorePathText.setText(provider.getKeyStorePath());
 						keyStorePasswordText.setText(new String(provider.getKeyStorePassword()));
 					}
 				});
-
 		trustStorePathText.setText(provider.getTrustStorePath());
 		trustStorePasswordText.setText(new String(provider.getTrustStorePassword()));
-
 		keyStorePathText.setText(provider.getKeyStorePath());
 		keyStorePasswordText.setText(new String(provider.getKeyStorePassword()));
-
 		trustStoreFieldsModified(null);
-
 		return c;
 	}
 
@@ -187,10 +178,5 @@ public class SSLSettingsDialog extends AbstractAFSDialog {
 		if (provider.save()) {
 			super.okPressed();
 		}
-	}
-
-	public static void update(ITrustStoreProvider provider) {
-		final SSLSettingsDialog dialog = new SSLSettingsDialog(Activator.getInstance().getPluginShell(), provider);
-		dialog.open();
 	}
 }

@@ -40,13 +40,12 @@ import com.arcadsoftware.rest.console.SectionId;
 public class SectionView extends AbstractSSCView implements IConnectionListener {
 	public static final String ID = "com.arcadsoftware.afs.client.server.ui.views.SectionView"; //$NON-NLS-1$
 
-	List<Category> categories;
-	CategoriesWrapper categoryinput;
-	ServerConnection currentServerConnection;
-	SectionViewer viewer;
-	Action refreshAction;
-
-	ConsoleConnector consoleConnector;
+	private List<Category> categories;
+	private CategoriesWrapper categoryinput;
+	private ServerConnection currentServerConnection;
+	private SectionViewer viewer;
+	private Action refreshAction;
+	private ConsoleConnector consoleConnector;
 
 	public SectionView() {
 		super();
@@ -57,8 +56,7 @@ public class SectionView extends AbstractSSCView implements IConnectionListener 
 	@Override
 	public void createPartControl(Composite parent) {
 		final GridLayout l = new GridLayout(1, false);
-		l.marginHeight = l.marginWidth = 0;
-		l.marginLeft = l.marginRight = l.marginBottom = l.marginTop = 0;
+		l.marginHeight = l.marginWidth = l.marginLeft = l.marginRight = l.marginBottom = l.marginTop = 0;
 		parent.setLayout(l);
 		viewer = new SectionViewer(parent, SWT.NONE | SWT.FULL_SELECTION) {
 			@Override
@@ -71,7 +69,6 @@ public class SectionView extends AbstractSSCView implements IConnectionListener 
 		viewer.getViewer().getControl().setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true, 3, 1));
 		((Tree) viewer.getViewer().getControl()).setLinesVisible(false);
 		super.createPartControl(parent);
-
 		ConnectionManager.getInstance().getLastServerConnection().ifPresent(this::OnConnection);
 	}
 
@@ -109,7 +106,6 @@ public class SectionView extends AbstractSSCView implements IConnectionListener 
 				viewer.setInput(categoryinput);
 			}
 		}
-
 	}
 
 	@Override

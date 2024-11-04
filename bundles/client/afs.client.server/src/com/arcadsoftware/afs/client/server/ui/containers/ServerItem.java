@@ -14,7 +14,6 @@
 package com.arcadsoftware.afs.client.server.ui.containers;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -40,16 +39,17 @@ import com.arcadsoftware.afs.framework.ui.plugins.LogUITools;
 import com.arcadsoftware.afs.framework.ui.views.AFSRootContainerInput;
 
 public class ServerItem extends AbstractConnectedContainerProvider {
+
 	public static final String EXTENSION_ID = "com.arcadsoftware.afs.client.server.main.container"; //$NON-NLS-1$
 	public static final String CLASS_ATTRIBUTE = "class"; //$NON-NLS-1$
 	public static final String VIEWID_ATTRIBUTE = "viewId"; //$NON-NLS-1$
 	public static final String ORDER_ATTRIBUTE = "order"; //$NON-NLS-1$
 	public static final String VISIBLE_ATTRIBUTE = "visible"; //$NON-NLS-1$
 
-	List<AbstractConnectedContainer> mainContainers;
-	private boolean loaded = false;
+	private List<AbstractConnectedContainer> mainContainers;
+	private boolean loaded;
 	private final Server server;
-	private ServerPropertySource propertySource = null;
+	private ServerPropertySource propertySource;
 	private final boolean autoExpandOnConnection;
 
 	public ServerItem(Container parent, Server server, boolean autoExpandOnConnection) {
@@ -63,7 +63,6 @@ public class ServerItem extends AbstractConnectedContainerProvider {
 		if (actions instanceof ServerItemActions) {
 			final ServerConnectAction connectionAction = ((ServerItemActions) actions).getConnectionAction();
 			connectionAction.run();
-
 			if (connectionAction.isRunOk() && autoExpandOnConnection) {
 				expand();
 			}
@@ -91,27 +90,27 @@ public class ServerItem extends AbstractConnectedContainerProvider {
 
 	@Override
 	public Object[] getContainers() {
-		if (!isConnected()) {
-			return EMPTYARRAY;
-		} else {
+		if (isConnected()) {
 			if (!loaded) {
 				loadContainers();
 				loaded = true;
 			}
-			return mainContainers.toArray();
+			if (mainContainers != null) {
+				return mainContainers.toArray();
+			}
 		}
+		return new Object[0];
 	}
 
 	private int getOrder(IConfigurationElement element) {
 		final String orderValue = element.getAttribute(ORDER_ATTRIBUTE);
 		if ((orderValue == null) || (orderValue.length() == 0)) {
 			return 0;
-		} else {
-			try {
-				return Integer.parseInt(orderValue);
-			} catch (final NumberFormatException e) {
-				return 0;
-			}
+		}
+		try {
+			return Integer.parseInt(orderValue);
+		} catch (final NumberFormatException e) {
+			return 0;
 		}
 	}
 
@@ -128,39 +127,26 @@ public class ServerItem extends AbstractConnectedContainerProvider {
 				try {
 					if (isValid(element.getAttribute(VISIBLE_ATTRIBUTE))) {
 						final String viewId = element.getAttribute(VIEWID_ATTRIBUTE);
-
 						if (viewId.equalsIgnoreCase(parentViewId)) {
-							final AbstractConnectedContainer container = (AbstractConnectedContainer) element
-									.createExecutableExtension(CLASS_ATTRIBUTE);
-
+							final AbstractConnectedContainer container = (AbstractConnectedContainer) element.createExecutableExtension(CLASS_ATTRIBUTE);
 							final Properties props = new Properties();
-							final IConfigurationElement[] properties = element.getChildren("property");
+							final IConfigurationElement[] properties = element.getChildren("property"); //$NON-NLS-1$
 							for (final IConfigurationElement property : properties) {
-								final String key = property.getAttribute("key");
-								final String value = property.getAttribute("value");
+								final String key = property.getAttribute("key"); //$NON-NLS-1$
+								final String value = property.getAttribute("value"); //$NON-NLS-1$
 								props.put(key, value);
 							}
-							props.put("parentViewId", parentViewId);
-							if (props.containsKey("id")) {
-								container.setContainerId(props.getProperty("id"));
+							props.put("parentViewId", parentViewId); //$NON-NLS-1$
+							if (props.containsKey("id")) { //$NON-NLS-1$
+								container.setContainerId(props.getProperty("id")); //$NON-NLS-1$
 							}
 							container.setProps(props);
 							container.setOrder(getOrder(element));
 							container.setParent(this);
-
 							mainContainers.add(container);
 						}
-
-						Collections.sort(mainContainers, (o1, o2) -> {
-							if (o1.getOrder() > o2.getOrder()) {
-								return 1;
-							} else if (o1.getOrder() < o2.getOrder()) {
-								return -1;
-							}
-							return 0;
-						});
+						mainContainers.sort(null);
 					}
-
 				} catch (final CoreException e) {
 					LogUITools.logWarning(Activator.getDefault().getBundle(), e);
 				}
@@ -176,10 +162,8 @@ public class ServerItem extends AbstractConnectedContainerProvider {
 				propertySource = new ServerPropertySource(server);
 			}
 			return (T) propertySource;
-		} else {
-			return super.getAdapter(adapter);
 		}
-
+		return super.getAdapter(adapter);
 	}
 
 	@Override
@@ -189,9 +173,7 @@ public class ServerItem extends AbstractConnectedContainerProvider {
 
 	@Override
 	public void setServerConnection(ServerConnection connection) {
-
 		super.setServerConnection(connection);
-
 		// Force reloading children with new connection
 		if ((mainContainers != null) && !mainContainers.isEmpty()) {
 			mainContainers = null;
@@ -209,7 +191,6 @@ public class ServerItem extends AbstractConnectedContainerProvider {
 		if ((getServerConnection() == null) || (serviceUrl == null) || (serviceUrl.length() == 0)) {
 			return true;
 		}
-
 		final DataAccessHelper helper = new DataAccessHelper(getServerConnection());
 		return helper.getXml(serviceUrl) != null;
 	}

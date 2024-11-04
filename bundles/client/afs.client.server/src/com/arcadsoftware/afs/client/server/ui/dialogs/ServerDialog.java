@@ -17,7 +17,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 
 import com.arcadsoftware.aev.core.ui.tools.GuiFormatTools;
@@ -44,8 +43,9 @@ public class ServerDialog extends AbstractAFSDialog {
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		final Composite composite = (Composite) super.createDialogArea(parent);
-		final Group serverGroup = GuiFormatTools.createGroup(composite, Activator.resString("server.group"));
-		serverComposite = new ServerMainComposite(serverGroup, SWT.NONE, server);
+		serverComposite = new ServerMainComposite( //
+				GuiFormatTools.createGroup(composite, Activator.resString("server.group")), //$NON-NLS-1$
+				SWT.NONE, server);
 		return composite;
 	}
 
@@ -54,12 +54,13 @@ public class ServerDialog extends AbstractAFSDialog {
 		if (serverComposite.checkData()) {
 			server.setName(serverComposite.getServerName());
 			server.setUrl(serverComposite.getUrl());
-			super.okPressed();
-		} else {
-			final String serverMessage = serverComposite.getErrorMessage();
-			if ((serverMessage != null) && !serverMessage.isEmpty()) {
-				MessageDialog.openError(getShell(), Activator.resString("label.error"), serverMessage);
+			if (!server.getUrl().toLowerCase().startsWith("http:")) { //$NON-NLS-1$
+				super.okPressed();
+			} else if (MessageDialog.openConfirm(getShell(), Activator.resString("title.confirmUseHttp"), Activator.resString("label.confirmUseHttp"))) { //$NON-NLS-1$ //$NON-NLS-2$
+				super.okPressed();
 			}
+		} else if ((serverComposite.getErrorMessage() != null) && !serverComposite.getErrorMessage().isEmpty()) {
+			MessageDialog.openError(getShell(), Activator.resString("label.error"), serverComposite.getErrorMessage()); //$NON-NLS-1$
 		}
 	}
 

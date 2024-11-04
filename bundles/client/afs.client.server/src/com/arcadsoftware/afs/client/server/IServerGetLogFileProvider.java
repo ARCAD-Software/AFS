@@ -21,6 +21,7 @@ import com.arcadsoftware.afs.client.core.connection.ServerConnection;
  * @author ARCAD Software
  */
 public interface IServerGetLogFileProvider {
+	
 	public boolean getLogFile();
 
 	public void setServerConnection(ServerConnection connection);

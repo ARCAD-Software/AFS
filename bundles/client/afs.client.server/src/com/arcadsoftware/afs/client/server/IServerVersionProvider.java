@@ -23,6 +23,7 @@ import com.arcadsoftware.afs.client.core.connection.ServerConnection;
  * @author ARCAD Software
  */
 public interface IServerVersionProvider {
+	
 	public String getServerVersion();
 
 	public String getServerDescription();
