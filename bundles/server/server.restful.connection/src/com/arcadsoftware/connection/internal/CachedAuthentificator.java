@@ -36,6 +36,7 @@ import org.restlet.security.Authenticator;
 
 import com.arcadsoftware.rest.BaseResource;
 import com.arcadsoftware.rest.connection.ConnectionUserBean;
+import com.arcadsoftware.rest.connection.IAuthentificationService;
 import com.arcadsoftware.rest.connection.IBasicAuthentificationService;
 import com.arcadsoftware.rest.connection.IConnectionCredential;
 import com.arcadsoftware.rest.connection.IConnectionUserBean;
@@ -84,7 +85,7 @@ public class CachedAuthentificator extends Authenticator {
 			return false;
 		}
 		// Si aucun service n'est enregistré alors la connection ne peut aboutir.
-		Object[] services = activator.getAuthServiceTracker().getServices();
+		IAuthentificationService[] services = activator.getAuthentificationServices();
 		if ((services == null) || (services.length == 0)) {
 			activator.debug(Messages.SecureGuard_NoAuthentificationService);
 			response.setStatus(Status.SERVER_ERROR_SERVICE_UNAVAILABLE, translateMessage(request, "notready")); //$NON-NLS-1$
@@ -104,7 +105,7 @@ public class CachedAuthentificator extends Authenticator {
         }
         // utilisation d'un autre schema.
         boolean manage_error = true;
-		for (Object o: services) {
+		for (IAuthentificationService o: services) {
 			try {
 				if (o instanceof IWWWAuthentificationService) {
 					IConnectionUserBean user = ((IWWWAuthentificationService) o).checkCredential(request, response);
@@ -140,7 +141,7 @@ public class CachedAuthentificator extends Authenticator {
 		return false;
 	}
 
-	private boolean basicCachedAuthenticate(Object[] services, Request request, Response response, long timing) {
+	private boolean basicCachedAuthenticate(IAuthentificationService[] services, Request request, Response response, long timing) {
         String identifier = request.getChallengeResponse().getIdentifier();
         char[] secret = request.getChallengeResponse().getSecret();
 		// Ici on vérifie les paramètres d'identification en déléguant le processus 
@@ -149,7 +150,7 @@ public class CachedAuthentificator extends Authenticator {
 		// 1. on cherche un service d'authentification qui accepte la requête.
 		// Le premier service qui l'accepte renvois un "credential" non null.
 		IConnectionCredential credential = null;
-		for (Object o:services) {
+		for (IAuthentificationService o: services) {
 			try {
 				if (o instanceof IBasicAuthentificationService) {
 					credential = ((IBasicAuthentificationService) o).generateCredential(request, identifier);
@@ -313,10 +314,10 @@ public class CachedAuthentificator extends Authenticator {
 		return true;
 	}
 
-	private List<ChallengeRequest> getAcceptedChanllenges(Request request, Object[] services) {
+	private List<ChallengeRequest> getAcceptedChanllenges(Request request, IAuthentificationService[] services) {
 		ArrayList<ChallengeRequest> result = new ArrayList<ChallengeRequest>();
         boolean isSomeBasic = false;
-        for(Object service:services) {
+        for (IAuthentificationService service: services) {
         	if (service instanceof IWWWAuthentificationService) {
         		ChallengeRequest cr = ((IWWWAuthentificationService) service).getChallengeRequest(request, activator.getRealm());
         		if (cr != null) {

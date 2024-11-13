@@ -15,8 +15,8 @@ package com.arcadsoftware.connection.internal;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
-import org.osgi.framework.ServiceReference;
 import org.restlet.data.CharacterSet;
 import org.restlet.data.Language;
 import org.restlet.data.MediaType;
@@ -31,7 +31,6 @@ import com.arcadsoftware.rest.JSONFriendlyList;
 import com.arcadsoftware.rest.UserLinkedResource;
 import com.arcadsoftware.rest.XMLRepresentation;
 import com.arcadsoftware.rest.XStreamCompact;
-import com.arcadsoftware.rest.connection.IAuthentificationService;
 
 public class AuthServicesResource extends UserLinkedResource {
 
@@ -78,18 +77,7 @@ public class AuthServicesResource extends UserLinkedResource {
 		return super.get(variant);
 	}
 
-	@SuppressWarnings("rawtypes")
-	private ArrayList<String> getAuthList() {
-		ArrayList<String> list = new ArrayList<String>();
-		for (ServiceReference sr:Activator.getInstance().getAuthServiceTracker().getServiceReferences()) {
-			Object o = sr.getProperty(IAuthentificationService.ENTITYNAME);
-			if (o != null) {
-				String v = o.toString();
-				if ((v.length() > 0) && !list.contains(v)) {
-					list.add(v);
-				}
-			}
-		}
-		return list;
+	private List<String> getAuthList() {
+		return Activator.getInstance().getAuthentificationEntities();
 	}
 }
