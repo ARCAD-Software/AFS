@@ -206,9 +206,66 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 			}
 		}
 	}
-	
-	public ServiceTracker<IAuthentificationService, IAuthentificationService> getAuthServiceTracker() {
-		return secTracker;
+
+	public IAuthentificationService[] getAuthentificationServices() {
+		ServiceReference<IAuthentificationService>[] services = secTracker.getServiceReferences();
+		if (services == null) {
+			return new IAuthentificationService[0];
+		}
+		IAuthentificationService[] result = new IAuthentificationService[services.length];
+		int p = Integer.MAX_VALUE;
+		int i = 0;
+		while (i < services.length) {
+			int z = Integer.MIN_VALUE;
+			for (ServiceReference<IAuthentificationService> service: services) {
+				int priority = 0;
+				Object o = service.getProperty(IAuthentificationService.PRIORITY);
+				if (o != null) {
+					if (o instanceof Integer) {
+						priority = (Integer) o;
+					} else {
+						try {
+							priority = Integer.parseInt(o.toString());
+						} catch (NumberFormatException e) {}
+					}
+				}
+				if ((priority > z) && (priority < p)) {
+					z = priority;
+				}
+			}
+			p = z;
+			for (ServiceReference<IAuthentificationService> service: services) {
+				int priority = 0;
+				Object o = service.getProperty(IAuthentificationService.PRIORITY);
+				if (o != null) {
+					if (o instanceof Integer) {
+						priority = (Integer) o;
+					} else {
+						try {
+							priority = Integer.parseInt(o.toString());
+						} catch (NumberFormatException e) {}
+					}
+				}
+				if (priority == p) {
+					result[i++] = secTracker.getService(service);
+				}
+			}
+		}
+		return result;
+	}
+
+	public List<String> getAuthentificationEntities() {
+		ArrayList<String> list = new ArrayList<String>();
+		for (ServiceReference<IAuthentificationService> sr: secTracker.getServiceReferences()) {
+			Object o = sr.getProperty(IAuthentificationService.ENTITYNAME);
+			if (o != null) {
+				String v = o.toString();
+				if ((v.length() > 0) && !list.contains(v)) {
+					list.add(v);
+				}
+			}
+		}
+		return list;
 	}
 	
 	public String getMessage(String key, Language language) {
@@ -287,15 +344,15 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 		// A défaut un tente d'utiliser le "login" comme un identifiant de connexion.
 		// Cela ne fonctionnera pas avec les mode de connexion utilisant d'autres
 		// entètes HTTP...
-		Object[] services = getAuthServiceTracker().getServices();
+		IAuthentificationService[] services = getAuthentificationServices();
 		if (services == null) {
 			debug(Messages.SecureGuard_NoAuthentificationService);
 			return null;
 		}
 		IConnectionCredential credential = null;
-		for (Object o:services) {
+		for (IAuthentificationService o: services) {
 			if (o instanceof IBasicAuthentificationService) {
-				credential = ((IBasicAuthentificationService)o).generateCredential(new Request(), login);
+				credential = ((IBasicAuthentificationService) o).generateCredential(new Request(), login);
 				if (credential != null) {
 					break;
 				}

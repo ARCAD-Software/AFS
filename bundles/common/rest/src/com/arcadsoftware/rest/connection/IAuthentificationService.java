@@ -28,14 +28,19 @@ public interface IAuthentificationService {
 	public static final String clazz = IAuthentificationService.class.getName();
 
 	/**
-	 * OSGi Service property identify the authentification entity name.
+	 * OSGi Service property identify the authentication entity name.
 	 */
 	public static final String ENTITYNAME = "entityname"; //$NON-NLS-1$
 
 	/**
-	 * OSGi Service property identify the authentification among other ones, specifiyng a list of Realm name that can be used to identify the service.
+	 * OSGi Service property identify the authentication among other ones, specifying a list of Realm name that can be used to identify the service.
 	 */
 	public static final String REALM = "realm"; //$NON-NLS-1$
+
+	/**
+	 * OSGi Service property allowing to order the concurrent authentication services.
+	 */
+	public static final String PRIORITY = "priority"; //$NON-NLS-1$
 
 	/**
 	 * If this Authentification Service maintain a connection cache then this method must purge it. 

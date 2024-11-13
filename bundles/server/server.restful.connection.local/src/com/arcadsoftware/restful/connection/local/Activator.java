@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.Dictionary;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
@@ -103,7 +104,10 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 		super.start(context);
 		messages = new MultiLanguageMessages(HTTP_MESSAGES, Activator.class.getClassLoader());
 		// Register an authentification service...
-		registerService(LocalAuthentificationService.clazz, new LocalAuthentificationService(this), LocalAuthentificationService.ENTITYNAME, LOCALAUTH);
+		Dictionary<String, Object> props = new Hashtable<>();
+		props.put(LocalAuthentificationService.ENTITYNAME, LOCALAUTH);
+		props.put(LocalAuthentificationService.PRIORITY, 10);
+		registerService(LocalAuthentificationService.clazz, new LocalAuthentificationService(this), props);
 		// Register a service usable for password testing
 		registerService(PasswordComplexityTester.clazz, tester);
 		// Register a branch for password modifications.

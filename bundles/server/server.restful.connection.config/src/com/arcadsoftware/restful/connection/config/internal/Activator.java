@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map.Entry;
 
 import org.eclipse.osgi.framework.console.CommandInterpreter;
@@ -44,7 +45,10 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 		instance = this;
 		super.start(bundleContext);
 		registerService(CommandProvider.class.getName(), this);
-		registerService(AuthentificationService.clazz, new AuthentificationService(this), AuthentificationService.ENTITYNAME, CONFIGAUTH);
+		Dictionary<String, Object> props = new Hashtable<>();
+		props.put(AuthentificationService.ENTITYNAME, CONFIGAUTH);
+		props.put(AuthentificationService.PRIORITY, 12);
+		registerService(AuthentificationService.clazz, new AuthentificationService(this), props);
 		registerService(SimpleBranch.clazz, new SimpleBranch() {
 			protected RouteList createAttachedResources(Context context, Router router) {
 				RouteList routes = new RouteList(router.attach("/configauth/{login}",new AuthLoginRestlet(context))); //$NON-NLS-1$

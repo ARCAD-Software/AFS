@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Hashtable;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -237,8 +238,11 @@ public class Activator extends AbstractConfiguredActivator {
 			// Create a new authentification service.
 			if (LdapAuthentificationService.isConfigurationComplete(properties)) {
 				try {
+					Dictionary<String, Object> props = new Hashtable<>();
+					props.put(LdapAuthentificationService.ENTITYNAME, LDAPAUTH);
+					props.put(LdapAuthentificationService.PRIORITY, 5);
 					ldap = new LdapAuthentificationService(this, properties);
-					ldas = registerService(IAuthentificationService.class, ldap, LdapAuthentificationService.ENTITYNAME, LDAPAUTH);
+					ldas = registerService(IAuthentificationService.class, ldap, props);
 				} catch (LDAPException | ConfiguredSSLContextException e) {
 					error("LDAP Connection invalid configuration.", e);
 				}
