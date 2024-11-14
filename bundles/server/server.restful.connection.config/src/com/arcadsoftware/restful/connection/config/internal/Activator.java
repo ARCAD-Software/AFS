@@ -47,7 +47,7 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 		registerService(CommandProvider.class.getName(), this);
 		Dictionary<String, Object> props = new Hashtable<>();
 		props.put(AuthentificationService.ENTITYNAME, CONFIGAUTH);
-		props.put(AuthentificationService.PRIORITY, 12);
+		props.put(AuthentificationService.PRIORITY, 1);
 		registerService(AuthentificationService.clazz, new AuthentificationService(this), props);
 		registerService(SimpleBranch.clazz, new SimpleBranch() {
 			protected RouteList createAttachedResources(Context context, Router router) {
