@@ -103,6 +103,13 @@
 		</dependency>
 		
 		<!-- JDBC and Databases -->
+		<!-- https://mvnrepository.com/artifact/org.osgi/org.osgi.service.jdbc -->
+		<dependency>
+		    <groupId>org.osgi</groupId>
+		    <artifactId>org.osgi.service.jdbc</artifactId>
+		    <version>1.1.0</version>
+		    <scope>provided</scope>
+		</dependency>
 		<dependency> <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
 			<groupId>com.zaxxer</groupId>
 			<artifactId>HikariCP</artifactId>
