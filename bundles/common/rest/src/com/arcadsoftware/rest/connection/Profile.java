@@ -124,6 +124,9 @@ public class Profile {
 		rights.remove(right);
 		rights.add(right);
 		if (right.getParam() > 0) {
+			if (params == null) {
+				buildKeysTable();
+			}
 			params.add(right);
 		}
 	}
@@ -146,7 +149,7 @@ public class Profile {
 	 * @return true if this profile contain any parameterized right
 	 */
 	public boolean isParametrized() {
-		return params.size() > 0;
+		return (params != null) && params.size() > 0;
 	}
 	
 	/**
@@ -155,6 +158,9 @@ public class Profile {
 	 * @return true if this profile contain the specified parameterized right
 	 */
 	public boolean isParametrized(int key) {
+		if (params == null) {
+			buildKeysTable();
+		}
 		for (Right right: params) {
 			if (right.getId() == key) {
 				return true;
