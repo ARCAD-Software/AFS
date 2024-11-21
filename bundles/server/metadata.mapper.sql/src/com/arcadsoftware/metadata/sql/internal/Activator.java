@@ -49,10 +49,11 @@ import com.arcadsoftware.osgi.AbstractActivator;
 public class Activator extends AbstractActivator implements EventHandler, ServiceTrackerCustomizer, CommandProvider {
 	
 	private static final String DOMAIN_JDBCPREFIX = "jdbc:"; //$NON-NLS-1$
-	private static final File sqltrace; 
+	private static final File sqltrace;
+	private static final boolean sqlTiming = Boolean.getBoolean("com.arcadsoftware.trace.sql.requests.timing"); //$NON-NLS-1$
 	
 	static {
-		String s = System.getProperty("com.arcadsoftware.trace.sql.requests");
+		String s = System.getProperty("com.arcadsoftware.trace.sql.requests"); //$NON-NLS-1$
 		if ((s != null) && !s.trim().isEmpty()) {
 			File f = new File(s);
 			if (!f.isFile()) {
@@ -75,9 +76,9 @@ public class Activator extends AbstractActivator implements EventHandler, Servic
 		return instance;
 	}
 
+	private volatile PrintWriter trace;
 	private HashMap<String, ServiceRegistration> map;
 	private ServiceTracker tracker;
-	private PrintWriter trace;
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -216,9 +217,14 @@ public class Activator extends AbstractActivator implements EventHandler, Servic
 		}
 	}
 	
-	public void trace(String query) {
+	public void trace(String query, long t) {
 		if (trace != null) {
-			trace.println(query);
+			if (sqlTiming) {
+				t = System.currentTimeMillis() - t;
+				trace.println(query + " -- " + t + "ms");
+			} else {
+				trace.println(query);
+			}
 		}
 	}
 }

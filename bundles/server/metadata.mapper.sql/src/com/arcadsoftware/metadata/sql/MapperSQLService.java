@@ -417,13 +417,15 @@ public class MapperSQLService extends AbstractMapperService {
 	 * @return
 	 */
 	protected int update(String query, Object[] values) {
+		long t = System.currentTimeMillis();
 		try {
-			Activator.getInstance().trace(query);
 			return runner.update(query, values);
 		} catch (SQLException e) {
 			Activator.getInstance().error(Messages.MapperSQLService_Error_Update + e.getLocalizedMessage(), e);
 			Activator.getInstance().debug(String.format(Messages.MapperSQLService_SQLError, query, arrayToString(values)));
 			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, Messages.MapperSQLService_Error_Update + e.getLocalizedMessage(), e);
+		} finally {
+			Activator.getInstance().trace(query, t);
 		} 
 	}
 
@@ -436,13 +438,15 @@ public class MapperSQLService extends AbstractMapperService {
 	 * @return
 	 */
 	protected int insert(String query, Object[] values, String idCol) {
+		long t = System.currentTimeMillis();
 		try {
-			Activator.getInstance().trace(query);
 			return runner.insert(query, values, idCol);
 		} catch (SQLException e) {
 			Activator.getInstance().error(Messages.MapperSQLService_Error_Insert + e.getLocalizedMessage(), e);
 			Activator.getInstance().debug(String.format(Messages.MapperSQLService_SQLError, query, arrayToString(values)));
 			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, Messages.MapperSQLService_Error_Insert + e.getLocalizedMessage(), e);
+		} finally {
+			Activator.getInstance().trace(query, t);
 		} 
 	}
 
@@ -454,8 +458,8 @@ public class MapperSQLService extends AbstractMapperService {
 	 * @return
 	 */
 	protected int count(String query, Object[] values) {
+		long t = System.currentTimeMillis();
 		try {
-			Activator.getInstance().trace(query);
 			Object o = runner.query(query, new ScalarHandler<Object>(), values);
 			if (o == null) {
 				return 0;
@@ -475,6 +479,8 @@ public class MapperSQLService extends AbstractMapperService {
 			Activator.getInstance().error(Messages.MapperSQLService_Error_Count + e.getLocalizedMessage(), e);
 			Activator.getInstance().debug(String.format(Messages.MapperSQLService_SQLError, query, arrayToString(values)));
 			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, Messages.MapperSQLService_Error_Count + e.getLocalizedMessage(), e);
+		} finally {
+			Activator.getInstance().trace(query, t);
 		} 
 	}
 	
@@ -487,14 +493,16 @@ public class MapperSQLService extends AbstractMapperService {
 	 * @return
 	 */
 	protected BeanMap query(String query, String type, Object[] values) {
+		long t = System.currentTimeMillis();
 		try {
-			Activator.getInstance().trace(query);
 			return (BeanMap) runner.query(query, new BeanMapHandler(type, RETURNEMPTYBEAMMAP), values);
 		} catch (SQLException e) {
 			Activator.getInstance().error(Messages.MapperSQLService_ItemSelection + e.getLocalizedMessage(), e);
 			Activator.getInstance().debug(String.format(Messages.MapperSQLService_SQLError, query, arrayToString(values)));
 			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, Messages.MapperSQLService_Error_ItemSelection + e.getLocalizedMessage(), e);
-		} 
+		} finally {
+			Activator.getInstance().trace(query, t);
+		}
 	}
 
 	/**
@@ -512,13 +520,15 @@ public class MapperSQLService extends AbstractMapperService {
 		if ((limit < 0) && (offset == 0)) {
 			return query(query, type, list, values);
 		}
+		long t = System.currentTimeMillis();
 		try {
-			Activator.getInstance().trace(query);
 			return (BeanMapList) runner.query(query, new PartialBeanMapListHandler(type, list, offset, limit), values);
 		} catch (SQLException e) {
 			Activator.getInstance().error(Messages.MapperSQLService_Error_Selection + e.getLocalizedMessage(), e);
 			Activator.getInstance().debug(String.format(Messages.MapperSQLService_SQLError, query, arrayToString(values)));
 			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, Messages.MapperSQLService_Error_Selection + e.getLocalizedMessage(), e);
+		} finally {
+			Activator.getInstance().trace(query, t);
 		}
 	}
 
@@ -532,13 +542,15 @@ public class MapperSQLService extends AbstractMapperService {
 	 * @return
 	 */
 	protected BeanMapList query(String query, String type, BeanMapList list, Object[] values) {
+		long t = System.currentTimeMillis();
 		try {
-			Activator.getInstance().trace(query);
 			return (BeanMapList) runner.query(query, new BeanMapListHandler(type, list), values);
 		} catch (SQLException e) {
 			Activator.getInstance().error(Messages.MapperSQLService_Error_Selection + e.getLocalizedMessage(), e);
 			Activator.getInstance().debug(String.format(Messages.MapperSQLService_SQLError, query, arrayToString(values)));
 			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, Messages.MapperSQLService_Error_Count + e.getLocalizedMessage(), e);
+		} finally {
+			Activator.getInstance().trace(query, t);
 		}
 	}
 
