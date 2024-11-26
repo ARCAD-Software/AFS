@@ -137,26 +137,12 @@ public class CurrentUserResource extends BaseResource {
 			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
 					Activator.getInstance().getMessage("empty_new_pwd", language)); //$NON-NLS-1$
 		}
-		String op = form.getFirstValue("oldpassword"); //$NON-NLS-1$
-		if ((op != null) && !op.isEmpty()) {
-			if ((oldp != null) && !oldp.isEmpty()) {
-				if (!oldp.equals(op)) {
-					throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, Activator.getInstance().getMessage("invalid_old_pwd", language)); //$NON-NLS-1$
-				}
-			}
-		} else {
-			op = oldp;
-		}
-		if ((op == null) || op.isEmpty()) {
-			Activator.getInstance().debug(Messages.CurrentUserResource_Debug_Empty_old_password);
-			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, Activator.getInstance().getMessage("empty_old_pwd", language)); //$NON-NLS-1$
-		}
-		if (newp.equals(op)) {
+		if (newp.equals(oldp)) {
 			if (user.isChangePWD()) {
 				throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, Activator.getInstance().getMessage("same_pwd", language)); //$NON-NLS-1$
 			}
 		} else {
-			final char[] oldpc = op.toCharArray();
+			final char[] oldpc = oldp.toCharArray();
 			final char[] newpc = newp.toCharArray();
 			String result = null;
 			try {
