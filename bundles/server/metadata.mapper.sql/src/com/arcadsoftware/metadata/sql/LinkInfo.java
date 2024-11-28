@@ -37,11 +37,11 @@ public class LinkInfo {
 	public LinkInfo(final MetaDataEntity entity, final MetaDataLink link) {
 		super();
 		BeanMap md = link.getMetadata();
-		// Auto-link management, we reverse the targetted link.
+		// Auto-link management, we reverse the targeted link.
 		String autolinkCode = md.getString(MetaDataEntity.METADATA_AUTOLINK);
 		if ((autolinkCode != null) && (autolinkCode.length() > 0)) {
 			MetaDataEntity le = link.getRefEntity();
-			// on ne supporte que les autolinks interne au même domaine. 
+			// only autolinks internal to the same domain are supported.
 			if ((le != null) && le.sameMapper(entity)) {
 				MetaDataLink l = le.getLink(autolinkCode);
 				if (l != null) {
@@ -54,17 +54,19 @@ public class LinkInfo {
 				}
 			}
 		} else {
-			// Reverse-Link management, we use the targetted entity as a link table.
+			// Reverse-Link management, we use the targeted entity as a link table.
 			String code = md.getString(MetaDataEntity.METADATA_REVERSELINK);
 			if (code != null) {
 				MetaDataEntity le = link.getRefEntity();
-				md = le.getMetadata();
-				table = md.getString(EntityInfo.METADATA_TABLE);
-				destCol = md.getString(EntityInfo.METADATA_IDCOL);
-				deleteCol = md.getString(EntityInfo.METADATA_DELETECOL);
-				MetaDataAttribute att = le.getAttribute(code);
-				if (att != null) {
-					sourceCol = att.getMetadata().getString(EntityInfo.METADATA_COLNAME);
+				if (le != null) {
+					md = le.getMetadata();
+					table = md.getString(EntityInfo.METADATA_TABLE);
+					destCol = md.getString(EntityInfo.METADATA_IDCOL);
+					deleteCol = md.getString(EntityInfo.METADATA_DELETECOL);
+					MetaDataAttribute att = le.getAttribute(code);
+					if (att != null) {
+						sourceCol = att.getMetadata().getString(EntityInfo.METADATA_COLNAME);
+					}
 				}
 			} else {
 				table = md.getString(EntityInfo.METADATA_TABLE);
