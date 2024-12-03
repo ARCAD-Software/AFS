@@ -937,6 +937,9 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 				}
 			}
 		}
+		if (list.isEmpty()) {
+			return null;
+		}
 		return list;
 	}
 
