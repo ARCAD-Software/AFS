@@ -901,7 +901,7 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 	 * @return null if the entity is not correctly initialized or the code bring to a inexistant entity.
 	 */
 	public ReferenceLine getReferenceLine(String code) {
-		// TODO Utiliser un cache interne à l'entité...
+		// TODO Use an internal cache of reference lines...
 		if ((code == null) || (code.length() == 0)) {
 			return null;
 		}
@@ -910,11 +910,14 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 		MetaDataEntity entity = this;
 		int l = 0;
 		for (String c : codes) {
+			if (entity == null) {
+				return null;
+			}
 			Element e = entity.getAttribute(c);
 			if (e == null) {
 				e = entity.getLink(c);
 				if (e == null) {
-					break;
+					return null;
 				}
 				list.add(e);
 				list.setIsLink(true);
@@ -923,18 +926,12 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 					list.setIsMultiLink(true);
 				}
 				entity = getEntity(e.getType());
-				if (entity == null) {
-					break;
-				}
-			} else if (((MetaDataAttribute)e).isSimpleType()) {
+			} else if (((MetaDataAttribute) e).isSimpleType()) {
 				list.add(e);
 				break;
 			} else {
 				list.add(e);
 				entity = getEntity(e.getType());
-				if (entity == null) {
-					break;
-				}
 			}
 		}
 		if (list.isEmpty()) {
