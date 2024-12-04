@@ -39,10 +39,10 @@ import com.arcadsoftware.afs.client.core.internal.Activator;
 import com.arcadsoftware.afs.client.core.ui.composites.AbstractSearchListComposite;
 import com.arcadsoftware.afs.framework.messages.UserMessage;
 import com.arcadsoftware.beanmap.BeanMap;
-import com.arcadsoftware.beanmap.BeanMapList;
 import com.arcadsoftware.metadata.MetaDataEntity;
 import com.arcadsoftware.metadata.criteria.AndCriteria;
 import com.arcadsoftware.metadata.criteria.EqualCriteria;
+import com.arcadsoftware.metadata.criteria.ISearchCriteria;
 import com.arcadsoftware.metadata.criteria.IdEqualCriteria;
 import com.arcadsoftware.metadata.criteria.NotCriteria;
 
@@ -50,10 +50,8 @@ public abstract class AbstractBeanMapListPropertyPage extends AbstractConnectedP
 
 	protected MetaDataEntity entity;
 	protected AbstractSearchListComposite composite;
-	// protected BeanMapListTableViewer viewer;
 	protected AbstractColumnedViewer viewer;
-	DataAccessHelper helper;
-
+	private DataAccessHelper helper;
 	private Action editAction;
 
 	public AbstractBeanMapListPropertyPage() {
@@ -61,17 +59,9 @@ public abstract class AbstractBeanMapListPropertyPage extends AbstractConnectedP
 		noDefaultAndApplyButton();
 	}
 
-	protected Button createButton(Composite parent,
-			String text,
-			ImageDescriptor imageDescriptor,
-			int anchor,
-			int offset,
-			int width,
-			int height) {
-
+	protected Button createButton(Composite parent, String text, ImageDescriptor imageDescriptor, int anchor, int offset, int width, int height) {
 		final Button b = new Button(parent, SWT.PUSH);
 		b.setText(text);
-
 		final FormData fData = new FormData();
 		fData.top = new FormAttachment(0, 0);
 		fData.height = height;
@@ -96,7 +86,6 @@ public abstract class AbstractBeanMapListPropertyPage extends AbstractConnectedP
 		if (c != null) {
 			return c;
 		}
-
 		helper = new DataAccessHelper(getServerConnection());
 		entity = helper.getEntity(getType());
 		composite = new AbstractSearchListComposite(parent, entity, getServerConnection(), false) {
@@ -162,9 +151,7 @@ public abstract class AbstractBeanMapListPropertyPage extends AbstractConnectedP
 			protected String getDisplayedSelectClause() {
 				return AbstractBeanMapListPropertyPage.this.getDisplayedSelectClause();
 			}
-
 		};
-
 		editAction = new Action() {
 			@Override
 			public void run() {
@@ -183,26 +170,28 @@ public abstract class AbstractBeanMapListPropertyPage extends AbstractConnectedP
 				}
 			}
 		};
-
 		viewer = composite.getViewer();
-
 		GridData layoutData = new GridData(GridData.FILL_BOTH);
 		layoutData.horizontalSpan = 3;
 		layoutData.grabExcessVerticalSpace = true;
 		layoutData.grabExcessHorizontalSpace = true;
 		composite.setLayoutData(layoutData);
-
 		final Composite bar = new Composite(composite, SWT.NONE);
 		layoutData = new GridData(GridData.FILL_HORIZONTAL);
 		layoutData.horizontalSpan = 3;
 		layoutData.grabExcessHorizontalSpace = true;
 		bar.setLayoutData(layoutData);
 		bar.setLayout(new FormLayout());
-
-		final Button bAdd = createButton(bar,
-				Activator.resString(isCreateDeleteStyle() ? "button.create.text" : "button.add.text"),
-				isCreateDeleteStyle() ? AFSIcon.CREATE.imageDescriptor() : AFSIcon.ADD.imageDescriptor(),
-				1, -100, 100, 25);
+		String text;
+		ImageDescriptor img;
+		if (isCreateDeleteStyle()) {
+			text = "button.create.text";
+			img = AFSIcon.CREATE.imageDescriptor();
+		} else {
+			text = "button.add.text";
+			img = AFSIcon.ADD.imageDescriptor();
+		}
+		final Button bAdd = createButton(bar, Activator.resString(text), img, 1, -100, 100, 25);
 		bAdd.addSelectionListener(
 				new SelectionAdapter() {
 					@Override
@@ -220,11 +209,8 @@ public abstract class AbstractBeanMapListPropertyPage extends AbstractConnectedP
 						}
 					}
 				});
-
-		final Button bUpdate = createButton(bar,
-				Activator.resString("button.edit.text"),
-				AFSIcon.EDIT.imageDescriptor(),
-				1, -208, 100, 25);
+		final Button bUpdate = createButton(bar, Activator.resString("button.edit.text"), //$NON-NLS-1$
+				AFSIcon.EDIT.imageDescriptor(), 1, -208, 100, 25);
 		bUpdate.addSelectionListener(
 				new SelectionAdapter() {
 					@Override
@@ -232,21 +218,21 @@ public abstract class AbstractBeanMapListPropertyPage extends AbstractConnectedP
 						editAction.run();
 					}
 				});
-
-		final Button bDelete = createButton(bar,
-				Activator.resString(isCreateDeleteStyle() ? "button.delete.text" : "button.remove.text"),
-				isCreateDeleteStyle() ? AFSIcon.DELETE.imageDescriptor() : AFSIcon.REMOVE.imageDescriptor(),
-				0, 0, 100, 25);
+		if (isCreateDeleteStyle()) {
+			text = "button.delete.text"; //$NON-NLS-1$
+			img = AFSIcon.DELETE.imageDescriptor();
+		} else {
+			text = "button.remove.text"; //$NON-NLS-1$
+			img = AFSIcon.REMOVE.imageDescriptor();
+		}
+		final Button bDelete = createButton(bar, Activator.resString(text), img, 0, 0, 100, 25);
 		bDelete.addSelectionListener(
 				new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent e) {
-
 						if (composite.enableMultiSelection()) {
-							final BeanMapList toBeDeleted = composite.getSelectedBeanMap();
-							final boolean result = confirmDeletion(null);
-							if (result) {
-								for (final BeanMap deleted : toBeDeleted) {
+							if (confirmDeletion(null)) {
+								for (final BeanMap deleted : composite.getSelectedBeanMap()) {
 									doDelete(deleted, false);
 								}
 								composite.search();
@@ -261,42 +247,35 @@ public abstract class AbstractBeanMapListPropertyPage extends AbstractConnectedP
 						}
 					}
 				});
-
 		additionalButon(bar);
-
 		composite.search();
-
 		return composite;
 	}
 
-	protected void additionalButon(Composite bar) {
-
-	}
+	protected void additionalButon(Composite bar) {}
 
 	private void showViolationMessage(BeanMap b) {
-		final String message = String.format(Activator.resString("msg.error.code.alreadyExists"),
-				b.getString(getCodeAttribute()));
+		final String message = String.format(Activator.resString("msg.error.code.alreadyExists"), b.getString(getCodeAttribute())); //$NON-NLS-1$
 		Activator.getDefault().openError(message);
 	}
 
 	private boolean alreadyExists(BeanMap b, boolean update) {
-		BeanMapList l;
-		final EqualCriteria equalCode = new EqualCriteria(getCodeAttribute(), b.getString(getCodeAttribute()));
-		if (update) {
-			// If test is made during update, we also check that
-			// the id is different
-			final IdEqualCriteria equalId = new IdEqualCriteria(b.getId());
-			final NotCriteria notEqualId = new NotCriteria(equalId);
-			final AndCriteria finalCriteria = new AndCriteria();
-			finalCriteria.add(equalCode);
-			finalCriteria.add(notEqualId);
-			l = helper.getList(getType(), finalCriteria);
-		} else {
-			l = helper.getList(getType(), equalCode);
+		String code = getCodeAttribute();
+		// Check that there is a "code" for this entity...
+		// FIXME this assume that a code, is always an "unique" data, which is just a convention. We should check the presence fs the "unique" metadata !
+		if ((code != null) && (entity.getAttribute(code) != null)) {
+			EqualCriteria equalCode = new EqualCriteria(code, b.getString(code));
+			if (update && (b.getId() > 0)) {
+				// If test is made during update, we also check that the id is different
+				ISearchCriteria finalCriteria = new NotCriteria(new IdEqualCriteria(b.getId()));
+				if (equalCode != null) {
+					finalCriteria = new AndCriteria(finalCriteria, equalCode);
+				}
+				return helper.count(getType(), finalCriteria) > 0;
+			}
+			return helper.count(getType(), equalCode) > 0;
 		}
-
-		return (!l.isEmpty());
-
+		return false;
 	}
 
 	protected BeanMap doAdd() {
@@ -312,18 +291,14 @@ public abstract class AbstractBeanMapListPropertyPage extends AbstractConnectedP
 	}
 
 	protected boolean doDelete(BeanMap deleted, boolean confirm) {
-		boolean result = true;
-		if (confirm) {
-			result = confirmDeletion(deleted);
-		}
-		if (result) {
+		if (confirm && confirmDeletion(deleted)) {
 			return helper.remove(deleted);
 		}
 		return false;
 	}
 
 	protected boolean confirmDeletion(BeanMap deleted) {
-		return Activator.getDefault().openConfirm(Activator.resString("msg.question.action.delete.confirmation"));
+		return Activator.getDefault().openConfirm(Activator.resString("msg.question.action.delete.confirmation")); //$NON-NLS-1$
 	}
 
 	protected String getDisplayedSelectClause() {
@@ -331,7 +306,7 @@ public abstract class AbstractBeanMapListPropertyPage extends AbstractConnectedP
 	}
 
 	protected String createSelectClause() {
-		return getCodeAttribute() + " " + getNameAttribute();
+		return getCodeAttribute() + " " + getNameAttribute(); //$NON-NLS-1$
 	}
 
 	protected String createSearchClause() {
@@ -346,6 +321,10 @@ public abstract class AbstractBeanMapListPropertyPage extends AbstractConnectedP
 		return getNameAttribute();
 	}
 
+	/**
+	 * Override this method and return "null" if this entity does not use a "unique" code attribute.
+	 * @return
+	 */
 	public String getCodeAttribute() {
 		return "code";
 	}
@@ -366,6 +345,7 @@ public abstract class AbstractBeanMapListPropertyPage extends AbstractConnectedP
 		return null;
 	}
 
+	@Deprecated
 	protected DataAccessHelper getHelper() {
 		return helper;
 	}
