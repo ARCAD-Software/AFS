@@ -27,6 +27,7 @@ import com.arcadsoftware.afs.framework.messages.UserMessage;
 import com.arcadsoftware.afs.framework.messages.UserMessageManager;
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
+import com.arcadsoftware.beanmap.BeanMapPartialList;
 import com.arcadsoftware.beanmap.xml.XmlBeanMapStream;
 import com.arcadsoftware.metadata.MetaDataEntity;
 import com.arcadsoftware.metadata.client.DataAccess;
@@ -959,6 +960,19 @@ public class DataAccessHelper {
 		} catch (final ServerErrorException e) {
 			manageException(e);
 			return null;
+		}
+	}
+
+	public int count(String type, ISearchCriteria criteria) {
+		try {
+			BeanMapList list = dataAccess.getList(type, "", criteria, null, 0, 1, false);
+			if (list instanceof BeanMapPartialList) {
+				return ((BeanMapPartialList) list).getTotal();
+			}
+			return list.size();
+		} catch (final ServerErrorException e) {
+			manageException(e);
+			return 0;
 		}
 	}
 

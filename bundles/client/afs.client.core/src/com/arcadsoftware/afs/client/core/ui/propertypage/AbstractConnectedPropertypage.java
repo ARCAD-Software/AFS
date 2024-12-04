@@ -58,11 +58,7 @@ public abstract class AbstractConnectedPropertypage extends AbstractAFSPropertyP
 
 	public boolean isAllowed() {
 		final ServerConnection connection = getServerConnection();
-		if (connection != null) {
-			return connection.isAllowed(getExpectedRigths());
-		} else {
-			return false;
-		}
+		return (connection != null) && connection.isAllowed(getExpectedRigths());
 	}
 
 	@Override
@@ -70,7 +66,7 @@ public abstract class AbstractConnectedPropertypage extends AbstractAFSPropertyP
 		// Check rights, if any defined
 		if (!isAllowed()) {
 			final Label notAllowed = new Label(parent, SWT.NONE);
-			notAllowed.setText(Activator.resString("search.label.notAllowed"));
+			notAllowed.setText(Activator.resString("search.label.notAllowed")); //$NON-NLS-1$
 			return notAllowed;
 		}
 		return null;
