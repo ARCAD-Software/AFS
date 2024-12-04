@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.List;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -28,23 +29,27 @@ import org.osgi.framework.BundleListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
+import org.restlet.data.Language;
 
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
 import com.arcadsoftware.beanmap.xml.XmlBeanMapStream;
 import com.arcadsoftware.metadata.MetaDataEntity;
+import com.arcadsoftware.metadata.ReferenceLine;
 import com.arcadsoftware.osgi.AbstractActivator;
 import com.arcadsoftware.rest.connection.ConnectionUserBean;
 import com.arcadsoftware.rest.connection.IConnectionInfoService;
+import com.arcadsoftware.rest.connection.IProfileRightsListService;
 import com.arcadsoftware.rest.connection.Profile;
 import com.arcadsoftware.rest.connection.Right;
+import com.arcadsoftware.rest.connection.RightInfo;
 
 /*
  * Cet activateur gère :
  * - la déclaration des Rights par fichiers xml.
  * - Le chargement des informations de connexion lié à l'entité user.
  */
-public class Activator extends AbstractActivator implements BundleListener, IConnectionInfoService {
+public class Activator extends AbstractActivator implements BundleListener, IConnectionInfoService, IProfileRightsListService {
 
 	public static final String USER = "user"; //$NON-NLS-1$
 	private static final String USER_TITLE = "title.name"; //$NON-NLS-1$
@@ -57,6 +62,7 @@ public class Activator extends AbstractActivator implements BundleListener, ICon
 	public static final String RIGHT = "right"; //$NON-NLS-1$
 	public static final String RIGHTCATEGORY = "list/rightcategory"; //$NON-NLS-1$
 	public static final String RIGHT_CODE = "code"; //$NON-NLS-1$
+	public static final String RIGHT_NAME = "name"; //$NON-NLS-1$
 	public static final String RIGHT_CATEGORY = "category"; //$NON-NLS-1$
 	public static final String RIGHT_PARAMTYPE = "paramType"; //$NON-NLS-1$
 	public static final String PARAM = "param"; //$NON-NLS-1$
@@ -68,6 +74,7 @@ public class Activator extends AbstractActivator implements BundleListener, ICon
 	private final HashMap<Integer, BeanMap> rights = new HashMap<Integer, BeanMap>();;
 	private final HashMap<Integer, BeanMap> rightscategories = new HashMap<Integer, BeanMap>();
 	private final XmlBeanMapStream xs = new XmlBeanMapStream();
+	private volatile ReferenceLine rightName;
 
 	@Override
 	public void start(BundleContext bundleContext) throws Exception {
@@ -75,6 +82,7 @@ public class Activator extends AbstractActivator implements BundleListener, ICon
 		registerService(RightsMapperService.clazz, new RightsMapperService(this), //
 				RightsMapperService.mapperProperties("mem:rights", false, true, false, false, false)); //$NON-NLS-1$
 		registerService(IConnectionInfoService.clazz, this);
+		registerService(IProfileRightsListService.class, this);
 		if (isCommonStarted()) {
 			proceedDelayedBundleScan();
 		}
@@ -301,6 +309,40 @@ public class Activator extends AbstractActivator implements BundleListener, ICon
 		if (entity != null) {
 			for (BeanMap bean: entity.dataSelection(RIGHTANDPARAM, false, USER, id)) {
 				profile.addRight(new Right(bean.getInt(RIGHT), bean.getInt(PARAM)));
+			}
+		}
+		return result;
+	}
+
+	@Override
+	public List<RightInfo> getProfileRights(Profile profile, Language language) {
+		ArrayList<RightInfo> result = new ArrayList<>();
+		if (rightName == null) {
+			MetaDataEntity entity = MetaDataEntity.loadEntity(RIGHT);
+			if (entity == null) {
+				return result;
+			}
+			rightName = new ReferenceLine(entity.getAttribute(RIGHT_NAME));
+		}
+		for (BeanMap r: rights.values()) {
+			Collection<Right> pr = profile.getParams(r.getId());
+			if ((pr == null) || pr.isEmpty()) {
+				if (profile.hasRight(r.getId())) {
+					String code = r.getString(RIGHT_CODE);
+					if (code == null) {
+						code = Integer.toString(r.getId());
+					}
+					result.add(new RightInfo(r.getId(), 0, code, rightName.translate(code, language)));
+				}
+			} else {
+				String code = r.getString(RIGHT_CODE);
+				if (code == null) {
+					code = Integer.toString(r.getId());
+				}
+				String name = rightName.translate(code, language);
+				for (Right right: pr) {
+					result.add(new RightInfo(r.getId(), right.getParam(), code, name));
+				}
 			}
 		}
 		return result;

@@ -180,7 +180,7 @@ public class LocalConnectionCredential implements IConnectionCredential, IUpdata
 	public String updatePassword(IConnectionUserBean user, char[] oldPassword, char[] newPassword, Language language) {
 		// Test current password.
 		if ((hash != null) && (oldPassword != null) && !Crypto.matches(hash, oldPassword)) {
-			return activator.getMessage("Error_invalid_password_test", language); //$NON-NLS-1$
+			return Activator.getMessage("Error_invalid_password_test", language); //$NON-NLS-1$
 		}
 		// Test the new password.
 		int i = activator.getTester().isPasswordAcceptable(login, oldPassword, newPassword);

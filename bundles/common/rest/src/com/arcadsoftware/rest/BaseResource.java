@@ -396,7 +396,7 @@ public abstract class BaseResource extends ServerResource {
 		}
 		float quality = Float.MIN_VALUE;
 		for (Preference<Language> pref : request.getClientInfo().getAcceptedLanguages()) {
-			if ((pref != null) && (pref.getQuality() > quality)) {
+			if ((pref != null) && (pref.getQuality() >= quality)) {
 				quality = pref.getQuality();
 				result = pref.getMetadata();
 			}

@@ -31,9 +31,9 @@ public class SecureBranch extends SimpleBranch {
 	@Override
 	protected RouteList createAttachedResources(Context context, Router router) {
 		RouteList list = new RouteList(3);
-		list.add(router.attach("/localauth/{login}",new LocalAuthLoginRestlet(activator, context))); //$NON-NLS-1$
-		list.add(router.attach("/localauth/{login}/{oldpassword}",new TestPasswordRestlet(activator, context))); //$NON-NLS-1$
-		list.add(router.attach("/localauth/{login}/{oldpassword}/{newpassword}",new TestPasswordRestlet(activator, context))); //$NON-NLS-1$
+		list.add(router.attach("/localauth/test/password", TestPasswordResource.class)); //$NON-NLS-1$
+		list.add(router.attach("/localauth/{login}", new LocalAuthLoginRestlet(activator, context))); //$NON-NLS-1$
+		list.add(router.attach("/localauth/{a}/{b}/{c}", new TestPasswordRestlet(context))); //$NON-NLS-1$
 		return list;
 	}
 

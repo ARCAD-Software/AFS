@@ -154,53 +154,53 @@ public class PasswordComplexityTester implements IPasswordComplexityTester {
 	@Override
 	public String getTextualReason(int reason, Language language) {
 		if (reason == 0) {
-			return activator.getMessage("ok", language); //$NON-NLS-1$
+			return Activator.getMessage("ok", language); //$NON-NLS-1$
 		}
-		StringBuilder result = new StringBuilder(activator.getMessage("Error", language)); //$NON-NLS-1$ 
+		StringBuilder result = new StringBuilder(Activator.getMessage("Error", language)); //$NON-NLS-1$ 
 		if ((reason & REASON_TOOSHORT) > 0) {
-			result.append(activator.getMessage("tooshort", language)); //$NON-NLS-1$
+			result.append(Activator.getMessage("tooshort", language)); //$NON-NLS-1$
 		}
 		if ((reason & REASON_TOOLONG) > 0) {
-			result.append(activator.getMessage("toolong", language)); //$NON-NLS-1$
+			result.append(Activator.getMessage("toolong", language)); //$NON-NLS-1$
 		}
 		if ((reason & REASON_NOTENOUGHDIGIT) > 0) {
-			result.append(activator.getMessage("notenoughdigit", language)); //$NON-NLS-1$
+			result.append(Activator.getMessage("notenoughdigit", language)); //$NON-NLS-1$
 		}
 		if ((reason & REASON_NOTENOUGHALPHA) > 0) {
-			result.append(activator.getMessage("notenoughalpha", language)); //$NON-NLS-1$
+			result.append(Activator.getMessage("notenoughalpha", language)); //$NON-NLS-1$
 		}
 		if ((reason & REASON_NOTENOUGHDIFFCHAR) > 0) {
-			result.append(activator.getMessage("notenoughdiff", language)); //$NON-NLS-1$
+			result.append(Activator.getMessage("notenoughdiff", language)); //$NON-NLS-1$
 		}
 		if ((reason & REASON_NOTENOUGHNONALPHA) > 0) {
-			result.append(activator.getMessage("notenoughnonalpha", language)); //$NON-NLS-1$
+			result.append(Activator.getMessage("notenoughnonalpha", language)); //$NON-NLS-1$
 		}
 		if ((reason & REASON_TOOMANYLOGINCHAR) > 0) {
-			result.append(activator.getMessage("difflogin", language)); //$NON-NLS-1$
+			result.append(Activator.getMessage("difflogin", language)); //$NON-NLS-1$
 		}
 		if ((reason & REASON_SAMEASLOGIN) > 0) {
-			result.append(activator.getMessage("sameaslogin", language)); //$NON-NLS-1$
+			result.append(Activator.getMessage("sameaslogin", language)); //$NON-NLS-1$
 		}
 		if ((reason & REASON_SAMEASOLD) > 0) {
-			result.append(activator.getMessage("sameasoldpwd", language)); //$NON-NLS-1$
+			result.append(Activator.getMessage("sameasoldpwd", language)); //$NON-NLS-1$
 		}
 		if ((reason & REASON_TOOMANYOLDCHAR) > 0) {
-			result.append(activator.getMessage("diffoldpwd", language)); //$NON-NLS-1$
+			result.append(Activator.getMessage("diffoldpwd", language)); //$NON-NLS-1$
 		}
 		if ((reason & REASON_NOTENOUGHLOWERCASE) > 0) {
-			result.append(activator.getMessage("notenoughlowercase", language)); //$NON-NLS-1$
+			result.append(Activator.getMessage("notenoughlowercase", language)); //$NON-NLS-1$
 		}
 		if ((reason & REASON_NOTENOUGHUPPERCASE) > 0) {
-			result.append(activator.getMessage("notenoughuppercase", language)); //$NON-NLS-1$
+			result.append(Activator.getMessage("notenoughuppercase", language)); //$NON-NLS-1$
 		}
 		if ((reason & REASON_TOOMANYREPEATING) > 0) {
-			result.append(activator.getMessage("toorepeating", language)); //$NON-NLS-1$
+			result.append(Activator.getMessage("toorepeating", language)); //$NON-NLS-1$
 		}
 		if ((reason & REASON_BLACKLISTED) > 0) {
-			result.append(activator.getMessage("blacklisted", language)); //$NON-NLS-1$
+			result.append(Activator.getMessage("blacklisted", language)); //$NON-NLS-1$
 		}
 		if ((reason & REASON_UNKNOWN) > 0) {
-			result.append(activator.getMessage("misc", language)); //$NON-NLS-1$
+			result.append(Activator.getMessage("misc", language)); //$NON-NLS-1$
 		}
 		return result.toString();
 	}

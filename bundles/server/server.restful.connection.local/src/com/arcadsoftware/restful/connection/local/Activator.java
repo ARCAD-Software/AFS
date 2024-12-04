@@ -44,6 +44,7 @@ import com.arcadsoftware.metadata.criteria.NotCriteria;
 import com.arcadsoftware.osgi.AbstractConfiguredActivator;
 import com.arcadsoftware.rest.MultiLanguageMessages;
 import com.arcadsoftware.rest.connection.IConnectionCache;
+import com.arcadsoftware.rest.connection.IPasswordComplexityTester;
 
 public class Activator extends AbstractConfiguredActivator implements CommandProvider {
 
@@ -83,7 +84,12 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 	// CETTE VALEUR DOIT RESTER A 5 PAR DEFAUT PARCE QUE LES BROWSERS FONT 
 	// SYSTEMATIQUEMENT UNE TENTATIVE AVANT D'OUVRIR LA DIALOGUE DE CONNECTION
 	// ET TELECHARGENT DIVERS OBJETS EN PARALELLE.
-	// De plus ce paramètre étant dans laconfiguration il n'y a AUCUNE raison de le modifier ici.
+	// De plus ce paramètre étant dans la configuration il n'y a AUCUNE raison de le modifier ici.
+	protected static final MultiLanguageMessages messages = new MultiLanguageMessages(HTTP_MESSAGES, Activator.class.getClassLoader());
+	
+	public static String getMessage(String key, Language language) {
+		return messages.get(key, language);
+	}
 
 	private final ConcurrentHashMap<Integer, Timer> unlockTimers = new ConcurrentHashMap<Integer, Timer>();
 	private int pwdDuration = PWD_DURATION;
@@ -95,21 +101,19 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 	private volatile HashMap<String, BeanMap> authCacheLogin;
 	private PasswordComplexityTester tester;
 	private ServiceTracker<IConnectionCache, IConnectionCache> connectionCacheTracker;
-	private MultiLanguageMessages messages;
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void start(BundleContext context) throws Exception {
 		tester = new PasswordComplexityTester(this);
 		super.start(context);
-		messages = new MultiLanguageMessages(HTTP_MESSAGES, Activator.class.getClassLoader());
 		// Register an authentification service...
 		Dictionary<String, Object> props = new Hashtable<>();
 		props.put(LocalAuthentificationService.ENTITYNAME, LOCALAUTH);
 		props.put(LocalAuthentificationService.PRIORITY, 10);
 		registerService(LocalAuthentificationService.clazz, new LocalAuthentificationService(this), props);
 		// Register a service usable for password testing
-		registerService(PasswordComplexityTester.clazz, tester);
+		registerService(IPasswordComplexityTester.class, tester);
 		// Register a branch for password modifications.
 		registerService(SecureBranch.clazz, new SecureBranch(this), SecureBranch.properties(SecureBranch.SECUREDBRANCH));
 		// Register itself as a console command provider.
@@ -494,10 +498,6 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 
 	public boolean isCaseSensitive() {
 		return casesensitive;
-	}
-	
-	public String getMessage(String key, Language language) {
-		return messages.get(key, language);
 	}
 	
 	public void recordUserLock(int uid) {

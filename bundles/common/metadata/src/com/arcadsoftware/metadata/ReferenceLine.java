@@ -743,6 +743,18 @@ public class ReferenceLine extends ArrayList<Element> implements Comparable<Refe
 	}
 
 	/**
+	 * Translate the last Attribute value corresponding to this reference line according to the given code (which may be a "code" value or an ID depending on the data).
+	 * 
+	 * @param aid a non null id
+	 * @param language
+	 */
+	public String translate(String code, Language language) {
+		MetaDataAttribute att = getLastAttribute();
+		// Translation rule: {type}.{attCode}.{code/id}
+		return Activator.getInstance().translate(Activator.TRANLATEDOMAIN_DATA, att.getParent().getType() + '.' + att.getCode() + '.' + code, language);
+	}
+
+	/**
 	 * Get the reference line required to ensure that this ReferenceLine will be translated (after selection).
 	 * 
 	 * <p>

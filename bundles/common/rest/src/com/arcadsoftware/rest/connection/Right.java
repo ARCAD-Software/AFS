@@ -16,8 +16,8 @@ package com.arcadsoftware.rest.connection;
 /**
  * A right define if a specific user can access a particular web-service.
  * 
- * <p> The rights are integer identified key that offer special privilège on the server.
- * The semantic of theses privilège is idenpendant from the definition and the storage 
+ * <p> The rights are integer identified key that offer special privilege on the server.
+ * The semantic of theses privilege is independent from the definition and the storage 
  * of theses rights.
  * 
  * <p>the Rights are stored, and cached, with the user connection informations.

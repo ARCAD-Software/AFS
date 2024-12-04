@@ -40,7 +40,7 @@ public class LocalAuthLoginRestlet extends Restlet {
 			} else if (activator.getAuth(login) == null) {
 				response.setStatus(Status.SUCCESS_NO_CONTENT);
 			} else {
-				response.setStatus(Status.CLIENT_ERROR_CONFLICT, activator.getMessage("Error_Login_invalid",  //$NON-NLS-1$
+				response.setStatus(Status.CLIENT_ERROR_CONFLICT, Activator.getMessage("Error_Login_invalid",  //$NON-NLS-1$
 						BaseResource.getClientPreferedLanguage(request)));
 			}
 		} else {

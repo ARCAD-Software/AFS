@@ -354,7 +354,7 @@ public class CachedAuthentificator extends Authenticator {
 			}
 		}
 		// Par défaut on traduit le message (pour respecter le protocole HTTP).
-		return activator.getMessage(msg, BaseResource.getClientPreferedLanguage(request));
+		return Activator.getMessage(msg, BaseResource.getClientPreferedLanguage(request));
 	}
 
 	/**

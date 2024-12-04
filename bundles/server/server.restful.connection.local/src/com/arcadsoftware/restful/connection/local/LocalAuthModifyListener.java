@@ -57,7 +57,7 @@ public class LocalAuthModifyListener implements IMetaDataModifyListener {
 						login = originalItem.getString(Activator.LOCALAUTH_LOGIN);
 					}
 					if (login == null) {
-						throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, activator.getMessage("Error_empty_login", language)); //$NON-NLS-1$
+						throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, Activator.getMessage("Error_empty_login", language)); //$NON-NLS-1$
 					}
 				}
 				// test to check if password is not already hashed... basic test

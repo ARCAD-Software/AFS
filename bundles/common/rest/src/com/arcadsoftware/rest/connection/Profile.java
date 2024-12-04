@@ -123,7 +123,7 @@ public class Profile {
 	public void addRight(Right right) {
 		rights.remove(right);
 		rights.add(right);
-		if (right.getParam() > 0) {
+		if (right.getParam() != 0) {
 			if (params == null) {
 				buildKeysTable();
 			}
@@ -196,4 +196,25 @@ public class Profile {
 		}
 		return result;
 	}
+	
+	/**
+	 * Get the list of all rights.
+	 * 
+	 * @return
+	 */
+	public List<Right> getRights() {
+		return new ArrayList<Right>(rights);
+	}
+
+	@Override
+	public int hashCode() {
+		return rights.hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return rights.toString();
+	}
+	
+	
 }

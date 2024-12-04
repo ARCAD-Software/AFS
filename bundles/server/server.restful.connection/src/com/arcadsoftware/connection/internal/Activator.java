@@ -46,28 +46,31 @@ import com.arcadsoftware.rest.connection.IConnectionUserRepository;
 public class Activator extends AbstractConfiguredActivator implements CommandProvider, IConnectionUserRepository {
 
 	private static Activator instance;
-
 	private static final String HTTP_MESSAGES = Activator.class.getPackage().getName() + ".clientmessages"; //$NON-NLS-1$
-
-	/**
+	private static final MultiLanguageMessages messages = new MultiLanguageMessages(HTTP_MESSAGES, Activator.class.getClassLoader());
+	/*
 	 * Avoid to recall the connection provider too early for the same connection.
 	 * <p>
 	 * This assume that during this period of time any revocation of the login will be ignored.
 	 * If the password is changed, either the old password or the new one will be accepted.
 	 */
 	private static final String PROP_CACHEDURATION = "cache"; //$NON-NLS-1$
-	
-	/**
-	 * Disable any connection to this server...
-	 */
+	// Disable any connection to this server...
 	private static final String PROP_INACTIVATE = "inactive"; //$NON-NLS-1$
-	
-	/**
-	 * Define the HTTP BASIC realm.
-	 */
+	// Define the HTTP BASIC realm.
 	private static final String PROP_REALM = "realm"; //$NON-NLS-1$
-
 	private static final int CACHE_DURATION = 30; // in seconds
+
+	public static String getMessage(String key, Language language) {
+		return messages.get(key, language);
+	}
+
+	/**
+	 * Return the activator first instance.
+	 */
+	public static Activator getInstance() {
+		return instance;
+	}
 
 	private int cacheDuration = CACHE_DURATION;
 	private ConnectionCache cache;
@@ -75,7 +78,6 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 	private ServiceTracker<IConnectionInfoService, IConnectionInfoService> userTracker;
 	private ServiceTracker<IConnectionUserCheck, IConnectionUserCheck> checkTracker;
 	private boolean inactivate;
-	private MultiLanguageMessages messages;
 	private String realm = "arcad-evolution"; //$NON-NLS-1$
 	private ServiceRegistration<?> breg;
 	
@@ -85,7 +87,6 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 		if (instance == null) {
 			instance = this;
 		}
-		messages = new MultiLanguageMessages(HTTP_MESSAGES, Activator.class.getClassLoader());
 		secTracker = new ServiceTracker<IAuthentificationService, IAuthentificationService>(context, IAuthentificationService.clazz, null);
 		secTracker.open();
 		userTracker = new ServiceTracker<IConnectionInfoService, IConnectionInfoService>(context, IConnectionInfoService.clazz, null);
@@ -146,13 +147,6 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 			unregister(breg);
 			breg = registerService(SecureBranch.clazz, new SecureBranch(this), SecureBranch.properties("/")); //$NON-NLS-1$
 		}
-	}
-
-	/**
-	 * Return the activator first instance.
-	 */
-	public static Activator getInstance() {
-		return instance;
 	}
 
 	public int getCacheDuration() {
@@ -266,10 +260,6 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 			}
 		}
 		return list;
-	}
-	
-	public String getMessage(String key, Language language) {
-		return messages.get(key, language);
 	}
 	
 	public boolean isInactivate() {

@@ -172,7 +172,7 @@ public abstract class OSGiResource extends BaseResource {
 			try {
 				Collection<ServiceReference<T>> srs = context.getServiceReferences(clazz, null);
 				if ((srs != null) && !srs.isEmpty()) {
-					for(ServiceReference<T> sr: srs) {
+					for (ServiceReference<T> sr: srs) {
 						T service = context.getService(sr);
 						if (service != null) {
 							result.add(service);
