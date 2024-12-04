@@ -183,7 +183,11 @@ public class Activator extends AbstractActivator implements EventHandler, Servic
 		if (dsid != null) {
 			 ServiceRegistration mr = map.get(DOMAIN_JDBCPREFIX + dsid);
 			if (mr != null) {
-				unregister(mr);
+				try {
+					unregister(mr);
+				} catch (IllegalStateException e) {
+					// The service has already been removed.
+				}
 			}
 		}
 	}
