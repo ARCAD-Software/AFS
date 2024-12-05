@@ -291,10 +291,10 @@ public abstract class AbstractBeanMapListPropertyPage extends AbstractConnectedP
 	}
 
 	protected boolean doDelete(BeanMap deleted, boolean confirm) {
-		if (confirm && confirmDeletion(deleted)) {
-			return helper.remove(deleted);
+		if (confirm && !confirmDeletion(deleted)) {
+			return false;
 		}
-		return false;
+		return helper.remove(deleted);
 	}
 
 	protected boolean confirmDeletion(BeanMap deleted) {
