@@ -1,10 +1,10 @@
-# AFS-OS release version 2023.7.34.
+# AFS-OS release version 2023.7.35.
 
-Release date Wed Dec 04 16:55:55 CET 2024.
+Release date Thu Dec 05 15:23:10 CET 2024.
 
-Link to the update site of [Version 2023.7.34](https://github.com/ARCAD-Software/AFS/releases/download/2023.7.34/).
+Link to the update site of [Version 2023.7.35](https://github.com/ARCAD-Software/AFS/releases/download/2023.7.35/).
 
-6 Bundles modified in this release.
+1 Bundles modified in this release.
 
 
 
@@ -14,8 +14,8 @@ Bundle Symbolic Name | Modification | Version
 -------------------- | ------------ | -------
 [com.arcadsoftware.afs.client.brands](bundles/client/afs.client.brands) | Not changed | 1.0.4
 [com.arcadsoftware.afs.client.cli](bundles/client/afs.client.cli) | Not changed | 1.3.3
-[com.arcadsoftware.afs.client.core](bundles/client/afs.client.core) | **Upgraded** from version 1.4.5 | **1.4.6**
-[com.arcadsoftware.afs.client.core.base](bundles/client/afs.client.core.base) | **Upgraded** from version 1.6.3 | **1.6.4**
+[com.arcadsoftware.afs.client.core](bundles/client/afs.client.core) | **Upgraded** from version 1.4.6 | **1.4.7**
+[com.arcadsoftware.afs.client.core.base](bundles/client/afs.client.core.base) | Not changed | 1.6.4
 [com.arcadsoftware.afs.client.core.rcp](bundles/client/afs.client.core.rcp) | Not changed | 1.3.3
 [com.arcadsoftware.afs.client.editors](bundles/client/afs.client.editors) | Not changed | 1.2.4
 [com.arcadsoftware.afs.client.list](bundles/client/afs.client.list) | Not changed | 1.3.3
@@ -47,9 +47,9 @@ Bundle Symbolic Name | Modification | Version
 [com.arcadsoftware.crypt.xml](bundles/common/crypt.xml) | Not changed | 1.1.4
 [com.arcadsoftware.email](bundles/common/email) | Not changed | 1.4.3
 [com.arcadsoftware.groovy.security](bundles/common/groovy.security) | Not changed | 1.1.5
-[com.arcadsoftware.metadata](bundles/common/metadata) | **Upgraded** from version 1.6.1 | **1.6.2**
+[com.arcadsoftware.metadata](bundles/common/metadata) | Not changed | 1.6.2
 [com.arcadsoftware.osgi](bundles/common/osgi) | Not changed | 1.9.7
-[com.arcadsoftware.rest](bundles/common/rest) | **Upgraded** from version 3.1.7 | **3.1.8**
+[com.arcadsoftware.rest](bundles/common/rest) | Not changed | 3.1.8
 [com.arcadsoftware.ssh](bundles/common/ssh) | Not changed | 1.2.5
 
 
@@ -61,7 +61,7 @@ Bundle Symbolic Name | Modification | Version
 [org.restlet.base](bundles/repack/org.restlet.base) | Not changed | 2.4.301
 [org.restlet.server](bundles/repack/org.restlet.server) | Not changed | 2.4.303
 [org.restlet.server.jmx](bundles/repack/org.restlet.server.jmx) | Not changed | 2.4.302
-[xstream](bundles/repack/xstream) | **Upgraded** from version 1.4.202 | **1.4.210**
+[xstream](bundles/repack/xstream) | Not changed | 1.4.210
 
 
 
@@ -73,7 +73,7 @@ Bundle Symbolic Name | Modification | Version
 [com.arcadsoftware.database.sql.h2](bundles/server/database.sql.h2) | Not changed | 3.1.3
 [com.arcadsoftware.database.sql.postgresql](bundles/server/database.sql.postgresql) | Not changed | 1.2.3
 [com.arcadsoftware.metadata.binary](bundles/server/metadata.binary) | Not changed | 1.2.6
-[com.arcadsoftware.metadata.mapper.sql](bundles/server/metadata.mapper.sql) | **Upgraded** from version 1.5.2 | **1.5.3**
+[com.arcadsoftware.metadata.mapper.sql](bundles/server/metadata.mapper.sql) | Not changed | 1.5.3
 [com.arcadsoftware.metadata.mapper.sql.postgresql](bundles/server/metadata.mapper.sql.postgresql) | Not changed | 1.1.2
 [com.arcadsoftware.metadata.registry.xml](bundles/server/metadata.registry.xml) | Not changed | 1.2.4
 [com.arcadsoftware.metadata.rest](bundles/server/metadata.rest) | Not changed | 1.4.11
