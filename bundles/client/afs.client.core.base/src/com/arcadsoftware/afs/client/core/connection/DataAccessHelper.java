@@ -44,10 +44,10 @@ public class DataAccessHelper {
 
 	private static final String CONFIG_TYPE = "config";
 
-	ServerConnection connection;
+	private ServerConnection connection;
 	protected DataAccess dataAccess;
-	private UserMessage lastMessage = null;
-	protected Throwable lastCause = null;
+	private UserMessage lastMessage;
+	protected Throwable lastCause;
 
 	public DataAccessHelper(ServerConnection connection) {
 		this.connection = connection;
