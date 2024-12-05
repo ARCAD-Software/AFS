@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AFS CLI Commands
 Bundle-SymbolicName: com.arcadsoftware.tool.cli
-Bundle-Version: 2.1.3
+Bundle-Version: 2.1.3.qualifier
 Bundle-Vendor: ARCAD Software
 Automatic-Module-Name: com.arcadsoftware.tool.cli
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
