@@ -59,10 +59,13 @@ public class WebBranch implements IBranch {
 				try {
 					File element = activator.toFile(urls.nextElement());
 					if ((element != null) && element.isDirectory()) {
-						String path = '/' + element.getName().replace('.', '/') + '/';
-						if (defpath == null) {
+						String subdir = '/' + element.getName().replace('.', '/');
+						String path = subdir + '/';
+						if ((defpath == null) && (element.getName().indexOf('.') < 0)) {
 							defpath = element.getName();
 						}
+						// Permanently deriect /dir to /dir/
+						rl.add(router.attach(subdir, new Redirection(context, path)));
 						rl.add(router.attach(path, new RedirectionDirectory(activator, context, path, element.getName(), element.toURI().toURL().toExternalForm())));
 						activator.info("Attach a web container to local path: " + path);
 					}
