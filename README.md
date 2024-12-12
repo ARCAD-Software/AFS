@@ -6,8 +6,6 @@ Link to the update site of [Version 2023.7.35](https://github.com/ARCAD-Software
 
 1 Bundles modified in this release.
 
-
-
 ### List of bundles from group **client**
 
 Bundle Symbolic Name | Modification | Version
