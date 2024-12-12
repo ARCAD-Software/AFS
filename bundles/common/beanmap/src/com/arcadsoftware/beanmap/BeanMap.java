@@ -36,9 +36,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.eclipse.core.runtime.IAdaptable;
 import org.restlet.data.Form;
 
+import com.arcadsoftware.beanmap.internal.BeanMapFromJSON;
 import com.arcadsoftware.beanmap.xml.JSonBeanMapStream;
 import com.arcadsoftware.beanmap.xml.XmlBeanMapStream;
 import com.arcadsoftware.osgi.ISODateFormater;
@@ -120,31 +123,32 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 	 * @return null if the XML fragment does not conform to the expected format.
 	 */
 	static public BeanMap loadFromJSon(String type, String json) {
-		JSonBeanMapStream xs = new JSonBeanMapStream();
-		if (type != null) {
-			xs.alias(type, BeanMap.class);
-		}
-		Object result = null;
 		try {
-			result = xs.fromXML(json);
-		} catch (Exception e) {
-			return null;
-		}
-		if (result == null) {
-			return null;
-		}
-		if (result instanceof BeanMap) {
-			return (BeanMap) result;
-		}
-		if (result instanceof IAdaptable) {
-			result = ((IAdaptable) result).getAdapter(BeanMap.class);
-			if (result instanceof BeanMap) {
-				return (BeanMap) result;
+			JSONObject o = new JSONObject(json);
+			if (type != null) {
+				return BeanMapFromJSON.parse(new BeanMap(type), o.getJSONObject(type));
 			}
+			return BeanMapFromJSON.parse(new BeanMap(), o);
+		} catch (JSONException e) {
+			return null;
 		}
+	}
+	
+	/**
+	 * Helper method.
+	 * 
+	 * Load a BeanMap from an JSON document string.
+	 * 
+	 * @param type
+	 *            the desired type of the BeanMap, may be null.
+	 * @param json
+	 *            the JSon document.
+	 * @return null if the XML fragment does not conform to the expected format.
+	 */
+	static public BeanMap loadFromJSon(String json) {
 		try {
-			return new BeanMap(result);
-		} catch (IntrospectionException e) {
+			return BeanMapFromJSON.parse(new BeanMap(), new JSONObject(json));
+		} catch (JSONException e) {
 			return null;
 		}
 	}

@@ -36,7 +36,7 @@ import com.arcadsoftware.rest.JsonStreamCompact;
  * </ul>
  * 
  * <p>
- * <b>This serialized can not transform JSON into BeanMap.</b>
+ * <b>This serializer can not transform JSON into BeanMap.</b>
  * 
  * @author ARCAD Software
  */
