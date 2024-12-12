@@ -30,8 +30,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.eclipse.core.runtime.IAdaptable;
 
+import com.arcadsoftware.beanmap.internal.BeanMapFromJSON;
 import com.arcadsoftware.beanmap.internal.BeanMapIterator;
 import com.arcadsoftware.beanmap.xml.JSonBeanMapStream;
 import com.arcadsoftware.beanmap.xml.XmlBeanMapStream;
@@ -152,35 +156,63 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	/**
 	 * Helper method.
 	 * 
+	 * Load a BeanMap list from an XML fragment string.
+	 * 
+	 * @param xml
+	 *            the XML fragment.
+	 * @return null if the XML fragment does not conform to the expect format.
+	 */
+	static public BeanMapList loadFromXml(String xml) {
+		return loadFromXml(null, xml);
+	}
+	
+	/**
+	 * Helper method.
+	 * 
 	 * Load a BeanMap list from an JSON document string.
 	 * 
 	 * @param type
 	 *            the desired type of the BeanMap, may be null.
-	 * @param xml
-	 *            the XML fragment.
+	 * @param json
+	 *            the JSON document.
+	 * @return null if the JSon document does not conform to the expect format.
+	 * @deprecated use {@link #loadFromJSon(String)}
+	 */
+	static public BeanMapList loadFromJSon(String type, String json) {
+		return loadFromJSon(json);
+	}
+	
+	/**
+	 * Helper method.
+	 * 
+	 * Load a BeanMap list from an JSON document string.
+	 * 
+	 * @param json
+	 *            the JSON document.
 	 * @return null if the JSon document does not conform to the expect format.
 	 */
-	static public BeanMapList loadFromJSon(String type, String xml) {
-		Object result = null;
+	static public BeanMapList loadFromJSon(String json) {
 		try {
-			if (type != null) {
-				result = new JSonBeanMapStream().fromXML(type, xml);
-			} else {
-				result = new JSonBeanMapStream().fromXML(xml);
+			JSONObject o = new JSONObject(json);
+			Iterator<?> itt = o.keys();
+			if (!itt.hasNext()) {
+				return null;
 			}
-		} catch (Exception e) {
+			String listKey = (String) itt.next();
+			JSONObject list = o.getJSONObject(listKey);
+			int count = 10;
+			try {
+				count = list.getInt("count"); //$NON-NLS-1$
+			} catch (JSONException e) {}
+			BeanMapList result = new BeanMapList(count);
+			JSONArray items = list.getJSONArray("items"); //$NON-NLS-1$
+			for (int i = 0; i < items.length(); i++) {
+				result.add(BeanMapFromJSON.parse(new BeanMap(), items.getJSONObject(i)));
+			}
+			return result;
+		} catch (JSONException e) {
 			return null;
 		}
-		if (result instanceof BeanMapList) {
-			return (BeanMapList) result;
-		}
-		if (result instanceof IAdaptable) {
-			result = ((IAdaptable) result).getAdapter(BeanMapList.class);
-			if (result instanceof BeanMapList) {
-				return (BeanMapList) result;
-			}
-		}
-		return null;
 	}
 
 	/**
@@ -737,7 +769,7 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
        		propertiesMap.put(property.getName(), property);
        	}
 		Constructor<?> constructor = null;
-        for (Constructor<?> c:clazz.getConstructors()) {
+        for (Constructor<?> c: clazz.getConstructors()) {
         	Class<?>[] parameterTypes = c.getParameterTypes();
             if ((parameterTypes.length == constructorParameters.length) && Modifier.isPublic(c.getModifiers())) {
             	boolean sametypes = true;
@@ -755,21 +787,13 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
         if (constructor == null) {
         	throw new IntrospectionException("Constructor parameters do not match any constructor from the given class.");
         }
-        for (BeanMap bm:this) {
+        for (BeanMap bm: this) {
         	try {
         		Object o = constructor.newInstance(constructorParameters);
         		if (clazz.isInstance(o)) {
         			list.add(bm.toBean(clazz.cast(o), propertiesMap));
         		}
-			} catch (IllegalArgumentException e) {
-				
-			} catch (InstantiationException e) {
-				
-			} catch (IllegalAccessException e) {
-				
-			} catch (InvocationTargetException e) {
-				
-			}
+			} catch (IllegalArgumentException | InstantiationException | IllegalAccessException  | InvocationTargetException e) {}
         }
 		return list;
 	}
@@ -800,7 +824,7 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	 */
 	public BeanMapList cloneBeanMaps() {
 		BeanMapList result = new BeanMapList(size());
-		for(BeanMap bean:this) {
+		for (BeanMap bean:this) {
 			if (bean != null) {
 				result.add((BeanMap)bean.clone());
 			}
