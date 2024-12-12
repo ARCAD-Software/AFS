@@ -28,7 +28,12 @@ public final class BeanMapFromJSON {
 			} else if (o.isNull(k)) {
 				bean.put(k, null);
 			} else {
-				bean.put(k, o.get(k));
+				Object x = o.get(k);
+				if (x instanceof JSONObject) {
+					bean.put(k, parse(new BeanMap(k), (JSONObject) x));
+				} else {
+					bean.put(k, x);
+				}
 			}
 		}
 		return bean;
