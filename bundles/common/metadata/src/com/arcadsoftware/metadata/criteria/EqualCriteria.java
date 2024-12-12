@@ -132,7 +132,6 @@ public class EqualCriteria extends AbstractSearchCriteria implements Cloneable, 
 			nullsOrEquals(value, ((EqualCriteria) obj).value) &&
 			(isCasesensitive() == ((EqualCriteria) obj).isCasesensitive());
 	}
-
 	
 	public boolean test(BeanMap bean, IConnectionUserBean currentUser) {
 		if (intval != null) {
@@ -147,6 +146,7 @@ public class EqualCriteria extends AbstractSearchCriteria implements Cloneable, 
 		return value.equalsIgnoreCase(bean.getString(attribute));
 	}
 
+	@Override
 	public String getAttribute() {
 		return attribute;
 	}
@@ -159,6 +159,7 @@ public class EqualCriteria extends AbstractSearchCriteria implements Cloneable, 
 		return intval;
 	}
 
+	@Override
 	public void setAttribute(String code) {
 		attribute = code;
 	}

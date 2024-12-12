@@ -203,6 +203,11 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 	 */
 	public static final String METADATA_HIDDEN = "hidden"; //$NON-NLS-1$
 
+	/**
+	 * The associated a link thisd link is not considered as a recursive one even if the targeted entity is the same one.
+	 */
+	public static final String METADATA_IGNORERECURSIVITY = "norecursive"; //$NON-NLS-1$
+
 	// Some other MetaDate can be defined by other bundles.
 	// You could have a look to the MapperSQLService.
 
@@ -3009,4 +3014,30 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 		return result;
 	}
 
+	/**
+	 * Return true if this entity define at least one link targeting itself.
+	 * @return
+	 */
+	public boolean hasRecursiveLink() {
+		for (MetaDataLink link: links.values()) {
+			if (link.isRecursive()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Get the first link defined in this Entity and targeting the same one.
+	 * 
+	 * @return null if there is no recursive link.
+	 */
+	public MetaDataLink getFirstRecursiveLink() {
+		for (MetaDataLink link: links.values()) {
+			if (link.isRecursive()) {
+				return link;
+			}
+		}
+		return null;
+	}
 }

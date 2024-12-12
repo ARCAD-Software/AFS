@@ -105,6 +105,8 @@ public class Messages extends NLS {
 	public static String ProgressState_3;
 	public static String Criteria_UnLinkedThrough;
 	public static String Criteria_Any;
+	public static String Criteria_InSet;
+	public static String Criteria_Recursive;
 
 	static {
 		// initialize resource bundle

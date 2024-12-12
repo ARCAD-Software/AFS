@@ -292,4 +292,20 @@ public class MetaDataLink extends Element {
 		}
 		return n;
 	}
+
+	/**
+	 * Return true if and only if the type of the parent entity is equal to the type of this link.
+	 * 
+	 * <p>
+	 * The link is defining a recursive link on the same entity.
+	 * 
+	 * <p>
+	 * Reverse links are never considered as recursive links, as the modification of the reference attribute does not avoid infinite loops.
+	 * @return
+	 */
+	public boolean isRecursive() {
+		return !getMetadata().getBoolean(MetaDataEntity.METADATA_IGNORERECURSIVITY) && //
+				getParent().getType().equals(getType()) && //
+				(getMetadata().get(MetaDataEntity.METADATA_REVERSELINK) == null);
+	}
 }

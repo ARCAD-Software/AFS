@@ -16,11 +16,17 @@ package com.arcadsoftware.metadata.rights;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
+
+import javax.sql.DataSource;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -34,8 +40,10 @@ import org.restlet.data.Language;
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
 import com.arcadsoftware.beanmap.xml.XmlBeanMapStream;
+import com.arcadsoftware.metadata.IMapperService;
 import com.arcadsoftware.metadata.MetaDataEntity;
 import com.arcadsoftware.metadata.ReferenceLine;
+import com.arcadsoftware.metadata.sql.MapperSQLService;
 import com.arcadsoftware.osgi.AbstractActivator;
 import com.arcadsoftware.rest.connection.ConnectionUserBean;
 import com.arcadsoftware.rest.connection.IConnectionInfoService;
@@ -266,7 +274,7 @@ public class Activator extends AbstractActivator implements BundleListener, ICon
 		if (!USER.equals(userType)) {
 			return null;
 		}
-		MetaDataEntity entity = MetaDataEntity.loadEntity(userType);
+		final MetaDataEntity entity = MetaDataEntity.loadEntity(userType);
 		if (entity == null) {
 			return null;
 		}		// Load the User information from database: 
@@ -305,9 +313,28 @@ public class Activator extends AbstractActivator implements BundleListener, ICon
 		Profile profile = new Profile();
 		result.setProfile(profile);
 		// Load user rights.
-		entity = MetaDataEntity.loadEntity(USERRIGHT);
-		if (entity != null) {
-			for (BeanMap bean: entity.dataSelection(RIGHTANDPARAM, false, USER, id)) {
+		MetaDataEntity rightentity = MetaDataEntity.loadEntity(USERRIGHT);
+		if (rightentity == null) {
+			// Performs a reverse-link with subdivision selection, with optimized SQL:
+			IMapperService userMapper = entity.getMapper();
+			if (userMapper instanceof MapperSQLService) {
+				DataSource ds = ((MapperSQLService) userMapper).getDataSource();
+				try (Connection cn = ds.getConnection()) {
+					try (PreparedStatement ps = cn.prepareStatement("with recursive x(r) as (select UPF_PRF_ID from USER_PROFILES where UPF_USR_ID = ? union all select PRP_CHILD from SUBPROFILES inner join x on (x.r = PRP_PARENT)) select distinct PFR_RIGHT, PFR_PARAMETER from x left outer join PROFILE_RIGHTS on (PFR_PRF_ID = x.r) where PFR_DELETED = 0")) {
+						ps.setInt(1, id);
+						try (ResultSet rs = ps.executeQuery()) {
+							while (rs.next()) {
+								profile.addRight(new Right(rs.getInt(1), rs.getInt(2)));
+							}
+						}
+					}
+				} catch (SQLException e) {
+					debug("Unable to get user rigths with AFS eneities: " + e.getLocalizedMessage());
+				}
+			}
+		} else {
+			// if there is a Entity providing a direct link between Users and Rights, we use it.
+			for (BeanMap bean: rightentity.dataSelection(RIGHTANDPARAM, false, USER, id)) {
 				profile.addRight(new Right(bean.getInt(RIGHT), bean.getInt(PARAM)));
 			}
 		}

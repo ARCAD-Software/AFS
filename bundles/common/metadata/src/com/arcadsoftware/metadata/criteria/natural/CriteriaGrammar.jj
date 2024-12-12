@@ -107,6 +107,7 @@ TOKEN: // Operators
 | < DOT: "." >
 | < SHARP: "#" >
 | < COLON: "," >
+| < STAR: "*" >
 }
 
 TOKEN:
@@ -287,14 +288,16 @@ ISearchCriteria equalsCriteria():
       | t = refline() { return equals(rl, t, cs); }
       )
     | < IN >
-      { ArrayList vals = new ArrayList(); }
-      t = < INTEGER >
-      { vals.add(integer(t)); }
-      ( < COLON > 
-        t = < INTEGER >
-        { vals.add(integer(t)); }
-      )*
-      { return isin(rl, vals); }
+      ( < STAR >        t = < INTEGER >
+        { return insubdivision(rl, t); }
+      | t = < INTEGER >
+        { ArrayList vals = new ArrayList(); vals.add(integer(t)); }
+        ( < COLON > 
+          t = < INTEGER >
+          { vals.add(integer(t)); }
+        )*
+        { return isin(rl, vals); }
+      )
     )
   | t = < INTEGER >
     ( < _EQUAL > | < _EQUAL2 > )

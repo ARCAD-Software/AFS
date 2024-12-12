@@ -90,10 +90,8 @@
 				<ldap>sn</ldap>
 			</metadata>
 		</attribute>
-		<link type="userRight" code="rights" readonly="true">
-			<metadata>
-				<reverseLink>user</reverseLink>
-			</metadata>
+		<link type="profileRight" code="rights" readonly="true">
+			<metadata/>
 		</link>
 		<link type="profile" code="profiles" readonly="false">
 			<rights>
@@ -109,30 +107,20 @@
 				<logUnlink>The user "%fullname%" is not associated to the profile "%code%" anymore.</logUnlink>
 			</metadata>
 		</link>
-	</entity>
-	<entity type="userRight" domain="userdb" version="2" date="2022-01-17T00:00:00Z" readonly="true">
-		<metadata>
-			<idCol>URI_ID</idCol>
-			<table>USER_RIGHTS</table>
-		</metadata>
-		<attribute type="integer" code="param" readonly="true"
-			listable="true" mandatory="false">
-			<metadata colrank="2" visible="true">
-				<col>URI_PARAM</col>
+		<link type="usergroup" code="groups" readonly="false">
+			<rights>
+				<create>
+					<hasright attribute="." right="38" />
+				</create>
+			</rights>
+			<metadata>
+				<sourceCol>UGU_USR_ID</sourceCol>
+				<destCol>UGU_UGP_ID</destCol>
+				<table>USERGROUPS_USERS</table>
+				<logLink>The user "%fullname%" has been added to the group "%code%".</logLink>
+				<logUnlink>The user "%fullname%" has been removed from the group "%code%".</logUnlink>
 			</metadata>
-		</attribute>
-		<attribute type="integer" code="right" readonly="true"
-			listable="true" mandatory="false">
-			<metadata colrank="1" visible="true">
-				<col>URI_RIGHT</col>
-			</metadata>
-		</attribute>
-		<attribute type="user" code="user" readonly="true"
-			listable="true" mandatory="false">
-			<metadata colrank="3" visible="true">
-				<col>URI_USER</col>
-			</metadata>
-		</attribute>
+		</link>
 	</entity>
 	<entity type="profile" domain="userdb" version="2" date="2022-01-17T00:00:00Z">
 		<rights>
@@ -193,6 +181,74 @@
 			</metadata>
 		</link>
 	</entity>
+
+	<entity type="usergroup" domain="userdb" version="1" date="2025-01-01T00:00:00Z">
+		<rights>
+			<create>
+				<hasright attribute="." right="39" />
+			</create>
+			<delete>
+				<hasright attribute="." right="39" />
+			</delete>
+			<update>
+				<or>
+					<hasright attribute="." right="39" />
+					<hasright attribute="." right="40" />
+				</or>
+			</update>
+		</rights>
+		<metadata>
+			<idCol>UGP_ID</idCol>
+			<colPrefix>UGP_</colPrefix>
+			<updateCol>UGP_UPDATE</updateCol>
+			<deleteCol>UGP_DELETED</deleteCol>
+			<table>USERGROUPS</table>
+			<logCreate>Creation of a new user group ([%code%] %name%)</logCreate>
+			<logUpdate>Update of a user group ([%code%] %name%)</logUpdate>
+			<logDelete>Deletion of a user group ([%code%] %name%)</logDelete>
+		</metadata>
+		<attribute type="string" code="code" readonly="false"
+			listable="true" mandatory="false" length="50">
+			<metadata colrank="1" colsize="150" visible="true">
+				<col>UGP_CODE</col>
+			</metadata>
+		</attribute>
+		<attribute type="string" code="name" readonly="false"
+			listable="true" mandatory="false" length="255">
+			<metadata colrank="2" colsize="200" visible="true">
+				<col>UGP_NAME</col>
+			</metadata>
+		</attribute>
+		<link type="usergroup" code="subgroups">
+			<metadata>
+				<sourceCol>SUG_PARENT</sourceCol>
+				<destCol>SUG_CHILD</destCol>
+				<table>SUBUSERGROUPS</table>
+			</metadata>
+		</link>
+		<link type="usergroup" code="parents" readonly="true">
+			<metadata norecursive="true">
+				<sourceCol>SUG_CHILD</sourceCol>
+				<destCol>SUG_PARENT</destCol>
+				<table>SUBUSERGROUPS</table>
+			</metadata>
+		</link>
+		<link type="user" code="users" readonly="false">
+			<rights>
+				<create>
+					<hasright attribute="." right="38" />
+				</create>
+			</rights>
+			<metadata>
+				<sourceCol>UGU_UGP_ID</sourceCol>
+				<destCol>UGU_USR_ID</destCol>
+				<table>USERGROUPS_USERS</table>
+				<logLink>The user "%fullname%" has been added to the group "%code%".</logLink>
+				<logUnlink>The user "%fullname%" has been removed from the group "%code%".</logUnlink>
+			</metadata>
+		</link>
+	</entity>
+
 	<update-entity type="right" domain="mem:rights" version="1" date="2023-01-31T16:12:29">
 		<link type="profile" code="profiles" readonly="true">
 			<metadata>

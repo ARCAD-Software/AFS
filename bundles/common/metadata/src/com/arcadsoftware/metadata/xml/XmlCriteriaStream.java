@@ -37,6 +37,7 @@ import com.arcadsoftware.metadata.criteria.IdGreaterStrictCriteria;
 import com.arcadsoftware.metadata.criteria.IdGreaterThanCriteria;
 import com.arcadsoftware.metadata.criteria.IdInListCriteria;
 import com.arcadsoftware.metadata.criteria.InListCriteria;
+import com.arcadsoftware.metadata.criteria.InSubdivisionCriteria;
 import com.arcadsoftware.metadata.criteria.IdLowerStrictCriteria;
 import com.arcadsoftware.metadata.criteria.IdLowerThanCriteria;
 import com.arcadsoftware.metadata.criteria.IsNullCriteria;
@@ -255,6 +256,9 @@ public class XmlCriteriaStream extends XStreamCompact {
 		xs.alias("idlowerthan", IdLowerThanCriteria.class); //$NON-NLS-1$
 		xs.useAttributeFor(IdLowerThanCriteria.class, "id"); //$NON-NLS-1$
 		xs.useAttributeFor(ChangedCriteria.class, "attribute"); //$NON-NLS-1$
+		xs.alias("insubset", InSubdivisionCriteria.class); //$NON-NLS-1$
+		xs.useAttributeFor(InSubdivisionCriteria.class, "attribute"); //$NON-NLS-1$
+		xs.useAttributeFor(InSubdivisionCriteria.class, "value"); //$NON-NLS-1$
 		// For upcomming declarations, do not forget to add the dedicated mapping in the JsonCriteriaStream class.
 		return xs;
 	}

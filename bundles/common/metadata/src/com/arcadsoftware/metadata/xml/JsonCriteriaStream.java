@@ -50,6 +50,7 @@ import com.arcadsoftware.metadata.criteria.IdEqualCriteria;
 import com.arcadsoftware.metadata.criteria.IdGreaterStrictCriteria;
 import com.arcadsoftware.metadata.criteria.IdGreaterThanCriteria;
 import com.arcadsoftware.metadata.criteria.InListCriteria;
+import com.arcadsoftware.metadata.criteria.InSubdivisionCriteria;
 import com.arcadsoftware.metadata.criteria.IdLowerStrictCriteria;
 import com.arcadsoftware.metadata.criteria.IdLowerThanCriteria;
 import com.arcadsoftware.metadata.criteria.IsNullCriteria;
@@ -373,6 +374,10 @@ public class JsonCriteriaStream  {
 			result.put("linkgreaterstrict", convertAttribute(criteria));
 		} else if (criteria instanceof LinkGreaterThanCriteria) {
 			result.put("linkgreaterthan", convertAttribute(criteria));
+		} else if (criteria instanceof InSubdivisionCriteria) {
+			JSONObject sub = convertAttribute(criteria);
+			sub.put("value", ((InSubdivisionCriteria) criteria).getValue());
+			result.put("insubset", sub);
 		} else {
 			throw new JSONException("Unexpected Criteria, unable to convert it in JSON:" + criteria);
 		}
@@ -622,6 +627,9 @@ public class JsonCriteriaStream  {
 		case "lcontains":
 		case "lcontain":
 			return fill(new LinkContainCriteria(), (JSONObject) value);
+		case "insubset":
+		case "subset":
+			return fill(new InSubdivisionCriteria(), (JSONObject) value);
 		}
 		return null;
 	}
@@ -704,6 +712,8 @@ public class JsonCriteriaStream  {
 							((BeforeCriteria) criteria).setValue(getDate(o));
 						} else if (criteria instanceof AfterCriteria) {
 							((AfterCriteria) criteria).setValue(getDate(o));
+						} else if (criteria instanceof InSubdivisionCriteria) {
+							((InSubdivisionCriteria) criteria).setValue(getInteger(o));
 						}
 						break;
 					case "casesensitive":

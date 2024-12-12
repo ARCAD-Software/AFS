@@ -496,7 +496,8 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 		try {
 			return connectionPool.getConnection();
 		} catch (LDAPException e) {
-			activator.error(e);
+			activator.error("There is an connection in the LDAP connection pool, check your configuration or the LDAP may be down): "+ e.getLocalizedMessage(), e);
+			activator.info("LDAP Diagnostic Message: " + e.getDiagnosticMessage());
 			return null;
 		}
 	}

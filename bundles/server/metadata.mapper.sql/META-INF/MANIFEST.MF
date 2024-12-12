@@ -30,7 +30,7 @@ Import-Package: com.arcadsoftware.beanmap;version="[2.0.0,3.0.0)",
  org.restlet.data;version="[2.4.3,3.0.0)",
  org.restlet.resource;version="[2.4.3,3.0.0)",
  org.restlet.routing;version="[2.4.3,3.0.0)"
-Export-Package: com.arcadsoftware.metadata.sql;version="1.0.1"
+Export-Package: com.arcadsoftware.metadata.sql;version="1.1.0"
 Automatic-Module-Name: com.arcadsoftware.metadata.mapper.sql
 Bundle-ActivationPolicy: lazy
 Bundle-License: https://www.eclipse.org/legal/epl-2.0

@@ -254,7 +254,7 @@ public class DataAccessHelper {
 			associationKey = createAttributeParameters(associationKey, attributeList);
 			final BeanMap bean = new BeanMap(type, id);
 			return dataAccess.getLinks(bean, associationKey, linkedType, attributeList, null, orderList, 0, count,
-					false);
+					false, false);
 
 		} catch (final ServerErrorException e) {
 			manageException(e);
@@ -311,7 +311,7 @@ public class DataAccessHelper {
 		try {
 			associationKey = createAttributeParameters(associationKey, attributeList);
 			final BeanMap bean = new BeanMap(type, id);
-			return dataAccess.getLinks(bean, associationKey, linkedType, attributeList, null, orderList, 0, -1, false);
+			return dataAccess.getLinks(bean, associationKey, linkedType, attributeList, null, orderList, 0, -1, false, false);
 
 		} catch (final ServerErrorException e) {
 			manageException(e);
@@ -344,7 +344,7 @@ public class DataAccessHelper {
 			associationKey = createAttributeParameters(associationKey, attributeList);
 			final BeanMap bean = new BeanMap(type, id);
 			return dataAccess.getLinks(bean, associationKey, linkedType, attributeList, criteria, orderList, 0, -1,
-					false);
+					false, false);
 
 		} catch (final ServerErrorException e) {
 			manageException(e);

@@ -1273,6 +1273,26 @@ public interface IMapperService {
 	public boolean linkTest(MetaDataLink link, int sourceId, int destId);
 
 	/**
+	 * Test if two item are linked with each other.
+	 * 
+	 * <p>
+	 * The link can be either as association (n-to-m relation) or a reversed reference (n-to-1 relation).
+	 * 
+	 * @param link
+	 *            The link metadata definition.
+	 * @param sourceId
+	 *            the item id origin of the link.
+	 * @param destId
+	 *            the item id target of the link.
+	 * @param ignoreSubdivision
+	 *            If false and if the link parent entity possess a recursive link then all the elements linked to 
+	 *            the sourceId plus all elements linked to any other source item linked, recursivelly to the
+	 *            sourceID one, will be tested.
+	 * @return true if the link exists.
+	 */
+	public boolean linkTest(MetaDataLink link, int sourceId, int destId, boolean ignoseSubdivision);
+
+	/**
 	 * Remove a link between two items. A link is an oriented relation that have an origin and a target. Some link can
 	 * be reversed, but both must be declared.
 	 * 
@@ -1397,6 +1417,30 @@ public interface IMapperService {
 			ReferenceLine attributeTest, Object value);
 
 	/**
+	 * Return the list of target items linked to the specified source item that possess the given attribute value.
+	 * 
+	 * @param link
+	 *            The link meta-data object.
+	 * @param sourceId
+	 *            the item id origin of the link.
+	 * @param attributes
+	 *            The list of attributes to select. If null, all of the attributes values will be returned.
+	 * @param deleted
+	 *            True if the selected items can be deleted. If False, then only not deleted items will be listed.
+	 * @param ignoreSubdivision
+	 *            If false and if the link parent entity possess a recursive link then all the elements linked to 
+	 *            the sourceId plus all elements linked to any other source item linked, recursivelly to the
+	 *            sourceID one, will be returned.
+	 * @param attributeTest
+	 *            The attribute to test.
+	 * @param value
+	 *            The attribute value to test.
+	 * @return the list of linked item. an empty list is returned if no linked item is found.
+	 */
+	public BeanMapList linkSelection(MetaDataLink link, int sourceId, List<ReferenceLine> attributes, boolean deleted,
+			boolean ignoreSubdivision, ReferenceLine attributeTest, Object value);
+
+	/**
 	 * Return the list of target items linked to the specified source item that correspond to the given complex
 	 * condition.
 	 * 
@@ -1465,6 +1509,42 @@ public interface IMapperService {
 			int page, int limit);
 
 	/**
+	 * Return the list of target items linked to the specified source item that correspond to the given complex
+	 * condition.
+	 * 
+	 * @param link
+	 *            The link meta-data object.
+	 * @param sourceId
+	 *            the item id origin of the link.
+	 * @param attributes
+	 *            The list of attributes to select. If null, all of the attributes values will be returned.
+	 * @param deleted
+	 *            True if the selected items can be deleted. If False, then only not deleted items will be listed.
+	 * @param criteria
+	 *            The complex condition for the selection.
+	 * @param distinct
+	 *            if true then only distinct items will be returned (not duplicated results). This option is not
+	 *            supported by all mappers.
+	 * @param ignoreSubdivision
+	 *            If false and if the link parent entity possess a recursive link then all the elements linked to 
+	 *            the sourceId plus all elements linked to any other source item linked, recursivelly to the
+	 *            sourceID one, will be returned.
+	 * @param orders
+	 *            The list of attributes used to sort the result. theses attributes need to be present into the selected
+	 *            attributes list. To process to a inverted sort, flag the ReferenceLine.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @param page
+	 *            The number of the first result row to return, zero for first row.
+	 * @param limit
+	 *            The maximal number of row to return, -1 if unlimited.
+	 * @return the list of linked item. an empty list is returned if no linked item is found.
+	 */
+	public BeanMapList linkSelection(MetaDataLink link, int sourceId, List<ReferenceLine> attributes, boolean deleted,
+			ISearchCriteria criteria, boolean distinct, boolean ignoreSubdivision, List<ReferenceLine> orders, 
+			IConnectionUserBean currentUser, int page, int limit);
+
+	/**
 	 * Count the selected target items linked to the specified source item that correspond to the given complex
 	 * condition.
 	 * 
@@ -1484,6 +1564,32 @@ public interface IMapperService {
 	 * @return the number of selected items.
 	 */
 	public int linkCount(MetaDataLink link, int sourceId, boolean deleted, ISearchCriteria criteria, boolean distinct,
+			IConnectionUserBean currentUser);
+
+	/**
+	 * Count the selected target items linked to the specified source item that correspond to the given complex
+	 * condition.
+	 * 
+	 * @param link
+	 *            The link meta-data object.
+	 * @param sourceId
+	 *            the item id origin of the link.
+	 * @param deleted
+	 *            True if the selected items can be deleted. If False, then only not deleted items will be listed.
+	 * @param criteria
+	 *            The complex condition for the selection.
+	 * @param distinct
+	 *            If true then only distinct items will be returned (not duplicated results). This option is not
+	 *            supported by all mappers.
+	 * @param ignoreSubdivision
+	 *            If false and if the link parent entity possess a recursive link then all the elements linked to 
+	 *            the sourceId plus all elements linked to any other source item linked, recursivelly to the
+	 *            sourceID one, will be returned.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return the number of selected items.
+	 */
+	public int linkCount(MetaDataLink link, int sourceId, boolean deleted, ISearchCriteria criteria, boolean distinct, boolean ignoreSubdivision,
 			IConnectionUserBean currentUser);
 
 }

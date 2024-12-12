@@ -879,14 +879,19 @@ public class DataAccessServices implements IMapperService, IEntityRegistry {
 
 	@Override
 	public boolean linkTest(String sourceType, String linkCode, int sourceId, int destId) {
-		return dao.testLink(sourceType, sourceId, linkCode, destId);
+		return dao.testLink(sourceType, sourceId, linkCode, destId, false);
 	}
 
 	@Override
 	public boolean linkTest(MetaDataLink link, int sourceId, int destId) {
-		return dao.testLink(link.getParent().getType(), sourceId, link.getCode(), destId);
+		return dao.testLink(link.getParent().getType(), sourceId, link.getCode(), destId, false);
 	}
 
+	@Override
+	public boolean linkTest(MetaDataLink link, int sourceId, int destId, boolean ignoseSubdivision) {
+		return dao.testLink(link.getParent().getType(), sourceId, link.getCode(), destId, ignoseSubdivision);
+	}
+	
 	@Override
 	public boolean linkRemove(String sourceType, String linkCode, int sourceId, int destId) {
 		try {
@@ -960,7 +965,7 @@ public class DataAccessServices implements IMapperService, IEntityRegistry {
 					link.getCode(), 
 					link.getType(), 
 					attributes,
-					new XmlCriteriaStream().toXML(new EqualCriteria(attributeTest, value.toString())),null,0,-1,deleted);
+					new XmlCriteriaStream().toXML(new EqualCriteria(attributeTest, value.toString())), null, 0, -1, deleted, false);
 		} catch (ServerErrorException e) {
 			logError(e);
 			return null;
@@ -975,7 +980,7 @@ public class DataAccessServices implements IMapperService, IEntityRegistry {
 					link.getCode(), 
 					link.getType(), 
 					ReferenceLine.getCodes(attributes),
-					new XmlCriteriaStream().toXML(new EqualCriteria(attributeTest.getCode(), value.toString())),null,0,-1,deleted);
+					new XmlCriteriaStream().toXML(new EqualCriteria(attributeTest.getCode(), value.toString())), null, 0, -1, deleted, false);
 		} catch (ServerErrorException e) {
 			logError(e);
 			return null;
@@ -1000,7 +1005,7 @@ public class DataAccessServices implements IMapperService, IEntityRegistry {
 		MetaDataLink link = entity.getLink(linkCode);
 		try {
 			return dao.getLinks(new BeanMap(link.getParent().getType(), sourceId),
-					link.getCode(), link.getType(), attributes, criteria, orders,page,limit,deleted);
+					link.getCode(), link.getType(), attributes, criteria, orders, page, limit, deleted, false);
 		} catch (ServerErrorException e) {
 			logError(e);
 			return null;
@@ -1018,7 +1023,7 @@ public class DataAccessServices implements IMapperService, IEntityRegistry {
 					link.getType(), 
 					ReferenceLine.getCodes(attributes),
 					new XmlCriteriaStream().toXML(criteria),
-					ReferenceLine.getCodes(orders),page,limit,deleted);
+					ReferenceLine.getCodes(orders), page, limit, deleted, false);
 		} catch (ServerErrorException e) {
 			logError(e);
 			return null;
@@ -1037,7 +1042,7 @@ public class DataAccessServices implements IMapperService, IEntityRegistry {
 					link.getType(), 
 					null,
 					new XmlCriteriaStream().toXML(criteria),
-					null,0,1,deleted);
+					null, 0, 1, deleted, false);
 			if (list instanceof BeanMapPartialList) {
 				return ((BeanMapPartialList)list).getTotal();
 			}
@@ -1073,6 +1078,64 @@ public class DataAccessServices implements IMapperService, IEntityRegistry {
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public BeanMapList linkSelection(MetaDataLink link, int sourceId, List<ReferenceLine> attributes, boolean deleted,
+			boolean ignoreSubdivision, ReferenceLine attributeTest, Object value) {
+		try {
+			return dao.getLinks(new BeanMap(link.getParent().getType(), sourceId), 
+					link.getCode(), 
+					link.getType(), 
+					ReferenceLine.getCodes(attributes),
+					new XmlCriteriaStream().toXML(new EqualCriteria(attributeTest.getCode(), value.toString())), null, 0, -1, deleted, ignoreSubdivision);
+		} catch (ServerErrorException e) {
+			logError(e);
+			return null;
+		}
+	}
+
+	@Override
+	public BeanMapList linkSelection(MetaDataLink link, int sourceId, List<ReferenceLine> attributes, boolean deleted,
+			ISearchCriteria criteria, boolean distinct, boolean ignoreSubdivision, List<ReferenceLine> orders,
+			IConnectionUserBean currentUser, int page, int limit) {
+		try {
+			// TODO Support user substitution (if real current user possess the associated right).
+			return dao.getLinks(new BeanMap(link.getParent().getType(), sourceId), 
+					link.getCode(), 
+					link.getType(), 
+					ReferenceLine.getCodes(attributes),
+					new XmlCriteriaStream().toXML(criteria),
+					ReferenceLine.getCodes(orders), page, limit, deleted, ignoreSubdivision);
+		} catch (ServerErrorException e) {
+			logError(e);
+			return null;
+		}
+	}
+
+	@Override
+	public int linkCount(MetaDataLink link, int sourceId, boolean deleted, ISearchCriteria criteria, boolean distinct,
+			boolean ignoreSubdivision, IConnectionUserBean currentUser) {
+		try {
+			// TODO DataAccess can not count items.
+			// TODO DataAccess can not select distinct items.
+			// TODO Support user substitution (if real current user possess the associated right).
+			BeanMapList list = dao.getLinks(new BeanMap(link.getParent().getType(), sourceId), 
+					link.getCode(), 
+					link.getType(), 
+					null,
+					new XmlCriteriaStream().toXML(criteria),
+					null, 0, 1, deleted, ignoreSubdivision);
+			if (list instanceof BeanMapPartialList) {
+				return ((BeanMapPartialList) list).getTotal();
+			}
+			if (list != null) {
+				return list.size();
+			}
+		} catch (ServerErrorException e) {
+			logError(e);
+		}
+		return 0;
 	}
 
 }

@@ -152,7 +152,7 @@ public class InListCriteria extends AbstractSearchCriteria implements Cloneable,
 		} else {
 			sb.append(Messages.Criteria_Id);
 		}
-		sb.append(Messages.Criteria_Equal);
+		sb.append(Messages.Criteria_InSet);
 		sb.append(ids);
 		return sb.toString();
 	}

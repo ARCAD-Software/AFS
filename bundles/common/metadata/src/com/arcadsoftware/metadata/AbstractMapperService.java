@@ -37,6 +37,7 @@ import com.arcadsoftware.metadata.criteria.IAttributesCriteria;
 import com.arcadsoftware.metadata.criteria.ICriteriaContext;
 import com.arcadsoftware.metadata.criteria.ISearchCriteria;
 import com.arcadsoftware.metadata.criteria.IdEqualCriteria;
+import com.arcadsoftware.metadata.criteria.InSubdivisionCriteria;
 import com.arcadsoftware.metadata.criteria.IsNullCriteria;
 import com.arcadsoftware.metadata.criteria.IsTrueCriteria;
 import com.arcadsoftware.metadata.criteria.LinkEqualCriteria;
@@ -807,7 +808,7 @@ public abstract class AbstractMapperService implements IMapperService {
 		if (attributes == null) {
 			attributes = entity.getListables();
 		}
-		final CriteriaContextBasic context = new CriteriaContextBasic(entity, currentUser);
+		final ICriteriaContext context = getContext(entity, currentUser);
 		if (criteria == null) {
 			criteria = ConstantCriteria.TRUE;
 		} else {
@@ -825,7 +826,7 @@ public abstract class AbstractMapperService implements IMapperService {
 			return new BeanMapList();
 		}
 		return doSelection(getAttributesList(entity, attributes), false, ConstantCriteria.TRUE, false,
-				new ArrayList<ReferenceLine>(), 0, -1, new CriteriaContextBasic(entity, null));
+				new ArrayList<ReferenceLine>(), 0, -1, getContext(entity, null));
 	}
 
 	@Override
@@ -851,7 +852,7 @@ public abstract class AbstractMapperService implements IMapperService {
 		if (entity == null) {
 			return new BeanMapList();
 		}
-		final CriteriaContextBasic context = new CriteriaContextBasic(entity, currentUser);
+		final ICriteriaContext context = getContext(entity, currentUser);
 		final ISearchCriteria ctr = getCriteria(criteria).reduce(context);
 		if (ConstantCriteria.FALSE.equals(ctr)) {
 			return new BeanMapList();
@@ -864,7 +865,7 @@ public abstract class AbstractMapperService implements IMapperService {
 	public final BeanMapList selection(MetaDataEntity entity, String attributes, boolean deleted,
 			ISearchCriteria criteria, boolean distinct, String orders, IConnectionUserBean currentUser, int page,
 			int limit) {
-		final CriteriaContextBasic context = new CriteriaContextBasic(entity, currentUser);
+		final ICriteriaContext context = getContext(entity, currentUser);
 		criteria = criteria.reduce(context);
 		if (ConstantCriteria.FALSE.equals(criteria)) {
 			return new BeanMapList();
@@ -960,9 +961,14 @@ public abstract class AbstractMapperService implements IMapperService {
 
 	@Override
 	public final boolean linkTest(MetaDataLink link, int sourceId, int destId) {
+		return linkTest(link, sourceId, destId, false);
+	}
+
+	@Override
+	public boolean linkTest(MetaDataLink link, int sourceId, int destId, boolean ignoseSubdivision) {
 		final String code = link.getMetadata().getString(MetaDataEntity.METADATA_REVERSELINK);
 		if (code == null) {
-			return doLinkTest(link, sourceId, destId);
+			return doLinkTest(link, sourceId, destId, ignoseSubdivision);
 		}
 		final MetaDataEntity e = link.getRefEntity();
 		if (e == null) {
@@ -988,7 +994,7 @@ public abstract class AbstractMapperService implements IMapperService {
 	 * @param destId
 	 * @return
 	 */
-	protected abstract boolean doLinkTest(MetaDataLink link, int sourceId, int destId);
+	protected abstract boolean doLinkTest(MetaDataLink link, int sourceId, int destId, boolean ignoseSubdivision);
 
 	@Override
 	public final boolean linkRemove(String sourceType, String linkCode, int sourceId, int destId) {
@@ -1049,7 +1055,7 @@ public abstract class AbstractMapperService implements IMapperService {
 		if (entity == null) {
 			return new BeanMapList();
 		}
-		return linkSelection(link, sourceId, entity.getListables(), false, ConstantCriteria.TRUE, false,
+		return linkSelection(link, sourceId, entity.getListables(), false, ConstantCriteria.TRUE, false, false,
 				new ArrayList<ReferenceLine>(), null, 0, -1);
 	}
 
@@ -1059,7 +1065,7 @@ public abstract class AbstractMapperService implements IMapperService {
 		if (entity == null) {
 			return new BeanMapList();
 		}
-		return linkSelection(link, sourceId, entity.getListables(), false, ConstantCriteria.TRUE, false,
+		return linkSelection(link, sourceId, entity.getListables(), false, ConstantCriteria.TRUE, false, false,
 				new ArrayList<ReferenceLine>(), null, 0, -1);
 	}
 
@@ -1078,7 +1084,7 @@ public abstract class AbstractMapperService implements IMapperService {
 		if (entity == null) {
 			return new BeanMapList();
 		}
-		return linkSelection(link, sourceId, getAttributesList(entity, attributes), deleted,
+		return linkSelection(link, sourceId, getAttributesList(entity, attributes), deleted, false,
 				entity.getAttributeLine(attributeTest), value);
 	}
 
@@ -1089,7 +1095,7 @@ public abstract class AbstractMapperService implements IMapperService {
 		if (entity == null) {
 			return new BeanMapList();
 		}
-		return linkSelection(link, sourceId, getAttributesList(entity, attributes), deleted,
+		return linkSelection(link, sourceId, getAttributesList(entity, attributes), deleted, false,
 				entity.getAttributeLine(attributeTest), value);
 	}
 
@@ -1110,7 +1116,7 @@ public abstract class AbstractMapperService implements IMapperService {
 			return new BeanMapList();
 		}
 		return linkSelection(link, sourceId, getAttributesList(entity, attributes), deleted, getCriteria(criteria),
-				distinct, entity.getAttributeLines(orders), currentUser, page, limit);
+				distinct, false, entity.getAttributeLines(orders), currentUser, page, limit);
 	}
 
 	@Override
@@ -1231,47 +1237,22 @@ public abstract class AbstractMapperService implements IMapperService {
 	public final BeanMapList linkSelection(MetaDataLink link, int sourceId, List<ReferenceLine> attributes,
 			boolean deleted, ISearchCriteria criteria, boolean distinct, List<ReferenceLine> orders,
 			IConnectionUserBean currentUser, int page, int limit) {
-		if ((page < 0) || (limit == 0)) {
-			return new BeanMapList();
-		}
-		final MetaDataEntity entity = link.getRefEntity();
-		if (entity == null) {
-			return new BeanMapList();
-		}
-		final String code = link.getMetadata().getString(MetaDataEntity.METADATA_REVERSELINK);
-		if (code == null) {
-			if (attributes == null) {
-				attributes = entity.getListables();
-			}
-			final ICriteriaContext context = getContext(entity, currentUser);
-			if (criteria == null) {
-				criteria = ConstantCriteria.TRUE;
-			} else {
-				criteria = criteria.reduce(context);
-				if (ConstantCriteria.FALSE.equals(criteria)) {
-					return new BeanMapList();
-				}
-			}
-			return doLinkSelection(link, sourceId, attributes, deleted, criteria, distinct, orders, page, limit,
-					context);
-		}
-		final MetaDataAttribute att = entity.getAttribute(code);
-		if ((att == null) || !link.getParent().equals(att.getRefEntity())) {
-			return new BeanMapList();
-		}
-		// Send the "reversed selection" to the correct mapper !
-		return entity.getMapper().selection(entity, attributes, deleted,
-				new AndCriteria(new EqualCriteria(att.getCode(), sourceId), criteria),
-				distinct, orders, currentUser, page, limit);
+		return linkSelection(link, sourceId, attributes, deleted, criteria, distinct, false, orders, currentUser, page, limit);
 	}
 
 	protected abstract BeanMapList doLinkSelection(MetaDataLink link, int sourceId, List<ReferenceLine> attributes,
-			boolean deleted, ISearchCriteria criteria, boolean distinct, List<ReferenceLine> orders, int page,
+			boolean deleted, ISearchCriteria criteria, boolean distinct, boolean ignoreSubdivision, List<ReferenceLine> orders, int page,
 			int limit, ICriteriaContext context);
 
 	@Override
 	public final int linkCount(MetaDataLink link, int sourceId, boolean deleted, ISearchCriteria criteria,
 			boolean distinct, IConnectionUserBean currentUser) {
+		return linkCount(link, sourceId, deleted, criteria, distinct, false, currentUser);
+	}
+
+	@Override
+	public int linkCount(MetaDataLink link, int sourceId, boolean deleted, ISearchCriteria criteria, boolean distinct,
+			boolean ignoreSubdivision, IConnectionUserBean currentUser) {
 		final String code = link.getMetadata().getString(MetaDataEntity.METADATA_REVERSELINK);
 		if (code == null) {
 			final ICriteriaContext context = getContext(link.getRefEntity(), currentUser);
@@ -1283,7 +1264,7 @@ public abstract class AbstractMapperService implements IMapperService {
 					return 0;
 				}
 			}
-			return doLinkCount(link, sourceId, deleted, criteria, distinct, context);
+			return doLinkCount(link, sourceId, deleted, ignoreSubdivision, criteria, distinct, context);
 		}
 		final MetaDataEntity e = link.getRefEntity();
 		if (e == null) {
@@ -1293,11 +1274,15 @@ public abstract class AbstractMapperService implements IMapperService {
 		if ((att == null) || !link.getParent().equals(att.getRefEntity())) {
 			return 0;
 		}
+		if (!ignoreSubdivision && link.getParent().hasRecursiveLink()) {
+			return e.getMapper().count(e, deleted, new AndCriteria(new InSubdivisionCriteria(att.getCode(), sourceId), criteria),
+					distinct, currentUser);
+		}
 		return e.getMapper().count(e, deleted, new AndCriteria(new EqualCriteria(att.getCode(), sourceId), criteria),
 				distinct, currentUser);
 	}
 
-	protected abstract int doLinkCount(MetaDataLink link, int sourceId, boolean deleted, ISearchCriteria criteria,
+	protected abstract int doLinkCount(MetaDataLink link, int sourceId, boolean deleted, boolean ignoreSubdivision, ISearchCriteria criteria,
 			boolean distinct, ICriteriaContext context);
 
 	@Override
@@ -1425,6 +1410,12 @@ public abstract class AbstractMapperService implements IMapperService {
 	@Override
 	public final BeanMapList linkSelection(MetaDataLink link, int sourceId, List<ReferenceLine> attributes,
 			boolean deleted, ReferenceLine attributeTest, Object value) {
+		return linkSelection(link, sourceId, attributes, deleted, false, attributeTest, value);
+	}
+
+	@Override
+	public BeanMapList linkSelection(MetaDataLink link, int sourceId, List<ReferenceLine> attributes, boolean deleted,
+			boolean ignoreSubdivision, ReferenceLine attributeTest, Object value) {
 		if (attributeTest == null) {
 			return new BeanMapList();
 		}
@@ -1442,11 +1433,17 @@ public abstract class AbstractMapperService implements IMapperService {
 			}
 			final ICriteriaContext context = getContext(entity, null);
 			return doLinkSelection(link, sourceId, attributes, deleted, getTestCriteria(attributeTest, value, context),
-					false, null, 0, -1, context);
+					false, ignoreSubdivision, null, 0, -1, context);
 		}
 		final MetaDataAttribute att = entity.getAttribute(code);
 		if ((att == null) || !link.getParent().equals(att.getRefEntity())) {
 			return new BeanMapList();
+		}
+		if (entity.hasRecursiveLink() && !ignoreSubdivision) {
+			return entity.getMapper().selection(attributes, deleted,
+					new AndCriteria(new InSubdivisionCriteria(att.getCode(), sourceId),
+							new EqualCriteria(attributeTest.getCode(), value.toString())),
+					false, null, null, 0, -1);
 		}
 		return entity.getMapper().selection(attributes, deleted,
 				new AndCriteria(new EqualCriteria(att.getCode(), sourceId),
@@ -1459,6 +1456,49 @@ public abstract class AbstractMapperService implements IMapperService {
 	@Override
 	public boolean undelete(MetaDataEntity entity, int itemId) {
 		return false;
+	}
+
+	@Override
+	public BeanMapList linkSelection(MetaDataLink link, int sourceId, List<ReferenceLine> attributes, boolean deleted,
+			ISearchCriteria criteria, boolean distinct, boolean ignoreSubdivision, List<ReferenceLine> orders,
+			IConnectionUserBean currentUser, int page, int limit) {
+		if ((page < 0) || (limit == 0)) {
+			return new BeanMapList();
+		}
+		final MetaDataEntity entity = link.getRefEntity();
+		if (entity == null) {
+			return new BeanMapList();
+		}
+		final String code = link.getMetadata().getString(MetaDataEntity.METADATA_REVERSELINK);
+		if (code == null) {
+			if (attributes == null) {
+				attributes = entity.getListables();
+			}
+			final ICriteriaContext context = getContext(entity, currentUser);
+			if (criteria == null) {
+				criteria = ConstantCriteria.TRUE;
+			} else {
+				criteria = criteria.reduce(context);
+				if (ConstantCriteria.FALSE.equals(criteria)) {
+					return new BeanMapList();
+				}
+			}
+			return doLinkSelection(link, sourceId, attributes, deleted, criteria, distinct, ignoreSubdivision, orders, page, limit,
+					context);
+		}
+		final MetaDataAttribute att = entity.getAttribute(code);
+		if ((att == null) || !link.getParent().equals(att.getRefEntity())) {
+			return new BeanMapList();
+		}
+		// Send the "reversed selection" to the correct mapper !
+		if (link.getParent().hasRecursiveLink() && !ignoreSubdivision) {
+			return entity.getMapper().selection(entity, attributes, deleted,
+					new AndCriteria(new InSubdivisionCriteria(att.getCode(), sourceId), criteria),
+					distinct, orders, currentUser, page, limit);
+		}
+		return entity.getMapper().selection(entity, attributes, deleted,
+				new AndCriteria(new EqualCriteria(att.getCode(), sourceId), criteria),
+				distinct, orders, currentUser, page, limit);
 	}
 
 }

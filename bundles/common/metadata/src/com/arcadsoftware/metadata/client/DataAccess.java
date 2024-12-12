@@ -83,8 +83,7 @@ public class DataAccess {
 	private static final String PARAM_OFFSET = "pagestart"; //$NON-NLS-1$
 	private static final String PARAM_ORDERS = "orders"; //$NON-NLS-1$
 	private static final String PARAM_DELETETARGET = "deletetargets"; //$NON-NLS-1$
-	//private static final String PARAM_DISTINCTS = "distincts"; //$NON-NLS-1$
-	//private static final String PARAM_NOTRANSLATION = "notranslation"; //$NON-NLS-1$
+	private static final String PARAM_IGNORESUBDIVISION = "ignoresubdivision"; //$NON-NLS-1$
 	private static final String PATH_LISTTYPE = "list/"; //$NON-NLS-1$
 	private static final String PATH_DATA = "data/"; //$NON-NLS-1$
 	private static final String PATH_ENTITY = "metadata/"; //$NON-NLS-1$
@@ -1002,6 +1001,10 @@ public class DataAccess {
 	 *            the maximal number of items to return, -1 for unlimited results.
 	 * @param deleted
 	 *            true if the deleted items must be returned with non deleted ones.
+	 * @param ignoreSubdivision
+	 *            If true and if the link parent entity possess a recursive link then all the elements linked to 
+	 *            the sourceId plus all elements linked to any other source item linked, recursivelly to the
+	 *            sourceID one, will be returned.
 	 * @return A list of linked BeanMap.
 	 * @throws ServerErrorException
 	 *             if the server return an error. This error can be due to a client mal formed request, connection
@@ -1009,7 +1012,7 @@ public class DataAccess {
 	 *             if it stop the current process.
 	 */
 	public BeanMapList getLinks(BeanMap item, String linkCode, String linkType, String attributes, String criteria,
-			String orders, int page, int count, boolean deleted) throws ServerErrorException {
+			String orders, int page, int count, boolean deleted, boolean ignoreSubdivision) throws ServerErrorException {
 		if ((item.getId() <= 0) || (item.getType() == null) || (item.getType().length() == 0)) {
 			return new BeanMapList();
 		}
@@ -1022,6 +1025,9 @@ public class DataAccess {
 		}
 		if (deleted) {
 			params.put(PARAM_DELETED, "true"); //$NON-NLS-1$
+		}
+		if (ignoreSubdivision) {
+			params.put(PARAM_IGNORESUBDIVISION, "true"); //$NON-NLS-1$
 		}
 		if (count != 0) {
 			params.put(PARAM_PAGECOUNT, count);
@@ -2151,8 +2157,35 @@ public class DataAccess {
 	 * @return True if the link exists.
 	 */
 	public boolean testLink(String type, int id, String linkCode, int subid) {
+		return testLink(type, id, linkCode, subid, false);
+	}
+
+	/**
+	 * Test if the given association link exist.
+	 * 
+	 * <p>
+	 * Return true if the item can be touched on the server. This operation should not require any privilege (right) and
+	 * return no information about the contain.
+	 * 
+	 * @param type
+	 *            the source entity type.
+	 * @param id
+	 *            The source item from <code>type</code> type.
+	 * @param linkCode
+	 *            The association code (By convention this is a type+"s").
+	 * @param subid
+	 *            The linked item.
+	 * @param ignoseSubdivision
+	 *            If true only a direct is test. 
+	 * @return True if the link exists.
+	 */
+	public boolean testLink(String type, int id, String linkCode, int subid, boolean ignoseSubdivision) {
 		try {
-			wsa.get(PATH_DATA + type + '/' + id + '/' + linkCode + '/' + subid, (Calendar) null);
+			if (ignoseSubdivision) {
+				wsa.get(PATH_DATA + type + '/' + id + '/' + linkCode + '/' + subid + "?norec=true", (Calendar) null);
+			} else {
+				wsa.get(PATH_DATA + type + '/' + id + '/' + linkCode + '/' + subid, (Calendar) null);
+			}
 			return true;
 		} catch (ServerErrorException e) {
 			return false;

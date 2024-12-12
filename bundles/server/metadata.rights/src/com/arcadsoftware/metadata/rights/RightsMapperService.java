@@ -174,14 +174,15 @@ public class RightsMapperService extends AbstractMapperService {
 	}
 
 	@Override
-	public boolean doLinkTest(MetaDataLink link, int sourceId, int destId) {
+	public boolean doLinkTest(MetaDataLink link, int sourceId, int destId, boolean ignoseSubdivision) {
 		BeanMap right = activator.getRightBean(destId);
 		return (right != null) && (right.getInt(Activator.RIGHT_CATEGORY) == sourceId);
 	}
 
 	@Override
 	public BeanMapList doLinkSelection(MetaDataLink link, int sourceId, List<ReferenceLine> attributes, boolean deleted,
-			ISearchCriteria criteria, boolean distinct, List<ReferenceLine> orders, int page, int limit, ICriteriaContext context) {
+			ISearchCriteria criteria, boolean distinct, boolean ignoreSubdivision, List<ReferenceLine> orders, int page, 
+			int limit, ICriteriaContext context) {
 		if (link.getParent().getMapper() != this) {
 			activator.error("Link Selection with RightsMapper on link: " + link.toString() + " belong to " + link.getParent().toString());
 			return new BeanMapList();
@@ -193,7 +194,7 @@ public class RightsMapperService extends AbstractMapperService {
 			return new BeanMapList();
 		}
 		BeanMapList result = new BeanMapList();
-		for(BeanMap right:activator.getRights()) {
+		for (BeanMap right:activator.getRights()) {
 			if (right.get(Activator.RIGHTCATEGORY).equals(sourceId) &&  criteria.test(right, context.getCurrentUser())) {
 				result.add(filterBean(right,attributes));
 			}
@@ -220,7 +221,7 @@ public class RightsMapperService extends AbstractMapperService {
 	}
 
 	@Override
-	public int doLinkCount(MetaDataLink link, int id, boolean deleted, ISearchCriteria criteria, boolean distinct,
+	public int doLinkCount(MetaDataLink link, int id, boolean deleted, boolean ignoreSubdivision, ISearchCriteria criteria, boolean distinct,
 			ICriteriaContext context) {
 		if (context.getEntity().getType().equals(Activator.RIGHT)) {
 			context.useReference(context.getReference(Activator.RIGHT_CATEGORY));

@@ -7,10 +7,12 @@
 	<right id="31" category="3" code="user.add"/>
 	<right id="32" category="3" code="user.edit"/>
 	<right id="37" category="3" code="user.profiles"/>
-	<right id="51" category="50" code="profile.add"/>
-	<right id="52" category="50" code="profile.edit"/>
+	<right id="38" category="3" code="user.groups"/>
+	<right id="39" category="3" code="group.add"/>
+	<right id="40" category="3" code="group.edit"/>
+	<right id="51" category="3" code="profile.add"/>
+	<right id="52" category="3" code="profile.edit"/>
 
 	<rightcategory id="3" code="user"/>
-	<rightcategory id="50" code="profile"/>
 	
 </list>

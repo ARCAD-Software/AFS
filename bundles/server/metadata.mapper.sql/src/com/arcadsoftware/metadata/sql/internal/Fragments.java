@@ -103,6 +103,7 @@ public class Fragments {
 	public String delete_val;
 	public String notintoselect;
 	public String inset;
+	public String recursive;
 	
 	public Fragments(String name) {
 		// Reset this class...

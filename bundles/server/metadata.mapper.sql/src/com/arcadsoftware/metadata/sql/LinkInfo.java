@@ -33,6 +33,8 @@ public class LinkInfo {
 	public String sql_add;
 	public String sql_test;
 	public String sql_delete;
+	public String sql_rectest;
+	public String sql_rec;
 	
 	public LinkInfo(final MetaDataEntity entity, final MetaDataLink link) {
 		super();

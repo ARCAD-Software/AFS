@@ -26,6 +26,7 @@ import com.arcadsoftware.metadata.criteria.IdEqualCriteria;
 import com.arcadsoftware.metadata.criteria.IdGreaterStrictCriteria;
 import com.arcadsoftware.metadata.criteria.IdGreaterThanCriteria;
 import com.arcadsoftware.metadata.criteria.InListCriteria;
+import com.arcadsoftware.metadata.criteria.InSubdivisionCriteria;
 import com.arcadsoftware.metadata.criteria.IdLowerStrictCriteria;
 import com.arcadsoftware.metadata.criteria.IdLowerThanCriteria;
 import com.arcadsoftware.metadata.criteria.IsNullCriteria;
@@ -339,5 +340,9 @@ public abstract class AbstractCriteriaParser {
 			return new DeletedCriteria(ref);
 		}
 		return new DeletedCriteria();
+	}
+	
+	protected ISearchCriteria insubdivision(Token rl, Token v) {
+		return new InSubdivisionCriteria(rl.image, integer(v));
 	}
 }
