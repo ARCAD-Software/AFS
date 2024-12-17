@@ -21,6 +21,7 @@ import com.arcadsoftware.beanmap.internal.xml.BeanMapConverter;
 import com.arcadsoftware.beanmap.internal.xml.BeanMapListConverter;
 import com.arcadsoftware.beanmap.internal.xml.BeanMapListUpdateConverter;
 import com.arcadsoftware.rest.JsonStreamCompact;
+import com.thoughtworks.xstream.converters.basic.DateConverter;
 
 /**
  * JSON Serialization of BeanMap Objects.
@@ -115,6 +116,14 @@ public class JSonBeanMapStream extends JsonStreamCompact {
 	}
 
 	protected void standartInitialization() {
+		// Convert date to ISO format by default... (but accept other format as well).
+		registerConverter(new DateConverter("yyyy-MM-dd'T'HH:mm:ss.S", new String[] { //$NON-NLS-1$ 
+				"yyyy-MM-dd HH:mm:ss.S z", //$NON-NLS-1$
+				"yyyy-MM-dd HH:mm:ss.S a", //$NON-NLS-1$
+				"yyyy-MM-dd HH:mm:ssz", //$NON-NLS-1$ 
+				"yyyy-MM-dd HH:mm:ss z", //$NON-NLS-1$
+				"yyyy-MM-dd HH:mm:ssa", //$NON-NLS-1$
+				"EEE MMM dd HH:mm:ss zzz yyyy" })); //$NON-NLS-1$;
 		BeanMapConverter beanMapConverter = new BeanMapConverter(getMapper(), true, false);
 		registerConverter(new BeanMapListConverter(beanMapConverter, getMapper(), true, false));
 		registerConverter(beanMapConverter);
