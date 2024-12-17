@@ -1359,8 +1359,18 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 	 * @return thE XML string
 	 */
 	public String saveAsXml() {
-		XmlBeanMapStream xs = new XmlBeanMapStream(getClass().getClassLoader());
-		return xs.toXML(this);
+		return new XmlBeanMapStream(getClass().getClassLoader()).toXML(this);
+	}
+
+	/**
+	 * Helper method.
+	 * 
+	 * Serialize the BeanMap to an JSON fragment string.
+	 * 
+	 * @return the JSON string
+	 */
+	public String saveAsJSON() {
+		return new JSonBeanMapStream(getClass().getClassLoader(), true, true, false).toXML(this);
 	}
 
 	/**
