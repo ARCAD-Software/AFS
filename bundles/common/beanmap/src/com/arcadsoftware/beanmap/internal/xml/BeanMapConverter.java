@@ -173,6 +173,8 @@ public class BeanMapConverter implements Converter {
 						writer.addAttribute(KEY_LIST, Integer.toString(((Collection) value).size()));
 					}
 					context.convertAnother(value);
+				} else if (value instanceof Date) {
+					writer.setValue( ISODateFormater.toString((Date) value));
 				} else {
 					context.convertAnother(value);
 				}
