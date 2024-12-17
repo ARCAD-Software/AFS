@@ -174,21 +174,32 @@ public class RightsMapperService extends AbstractMapperService {
 	}
 
 	@Override
-	public boolean doLinkTest(MetaDataLink link, int sourceId, int destId, boolean ignoseSubdivision) {
+	public boolean linkTest(List<MetaDataLink> links, int sourceId, int destId, boolean ignoseSubdivision) {
+		if ((links == null) || (links.size() != 1)) {
+			return false;
+		}
 		BeanMap right = activator.getRightBean(destId);
 		return (right != null) && (right.getInt(Activator.RIGHT_CATEGORY) == sourceId);
 	}
 
 	@Override
-	public BeanMapList doLinkSelection(MetaDataLink link, int sourceId, List<ReferenceLine> attributes, boolean deleted,
+	public BeanMapList doLinkSelection(List<MetaDataLink> links, int sourceId, List<ReferenceLine> attributes, boolean deleted,
 			ISearchCriteria criteria, boolean distinct, boolean ignoreSubdivision, List<ReferenceLine> orders, int page, 
 			int limit, ICriteriaContext context) {
-		if (link.getParent().getMapper() != this) {
-			activator.error("Link Selection with RightsMapper on link: " + link.toString() + " belong to " + link.getParent().toString());
+		if ((links == null) || links.isEmpty()) {
 			return new BeanMapList();
 		}
-		if (link.getRefEntity().getMapper() != this) {
-			return link.getRefEntity().getMapper().linkSelection(link, sourceId, attributes, deleted, criteria, distinct, orders, context.getCurrentUser(), page, limit);
+		MetaDataEntity parent = links.get(0).getParent();
+		if (parent.getMapper() != this) {
+			activator.error("Link Selection with RightsMapper on link: " + links.get(0) + " belong to " + parent.toString());
+			return new BeanMapList();
+		}
+		MetaDataEntity refentity = links.get(links.size() - 1).getRefEntity();
+		if ((refentity == null) || (refentity.getMapper() == null)) {
+			return new BeanMapList();
+		}
+		if (refentity.getMapper() != this) {
+			return refentity.getMapper().linkSelection(links, sourceId, attributes, deleted, criteria, distinct, ignoreSubdivision, orders, context.getCurrentUser(), page, limit);
 		}
 		if (!Activator.RIGHT.equals(context.getEntity().getType())) {
 			return new BeanMapList();
@@ -221,14 +232,18 @@ public class RightsMapperService extends AbstractMapperService {
 	}
 
 	@Override
-	public int doLinkCount(MetaDataLink link, int id, boolean deleted, boolean ignoreSubdivision, ISearchCriteria criteria, boolean distinct,
+	public int doLinkCount(List<MetaDataLink> links, int id, boolean deleted, boolean ignoreSubdivision, ISearchCriteria criteria, boolean distinct,
 			ICriteriaContext context) {
+		if ((links == null) || links.isEmpty()) {
+			return 0;
+		}
 		if (context.getEntity().getType().equals(Activator.RIGHT)) {
 			context.useReference(context.getReference(Activator.RIGHT_CATEGORY));
 			return doCount(deleted,new AndCriteria(criteria, new EqualCriteria(Activator.RIGHT_CATEGORY, id)),distinct,context);
 		}
-		if (link.getRefEntity().getMapper() != this) {
-			return link.getRefEntity().getMapper().linkCount(link, id, deleted, criteria, distinct, context.getCurrentUser());
+		MetaDataEntity refEntity = links.get(links.size() - 1).getRefEntity();
+		if ((refEntity != null) && (refEntity.getMapper() != null) && (refEntity.getMapper() != this)) {
+			return refEntity.getMapper().linkCount(links, id, deleted, criteria, distinct, ignoreSubdivision, context.getCurrentUser());
 		}
 		return 0;
 	}

@@ -77,8 +77,6 @@ public class Activator extends AbstractActivator {
 		props.put(IMetaDataLinkingListener.PROP_TYPE, TYPE_PROFILE);
 		props.put(IMetaDataLinkingListener.PROP_LINK, LINK_PROFILERIGHTS);
 		registerService(IMetaDataLinkingListener.class, new LinkingProfileListener(), props);
-
-		
 		// Check if any Mapper is not already started...
 		Collection<ServiceReference<IMapperService>> msrs = bundleContext.getServiceReferences(IMapperService.class, null);
 		if (msrs != null) {

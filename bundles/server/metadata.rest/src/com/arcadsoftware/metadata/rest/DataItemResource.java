@@ -110,6 +110,35 @@ public class DataItemResource extends UserLinkedResource {
 	}
 
 	/**
+	 * Return the URL remaining part without starting and trailing slashes.
+	 * 
+	 * @return null if this part is empty.
+	 */
+	protected String preprocessRemainingPart() {
+		String result = getReference().getRemainingPart(true, false);
+		if (result == null) {
+			return null;
+		}
+		if (result.length() == 0) {
+			return null;
+		}
+		while (result.charAt(0) == '/') {
+			result = result.substring(1);
+			if (result.length() == 0) {
+				return null;
+			}
+		}
+		while (result.charAt(result.length() - 1) == '/') {
+			result = result.substring(0, result.length() - 1);
+			if (result.length() == 0) {
+				return null;
+			}
+		}
+		return result;
+	}
+
+	
+	/**
 	 * Get the specified entity from its type.
 	 * 
 	 * @param type

@@ -939,7 +939,7 @@ public abstract class AbstractMapperService implements IMapperService {
 	 * value of this Metadata tag is the corresponding link code into the target entity.
 	 *
 	 * @param link
-	 *            the link metadate object.
+	 *            the link metadata object.
 	 * @param sourceId
 	 * @param destId
 	 * @return true
@@ -953,9 +953,6 @@ public abstract class AbstractMapperService implements IMapperService {
 			return false;
 		}
 		final MetaDataLink link = entity.getLink(linkCode);
-		if (link == null) {
-			return false;
-		}
 		return linkTest(link, sourceId, destId);
 	}
 
@@ -965,36 +962,25 @@ public abstract class AbstractMapperService implements IMapperService {
 	}
 
 	@Override
-	public boolean linkTest(MetaDataLink link, int sourceId, int destId, boolean ignoseSubdivision) {
+	public boolean linkTest(MetaDataLink link, int sourceId, int destId, boolean ignoreSubdivision) {
+		if (link == null) {
+			return false;
+		}
 		final String code = link.getMetadata().getString(MetaDataEntity.METADATA_REVERSELINK);
-		if (code == null) {
-			return doLinkTest(link, sourceId, destId, ignoseSubdivision);
+		// Optimization for simple reverse link without subdivision...
+		if ((code != null) && ignoreSubdivision) {
+			final MetaDataEntity e = link.getRefEntity();
+			if (e == null) {
+				return false;
+			}
+			final MetaDataAttribute att = e.getAttribute(code);
+			if ((att == null) || !link.getParent().equals(att.getRefEntity())) {
+				return false;
+			}
+			return e.getMapper().test(e, destId, new EqualCriteria(att.getCode(), sourceId), null);
 		}
-		final MetaDataEntity e = link.getRefEntity();
-		if (e == null) {
-			return false;
-		}
-		final MetaDataAttribute att = e.getAttribute(code);
-		if ((att == null) || !link.getParent().equals(att.getRefEntity())) {
-			return false;
-		}
-		return e.getMapper().test(e, destId, new EqualCriteria(att.getCode(), sourceId), null);
+		return linkTest(link.getLinkChain(), sourceId, destId, ignoreSubdivision);
 	}
-
-	/**
-	 * Perform a link test.
-	 * <p>
-	 * "Reversed references" are <b>not</b> proceeded by this method.
-	 * <p>
-	 * But "auto links" must be taken into account. Auto-links are links automatically created from reversed links, the
-	 * value of this Metadata tag is the corresponding link code into the target entity.
-	 *
-	 * @param link
-	 * @param sourceId
-	 * @param destId
-	 * @return
-	 */
-	protected abstract boolean doLinkTest(MetaDataLink link, int sourceId, int destId, boolean ignoseSubdivision);
 
 	@Override
 	public final boolean linkRemove(String sourceType, String linkCode, int sourceId, int destId) {
@@ -1047,25 +1033,32 @@ public abstract class AbstractMapperService implements IMapperService {
 		if (entity == null) {
 			return new BeanMapList();
 		}
-		final MetaDataLink link = entity.getLink(linkCode);
-		if (link == null) {
+		final List<MetaDataLink> links = entity.getLinkChain(linkCode.split(" ")); //$NON-NLS-1$
+		if (links == null) {
 			return new BeanMapList();
 		}
-		entity = link.getRefEntity();
+		entity = links.get(links.size() - 1).getRefEntity();
 		if (entity == null) {
 			return new BeanMapList();
 		}
-		return linkSelection(link, sourceId, entity.getListables(), false, ConstantCriteria.TRUE, false, false,
+		return linkSelection(links, sourceId, entity.getListables(), false, ConstantCriteria.TRUE, false, false,
 				new ArrayList<ReferenceLine>(), null, 0, -1);
 	}
 
 	@Override
 	public final BeanMapList linkSelection(MetaDataLink link, int sourceId) {
+		if (link == null) {
+			return new BeanMapList();
+		}
+		List<MetaDataLink> links = link.getLinkChain();
+		if (links == null) {
+			return new BeanMapList();
+		}
 		final MetaDataEntity entity = link.getRefEntity();
 		if (entity == null) {
 			return new BeanMapList();
 		}
-		return linkSelection(link, sourceId, entity.getListables(), false, ConstantCriteria.TRUE, false, false,
+		return linkSelection(links, sourceId, entity.getListables(), false, ConstantCriteria.TRUE, false, false,
 				new ArrayList<ReferenceLine>(), null, 0, -1);
 	}
 
@@ -1076,26 +1069,30 @@ public abstract class AbstractMapperService implements IMapperService {
 		if (entity == null) {
 			return new BeanMapList();
 		}
-		final MetaDataLink link = entity.getLink(linkCode);
-		if (link == null) {
+		final List<MetaDataLink> links = entity.getLinkChain(linkCode.split(" ")); //$NON-NLS-N$
+		if (links == null) {
 			return new BeanMapList();
 		}
-		entity = link.getRefEntity();
+		entity = links.get(links.size() - 1).getRefEntity();
 		if (entity == null) {
 			return new BeanMapList();
 		}
-		return linkSelection(link, sourceId, getAttributesList(entity, attributes), deleted, false,
+		return linkSelection(links, sourceId, getAttributesList(entity, attributes), deleted, false,
 				entity.getAttributeLine(attributeTest), value);
 	}
 
 	@Override
 	public final BeanMapList linkSelection(MetaDataLink link, int sourceId, String attributes, boolean deleted,
 			String attributeTest, Object value) {
+		final List<MetaDataLink> links = link.getLinkChain();
+		if (links == null) {
+			return new BeanMapList();
+		}
 		final MetaDataEntity entity = link.getRefEntity();
 		if (entity == null) {
 			return new BeanMapList();
 		}
-		return linkSelection(link, sourceId, getAttributesList(entity, attributes), deleted, false,
+		return linkSelection(links, sourceId, getAttributesList(entity, attributes), deleted, false,
 				entity.getAttributeLine(attributeTest), value);
 	}
 
@@ -1107,15 +1104,15 @@ public abstract class AbstractMapperService implements IMapperService {
 		if (entity == null) {
 			return new BeanMapList();
 		}
-		final MetaDataLink link = entity.getLink(linkCode);
-		if (link == null) {
+		final List<MetaDataLink> links = entity.getLinkChain(linkCode.split(" ")); //$NON-NLS-1$
+		if (links == null) {
 			return new BeanMapList();
 		}
-		entity = link.getRefEntity();
+		entity = links.get(links.size() - 1).getRefEntity();
 		if (entity == null) {
 			return new BeanMapList();
 		}
-		return linkSelection(link, sourceId, getAttributesList(entity, attributes), deleted, getCriteria(criteria),
+		return linkSelection(links, sourceId, getAttributesList(entity, attributes), deleted, getCriteria(criteria),
 				distinct, false, entity.getAttributeLines(orders), currentUser, page, limit);
 	}
 
@@ -1237,52 +1234,67 @@ public abstract class AbstractMapperService implements IMapperService {
 	public final BeanMapList linkSelection(MetaDataLink link, int sourceId, List<ReferenceLine> attributes,
 			boolean deleted, ISearchCriteria criteria, boolean distinct, List<ReferenceLine> orders,
 			IConnectionUserBean currentUser, int page, int limit) {
-		return linkSelection(link, sourceId, attributes, deleted, criteria, distinct, false, orders, currentUser, page, limit);
+		final List<MetaDataLink> links = link.getLinkChain();
+		if (links == null) {
+			return new BeanMapList();
+		}
+		return linkSelection(links, sourceId, attributes, deleted, criteria, distinct, false, orders, currentUser, page, limit);
 	}
 
-	protected abstract BeanMapList doLinkSelection(MetaDataLink link, int sourceId, List<ReferenceLine> attributes,
+	protected abstract BeanMapList doLinkSelection(List<MetaDataLink> links, int sourceId, List<ReferenceLine> attributes,
 			boolean deleted, ISearchCriteria criteria, boolean distinct, boolean ignoreSubdivision, List<ReferenceLine> orders, int page,
 			int limit, ICriteriaContext context);
 
 	@Override
 	public final int linkCount(MetaDataLink link, int sourceId, boolean deleted, ISearchCriteria criteria,
 			boolean distinct, IConnectionUserBean currentUser) {
-		return linkCount(link, sourceId, deleted, criteria, distinct, false, currentUser);
+		final List<MetaDataLink> links = link.getLinkChain();
+		if (links == null) {
+			return 0;
+		}
+		return linkCount(links, sourceId, deleted, criteria, distinct, false, currentUser);
 	}
 
 	@Override
-	public int linkCount(MetaDataLink link, int sourceId, boolean deleted, ISearchCriteria criteria, boolean distinct,
+	public int linkCount(List<MetaDataLink> links, int sourceId, boolean deleted, ISearchCriteria criteria, boolean distinct,
 			boolean ignoreSubdivision, IConnectionUserBean currentUser) {
-		final String code = link.getMetadata().getString(MetaDataEntity.METADATA_REVERSELINK);
-		if (code == null) {
-			final ICriteriaContext context = getContext(link.getRefEntity(), currentUser);
-			if (criteria == null) {
-				criteria = ConstantCriteria.TRUE;
-			} else {
-				criteria = criteria.reduce(context);
-				if (ConstantCriteria.FALSE.equals(criteria)) {
+		if ((links == null) || (links.size() == 0)) {
+			return 0;
+		}
+		if (links.size() == 1) {
+			// Simplification of atomic chain on a reverse link...
+			final String code = links.get(0).getMetadata().getString(MetaDataEntity.METADATA_REVERSELINK);
+			if (code != null) {
+				final MetaDataEntity e = links.get(0).getRefEntity();
+				if (e == null) {
 					return 0;
 				}
+				final MetaDataAttribute att = e.getAttribute(code);
+				if ((att == null) || !links.get(0).getParent().equals(att.getRefEntity())) {
+					return 0;
+				}
+				// FIXME take into account recursive target AND source entities !
+				if (!ignoreSubdivision && e.hasRecursiveLink()) {
+					return e.getMapper().count(e, deleted, new AndCriteria(new InSubdivisionCriteria(att.getCode(), sourceId), criteria),
+							distinct, currentUser);
+				}
+				return e.getMapper().count(e, deleted, new AndCriteria(new EqualCriteria(att.getCode(), sourceId), criteria),
+						distinct, currentUser);
 			}
-			return doLinkCount(link, sourceId, deleted, ignoreSubdivision, criteria, distinct, context);
 		}
-		final MetaDataEntity e = link.getRefEntity();
-		if (e == null) {
-			return 0;
+		final ICriteriaContext context = getContext(links.get(links.size() - 1).getRefEntity(), currentUser);
+		if (criteria == null) {
+			criteria = ConstantCriteria.TRUE;
+		} else {
+			criteria = criteria.reduce(context);
+			if (ConstantCriteria.FALSE.equals(criteria)) {
+				return 0;
+			}
 		}
-		final MetaDataAttribute att = e.getAttribute(code);
-		if ((att == null) || !link.getParent().equals(att.getRefEntity())) {
-			return 0;
-		}
-		if (!ignoreSubdivision && link.getParent().hasRecursiveLink()) {
-			return e.getMapper().count(e, deleted, new AndCriteria(new InSubdivisionCriteria(att.getCode(), sourceId), criteria),
-					distinct, currentUser);
-		}
-		return e.getMapper().count(e, deleted, new AndCriteria(new EqualCriteria(att.getCode(), sourceId), criteria),
-				distinct, currentUser);
+		return doLinkCount(links, sourceId, deleted, ignoreSubdivision, criteria, distinct, context);
 	}
 
-	protected abstract int doLinkCount(MetaDataLink link, int sourceId, boolean deleted, boolean ignoreSubdivision, ISearchCriteria criteria,
+	protected abstract int doLinkCount(List<MetaDataLink> links, int sourceId, boolean deleted, boolean ignoreSubdivision, ISearchCriteria criteria,
 			boolean distinct, ICriteriaContext context);
 
 	@Override
@@ -1410,95 +1422,107 @@ public abstract class AbstractMapperService implements IMapperService {
 	@Override
 	public final BeanMapList linkSelection(MetaDataLink link, int sourceId, List<ReferenceLine> attributes,
 			boolean deleted, ReferenceLine attributeTest, Object value) {
-		return linkSelection(link, sourceId, attributes, deleted, false, attributeTest, value);
+		final List<MetaDataLink> links = link.getLinkChain();
+		if (links == null) {
+			return new BeanMapList();
+		}
+		return linkSelection(links, sourceId, attributes, deleted, false, attributeTest, value);
 	}
 
 	@Override
-	public BeanMapList linkSelection(MetaDataLink link, int sourceId, List<ReferenceLine> attributes, boolean deleted,
+	public BeanMapList linkSelection(List<MetaDataLink> links, int sourceId, List<ReferenceLine> attributes, boolean deleted,
 			boolean ignoreSubdivision, ReferenceLine attributeTest, Object value) {
-		if (attributeTest == null) {
+		if ((links == null) || links.isEmpty() || (attributeTest == null)) {
 			return new BeanMapList();
 		}
-		final MetaDataEntity entity = link.getRefEntity();
+		final MetaDataEntity entity = links.get(links.size() - 1).getRefEntity();
 		if (entity == null) {
 			return new BeanMapList();
 		}
-		final String code = link.getMetadata().getString(MetaDataEntity.METADATA_REVERSELINK);
-		if (code == null) {
-			if ((attributes == null) || (attributes.size() == 0)) {
-				attributes = entity.getAllAttributes();
-				if (attributes.size() == 0) {
+		// Simplification of atomic reverse link selection:
+		if (links.size() == 1) {
+			final String code = links.get(0).getMetadata().getString(MetaDataEntity.METADATA_REVERSELINK);
+			if (code != null) {
+				final MetaDataAttribute att = entity.getAttribute(code);
+				if ((att == null) || !links.get(0).getParent().equals(att.getRefEntity())) {
 					return new BeanMapList();
 				}
+				// FIXME take into account recursive target AND source entities !
+				if (entity.hasRecursiveLink() && !ignoreSubdivision) {
+					return entity.getMapper().selection(attributes, deleted,
+							new AndCriteria(new InSubdivisionCriteria(att.getCode(), sourceId),
+									new EqualCriteria(attributeTest.getCode(), value.toString())),
+							false, null, null, 0, -1);
+				}
+				return entity.getMapper().selection(attributes, deleted,
+						new AndCriteria(new EqualCriteria(att.getCode(), sourceId),
+								new EqualCriteria(attributeTest.getCode(), value.toString())),
+						false, null, null, 0, -1);
 			}
-			final ICriteriaContext context = getContext(entity, null);
-			return doLinkSelection(link, sourceId, attributes, deleted, getTestCriteria(attributeTest, value, context),
-					false, ignoreSubdivision, null, 0, -1, context);
 		}
-		final MetaDataAttribute att = entity.getAttribute(code);
-		if ((att == null) || !link.getParent().equals(att.getRefEntity())) {
-			return new BeanMapList();
+		if ((attributes == null) || (attributes.size() == 0)) {
+			attributes = entity.getAllAttributes();
+			if (attributes.size() == 0) {
+				return new BeanMapList();
+			}
 		}
-		if (entity.hasRecursiveLink() && !ignoreSubdivision) {
-			return entity.getMapper().selection(attributes, deleted,
-					new AndCriteria(new InSubdivisionCriteria(att.getCode(), sourceId),
-							new EqualCriteria(attributeTest.getCode(), value.toString())),
-					false, null, null, 0, -1);
-		}
-		return entity.getMapper().selection(attributes, deleted,
-				new AndCriteria(new EqualCriteria(att.getCode(), sourceId),
-						new EqualCriteria(attributeTest.getCode(), value.toString())),
-				false, null, null, 0, -1);
+		final ICriteriaContext context = getContext(entity, null);
+		return doLinkSelection(links, sourceId, attributes, deleted, getTestCriteria(attributeTest, value, context),
+				false, ignoreSubdivision, null, 0, -1, context);
 	}
 
-	// Default Implementations...
-
+	// Default Implementation...
 	@Override
 	public boolean undelete(MetaDataEntity entity, int itemId) {
 		return false;
 	}
 
 	@Override
-	public BeanMapList linkSelection(MetaDataLink link, int sourceId, List<ReferenceLine> attributes, boolean deleted,
+	public BeanMapList linkSelection(List<MetaDataLink> links, int sourceId, List<ReferenceLine> attributes, boolean deleted,
 			ISearchCriteria criteria, boolean distinct, boolean ignoreSubdivision, List<ReferenceLine> orders,
 			IConnectionUserBean currentUser, int page, int limit) {
-		if ((page < 0) || (limit == 0)) {
+		if ((links == null) || links.isEmpty() || (page < 0) || (limit == 0)) {
 			return new BeanMapList();
 		}
-		final MetaDataEntity entity = link.getRefEntity();
+		final MetaDataEntity entity = links.get(links.size() - 1).getRefEntity();
 		if (entity == null) {
 			return new BeanMapList();
 		}
-		final String code = link.getMetadata().getString(MetaDataEntity.METADATA_REVERSELINK);
-		if (code == null) {
-			if (attributes == null) {
-				attributes = entity.getListables();
-			}
-			final ICriteriaContext context = getContext(entity, currentUser);
-			if (criteria == null) {
-				criteria = ConstantCriteria.TRUE;
-			} else {
-				criteria = criteria.reduce(context);
-				if (ConstantCriteria.FALSE.equals(criteria)) {
+		// Simplification of atomic reverse link selection:
+		if (links.size() == 1) {
+			final String code = links.get(0).getMetadata().getString(MetaDataEntity.METADATA_REVERSELINK);
+			if (code != null) {
+				final MetaDataAttribute att = entity.getAttribute(code);
+				final MetaDataEntity pentity = links.get(0).getParent();
+				if ((att == null) || !pentity.equals(att.getRefEntity())) {
 					return new BeanMapList();
 				}
+				// FIXME take into account recursive target AND source entities !
+				// Send the "reversed selection" to the correct mapper !
+				if (entity.hasRecursiveLink() && !ignoreSubdivision) {
+					return entity.getMapper().selection(entity, attributes, deleted,
+							new AndCriteria(new InSubdivisionCriteria(att.getCode(), sourceId), criteria),
+							distinct, orders, currentUser, page, limit);
+				}
+				return entity.getMapper().selection(entity, attributes, deleted,
+						new AndCriteria(new EqualCriteria(att.getCode(), sourceId), criteria),
+						distinct, orders, currentUser, page, limit);
 			}
-			return doLinkSelection(link, sourceId, attributes, deleted, criteria, distinct, ignoreSubdivision, orders, page, limit,
-					context);
 		}
-		final MetaDataAttribute att = entity.getAttribute(code);
-		if ((att == null) || !link.getParent().equals(att.getRefEntity())) {
-			return new BeanMapList();
+		if (attributes == null) {
+			attributes = entity.getListables();
 		}
-		// Send the "reversed selection" to the correct mapper !
-		if (link.getParent().hasRecursiveLink() && !ignoreSubdivision) {
-			return entity.getMapper().selection(entity, attributes, deleted,
-					new AndCriteria(new InSubdivisionCriteria(att.getCode(), sourceId), criteria),
-					distinct, orders, currentUser, page, limit);
+		final ICriteriaContext context = getContext(entity, currentUser);
+		if (criteria == null) {
+			criteria = ConstantCriteria.TRUE;
+		} else {
+			criteria = criteria.reduce(context);
+			if (ConstantCriteria.FALSE.equals(criteria)) {
+				return new BeanMapList();
+			}
 		}
-		return entity.getMapper().selection(entity, attributes, deleted,
-				new AndCriteria(new EqualCriteria(att.getCode(), sourceId), criteria),
-				distinct, orders, currentUser, page, limit);
+		return doLinkSelection(links, sourceId, attributes, deleted, criteria, distinct, ignoreSubdivision, orders, page, limit,
+				context);
 	}
 
 }

@@ -89,7 +89,7 @@ public class MetaDataItemResource extends DataItemResource {
 	@Override
 	protected void doInit() throws ResourceException {
 		// prétraitement de la fin de l'url.
-		preprocessCodes();
+		codes = preprocessRemainingPart();
 		super.doInit();
 		if (!isExisting()) {
 			return;
@@ -237,7 +237,7 @@ public class MetaDataItemResource extends DataItemResource {
 				if (s.length > 1) {
 					// Legacy: The first level space by be + between identifiers. 
 					lids = s[1].replace(' ', '+');
-					for (int i = 2;i < s.length; i++) {
+					for (int i = 2; i < s.length; i++) {
 						lids = lids + '+' + s[i];
 					}
 				}
@@ -273,32 +273,6 @@ public class MetaDataItemResource extends DataItemResource {
 				}
 			} else {
 				linkeds = getLinksFromForm(getRequestForm());
-			}
-		}
-	}
-
-	private void preprocessCodes() {
-		codes = getReference().getRemainingPart(true, false);
-		if (codes != null) {
-			if (codes.length() == 0) {
-				codes = null;
-			} else {
-				while (codes.charAt(0) == '/') {
-					codes = codes.substring(1);
-					if (codes.length() == 0) {
-						codes = null;
-						break;
-					}
-				}
-			}
-			if (codes != null) {
-				while (codes.charAt(codes.length() - 1) == '/') {
-					codes = codes.substring(0, codes.length() - 1);
-					if (codes.length() == 0) {
-						codes = null;
-						break;
-					}
-				}
 			}
 		}
 	}

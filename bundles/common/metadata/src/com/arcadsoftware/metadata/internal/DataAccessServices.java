@@ -888,8 +888,29 @@ public class DataAccessServices implements IMapperService, IEntityRegistry {
 	}
 
 	@Override
-	public boolean linkTest(MetaDataLink link, int sourceId, int destId, boolean ignoseSubdivision) {
-		return dao.testLink(link.getParent().getType(), sourceId, link.getCode(), destId, ignoseSubdivision);
+	public boolean linkTest(MetaDataLink link, int sourceId, int destId, boolean ignoreSubdivision) {
+		return dao.testLink(link.getParent().getType(), sourceId, link.getCode(), destId, ignoreSubdivision);
+	}
+
+	@Override
+	public boolean linkTest(List<MetaDataLink> links, int sourceId, int destId, boolean ignoreSubdivision) {
+		if (links == null) {
+			return false;
+		}
+		StringBuilder linkCode = new StringBuilder();
+		String type = null;
+		for (MetaDataLink l : links) {
+			if (type == null) {
+				type = l.getParent().getType();
+			} else {
+				linkCode.append('+');
+			}
+			linkCode.append(l.getCode());
+		}
+		if ((type == null) || linkCode.isEmpty()) {
+			return false;
+		}
+		return dao.testLink(type, sourceId, linkCode.toString(), destId, ignoreSubdivision);
 	}
 	
 	@Override
@@ -1081,12 +1102,22 @@ public class DataAccessServices implements IMapperService, IEntityRegistry {
 	}
 
 	@Override
-	public BeanMapList linkSelection(MetaDataLink link, int sourceId, List<ReferenceLine> attributes, boolean deleted,
+	public BeanMapList linkSelection(List<MetaDataLink> links, int sourceId, List<ReferenceLine> attributes, boolean deleted,
 			boolean ignoreSubdivision, ReferenceLine attributeTest, Object value) {
+		if ((links == null) || links.isEmpty()) {
+			return new BeanMapList();
+		}
+		StringBuilder codes = new StringBuilder();
+		for (MetaDataLink l: links) {
+			if (!codes.isEmpty()) {
+				codes.append('+');
+			}
+			codes.append(l.getCode());
+		}
 		try {
-			return dao.getLinks(new BeanMap(link.getParent().getType(), sourceId), 
-					link.getCode(), 
-					link.getType(), 
+			return dao.getLinks(new BeanMap(links.get(0).getParent().getType(), sourceId), 
+					codes.toString(), 
+					links.get(links.size() - 1).getType(), 
 					ReferenceLine.getCodes(attributes),
 					new XmlCriteriaStream().toXML(new EqualCriteria(attributeTest.getCode(), value.toString())), null, 0, -1, deleted, ignoreSubdivision);
 		} catch (ServerErrorException e) {
@@ -1096,14 +1127,24 @@ public class DataAccessServices implements IMapperService, IEntityRegistry {
 	}
 
 	@Override
-	public BeanMapList linkSelection(MetaDataLink link, int sourceId, List<ReferenceLine> attributes, boolean deleted,
+	public BeanMapList linkSelection(List<MetaDataLink> links, int sourceId, List<ReferenceLine> attributes, boolean deleted,
 			ISearchCriteria criteria, boolean distinct, boolean ignoreSubdivision, List<ReferenceLine> orders,
 			IConnectionUserBean currentUser, int page, int limit) {
+		if ((links == null) || links.isEmpty()) {
+			return new BeanMapList();
+		}
+		StringBuilder codes = new StringBuilder();
+		for (MetaDataLink l: links) {
+			if (!codes.isEmpty()) {
+				codes.append('+');
+			}
+			codes.append(l.getCode());
+		}
 		try {
 			// TODO Support user substitution (if real current user possess the associated right).
-			return dao.getLinks(new BeanMap(link.getParent().getType(), sourceId), 
-					link.getCode(), 
-					link.getType(), 
+			return dao.getLinks(new BeanMap(links.get(0).getParent().getType(), sourceId), 
+					codes.toString(), 
+					links.get(links.size() - 1).getType(), 
 					ReferenceLine.getCodes(attributes),
 					new XmlCriteriaStream().toXML(criteria),
 					ReferenceLine.getCodes(orders), page, limit, deleted, ignoreSubdivision);
@@ -1114,15 +1155,25 @@ public class DataAccessServices implements IMapperService, IEntityRegistry {
 	}
 
 	@Override
-	public int linkCount(MetaDataLink link, int sourceId, boolean deleted, ISearchCriteria criteria, boolean distinct,
+	public int linkCount(List<MetaDataLink> links, int sourceId, boolean deleted, ISearchCriteria criteria, boolean distinct,
 			boolean ignoreSubdivision, IConnectionUserBean currentUser) {
+		if ((links == null) || links.isEmpty()) {
+			return 0;
+		}
+		StringBuilder codes = new StringBuilder();
+		for (MetaDataLink l: links) {
+			if (!codes.isEmpty()) {
+				codes.append('+');
+			}
+			codes.append(l.getCode());
+		}
 		try {
 			// TODO DataAccess can not count items.
 			// TODO DataAccess can not select distinct items.
 			// TODO Support user substitution (if real current user possess the associated right).
-			BeanMapList list = dao.getLinks(new BeanMap(link.getParent().getType(), sourceId), 
-					link.getCode(), 
-					link.getType(), 
+			BeanMapList list = dao.getLinks(new BeanMap(links.get(0).getParent().getType(), sourceId), 
+					codes.toString(), 
+					links.get(links.size() - 1).getType(), 
 					null,
 					new XmlCriteriaStream().toXML(criteria),
 					null, 0, 1, deleted, ignoreSubdivision);

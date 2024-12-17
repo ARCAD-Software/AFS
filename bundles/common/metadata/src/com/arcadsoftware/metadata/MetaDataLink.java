@@ -13,6 +13,9 @@
  *******************************************************************************/
 package com.arcadsoftware.metadata;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.restlet.data.Language;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
@@ -194,6 +197,11 @@ public class MetaDataLink extends Element {
 		return !getMetadata().getBoolean(MetaDataEntity.METADATA_HIDDEN);
 	}
 
+	@Override
+	public boolean isReadonly() {
+		return super.isReadonly() || getMetadata().contains(MetaDataEntity.METADATA_COMBOLINK);
+	}
+
 	/**
 	 * Link to data according to this link.
 	 * 
@@ -202,6 +210,9 @@ public class MetaDataLink extends Element {
 	 * @return
 	 */
 	public boolean dataLinkTo(int sourceId, int destId) {
+		if (isReadonly()) {
+			return false;
+		}
 		IMapperService mapper = getParent().getMapper();
 		if (mapper == null) {
 			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataUpdate,getType()));
@@ -232,6 +243,9 @@ public class MetaDataLink extends Element {
 	 * @return
 	 */
 	public boolean dataUnlink(int sourceId, int destId) {
+		if (isReadonly()) {
+			return false;
+		}
 		IMapperService mapper = getParent().getMapper();
 		if (mapper == null) {
 			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataDeletion,getType()));
@@ -306,6 +320,61 @@ public class MetaDataLink extends Element {
 	public boolean isRecursive() {
 		return !getMetadata().getBoolean(MetaDataEntity.METADATA_IGNORERECURSIVITY) && //
 				getParent().getType().equals(getType()) && //
-				(getMetadata().get(MetaDataEntity.METADATA_REVERSELINK) == null);
+				(getMetadata().get(MetaDataEntity.METADATA_REVERSELINK) == null) && //
+				(getMetadata().get(MetaDataEntity.METADATA_COMBOLINK) == null);
+	}
+	
+	/**
+	 * If this link is a combined link then this method return the list of atomic links included in the chain.
+	 * 
+	 * <p>
+	 * This method return this link if it is not a combined link.
+	 * 
+	 * @return null if the chain is broken. 
+	 */
+	public List<MetaDataLink> getLinkChain() {
+		ArrayList<MetaDataLink> result = new ArrayList<MetaDataLink>(1);
+		if (addAtomicLinks(result)) {
+			return null;
+		}
+		if (result.isEmpty()) {
+			return null;
+		}
+		MetaDataLink last = result.get(result.size() - 1);
+		if (!getType().equals(last.getType())) {
+			return null;
+		}
+		return result;
+	}
+
+	/**
+	 * Add all the atomic (not combined) link relative to the given link.
+	 * 
+	 * @param result
+	 * @param link
+	 * @return true if a error occurs.
+	 */
+	protected boolean addAtomicLinks(ArrayList<MetaDataLink> result) {
+		String combo = getMetadata().getString(MetaDataEntity.METADATA_COMBOLINK);
+		if ((combo == null) || combo.isEmpty()) {
+			result.add(this);
+		} else {
+			MetaDataEntity e = getParent();
+			for (String code: combo.split(" ")) { //$NON-NLS-1$
+				if (!code.isEmpty()) {
+					MetaDataLink l = e.getLink(code);
+					if (l == null) {
+						return true;
+					}
+					if (l.addAtomicLinks(result)) {
+						return true;
+					}
+					if (!result.isEmpty()) {
+						e = result.get(result.size() - 1).getRefEntity();
+					}
+				}
+			}
+		}
+		return false;
 	}
 }

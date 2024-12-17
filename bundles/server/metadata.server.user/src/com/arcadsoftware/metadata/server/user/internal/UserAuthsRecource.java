@@ -62,10 +62,6 @@ public class UserAuthsRecource extends UserLinkedIdentifiedResource {
 			}
 		} catch (InvalidSyntaxException e) {}
 		setExisting((user != null) && !auths.isEmpty());
-		
-		
-		
-		
 	}
 	
 	protected boolean isParameterTrue(Form form, String key) {

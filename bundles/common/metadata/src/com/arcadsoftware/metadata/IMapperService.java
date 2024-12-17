@@ -1290,7 +1290,22 @@ public interface IMapperService {
 	 *            sourceID one, will be tested.
 	 * @return true if the link exists.
 	 */
-	public boolean linkTest(MetaDataLink link, int sourceId, int destId, boolean ignoseSubdivision);
+	public boolean linkTest(MetaDataLink link, int sourceId, int destId, boolean ignoreSubdivision);
+
+
+	/**
+	 * Perform a link test across a chain of multiple links.
+	 * 
+	 * <p>
+	 * The link can be either as association (n-to-m relation) or a reversed reference (n-to-1 relation).
+	 * 
+	 * @param links
+	 * @param sourceId
+	 * @param destId
+	 * @param ignoreSubdivision
+	 * @return
+	 */
+	public boolean linkTest(List<MetaDataLink> links, int sourceId, int destId, boolean ignoreSubdivision);
 
 	/**
 	 * Remove a link between two items. A link is an oriented relation that have an origin and a target. Some link can
@@ -1419,8 +1434,8 @@ public interface IMapperService {
 	/**
 	 * Return the list of target items linked to the specified source item that possess the given attribute value.
 	 * 
-	 * @param link
-	 *            The link meta-data object.
+	 * @param links
+	 *            A chain of link meta-data objects.
 	 * @param sourceId
 	 *            the item id origin of the link.
 	 * @param attributes
@@ -1437,7 +1452,7 @@ public interface IMapperService {
 	 *            The attribute value to test.
 	 * @return the list of linked item. an empty list is returned if no linked item is found.
 	 */
-	public BeanMapList linkSelection(MetaDataLink link, int sourceId, List<ReferenceLine> attributes, boolean deleted,
+	public BeanMapList linkSelection(List<MetaDataLink> links, int sourceId, List<ReferenceLine> attributes, boolean deleted,
 			boolean ignoreSubdivision, ReferenceLine attributeTest, Object value);
 
 	/**
@@ -1512,8 +1527,8 @@ public interface IMapperService {
 	 * Return the list of target items linked to the specified source item that correspond to the given complex
 	 * condition.
 	 * 
-	 * @param link
-	 *            The link meta-data object.
+	 * @param links
+	 *            A chain of link meta-data objects.
 	 * @param sourceId
 	 *            the item id origin of the link.
 	 * @param attributes
@@ -1540,7 +1555,7 @@ public interface IMapperService {
 	 *            The maximal number of row to return, -1 if unlimited.
 	 * @return the list of linked item. an empty list is returned if no linked item is found.
 	 */
-	public BeanMapList linkSelection(MetaDataLink link, int sourceId, List<ReferenceLine> attributes, boolean deleted,
+	public BeanMapList linkSelection(List<MetaDataLink> links, int sourceId, List<ReferenceLine> attributes, boolean deleted,
 			ISearchCriteria criteria, boolean distinct, boolean ignoreSubdivision, List<ReferenceLine> orders, 
 			IConnectionUserBean currentUser, int page, int limit);
 
@@ -1570,8 +1585,8 @@ public interface IMapperService {
 	 * Count the selected target items linked to the specified source item that correspond to the given complex
 	 * condition.
 	 * 
-	 * @param link
-	 *            The link meta-data object.
+	 * @param links
+	 *            A chain of link meta-data objects.
 	 * @param sourceId
 	 *            the item id origin of the link.
 	 * @param deleted
@@ -1589,7 +1604,7 @@ public interface IMapperService {
 	 *            The connected user that is at the origin of this request. Can be null.
 	 * @return the number of selected items.
 	 */
-	public int linkCount(MetaDataLink link, int sourceId, boolean deleted, ISearchCriteria criteria, boolean distinct, boolean ignoreSubdivision,
+	public int linkCount(List<MetaDataLink> links, int sourceId, boolean deleted, ISearchCriteria criteria, boolean distinct, boolean ignoreSubdivision,
 			IConnectionUserBean currentUser);
 
 }

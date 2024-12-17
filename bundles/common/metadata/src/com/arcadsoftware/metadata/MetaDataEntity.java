@@ -208,6 +208,11 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 	 */
 	public static final String METADATA_IGNORERECURSIVITY = "norecursive"; //$NON-NLS-1$
 
+	/**
+	 * use in link which are composed with a chain of other links.
+	 */
+	public static final String METADATA_COMBOLINK = "combo"; //$NON-NLS-1$
+
 	// Some other MetaDate can be defined by other bundles.
 	// You could have a look to the MapperSQLService.
 
@@ -3039,5 +3044,39 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * Get a list of link according to the given chain of code. 
+	 * 
+	 * <p>
+	 * The returned links are all atomic link (not combined with the "combo" metadata).
+	 * This method can be used to resolve a single combined link by passing a single code as parameter.
+	 *  
+	 * @param codes a list of chained link codes.
+	 * @return null if one of the code does not exist or if the chain is broken.
+	 */
+	public List<MetaDataLink> getLinkChain(String... codes) {
+		if ((codes == null) || (codes.length == 0)) {
+			return null;
+		}
+		ArrayList<MetaDataLink> result = new ArrayList<>(codes.length);
+		MetaDataEntity e = this;
+		for (String code: codes) {
+			if ((code != null) && !code.isEmpty()) {
+				MetaDataLink l = e.getLink(code);
+				if (l == null) {
+					return null;
+				}
+				l.addAtomicLinks(result);
+				if (!result.isEmpty()) {
+					e = result.get(result.size() - 1).getRefEntity();
+				}
+			}
+		}
+		if (result.isEmpty()) {
+			return null;
+		}
+		return result;
 	}
 }

@@ -104,6 +104,9 @@ public class Fragments {
 	public String notintoselect;
 	public String inset;
 	public String recursive;
+	public String recursive_alt;
+	public String select_const;
+	public String id;
 	
 	public Fragments(String name) {
 		// Reset this class...

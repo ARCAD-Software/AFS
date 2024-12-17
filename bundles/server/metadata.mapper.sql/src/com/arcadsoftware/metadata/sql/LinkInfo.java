@@ -31,7 +31,6 @@ public class LinkInfo {
 	public String deleteCol;
 	// SQL Cache
 	public String sql_add;
-	public String sql_test;
 	public String sql_delete;
 	public String sql_rectest;
 	public String sql_rec;

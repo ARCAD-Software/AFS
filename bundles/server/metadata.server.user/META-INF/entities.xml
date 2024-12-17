@@ -91,7 +91,9 @@
 			</metadata>
 		</attribute>
 		<link type="profileRight" code="rights" readonly="true">
-			<metadata/>
+			<metadata>
+				<combo>profiles profilerights</combo>
+			</metadata>
 		</link>
 		<link type="profile" code="profiles" readonly="false">
 			<rights>
@@ -180,8 +182,21 @@
 				<logUnlink>The user "%fullname%" is not associated to the profile "%code%" anymore.</logUnlink>
 			</metadata>
 		</link>
+		<link type="profile" code="subprofiles">
+			<metadata>
+				<sourceCol>PRP_PARENT</sourceCol>
+				<destCol>PRP_CHILD</destCol>
+				<table>SUBPROFILES</table>
+			</metadata>
+		</link>
+		<link type="profile" code="parents" readonly="true">
+			<metadata norecursive="true">
+				<sourceCol>PRP_CHILD</sourceCol>
+				<destCol>PRP_PARENT</destCol>
+				<table>SUBPROFILES</table>
+			</metadata>
+		</link>
 	</entity>
-
 	<entity type="usergroup" domain="userdb" version="1" date="2025-01-01T00:00:00Z">
 		<rights>
 			<create>

@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.arcadsoftware.beanmap.BeanMap;
+import com.arcadsoftware.beanmap.BeanMapList;
 import com.arcadsoftware.metadata.ReferenceLine;
 import com.arcadsoftware.metadata.internal.Messages;
 import com.arcadsoftware.rest.connection.IConnectionUserBean;
@@ -53,6 +54,19 @@ public class InListCriteria extends AbstractSearchCriteria implements Cloneable,
 
 	public InListCriteria(String attribute, Collection<Integer> ids) {
 		this(ids);
+		this.attribute = attribute;
+	}
+
+	public InListCriteria(BeanMapList list) {
+		super();
+		this.ids = new TreeSet<Integer>();
+		for (BeanMap b: list) {
+			this.ids.add(b.getId());
+		}
+	}
+
+	public InListCriteria(String attribute, BeanMapList list) {
+		this(list);
 		this.attribute = attribute;
 	}
 

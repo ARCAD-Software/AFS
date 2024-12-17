@@ -119,8 +119,7 @@ public class MapperSQLService extends AbstractMapperService {
 	private static final char COLUMNPREFIX_PLACEHOLDER = '~';
 	private static final String COLUMNPREFIX_PLACEHOLDERS = "~"; //$NON-NLS-1$
 	private static final String DEFAULT_TABLEALIAS = "x"; //$NON-NLS-1$
-	private static final String DEFAULT_LINKTABLEALIAS = "l"; //$NON-NLS-1$
-	private static final String RECURCIVE_PREFIX = "rt_"; //$NON-NLS-1$
+	protected static final String RECURCIVE_PREFIX = "rt_"; //$NON-NLS-1$
 	
 	/**
 	 * This class is used to store all the join part of a request, this avoid duplicates joins.
@@ -175,7 +174,7 @@ public class MapperSQLService extends AbstractMapperService {
 	}
 	
 	private final DataSource ds;
-	private final Fragments fg;
+	final Fragments fg;
 	private final Escapes esc;
 	private final ConcurrentHashMap<MetaDataEntity, EntityInfo> infos;
 	private final QueryRunnerEx runner;
@@ -1767,54 +1766,6 @@ public class MapperSQLService extends AbstractMapperService {
 	}
 
 	@Override
-	protected boolean doLinkTest(MetaDataLink link, int sourceId, int destId, boolean ignoseSubdivision) {
-		EntityInfo e = getEntityInfo(link.getParent());
-		if (e == null) {
-			return false;
-		}
-		LinkInfo l = e.links.get(link.getCode());
-		if (l == null) {
-			return false;
-		}
-		if (l.sql_test == null) {
-			// Check if there is no subdivision in this entity...
-			final MetaDataLink reclink = link.getParent().getFirstRecursiveLink();
-			final LinkInfo rl;
-			if (reclink != null) {
-				rl = e.links.get(reclink.getCode());
-			} else {
-				rl = null;
-			}
-			if (!ignoseSubdivision && (rl != null) && rl.isComplete()) {
-				String rec_alias = RECURCIVE_PREFIX + reclink.getCode();
-				if (rl.sql_rec == null) {
-					rl.sql_rec = String.format(fg.recursive, rec_alias, rl.table, rl.destCol, rl.sourceCol);
-				}
-				StringBuilder from = new StringBuilder(rec_alias);
-				from.append(String.format(fg.joinref, l.table, DEFAULT_LINKTABLEALIAS, l.sourceCol, rec_alias, "r")); //$NON-NLS-1$
-				StringBuilder clause = new StringBuilder();
-				clause.append(String.format(fg.equal, DEFAULT_LINKTABLEALIAS + '.' + l.destCol, fg.param));
-				if (l.deleteCol != null) {
-					clause.append(fg.and);
-					clause.append(String.format(fg.equal, l.deleteCol, fg.false_val));
-				}
-				l.sql_test = rl.sql_rec + ' ' + String.format(fg.select, fg.count, from.toString(), clause.toString());
-			} else {
-				StringBuilder clause = new StringBuilder();
-				clause.append(String.format(fg.equal, l.sourceCol, fg.param));
-				clause.append(fg.and);
-				clause.append(String.format(fg.equal, l.destCol, fg.param));
-				if (l.deleteCol != null) {
-					clause.append(fg.and);
-					clause.append(String.format(fg.equal, l.deleteCol, fg.false_val));
-				}
-				l.sql_test = String.format(fg.select, fg.count, l.table, clause.toString());
-			}
-		}
-		return count(l.sql_test, new Object[] {sourceId, destId}) > 0;
-	}
-
-	@Override
 	protected boolean doLinkRemove(MetaDataLink link, int sourceId, int destId) {
 		// TODO Support removal into recursive links ?
 		EntityInfo e = getEntityInfo(link.getParent());
@@ -2031,80 +1982,49 @@ public class MapperSQLService extends AbstractMapperService {
 	}
 
 	@Override
-	protected BeanMapList doLinkSelection(MetaDataLink link, int sourceId, List<ReferenceLine> attributes,
+	protected BeanMapList doLinkSelection(List<MetaDataLink> links, int sourceId, List<ReferenceLine> attributes,
 			boolean deleted, ISearchCriteria criteria, boolean distinct, boolean ignoreSubdivision, 
 			List<ReferenceLine> orders, int page, int limit, ICriteriaContext context) {
-		final EntityInfo pe = getEntityInfo(link.getParent());
-		final EntityInfo e = getEntityInfo(context.getEntity());
-		LinkInfo l;
-		if (pe == null) {
-			if (e == null) { // not foreign entity, try to revert the link !
-				// We should send the request to the mapper of the source entity... but there is no reason why the SQL mapper was used
-				// to generate a link selection on to foreign entities !!!
-				return new BeanMapPartialList();
+		EntityInfo ei = getEntityInfo(links.get(0).getParent());
+		final String mlqc = MultiLinkQuery.getCode(links, deleted, ignoreSubdivision);
+		MultiLinkQuery mlq = ei.sql_links.get(mlqc);
+		if (mlq == null) {
+			mlq = MultiLinkQuery.generate(this, links, deleted, ignoreSubdivision);
+			if (mlq == null) {
+				return new BeanMapList();
 			}
-			// We assume that the link table is always into the Database source !
-			l = new LinkInfo(link.getRefEntity(), link);
-			if (!l.isComplete()) {
-				return new BeanMapPartialList();
-			}
-			// invert the link !
-			String ref = l.destCol;
-			l.destCol = l.sourceCol;
-			l.sourceCol = ref;
-		} else {
-			l = pe.links.get(link.getCode());
-			if ((l == null) || (!l.isComplete())) {
-				return new BeanMapPartialList();
-			}
+			ei.sql_links.put(mlqc, mlq);
 		}
-		final JoinsMap joins;
-		final StringBuilder where;
-		// Recursive links management.
-		final MetaDataLink reclink = link.getParent().getFirstRecursiveLink();
-		final LinkInfo rl;
-		if (reclink != null) {
-			rl = pe.links.get(reclink.getCode());
-		} else {
-			rl = null;
+		if (mlq.rec_alias != null) {
+			((SQLCriteriaContext) context).addQueryContext(mlq.rec_alias, mlq.rec_query);
 		}
-		if (!ignoreSubdivision && (rl != null) && rl.isComplete()) {
-			// A recursive link use a pre-query which sill replace the test "id = sourceId" in the where clause.  
-			String rec_alias = RECURCIVE_PREFIX + reclink.getCode();
-			if (rl.sql_rec == null) {
-				rl.sql_rec = String.format(fg.recursive, rec_alias, rl.table, rl.destCol, rl.sourceCol);
-			}
-			((SQLCriteriaContext) context).addQueryContext(rec_alias, rl.sql_rec);
-			joins = new JoinsMap(rec_alias);
-			joins.add(DEFAULT_LINKTABLEALIAS, String.format(fg.joinref, l.table, DEFAULT_LINKTABLEALIAS, l.sourceCol, rec_alias, "r")); //$NON-NLS-1$
-			where = new StringBuilder(); //$NON-NLS-1$
-		} else {
-			joins = new JoinsMap(String.format(fg.tablealias, l.table, DEFAULT_LINKTABLEALIAS));
-			where = new StringBuilder(DEFAULT_LINKTABLEALIAS + fg.prefix + l.sourceCol + fg.paramequal);
-		}
+		final JoinsMap joins = new JoinsMap(mlq.join);
+		final StringBuilder where = new StringBuilder(mlq.where);
 		StringBuilder cols = new StringBuilder();
 		if (distinct) {
 			cols.append(fg.distinct);
 		}
-		HashMap<String, String> colNames = new HashMap<String, String>();
-		StringBuilder orderCols = new StringBuilder();
-		if (e == null) { // FIXME Non support des link intra-mappers
-			if (context.getEntity() == null) {
-				return new BeanMapPartialList();
-			}
-			// Get the list of ID to get from the foreign mapper...
-			cols.append(DEFAULT_LINKTABLEALIAS);
+		final HashMap<String, String> colNames = new HashMap<String, String>();
+		final StringBuilder orderCols = new StringBuilder();
+		final MetaDataEntity targetEntity = context.getEntity();
+		if (targetEntity == null) {
+			return new BeanMapPartialList();
+		}
+		final EntityInfo tei = getEntityInfo(targetEntity); 
+		if (tei == null) {
+			// Just get the list of ID to pass to the foreign mapper...
+			cols.append(mlq.linkAlias);
 			cols.append(fg.prefix);
-			cols.append(l.destCol);
+			cols.append(mlq.linkCol);
 			cols.append(fg.asid);
 		} else {
-			joins.add(DEFAULT_TABLEALIAS, String.format(fg.joinref, e.table, DEFAULT_TABLEALIAS, e.idCol, 
-					DEFAULT_LINKTABLEALIAS, l.destCol));
-			generateColumns(context.getEntity(), e, attributes, joins, colNames, cols, DEFAULT_TABLEALIAS);
+			joins.add(DEFAULT_TABLEALIAS, String.format(fg.joinref, tei.table, DEFAULT_TABLEALIAS, tei.idCol, 
+					mlq.linkAlias, mlq.linkCol));
+			generateColumns(context.getEntity(), tei, attributes, joins, colNames, cols, DEFAULT_TABLEALIAS);
 			generateOrders(orders, colNames, orderCols);
-			generateContextCols(e, context, joins, colNames, DEFAULT_TABLEALIAS);
+			generateContextCols(tei, context, joins, colNames, DEFAULT_TABLEALIAS);
 			if ((criteria != null) && !ConstantCriteria.TRUE.equals(criteria)) {
-				criteria = getLocalCriteria(criteria,context);
+				criteria = getLocalCriteria(criteria, context);
 				if (ConstantCriteria.FALSE.equals(criteria)) {
 					return new BeanMapPartialList();
 				}
@@ -2112,14 +2032,14 @@ public class MapperSQLService extends AbstractMapperService {
 					if (where.length() > 0) {
 						where.append(fg.and);
 					}
-					generateCriteria(e, criteria, context, colNames, joins, where);
+					generateCriteria(tei, criteria, context, colNames, joins, where);
 				}
 			}
-			generateDeleteTest(e, deleted, cols, where);
+			generateDeleteTest(tei, deleted, cols, where);
 		}
 		String query;
 		boolean softPagination = false;
-		if (((page == 0) && (limit <= 0)) || (fg.partial == null) || (fg.partial.length() == 0) || (e == null)) {
+		if (((page == 0) && (limit <= 0)) || (fg.partial == null) || (fg.partial.length() == 0) || (tei == null)) {
 			softPagination = (fg.partial == null) || (fg.partial.length() == 0);
 			// Pas de pagination (pas nécessaire ou non supporté par le SGDB).
 			if (where.length() == 0) {
@@ -2139,26 +2059,26 @@ public class MapperSQLService extends AbstractMapperService {
 						page, // first element to return
 						limit, // number of element to return
 						page + limit + 1, // first element to not return.
-						e.idCol);
+						tei.idCol);
 			} else {
 				query = ((SQLCriteriaContext) context).formatQuery(fg.partialallorder, cols.toString(), joins.toString(), //
 						page, // first element to return
 						limit, // number of element to return
 						page + limit + 1, // first element to not return.
-						orderCols.toString(), e.idCol);
+						orderCols.toString(), tei.idCol);
 			}
 		} else if (orderCols.length() == 0) {
 			query = ((SQLCriteriaContext) context).formatQuery(fg.partial, cols.toString(), joins.toString(), where.toString(), //
 			page, // first element to return
 			limit, // number of element to return
 			page + limit + 1, // first element to not return.
-			e.idCol);
+			tei.idCol);
 		} else {
 			query = ((SQLCriteriaContext) context).formatQuery(fg.partialorder, cols.toString(), joins.toString(), where.toString(), //
 					page, // first element to return
 					limit, // number of element to return
 					page + limit + 1, // first element to not return.
-					orderCols.toString(), e.idCol);
+					orderCols.toString(), tei.idCol);
 		}
 		BeanMapList result;
 		if (limit < 0) {
@@ -2171,117 +2091,101 @@ public class MapperSQLService extends AbstractMapperService {
 		} else {
 			result = query(query, context.getEntity().getType(), result, new Object[] {sourceId});
 		}
-		if (e != null) {
+		// Post treatment of foreign elements:
+		if (tei != null) {
 			// Result list completed, add the foreigns attributes...
 			return completeForeignAttributes(attributes, result);
 		}
-		// select the foreign entities
+		// select the foreign entity using the list of ID...
 		if (result.size() == 0) {
 			return result;
 		}
-		if (result.size() < 50) {
-			OrCriteria presel = new OrCriteria();
-			for (BeanMap b: result) {
-				presel.add(new IdEqualCriteria(b.getId()));
-			}
-			return link.getRefEntity().getMapper().selection(attributes, //
-					deleted, //
-					new AndCriteria(criteria, presel), //
-					distinct, //
-					orders, //
-					context.getCurrentUser(), //
-					0, -1);
-		}
-		BeanMapList presel = new BeanMapList(result.size());
-		int z = result.size();
-		while (z > 0) {
-			OrCriteria subsel = new OrCriteria();
-			int zz = z - 40;
-			if (zz < 0) {
-				zz = 0;
-			}
-			for (int i = zz; i < z; i++) {
-				subsel.add(new IdEqualCriteria(result.get(i).getId()));
-			}
-			z = zz;
-			presel.addAll(link.getRefEntity().getMapper().selection(attributes, //
-					deleted, //
-					new AndCriteria(criteria, subsel), //
-					distinct, //
-					orders, //
-					context.getCurrentUser(), //
-					0, -1));
-		}
-		// FIXME The order is not globally respected !!!
-		return new BeanMapPartialList(presel, page, limit);
+		return context.getEntity().getMapper().selection(attributes, //
+				deleted, //
+				new AndCriteria(new InListCriteria(result), criteria), //
+				distinct, //
+				orders, //
+				context.getCurrentUser(), //
+				0, -1);
 	}
 
+
 	@Override
-	protected int doLinkCount(MetaDataLink link, int sourceId, boolean deleted,  boolean ignoreSubdivision, ISearchCriteria criteria,
+	public boolean linkTest(List<MetaDataLink> links, int sourceId, int destId, boolean ignoreSubdivision) {
+		// This method (and all "link tests") assume that soft-deleted items are not linked.
+		if ((links == null) || links.isEmpty()) {
+			return false;
+		}
+		EntityInfo ei = getEntityInfo(links.get(0).getParent());
+		final String mlqc = MultiLinkQuery.getCode(links, false, ignoreSubdivision);
+		MultiLinkQuery mlq = ei.sql_links.get(mlqc);
+		if (mlq == null) {
+			mlq = MultiLinkQuery.generate(this, links, false, ignoreSubdivision);
+			if (mlq == null) {
+				return false;
+			}
+			ei.sql_links.put(mlqc, mlq);
+		}
+		final StringBuilder joins = new StringBuilder(mlq.join);
+		// Take into account soft deletion of the target entity... only if this entity depends on this mapper.
+		ei = getEntityInfo(links.get(links.size() - 1).getRefEntity());
+		if ((ei != null) && (ei.deleteCol != null)) {
+			joins.append(String.format(fg.join_inner, ei.table, DEFAULT_TABLEALIAS, ei.idCol, mlq.linkAlias, mlq.linkCol));
+			joins.append(fg.and);
+			joins.append(DEFAULT_TABLEALIAS);
+			joins.append(fg.prefix);
+			joins.append(ei.deleteCol);
+			joins.append(fg.equaldelfalse);
+		}
+		// Add the final test on the last link target column.
+		final StringBuilder where = new StringBuilder(mlq.where);
+		if (!where.isEmpty()) {
+			where.append(fg.and);
+		}
+		where.append(mlq.linkAlias);
+		where.append(fg.prefix);
+		where.append(mlq.linkCol);
+		where.append(fg.paramequal);
+		final StringBuilder query = new StringBuilder(); 
+		if (mlq.rec_alias != null) {
+			query.append(mlq.rec_query);
+		}
+		query.append(String.format(fg.select, fg.count, joins.toString(), where.toString()));
+		return count(query.toString(), new Object[] {sourceId, destId}) > 0;
+	}
+	
+	@Override
+	protected int doLinkCount(List<MetaDataLink> links, int sourceId, boolean deleted,  boolean ignoreSubdivision, ISearchCriteria criteria,
 			boolean distinct, ICriteriaContext context) {
-		final EntityInfo pe = getEntityInfo(link.getParent());
-		final EntityInfo e = getEntityInfo(context.getEntity());
-		LinkInfo l = null;
-		if (pe == null) { // foreign entity source... try the revert the link !
-			if (e == null) { // not foreign entity !
-				// We should send the request to the mapper of the source entity... but there is no reason why this SQL mapper was used
-				// to generate a link selection on to foreign entities !!!
+		EntityInfo ei = getEntityInfo(links.get(0).getParent());
+		final String mlqc = MultiLinkQuery.getCode(links, deleted, ignoreSubdivision);
+		MultiLinkQuery mlq = ei.sql_links.get(mlqc);
+		if (mlq == null) {
+			mlq = MultiLinkQuery.generate(this, links, deleted, ignoreSubdivision);
+			if (mlq == null) {
 				return 0;
 			}
-			// We assume that the link table is always into the Database source !
-			l = new LinkInfo(link.getRefEntity(), link);
-			if (!l.isComplete()) {
-				l = null;
-			}
-			// invert the link !
-			String ref = l.destCol;
-			l.destCol = l.sourceCol;
-			l.sourceCol = ref;
-		} else {
-			l = pe.links.get(link.getCode());
+			ei.sql_links.put(mlqc, mlq);
 		}
-		if (l == null) {
-			return 0;
+		if (mlq.rec_alias != null) {
+			((SQLCriteriaContext) context).addQueryContext(mlq.rec_alias, mlq.rec_query);
 		}
-		final JoinsMap joins;
-		final StringBuilder where;
-		// Recursive links management.
-		final MetaDataLink reclink = link.getParent().getFirstRecursiveLink();
-		final LinkInfo rl;
-		if (reclink != null) {
-			rl = pe.links.get(reclink.getCode());
-		} else {
-			rl = null;
-		}
-		if (!ignoreSubdivision && (rl != null) && rl.isComplete()) {
-			// A recursive link use a pre-query which sill replace the test "id = sourceId" in the where clause.
-			String rec_alias = RECURCIVE_PREFIX + reclink.getCode();
-			if (rl.sql_rec == null) {
-				rl.sql_rec = String.format(fg.recursive, rec_alias, rl.table, rl.destCol, rl.sourceCol);
-			}
-			((SQLCriteriaContext) context).addQueryContext(rec_alias, rl.sql_rec);
-			joins = new JoinsMap(rec_alias);
-			joins.add(DEFAULT_LINKTABLEALIAS, String.format(fg.joinref, l.table, DEFAULT_LINKTABLEALIAS, l.sourceCol, rec_alias, "r")); //$NON-NLS-1$
-			where = new StringBuilder();
-		} else {
-			joins = new JoinsMap(String.format(fg.tablealias, l.table, DEFAULT_LINKTABLEALIAS));
-			where = new StringBuilder(DEFAULT_LINKTABLEALIAS + fg.prefix + l.sourceCol  + fg.paramequal);
-		}
+		final EntityInfo e = getEntityInfo(context.getEntity());
+		final JoinsMap joins = new JoinsMap(mlq.join);
+		final StringBuilder where = new StringBuilder(mlq.where);
 		HashMap<String, String> colNames = new HashMap<String, String>();
 		final String col;
 		if (e == null) {
-			if (context.getEntity() == null) {
-				return 0;
-			}
 			col = fg.count;
 			// Link "extra-mapper"...
-			// FIXME Ignore the distinct constraint !!!
+			// FIXME This ignore the distinct constraint !!!
 			// FIXME Ignore the criteria clause !!!
 			// FIXME This assume that the linked data are not deleted !!!
 		} else {
 			joins.add(DEFAULT_TABLEALIAS, String.format(fg.joinref, e.table, DEFAULT_TABLEALIAS, e.idCol, 
-					DEFAULT_LINKTABLEALIAS, l.destCol));
-			// utilisation de distinct
+					mlq.linkAlias, mlq.linkCol));
+			// A distinct clause need columns...
+			// FIXME this may be a problem if this test is performed for another selection whichi use a specific list of attributes !
 			if (distinct) {
 				col = String.format(fg.count_distinct, DEFAULT_TABLEALIAS + fg.prefix + e.idCol);
 			} else {

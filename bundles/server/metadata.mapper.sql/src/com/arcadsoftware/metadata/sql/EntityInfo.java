@@ -66,6 +66,7 @@ public class EntityInfo {
 	public String sql_harddelete;
 	public String sql_delete;
 	public String sql_undelete;
+	public HashMap<String, MultiLinkQuery> sql_links;
 	
 	public EntityInfo(MetaDataEntity entity, MapperSQLService mapper) {
 		super();
@@ -80,6 +81,8 @@ public class EntityInfo {
 		sql_harddelete = null;
 		sql_delete = null;
 		sql_undelete = null;
+		// FIXME as this cache depends on other entities it must be cleared when other entities are modified !
+		sql_links = new HashMap<>(); 
 		BeanMap md = entity.getMetadata();
 		if (md != null) {
 			idCol = md.getString(METADATA_IDCOL);
