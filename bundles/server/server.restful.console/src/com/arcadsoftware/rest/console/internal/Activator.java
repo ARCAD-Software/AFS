@@ -179,6 +179,16 @@ public class Activator extends AbstractConfiguredActivator implements BundleList
 	}
 
 	@Override
+	public boolean initializeConfiguration(Dictionary<String, Object> properties) {
+		boolean changed = false;
+		if ((properties != null) && (properties.get(PROP_ADMINCONFENABLED) == null)) {
+			properties.put(PROP_ADMINCONFENABLED, "true"); //$NON-NLS-1$
+			changed = true;
+		}
+		return changed;
+	}
+
+	@Override
 	public void updatedConfiguration(Dictionary<String,Object> properties) {
 		if (properties != null) {
 			if (properties.get(PROP_ADMINCONFENABLED) != null) {
