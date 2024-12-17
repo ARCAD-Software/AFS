@@ -11,7 +11,7 @@ Require-Bundle: org.eclipse.core.runtime,
  com.arcadsoftware.aev.core;bundle-version="[12.0.0,13.0.0)",
  com.arcadsoftware.aev.core.ui;bundle-version="[12.0.0,13.0.0)",
  com.arcadsoftware.osgi;bundle-version="[1.8.0,2.0.0)",
- com.arcadsoftware.metadata;bundle-version="[1.5.0,2.0.0)",
+ com.arcadsoftware.metadata;bundle-version="[2.0.0,3.0.0)",
  com.arcadsoftware.afs.framework;bundle-version="[1.2.0,2.0.0)",
  org.restlet.base;bundle-version="[2.4.3,3.0.0)",
  com.arcadsoftware.afs.client.brands;bundle-version="[1.0.0,2.0.0)"
