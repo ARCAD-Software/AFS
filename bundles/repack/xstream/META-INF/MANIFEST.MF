@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: xstream
 Bundle-SymbolicName: xstream
-Bundle-Version: 1.4.210.qualifier
+Bundle-Version: 1.4.211
 Bundle-Vendor: XStream
 Automatic-Module-Name: xstream
 Bundle-ClassPath: libs/mxparser-1.2.2.jar,

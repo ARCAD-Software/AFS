@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AFS Cryptography for XML
 Bundle-SymbolicName: com.arcadsoftware.crypt.xml
-Bundle-Version: 1.1.4.qualifier
+Bundle-Version: 1.1.4
 Bundle-Vendor: ARCAD Software
 Automatic-Module-Name: com.arcadsoftware.crypt.xml
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
