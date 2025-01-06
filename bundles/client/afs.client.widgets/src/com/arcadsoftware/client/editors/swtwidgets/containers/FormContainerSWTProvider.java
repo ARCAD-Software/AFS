@@ -156,7 +156,7 @@ public class FormContainerSWTProvider implements IContainerSWTProvider {
 	public void create(ISWTRenderer renderer, ILayoutParameters params, boolean isEmpty, MetaDataEntity structure) {
 		final String icon = params.getParameter(IConstants.ICON);
 		ImageDescriptor id = null;
-		if ((icon != null) && (icon.length() > 0)) {
+		if ((icon != null) && (!icon.isEmpty())) {
 			id = renderer.getImageDescriptor(icon);
 		}
 		final int cols = params.getParameterInteger(IConstants.COLS, 0);
@@ -212,7 +212,7 @@ public class FormContainerSWTProvider implements IContainerSWTProvider {
 			for (final char c : label.toCharArray()) {
 				if (tagName != null) {
 					if (c == '%') {
-						if ((tagName == null) || (tagName.length() == 0)) {
+						if (tagName.length() == 0) {
 							result.append('%');
 						} else {
 							final String code = tagName.toString();
@@ -233,6 +233,7 @@ public class FormContainerSWTProvider implements IContainerSWTProvider {
 					result.append(c);
 				}
 			}
+			return result.toString();
 		}
 		return label;
 	}
