@@ -19,7 +19,10 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
 
 /**
  * Test if the String value of the attribute is equals to the given text, ignoring case.
+ * 
+ * @deprecated Use EqualCriteria which support a ignore case parameter now.
  */
+@Deprecated
 public class EqualICCriteria extends AbstractSearchCriteria implements Cloneable, IAttributeCriteria {
 
 	private String attribute;

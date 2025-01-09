@@ -13,7 +13,7 @@
  *******************************************************************************/
 package com.arcadsoftware.metadata.criteria;
 
-public interface IAttributeCriteria {
+public interface IAttributeCriteria extends ISearchCriteria {
 
 	/**
 	 * Define the attribute code associated to the condition.

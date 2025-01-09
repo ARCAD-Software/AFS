@@ -65,6 +65,23 @@ public class LinkEqualCriteria extends AbstractLinkTestCriteria implements Clone
 		this.casesensitive = casesensitive;
 	}
 
+	/**
+	 * 
+	 * @param reference a attribute reference line from which the link code is applicable, may be null.
+	 * @param linkCode a non null link code.
+	 * @param attribute an attribute reference line starting from the link target entity. 
+	 * @param secondAttribute another attribure reference line (from the tested entity) used to be compared with the 
+	 * @param value the constant value to test.
+	 * @param ignoreSubdivision if true the subdivision included in the link chain will be ignored.
+	 * @param deleted if true the soft-deleted links and inner entity items will be taken into account.
+	 * @param casesensitive true if the test is case sensitive
+	 */
+	public LinkEqualCriteria(String reference, String linkCode, String attribute, String secondAttribute, String value, boolean ignoreSubdivision, boolean deleted, boolean casesensitive) {
+		super(reference, linkCode, attribute, value, ignoreSubdivision, deleted);
+		this.secondAttribute = secondAttribute;
+		this.casesensitive = casesensitive;
+	}
+	
 	public LinkEqualCriteria() {
 		super();
 	}
@@ -76,7 +93,7 @@ public class LinkEqualCriteria extends AbstractLinkTestCriteria implements Clone
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
-		return new LinkEqualCriteria(getReference(), getLinkCode(), getAttribute(), secondAttribute, getValue(), casesensitive);
+		return new LinkEqualCriteria(getReference(), getLinkCode(), getAttribute(), secondAttribute, getValue(), isIgnoreSubdivision(), isDeletedLinks(), casesensitive);
 	}
 	
 	@Override

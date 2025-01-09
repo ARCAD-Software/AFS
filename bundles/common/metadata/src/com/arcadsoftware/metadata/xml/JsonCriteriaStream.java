@@ -45,12 +45,12 @@ import com.arcadsoftware.metadata.criteria.GreaterThanCriteria;
 import com.arcadsoftware.metadata.criteria.HasRightCriteria;
 import com.arcadsoftware.metadata.criteria.IAttributeCriteria;
 import com.arcadsoftware.metadata.criteria.IAttributesCriteria;
+import com.arcadsoftware.metadata.criteria.ILinkCriteria;
 import com.arcadsoftware.metadata.criteria.ISearchCriteria;
 import com.arcadsoftware.metadata.criteria.IdEqualCriteria;
 import com.arcadsoftware.metadata.criteria.IdGreaterStrictCriteria;
 import com.arcadsoftware.metadata.criteria.IdGreaterThanCriteria;
 import com.arcadsoftware.metadata.criteria.InListCriteria;
-import com.arcadsoftware.metadata.criteria.InSubdivisionCriteria;
 import com.arcadsoftware.metadata.criteria.IdLowerStrictCriteria;
 import com.arcadsoftware.metadata.criteria.IdLowerThanCriteria;
 import com.arcadsoftware.metadata.criteria.IsNullCriteria;
@@ -284,8 +284,6 @@ public class JsonCriteriaStream  {
 				sub.put("userAttribute", ((CurrentUserCriteria) criteria).getUserAttribute());
 			}
 			result.put("currentUser", sub);
-		} else if (criteria instanceof PreGeneratedCriteria) {
-			result.put("pregen", ((PreGeneratedCriteria) criteria).getSql());
 		} else if (criteria instanceof SubstCriteria) {
 			result.put("subst", ((SubstCriteria) criteria).getCode());
 		} else if (criteria instanceof AttributeEqualsCriteria) {
@@ -374,10 +372,6 @@ public class JsonCriteriaStream  {
 			result.put("linkgreaterstrict", convertAttribute(criteria));
 		} else if (criteria instanceof LinkGreaterThanCriteria) {
 			result.put("linkgreaterthan", convertAttribute(criteria));
-		} else if (criteria instanceof InSubdivisionCriteria) {
-			JSONObject sub = convertAttribute(criteria);
-			sub.put("value", ((InSubdivisionCriteria) criteria).getValue());
-			result.put("insubset", sub);
 		} else {
 			throw new JSONException("Unexpected Criteria, unable to convert it in JSON:" + criteria);
 		}
@@ -397,6 +391,14 @@ public class JsonCriteriaStream  {
 			result.put("value", ((AbstractLinkTestCriteria) criteria).getValue());
 			if (((AbstractLinkTestCriteria) criteria).getReference() != null) {
 				result.put("reference", ((AbstractLinkTestCriteria) criteria).getReference());
+			}
+		}
+		if (criteria instanceof ILinkCriteria) {
+			if (((ILinkCriteria) criteria).isIgnoreSubdivision()) {
+				result.put("ignoresd", true);
+			}
+			if (((ILinkCriteria) criteria).isDeletedLinks()) {
+				result.put("deleted", true);
 			}
 		}
 		return result;
@@ -477,9 +479,6 @@ public class JsonCriteriaStream  {
 			return new IdEqualCriteria((String) value);
 		case "istrue":
 			return new IsTrueCriteria((String) value);
-		case "pregen":
-		case "sql":
-			return new PreGeneratedCriteria((String) value);
 		case "subst":
 		case "sub":
 			return new SubstCriteria((String) value);
@@ -584,7 +583,9 @@ public class JsonCriteriaStream  {
 			return fill(new LinkEqualCriteria(), (JSONObject) value);
 		case "equalsic":
 		case "eqic":
-			return fill(new EqualICCriteria(), (JSONObject) value);
+			EqualCriteria c = fill(new EqualCriteria(), (JSONObject) value);
+			c.setCasesensitive(false);
+			return c;
 		case "hasright":
 		case "right":
 			return fill(new HasRightCriteria(), (JSONObject) value);
@@ -627,9 +628,6 @@ public class JsonCriteriaStream  {
 		case "lcontains":
 		case "lcontain":
 			return fill(new LinkContainCriteria(), (JSONObject) value);
-		case "insubset":
-		case "subset":
-			return fill(new InSubdivisionCriteria(), (JSONObject) value);
 		}
 		return null;
 	}
@@ -668,12 +666,8 @@ public class JsonCriteriaStream  {
 					case "link":
 					case "lc":
 					case "l":
-						if (criteria instanceof AbstractLinkTestCriteria) {
-							((AbstractLinkTestCriteria) criteria).setLinkCode(o.toString());
-						} else if (criteria instanceof LinkCriteria) {
-							((LinkCriteria) criteria).setLinkCode(o.toString());
-						} else if (criteria instanceof UnlinkCriteria) {
-							((UnlinkCriteria) criteria).setLinkCode(o.toString());
+						if (criteria instanceof ILinkCriteria) {
+							((ILinkCriteria) criteria).setLinkCode(o.toString());
 						} else if (criteria instanceof CurrentUserCriteria) {
 							((CurrentUserCriteria) criteria).setLinkCode(o.toString());
 						}
@@ -706,14 +700,10 @@ public class JsonCriteriaStream  {
 							((StartCriteria) criteria).setValue(o.toString());
 						} else if (criteria instanceof EndCriteria) {
 							((EndCriteria) criteria).setValue(o.toString());
-						} else if (criteria instanceof EqualICCriteria) {
-							((EqualICCriteria) criteria).setValue(o.toString());
 						} else if (criteria instanceof BeforeCriteria) {
 							((BeforeCriteria) criteria).setValue(getDate(o));
 						} else if (criteria instanceof AfterCriteria) {
 							((AfterCriteria) criteria).setValue(getDate(o));
-						} else if (criteria instanceof InSubdivisionCriteria) {
-							((InSubdivisionCriteria) criteria).setValue(getInteger(o));
 						}
 						break;
 					case "casesensitive":
@@ -937,6 +927,22 @@ public class JsonCriteriaStream  {
 							((BetweenCriteria) criteria).setBeforeminuts(i);
 						} else if (criteria instanceof ChangedCriteria) {
 							((ChangedCriteria) criteria).setBeforeminuts(i);
+						}
+						break;
+					case "ignoresubdivision":
+					case "ignoresd":
+					case "nosd":
+						b = getBoolean(o);
+						if (criteria instanceof ILinkCriteria) {
+							((ILinkCriteria) criteria).setIgnoreSubdivision(b);
+						}
+						break;
+					case "deletedlinks":
+					case "deleted":
+					case "del":
+						b = getBoolean(o);
+						if (criteria instanceof ILinkCriteria) {
+							((ILinkCriteria) criteria).setDeletedLinks(b);
 						}
 						break;
 					}

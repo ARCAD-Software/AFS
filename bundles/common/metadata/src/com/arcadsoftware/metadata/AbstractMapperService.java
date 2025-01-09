@@ -30,14 +30,12 @@ import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
 import com.arcadsoftware.metadata.criteria.AndCriteria;
 import com.arcadsoftware.metadata.criteria.ConstantCriteria;
-import com.arcadsoftware.metadata.criteria.CriteriaContextBasic;
 import com.arcadsoftware.metadata.criteria.EqualCriteria;
 import com.arcadsoftware.metadata.criteria.IAttributeCriteria;
 import com.arcadsoftware.metadata.criteria.IAttributesCriteria;
 import com.arcadsoftware.metadata.criteria.ICriteriaContext;
 import com.arcadsoftware.metadata.criteria.ISearchCriteria;
 import com.arcadsoftware.metadata.criteria.IdEqualCriteria;
-import com.arcadsoftware.metadata.criteria.InSubdivisionCriteria;
 import com.arcadsoftware.metadata.criteria.IsNullCriteria;
 import com.arcadsoftware.metadata.criteria.IsTrueCriteria;
 import com.arcadsoftware.metadata.criteria.LinkEqualCriteria;
@@ -65,7 +63,7 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
  * <p>
  * This class also propose some useful tools for extender classes.
  */
-public abstract class AbstractMapperService implements IMapperService {
+public abstract class AbstractMapperService<T extends ICriteriaContext> implements IMapperService {
 
 	/*
 	 * Limite au dela de laquelle on ne génère plus une sous conditions à partir d'une sélection extra domaine
@@ -255,8 +253,9 @@ public abstract class AbstractMapperService implements IMapperService {
 		return result;
 	}
 
-	private ISearchCriteria getTestCriteria(ReferenceLine attributeTest, Object value, ICriteriaContext context) {
+	private ISearchCriteria getTestCriteria(ReferenceLine attributeTest, Object value, T context) {
 		context.useReference(attributeTest);
+		// note that the following criteria do not need to be reduced.
 		if (value == null) {
 			return new IsNullCriteria(attributeTest.getCode());
 		}
@@ -284,10 +283,8 @@ public abstract class AbstractMapperService implements IMapperService {
 	 * @param currentUser
 	 * @return
 	 */
-	protected ICriteriaContext getContext(MetaDataEntity entity, IConnectionUserBean currentUser) {
-		return new CriteriaContextBasic(entity, currentUser);
-	}
-
+	protected abstract T getContext(MetaDataEntity entity, IConnectionUserBean currentUser);
+	
 	/**
 	 * This method process to selection of foreign attributes (references line that goes to other domains).
 	 *
@@ -383,7 +380,7 @@ public abstract class AbstractMapperService implements IMapperService {
 	 *            The associated criteria context.
 	 * @return a new criteria where all condition use the local domain of the referenced entity.
 	 */
-	protected ISearchCriteria completeForeignCriteria(ISearchCriteria criteria, ICriteriaContext context) {
+	protected ISearchCriteria completeForeignCriteria(ISearchCriteria criteria, T context) {
 		// Note:
 		// Le principe de cette implémentation repose sur la décomposition de la condition
 		// en sous conditions locales à chaque référence externe.
@@ -440,7 +437,7 @@ public abstract class AbstractMapperService implements IMapperService {
 	 * Fonction auxiliaire (récursive) de la méthode completeForeignCriteria (ci-dessus).
 	 */
 	private ISearchCriteria convertForeignCriterion(List<ISearchCriteria> criterias, boolean andParent,
-			ICriteriaContext context, Map<String, ReferenceLine> foreigners) {
+			T context, Map<String, ReferenceLine> foreigners) {
 		final ArrayList<ISearchCriteria> result = new ArrayList<>();
 		final HashMap<ReferenceLine, List<ISearchCriteria>> fcriterion = new HashMap<>();
 		// 1. construction des conditions de sous-sélection.
@@ -808,7 +805,7 @@ public abstract class AbstractMapperService implements IMapperService {
 		if (attributes == null) {
 			attributes = entity.getListables();
 		}
-		final ICriteriaContext context = getContext(entity, currentUser);
+		final T context = getContext(entity, currentUser);
 		if (criteria == null) {
 			criteria = ConstantCriteria.TRUE;
 		} else {
@@ -852,7 +849,7 @@ public abstract class AbstractMapperService implements IMapperService {
 		if (entity == null) {
 			return new BeanMapList();
 		}
-		final ICriteriaContext context = getContext(entity, currentUser);
+		final T context = getContext(entity, currentUser);
 		final ISearchCriteria ctr = getCriteria(criteria).reduce(context);
 		if (ConstantCriteria.FALSE.equals(ctr)) {
 			return new BeanMapList();
@@ -865,7 +862,7 @@ public abstract class AbstractMapperService implements IMapperService {
 	public final BeanMapList selection(MetaDataEntity entity, String attributes, boolean deleted,
 			ISearchCriteria criteria, boolean distinct, String orders, IConnectionUserBean currentUser, int page,
 			int limit) {
-		final ICriteriaContext context = getContext(entity, currentUser);
+		final T context = getContext(entity, currentUser);
 		criteria = criteria.reduce(context);
 		if (ConstantCriteria.FALSE.equals(criteria)) {
 			return new BeanMapList();
@@ -1122,7 +1119,7 @@ public abstract class AbstractMapperService implements IMapperService {
 				|| (values.size() != attributes.size()) || (criteria == null)) {
 			return false;
 		}
-		final ICriteriaContext context = getContext(attributes.get(0).getParent(), null);
+		final T context = getContext(attributes.get(0).getParent(), null);
 		criteria = criteria.reduce(context);
 		if (ConstantCriteria.FALSE.equals(criteria)) {
 			return false;
@@ -1133,7 +1130,7 @@ public abstract class AbstractMapperService implements IMapperService {
 	@Override
 	public final boolean update(MetaDataEntity entity, List<MetaDataAttribute> attributes, List<Object> values,
 			ISearchCriteria criteria) {
-		final ICriteriaContext context = getContext(entity, null);
+		final T context = getContext(entity, null);
 		if (criteria == null) {
 			criteria = ConstantCriteria.TRUE;
 		} else {
@@ -1146,7 +1143,7 @@ public abstract class AbstractMapperService implements IMapperService {
 	}
 
 	protected abstract boolean doUpdate(List<MetaDataAttribute> attributes, List<Object> values,
-			ISearchCriteria criteria, ICriteriaContext context);
+			ISearchCriteria criteria, T context);
 
 	@Override
 	public final BeanMapList selection(List<ReferenceLine> attributes, boolean deleted, ISearchCriteria criteria,
@@ -1154,7 +1151,7 @@ public abstract class AbstractMapperService implements IMapperService {
 		if ((page < 0) || (limit == 0) || (attributes == null) || (attributes.size() == 0)) {
 			return new BeanMapList();
 		}
-		final ICriteriaContext context = getContext(attributes.get(0).getOriginEntity(), currentUser);
+		final T context = getContext(attributes.get(0).getOriginEntity(), currentUser);
 		if (criteria == null) {
 			criteria = ConstantCriteria.TRUE;
 		} else {
@@ -1172,7 +1169,7 @@ public abstract class AbstractMapperService implements IMapperService {
 		if ((page < 0) || (limit == 0) || (entity == null)) {
 			return new BeanMapList();
 		}
-		final ICriteriaContext context = getContext(entity, currentUser);
+		final T context = getContext(entity, currentUser);
 		if (criteria == null) {
 			criteria = ConstantCriteria.TRUE;
 		} else {
@@ -1201,12 +1198,12 @@ public abstract class AbstractMapperService implements IMapperService {
 	 */
 	protected abstract BeanMapList doSelection(List<ReferenceLine> attributes, boolean deleted,
 			ISearchCriteria criteria, boolean distinct, List<ReferenceLine> orders, int page, int limit,
-			ICriteriaContext context);
+			T context);
 
 	@Override
 	public final int count(MetaDataEntity entity, boolean deleted, ISearchCriteria criteria, boolean distinct,
 			IConnectionUserBean currentUser) {
-		final ICriteriaContext context = getContext(entity, currentUser);
+		final T context = getContext(entity, currentUser);
 		if (criteria == null) {
 			criteria = ConstantCriteria.TRUE;
 		} else {
@@ -1228,7 +1225,7 @@ public abstract class AbstractMapperService implements IMapperService {
 	 * @return
 	 */
 	protected abstract int doCount(boolean deleted, ISearchCriteria criteria, boolean distinct,
-			ICriteriaContext context);
+			T context);
 
 	@Override
 	public final BeanMapList linkSelection(MetaDataLink link, int sourceId, List<ReferenceLine> attributes,
@@ -1243,7 +1240,7 @@ public abstract class AbstractMapperService implements IMapperService {
 
 	protected abstract BeanMapList doLinkSelection(List<MetaDataLink> links, int sourceId, List<ReferenceLine> attributes,
 			boolean deleted, ISearchCriteria criteria, boolean distinct, boolean ignoreSubdivision, List<ReferenceLine> orders, int page,
-			int limit, ICriteriaContext context);
+			int limit, T context);
 
 	@Override
 	public final int linkCount(MetaDataLink link, int sourceId, boolean deleted, ISearchCriteria criteria,
@@ -1265,24 +1262,23 @@ public abstract class AbstractMapperService implements IMapperService {
 			// Simplification of atomic chain on a reverse link...
 			final String code = links.get(0).getMetadata().getString(MetaDataEntity.METADATA_REVERSELINK);
 			if (code != null) {
-				final MetaDataEntity e = links.get(0).getRefEntity();
-				if (e == null) {
+				final MetaDataEntity refEntity = links.get(0).getRefEntity();
+				final MetaDataEntity parentEntity = links.get(0).getParent();
+				if ((refEntity == null) || (parentEntity == null)) {
 					return 0;
 				}
-				final MetaDataAttribute att = e.getAttribute(code);
-				if ((att == null) || !links.get(0).getParent().equals(att.getRefEntity())) {
+				final MetaDataAttribute att = refEntity.getAttribute(code);
+				if ((att == null) || !parentEntity.equals(att.getRefEntity())) {
 					return 0;
 				}
-				// FIXME take into account recursive target AND source entities !
-				if (!ignoreSubdivision && e.hasRecursiveLink()) {
-					return e.getMapper().count(e, deleted, new AndCriteria(new InSubdivisionCriteria(att.getCode(), sourceId), criteria),
+				// Take into account recursive target AND source entities !
+				if (ignoreSubdivision || (!refEntity.hasRecursiveLink() && !parentEntity.hasRecursiveLink())) {
+					return refEntity.getMapper().count(refEntity, deleted, new AndCriteria(new EqualCriteria(att.getCode(), sourceId), criteria),
 							distinct, currentUser);
 				}
-				return e.getMapper().count(e, deleted, new AndCriteria(new EqualCriteria(att.getCode(), sourceId), criteria),
-						distinct, currentUser);
 			}
 		}
-		final ICriteriaContext context = getContext(links.get(links.size() - 1).getRefEntity(), currentUser);
+		final T context = getContext(links.get(links.size() - 1).getRefEntity(), currentUser);
 		if (criteria == null) {
 			criteria = ConstantCriteria.TRUE;
 		} else {
@@ -1295,14 +1291,14 @@ public abstract class AbstractMapperService implements IMapperService {
 	}
 
 	protected abstract int doLinkCount(List<MetaDataLink> links, int sourceId, boolean deleted, boolean ignoreSubdivision, ISearchCriteria criteria,
-			boolean distinct, ICriteriaContext context);
+			boolean distinct, T context);
 
 	@Override
 	public final boolean test(MetaDataEntity entity, ISearchCriteria criteria, IConnectionUserBean currentUser) {
 		if (criteria == null) {
 			return true;
 		}
-		final ICriteriaContext context = getContext(entity, currentUser);
+		final T context = getContext(entity, currentUser);
 		criteria = criteria.reduce(context);
 		if (ConstantCriteria.FALSE.equals(criteria)) {
 			return false;
@@ -1316,7 +1312,7 @@ public abstract class AbstractMapperService implements IMapperService {
 	@Override
 	public boolean test(MetaDataEntity entity, int itemId, ISearchCriteria criteria, boolean deleted,
 			IConnectionUserBean currentUser) {
-		final ICriteriaContext context = getContext(entity, currentUser);
+		final T context = getContext(entity, currentUser);
 		if (criteria == null) {
 			criteria = new IdEqualCriteria(itemId);
 		} else {
@@ -1344,17 +1340,17 @@ public abstract class AbstractMapperService implements IMapperService {
 	@Override
 	public final BeanMapList selection(List<ReferenceLine> attributes, boolean deleted, ReferenceLine attributeTest,
 			Object value) {
-		if (attributeTest == null) {
+		if ((attributeTest == null) || attributeTest.isEmpty() || attributeTest.isLinkList()) {
 			return new BeanMapList();
 		}
-		final ICriteriaContext context = getContext(attributeTest.getOriginEntity(), null);
+		final T context = getContext(attributeTest.getOriginEntity(), null);
 		return doSelection(attributes, deleted, getTestCriteria(attributeTest, value, context), false, null, 0, -1,
 				context);
 	}
 
 	@Override
 	public final int count(MetaDataEntity entity, boolean deleted, ReferenceLine attributeTest, Object value) {
-		final ICriteriaContext context = getContext(entity, null);
+		final T context = getContext(entity, null);
 		return doCount(deleted, getTestCriteria(attributeTest, value, context), false, context);
 	}
 
@@ -1364,7 +1360,7 @@ public abstract class AbstractMapperService implements IMapperService {
 		if (attributeTest == null) {
 			return null;
 		}
-		final ICriteriaContext context = getContext(attributeTest.getOriginEntity(), null);
+		final T context = getContext(attributeTest.getOriginEntity(), null);
 		return doSelectionFirst(attributes, deleted, getTestCriteria(attributeTest, value, context), context);
 	}
 
@@ -1375,7 +1371,7 @@ public abstract class AbstractMapperService implements IMapperService {
 		if (entity == null) {
 			return null;
 		}
-		final ICriteriaContext context = getContext(entity, currentUser);
+		final T context = getContext(entity, currentUser);
 		final ISearchCriteria ctr = getCriteria(criteria).reduce(context);
 		if (ConstantCriteria.FALSE.equals(ctr)) {
 			return null;
@@ -1389,7 +1385,7 @@ public abstract class AbstractMapperService implements IMapperService {
 		if ((attributes == null) || (attributes.size() == 0)) {
 			return null;
 		}
-		final ICriteriaContext context = getContext(attributes.get(0).getOriginEntity(), currentUser);
+		final T context = getContext(attributes.get(0).getOriginEntity(), currentUser);
 		if (criteria == null) {
 			criteria = ConstantCriteria.TRUE;
 		} else {
@@ -1404,7 +1400,7 @@ public abstract class AbstractMapperService implements IMapperService {
 	@Override
 	public final BeanMap selectionFirst(MetaDataEntity entity, List<ReferenceLine> attributes, boolean deleted,
 			ISearchCriteria criteria, IConnectionUserBean currentUser) {
-		final ICriteriaContext context = getContext(entity, currentUser);
+		final T context = getContext(entity, currentUser);
 		if (criteria == null) {
 			criteria = ConstantCriteria.TRUE;
 		} else {
@@ -1417,7 +1413,7 @@ public abstract class AbstractMapperService implements IMapperService {
 	}
 
 	protected abstract BeanMap doSelectionFirst(List<ReferenceLine> attributes, boolean deleted,
-			ISearchCriteria criteria, ICriteriaContext context);
+			ISearchCriteria criteria, T context);
 
 	@Override
 	public final BeanMapList linkSelection(MetaDataLink link, int sourceId, List<ReferenceLine> attributes,
@@ -1444,20 +1440,17 @@ public abstract class AbstractMapperService implements IMapperService {
 			final String code = links.get(0).getMetadata().getString(MetaDataEntity.METADATA_REVERSELINK);
 			if (code != null) {
 				final MetaDataAttribute att = entity.getAttribute(code);
-				if ((att == null) || !links.get(0).getParent().equals(att.getRefEntity())) {
+				final MetaDataEntity parentEntity = links.get(0).getParent();
+				if ((att == null) || (parentEntity == null) || !parentEntity.equals(att.getRefEntity())) {
 					return new BeanMapList();
 				}
-				// FIXME take into account recursive target AND source entities !
-				if (entity.hasRecursiveLink() && !ignoreSubdivision) {
+				// take into account recursive target AND source entities !
+				if (ignoreSubdivision || (!entity.hasRecursiveLink() && !parentEntity.hasRecursiveLink())) {
 					return entity.getMapper().selection(attributes, deleted,
-							new AndCriteria(new InSubdivisionCriteria(att.getCode(), sourceId),
+							new AndCriteria(new EqualCriteria(att.getCode(), sourceId),
 									new EqualCriteria(attributeTest.getCode(), value.toString())),
 							false, null, null, 0, -1);
 				}
-				return entity.getMapper().selection(attributes, deleted,
-						new AndCriteria(new EqualCriteria(att.getCode(), sourceId),
-								new EqualCriteria(attributeTest.getCode(), value.toString())),
-						false, null, null, 0, -1);
 			}
 		}
 		if ((attributes == null) || (attributes.size() == 0)) {
@@ -1466,7 +1459,7 @@ public abstract class AbstractMapperService implements IMapperService {
 				return new BeanMapList();
 			}
 		}
-		final ICriteriaContext context = getContext(entity, null);
+		final T context = getContext(entity, null);
 		return doLinkSelection(links, sourceId, attributes, deleted, getTestCriteria(attributeTest, value, context),
 				false, ignoreSubdivision, null, 0, -1, context);
 	}
@@ -1494,25 +1487,22 @@ public abstract class AbstractMapperService implements IMapperService {
 			if (code != null) {
 				final MetaDataAttribute att = entity.getAttribute(code);
 				final MetaDataEntity pentity = links.get(0).getParent();
-				if ((att == null) || !pentity.equals(att.getRefEntity())) {
+				if ((att == null) || (pentity == null) || !pentity.equals(att.getRefEntity())) {
 					return new BeanMapList();
 				}
-				// FIXME take into account recursive target AND source entities !
-				// Send the "reversed selection" to the correct mapper !
-				if (entity.hasRecursiveLink() && !ignoreSubdivision) {
+				// take into account recursive target AND source entities !
+				if (ignoreSubdivision || (!entity.hasRecursiveLink() && !pentity.hasRecursiveLink())) {
+					// Send the "reversed selection" to the correct mapper !
 					return entity.getMapper().selection(entity, attributes, deleted,
-							new AndCriteria(new InSubdivisionCriteria(att.getCode(), sourceId), criteria),
+							new AndCriteria(new EqualCriteria(att.getCode(), sourceId), criteria),
 							distinct, orders, currentUser, page, limit);
 				}
-				return entity.getMapper().selection(entity, attributes, deleted,
-						new AndCriteria(new EqualCriteria(att.getCode(), sourceId), criteria),
-						distinct, orders, currentUser, page, limit);
 			}
 		}
 		if (attributes == null) {
 			attributes = entity.getListables();
 		}
-		final ICriteriaContext context = getContext(entity, currentUser);
+		final T context = getContext(entity, currentUser);
 		if (criteria == null) {
 			criteria = ConstantCriteria.TRUE;
 		} else {

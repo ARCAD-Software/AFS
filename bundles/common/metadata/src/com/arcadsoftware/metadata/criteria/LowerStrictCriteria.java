@@ -19,6 +19,7 @@ import java.util.Date;
 
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.metadata.ReferenceLine;
+import com.arcadsoftware.metadata.internal.Activator;
 import com.arcadsoftware.metadata.internal.Messages;
 import com.arcadsoftware.osgi.ISODateFormater;
 import com.arcadsoftware.rest.connection.IConnectionUserBean;
@@ -50,12 +51,30 @@ public class LowerStrictCriteria extends AbstractSearchCriteria implements Clone
 
 	@Override
 	public ISearchCriteria reduce(ICriteriaContext context) {
-		ReferenceLine attributeRef = context.getEntity().getAttributeLine(attribute);
-		if (attributeRef != null) {
-			context.useReference(attributeRef);
-			return new LowerStrictCriteria(attribute,value);
+		ReferenceLine refline = context.getEntity().getAttributeLine(attribute);
+		if (refline == null) {
+			return ConstantCriteria.FALSE;
+		}			
+		if (refline.isMultiLinkList()) {
+			Activator.getInstance().warn("\"Lower Strict\" Criteria with multi-link references is not supported: " + toString());
+			return ConstantCriteria.FALSE;
 		}
-		return new ConstantCriteria(false);
+		if (refline.isLinkList()) {
+			String preLinkCode = refline.getPreLinkCodes();
+			if (preLinkCode.isEmpty()) {
+				preLinkCode = null;
+			}
+			String postLinkCode = refline.getPostLinkCodes();
+			if (postLinkCode.isEmpty()) {
+				Activator.getInstance().warn("Invalid \"Lower Strict\" Criteria with terminal link reference: " + toString());
+			}
+			return new LinkLowerStrictCriteria(preLinkCode, refline.getFirstLinkCode(), postLinkCode, value).reduce(context);
+		}
+		context.useReference(refline);
+		if (value == null) {
+			return new NotCriteria(new IsNullCriteria(attribute));
+		}
+		return this;
 	}
 
 	@Override

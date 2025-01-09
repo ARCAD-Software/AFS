@@ -106,7 +106,8 @@ public class Messages extends NLS {
 	public static String Criteria_UnLinkedThrough;
 	public static String Criteria_Any;
 	public static String Criteria_InSet;
-	public static String Criteria_Recursive;
+	public static String Criteria_NoSubdivision;
+	public static String Criteria_EvenDeleted;
 
 	static {
 		// initialize resource bundle

@@ -25,6 +25,8 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
 
 /**
  * Test if the internal Identifier (ID) or the given reference line of the selected data is member of the given set of values.
+ * 
+ * @author ARCAD Software
  */
 public class InListCriteria extends AbstractSearchCriteria implements Cloneable, IAttributeCriteria {
 

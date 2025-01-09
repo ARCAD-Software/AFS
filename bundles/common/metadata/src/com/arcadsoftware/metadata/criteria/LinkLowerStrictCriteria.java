@@ -13,10 +13,15 @@
  *******************************************************************************/
 package com.arcadsoftware.metadata.criteria;
 
+import java.text.ParseException;
+import java.util.Calendar;
+import java.util.Date;
+
 import com.arcadsoftware.metadata.internal.Messages;
+import com.arcadsoftware.osgi.ISODateFormater;
 
 /**
- * Test if the attribute value of linked items (through linkCode), is terminated by the given text fragment (value).
+ * Test if the attribute value of linked items (through linkCode), is lower than the given number (value).
  * 
  * <p>
  * The <code>linkcode</code> is applied to the selected entity from witch a column is tested. 
@@ -24,9 +29,7 @@ import com.arcadsoftware.metadata.internal.Messages;
  * 
  * @author ARCAD Software
  */
-public class LinkEndCriteria extends AbstractLinkTestCriteria implements Cloneable {
-
-	private boolean casesensitive;
+public class LinkLowerStrictCriteria extends AbstractLinkTestCriteria implements Cloneable {
 
 	/**
 	 * 
@@ -34,7 +37,7 @@ public class LinkEndCriteria extends AbstractLinkTestCriteria implements Cloneab
 	 * @param attribute an attribute reference line starting from the link target entity. 
 	 * @param value the constant value to test.
 	 */
-	public LinkEndCriteria(String linkCode, String attribute, String value) {
+	public LinkLowerStrictCriteria(String linkCode, String attribute, String value) {
 		super(linkCode, attribute, value);
 	}
 
@@ -45,19 +48,7 @@ public class LinkEndCriteria extends AbstractLinkTestCriteria implements Cloneab
 	 * @param attribute an attribute reference line starting from the link target entity. 
 	 * @param value the constant value to test.
 	 */
-	public LinkEndCriteria(String reference, String linkCode, String attribute, String value, boolean casesensitive) {
-		super(reference, linkCode, attribute, value);
-		this.casesensitive = casesensitive;
-	}
-
-	/**
-	 * 
-	 * @param reference a attribute reference line from which the link code is applicable, may be null.
-	 * @param linkCode a non null link code.
-	 * @param attribute an attribute reference line starting from the link target entity. 
-	 * @param value the constant value to test.
-	 */
-	public LinkEndCriteria(String reference, String linkCode, String attribute, String value) {
+	public LinkLowerStrictCriteria(String reference, String linkCode, String attribute, String value) {
 		super(reference, linkCode, attribute, value);
 	}
 
@@ -69,51 +60,77 @@ public class LinkEndCriteria extends AbstractLinkTestCriteria implements Cloneab
 	 * @param value the constant value to test.
 	 * @param ignoreSubdivision if true the subdivision included in the link chain will be ignored.
 	 * @param deleted if true the soft-deleted links and inner entity items will be taken into account.
-	 * @param casesensitive true if the test is case sensitive
 	 */
-	public LinkEndCriteria(String reference, String linkCode, String attribute, String value, boolean ignoreSubdivision, boolean deleted, boolean casesensitive) {
+	public LinkLowerStrictCriteria(String reference, String linkCode, String attribute, String value, boolean ignoreSubdivision, boolean deleted) {
 		super(reference, linkCode, attribute, value, ignoreSubdivision, deleted);
-		this.casesensitive = casesensitive;
 	}
 
-	public LinkEndCriteria() {
+	public LinkLowerStrictCriteria() {
 		super();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		return (obj instanceof LinkEndCriteria) && super.equals(obj) && (((LinkEndCriteria) obj).casesensitive == casesensitive);
+		return (obj instanceof LinkLowerStrictCriteria) && super.equals(obj);
 	}
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
-		return new LinkEndCriteria(getReference(), getLinkCode(), getAttribute(), getValue(), isIgnoreSubdivision(), isDeletedLinks(), casesensitive);
+		return new LinkLowerStrictCriteria(getReference(), getLinkCode(), getAttribute(), getValue(), isIgnoreSubdivision(), isDeletedLinks());
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	protected boolean test(Object attributeValue, Object value) {
 		if (attributeValue == null) {
-			return value.toString().length() == 0;
+			return (value == null) || (value.toString().length() == 0);
 		}
-		if (casesensitive) {
-			return attributeValue.toString().endsWith(value.toString());
+		if (attributeValue instanceof Integer) {
+			try {
+				return Integer.decode(value.toString()) > (Integer) attributeValue;
+			} catch (NumberFormatException e) {
+				return false;
+			}
 		}
-		return attributeValue.toString().toLowerCase().endsWith(value.toString().toLowerCase());
+		if (attributeValue instanceof Long) {
+			try {
+				return Long.decode(value.toString()) > (Long) attributeValue;
+			} catch (NumberFormatException e) {
+				return false;
+			}
+		}
+		if (attributeValue instanceof Short) {
+			try {
+				return Short.decode(value.toString()) > (Short) attributeValue;
+			} catch (NumberFormatException e) {
+				return false;
+			}
+		}
+		if (attributeValue instanceof Double) {
+			try {
+				return Double.parseDouble(value.toString()) > (Double) attributeValue;
+			} catch (NumberFormatException e) {
+				return false;
+			}
+		}
+		if (attributeValue instanceof Calendar) {
+			attributeValue = ((Calendar) attributeValue).getTime();
+		}
+		if (attributeValue instanceof Date) {
+			try {
+				return ISODateFormater.toDate(value.toString()).getTime() > ((Date)attributeValue).getTime();
+			} catch (ParseException e) {
+				return false;
+			}
+		}
+		if (attributeValue instanceof Comparable) {
+			return ((Comparable) attributeValue).compareTo(value) < 0;
+		}
+		return attributeValue.toString().compareTo(value.toString()) < 0;
 	}
 
 	@Override
 	protected String getTestString() {
-		if (casesensitive) {
-			return Messages.Criteria_EndWith + Messages.Criteria_CaseSensitive;
-		}
-		return Messages.Criteria_EndWith;
-	}
-
-	public boolean isCasesensitive() {
-		return casesensitive;
-	}
-
-	public void setCasesensitive(boolean casesensitive) {
-		this.casesensitive = casesensitive;
+		return Messages.Criteria_Lower;
 	}
 }

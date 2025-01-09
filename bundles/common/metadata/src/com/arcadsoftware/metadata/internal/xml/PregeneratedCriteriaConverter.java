@@ -13,6 +13,7 @@
  *******************************************************************************/
 package com.arcadsoftware.metadata.internal.xml;
 
+import com.arcadsoftware.metadata.criteria.ConstantCriteria;
 import com.arcadsoftware.metadata.criteria.PreGeneratedCriteria;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
@@ -27,11 +28,10 @@ public class PregeneratedCriteriaConverter implements Converter {
 	}
 	
 	public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
-		writer.setValue(((PreGeneratedCriteria)source).getSql());
 	}
 	
 	public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
-		return new PreGeneratedCriteria(reader.getValue());
+		return ConstantCriteria.FALSE;
 	}
 
 }

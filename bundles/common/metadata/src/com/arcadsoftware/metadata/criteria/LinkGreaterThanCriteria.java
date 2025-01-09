@@ -21,9 +21,13 @@ import com.arcadsoftware.metadata.internal.Messages;
 import com.arcadsoftware.osgi.ISODateFormater;
 
 /**
- * Test an attribute of linked items.
+ * Test if the attribute value of linked items (through linkCode), is greater or equals to the given number (value).
  * 
- * <p>The <code>linkcode</code> is applied to the selected entity from witch a column is tested.  
+ * <p>
+ * The <code>linkcode</code> is applied to the selected entity from witch a column is tested. 
+ * If <code>reference</code> is use the this entity is the type of the last attribute of the reference line.
+ * 
+ * @author ARCAD Software
  */
 public class LinkGreaterThanCriteria extends AbstractLinkTestCriteria implements Cloneable {
 
@@ -48,6 +52,19 @@ public class LinkGreaterThanCriteria extends AbstractLinkTestCriteria implements
 		super(reference, linkCode, attribute, value);
 	}
 
+	/**
+	 * 
+	 * @param reference a attribute reference line from which the link code is applicable, may be null.
+	 * @param linkCode a non null link code.
+	 * @param attribute an attribute reference line starting from the link target entity. 
+	 * @param value the constant value to test.
+	 * @param ignoreSubdivision if true the subdivision included in the link chain will be ignored.
+	 * @param deleted if true the soft-deleted links and inner entity items will be taken into account.
+	 */
+	public LinkGreaterThanCriteria(String reference, String linkCode, String attribute, String value, boolean ignoreSubdivision, boolean deleted) {
+		super(reference, linkCode, attribute, value, ignoreSubdivision, deleted);
+	}
+
 	public LinkGreaterThanCriteria() {
 		super();
 	}
@@ -59,7 +76,7 @@ public class LinkGreaterThanCriteria extends AbstractLinkTestCriteria implements
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
-		return new LinkGreaterThanCriteria(getReference(), getLinkCode(), getAttribute(), getValue());
+		return new LinkGreaterThanCriteria(getReference(), getLinkCode(), getAttribute(), getValue(), isIgnoreSubdivision(), isDeletedLinks());
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -114,6 +131,6 @@ public class LinkGreaterThanCriteria extends AbstractLinkTestCriteria implements
 
 	@Override
 	protected String getTestString() {
-		return Messages.Criteria_Equal;
+		return Messages.Criteria_GreaterOrEqual;
 	}
 }

@@ -40,72 +40,96 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
  */
 public class CriteriaContextBasic implements ICriteriaContext {
 
-	private MetaDataEntity entity;
-	private IConnectionUserBean currentUser;
-	private HashMap<String, ReferenceLine> map;
-	private HashMap<MetaDataLink, HashMap<String, ReferenceLine>> linksmap;
+	private final MetaDataEntity entity;
+	private final IConnectionUserBean currentUser;
+	private final HashMap<String, ReferenceLine> refmap;
+	private final HashMap<String, List<MetaDataLink>> linksmap;
+	private final HashMap<String, HashMap<String, ReferenceLine>> linksrefmap;
 	
 	public CriteriaContextBasic(MetaDataEntity entity, IConnectionUserBean currentUser) {
 		super();
 		this.entity = entity;
 		this.currentUser = currentUser;
-		map = new HashMap<String, ReferenceLine>();
-		linksmap = new HashMap<MetaDataLink, HashMap<String,ReferenceLine>>();
+		refmap = new HashMap<String, ReferenceLine>();
+		linksrefmap = new HashMap<String, HashMap<String, ReferenceLine>>();
+		linksmap = new HashMap<String, List<MetaDataLink>>();
 	}
 
+	@Override
 	public MetaDataEntity getEntity() {
 		return entity;
 	}
 
+	@Override
 	public MetaDataEntity getEntity(String type) {
 		return entity.getEntity(type);
 	}
 
+	@Override
 	public IConnectionUserBean getCurrentUser() {
 		return currentUser;
 	}
 
+	@Override
 	public void useReference(ReferenceLine reference) {
 		if (!reference.isEmpty()) {
-			map.put(reference.getCode(), reference);
+			refmap.put(reference.getCode(), reference);
 		}
 	}
 
+	@Override
 	public void useReferences(List<ReferenceLine> references) {
-		for(ReferenceLine reference:references) {
+		for(ReferenceLine reference : references) {
 			useReference(reference);
 		}
 	}
 
+	@Override
 	public ReferenceLine getReference(String code) {
-		return map.get(code);
+		return refmap.get(code);
 	}
 	
+	@Override
 	public Collection<ReferenceLine> getReferences() {
-		return map.values();
+		return refmap.values();
 	}
 
-	public void useLinkReference(MetaDataLink link, ReferenceLine reference) {
-		HashMap<String, ReferenceLine> refs = linksmap.get(link);
-		if (refs == null) {
-			refs = new HashMap<String, ReferenceLine>();
-			linksmap.put(link, refs);
-		}
+	@Override
+	public void useLinkReference(String code, ReferenceLine reference) {
 		if (reference != null) {
+			HashMap<String, ReferenceLine> refs = linksrefmap.get(code);
+			if (refs == null) {
+				refs = new HashMap<String, ReferenceLine>();
+				linksrefmap.put(code, refs);
+			}
 			refs.put(reference.getCode(), reference);
 		}
 	}
-	
-	public Collection<MetaDataLink> getLinks() {
-		return linksmap.keySet();
+
+	@Override
+	public void useLinks(String code, List<MetaDataLink> links) {
+		if ((links != null) && !links.isEmpty()) {
+			linksmap.put(code, links);
+		}
 	}
-	
-	public Collection<ReferenceLine> getReferences(MetaDataLink link) {
-		HashMap<String, ReferenceLine> refs = linksmap.get(link);
-		if (refs == null) {
+
+	@Override
+	public List<MetaDataLink> getLinks(String code) {
+		return linksmap.get(code);
+	}
+
+	@Override
+	public Collection<List<MetaDataLink>> getLinks() {
+		return linksmap.values();
+	}
+
+	@Override
+	public ReferenceLine getLinkReference(String linkCode, String code) {
+		HashMap<String, ReferenceLine> linksref = linksrefmap.get(linkCode);
+		if (linksref == null) {
 			return null;
 		}
-		return refs.values();
+		return linksref.get(code);
 	}
 
 	private boolean isRefsMultiMappers(Collection<ReferenceLine> refs) {
@@ -117,27 +141,24 @@ public class CriteriaContextBasic implements ICriteriaContext {
 		return false;
 	}
 
+	@Override
 	public boolean isMapperUnique() {
-		if (isRefsMultiMappers(map.values())) {
+		if (isRefsMultiMappers(refmap.values())) {
 			return false;
 		}
-		for(Entry<MetaDataLink, HashMap<String, ReferenceLine>> e:linksmap.entrySet()) {
+		for(Entry<String, HashMap<String, ReferenceLine>> e: linksrefmap.entrySet()) {
 			if (isRefsMultiMappers(e.getValue().values())) {
 				return false;
 			}
-			if (!entity.sameMapper(e.getKey().getRefEntity())) {
-				return false;
+		}
+		for (List<MetaDataLink> v: linksmap.values()) {
+			for (MetaDataLink l : v) {
+				if (!entity.sameMapper(l.getParent())) {
+					return false;
+				}
 			}
 		}
 		return true;
-	}
-
-	public ReferenceLine getReference(MetaDataLink link, String code) {
-		HashMap<String, ReferenceLine> refs = linksmap.get(link);
-		if (refs == null) {
-			return null;
-		}
-		return refs.get(code);
 	}
 
 	@Override
@@ -147,9 +168,22 @@ public class CriteriaContextBasic implements ICriteriaContext {
 		sb.append(Messages.CriteriaContextBasic_CurrentUser);
 		sb.append(currentUser);
 		sb.append(Messages.CriteriaContextBasic_NumberOfReferences);
-		sb.append(map.size());
+		sb.append(refmap.size());
 		sb.append(Messages.CriteriaContextBasic_NumberOfLinks);
 		sb.append(linksmap.size());
 		return sb.toString();
+	}
+
+	@Override
+	public boolean hasReferences() {
+		if (!linksrefmap.isEmpty() || !linksmap.isEmpty()) {
+			return true;
+		}
+		for (ReferenceLine ref: refmap.values()) {
+			if (!ref.isSimple()) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

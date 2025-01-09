@@ -7,6 +7,7 @@ import com.arcadsoftware.metadata.MetaDataLink;
 
 /**
  * Object used to cache multi-links pre-generated selection queries.
+ * 
  * <p>
  * If code is null the this link query is not correctly built and is unusable. Please note that the generated SQL code
  * is invariant as long as any of the implicated links and inner entities are modified.
@@ -40,6 +41,12 @@ public class MultiLinkQuery {
 	 */
 	public static String getCode(List<MetaDataLink> links, boolean deleted, boolean ignoreSubdivision) {
 		final StringBuilder code = new StringBuilder();
+		for (final MetaDataLink l : links) {
+			if (!code.isEmpty() ) {
+				code.append('.');
+			}
+			code.append(l.getCode());
+		}
 		if (deleted) {
 			code.append('%');
 		} else {
@@ -50,9 +57,28 @@ public class MultiLinkQuery {
 		} else {
 			code.append('@');
 		}
-		for (final MetaDataLink l : links) {
+		return code.toString();
+	}
+
+	/**
+	 * Generate a unique code that represents the given link chain.
+	 * 
+	 * @param linkCode
+	 * @param deleted
+	 * @param ignoreSubdivision
+	 * @return a non null code.
+	 */
+	public static String getCode(String linkCode, boolean deleted, boolean ignoreSubdivision) {
+		final StringBuilder code = new StringBuilder(linkCode);
+		if (deleted) {
+			code.append('%');
+		} else {
 			code.append('_');
-			code.append(l.getCode());
+		}
+		if (ignoreSubdivision) {
+			code.append('_');
+		} else {
+			code.append('@');
 		}
 		return code.toString();
 	}
@@ -76,6 +102,29 @@ public class MultiLinkQuery {
 	 */
 	public static MultiLinkQuery generate(MapperSQLService mapper, List<MetaDataLink> links, boolean deleted,
 			boolean ignoreSubdivision) {
+		return generate(1, mapper, links, deleted, ignoreSubdivision);
+	}
+	
+	/**
+	 * Generate the query part allowing to select the target data through the given link chain.
+	 * 
+	 * <p>
+	 * A non null result ensure that:
+	 * 
+	 * <ul>
+	 * <li> The link list is not null, non empty, and all members are not null.
+	 * <li> All link given in the list are owned by the given mapper.
+	 * </ul>
+	 * 
+	 * @parma initial a positive number used to generate unique aliases (need to be >= to the previous chain "nextIncrement" value). 
+	 * @param mapper a non null mapper from where all the given links belong to.  
+	 * @param links a chain on MetaDataEntity links.
+	 * @param deleted true if soft-deleted links and soft-deleted inner items must be also be taken into account.
+	 * @param ignoreSubdivision true if subdivision (recursive query) must be ignored.
+	 * @return null if this link chains can not be proceeded or is invalid.
+	 */
+	public static MultiLinkQuery generate(int initial, MapperSQLService mapper, List<MetaDataLink> links, boolean deleted,
+			boolean ignoreSubdivision) {
 		if ((links == null) || links.isEmpty()) {
 			return null;
 		}
@@ -85,7 +134,7 @@ public class MultiLinkQuery {
 		String rec_query = ""; //$NON-NLS-1$
 		String prev_col = null;
 		String prev_alias = null;
-		int alias = 1;
+		int alias = initial;
 		for (final MetaDataLink l : links) {
 			if (l == null) {
 				alias = 1;
@@ -158,17 +207,23 @@ public class MultiLinkQuery {
 					// Reinitialize the joins chains from the recursive table,
 					joins = new StringBuilder(rec_alias);
 					where = new StringBuilder();
-					prev_alias = la;
-					prev_col = cli.destCol;
-					// And add the current link to the final selection.
-					joins.append(String.format(mapper.fg.join_inner, cli.table, la, cli.sourceCol, //
-							rec_alias, mapper.fg.id));
-					if ((!deleted) && (cli.deleteCol != null)) {
-						joins.append(mapper.fg.and);
-						joins.append(la);
-						joins.append(mapper.fg.prefix);
-						joins.append(cli.deleteCol);
-						joins.append(mapper.fg.equaldelfalse);
+					if (recLink.getCode().equals(l.getCode())) {
+						// The current link is the recursive one so we already have the target selection.
+						prev_alias = rec_alias;
+						prev_col = mapper.fg.id;
+					} else {
+						// And add the current link to the final selection.
+						prev_alias = la;
+						prev_col = cli.destCol;
+						joins.append(String.format(mapper.fg.join_inner, cli.table, la, cli.sourceCol, //
+								rec_alias, mapper.fg.id));
+						if ((!deleted) && (cli.deleteCol != null)) {
+							joins.append(mapper.fg.and);
+							joins.append(la);
+							joins.append(mapper.fg.prefix);
+							joins.append(cli.deleteCol);
+							joins.append(mapper.fg.equaldelfalse);
+						}
 					}
 					continue;
 				}
@@ -215,7 +270,7 @@ public class MultiLinkQuery {
 			}
 		}
 		// Link chain correctly generated (at least one link, and no unknown entities nor virtual links.
-		if (alias <= 1) {
+		if (alias <= initial) {
 			return null;
 		}
 		// Process recursive link on the final target entity, if available:
@@ -268,9 +323,10 @@ public class MultiLinkQuery {
 				}
 			}
 		}
-		return new MultiLinkQuery(joins.toString(), where.toString(), rec_alias, rec_query, prev_alias, prev_col);
+		return new MultiLinkQuery(alias + 1, joins.toString(), where.toString(), rec_alias, rec_query, prev_alias, prev_col);
 	}
 	
+	public final int nextIncrement;
 	public final String rec_alias;
 	public final String rec_query;
 	public final String join;
@@ -278,9 +334,10 @@ public class MultiLinkQuery {
 	public final String linkAlias;
 	public final String linkCol;
 
-	public MultiLinkQuery(String join, String where, String rec_alias, String rec_query, String linkAlias,
+	public MultiLinkQuery(int nextIncrement, String join, String where, String rec_alias, String rec_query, String linkAlias,
 			String linkCol) {
 		super();
+		this.nextIncrement = nextIncrement;
 		this.join = join;
 		this.where = where;
 		this.rec_alias = rec_alias;
@@ -288,6 +345,4 @@ public class MultiLinkQuery {
 		this.linkAlias = linkAlias;
 		this.linkCol = linkCol;
 	}
-	
-	
 }

@@ -26,7 +26,6 @@ import com.arcadsoftware.metadata.criteria.IdEqualCriteria;
 import com.arcadsoftware.metadata.criteria.IdGreaterStrictCriteria;
 import com.arcadsoftware.metadata.criteria.IdGreaterThanCriteria;
 import com.arcadsoftware.metadata.criteria.InListCriteria;
-import com.arcadsoftware.metadata.criteria.InSubdivisionCriteria;
 import com.arcadsoftware.metadata.criteria.IdLowerStrictCriteria;
 import com.arcadsoftware.metadata.criteria.IdLowerThanCriteria;
 import com.arcadsoftware.metadata.criteria.IsNullCriteria;
@@ -37,6 +36,8 @@ import com.arcadsoftware.metadata.criteria.LinkEndCriteria;
 import com.arcadsoftware.metadata.criteria.LinkEqualCriteria;
 import com.arcadsoftware.metadata.criteria.LinkGreaterStrictCriteria;
 import com.arcadsoftware.metadata.criteria.LinkGreaterThanCriteria;
+import com.arcadsoftware.metadata.criteria.LinkLowerStrictCriteria;
+import com.arcadsoftware.metadata.criteria.LinkLowerThanCriteria;
 import com.arcadsoftware.metadata.criteria.LinkStartCriteria;
 import com.arcadsoftware.metadata.criteria.LowerStrictCriteria;
 import com.arcadsoftware.metadata.criteria.LowerThanCriteria;
@@ -275,6 +276,10 @@ public abstract class AbstractCriteriaParser {
 			return new LinkStartCriteria(ref, linkCode, att, v, cs);
 		case 5: // ends
 			return new LinkEndCriteria(ref, linkCode, att, v, cs);
+		case 6: // greater
+			return new LinkLowerStrictCriteria(ref, linkCode, att, v);
+		case 7: // greater or equals
+			return new LinkLowerThanCriteria(ref, linkCode, att, v);
 		}
 		throw new RuntimeException("Criteria Parsing Error: Unknown link comparison operator.");
 	}
@@ -340,9 +345,5 @@ public abstract class AbstractCriteriaParser {
 			return new DeletedCriteria(ref);
 		}
 		return new DeletedCriteria();
-	}
-	
-	protected ISearchCriteria insubdivision(Token rl, Token v) {
-		return new InSubdivisionCriteria(rl.image, integer(v));
 	}
 }

@@ -1,5 +1,7 @@
 package com.arcadsoftware.metadata.criteria;
 
+import java.util.List;
+
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
 import com.arcadsoftware.metadata.MetaDataEntity;
@@ -8,15 +10,21 @@ import com.arcadsoftware.metadata.ReferenceLine;
 import com.arcadsoftware.metadata.internal.Messages;
 import com.arcadsoftware.rest.connection.IConnectionUserBean;
 
-public abstract class AbstractLinkTestCriteria extends AbstractSearchCriteria implements IAttributeCriteria {
+public abstract class AbstractLinkTestCriteria extends AbstractSearchCriteria implements IAttributeCriteria, ILinkCriteria {
 
 	private String linkCode;
 	private String reference;
 	private String attribute;
 	private String value;
+	private boolean ignoreSubdivision;
+	private boolean deleted;
+	
+	public AbstractLinkTestCriteria() {
+		super();
+	}
 
 	public AbstractLinkTestCriteria(String linkCode, String attribute, String value) {
-		super();
+		this();
 		this.linkCode = linkCode;
 		this.attribute = attribute;
 		this.value = value;
@@ -26,9 +34,11 @@ public abstract class AbstractLinkTestCriteria extends AbstractSearchCriteria im
 		this(linkCode, attribute, value);
 		this.reference = reference;
 	}
-	
-	public AbstractLinkTestCriteria() {
-		super();
+
+	public AbstractLinkTestCriteria(String reference, String linkCode, String attribute, String value, boolean ignoreSubdivision, boolean deleted) {
+		this(reference, linkCode, attribute, value);
+		this.ignoreSubdivision = ignoreSubdivision;
+		this.deleted = deleted;
 	}
 
 	@Override
@@ -45,15 +55,20 @@ public abstract class AbstractLinkTestCriteria extends AbstractSearchCriteria im
 				return ConstantCriteria.FALSE;
 			}
 		}
-		MetaDataLink link = entity.getLink(linkCode);
-		if (link != null) {
-			MetaDataEntity e = link.getRefEntity();
+		List<MetaDataLink> links = entity.getLinkChain(getLinkCodes());
+		if (links != null) {
+			MetaDataEntity e = links.get(links.size() - 1).getRefEntity();
 			if (e != null) {
 				ReferenceLine ref = e.getAttributeLine(attribute);
 				if (ref != null) {
-					context.useLinkReference(link, ref);
 					if (referenceRef != null) {
 						context.useReference(referenceRef);
+						String code = reference + '/' + linkCode;
+						context.useLinks(code, links);
+						context.useLinkReference(code, ref);
+					} else {
+						context.useLinks(linkCode, links);
+						context.useLinkReference(linkCode, ref);
 					}
 					return this;
 				}
@@ -63,8 +78,18 @@ public abstract class AbstractLinkTestCriteria extends AbstractSearchCriteria im
 	}
 
 	@Override
+	public String[] getLinkCodes() {
+		if (linkCode == null) {
+			return new String[0];
+		}
+		return linkCode.split("\\."); //$NON-NLS-1$
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		return (obj instanceof AbstractLinkTestCriteria) && // 
+				(ignoreSubdivision == ((AbstractLinkTestCriteria) obj).ignoreSubdivision) && //
+				(deleted == ((AbstractLinkTestCriteria) obj).deleted) && //
 				nullsOrEquals(value, ((AbstractLinkTestCriteria) obj).value) && //
 				nullsOrEquals(attribute, ((AbstractLinkTestCriteria) obj).attribute) && //
 				nullsOrEquals(reference, ((AbstractLinkTestCriteria) obj).reference) && //
@@ -113,6 +138,12 @@ public abstract class AbstractLinkTestCriteria extends AbstractSearchCriteria im
 		sb.append(String.format(Messages.Criteria_LinkedThrough, linkCode));
 		sb.append(attribute);
 		sb.append(getTestString());
+		if (ignoreSubdivision) {
+			sb.append(Messages.Criteria_NoSubdivision);
+		}
+		if (deleted) {
+			sb.append(Messages.Criteria_EvenDeleted);
+		}
 		sb.append('"');
 		sb.append(value);
 		sb.append('"');
@@ -125,10 +156,12 @@ public abstract class AbstractLinkTestCriteria extends AbstractSearchCriteria im
 	 */
 	protected abstract String getTestString();
 
+	@Override
 	public String getLinkCode() {
 		return linkCode;
 	}
 
+	@Override
 	public void setLinkCode(String linkCode) {
 		this.linkCode = linkCode;
 	}
@@ -141,10 +174,12 @@ public abstract class AbstractLinkTestCriteria extends AbstractSearchCriteria im
 		this.reference = reference;
 	}
 
+	@Override
 	public String getAttribute() {
 		return attribute;
 	}
 
+	@Override
 	public void setAttribute(String attribute) {
 		this.attribute = attribute;
 	}
@@ -157,4 +192,23 @@ public abstract class AbstractLinkTestCriteria extends AbstractSearchCriteria im
 		this.value = value;
 	}
 
+	@Override
+	public boolean isIgnoreSubdivision() {
+		return ignoreSubdivision;
+	}
+
+	@Override
+	public void setIgnoreSubdivision(boolean ignoreSubdivision) {
+		this.ignoreSubdivision = ignoreSubdivision;
+	}
+
+	@Override
+	public boolean isDeletedLinks() {
+		return deleted;
+	}
+
+	@Override
+	public void setDeletedLinks(boolean deleted) {
+		this.deleted = deleted;
+	}
 }

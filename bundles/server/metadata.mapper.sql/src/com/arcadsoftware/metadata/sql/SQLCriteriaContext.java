@@ -16,13 +16,16 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
  */
 public class SQLCriteriaContext extends CriteriaContextBasic {
 
+	private final MapperSQLService mapper;
 	private final HashMap<String, String> queryContextes;
 	
-	public SQLCriteriaContext(MetaDataEntity entity, IConnectionUserBean currentUser) {
+	public SQLCriteriaContext(MapperSQLService mapper, MetaDataEntity entity, IConnectionUserBean currentUser) {
 		super(entity, currentUser);
+		this.mapper = mapper;
 		queryContextes = new HashMap<>();
 	}
-
+	
+	
 	/**
 	 * Add a now part of SQL query to be added to the definitive SQL Query.
 	 * 

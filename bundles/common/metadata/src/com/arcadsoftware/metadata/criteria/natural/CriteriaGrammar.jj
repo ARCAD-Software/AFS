@@ -288,16 +288,13 @@ ISearchCriteria equalsCriteria():
       | t = refline() { return equals(rl, t, cs); }
       )
     | < IN >
-      ( < STAR >        t = < INTEGER >
-        { return insubdivision(rl, t); }
-      | t = < INTEGER >
-        { ArrayList vals = new ArrayList(); vals.add(integer(t)); }
-        ( < COLON > 
-          t = < INTEGER >
-          { vals.add(integer(t)); }
-        )*
-        { return isin(rl, vals); }
-      )
+      t = < INTEGER >
+      { ArrayList vals = new ArrayList(); vals.add(integer(t)); }
+      ( < COLON > 
+        t = < INTEGER >
+        { vals.add(integer(t)); }
+      )*
+      { return isin(rl, vals); }
     )
   | t = < INTEGER >
     ( < _EQUAL > | < _EQUAL2 > )
@@ -496,6 +493,8 @@ ISearchCriteria linksCriteria():
     | < _CONTAINEQUAL > { o = 3; cs = true; }
     | < _STARTEQUAL > { o = 4; cs = true; }
     | < _ENDEQUAL > { o = 5; cs = true; }
+    | < _LOWER > { o = 6; }
+    | < _LOWEREQUAL > { o = 7; }
     )
     ( i = < INTEGER >
     | i = < QUOTED_STRING >

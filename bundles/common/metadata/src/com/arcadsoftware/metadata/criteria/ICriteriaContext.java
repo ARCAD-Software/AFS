@@ -14,6 +14,7 @@
 package com.arcadsoftware.metadata.criteria;
 
 import java.util.Collection;
+import java.util.List;
 
 import com.arcadsoftware.metadata.MetaDataEntity;
 import com.arcadsoftware.metadata.MetaDataLink;
@@ -54,9 +55,18 @@ public interface ICriteriaContext {
 	 * The Context can use this method to prepare the query with necessary data.
 	 *  
 	 * @param reference
-	 * @return
 	 */
 	public void useReference(ReferenceLine reference);
+
+	/**
+	 * This method is called during reduce operation to store the computed list of reference lines.
+	 * 
+	 * <p>
+	 * The Context can use this method to prepare the query with necessary data.
+	 *  
+	 * @param references a non null list of reference lines.
+	 */
+	public void useReferences(List<ReferenceLine> references);
 	
 	/**
 	 * This method is called during reduce operation to store the computed reference line relative to a linked entity.
@@ -64,10 +74,21 @@ public interface ICriteriaContext {
 	 * <p>
 	 * The Context can use this method to prepare the query with necessary data.
 	 *  
-	 * @param link
-	 * @param reference this reference can be null if the criteria use only the link information.
+	 * @param code a non null link code.
+	 * @param reference the reference starting from referenced entity.
 	 */
-	public void useLinkReference(MetaDataLink link, ReferenceLine reference);
+	public void useLinkReference(String code, ReferenceLine reference);
+	
+	/**
+	 * This method is called during reduce operation to store the computed reference line relative to a linked entity.
+	 * 
+	 * <p>
+	 * The Context can use this method to prepare the query with necessary data.
+	 *  
+	 * @param code a non null link code.
+	 * @param links the corresponding list of links.
+	 */
+	public void useLinks(String code, List<MetaDataLink> links);
 
 	/**
 	 * This method is used to determine if the domain of used attributes is unique.
@@ -86,6 +107,14 @@ public interface ICriteriaContext {
 	 * @return
 	 */
 	public ReferenceLine getReference(String code);
+
+	/**
+	 * Get the corresponding chain of links.
+	 * 
+	 * @param code
+	 * @return
+	 */
+	public List<MetaDataLink> getLinks(String code);
 	
 	/**
 	 * Get the list of all unique references used into this Criteria context.
@@ -105,18 +134,7 @@ public interface ICriteriaContext {
 	 * 
 	 * @return
 	 */
-	public Collection<MetaDataLink> getLinks();
-
-	/**
-	 * Get the references line recorded with this link.
-	 * 
-	 * <p>
-	 * Note that this method must be used, during or after the criteria reduction process.
-	 * 
-	 * @param link
-	 * @return
-	 */
-	public Collection<ReferenceLine> getReferences(MetaDataLink link);
+	public Collection<List<MetaDataLink>> getLinks();
 
 	/**
 	 * Get the recorded link reference.
@@ -124,10 +142,15 @@ public interface ICriteriaContext {
 	 * <p>
 	 * Note that this method must be used, during or after the criteria reduction process.
 	 * 
-	 * @param link
 	 * @param code
 	 * @return
 	 */
-	public ReferenceLine getReference(MetaDataLink link, String code);
+	public ReferenceLine getLinkReference(String linkCode, String code);
+	
+	/**
+	 * Return true if this context will use any attribute reference (other than the entity attributes) or any links.
+	 * @return
+	 */
+	public boolean hasReferences();
 
 }

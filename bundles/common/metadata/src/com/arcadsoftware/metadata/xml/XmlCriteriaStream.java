@@ -37,7 +37,6 @@ import com.arcadsoftware.metadata.criteria.IdGreaterStrictCriteria;
 import com.arcadsoftware.metadata.criteria.IdGreaterThanCriteria;
 import com.arcadsoftware.metadata.criteria.IdInListCriteria;
 import com.arcadsoftware.metadata.criteria.InListCriteria;
-import com.arcadsoftware.metadata.criteria.InSubdivisionCriteria;
 import com.arcadsoftware.metadata.criteria.IdLowerStrictCriteria;
 import com.arcadsoftware.metadata.criteria.IdLowerThanCriteria;
 import com.arcadsoftware.metadata.criteria.IsNullCriteria;
@@ -48,6 +47,8 @@ import com.arcadsoftware.metadata.criteria.LinkEndCriteria;
 import com.arcadsoftware.metadata.criteria.LinkEqualCriteria;
 import com.arcadsoftware.metadata.criteria.LinkGreaterStrictCriteria;
 import com.arcadsoftware.metadata.criteria.LinkGreaterThanCriteria;
+import com.arcadsoftware.metadata.criteria.LinkLowerStrictCriteria;
+import com.arcadsoftware.metadata.criteria.LinkLowerThanCriteria;
 import com.arcadsoftware.metadata.criteria.LinkStartCriteria;
 import com.arcadsoftware.metadata.criteria.LowerStrictCriteria;
 import com.arcadsoftware.metadata.criteria.LowerThanCriteria;
@@ -256,9 +257,16 @@ public class XmlCriteriaStream extends XStreamCompact {
 		xs.alias("idlowerthan", IdLowerThanCriteria.class); //$NON-NLS-1$
 		xs.useAttributeFor(IdLowerThanCriteria.class, "id"); //$NON-NLS-1$
 		xs.useAttributeFor(ChangedCriteria.class, "attribute"); //$NON-NLS-1$
-		xs.alias("insubset", InSubdivisionCriteria.class); //$NON-NLS-1$
-		xs.useAttributeFor(InSubdivisionCriteria.class, "attribute"); //$NON-NLS-1$
-		xs.useAttributeFor(InSubdivisionCriteria.class, "value"); //$NON-NLS-1$
+		// New criteria of version 2.0.0
+		xs.alias("linkgreaterstrict", LinkLowerStrictCriteria.class); //$NON-NLS-1$
+		xs.alias("linkgreaterthan", LinkLowerThanCriteria.class); //$NON-NLS-1$
+		xs.useAttributeFor(LinkCriteria.class, "ignoreSubdivision"); //$NON-NLS-1$
+		xs.useAttributeFor(AbstractLinkTestCriteria.class, "ignoreSubdivision"); //$NON-NLS-1$
+		xs.useAttributeFor(UnlinkCriteria.class, "ignoreSubdivision"); //$NON-NLS-1$
+		xs.useAttributeFor(LinkCriteria.class, "deleted"); //$NON-NLS-1$
+		xs.useAttributeFor(AbstractLinkTestCriteria.class, "deleted"); //$NON-NLS-1$
+		xs.useAttributeFor(UnlinkCriteria.class, "deleted"); //$NON-NLS-1$
+		xs.aliasAttribute("ignoreSubdivision", "nosub");
 		// For upcomming declarations, do not forget to add the dedicated mapping in the JsonCriteriaStream class.
 		return xs;
 	}

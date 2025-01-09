@@ -26,15 +26,15 @@ import com.arcadsoftware.metadata.MetaDataLink;
 import com.arcadsoftware.metadata.OrderComparator;
 import com.arcadsoftware.metadata.ReferenceLine;
 import com.arcadsoftware.metadata.criteria.AndCriteria;
+import com.arcadsoftware.metadata.criteria.CriteriaContextBasic;
 import com.arcadsoftware.metadata.criteria.EqualCriteria;
-import com.arcadsoftware.metadata.criteria.ICriteriaContext;
 import com.arcadsoftware.metadata.criteria.ISearchCriteria;
 import com.arcadsoftware.rest.connection.IConnectionUserBean;
 
 /**
  * Read only memory mapper...
  */
-public class RightsMapperService extends AbstractMapperService {
+public class RightsMapperService extends AbstractMapperService<CriteriaContextBasic> {
 
 	private Activator activator;
 	
@@ -70,7 +70,7 @@ public class RightsMapperService extends AbstractMapperService {
 	}
 
 	@Override
-	public boolean doUpdate(List<MetaDataAttribute> attributes, List<Object> values, ISearchCriteria criteria, ICriteriaContext context) {
+	public boolean doUpdate(List<MetaDataAttribute> attributes, List<Object> values, ISearchCriteria criteria, CriteriaContextBasic context) {
 		return false;
 	}
 
@@ -100,7 +100,7 @@ public class RightsMapperService extends AbstractMapperService {
 
 	@Override
 	public BeanMapList doSelection(List<ReferenceLine> attributes, boolean deleted, ISearchCriteria criteria,
-			boolean distinct, List<ReferenceLine> orders, int page, int limit, ICriteriaContext context) {
+			boolean distinct, List<ReferenceLine> orders, int page, int limit, CriteriaContextBasic context) {
 		BeanMapList result = new BeanMapList();
 		if (Activator.RIGHT.equals(context.getEntity().getType())) {
 			for (BeanMap right: activator.getRights()) {
@@ -137,7 +137,7 @@ public class RightsMapperService extends AbstractMapperService {
 	}
 
 	@Override
-	public int doCount(boolean deleted, ISearchCriteria criteria, boolean distinct, ICriteriaContext context) {
+	public int doCount(boolean deleted, ISearchCriteria criteria, boolean distinct, CriteriaContextBasic context) {
 		int result = 0;
 		if (Activator.RIGHT.equals(context.getEntity().getType())) {
 			for (BeanMap right: activator.getRights()) {
@@ -156,7 +156,7 @@ public class RightsMapperService extends AbstractMapperService {
 	}
 
 	@Override
-	public BeanMap doSelectionFirst(List<ReferenceLine> attributes, boolean deleted, ISearchCriteria criteria, ICriteriaContext context) {
+	public BeanMap doSelectionFirst(List<ReferenceLine> attributes, boolean deleted, ISearchCriteria criteria, CriteriaContextBasic context) {
 		if (Activator.RIGHT.equals(context.getEntity().getType())) {
 			for(BeanMap right: activator.getRights()) {
 				if (criteria.test(right, context.getCurrentUser())) {
@@ -185,7 +185,7 @@ public class RightsMapperService extends AbstractMapperService {
 	@Override
 	public BeanMapList doLinkSelection(List<MetaDataLink> links, int sourceId, List<ReferenceLine> attributes, boolean deleted,
 			ISearchCriteria criteria, boolean distinct, boolean ignoreSubdivision, List<ReferenceLine> orders, int page, 
-			int limit, ICriteriaContext context) {
+			int limit, CriteriaContextBasic context) {
 		if ((links == null) || links.isEmpty()) {
 			return new BeanMapList();
 		}
@@ -233,19 +233,23 @@ public class RightsMapperService extends AbstractMapperService {
 
 	@Override
 	public int doLinkCount(List<MetaDataLink> links, int id, boolean deleted, boolean ignoreSubdivision, ISearchCriteria criteria, boolean distinct,
-			ICriteriaContext context) {
+			CriteriaContextBasic context) {
 		if ((links == null) || links.isEmpty()) {
 			return 0;
 		}
 		if (context.getEntity().getType().equals(Activator.RIGHT)) {
-			context.useReference(context.getReference(Activator.RIGHT_CATEGORY));
-			return doCount(deleted,new AndCriteria(criteria, new EqualCriteria(Activator.RIGHT_CATEGORY, id)),distinct,context);
+			return doCount(deleted, new AndCriteria(criteria, new EqualCriteria(Activator.RIGHT_CATEGORY, id)), distinct, context);
 		}
 		MetaDataEntity refEntity = links.get(links.size() - 1).getRefEntity();
 		if ((refEntity != null) && (refEntity.getMapper() != null) && (refEntity.getMapper() != this)) {
 			return refEntity.getMapper().linkCount(links, id, deleted, criteria, distinct, ignoreSubdivision, context.getCurrentUser());
 		}
 		return 0;
+	}
+
+	@Override
+	protected CriteriaContextBasic getContext(MetaDataEntity entity, IConnectionUserBean currentUser) {
+		return new CriteriaContextBasic(entity, currentUser);
 	}
 
 }

@@ -40,11 +40,13 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
  * exclude any data with no link at all.
  * 
  */
-public class LinkCriteria extends AbstractSearchCriteria implements Cloneable, IAttributeCriteria {
+public class LinkCriteria extends AbstractSearchCriteria implements Cloneable, IAttributeCriteria, ILinkCriteria {
 
 	private String attribute;
 	private String linkCode;
 	private int id;
+	private boolean ignoreSubdivision;
+	private boolean deleted;
 	
 	public LinkCriteria(int id, String linkCode) {
 		this();
@@ -56,6 +58,11 @@ public class LinkCriteria extends AbstractSearchCriteria implements Cloneable, I
 		this(id, linkCode);
 		this.attribute = attribute;
 	}
+	
+	public LinkCriteria(int id, String linkCode, String attribute, boolean ignoreSubdivision) {
+		this(id, linkCode, attribute);
+		this.ignoreSubdivision = ignoreSubdivision;
+	}
 
 	public LinkCriteria() {
 		super();
@@ -63,16 +70,16 @@ public class LinkCriteria extends AbstractSearchCriteria implements Cloneable, I
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
-		return new LinkCriteria(id, linkCode, attribute);
+		return new LinkCriteria(id, linkCode, attribute, ignoreSubdivision);
 	}
 
 	@Override
 	public ISearchCriteria reduce(ICriteriaContext context) {
 		if (id > 0) {
 			if ((attribute == null) || (attribute.length() == 0)) {
-				MetaDataLink link = context.getEntity().getLink(linkCode);
-				if (link != null) {
-					context.useLinkReference(link, null);
+				List<MetaDataLink> links = context.getEntity().getLinkChain(getLinkCodes());
+				if (links != null) {
+					context.useLinks(linkCode, links);
 					return this;
 				}
 			} else {
@@ -80,10 +87,10 @@ public class LinkCriteria extends AbstractSearchCriteria implements Cloneable, I
 				if ((attributeRef != null) && (attributeRef.size() > 0)) {
 					MetaDataEntity e = attributeRef.getLastAttribute().getRefEntity();
 					if (e != null) {
-						MetaDataLink link = e.getLink(linkCode);
-						if (link != null) {
+						List<MetaDataLink> links = e.getLinkChain(getLinkCodes());
+						if ((links != null) && !links.isEmpty()) {
 							context.useReference(attributeRef);
-							context.useLinkReference(link, null);
+							context.useLinks(attribute + '/' + linkCode, links);
 							return this;
 						}
 					}
@@ -94,9 +101,19 @@ public class LinkCriteria extends AbstractSearchCriteria implements Cloneable, I
 	}
 
 	@Override
+	public String[] getLinkCodes() {
+		if (linkCode == null) {
+			return new String[0];
+		}
+		return linkCode.split("\\."); //$NON-NLS-1$
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		return (obj instanceof LinkCriteria) && // 
 			(id == ((LinkCriteria) obj).id) && //
+			(ignoreSubdivision == ((LinkCriteria) obj).ignoreSubdivision) && //
+			(deleted == ((LinkCriteria) obj).deleted) && //
 			nullsOrEquals(linkCode, ((LinkCriteria) obj).linkCode) && //
 			nullsOrEquals(attribute, ((LinkCriteria) obj).attribute);
 	}
@@ -113,7 +130,7 @@ public class LinkCriteria extends AbstractSearchCriteria implements Cloneable, I
 			}
 			if (o instanceof List) {
 				for(Object x:((List) o)) {
-					if ((x instanceof IIdentifiedBean) && (((IIdentifiedBean)x).getId() == id)) {
+					if ((x instanceof IIdentifiedBean) && (((IIdentifiedBean) x).getId() == id)) {
 						return true;
 					}
 				}
@@ -122,10 +139,12 @@ public class LinkCriteria extends AbstractSearchCriteria implements Cloneable, I
 		return false;
 	}
 
+	@Override
 	public String getAttribute() {
 		return attribute;
 	}
 
+	@Override
 	public String getLinkCode() {
 		return linkCode;
 	}
@@ -134,10 +153,12 @@ public class LinkCriteria extends AbstractSearchCriteria implements Cloneable, I
 		return id;
 	}
 
+	@Override
 	public void setAttribute(String code) {
 		attribute = code;
 	}
 	
+	@Override
 	public void setLinkCode(String linkCode) {
 		this.linkCode = linkCode;
 	}
@@ -153,10 +174,35 @@ public class LinkCriteria extends AbstractSearchCriteria implements Cloneable, I
 			sb.append(attribute);
 			sb.append(' ');
 		}
-		sb.append(String.format(Messages.Criteria_LinkedThrough,linkCode));
+		sb.append(String.format(Messages.Criteria_LinkedThrough, linkCode));
+		if (ignoreSubdivision) {
+			sb.append(Messages.Criteria_NoSubdivision);
+		}
+		if (deleted) {
+			sb.append(Messages.Criteria_EvenDeleted);
+		}
 		sb.append('#');
 		sb.append(id);
 		return sb.toString();
 	}
 
+	@Override
+	public boolean isIgnoreSubdivision() {
+		return ignoreSubdivision;
+	}
+
+	@Override
+	public void setIgnoreSubdivision(boolean ignoreSubdivision) {
+		this.ignoreSubdivision = ignoreSubdivision;
+	}
+
+	@Override
+	public boolean isDeletedLinks() {
+		return deleted;
+	}
+
+	@Override
+	public void setDeletedLinks(boolean deleted) {
+		this.deleted = deleted;
+	}
 }

@@ -58,17 +58,14 @@ import com.arcadsoftware.metadata.criteria.ContainCriteria;
 import com.arcadsoftware.metadata.criteria.DeletedCriteria;
 import com.arcadsoftware.metadata.criteria.EndCriteria;
 import com.arcadsoftware.metadata.criteria.EqualCriteria;
-import com.arcadsoftware.metadata.criteria.EqualICCriteria;
 import com.arcadsoftware.metadata.criteria.GreaterStrictCriteria;
 import com.arcadsoftware.metadata.criteria.GreaterThanCriteria;
 import com.arcadsoftware.metadata.criteria.HasRightCriteria;
-import com.arcadsoftware.metadata.criteria.ICriteriaContext;
 import com.arcadsoftware.metadata.criteria.ISearchCriteria;
 import com.arcadsoftware.metadata.criteria.IdEqualCriteria;
 import com.arcadsoftware.metadata.criteria.IdGreaterStrictCriteria;
 import com.arcadsoftware.metadata.criteria.IdGreaterThanCriteria;
 import com.arcadsoftware.metadata.criteria.InListCriteria;
-import com.arcadsoftware.metadata.criteria.InSubdivisionCriteria;
 import com.arcadsoftware.metadata.criteria.IdLowerStrictCriteria;
 import com.arcadsoftware.metadata.criteria.IdLowerThanCriteria;
 import com.arcadsoftware.metadata.criteria.IsNullCriteria;
@@ -79,6 +76,8 @@ import com.arcadsoftware.metadata.criteria.LinkEndCriteria;
 import com.arcadsoftware.metadata.criteria.LinkEqualCriteria;
 import com.arcadsoftware.metadata.criteria.LinkGreaterStrictCriteria;
 import com.arcadsoftware.metadata.criteria.LinkGreaterThanCriteria;
+import com.arcadsoftware.metadata.criteria.LinkLowerStrictCriteria;
+import com.arcadsoftware.metadata.criteria.LinkLowerThanCriteria;
 import com.arcadsoftware.metadata.criteria.LinkStartCriteria;
 import com.arcadsoftware.metadata.criteria.LowerStrictCriteria;
 import com.arcadsoftware.metadata.criteria.LowerThanCriteria;
@@ -109,7 +108,7 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
  * <p>
  * Creation Date: 2011-2-3
  */
-public class MapperSQLService extends AbstractMapperService {
+public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> {
 	
 	private static final boolean RETURNEMPTYBEAMMAP = Boolean.getBoolean("com.arcadsoftware.mapper.sql.empty.beanmap"); //$NON-NLS-1$
 	private static final String SQL_JAVA_PREFIX = "j_"; //$NON-NLS-1$
@@ -201,8 +200,8 @@ public class MapperSQLService extends AbstractMapperService {
 	}
 	
 	@Override
-	protected ICriteriaContext getContext(MetaDataEntity entity, IConnectionUserBean currentUser) {
-		return new SQLCriteriaContext(entity, currentUser);
+	protected SQLCriteriaContext getContext(MetaDataEntity entity, IConnectionUserBean currentUser) {
+		return new SQLCriteriaContext(this, entity, currentUser);
 	}
 
 	/**
@@ -595,7 +594,7 @@ public class MapperSQLService extends AbstractMapperService {
 	 * @param context
 	 * @return
 	 */
-	protected ISearchCriteria getLocalCriteria(ISearchCriteria criteria, ICriteriaContext context) {
+	protected ISearchCriteria getLocalCriteria(ISearchCriteria criteria, SQLCriteriaContext context) {
 		if (context.isMapperUnique()) {
 			return criteria;
 		}
@@ -634,7 +633,7 @@ public class MapperSQLService extends AbstractMapperService {
 	 * @param result The SQL "where" clause. 
 	 * @return the "result" param.
 	 */
-	protected StringBuilder generateCriteria(EntityInfo entityInfo, ISearchCriteria criteria, ICriteriaContext context,
+	protected StringBuilder generateCriteria(EntityInfo entityInfo, ISearchCriteria criteria, SQLCriteriaContext context,
 			Map<String, String> colNames, JoinsMap joinMap, StringBuilder result) {
 		if (criteria instanceof AfterCriteria) {
 			result.append(String.format(fg.greater, 
@@ -749,36 +748,38 @@ public class MapperSQLService extends AbstractMapperService {
 					colNames.get(((AttributeLowerOrEqualsCriteria) criteria).getAttribute()),
 					colNames.get(((AttributeLowerOrEqualsCriteria) criteria).getSecondAttribute())));
 		} else if (criteria instanceof EqualCriteria) {
-			if (((EqualCriteria) criteria).getIntval() != null) {
-				if (context.getReference(((EqualCriteria) criteria).getAttribute()).isNumericType()) {
+			if (context.getReference(((EqualCriteria) criteria).getAttribute()).isNumericType()) {
+				if (((EqualCriteria) criteria).getIntval() != null) {
 					result.append(String.format(fg.equal,
 							colNames.get(((EqualCriteria) criteria).getAttribute()),
 							((EqualCriteria) criteria).getIntval().toString()));
 				} else {
-					result.append(String.format(fg.equal,
-							colNames.get(((EqualCriteria) criteria).getAttribute()),
-							enquote(((EqualCriteria) criteria).getIntval().toString())));
-				}
-			} else if (context.getReference(((EqualCriteria) criteria).getAttribute()).isNumericType()) {
-				try {
-					Integer.parseInt(((EqualCriteria) criteria).getValue());
-					result.append(String.format(fg.equal,
-							colNames.get(((EqualCriteria) criteria).getAttribute()),
-							((EqualCriteria) criteria).getValue()));
-				} catch (NumberFormatException e) {
-					result.append(String.format(fg.equal,
-							colNames.get(((EqualCriteria) criteria).getAttribute()),
-							enquote(((EqualCriteria) criteria).getValue())));
+					try {
+						Integer.parseInt(((EqualCriteria) criteria).getValue());
+						result.append(String.format(fg.equal,
+								colNames.get(((EqualCriteria) criteria).getAttribute()),
+								((EqualCriteria) criteria).getValue()));
+					} catch (NumberFormatException e) {
+						result.append(String.format(fg.equal,
+								colNames.get(((EqualCriteria) criteria).getAttribute()),
+								enquote(((EqualCriteria) criteria).getValue())));
+					}
 				}
 			} else {
-				result.append(String.format(fg.equal,
-						colNames.get(((EqualCriteria) criteria).getAttribute()),
-						enquote(((EqualCriteria) criteria).getValue())));
+				String value = ((EqualCriteria) criteria).getValue();
+				if (((EqualCriteria) criteria).getIntval() != null) {
+					value = ((EqualCriteria) criteria).getIntval().toString();
+				}
+				if (((EqualCriteria) criteria).isCasesensitive()) {			
+					result.append(String.format(fg.equal,
+							colNames.get(((EqualCriteria) criteria).getAttribute()),
+							enquote(value)));
+				} else {			
+					result.append(String.format(fg.equalignorecase,
+							colNames.get(((EqualCriteria) criteria).getAttribute()),
+						enquote(value.toUpperCase())));
+				}
 			}
-		} else if (criteria instanceof EqualICCriteria) {
-			result.append(String.format(fg.equalignorecase,
-					colNames.get(((EqualICCriteria) criteria).getAttribute()),
-				enquote(((EqualICCriteria) criteria).getValue().toUpperCase())));
 		} else if (criteria instanceof GreaterStrictCriteria) {
 			if (context.getReference(((GreaterStrictCriteria)criteria).getAttribute()).isNumericType()) {
 				try {
@@ -875,6 +876,20 @@ public class MapperSQLService extends AbstractMapperService {
 		} else if (criteria instanceof IsTrueCriteria) {
 			result.append(String.format(fg.istrue, colNames.get(((IsTrueCriteria) criteria).getAttribute())));
 		} else if (criteria instanceof LinkCriteria) {
+			
+			
+			
+			// la listes des incident nomé "X" et dont le "owner" est aussi un des "intervenants":
+			select from "incident" where ("code" = 'X') and (linked through "intervenents" to "owner")
+			
+			
+			option 1:
+				
+			select from "incident" where ("code" = 'X') and ("owner" in (select id from "intervenant"... ))	
+			
+			
+			
+			
 			// On construit une jointure externe vers la table d'association
 			// Puis on compare l'ID de destination à l'ID passé dans le critère.
 			String lc = ((LinkCriteria) criteria).getLinkCode();
@@ -914,7 +929,12 @@ public class MapperSQLService extends AbstractMapperService {
 					result.append(fg.parout);
 				}
 			}
+			
+			
+			
 		} else if (criteria instanceof UnlinkCriteria) {
+			
+			
 			String attcn = colNames.get(((UnlinkCriteria) criteria).getAttribute());
 			LinkInfo l;
 			if (attcn == null) {
@@ -943,7 +963,14 @@ public class MapperSQLService extends AbstractMapperService {
 				}
 				result.append(String.format(fg.notintoselect, attcn, l.sourceCol, l.table, condition.toString()));
 			}
+			
+			
+			
 		} else if (criteria instanceof AbstractLinkTestCriteria) {
+			
+			
+			
+			
 			// We build a join to the target entity, through the association table.
 			// Then we follow the joins of the attributes up to the attribute to be tested.
 			MetaDataLink link = null;
@@ -1004,7 +1031,7 @@ public class MapperSQLService extends AbstractMapperService {
 					} else if (((LinkEqualCriteria) criteria).isCasesensitive()) {
 						result.append(String.format(fg.equal, attcn, enquote(((LinkEqualCriteria) criteria).getValue())));
 					} else {
-						result.append(String.format(fg.equalignorecase, attcn, enquote(((EqualICCriteria) criteria).getValue().toUpperCase())));
+						result.append(String.format(fg.equalignorecase, attcn, enquote(((LinkEqualCriteria) criteria).getValue().toUpperCase())));
 					}
 				} else if (criteria instanceof LinkContainCriteria) {
 					if (((LinkContainCriteria) criteria).isCasesensitive()) {
@@ -1041,6 +1068,28 @@ public class MapperSQLService extends AbstractMapperService {
 						}
 					} else {
 						result.append(String.format(fg.greaterorequal, attcn, enquote(((LinkGreaterThanCriteria) criteria).getValue())));
+					}
+				} else if (criteria instanceof LinkLowerStrictCriteria) {
+					if (context.getReference(link, ((LinkLowerStrictCriteria) criteria).getAttribute()).isNumericType()) {
+						try {
+							Integer.parseInt(((LinkLowerStrictCriteria) criteria).getValue());
+							result.append(String.format(fg.lower, attcn, ((LinkLowerStrictCriteria) criteria).getValue()));
+						} catch (NumberFormatException e) {
+							result.append(String.format(fg.lower, attcn, enquote(((LinkLowerStrictCriteria) criteria).getValue())));
+						}
+					} else {
+						result.append(String.format(fg.lower, attcn, enquote(((LinkLowerStrictCriteria) criteria).getValue())));
+					}
+				} else if (criteria instanceof LinkLowerThanCriteria) {
+					if (context.getReference(link, ((LinkLowerThanCriteria) criteria).getAttribute()).isNumericType()) {
+						try {
+							Integer.parseInt(((LinkLowerThanCriteria) criteria).getValue());
+							result.append(String.format(fg.lowerorequal, attcn, ((LinkLowerThanCriteria) criteria).getValue()));
+						} catch (NumberFormatException e) {
+							result.append(String.format(fg.lowerorequal, attcn, enquote(((LinkLowerThanCriteria) criteria).getValue())));
+						}
+					} else {
+						result.append(String.format(fg.lowerorequal, attcn, enquote(((LinkLowerThanCriteria) criteria).getValue())));
 					}
 				} else if (criteria instanceof LinkStartCriteria) {
 					if (((LinkStartCriteria) criteria).isCasesensitive()) {
@@ -1102,7 +1151,6 @@ public class MapperSQLService extends AbstractMapperService {
 						enquote(((LowerThanCriteria) criteria).getValue())));
 			}
 		} else if (criteria instanceof PreGeneratedCriteria) {
-			// FIXME Analyze the SQL code to avoid SQL injection/
 			result.append(((PreGeneratedCriteria) criteria).getSql());
 		} else if (criteria instanceof StartCriteria) {
 			if (((StartCriteria) criteria).isCasesensitive()) {
@@ -1371,12 +1419,12 @@ public class MapperSQLService extends AbstractMapperService {
 	 * @param result
 	 */
 	protected void generateOrders(List<ReferenceLine> orders, Map<String, String> colNames, StringBuilder result) {
-		// FIXME ATTENTION: On ne fait aucun test pour valider que les order ne sont pas des colones complèxes (genre "A+B") !
 		if (orders != null) {
 			for(ReferenceLine order: orders) {
 				String col = colNames.get(order.getCode());
-				if (col != null) {
-					// on ne trie que par les éléments de même domaine et qui sont effectivement sélectionnés !
+				// Avoid usage of complex column in the order clause.
+				if ((col != null) && (col.indexOf('+') < 0)) {
+					// we only sort by elements of the same domain and which are actually selected
 					if (result.length() > 0) {
 						result.append(fg.columnsep);
 					}
@@ -1390,7 +1438,7 @@ public class MapperSQLService extends AbstractMapperService {
 		}
 	}
 
-	private void generateContextCols(EntityInfo entityInfo, ICriteriaContext context, JoinsMap joins, Map<String, String> colsNames, String prefix) {
+	private void generateContextCols(EntityInfo entityInfo, SQLCriteriaContext context, JoinsMap joins, Map<String, String> colsNames, String prefix) {
 		for (ReferenceLine att: context.getReferences()) {
 			String cn = buildAttributeColName(entityInfo, att, joins, prefix);
 			if (cn != null) {
@@ -1449,7 +1497,7 @@ public class MapperSQLService extends AbstractMapperService {
 		if (e == null) {
 			return 0;
 		}
-		ICriteriaContext context = getContext(entity, currentUser);
+		SQLCriteriaContext context = getContext(entity, currentUser);
 		criteria = criteria.reduce(context);
 		if (ConstantCriteria.FALSE.equals(criteria)) {
 			return 0;
@@ -1463,16 +1511,8 @@ public class MapperSQLService extends AbstractMapperService {
 			return update(String.format(fg.delete_hardex, joins.toString(), where.toString()), new Object[0]);
 		}
 		// An SQL limitation may prevent the usage of joins in updates...
-		boolean hasjoins = !context.getLinks().isEmpty();
-		if (!hasjoins) {
-			for (ReferenceLine ref: context.getReferences()) {
-				if (!ref.isSimple()) {
-					hasjoins = true;
-					break;
-				}
-			}
-		}
-		if ((fg.update_join.isEmpty() && hasjoins) || useSubdivision(criteria)) {
+		final Boolean hasjoins = context.hasReferences();
+		if (fg.update_join.isEmpty() && hasjoins) {
 			// we abandon the update by single request, the criterion involves other elements...
 			// We have to use a pre-selection of the updated items.
 			BeanMapList list = doSelection(new ArrayList<ReferenceLine>(), false, criteria, false, null, 0, -1, context);
@@ -1546,22 +1586,14 @@ public class MapperSQLService extends AbstractMapperService {
 		if ((e == null) || (e.deleteCol == null)) {
 			return 0;
 		}
-		ICriteriaContext context = getContext(entity, currentUser);
+		SQLCriteriaContext context = getContext(entity, currentUser);
 		criteria = criteria.reduce(context);
 		if (ConstantCriteria.FALSE.equals(criteria)) {
 			return 0;
 		}
 		// An SQL limitation may prevent the usage of joins in updates...
-		boolean hasjoins = !context.getLinks().isEmpty();
-		if (!hasjoins) {
-			for (ReferenceLine ref: context.getReferences()) {
-				if (!ref.isSimple()) {
-					hasjoins = true;
-					break;
-				}
-			}
-		}
-		if ((fg.update_join.isEmpty() && hasjoins) || useSubdivision(criteria)) {
+		final Boolean hasjoins = context.hasReferences();
+		if (fg.update_join.isEmpty() && hasjoins) {
 			// on abandonne l'update par requête unique, le critère fait intervenir d'autres éléments.
 			// Il faut passer par une présélection
 			BeanMapList list = doSelection(new ArrayList<ReferenceLine>(), true, criteria, false, null, 0, -1, context);
@@ -1663,7 +1695,7 @@ public class MapperSQLService extends AbstractMapperService {
 	}
 
 	@Override
-	protected boolean doUpdate(List<MetaDataAttribute> attributes, List<Object> values, ISearchCriteria criteria, ICriteriaContext context) {
+	protected boolean doUpdate(List<MetaDataAttribute> attributes, List<Object> values, ISearchCriteria criteria, SQLCriteriaContext context) {
 		EntityInfo e = getEntityInfo(context.getEntity());
 		if (e == null) {
 			return false;
@@ -1674,17 +1706,9 @@ public class MapperSQLService extends AbstractMapperService {
 			return false;
 		}
 		// An SQL limitation may prevent the usage of joins in updates...
-		boolean hasjoins = !context.getLinks().isEmpty();
-		if (!hasjoins) {
-			for (ReferenceLine ref: context.getReferences()) {
-				if (!ref.isSimple()) {
-					hasjoins = true;
-					break;
-				}
-			}
-		}
+		final Boolean hasjoins = context.hasReferences();
 		String lcols = listUpdateCols(cols);
-		if ((fg.update_join.isEmpty() && hasjoins) || useSubdivision(criteria)) {
+		if ((fg.update_join.isEmpty() && hasjoins)) {
 			// on abandonne l'update par requête unique, le critère fait intervenir d'autres éléments.
 			// Il faut passer par une présélection
 			BeanMapList list = doSelection(new ArrayList<ReferenceLine>(), false, criteria, false, null, 0, -1, context);
@@ -1767,9 +1791,12 @@ public class MapperSQLService extends AbstractMapperService {
 
 	@Override
 	protected boolean doLinkRemove(MetaDataLink link, int sourceId, int destId) {
-		// TODO Support removal into recursive links ?
 		EntityInfo e = getEntityInfo(link.getParent());
 		if (e == null) {
+			return false;
+		}
+		List<MetaDataLink> links = link.getLinkChain();
+		if ((links == null) || (links.size() > 1)) {
 			return false;
 		}
 		LinkInfo l = e.links.get(link.getCode());
@@ -1830,7 +1857,7 @@ public class MapperSQLService extends AbstractMapperService {
 
 	@Override
 	protected BeanMapList doSelection(List<ReferenceLine> attributes, boolean deleted, ISearchCriteria criteria,
-			boolean distinct, List<ReferenceLine> orders, int page, int limit, ICriteriaContext context) {
+			boolean distinct, List<ReferenceLine> orders, int page, int limit, SQLCriteriaContext context) {
 		EntityInfo e = getEntityInfo(context.getEntity());
 		if (e == null) {
 			return new BeanMapPartialList();
@@ -1916,7 +1943,7 @@ public class MapperSQLService extends AbstractMapperService {
 
 	@Override
 	protected BeanMap doSelectionFirst(List<ReferenceLine> attributes, boolean deleted, ISearchCriteria criteria,
-			ICriteriaContext context) {
+			SQLCriteriaContext context) {
 		EntityInfo e = getEntityInfo(context.getEntity());
 		if (e == null) {
 			return null;
@@ -1947,7 +1974,7 @@ public class MapperSQLService extends AbstractMapperService {
 	}
 
 	@Override
-	protected int doCount(boolean deleted, ISearchCriteria criteria, boolean distinct, ICriteriaContext context) {
+	protected int doCount(boolean deleted, ISearchCriteria criteria, boolean distinct, SQLCriteriaContext context) {
 		EntityInfo e = getEntityInfo(context.getEntity());
 		if (e == null) {
 			return 0;
@@ -1984,7 +2011,7 @@ public class MapperSQLService extends AbstractMapperService {
 	@Override
 	protected BeanMapList doLinkSelection(List<MetaDataLink> links, int sourceId, List<ReferenceLine> attributes,
 			boolean deleted, ISearchCriteria criteria, boolean distinct, boolean ignoreSubdivision, 
-			List<ReferenceLine> orders, int page, int limit, ICriteriaContext context) {
+			List<ReferenceLine> orders, int page, int limit, SQLCriteriaContext context) {
 		EntityInfo ei = getEntityInfo(links.get(0).getParent());
 		final String mlqc = MultiLinkQuery.getCode(links, deleted, ignoreSubdivision);
 		MultiLinkQuery mlq = ei.sql_links.get(mlqc);
@@ -1996,7 +2023,7 @@ public class MapperSQLService extends AbstractMapperService {
 			ei.sql_links.put(mlqc, mlq);
 		}
 		if (mlq.rec_alias != null) {
-			((SQLCriteriaContext) context).addQueryContext(mlq.rec_alias, mlq.rec_query);
+			context.addQueryContext(mlq.rec_alias, mlq.rec_query);
 		}
 		final JoinsMap joins = new JoinsMap(mlq.join);
 		final StringBuilder where = new StringBuilder(mlq.where);
@@ -2156,7 +2183,7 @@ public class MapperSQLService extends AbstractMapperService {
 	
 	@Override
 	protected int doLinkCount(List<MetaDataLink> links, int sourceId, boolean deleted,  boolean ignoreSubdivision, ISearchCriteria criteria,
-			boolean distinct, ICriteriaContext context) {
+			boolean distinct, SQLCriteriaContext context) {
 		EntityInfo ei = getEntityInfo(links.get(0).getParent());
 		final String mlqc = MultiLinkQuery.getCode(links, deleted, ignoreSubdivision);
 		MultiLinkQuery mlq = ei.sql_links.get(mlqc);
@@ -2168,7 +2195,7 @@ public class MapperSQLService extends AbstractMapperService {
 			ei.sql_links.put(mlqc, mlq);
 		}
 		if (mlq.rec_alias != null) {
-			((SQLCriteriaContext) context).addQueryContext(mlq.rec_alias, mlq.rec_query);
+			context.addQueryContext(mlq.rec_alias, mlq.rec_query);
 		}
 		final EntityInfo e = getEntityInfo(context.getEntity());
 		final JoinsMap joins = new JoinsMap(mlq.join);
@@ -2184,8 +2211,8 @@ public class MapperSQLService extends AbstractMapperService {
 		} else {
 			joins.add(DEFAULT_TABLEALIAS, String.format(fg.joinref, e.table, DEFAULT_TABLEALIAS, e.idCol, 
 					mlq.linkAlias, mlq.linkCol));
-			// A distinct clause need columns...
-			// FIXME this may be a problem if this test is performed for another selection whichi use a specific list of attributes !
+			// A distinct clause need columns... but as long as we select the ID primary key in each request
+			// this information is enough to count distinct selection.
 			if (distinct) {
 				col = String.format(fg.count_distinct, DEFAULT_TABLEALIAS + fg.prefix + e.idCol);
 			} else {
@@ -2264,24 +2291,4 @@ public class MapperSQLService extends AbstractMapperService {
 		}
 		return col;
 	}
-
-	private boolean useSubdivision(ISearchCriteria criteria) {
-		if (criteria instanceof AndCriteria) {
-			for (ISearchCriteria c: ((AndCriteria) criteria).getCriterias()) {
-				if (useSubdivision(c)) {
-					return true;
-				}
-			}
-		} else if (criteria instanceof OrCriteria) {
-			for (ISearchCriteria c: ((OrCriteria) criteria).getCriterias()) {
-				if (useSubdivision(c)) {
-					return true;
-				}
-			}
-		} else if (criteria instanceof NotCriteria) {
-			return useSubdivision(((NotCriteria) criteria).getCriteria());
-		}
-		return (criteria instanceof InSubdivisionCriteria);
-	}
-
 }
