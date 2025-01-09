@@ -34,6 +34,22 @@ public final class ISODateFormater {
 
 	public static final Date EPOCH = new Date(0);
 	
+	private static final char MS_SEPARATOR;
+	
+	static {
+		String v = System.getProperty("com.arcadsoftware.date.format.separator.ms", ",");
+		if (v == null) {
+			MS_SEPARATOR = ',';
+		} else {
+			v = v.trim();
+			if (v.isEmpty()) {
+				MS_SEPARATOR = ',';
+			} else {
+				MS_SEPARATOR = v.charAt(0);
+			}
+		}
+	}
+	
 	/**
 	 * Test the string without parsing it to state if it may represent an ISO formated date. 
 	 * 
@@ -81,7 +97,7 @@ public final class ISODateFormater {
 			result.set(Calendar.MINUTE, Integer.parseInt(string.substring(14,16)));
 			i = 17;
 			result.set(Calendar.SECOND, Integer.parseInt(string.substring(17,19)));
-			if ((string.length() > 20) && (string.charAt(19) == ',')) {
+			if ((string.length() > 20) && ((string.charAt(19) == ',') || (string.charAt(19) == '.'))) {
 				i = 20;
 				result.set(Calendar.MILLISECOND, Integer.parseInt(string.substring(20,24)));
 			}
@@ -173,7 +189,7 @@ public final class ISODateFormater {
 	 */
 	static public String toString(Calendar calendar) {
 		calendar.set(Calendar.ZONE_OFFSET, 0);
-		return String.format("%04d-%02d-%02dT%02d:%02d:%02d,%04dZ", //$NON-NLS-1$
+		return String.format("%04d-%02d-%02dT%02d:%02d:%02d" + MS_SEPARATOR + "%04dZ", //$NON-NLS-1$
 				calendar.get(Calendar.YEAR),
 				calendar.get(Calendar.MONTH) + 1,
 				calendar.get(Calendar.DAY_OF_MONTH),
