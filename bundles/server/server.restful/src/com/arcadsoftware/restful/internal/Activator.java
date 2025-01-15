@@ -132,16 +132,18 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 		}
 		context.addBundleListener(this);
 		// Initially start of the default HTTP server...
-		final Timer timer = new Timer("Delayed REST Server Starting"); //$NON-NLS-1$
-		timer.schedule(new TimerTask() {
-			public void run() {
-				// This is only useful if the configuration administration is not installed. 
-				if (component == null) {
-					startServer();
+		if (!"true".equalsIgnoreCase(System.getProperty("com.arcadsoftware.rest.default.disabled", "false"))) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			final Timer timer = new Timer("Delayed REST Server Starting"); //$NON-NLS-1$
+			timer.schedule(new TimerTask() {
+				public void run() {
+					// This is only useful if the configuration administration is not installed. 
+					if (component == null) {
+						startServer();
+					}
+					timer.cancel();
 				}
-				timer.cancel();
-			}
-		}, 5000);
+			}, 5000);
+		}
 		monitorReg = context.registerService(IRestServerMonitor.class, this, null);
 	}
 
