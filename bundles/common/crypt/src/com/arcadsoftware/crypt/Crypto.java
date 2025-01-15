@@ -235,7 +235,7 @@ public final class Crypto {
 			} else {
 				dmk = null;
 			}
-		} 
+		}
 		if (dmk == null) {
 			dmk = System.getProperty("com.arcadsoftware.masterkey.fog"); //$NON-NLS-1$
 			if (dmk != null) {
