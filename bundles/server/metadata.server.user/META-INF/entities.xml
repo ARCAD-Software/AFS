@@ -67,7 +67,7 @@
 		<attribute type="string" code="fullname" readonly="true"
 			listable="true" mandatory="false" length="513">
 			<metadata colrank="1" colsize="500" visible="true">
-				<col>USR_FIRSTNAME+&apos; &apos;+USR_LASTNAME</col>
+				<col>~USR_FIRSTNAME + &apos; &apos; + ~USR_LASTNAME</col>
 			</metadata>
 		</attribute>
 		<attribute type="list/title" code="title" readonly="false"
