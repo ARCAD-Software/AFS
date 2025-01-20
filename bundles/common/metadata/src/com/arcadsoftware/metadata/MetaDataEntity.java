@@ -932,7 +932,7 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 				list.add(e);
 				list.setIsLink(true);
 				l++;
-				if (l > 1) {
+				if ((l > 1) && !(list.getLast() instanceof MetaDataLink)) {
 					list.setIsMultiLink(true);
 				}
 				entity = getEntity(e.getType());
