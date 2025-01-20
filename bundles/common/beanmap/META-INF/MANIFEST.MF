@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AFS BeanMap Management
 Bundle-SymbolicName: com.arcadsoftware.beanmap
-Bundle-Version: 1.3.9.qualifier
+Bundle-Version: 1.3.10
 Bundle-Vendor: ARCAD Software
 Bundle-License: https://www.eclipse.org/legal/epl-2.0
 Bundle-License-Name: Eclipse Public License Version 2.0

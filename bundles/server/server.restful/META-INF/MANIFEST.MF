@@ -8,7 +8,7 @@ Bundle-License-Name: Eclipse Public License Version 2.0
 Bundle-DocURL: https://github.com/ARCAD-Software/AFS/wiki
 Bundle-Copyright: This API is reusable in the terms of the license EPL 2.0.
 Bundle-SymbolicName: com.arcadsoftware.server.restful;singleton:=true
-Bundle-Version: 3.1.9.qualifier
+Bundle-Version: 3.1.10
 Bundle-Activator: com.arcadsoftware.restful.internal.Activator
 Bundle-Vendor: ARCAD Software
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
