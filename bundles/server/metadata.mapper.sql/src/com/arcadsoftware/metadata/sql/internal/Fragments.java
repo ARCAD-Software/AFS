@@ -44,8 +44,6 @@ public class Fragments {
 	public String quote;
 	public String join;
 	public String join_inner;
-	public String joinref;
-	public String prefix;
 	public String exists;
 	public String partial;
 	public String partialall;

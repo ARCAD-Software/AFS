@@ -167,17 +167,16 @@ public class MultiLinkQuery {
 						// check if current entity items are not deleted too.
 						if ((!deleted) && (csei.deleteCol != null)) {
 							final String talias = DEFAULT_LINKALIASPREFIX + alias++;
-							joins.append(String.format(mapper.fg.join_inner, csei.table, talias, csei.idCol, prev_alias,
-									prev_col));
+							joins.append(String.format(mapper.fg.join_inner, csei.table, talias, csei.idCol, prev_alias + '.' + prev_col));
 							joins.append(' ');
 							joins.append(mapper.fg.and);
 							joins.append(talias);
-							joins.append(mapper.fg.prefix);
+							joins.append('.');
 							joins.append(csei.deleteCol);
 							joins.append(mapper.fg.equaldelfalse);
 						}
 						firstSelect = String.format(mapper.fg.select,
-								prev_alias + mapper.fg.prefix + prev_col + mapper.fg.asid, joins.toString(),
+								prev_alias + '.' + prev_col + mapper.fg.asid, joins.toString(),
 								where.toString());
 					}
 					final StringBuilder del = new StringBuilder();
@@ -185,7 +184,7 @@ public class MultiLinkQuery {
 						if (rli.deleteCol != null) {
 							del.append(mapper.fg.and);
 							del.append(LNKALS_INRECQUERY);
-							del.append(mapper.fg.prefix);
+							del.append('.');
 							del.append(rli.deleteCol);
 							del.append(mapper.fg.equaldelfalse);
 						}
@@ -193,11 +192,11 @@ public class MultiLinkQuery {
 						if ((joins != null) && (csei.deleteCol != null)) {
 							final String talias = LNKALS_INRECQUERY + DEFAULT_LINKALIASPREFIX + alias++;
 							del.append(String.format(mapper.fg.join_inner, csei.table, talias, csei.idCol,
-									LNKALS_INRECQUERY, rli.sourceCol));
+									LNKALS_INRECQUERY + '.' + rli.sourceCol));
 							del.append(' ');
 							del.append(mapper.fg.and);
 							del.append(talias);
-							del.append(mapper.fg.prefix);
+							del.append('.');
 							del.append(csei.deleteCol);
 							del.append(mapper.fg.equaldelfalse);
 						}
@@ -216,11 +215,11 @@ public class MultiLinkQuery {
 						prev_alias = la;
 						prev_col = cli.destCol;
 						joins.append(String.format(mapper.fg.join_inner, cli.table, la, cli.sourceCol, //
-								rec_alias, mapper.fg.id));
+								rec_alias + '.' + mapper.fg.id));
 						if ((!deleted) && (cli.deleteCol != null)) {
 							joins.append(mapper.fg.and);
 							joins.append(la);
-							joins.append(mapper.fg.prefix);
+							joins.append('.');
 							joins.append(cli.deleteCol);
 							joins.append(mapper.fg.equaldelfalse);
 						}
@@ -232,13 +231,13 @@ public class MultiLinkQuery {
 				// Initialize the selection
 				joins = new StringBuilder(String.format(mapper.fg.tablealias, cli.table, la));
 				where = new StringBuilder(la);
-				where.append(mapper.fg.prefix);
+				where.append('.');
 				where.append(cli.sourceCol);
 				where.append(mapper.fg.paramequal);
 				if ((!deleted) && (cli.deleteCol != null)) {
 					where.append(mapper.fg.and);
 					where.append(la);
-					where.append(mapper.fg.prefix);
+					where.append('.');
 					where.append(cli.deleteCol);
 					where.append(mapper.fg.equaldelfalse);
 				}
@@ -248,20 +247,20 @@ public class MultiLinkQuery {
 				// Test if the current link source items are not deleted too.
 				if ((!deleted) && (csei.deleteCol != null)) {
 					final String talias = DEFAULT_LINKALIASPREFIX + alias++;
-					joins.append(String.format(mapper.fg.join_inner, csei.table, talias, csei.idCol, prev_alias, prev_col));
+					joins.append(String.format(mapper.fg.join_inner, csei.table, talias, csei.idCol, prev_alias + '.' + prev_col));
 					joins.append(' ');
 					joins.append(mapper.fg.and);
 					joins.append(talias);
-					joins.append(mapper.fg.prefix);
+					joins.append('.');
 					joins.append(csei.deleteCol);
 					joins.append(mapper.fg.equaldelfalse);
 				}
 				// Add the current link to the selection
-				joins.append(String.format(mapper.fg.join_inner, cli.table, la, cli.sourceCol, prev_alias, prev_col));
+				joins.append(String.format(mapper.fg.join_inner, cli.table, la, cli.sourceCol, prev_alias + '.' + prev_col));
 				if ((!deleted) && (cli.deleteCol != null)) {
 					joins.append(mapper.fg.and);
 					joins.append(la);
-					joins.append(mapper.fg.prefix);
+					joins.append('.');
 					joins.append(cli.deleteCol);
 					joins.append(mapper.fg.equaldelfalse);
 				}
@@ -291,26 +290,26 @@ public class MultiLinkQuery {
 							// for the first selection in the recursive query
 							String talias = DEFAULT_LINKALIASPREFIX + alias;
 							joins.append(String.format(mapper.fg.join_inner, fei.table, talias, fei.idCol,
-									prev_alias, prev_col));
+									prev_alias + '.' + prev_col));
 							joins.append(' ');
 							joins.append(mapper.fg.and);
 							joins.append(talias);
-							joins.append(mapper.fg.prefix);
+							joins.append('.');
 							joins.append(fei.deleteCol);
 							joins.append(mapper.fg.equaldelfalse);
 							// for the recursive selection itself
 							talias = LNKALS_INRECQUERY + DEFAULT_LINKALIASPREFIX + alias;
 							del.append(String.format(mapper.fg.join_inner, fei.table, talias, fei.idCol,
-									LNKALS_INRECQUERY, rfli.sourceCol));
+									LNKALS_INRECQUERY + '.' + rfli.sourceCol));
 							del.append(' ');
 							del.append(mapper.fg.and);
 							del.append(talias);
-							del.append(mapper.fg.prefix);
+							del.append('.');
 							del.append(fei.deleteCol);
 							del.append(mapper.fg.equaldelfalse);
 						}
 						final String firstSelect = String.format(mapper.fg.select,
-								prev_alias + mapper.fg.prefix + prev_col + mapper.fg.asid, joins.toString(),
+								prev_alias + '.' + prev_col + mapper.fg.asid, joins.toString(),
 								where.toString());
 						rec_query += String.format(mapper.fg.recursive_alt, rec_alias, firstSelect, rfli.table,
 								rfli.destCol, rfli.sourceCol, del.toString());

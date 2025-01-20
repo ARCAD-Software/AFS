@@ -28,6 +28,7 @@ import org.restlet.resource.ResourceException;
 
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
+import com.arcadsoftware.metadata.criteria.AbstractLinkTestCriteria;
 import com.arcadsoftware.metadata.criteria.AndCriteria;
 import com.arcadsoftware.metadata.criteria.ConstantCriteria;
 import com.arcadsoftware.metadata.criteria.EqualCriteria;
@@ -38,7 +39,6 @@ import com.arcadsoftware.metadata.criteria.ISearchCriteria;
 import com.arcadsoftware.metadata.criteria.IdEqualCriteria;
 import com.arcadsoftware.metadata.criteria.IsNullCriteria;
 import com.arcadsoftware.metadata.criteria.IsTrueCriteria;
-import com.arcadsoftware.metadata.criteria.LinkEqualCriteria;
 import com.arcadsoftware.metadata.criteria.NotCriteria;
 import com.arcadsoftware.metadata.criteria.OrCriteria;
 import com.arcadsoftware.metadata.internal.Activator;
@@ -148,7 +148,7 @@ public abstract class AbstractMapperService<T extends ICriteriaContext> implemen
 	 * @param element
 	 * @return
 	 */
-	protected boolean isEncrypted(Element element) {
+	public boolean isEncrypted(Element element) {
 		final String s = element.getMetadata().getString(MetaDataEntity.METADATA_CRYPT);
 		return (s != null) && //
 				("mapper".equalsIgnoreCase(s) || //$NON-NLS-1$
@@ -380,37 +380,43 @@ public abstract class AbstractMapperService<T extends ICriteriaContext> implemen
 	 *            The associated criteria context.
 	 * @return a new criteria where all condition use the local domain of the referenced entity.
 	 */
-	protected ISearchCriteria completeForeignCriteria(ISearchCriteria criteria, T context) {
+	public ISearchCriteria completeForeignCriteria(ISearchCriteria criteria, T context) {
 		// Note:
-		// Le principe de cette implémentation repose sur la décomposition de la condition
-		// en sous conditions locales à chaque référence externe.
-		// Par exemple (si "a1" à "a9" sont des attribut du domaine "a" etc pour "b" et "c") :
-		// (a1.a2.b1 = 1) et ((a3.c2 = 2) ou (a4.b2 = 3))
-		// peut être décomposé en :
-		// Sélection sur le domaine B des élément : (b1 = 1).
-		// puis reconstruction de la condition (a1.a2 = res) où res est un élément sélectionné par
-		// la condition précédente.
-		// Sélection sur le domaine C : (c1 = 2) puis reconstruction de (a3 = res).
-		// Sélection sur le domaine B (à nouveau) : (b2 = 3) reconstruction en (a4 = 3).
-		// enfin on peut garantir l'exécution de la condition complète sur le domaine A :
-		// (a1.a2 = resB1)... et ((a3 = resC)... ou (a4 = resB2)...)
-		// Au risque d'obtenir une condition relativement complexe si les sous sélections sont trop
-		// nombreuses. Pour limiter ce problème une exception est déclenchée si une sous sélection
-		// dépasse le seuil fixé par la constante EXTRADOMAINCONDITION_MAXIMUM
+		// 
+		// The principle of this implementation is based on the decomposition 
+		// of the condition into local sub-conditions for each external reference.
+		// 
+		// For example (if "a1" to "a9" are attributes of the domain "a" etc for "b" and "c"):
+		// (a1.a2.b1 = 1) and ((a3.c2 = 2) or (a4.b2 = 3))
+		// can be decomposed into:
+		// 
+		// Selection on domain B of the elements: (b1 = 1), then reconstruction of the 
+		// condition (a1.a2 = res) where res is an element selected by the previous condition.
 		//
-		// Cette implémentation est multi-récussive. C'est à dire qu'elle est récursive sur l'arbre de
-		// la condition à localiser. Elle est aussi récursive dans le sens ou chaque sous condition
-		// sera elle aussi localisée au sous domaine conserné. Ainsi chaque condition peut transiter
-		// par des domaines intermédiaire.
+		// Selection on domain C: (c1 = 2) then reconstruction of (a3 = res).
 		//
-		// Bien sur ce traitement entraîne des performances dégradées dans le cas d'un usage massif
-		// de requêtes multi-domaines.
+		// Selection on domain B (again): (b2 = 3) reconstruction in (a4 = 3).
+		//
+		// Finally, we can guarantee the execution of the complete condition on domain A:
+		// (a1.a2 = resB1)... and ((a3 = resC)... or (a4 = resB2)...)
+		//
+		// At the risk of obtaining a relatively complex condition if the sub-selections are 
+		// too numerous. To limit this problem, an exception is triggered if a sub-selection 
+		// exceeds the threshold set by the constant EXTRADOMAINCONDITION_MAXIMUM.
+		//
+		// This implementation is multi-recusive. That is to say, it is recursive on the tree 
+		// of the condition to be located. It is also recursive in the sense that each sub-condition 
+		// will also be located in the sub-domain concerned. Thus, each condition can transit
+		// through intermediate domains.
+		//
+		// Of course, this processing results in degraded performance in the case of massive use 
+		// of multi-domain queries.
 		//
 		final Map<String, ReferenceLine> foreigners = ReferenceLine.extraDomainReferences(context.getReferences());
 		if ((foreigners == null) || (foreigners.size() == 0)) {
 			return criteria;
 		}
-		// Cette méthode travaille de manière récursive.
+		// This method is recursive...
 		if (criteria instanceof AndCriteria) {
 			return convertForeignCriterion(((AndCriteria) criteria).getCriterias(), true, context, foreigners);
 		}
@@ -420,9 +426,9 @@ public abstract class AbstractMapperService<T extends ICriteriaContext> implemen
 		if (criteria instanceof NotCriteria) {
 			return new NotCriteria(completeForeignCriteria(((NotCriteria) criteria).getCriteria(), context));
 		}
-		if (criteria instanceof LinkEqualCriteria) {
-			if ((foreigners.get(((LinkEqualCriteria) criteria).getReference()) != null) || //
-					(foreigners.get(((LinkEqualCriteria) criteria).getAttribute()) != null)) {
+		if (criteria instanceof AbstractLinkTestCriteria) {
+			if ((foreigners.get(((AbstractLinkTestCriteria) criteria).getReference()) != null) || //
+					(foreigners.get(((AbstractLinkTestCriteria) criteria).getAttribute()) != null)) {
 				throw new ResourceException(Status.SERVER_ERROR_NOT_IMPLEMENTED,
 						Messages.AbstractMapperService_Error_NoMultidomainForLinkEqualsCriteria);
 			}

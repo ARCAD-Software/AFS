@@ -778,13 +778,30 @@ public class ReferenceLine extends ArrayList<Element> implements Comparable<Refe
 		return result;
 	}
 
+	/**
+	 * Get the first link reference included into this reference line.
+	 * 
+	 * <p>
+	 * Note that this code may be a multi-code (e.g. link1.link2.link3) of a link chain.
+	 * 
+	 * @return null if this reference line does not contain any link.
+	 */
 	public String getFirstLinkCode() {
+		StringBuilder result = new StringBuilder();
 		for (Element element: this) {
 			if (element instanceof MetaDataLink) {
-				return element.getCode();
+				if (!result.isEmpty()) {
+					result.append('.');
+				}
+				result.append(element.getCode());
+			} else if (!result.isEmpty()) {
+				return result.toString();
 			}
 		}
-		return null;
+		if (result.isEmpty()) {
+			return null;
+		}
+		return result.toString();
 	}
 
 	public String getPreLinkCodes() {
