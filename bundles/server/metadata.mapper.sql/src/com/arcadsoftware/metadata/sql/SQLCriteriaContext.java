@@ -85,6 +85,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 	private final EntityInfo entityInfo;
 	private final HashMap<String, String> colNames;
 	private JoinElement joinTree;
+	private int hrpc;
 	
 	public SQLCriteriaContext(MapperSQLService mapper, MetaDataEntity entity, IConnectionUserBean currentUser) {
 		super(entity, currentUser);
@@ -92,6 +93,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 		queryContextes = new HashMap<>();
 		entityInfo = mapper.getEntityInfo(entity);
 		colNames = new HashMap<>();
+		hrpc = 1;
 	}
 	
 	/**
@@ -548,56 +550,48 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 						mapper.enquote(((GreaterThanCriteria) criteria).getValue())));
 			}
 		} else if (criteria instanceof HasRightCriteria) {
-			// Test that the value of the "attribute" is a user ID, or the current selected user, is present in the list
-			// of user possessing the given right+param value.
-			
-			
+			// Test that the value of the "attribute", a user ID, or the current selected user, is present in the list
+			// of the users possessing the given right+param value.
+			String table = "hrpc_" + hrpc++;
 			// Use the hypothetic double link [profileRight] ---> [profile] --users--> [user]
-			
-			
-			
-			
-			StringBuilder suffix = new StringBuilder();
-			if (((HasRightCriteria) criteria).getRight() != null) {
-				suffix.append(Integer.toHexString(((HasRightCriteria) criteria).getRight()));
-			}
-			if (((HasRightCriteria) criteria).getParam() != null) {
-				suffix.append('p');
-				suffix.append(Integer.toHexString(((HasRightCriteria) criteria).getParam().hashCode()));
-			}
-			String alias = getAlias(((HasRightCriteria) criteria).getAttribute(), "r", suffix.toString()); //$NON-NLS-1$
-			String col;
-			if (((HasRightCriteria) criteria).getAttribute() != null) {
-				col = colNames.get(((HasRightCriteria) criteria).getAttribute());
+			String sql = mapper.generateHashRightPrequery();
+			if (sql == null) {
+				result.append(mapper.fg.false_cond);
 			} else {
-				col = MapperSQLService.DEFAULT_TABLEALIAS + '.' + entityInfo.idCol;
-			}
-			if (joinMap.doNotExists(alias)) {
-				joinMap.add(alias, String.format(mapper.fg.join, "USER_RIGHTS", alias, "URI_USER", col)); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-			// test
-			result.append(mapper.fg.parin);
-			if (((HasRightCriteria) criteria).getRight() != null) {
-				result.append(String.format(mapper.fg.equal, alias + '.' + "URI_RIGHT", ((HasRightCriteria) criteria).getRight().toString())); //$NON-NLS-1$
-			}
-			if (((HasRightCriteria) criteria).getParam() != null) {
 				if (((HasRightCriteria) criteria).getRight() != null) {
-					result.append(mapper.fg.and);
-				}
-				// Param could be an integer, "." or a referenceline.
-				if (((HasRightCriteria) criteria).getParam().equals(".")) { //$NON-NLS-1$
-					result.append(String.format(mapper.fg.equal, alias + '.' + "URI_PARAM", MapperSQLService.DEFAULT_TABLEALIAS + '.' + entityInfo.idCol)); //$NON-NLS-1$
-				} else {
-					col = colNames.get(((HasRightCriteria) criteria).getParam());
-					if (col == null) {
-						// assume that the parameter value is an integer !
-						result.append(String.format(mapper.fg.equal, alias + '.' + "URI_PARAM", ((HasRightCriteria) criteria).getParam())); //$NON-NLS-1$
+					if (((HasRightCriteria) criteria).getParam() != null) {
+						sql = String.format(sql, table, " = " + ((HasRightCriteria) criteria).getRight(), //$NON-NLS-1$
+								" = " + ((HasRightCriteria) criteria).getParam()); //$NON-NLS-1$
 					} else {
-						result.append(String.format(mapper.fg.equal, alias + '.' + "URI_PARAM", col)); //$NON-NLS-1$
+						sql = String.format(sql, table, " = " + ((HasRightCriteria) criteria).getRight(), //$NON-NLS-1$
+								mapper.fg.isnullex);
 					}
+				} else {
+					sql = String.format(sql, table, mapper.fg.isnullex, //
+							" = " + ((HasRightCriteria) criteria).getParam()); //$NON-NLS-1$
 				}
+				addQueryContext(table, sql);
+				String col;
+				if (((HasRightCriteria) criteria).getAttribute() != null) {
+					col = colNames.get(((HasRightCriteria) criteria).getAttribute());
+				} else {
+					col = MapperSQLService.DEFAULT_TABLEALIAS + '.' + entityInfo.idCol;
+				}
+				EntityInfo users = mapper.getEntityInfo(MetaDataEntity.loadEntity("user")); //$NON-NLS-1$
+				if (users == null) {
+					// TODO get the user list from the foreign mappser...
+					result.append(mapper.fg.false_cond);
+				}
+				LinkInfo userProfiles = users.links.get("profiles");
+				if (userProfiles == null) {
+					// TODO get the user list from the foreign mappser...
+					result.append(mapper.fg.false_cond);
+				}
+				// Add a join on the User table (we do not test that eh users are deleted or not !!!)
+				result.append(String.format(mapper.fg.inset, col, //
+						String.format(mapper.fg.selectall, userProfiles.sourceCol, userProfiles.table + 
+								String.format(mapper.fg.join_inner, table, "r", mapper.fg.id, userProfiles.destCol))));
 			}
-			result.append(mapper.fg.parout);
 		} else if (criteria instanceof IdEqualCriteria) {
 			String col = MapperSQLService.DEFAULT_TABLEALIAS + '.' + entityInfo.idCol;
 			result.append(String.format(mapper.fg.equal,  col, ((IdEqualCriteria) criteria).getId()));
@@ -632,7 +626,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 			
 			
 			//option 1:
-				
+			
 			// select from "incident" where ("code" = 'X') and ("owner" in (select id from "intervenant"... ))	
 			
 			

@@ -119,6 +119,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 	private final DataSource ds;
 	final Fragments fg;
 	final SimpleDateFormat sdf;
+	private volatile String hasRightrecursiveRequest;
 	private final Escapes esc;
 	private final ConcurrentHashMap<MetaDataEntity, EntityInfo> infos;
 	private final QueryRunnerEx runner;
@@ -141,6 +142,50 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 	 */
 	public DataSource getDataSource() {
 		return ds;
+	}
+	
+	/**
+	 * Create or reuse a with SQL clause which can be used to get the list of profiles containing a given right+param.
+	 * <ul>
+	 * <li>%1$s = is the name of the recursive table of profile ids.
+	 * <li>%2$s = is the right value test ("is null" or "= X".
+	 * <li>%3$s = is the param value test ("is null" or "= X".
+	 * </ul> 
+	 * @return
+	 */
+	protected String generateHashRightPrequery() {
+		if (hasRightrecursiveRequest == null) {
+			// This code should be synchronized, but there is no problem to generate this request twice...
+			MetaDataEntity pre = MetaDataEntity.loadEntity("profileRight"); //$NON-NLS-1$
+			if (pre.getMapper() != this) {
+				return ((MapperSQLService) pre.getMapper()).generateHashRightPrequery();
+			}
+			EntityInfo profileRights = getEntityInfo(pre);
+			String profileCol = profileRights.attributesCols.get("profile"); //$NON-NLS-1$
+			EntityInfo profiles = getEntityInfo(MetaDataEntity.loadEntity("profile")); //$NON-NLS-1$
+			if (profiles == null) {
+				return null;
+			}
+			LinkInfo subprofiles = profiles.links.get("subprofiles"); //$NON-NLS-1$
+			if (subprofiles == null) {
+				return null;
+			}
+			hasRightrecursiveRequest = String.format(fg.recursive_alt, "%1$s", //$NON-NLS-1$
+					String.format(fg.select,
+							profileCol, // selected column
+							profileRights.table + // table + join on undeleted profiles
+							String.format(fg.join_inner, profiles.table, "p", profiles.idCol, //$NON-NLS-1$ 
+									profileCol + fg.and + profiles.deleteCol + fg.equaldelfalse),
+							fg.parin + profileRights.deleteCol + fg.equaldelfalse + fg.parout + fg.and + // where clause: profileRight undeleted and:
+							fg.parin + profileRights.attributesCols.get("right") + "%2$s" + fg.parout + fg.and + //$NON-NLS-1$ //$NON-NLS-2$
+							fg.parin + profileRights.attributesCols.get("parameter") + "%3$s" + fg.parout), //$NON-NLS-1$ //$NON-NLS-2$
+					subprofiles.table,
+					subprofiles.destCol,
+					subprofiles.sourceCol,
+					String.format(fg.join_inner, profiles.table, "p", profiles.idCol, //$NON-NLS-1$ 
+							subprofiles.destCol + fg.and + profiles.deleteCol + fg.equaldelfalse));
+		}
+		return hasRightrecursiveRequest;
 	}
 	
 	@Override

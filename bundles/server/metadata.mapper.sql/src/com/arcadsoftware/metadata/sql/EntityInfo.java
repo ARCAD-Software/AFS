@@ -44,9 +44,6 @@ public class EntityInfo {
 	private static final String METADATA_UPDATECOL = "updateCol"; //$NON-NLS-1$
 	private static final String METADATA_LOCKCOL = "lockCol"; //$NON-NLS-1$
 	private static final String METADATA_LOCKDATECOL = "lockDateCol"; //$NON-NLS-1$
-	private static final String METADATA_GROUPTABLE = "groupTable"; //$NON-NLS-1$
-	private static final String METADATA_GROUPMINCOL = "groupMinCol"; //$NON-NLS-1$
-	private static final String METADATA_GROUPMAXCOL = "groupMaxCol"; //$NON-NLS-1$
 
 	public String table;
 	public String idCol;
@@ -55,9 +52,6 @@ public class EntityInfo {
 	public String updateCol;
 	public String lockCol;
 	public String lockDateCol;
-	public String groupTable;
-	public String groupMinCol;
-	public String groupMaxCol;
 
 	public HashMap<String, String> attributesCols;
 	public HashMap<String, LinkInfo> links;
@@ -113,18 +107,6 @@ public class EntityInfo {
 			if ((lockDateCol != null) && (lockDateCol.length() == 0)) {
 				lockDateCol = null;
 			}
-			groupTable = md.getString(METADATA_GROUPTABLE);
-			if ((groupTable != null) && (groupTable.length() == 0)) {
-				groupTable = null;
-			}
-			groupMinCol = md.getString(METADATA_GROUPMINCOL);
-			if ((groupMinCol != null) && (groupMinCol.length() == 0)) {
-				groupMinCol = null;
-			}
-			groupMaxCol = md.getString(METADATA_GROUPMAXCOL);
-			if ((groupMaxCol != null) && (groupMaxCol.length() == 0)) {
-				groupMaxCol = null;
-			}
 		}
 		attributesCols = new HashMap<String, String>();
 		for (Entry<String, MetaDataAttribute> e: entity.getAttributes().entrySet()) {
@@ -155,8 +137,6 @@ public class EntityInfo {
 		s.append(updateCol);
 		s.append("\nLockCol: "); //$NON-NLS-1$
 		s.append(lockCol);
-		s.append("\nGroupTable: "); //$NON-NLS-1$
-		s.append(groupTable);
 		s.append("\nAttributes: "); //$NON-NLS-1$
 		s.append(attributesCols);
 		s.append("\nLinks: "); //$NON-NLS-1$

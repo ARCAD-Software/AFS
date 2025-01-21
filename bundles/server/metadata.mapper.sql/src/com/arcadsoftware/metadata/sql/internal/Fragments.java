@@ -105,6 +105,7 @@ public class Fragments {
 	public String recursive_alt;
 	public String select_const;
 	public String id;
+	public String isnullex;
 	
 	public Fragments(String name) {
 		// Reset this class...
