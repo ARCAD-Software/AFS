@@ -201,7 +201,7 @@ public final class ISODateFormater {
 	 */
 	static public String toString(Calendar calendar) {
 		calendar.set(Calendar.ZONE_OFFSET, 0);
-		return String.format("%04d-%02d-%02dT%02d:%02d:%02d" + MS_SEPARATOR + "%04dZ", //$NON-NLS-1$
+		return String.format("%04d-%02d-%02dT%02d:%02d:%02d" + MS_SEPARATOR + "%03dZ", //$NON-NLS-1$
 				calendar.get(Calendar.YEAR),
 				calendar.get(Calendar.MONTH) + 1,
 				calendar.get(Calendar.DAY_OF_MONTH),
