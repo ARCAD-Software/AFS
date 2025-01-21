@@ -97,9 +97,21 @@ public final class ISODateFormater {
 			result.set(Calendar.MINUTE, Integer.parseInt(string.substring(14,16)));
 			i = 17;
 			result.set(Calendar.SECOND, Integer.parseInt(string.substring(17,19)));
-			if ((string.length() > 20) && ((string.charAt(19) == ',') || (string.charAt(19) == '.'))) {
+			if ((string.length() > 20) && ((string.charAt(19) == ',') || (string.charAt(19) == '.') || (string.charAt(19) == MS_SEPARATOR))) {
 				i = 20;
-				result.set(Calendar.MILLISECOND, Integer.parseInt(string.substring(20,24)));
+				switch (string.length()) {
+				case 21:
+					result.set(Calendar.MILLISECOND, Integer.parseInt(string.substring(20)) * 100);
+					break;
+				case 22:
+					result.set(Calendar.MILLISECOND, Integer.parseInt(string.substring(20)) * 10);
+					break;
+				case 23:
+					result.set(Calendar.MILLISECOND, Integer.parseInt(string.substring(20)));
+					break;
+				default:	
+					result.set(Calendar.MILLISECOND, Integer.parseInt(string.substring(20, 23)));
+				}
 			}
 		} catch (NumberFormatException e) {
 			throw new ParseException(e.getMessage(), i);
