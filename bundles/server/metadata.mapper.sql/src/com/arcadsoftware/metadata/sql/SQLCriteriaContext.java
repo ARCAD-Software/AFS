@@ -107,18 +107,18 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 		return entityInfo;
 	}
 	
-	public String generateJoins() {
-		init();
+	public String generateJoins(boolean deleted) {
+		init(deleted);
 		return joinTree.toString(mapper);
 	}
 	
-	private void init() {
+	private void init(boolean deleted) {
 		if (joinTree == null) {
 			joinTree = new JoinElement(MapperSQLService.DEFAULT_TABLEALIAS, String.format(mapper.fg.tablealias, entityInfo.table, MapperSQLService.DEFAULT_TABLEALIAS));
 			for (ReferenceLine rf: getReferences()) {
 				String code = rf.getCode();
 				if (!colNames.containsKey(code)) {
-					String col = buildAttributeColName(rf, true);
+					String col = buildAttributeColName(rf, false, deleted);
 					if (col != null) {
 						colNames.put(code, col);
 					}
@@ -126,19 +126,40 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 			}
 		}
 	}
- 	
+
+	/**
+	 * Quote an SQL string.
+	 *  
+	 * @param value
+	 * @return
+	 */
+	private String enquote(String value) {
+		return mapper.fg.quote + mapper.esc.escape(value) + mapper.fg.quote;
+	}
+
+	/**
+	 * Escape SQL String delimiters.
+	 * 
+	 * @param value
+	 * @return
+	 */
+	protected String escape(String value) {
+		return mapper.esc.escape(value);
+	}
+
 	/**
 	 * If the Form clause require a dedicated initialization, it must be called before any generate methods !
 	 * 
 	 * @param sql
 	 */
-	public void initJoinTree(String alias, String sql) {
+	public void initJoinTree(String alias, String sql, boolean deleted) {
 		if (joinTree == null) {
 			joinTree = new JoinElement(alias, sql);
 			for (ReferenceLine rf: getReferences()) {
 				String code = rf.getCode();
 				if (!colNames.containsKey(code)) {
-					String col = buildAttributeColName(rf, true);
+					// We use left outer join for columns used in where clause.
+					String col = buildAttributeColName(rf, false, deleted);
 					if (col != null) {
 						colNames.put(code, col);
 					}
@@ -182,13 +203,13 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 	 * @param prefix
 	 */
 	public StringBuilder generateColumns(List<ReferenceLine> attributes, boolean deleted) {
-		init();
+		init(deleted);
 		StringBuilder result = new StringBuilder(MapperSQLService.DEFAULT_TABLEALIAS);
 		result.append('.');
 		result.append(entityInfo.idCol);
 		result.append(mapper.fg.asid);
 		for (ReferenceLine att: attributes) {
-			String cn = buildAttributeColName(att, false);
+			String cn = buildAttributeColName(att, false, deleted);
 			if (cn != null) {
 				colNames.put(att.getCode(), cn);
 				result.append(mapper.fg.columnsep);
@@ -229,8 +250,8 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 	 * @param orders
 	 * @return the Order SQL clause.
 	 */
-	public String generateOrders(List<ReferenceLine> orders) {
-		init();
+	public String generateOrders(List<ReferenceLine> orders, boolean deleted) {
+		init(deleted);
 		StringBuilder result = new StringBuilder();
 		if (orders != null) {
 			for(ReferenceLine order: orders) {
@@ -260,7 +281,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 	 * @param innerJoin if false the reference is computed through "left outer joins" and is then optional. 
 	 * @return The SQL column representation.
 	 */
-	protected String buildAttributeColName(ReferenceLine reference, boolean innerJoin) {
+	protected String buildAttributeColName(ReferenceLine reference, boolean innerJoin, boolean deleted) {
 		JoinElement j = joinTree;
 		EntityInfo lastInfo = entityInfo;
 		String currentCol = null;
@@ -284,7 +305,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 						// The entity is not declared in the database.
 						break;
 					}
-					JoinElement x = j.add(nei, j.getAlias() + '.' + currentCol);
+					JoinElement x = j.add(nei, j.getAlias() + '.' + currentCol, deleted);
 					if (innerJoin) {
 						x.setInner();
 					}
@@ -310,7 +331,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 		return j.getAlias() + '.' + currentCol;
 	}
 
-	private JoinElement getJoin(ReferenceLine ref, boolean innerJoin) {
+	private JoinElement getJoin(ReferenceLine ref, boolean innerJoin, boolean deleted) {
 		JoinElement result = joinTree;
 		EntityInfo lastInfo = entityInfo;
 		for (Element e: ref) {
@@ -324,7 +345,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 					return null;
 				}
 				lastInfo = mapper.getEntityInfo(entity);
-				result = result.add(lastInfo, result.getAlias() + col);
+				result = result.add(lastInfo, result.getAlias() + col, deleted);
 				if (innerJoin) {
 					result.setInner();
 				}
@@ -421,11 +442,11 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 			if (((ContainCriteria) criteria).isCasesensitive()) {
 				result.append(String.format(mapper.fg.contain, 
 						colNames.get(((ContainCriteria) criteria).getAttribute()),
-						mapper.escape(((ContainCriteria) criteria).getValue())));
+						escape(((ContainCriteria) criteria).getValue())));
 			} else {
 				result.append(String.format(mapper.fg.contain, 
 						String.format(mapper.fg.lowercase, colNames.get(((ContainCriteria) criteria).getAttribute())),
-						mapper.escape(((ContainCriteria) criteria).getValue().toLowerCase())));
+						escape(((ContainCriteria) criteria).getValue().toLowerCase())));
 			}
 		} else if (criteria instanceof DeletedCriteria) {
 			if (((DeletedCriteria) criteria).getAttribute() == null) {
@@ -447,7 +468,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 					result.append(mapper.fg.false_cond);
 				} else {
 					result.append(mapper.fg.parin);
-					result.append(getJoin(ref, true).getAlias());
+					result.append(getJoin(ref, true, true).getAlias());
 					result.append('.');
 					result.append(ae.deleteCol);
 					result.append(mapper.fg.equaldeltrue);
@@ -458,11 +479,11 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 			if (((EndCriteria) criteria).isCasesensitive()) {
 				result.append(String.format(mapper.fg.endwith, 
 						colNames.get(((EndCriteria) criteria).getAttribute()),
-						mapper.escape(((EndCriteria) criteria).getValue())));
+						escape(((EndCriteria) criteria).getValue())));
 			} else {
 				result.append(String.format(mapper.fg.endwith, 
 						String.format(mapper.fg.lowercase, colNames.get(((EndCriteria) criteria).getAttribute())),
-						mapper.escape(((EndCriteria) criteria).getValue().toLowerCase())));
+						escape(((EndCriteria) criteria).getValue().toLowerCase())));
 			}
 		} else if (criteria instanceof AttributeEqualsCriteria) {
 			if (((AttributeEqualsCriteria) criteria).isCasesensitive()) {			
@@ -497,7 +518,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 					} catch (NumberFormatException e) {
 						result.append(String.format(mapper.fg.equal,
 								colNames.get(((EqualCriteria) criteria).getAttribute()),
-								mapper.enquote(((EqualCriteria) criteria).getValue())));
+								enquote(((EqualCriteria) criteria).getValue())));
 					}
 				}
 			} else {
@@ -508,11 +529,11 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 				if (((EqualCriteria) criteria).isCasesensitive()) {			
 					result.append(String.format(mapper.fg.equal,
 							colNames.get(((EqualCriteria) criteria).getAttribute()),
-							mapper.enquote(value)));
+							enquote(value)));
 				} else {			
 					result.append(String.format(mapper.fg.equalignorecase,
 							colNames.get(((EqualCriteria) criteria).getAttribute()),
-						mapper.enquote(value.toUpperCase())));
+						enquote(value.toUpperCase())));
 				}
 			}
 		} else if (criteria instanceof GreaterStrictCriteria) {
@@ -525,12 +546,12 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 				} catch (NumberFormatException e) {
 					result.append(String.format(mapper.fg.greater,
 							colNames.get(((GreaterStrictCriteria) criteria).getAttribute()),
-							mapper.enquote(((GreaterStrictCriteria) criteria).getValue())));
+							enquote(((GreaterStrictCriteria) criteria).getValue())));
 				}
 			} else {
 				result.append(String.format(mapper.fg.greater,
 						colNames.get(((GreaterStrictCriteria) criteria).getAttribute()),
-						mapper.enquote(((GreaterStrictCriteria) criteria).getValue())));
+						enquote(((GreaterStrictCriteria) criteria).getValue())));
 			}
 		} else if (criteria instanceof GreaterThanCriteria) {
 			if (getReference(((GreaterThanCriteria) criteria).getAttribute()).isNumericType()) {
@@ -542,12 +563,12 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 				} catch (NumberFormatException e) {
 					result.append(String.format(mapper.fg.greaterorequal,
 							colNames.get(((GreaterThanCriteria) criteria).getAttribute()),
-							mapper.enquote(((GreaterThanCriteria) criteria).getValue())));
+							enquote(((GreaterThanCriteria) criteria).getValue())));
 				}
 			} else {
 				result.append(String.format(mapper.fg.greaterorequal,
 						colNames.get(((GreaterThanCriteria) criteria).getAttribute()),
-						mapper.enquote(((GreaterThanCriteria) criteria).getValue())));
+						enquote(((GreaterThanCriteria) criteria).getValue())));
 			}
 		} else if (criteria instanceof HasRightCriteria) {
 			// Test that the value of the "attribute", a user ID, or the current selected user, is present in the list
@@ -593,40 +614,55 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 								String.format(mapper.fg.join_inner, table, "r", mapper.fg.id, userProfiles.destCol))));
 			}
 		} else if (criteria instanceof IdEqualCriteria) {
-			String col = MapperSQLService.DEFAULT_TABLEALIAS + '.' + entityInfo.idCol;
-			result.append(String.format(mapper.fg.equal,  col, ((IdEqualCriteria) criteria).getId()));
+			result.append(String.format(mapper.fg.equal,  getIdCol(), ((IdEqualCriteria) criteria).getId()));
 		} else if (criteria instanceof IdGreaterThanCriteria) {
-			String col = MapperSQLService.DEFAULT_TABLEALIAS + '.' + entityInfo.idCol;
-			result.append(String.format(mapper.fg.greaterorequal,  col, ((IdGreaterThanCriteria) criteria).getId()));	
+			result.append(String.format(mapper.fg.greaterorequal,  getIdCol(), ((IdGreaterThanCriteria) criteria).getId()));	
 		} else if (criteria instanceof IdGreaterStrictCriteria) {
-			String col = MapperSQLService.DEFAULT_TABLEALIAS + '.' + entityInfo.idCol;
-			result.append(String.format(mapper.fg.greater,  col, ((IdGreaterStrictCriteria) criteria).getId()));	
+			result.append(String.format(mapper.fg.greater,  getIdCol(), ((IdGreaterStrictCriteria) criteria).getId()));	
 		} else if (criteria instanceof IdLowerThanCriteria) {
-			String col = MapperSQLService.DEFAULT_TABLEALIAS + '.' + entityInfo.idCol;
-			result.append(String.format(mapper.fg.lowerorequal,  col, ((IdLowerThanCriteria) criteria).getId()));	
+			result.append(String.format(mapper.fg.lowerorequal,  getIdCol(), ((IdLowerThanCriteria) criteria).getId()));	
 		} else if (criteria instanceof IdLowerStrictCriteria) {
-			String col = MapperSQLService.DEFAULT_TABLEALIAS + '.' + entityInfo.idCol;
-			result.append(String.format(mapper.fg.lower,  col, ((IdLowerStrictCriteria) criteria).getId()));				
+			result.append(String.format(mapper.fg.lower,  getIdCol(), ((IdLowerStrictCriteria) criteria).getId()));				
 		} else if (criteria instanceof IsNullCriteria) {
 			result.append(String.format(mapper.fg.isnull, colNames.get(((IsNullCriteria) criteria).getAttribute())));
 		} else if (criteria instanceof IsTrueCriteria) {
 			result.append(String.format(mapper.fg.istrue, colNames.get(((IsTrueCriteria) criteria).getAttribute())));
 		} else if (criteria instanceof LinkCriteria) {
 			
+			/*
 			
 			
-			// Il faut quand même des left outer join pour que les test disjonctif fonctionnent !
+			ref in (select l1.source 
+					from L1 
+  				         join L2 on (l1.dest = l2.source and l2.deleted = 0)   + join sur l'entité deleted =0
+				         join L3 on (l2.dest = l3.source and l3.deleted = 0)   
+					     join E4 on (l2.dest =  e4.id and e4.deleted = 0)
+					where (L1.deleted = 0)
+					  and E4.a = 'x'
+					)
+			
+			
+			*/
+			
+			
+			// Prepare the link subselection...
+			
+			// --> Dans le sub-select/with les jointure sont inner !!!
 			
 			
 			
+			// Use the col generated for the test (or the id col if it is null !)
+			String attcn = colNames.get(((LinkCriteria) criteria).getAttribute());
+			if (attcn == null) {
+				attcn = getIdCol();
+			}
 			
+			
+			
+			// Il faut quand même des left outer join pour que les test disjonctif fonctionnent.
 			// la listes des incident nomé "X" et dont le "owner" est aussi un des "intervenants":
-			
 			// select from "incident" where ("code" = 'X') and (linked through "intervenents" to "owner")
-			
-			
-			//option 1:
-			
+			// ==
 			// select from "incident" where ("code" = 'X') and ("owner" in (select id from "intervenant"... ))	
 			
 			
@@ -768,26 +804,26 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 							Integer.parseInt(((LinkEqualCriteria) criteria).getValue());
 							result.append(String.format(mapper.fg.equal, attcn, ((LinkEqualCriteria) criteria).getValue()));
 						} catch (NumberFormatException e) {
-							result.append(String.format(mapper.fg.equal, attcn, mapper.enquote(((LinkEqualCriteria) criteria).getValue())));
+							result.append(String.format(mapper.fg.equal, attcn, enquote(((LinkEqualCriteria) criteria).getValue())));
 						}
 					} else if (((LinkEqualCriteria) criteria).isCasesensitive()) {
-						result.append(String.format(mapper.fg.equal, attcn, mapper.enquote(((LinkEqualCriteria) criteria).getValue())));
+						result.append(String.format(mapper.fg.equal, attcn, enquote(((LinkEqualCriteria) criteria).getValue())));
 					} else {
-						result.append(String.format(mapper.fg.equalignorecase, attcn, mapper.enquote(((LinkEqualCriteria) criteria).getValue().toUpperCase())));
+						result.append(String.format(mapper.fg.equalignorecase, attcn, enquote(((LinkEqualCriteria) criteria).getValue().toUpperCase())));
 					}
 				} else if (criteria instanceof LinkContainCriteria) {
 					if (((LinkContainCriteria) criteria).isCasesensitive()) {
-						result.append(String.format(mapper.fg.contain, attcn, mapper.escape(((LinkContainCriteria) criteria).getValue())));
+						result.append(String.format(mapper.fg.contain, attcn, escape(((LinkContainCriteria) criteria).getValue())));
 					} else {
 						result.append(String.format(mapper.fg.contain, String.format(mapper.fg.lowercase, attcn),
-								mapper.escape(((LinkContainCriteria) criteria).getValue().toLowerCase())));
+								escape(((LinkContainCriteria) criteria).getValue().toLowerCase())));
 					}
 				} else if (criteria instanceof LinkEndCriteria) {
 					if (((LinkEndCriteria) criteria).isCasesensitive()) {
-						result.append(String.format(mapper.fg.endwith, attcn, mapper.escape(((LinkEndCriteria) criteria).getValue())));
+						result.append(String.format(mapper.fg.endwith, attcn, escape(((LinkEndCriteria) criteria).getValue())));
 					} else {
 						result.append(String.format(mapper.fg.endwith, String.format(mapper.fg.lowercase, attcn),
-								mapper.escape(((LinkEndCriteria) criteria).getValue().toLowerCase())));
+								escape(((LinkEndCriteria) criteria).getValue().toLowerCase())));
 					}
 				} else if (criteria instanceof LinkGreaterStrictCriteria) {
 					if (getReference(link, ((LinkGreaterStrictCriteria) criteria).getAttribute()).isNumericType()) {
@@ -795,10 +831,10 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 							Integer.parseInt(((LinkGreaterStrictCriteria) criteria).getValue());
 							result.append(String.format(mapper.fg.greater, attcn, ((LinkGreaterStrictCriteria) criteria).getValue()));
 						} catch (NumberFormatException e) {
-							result.append(String.format(mapper.fg.greater, attcn, mapper.enquote(((LinkGreaterStrictCriteria) criteria).getValue())));
+							result.append(String.format(mapper.fg.greater, attcn, enquote(((LinkGreaterStrictCriteria) criteria).getValue())));
 						}
 					} else {
-						result.append(String.format(mapper.fg.greater, attcn, mapper.enquote(((LinkGreaterStrictCriteria) criteria).getValue())));
+						result.append(String.format(mapper.fg.greater, attcn, enquote(((LinkGreaterStrictCriteria) criteria).getValue())));
 					}
 				} else if (criteria instanceof LinkGreaterThanCriteria) {
 					if (getReference(link, ((LinkGreaterThanCriteria) criteria).getAttribute()).isNumericType()) {
@@ -806,10 +842,10 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 							Integer.parseInt(((LinkGreaterThanCriteria) criteria).getValue());
 							result.append(String.format(mapper.fg.greaterorequal, attcn, ((LinkGreaterThanCriteria) criteria).getValue()));
 						} catch (NumberFormatException e) {
-							result.append(String.format(mapper.fg.greaterorequal, attcn, mapper.enquote(((LinkGreaterThanCriteria) criteria).getValue())));
+							result.append(String.format(mapper.fg.greaterorequal, attcn, enquote(((LinkGreaterThanCriteria) criteria).getValue())));
 						}
 					} else {
-						result.append(String.format(mapper.fg.greaterorequal, attcn, mapper.enquote(((LinkGreaterThanCriteria) criteria).getValue())));
+						result.append(String.format(mapper.fg.greaterorequal, attcn, enquote(((LinkGreaterThanCriteria) criteria).getValue())));
 					}
 				} else if (criteria instanceof LinkLowerStrictCriteria) {
 					if (getReference(link, ((LinkLowerStrictCriteria) criteria).getAttribute()).isNumericType()) {
@@ -817,10 +853,10 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 							Integer.parseInt(((LinkLowerStrictCriteria) criteria).getValue());
 							result.append(String.format(mapper.fg.lower, attcn, ((LinkLowerStrictCriteria) criteria).getValue()));
 						} catch (NumberFormatException e) {
-							result.append(String.format(mapper.fg.lower, attcn, mapper.enquote(((LinkLowerStrictCriteria) criteria).getValue())));
+							result.append(String.format(mapper.fg.lower, attcn, enquote(((LinkLowerStrictCriteria) criteria).getValue())));
 						}
 					} else {
-						result.append(String.format(mapper.fg.lower, attcn, mapper.enquote(((LinkLowerStrictCriteria) criteria).getValue())));
+						result.append(String.format(mapper.fg.lower, attcn, enquote(((LinkLowerStrictCriteria) criteria).getValue())));
 					}
 				} else if (criteria instanceof LinkLowerThanCriteria) {
 					if (getReference(link, ((LinkLowerThanCriteria) criteria).getAttribute()).isNumericType()) {
@@ -828,16 +864,16 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 							Integer.parseInt(((LinkLowerThanCriteria) criteria).getValue());
 							result.append(String.format(mapper.fg.lowerorequal, attcn, ((LinkLowerThanCriteria) criteria).getValue()));
 						} catch (NumberFormatException e) {
-							result.append(String.format(mapper.fg.lowerorequal, attcn, mapper.enquote(((LinkLowerThanCriteria) criteria).getValue())));
+							result.append(String.format(mapper.fg.lowerorequal, attcn, enquote(((LinkLowerThanCriteria) criteria).getValue())));
 						}
 					} else {
-						result.append(String.format(mapper.fg.lowerorequal, attcn, mapper.enquote(((LinkLowerThanCriteria) criteria).getValue())));
+						result.append(String.format(mapper.fg.lowerorequal, attcn, enquote(((LinkLowerThanCriteria) criteria).getValue())));
 					}
 				} else if (criteria instanceof LinkStartCriteria) {
 					if (((LinkStartCriteria) criteria).isCasesensitive()) {
-						result.append(String.format(mapper.fg.startwith, attcn, mapper.escape(((LinkStartCriteria) criteria).getValue())));
+						result.append(String.format(mapper.fg.startwith, attcn, escape(((LinkStartCriteria) criteria).getValue())));
 					} else {
-						result.append(String.format(mapper.fg.startwith, String.format(mapper.fg.lowercase, attcn), mapper.escape(((LinkStartCriteria) criteria).getValue().toLowerCase())));
+						result.append(String.format(mapper.fg.startwith, String.format(mapper.fg.lowercase, attcn), escape(((LinkStartCriteria) criteria).getValue().toLowerCase())));
 					}
 				}
 				if (ei.deleteCol != null) {
@@ -868,12 +904,12 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 				} catch (NumberFormatException e) {
 					result.append(String.format(mapper.fg.lower,
 							colNames.get(((LowerStrictCriteria) criteria).getAttribute()),
-							mapper.enquote(((LowerStrictCriteria) criteria).getValue())));
+							enquote(((LowerStrictCriteria) criteria).getValue())));
 				}
 			} else {
 				result.append(String.format(mapper.fg.lower,
 						colNames.get(((LowerStrictCriteria) criteria).getAttribute()),
-						mapper.enquote(((LowerStrictCriteria) criteria).getValue())));
+						enquote(((LowerStrictCriteria) criteria).getValue())));
 			}
 		} else if (criteria instanceof LowerThanCriteria) {
 			if (getReference(((LowerThanCriteria) criteria).getAttribute()).isNumericType()) {
@@ -885,12 +921,12 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 				} catch (NumberFormatException e) {
 					result.append(String.format(mapper.fg.lowerorequal,
 							colNames.get(((LowerThanCriteria) criteria).getAttribute()),
-							mapper.enquote(((LowerThanCriteria) criteria).getValue())));
+							enquote(((LowerThanCriteria) criteria).getValue())));
 				}
 			} else {
 				result.append(String.format(mapper.fg.lowerorequal,
 						colNames.get(((LowerThanCriteria) criteria).getAttribute()),
-						mapper.enquote(((LowerThanCriteria) criteria).getValue())));
+						enquote(((LowerThanCriteria) criteria).getValue())));
 			}
 		} else if (criteria instanceof PreGeneratedCriteria) {
 			result.append(((PreGeneratedCriteria) criteria).getSql());
@@ -898,11 +934,11 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 			if (((StartCriteria) criteria).isCasesensitive()) {
 				result.append(String.format(mapper.fg.startwith, 
 						colNames.get(((StartCriteria) criteria).getAttribute()),
-						mapper.escape(((StartCriteria) criteria).getValue())));
+						escape(((StartCriteria) criteria).getValue())));
 			} else {
 				result.append(String.format(mapper.fg.startwith, 
 						String.format(mapper.fg.lowercase, colNames.get(((StartCriteria) criteria).getAttribute())),
-						mapper.escape(((StartCriteria) criteria).getValue().toLowerCase())));
+						escape(((StartCriteria) criteria).getValue().toLowerCase())));
 			}
 		} else if (criteria instanceof SubstCriteria) {
 			Activator.getInstance().debug(Messages.MapperSQLService_InternalError_CriteriaNotReduced, new ResourceException(Status.SERVER_ERROR_INTERNAL));
@@ -917,7 +953,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 				if (ae.updateCol == null) {
 					dateCol = null;
 				} else {
-					dateCol = getJoin(ref, true).getAlias() + '.' + ae.updateCol;
+					dateCol = getJoin(ref, true, deleted).getAlias() + '.' + ae.updateCol;
 				}
 			}
 			if (dateCol == null) {
@@ -955,6 +991,10 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 		return result;
 	}
 
+	private String getIdCol() {
+		return MapperSQLService.DEFAULT_TABLEALIAS + '.' + entityInfo.idCol;
+	}
+	
 	/**
 	 * Return a local version of the given Criteria (Execute remote tests if possible).
 	 * @param criteria

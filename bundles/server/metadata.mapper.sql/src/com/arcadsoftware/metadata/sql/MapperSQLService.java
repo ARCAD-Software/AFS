@@ -118,9 +118,9 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 	
 	private final DataSource ds;
 	final Fragments fg;
+	final Escapes esc;
 	final SimpleDateFormat sdf;
 	private volatile String hasRightrecursiveRequest;
-	private final Escapes esc;
 	private final ConcurrentHashMap<MetaDataEntity, EntityInfo> infos;
 	private final QueryRunnerEx runner;
 	private final boolean convertValues;
@@ -166,24 +166,26 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 			if (profiles == null) {
 				return null;
 			}
-			LinkInfo subprofiles = profiles.links.get("subprofiles"); //$NON-NLS-1$
-			if (subprofiles == null) {
+			// We return all profiles containing the given right,
+			// plus all profiles containing these profiles, recursively.
+			LinkInfo parentProfiles = profiles.links.get("parents"); //$NON-NLS-1$
+			if (parentProfiles == null) {
 				return null;
 			}
 			hasRightrecursiveRequest = String.format(fg.recursive_alt, "%1$s", //$NON-NLS-1$
 					String.format(fg.select,
 							profileCol, // selected column
-							profileRights.table + // table + join on undeleted profiles
+							profileRights.table + // table + join on undeleted profiles:
 							String.format(fg.join_inner, profiles.table, "p", profiles.idCol, //$NON-NLS-1$ 
-									profileCol + fg.and + profiles.deleteCol + fg.equaldelfalse),
+									profileCol + fg.and + profiles.deleteCol + fg.equaldelfalse), //
 							fg.parin + profileRights.deleteCol + fg.equaldelfalse + fg.parout + fg.and + // where clause: profileRight undeleted and:
 							fg.parin + profileRights.attributesCols.get("right") + "%2$s" + fg.parout + fg.and + //$NON-NLS-1$ //$NON-NLS-2$
 							fg.parin + profileRights.attributesCols.get("parameter") + "%3$s" + fg.parout), //$NON-NLS-1$ //$NON-NLS-2$
-					subprofiles.table,
-					subprofiles.destCol,
-					subprofiles.sourceCol,
+					parentProfiles.table, // from parents link table,
+					parentProfiles.destCol, // select the parent,
+					parentProfiles.sourceCol, // join to the recursive table, and only if the parent profile is undeleted:
 					String.format(fg.join_inner, profiles.table, "p", profiles.idCol, //$NON-NLS-1$ 
-							subprofiles.destCol + fg.and + profiles.deleteCol + fg.equaldelfalse));
+							parentProfiles.destCol + fg.and + profiles.deleteCol + fg.equaldelfalse));
 		}
 		return hasRightrecursiveRequest;
 	}
@@ -561,26 +563,9 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 	 */
 	public void purgeCache(MetaDataEntity entity) {
 		infos.remove(entity);
-	}
-
-	/**
-	 * Quote an SQL string.
-	 *  
-	 * @param value
-	 * @return
-	 */
-	protected String enquote(String value) {
-		return fg.quote + esc.escape(value) + fg.quote;
-	}
-
-	/**
-	 * Escape SQL String delimiters.
-	 * 
-	 * @param value
-	 * @return
-	 */
-	protected String escape(String value) {
-		return esc.escape(value);
+		if ("profile".equals(entity.getType()) || "profileRight".equals(entity.getType())) { //$NON-NLS-1$ //$NON-NLS-2$
+			hasRightrecursiveRequest = null;
+		}
 	}
 	
 	@Override
@@ -1224,61 +1209,5 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 			context.generateCriteria(criteria, deleted, where);
 		}
 		return count(((SQLCriteriaContext) context).formatQuery(fg.select, col, context.generateJoins(), where.toString()), new Object[] {sourceId});
-	}
-
-	/**
-	 * Parse complex Attributes column names.
-	 * 
-	 * @param type
-	 * @param col
-	 * @return
-	 */
-	protected String parseAttributeColumn(String type, String col) {
-		int trunc = 0;
-		// Truncate long Strings.
-		if (col.indexOf('^') > 0) {
-			try {
-				trunc = Integer.parseInt(col.substring(col.indexOf('^') + 1));
-				col = col.substring(0, col.indexOf('^') - 1);
-				if (col.indexOf('+') < 0) {
-					col = COLUMNPREFIX_PLACEHOLDER + col;
-				}
-			} catch (NumberFormatException e) {
-				Activator.getInstance().debug(e);
-			}
-		} 
-		// Concat or sum columns values.
-		if (col.indexOf('+') > 0) {
-			String concat = fg.concat;
-			if (MetaDataAttribute.TYPE_STRING.equals(type)) {
-				concat = fg.concat_string;
-			} else if (MetaDataAttribute.TYPE_DATE.equals(type)) {
-				concat = fg.concat_days;
-			}
-			char quote = fg.quote.charAt(0);
-			String[] cols = col.split("\\+"); //$NON-NLS-1$
-			String result;
-			if (cols[0].charAt(0) == quote) {
-				result = String.format(concat, cols[0], "%1$s"); //$NON-NLS-1$
-			} else {
-				result = String.format(concat, COLUMNPREFIX_PLACEHOLDER + cols[0], "%1$s"); //$NON-NLS-1$
-			}
-			for (int i = 1; i < (cols.length - 1); i++) {
-				if (cols[i].charAt(0) == quote) {
-					result = String.format(result, String.format(concat, cols[i], "%1$s")); //$NON-NLS-1$
-				} else {
-					result = String.format(result, String.format(concat, COLUMNPREFIX_PLACEHOLDER + cols[i], "%1$s")); //$NON-NLS-1$
-				}
-			}
-			if (cols[cols.length - 1].charAt(0) == quote) {
-				col = String.format(result, cols[cols.length - 1]);
-			} else {
-				col = String.format(result, COLUMNPREFIX_PLACEHOLDER + cols[cols.length - 1]);
-			}
-		}
-		if (trunc > 0) {
-			return String.format(fg.trunc_string, col, trunc);
-		}
-		return col;
 	}
 }

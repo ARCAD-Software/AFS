@@ -20,6 +20,7 @@ import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.metadata.MetaDataAttribute;
 import com.arcadsoftware.metadata.MetaDataEntity;
 import com.arcadsoftware.metadata.MetaDataLink;
+import com.arcadsoftware.metadata.sql.internal.Activator;
 
 /**
  * Utility class that allows quick access to information related to the storage of the entity.
@@ -112,7 +113,7 @@ public class EntityInfo {
 		for (Entry<String, MetaDataAttribute> e: entity.getAttributes().entrySet()) {
 			String col = e.getValue().getMetadata().getString(METADATA_COLNAME);
 			if ((col != null) && (col.length() > 0)) {
-				attributesCols.put(e.getKey(), mapper.parseAttributeColumn(e.getValue().getType(),col));
+				attributesCols.put(e.getKey(), parseAttributeColumn(mapper, e.getValue().getType(), col));
 			}
 		}
 		links = new HashMap<String, LinkInfo>();
@@ -122,6 +123,62 @@ public class EntityInfo {
 				links.put(e.getKey(), i);
 			}
 		}
+	}
+
+	/**
+	 * Parse complex Attributes column names.
+	 * 
+	 * @param type
+	 * @param col
+	 * @return
+	 */
+	protected String parseAttributeColumn(MapperSQLService mapper, String type, String col) {
+		int trunc = 0;
+		// Truncate long Strings.
+		if (col.indexOf('^') > 0) {
+			try {
+				trunc = Integer.parseInt(col.substring(col.indexOf('^') + 1));
+				col = col.substring(0, col.indexOf('^') - 1);
+				if (col.indexOf('+') < 0) {
+					col = MapperSQLService.COLUMNPREFIX_PLACEHOLDER + col;
+				}
+			} catch (NumberFormatException e) {
+				Activator.getInstance().debug(e);
+			}
+		} 
+		// Concat or sum columns values.
+		if (col.indexOf('+') > 0) {
+			String concat = mapper.fg.concat;
+			if (MetaDataAttribute.TYPE_STRING.equals(type)) {
+				concat = mapper.fg.concat_string;
+			} else if (MetaDataAttribute.TYPE_DATE.equals(type)) {
+				concat = mapper.fg.concat_days;
+			}
+			char quote = mapper.fg.quote.charAt(0);
+			String[] cols = col.split("\\+"); //$NON-NLS-1$
+			String result;
+			if (cols[0].charAt(0) == quote) {
+				result = String.format(concat, cols[0], "%1$s"); //$NON-NLS-1$
+			} else {
+				result = String.format(concat, MapperSQLService.COLUMNPREFIX_PLACEHOLDER + cols[0], "%1$s"); //$NON-NLS-1$
+			}
+			for (int i = 1; i < (cols.length - 1); i++) {
+				if (cols[i].charAt(0) == quote) {
+					result = String.format(result, String.format(concat, cols[i], "%1$s")); //$NON-NLS-1$
+				} else {
+					result = String.format(result, String.format(concat, MapperSQLService.COLUMNPREFIX_PLACEHOLDER + cols[i], "%1$s")); //$NON-NLS-1$
+				}
+			}
+			if (cols[cols.length - 1].charAt(0) == quote) {
+				col = String.format(result, cols[cols.length - 1]);
+			} else {
+				col = String.format(result, MapperSQLService.COLUMNPREFIX_PLACEHOLDER + cols[cols.length - 1]);
+			}
+		}
+		if (trunc > 0) {
+			return String.format(mapper.fg.trunc_string, col, trunc);
+		}
+		return col;
 	}
 
 	@Override
