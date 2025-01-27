@@ -267,6 +267,8 @@ public class XmlCriteriaStream extends XStreamCompact {
 		xs.useAttributeFor(AbstractLinkTestCriteria.class, "deleted"); //$NON-NLS-1$
 		xs.useAttributeFor(UnlinkCriteria.class, "deleted"); //$NON-NLS-1$
 		xs.aliasAttribute("ignoreSubdivision", "nosub");
+		xs.aliasAttribute("ignoresubdivision", "nosub");
+		xs.aliasAttribute("linkcode", "linkCode");
 		// For upcomming declarations, do not forget to add the dedicated mapping in the JsonCriteriaStream class.
 		return xs;
 	}
