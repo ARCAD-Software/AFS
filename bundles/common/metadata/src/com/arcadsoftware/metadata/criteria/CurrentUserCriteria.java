@@ -81,7 +81,7 @@ public class CurrentUserCriteria extends AbstractSearchCriteria implements Clone
 			}
 		}
 		if (linkCode != null) {
-			return new LinkCriteria(i, linkCode, attribute);
+			return new LinkCriteria(i, linkCode, attribute).reduce(context);
 		}
 		if (isTestId()) {
 			return new IdEqualCriteria(i);
