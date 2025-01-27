@@ -260,6 +260,7 @@ public class XmlCriteriaStream extends XStreamCompact {
 		xs.alias("idlowerthan", IdLowerThanCriteria.class); //$NON-NLS-1$
 		xs.useAttributeFor(IdLowerThanCriteria.class, "id"); //$NON-NLS-1$
 		xs.useAttributeFor(ChangedCriteria.class, "attribute"); //$NON-NLS-1$
+		xs.aliasAttribute("linkcode", "linkCode");
 		// For upcomming declarations, do not forget to add the dedicated mapping in the JsonCriteriaStream class.
 		return xs;
 	}
