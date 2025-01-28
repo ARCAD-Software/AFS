@@ -1,10 +1,10 @@
-# AFS-OS release version 2023.7.37.
+# AFS-OS release version 2023.7.38.
 
-Release date Mon Jan 20 17:38:10 CET 2025.
+Release date Tue Jan 28 09:41:03 CET 2025.
 
-Link to the update site of [Version 2023.7.37](https://github.com/ARCAD-Software/AFS/releases/download/2023.7.37/).
+Link to the update site of [Version 2023.7.38](https://github.com/ARCAD-Software/AFS/releases/download/2023.7.38/).
 
-4 Bundles modified in this release.
+3 Bundles modified in this release.
 
 
 
@@ -26,7 +26,7 @@ Bundle Symbolic Name | Modification | Version
 [com.arcadsoftware.afs.client.server.admin.common.actions](bundles/client/afs.client.server.admin.common.actions) | Not changed | 1.3.3
 [com.arcadsoftware.afs.client.ssh](bundles/client/afs.client.ssh) | Not changed | 2.2.6
 [com.arcadsoftware.afs.client.users](bundles/client/afs.client.users) | Not changed | 1.4.4
-[com.arcadsoftware.afs.client.widgets](bundles/client/afs.client.widgets) | **Upgraded** from version 1.2.3 | **1.2.4**
+[com.arcadsoftware.afs.client.widgets](bundles/client/afs.client.widgets) | Not changed | 1.2.4
 [com.arcadsoftware.afs.client.widgets.rcp](bundles/client/afs.client.widgets.rcp) | Not changed | 1.3.3
 [com.arcadsoftware.afs.framework](bundles/client/afs.framework) | Not changed | 1.2.3
 [com.arcadsoftware.afs.framework.application](bundles/client/afs.framework.application) | Not changed | 1.3.5
@@ -40,15 +40,15 @@ Bundle Symbolic Name | Modification | Version
 
 Bundle Symbolic Name | Modification | Version
 -------------------- | ------------ | -------
-[com.arcadsoftware.beanmap](bundles/common/beanmap) | **Upgraded** from version 1.3.9 | **1.3.10**
+[com.arcadsoftware.beanmap](bundles/common/beanmap) | **Upgraded** from version 1.3.10 | **1.3.11**
 [com.arcadsoftware.cleanup](bundles/common/cleanup) | Not changed | 1.4.2
 [com.arcadsoftware.cm.simple](bundles/common/cm.simple) | Not changed | 1.5.4
 [com.arcadsoftware.crypt](bundles/common/crypt) | Not changed | 1.8.6
 [com.arcadsoftware.crypt.xml](bundles/common/crypt.xml) | Not changed | 1.1.4
 [com.arcadsoftware.email](bundles/common/email) | Not changed | 1.4.3
 [com.arcadsoftware.groovy.security](bundles/common/groovy.security) | Not changed | 1.1.5
-[com.arcadsoftware.metadata](bundles/common/metadata) | Not changed | 1.6.2
-[com.arcadsoftware.osgi](bundles/common/osgi) | **Upgraded** from version 1.9.7 | **1.9.8**
+[com.arcadsoftware.metadata](bundles/common/metadata) | **Upgraded** from version 1.6.2 | **1.6.3**
+[com.arcadsoftware.osgi](bundles/common/osgi) | **Upgraded** from version 1.9.8 | **1.9.9**
 [com.arcadsoftware.rest](bundles/common/rest) | Not changed | 3.1.8
 [com.arcadsoftware.ssh](bundles/common/ssh) | Not changed | 1.2.5
 
@@ -82,7 +82,7 @@ Bundle Symbolic Name | Modification | Version
 [com.arcadsoftware.server.binaries](bundles/server/server.binaries) | Not changed | 1.2.7
 [com.arcadsoftware.server.messages](bundles/server/server.messages) | Not changed | 1.2.3
 [com.arcadsoftware.server.properties](bundles/server/server.properties) | Not changed | 1.2.3
-[com.arcadsoftware.server.restful](bundles/server/server.restful) | **Upgraded** from version 3.1.9 | **3.1.10**
+[com.arcadsoftware.server.restful](bundles/server/server.restful) | Not changed | 3.1.10
 [com.arcadsoftware.server.restful.connection](bundles/server/server.restful.connection) | Not changed | 2.1.6
 [com.arcadsoftware.server.restful.connection.config](bundles/server/server.restful.connection.config) | Not changed | 1.3.3
 [com.arcadsoftware.server.restful.connection.ldap](bundles/server/server.restful.connection.ldap) | Not changed | 2.4.7
