@@ -1044,6 +1044,15 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 		if (o instanceof char[]) {
 			return new String((char[]) o);
 		}
+		if (o instanceof Date) {
+			return ISODateFormater.toString((Date) o);
+		}
+		if (o instanceof Calendar) {
+			return ISODateFormater.toString((Calendar) o);
+		}
+		if (o instanceof Timestamp) {
+			return ISODateFormater.toString(((Timestamp) o).getTime());
+		}
 		return o.toString();
 	}
 
@@ -1057,17 +1066,11 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 	 * @return defaultValue if the key does not exist or the string representation of the value.
 	 */
 	public String getString(String key, String defaultValue) {
-		Object o = get(key);
-		if (o == null) {
+		String s = getString(key);
+		if (s == null) {
 			return defaultValue;
 		}
-		if (o instanceof String) {
-			return (String) o;
-		}
-		if (o instanceof char[]) {
-			return new String((char[]) o);
-		}
-		return o.toString();
+		return s;
 	}
 
 	/**
