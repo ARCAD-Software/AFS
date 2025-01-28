@@ -106,6 +106,10 @@ public class Fragments {
 	public String select_const;
 	public String id;
 	public String isnullex;
+	public String recursive_link;
+	public String recursive_linkdel;
+	public String source;
+	public String dest;
 	
 	public Fragments(String name) {
 		// Reset this class...

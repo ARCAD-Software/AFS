@@ -114,7 +114,6 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 	protected static final char COLUMNPREFIX_PLACEHOLDER = '~';
 	protected static final String COLUMNPREFIX_PLACEHOLDERS = "~"; //$NON-NLS-1$
 	protected static final String DEFAULT_TABLEALIAS = "x"; //$NON-NLS-1$
-	protected static final String RECURCIVE_PREFIX = "rt_"; //$NON-NLS-1$
 	
 	private final DataSource ds;
 	final Fragments fg;

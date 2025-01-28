@@ -61,6 +61,7 @@ public class EntityInfo {
 	public String sql_harddelete;
 	public String sql_delete;
 	public String sql_undelete;
+	public String sql_subselect;
 	public HashMap<String, MultiLinkQuery> sql_links;
 	
 	public EntityInfo(MetaDataEntity entity, MapperSQLService mapper) {

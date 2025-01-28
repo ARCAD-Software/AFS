@@ -3035,12 +3035,17 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 	/**
 	 * Get the first link defined in this Entity and targeting the same one.
 	 * 
+	 * <p>
+	 * If this entity use the "norecursive" flag MetaData the this method will return null.
+	 * 
 	 * @return null if there is no recursive link.
 	 */
 	public MetaDataLink getFirstRecursiveLink() {
-		for (MetaDataLink link: links.values()) {
-			if (link.isRecursive()) {
-				return link;
+		if (!getMetadata().getBoolean(MetaDataEntity.METADATA_IGNORERECURSIVITY)) {
+			for (MetaDataLink link: links.values()) {
+				if (link.isRecursive()) {
+					return link;
+				}
 			}
 		}
 		return null;

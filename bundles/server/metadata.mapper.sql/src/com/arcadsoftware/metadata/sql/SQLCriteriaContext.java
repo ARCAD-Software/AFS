@@ -79,6 +79,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 	private static final String SQL_JAVA_CRYPT_PREFIX = "z_"; //$NON-NLS-1$
 	private static final String SQL_DATECOL = SQL_JAVA_PREFIX + "date"; //$NON-NLS-1$
 	private static final String SQL_DELETECOL = SQL_JAVA_PREFIX + "deleted"; //$NON-NLS-1$
+	private static final String SQL_RECURCIVE_PREFIX = "rt_"; //$NON-NLS-1$
 
 	private final MapperSQLService mapper;
 	private final HashMap<String, String> queryContextes;
@@ -354,6 +355,44 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 			}
 		}
 		return result;
+	}
+
+	protected String getSubDivision(MetaDataEntity entity, boolean deleted) {
+		final MetaDataLink link = entity.getFirstRecursiveLink();
+		if (link == null) {
+			return null;
+		}
+		final EntityInfo ei = mapper.getEntityInfo(entity);
+		if (ei == null) {
+			return null;
+		}
+		return getSubDivision(ei, link.getCode(), deleted);
+	}
+	
+	private String getSubDivision(EntityInfo e, String linkCode, boolean deleted) {
+		final String alias = SQL_RECURCIVE_PREFIX + e.table;
+		if (e.sql_subselect == null) {
+			LinkInfo l = e.links.get(linkCode);
+			if (l == null) {
+				return null;
+			}
+			if (deleted && ((e.deleteCol != null) || (l.deleteCol != null))) {
+				// Do not cache this request !
+				addQueryContext(alias, String.format(mapper.fg.recursive_link, alias, e.table, e.idCol, l.table, l.sourceCol, l.destCol));
+				return alias;
+			}
+			String sourceCol = l.sourceCol;
+			if ((l.deleteCol != null) && !deleted) {
+				sourceCol += mapper.fg.and + "z." + l.deleteCol + mapper.fg.equaldelfalse;
+			}
+			if ((e.deleteCol != null) && !deleted) {
+				e.sql_subselect = String.format(mapper.fg.recursive_link, alias, e.table, e.idCol, e.deleteCol, l.table, sourceCol, l.destCol);
+			} else {
+				e.sql_subselect = String.format(mapper.fg.recursive_link, alias, e.table, e.idCol, l.table, sourceCol, l.destCol);
+			}
+		}
+		addQueryContext(alias, e.sql_subselect);
+		return alias;
 	}
 	
 	/**
