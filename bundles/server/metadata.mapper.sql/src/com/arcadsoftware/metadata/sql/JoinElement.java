@@ -22,11 +22,25 @@ public class JoinElement {
 	private boolean inner;
 	
 	public JoinElement(String alias, String sql) {
+		this(alias, sql, null);
+	}
+	
+	public JoinElement(String alias, String sql, String id) {
 		super();
 		this.alias = alias;
 		table = sql;
-		id = null;
+		this.id = id;
 		parentCol = null;
+		deletedCol = null;
+		children = new ArrayList<>();
+	}
+	
+	public JoinElement(String alias, String table, String id, String parentCol) {
+		super();
+		this.alias = alias;
+		this.table = table;
+		this.id = id;
+		this.parentCol = parentCol;
 		deletedCol = null;
 		children = new ArrayList<>();
 	}
@@ -67,6 +81,17 @@ public class JoinElement {
 		return alias;
 	}
 	
+	public JoinElement getLastet() {
+		if (children.isEmpty()) {
+			return this;
+		}
+		JoinElement result = children.get(children.size() - 1);
+		while (!result.children.isEmpty()) {
+			result = result.children.get(children.size() - 1);
+		}
+		return result;
+	}
+	
 	/**
 	 * 
 	 * @param entityInfo the current entity to be added to the join tree.
@@ -95,6 +120,17 @@ public class JoinElement {
 		children.add(result);
 		return result;
 	}
+	
+	public JoinElement add(String table, String sourceCol, String parentCol) {
+		for (JoinElement c: children) {
+			if ((table == c.table) && c.parentCol.equals(parentCol) && c.id.equals(sourceCol)) {
+				return c;
+			}
+		}
+		JoinElement result = new JoinElement(alias + '_' + children.size(), table, sourceCol, parentCol);
+		children.add(result);
+		return result;
+	}
 
 	public String toString(MapperSQLService mapper) {
 		StringBuilder sb = new StringBuilder(table);
@@ -117,6 +153,25 @@ public class JoinElement {
 			sb.append(String.format(mapper.fg.join, table, alias, id, refcol));
 		}
 	}
-	
+
+	public ArrayList<JoinElement> getChildren() {
+		return children;
+	}
+
+	public String getTable() {
+		return table;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public String getParentCol() {
+		return parentCol;
+	}
+
+	public String getDeletedCol() {
+		return deletedCol;
+	}
 	
 }

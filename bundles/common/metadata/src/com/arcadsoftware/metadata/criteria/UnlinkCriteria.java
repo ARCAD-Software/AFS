@@ -17,9 +17,6 @@ import java.util.List;
 
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.IIdentifiedBean;
-import com.arcadsoftware.metadata.MetaDataEntity;
-import com.arcadsoftware.metadata.MetaDataLink;
-import com.arcadsoftware.metadata.ReferenceLine;
 import com.arcadsoftware.metadata.internal.Messages;
 import com.arcadsoftware.rest.connection.IConnectionUserBean;
 
@@ -30,6 +27,7 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
  * 
  * 
  */
+@Deprecated
 public class UnlinkCriteria extends AbstractSearchCriteria implements Cloneable, IAttributeCriteria, ILinkCriteria {
 
 	private String attribute;
@@ -66,27 +64,7 @@ public class UnlinkCriteria extends AbstractSearchCriteria implements Cloneable,
 
 	@Override
 	public ISearchCriteria reduce(ICriteriaContext context) {
-		if ((attribute == null) || (attribute.length() == 0)) {
-			List<MetaDataLink> links = context.getEntity().getLinkChain(getLinkCodes());
-			if (links != null) {
-				context.useLinks(linkCode, links);
-				return this;
-			}
-		} else {
-			ReferenceLine attributeRef = context.getEntity().getAttributeLine(attribute);
-			if ((attributeRef != null) && (attributeRef.size() > 0)) {
-				MetaDataEntity e = attributeRef.getLastAttribute().getRefEntity();
-				if (e != null) {
-					List<MetaDataLink> links = e.getLinkChain(getLinkCodes());
-					if (links != null) {
-						context.useReference(attributeRef);
-						context.useLinks(attribute + '/' + linkCode, links);
-						return this;
-					}
-				}
-			}
-		}
-		return ConstantCriteria.FALSE;
+		return new NotCriteria(new LinkCriteria(id, linkCode, attribute, ignoreSubdivision, deleted)).reduce(context);
 	}
 
 	@Override

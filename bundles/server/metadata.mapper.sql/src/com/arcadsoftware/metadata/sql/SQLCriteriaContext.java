@@ -3,7 +3,6 @@ package com.arcadsoftware.metadata.sql;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
@@ -31,6 +30,7 @@ import com.arcadsoftware.metadata.criteria.EqualCriteria;
 import com.arcadsoftware.metadata.criteria.GreaterStrictCriteria;
 import com.arcadsoftware.metadata.criteria.GreaterThanCriteria;
 import com.arcadsoftware.metadata.criteria.HasRightCriteria;
+import com.arcadsoftware.metadata.criteria.IAttributesCriteria;
 import com.arcadsoftware.metadata.criteria.ISearchCriteria;
 import com.arcadsoftware.metadata.criteria.IdEqualCriteria;
 import com.arcadsoftware.metadata.criteria.IdGreaterStrictCriteria;
@@ -56,7 +56,6 @@ import com.arcadsoftware.metadata.criteria.OrCriteria;
 import com.arcadsoftware.metadata.criteria.PreGeneratedCriteria;
 import com.arcadsoftware.metadata.criteria.StartCriteria;
 import com.arcadsoftware.metadata.criteria.SubstCriteria;
-import com.arcadsoftware.metadata.criteria.UnlinkCriteria;
 import com.arcadsoftware.metadata.sql.internal.Activator;
 import com.arcadsoftware.metadata.sql.internal.Messages;
 import com.arcadsoftware.rest.connection.IConnectionUserBean;
@@ -153,43 +152,34 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 	 * 
 	 * @param sql
 	 */
-	public void initJoinTree(String alias, String sql, boolean deleted) {
+	public JoinElement initJoinTree(String alias, String sql, EntityInfo entity, String parentCol, boolean deleted) {
 		if (joinTree == null) {
 			joinTree = new JoinElement(alias, sql);
+			JoinElement result;
+			if (entity == null) {
+				result = joinTree;
+				entity = entityInfo;
+			} else {
+				result = joinTree.add(entity, parentCol, deleted);
+			}
 			for (ReferenceLine rf: getReferences()) {
 				String code = rf.getCode();
 				if (!colNames.containsKey(code)) {
 					// We use left outer join for columns used in where clause.
-					String col = buildAttributeColName(rf, false, deleted);
+					String col = buildAttributeColName(rf, entity, result, false, deleted);
 					if (col != null) {
 						colNames.put(code, col);
 					}
 				}
 			}
-		} else {
-			Activator.getInstance().debug("Error into SQL Mapper: the Form clause is initialized after a generation is done..."); //$NON-NLS-1$
+			return result;
 		}
+		Activator.getInstance().error("Error into SQL Mapper: the Form clause is initialized after a generation is done..."); //$NON-NLS-1$
+		return null;
 	}
 
-	/**
-	 * Generate an alias from a code, prefix (if code is null) and suffix.
-	 * 
-	 * @param code
-	 * @param defaultPrefix used only if code is null.
-	 * @param suffix optional added to the code or to the defaultPrefix
-	 * @return
-	 */
-	private String getAlias(String code, String defaultPrefix, String suffix) {
-		StringBuilder prefix = new StringBuilder();
-		if (code == null) {
-			prefix.append(defaultPrefix);
-		} else {
-			prefix.append(code.replace('.', '_'));
-		}
-		if (suffix != null) {
-			prefix.append(suffix);
-		}
-		return prefix.toString();
+	public JoinElement addJoin(EntityInfo e, String parentCol, boolean deleted) {
+		return joinTree.add(e, parentCol, deleted);
 	}
 
 	/**
@@ -205,12 +195,16 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 	 */
 	public StringBuilder generateColumns(List<ReferenceLine> attributes, boolean deleted) {
 		init(deleted);
-		StringBuilder result = new StringBuilder(MapperSQLService.DEFAULT_TABLEALIAS);
+		return generateColumns(entityInfo, joinTree, attributes, deleted);
+	}
+	
+	public StringBuilder generateColumns(EntityInfo e, JoinElement join, List<ReferenceLine> attributes, boolean deleted) {
+		StringBuilder result = new StringBuilder(join.getAlias());
 		result.append('.');
-		result.append(entityInfo.idCol);
+		result.append(e.idCol);
 		result.append(mapper.fg.asid);
 		for (ReferenceLine att: attributes) {
-			String cn = buildAttributeColName(att, false, deleted);
+			String cn = buildAttributeColName(att, e, join, false, deleted);
 			if (cn != null) {
 				colNames.put(att.getCode(), cn);
 				result.append(mapper.fg.columnsep);
@@ -224,19 +218,19 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 				result.append(att.getCode().replace('.', '_'));
 			}
 		}
-		if (entityInfo.updateCol != null) {
+		if (e.updateCol != null) {
 			result.append(mapper.fg.columnsep);
-			result.append(MapperSQLService.DEFAULT_TABLEALIAS);
+			result.append(join.getAlias());
 			result.append('.');
-			result.append(entityInfo.updateCol);
+			result.append(e.updateCol);
 			result.append(mapper.fg.as);
 			result.append(SQL_DATECOL);
 		}
-		if ((entityInfo.deleteCol != null) && deleted) {
+		if ((e.deleteCol != null) && deleted) {
 			result.append(mapper.fg.columnsep);
-			result.append(MapperSQLService.DEFAULT_TABLEALIAS);
+			result.append(join.getAlias());
 			result.append('.');
-			result.append(entityInfo.deleteCol);
+			result.append(e.deleteCol);
 			result.append(mapper.fg.as);
 			result.append(SQL_DELETECOL);
 		}
@@ -256,6 +250,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 		StringBuilder result = new StringBuilder();
 		if (orders != null) {
 			for(ReferenceLine order: orders) {
+				// Assume that the columns are included in the selected columns and generateColumns is called before generateOrders.
 				String col = colNames.get(order.getCode());
 				// Avoid usage of complex column in the order clause.
 				// TODO Support order by complex columns (just remove constants).
@@ -283,8 +278,10 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 	 * @return The SQL column representation.
 	 */
 	protected String buildAttributeColName(ReferenceLine reference, boolean innerJoin, boolean deleted) {
-		JoinElement j = joinTree;
-		EntityInfo lastInfo = entityInfo;
+		return buildAttributeColName(reference, entityInfo, joinTree, innerJoin, deleted);
+	}
+	
+	private String buildAttributeColName(ReferenceLine reference, EntityInfo lastInfo, JoinElement join, boolean innerJoin, boolean deleted) {
 		String currentCol = null;
 		String code = null;
 		for (int i = 0; i < reference.size(); i++) {
@@ -306,17 +303,17 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 						// The entity is not declared in the database.
 						break;
 					}
-					JoinElement x = j.add(nei, j.getAlias() + '.' + currentCol, deleted);
+					JoinElement x = join.add(nei, join.getAlias() + '.' + currentCol, deleted);
 					if (innerJoin) {
 						x.setInner();
 					}
 					lastInfo = nei;
-					j = x;
+					join = x;
 				} else {
 					break;
 				}
 			} else {
-				Activator.getInstance().debug("Error into SQL Mapper: A invalid reference line contain " + e); //$NON-NLS-1$
+				Activator.getInstance().debug("Error into SQL Mapper: A invalid reference line \"" + reference.getCode() + "\" contain " + e); //$NON-NLS-1$
 				break; 
 			}
 		}
@@ -327,9 +324,9 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 		if (currentCol.contains(MapperSQLService.COLUMNPREFIX_PLACEHOLDERS)) {
 			// This column name may be a complex SQL expression (like a function...) in that
 			// case the alias must be placed in replacement of the ~ character. 
-			return currentCol.replace(MapperSQLService.COLUMNPREFIX_PLACEHOLDERS, j.getAlias() + '.');
+			return currentCol.replace(MapperSQLService.COLUMNPREFIX_PLACEHOLDERS, join.getAlias() + '.');
 		}
-		return j.getAlias() + '.' + currentCol;
+		return join.getAlias() + '.' + currentCol;
 	}
 
 	private JoinElement getJoin(ReferenceLine ref, boolean innerJoin, boolean deleted) {
@@ -394,21 +391,87 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 		addQueryContext(alias, e.sql_subselect);
 		return alias;
 	}
-	
+
+	private JoinElement generateLinkJoins(List<MetaDataLink> links, StringBuilder where, StringBuilder lastJoinCol, boolean endWithEntity, boolean deleted) {
+		MetaDataEntity e = links.get(0).getParent();
+		EntityInfo ei = mapper.getEntityInfo(e);
+		JoinElement result = null;
+		String a = getSubDivision(e, deleted);
+		String parentCol = null;
+		if (a != null) {
+			result = new JoinElement(a, a, mapper.fg.source);
+			parentCol = a + '.' + mapper.fg.dest;
+		} else if (!deleted && (ei.deleteCol != null)) {
+			result = new JoinElement("xa",ei.table + " xa", ei.idCol);
+			parentCol = "xa." + ei.idCol;
+			if (!where.isEmpty()) {
+				where.append(mapper.fg.and);
+			}
+			where.append(ei.deleteCol);
+			where.append(mapper.fg.equaldelfalse);
+		}
+		JoinElement current = result;
+		// TODO Auto-generated method stub
+		for (MetaDataLink link: links) {
+			LinkInfo li = ei.links.get(link.getCode());
+			if (result == null) {
+				result = new JoinElement("la", li.table + " la", li.sourceCol);
+				parentCol = "la." + li.destCol;
+				current = result;
+				if (!deleted && (li.deleteCol != null)) {
+					if (!where.isEmpty()) {
+						where.append(mapper.fg.and);
+					}
+					where.append(li.deleteCol);
+					where.append(mapper.fg.equaldelfalse);
+				}
+			} else {
+				current = current.add(li, parentCol, deleted);
+				current.setInner();
+				parentCol = current.getAlias() + '.' + li.destCol;
+			}
+			e = link.getRefEntity();
+			ei = mapper.getEntityInfo(e);
+			if (ei == null) {
+				// TODO support multi domain links...
+				break;
+			}
+			a = getSubDivision(e, deleted);
+			if (a != null) {
+				current = current.add(a, mapper.fg.source, parentCol);
+				current.setInner();
+				parentCol = current.getAlias() + '.' + mapper.fg.dest;
+			} else if (!deleted && (ei.deleteCol != null)) {
+				current = current.add(ei, parentCol, false);
+				current.setInner();
+				parentCol = current.getAlias() + '.' + ei.idCol;
+			}
+		}
+		if (endWithEntity && !parentCol.endsWith(ei.idCol)) {
+			// Ensure that this join is on the last entity... 
+			current = current.add(ei, parentCol, false);
+			current.setInner();
+			parentCol = current.getAlias() + '.' + ei.idCol;
+		}
+		if (lastJoinCol != null) {
+			// If the lastJoinAlias is required then this is because be need to use it to refer to last entity id.
+			lastJoinCol.append(parentCol);
+		}
+		return result;
+	}
+
 	/**
 	 * Generate an SQL where clause from a Criteria.
 	 *  
 	 * <p>
 	 * This criteria must have been reduced, before to be passed to this method.
 	 * 
-	 * @param entityInfo The base Entity SQL informations.
 	 * @param criteria The search criteria to compute.
-	 * @param context The context object used to reduce the criteria.
-	 * @param colNames The used colons names prefix with their table alias. 
-	 * @param joinMap The map of join to add to the request.
+	 * @param deleted False is the deletion flag must also be tested.
 	 * @return a non null StringBuilder containing the conversion of the Criteria into a Where Clause.
 	 */
 	protected StringBuilder generateCriteria(ISearchCriteria criteria, boolean deleted) {
+		init(deleted);
 		if ((criteria != null) && !ConstantCriteria.TRUE.equals(criteria)) {
 			criteria = getLocalCriteria(criteria);
 			if (ConstantCriteria.FALSE.equals(criteria)) {
@@ -433,6 +496,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 	 * @return the "result" param.
 	 */
 	protected StringBuilder generateCriteria(ISearchCriteria criteria, boolean deleted, StringBuilder result) {
+		init(deleted);
 		if (criteria instanceof AfterCriteria) {
 			result.append(String.format(mapper.fg.greater, 
 				colNames.get(((AfterCriteria) criteria).getAttribute()),
@@ -525,14 +589,15 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 						escape(((EndCriteria) criteria).getValue().toLowerCase())));
 			}
 		} else if (criteria instanceof AttributeEqualsCriteria) {
-			if (((AttributeEqualsCriteria) criteria).isCasesensitive()) {			
+			if (((AttributeEqualsCriteria) criteria).isCasesensitive() || //
+					getReference(((AttributeEqualsCriteria) criteria).getAttribute()).isNumericType()) {
 				result.append(String.format(mapper.fg.equal,
 						colNames.get(((AttributeEqualsCriteria) criteria).getAttribute()),
 						colNames.get(((AttributeEqualsCriteria) criteria).getSecondAttribute())));
 			} else {
 				result.append(String.format(mapper.fg.equal,
-						String.format(mapper.fg.lowercase,colNames.get(((AttributeEqualsCriteria) criteria).getAttribute())),
-								String.format(mapper.fg.lowercase,colNames.get(((AttributeEqualsCriteria) criteria).getSecondAttribute()))));
+						String.format(mapper.fg.lowercase, colNames.get(((AttributeEqualsCriteria) criteria).getAttribute())),
+								String.format(mapper.fg.lowercase, colNames.get(((AttributeEqualsCriteria) criteria).getSecondAttribute()))));
 			}
 		} else if (criteria instanceof AttributeLowerCriteria) {
 			result.append(String.format(mapper.fg.lower,
@@ -667,272 +732,111 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 		} else if (criteria instanceof IsTrueCriteria) {
 			result.append(String.format(mapper.fg.istrue, colNames.get(((IsTrueCriteria) criteria).getAttribute())));
 		} else if (criteria instanceof LinkCriteria) {
-			
-			/*
-			
-			
-			ref in (select l1.source 
-					from L1 
-  				         join L2 on (l1.dest = l2.source and l2.deleted = 0)   + join sur l'entité deleted =0
-				         join L3 on (l2.dest = l3.source and l3.deleted = 0)   
-					     join E4 on (l2.dest =  e4.id and e4.deleted = 0)
-					where (L1.deleted = 0)
-					  and E4.a = 'x'
-					)
-			
-			
-			*/
-			
-			
-			// Prepare the link subselection...
-			
-			// --> Dans le sub-select/with les jointure sont inner !!!
-			
-			
-			
-			// Use the col generated for the test (or the id col if it is null !)
+			// Criteria using a link use a sub-selection and the "in" operator.
+			// If some of the entities contain a subdivision (recursive) link this operation also imply a recursive SQL query.
 			String attcn = colNames.get(((LinkCriteria) criteria).getAttribute());
+			String code;
 			if (attcn == null) {
 				attcn = getIdCol();
-			}
-			
-			
-			
-			// Il faut quand même des left outer join pour que les test disjonctif fonctionnent.
-			// la listes des incident nomé "X" et dont le "owner" est aussi un des "intervenants":
-			// select from "incident" where ("code" = 'X') and (linked through "intervenents" to "owner")
-			// ==
-			// select from "incident" where ("code" = 'X') and ("owner" in (select id from "intervenant"... ))	
-			
-			
-			
-			
-			// On construit une jointure externe vers la table d'association
-			// Puis on compare l'ID de destination à l'ID passé dans le critère.
-			String lc = ((LinkCriteria) criteria).getLinkCode();
-			LinkInfo l;
-			String alias;
-			String attcn = colNames.get(((LinkCriteria) criteria).getAttribute());
-			if (attcn == null) {
-				alias = getAlias(lc, null, "_a"); //$NON-NLS-1$
-				l = entityInfo.links.get(lc);
-				if (joinMap.doNotExists(alias)) {
-					joinMap.add(alias, String.format(mapper.fg.joinref, l.table, alias, l.sourceCol, MapperSQLService.DEFAULT_TABLEALIAS, entityInfo.idCol));
-				}
+				code = ((LinkCriteria) criteria).getLinkCode();
 			} else {
-				alias = getAlias(((LinkCriteria) criteria).getAttribute(), lc, "_a"); //$NON-NLS-1$
-				l = mapper.getEntityInfo(getReference(((LinkCriteria) criteria).getAttribute()).getLastAttribute().getRefEntity()).links.get(lc);
-				if (joinMap.doNotExists(alias)) {
-					joinMap.add(alias, String.format(mapper.fg.join, l.table, alias, l.sourceCol, attcn));
-				}
-				// On ne teste pas que l'entité cible ne soit pas supprimée.
-				// La cible est référencée et son id est passé en paramètre. Même si elle supprimée, on l'utilise expressément
-				// donc on doit en tenir compte comme un résultat valide.  
+				code = ((LinkCriteria) criteria).getAttribute() + '/' + ((LinkCriteria) criteria).getLinkCode();
 			}
-			if (l == null) {
-				result.append(mapper.fg.false_cond);
-			} else {
-				// prise en compte des association avec suppression logique.
-				if (l.deleteCol != null) {
-					result.append(mapper.fg.parin);
-				}
-				result.append(String.format(mapper.fg.equal, alias + '.' + l.destCol, Integer.toString(((LinkCriteria) criteria).getId())));
-				if (l.deleteCol != null) {
-					result.append(mapper.fg.and);
-					result.append(alias);
-					result.append('.');
-					result.append(l.deleteCol);
-					result.append(mapper.fg.equaldelfalse);
-					result.append(mapper.fg.parout);
-				}
+			StringBuilder subWhere = new StringBuilder();
+			StringBuilder lastCol = new StringBuilder();
+			JoinElement join = generateLinkJoins(getLinks(code), subWhere, lastCol, deleted, false);
+			if (!subWhere.isEmpty()) {
+				subWhere.append(mapper.fg.and);
 			}
-			
-			
-			
-		} else if (criteria instanceof UnlinkCriteria) {
-			
-			
-			String attcn = colNames.get(((UnlinkCriteria) criteria).getAttribute());
-			LinkInfo l;
-			if (attcn == null) {
-				attcn = MapperSQLService.DEFAULT_TABLEALIAS + '.' + entityInfo.idCol;
-				l = entityInfo.links.get(((UnlinkCriteria) criteria).getLinkCode());
-			} else {
-				l = mapper.getEntityInfo(getReference(((UnlinkCriteria) criteria).getAttribute()).getLastAttribute().getRefEntity()).links.get(((UnlinkCriteria) criteria).getLinkCode());
-			}
-			if (l == null) {
-				result.append(mapper.fg.false_cond);
-			} else {
-				StringBuilder condition = new StringBuilder();
-				int id = ((UnlinkCriteria) criteria).getId();
-				if (id > 0) {
-					condition.append(String.format(mapper.fg.equal, l.destCol, Integer.toString(id)));
-				}
-				if (l.deleteCol != null) {
-					if (id > 0) {
-						condition.append(mapper.fg.and);
-					}
-					condition.append(l.deleteCol);
-					condition.append(mapper.fg.equaldelfalse);
-				}
-				if (condition.length() == 0) {
-					condition.append(mapper.fg.true_cond);
-				}
-				result.append(String.format(mapper.fg.notintoselect, attcn, l.sourceCol, l.table, condition.toString()));
-			}
-			
-			
-			
+			subWhere.append(String.format(mapper.fg.equal, lastCol.toString(), Integer.toString(((LinkCriteria) criteria).getId())));
+			result.append(String.format(mapper.fg.inset, attcn, 
+					String.format(mapper.fg.select, join.getAlias() + join.getId(), join.toString(mapper), subWhere.toString())));
 		} else if (criteria instanceof AbstractLinkTestCriteria) {
-			
-			
-			
-			
-			// We build a join to the target entity, through the association table.
-			// Then we follow the joins of the attributes up to the attribute to be tested.
-			MetaDataLink link = null;
-			LinkInfo l; // = SQL information about the association.
-			String alias; // = alias used for the association.
-			String refcn = colNames.get(((AbstractLinkTestCriteria) criteria).getReference());
-			String lc = ((AbstractLinkTestCriteria) criteria).getLinkCode();
-			if (refcn == null) {
-				alias = getAlias(lc, null, "_a"); //$NON-NLS-1$
-				l = entityInfo.links.get(lc);
-				if (l != null) {
-					link = (MetaDataLink) getEntity().getLink(lc);
-					if (joinMap.doNotExists(alias)) {
-						joinMap.add(alias, String.format(mapper.fg.joinref, l.table, alias, l.sourceCol, MapperSQLService.DEFAULT_TABLEALIAS, entityInfo.idCol));
-					}
-				}
+			String attcn = colNames.get(((AbstractLinkTestCriteria) criteria).getReference());
+			String code;
+			if (attcn == null) {
+				attcn = getIdCol();
+				code = ((AbstractLinkTestCriteria) criteria).getLinkCode();
 			} else {
-				alias = getAlias(((AbstractLinkTestCriteria) criteria).getReference(), lc, "_a"); //$NON-NLS-1$
-				MetaDataEntity refEntity = getReference(((AbstractLinkTestCriteria) criteria).getReference()).getLastAttribute().getRefEntity();
-				l = mapper.getEntityInfo(refEntity).links.get(lc);
-				if (l != null) {
-					link = (MetaDataLink) refEntity.getLink(lc);
-					if (joinMap.doNotExists(alias)) {
-						joinMap.add(alias, String.format(mapper.fg.join, l.table, alias, l.sourceCol, refcn));
+				code = ((AbstractLinkTestCriteria) criteria).getAttribute() + '/' + ((AbstractLinkTestCriteria) criteria).getLinkCode();
+			}
+			StringBuilder subWhere = new StringBuilder();
+			JoinElement join = generateLinkJoins(getLinks(code), subWhere, null, deleted, true);
+			// Follow up the join to the targeted attribute used for the final test...
+			ReferenceLine refline = getLinkReference(code, ((AbstractLinkTestCriteria) criteria).getAttribute());
+			EntityInfo ei = mapper.getEntityInfo(refline.getOriginEntity());
+			JoinElement entityJoin = join.getLastet();
+			String col = buildAttributeColName(refline, ei, entityJoin, false, deleted);
+			if (!subWhere.isEmpty()) {
+				subWhere.append(mapper.fg.and);
+			}
+			String scol = null;
+			if (criteria instanceof IAttributesCriteria) {
+				scol = colNames.get(((LinkEqualCriteria) criteria).getSecondAttribute());
+				// FIXME there is an ambiguity here !
+				if (scol == null) {
+					scol = buildAttributeColName(getLinkReference(code, ((IAttributesCriteria) criteria).getSecondAttribute()), //
+						ei, entityJoin, false, deleted);
+				}
+			}
+			String value = ((AbstractLinkTestCriteria) criteria).getValue();
+			if (value != null) {
+				if (refline.isNumericType()) {
+					try {
+						Integer.parseInt(value);
+					} catch (NumberFormatException e) {
+						try {
+							Float.parseFloat(value);
+						} catch (NumberFormatException ee) {
+							value = enquote(((LinkEqualCriteria) criteria).getValue());
+						}
 					}
 				}
 			}
-			if ((l == null) || (link == null)) {
-				result.append(mapper.fg.false_cond);
-			} else {
-				EntityInfo ei = mapper.getEntityInfo(link.getRefEntity());
-				// Specific alias for this reference table.
-				String refalias = "d_" + alias; //$NON-NLS-1$
-				if (joinMap.doNotExists(refalias)) {
-					joinMap.add(refalias, String.format(mapper.fg.joinref, ei.table, refalias, ei.idCol, alias, l.destCol));
+			// Implement the actual SQL test depending on the real criteria type...
+			if (criteria instanceof LinkEqualCriteria) {
+				if (((LinkEqualCriteria) criteria).getSecondAttribute() != null) {
+					if (((LinkEqualCriteria) criteria).isCasesensitive()) {
+						subWhere.append(String.format(mapper.fg.equal, col, scol));
+					} else {
+						subWhere.append(String.format(mapper.fg.equal, String.format(mapper.fg.lowercase, col), String.format(mapper.fg.lowercase, scol)));
+					}
+				} else if (refline.isNumericType() || ((LinkEqualCriteria) criteria).isCasesensitive()) {
+					subWhere.append(String.format(mapper.fg.equal, col, value));
+				} else {
+					subWhere.append(String.format(mapper.fg.equalignorecase, col, value.toUpperCase()));
 				}
-				// Taking into account associations with logical deletion.
-				if ((l.deleteCol != null) || (ei.deleteCol != null)) {
-					result.append(mapper.fg.parin);
+			} else if (criteria instanceof LinkContainCriteria) {
+				if (((LinkContainCriteria) criteria).isCasesensitive()) {
+					subWhere.append(String.format(mapper.fg.contain, col, escape(((LinkContainCriteria) criteria).getValue())));
+				} else {
+					subWhere.append(String.format(mapper.fg.contain, String.format(mapper.fg.lowercase, col),
+							escape(((LinkContainCriteria) criteria).getValue().toLowerCase())));
 				}
-				String attcn = buildAttributeColName(ei, getReference(link, ((AbstractLinkTestCriteria) criteria).getAttribute()), joinMap, refalias);
-				// Implement the actual SQL test depending on the real criteria type...
-				if (criteria instanceof LinkEqualCriteria) {
-					if (((LinkEqualCriteria) criteria).getSecondAttribute() != null) {
-						if (((LinkEqualCriteria) criteria).isCasesensitive()) {
-							result.append(String.format(mapper.fg.equal, attcn, colNames.get(((LinkEqualCriteria) criteria).getSecondAttribute())));
-						} else {
-							result.append(String.format(mapper.fg.equal, String.format(mapper.fg.lowercase, attcn),
-									String.format(mapper.fg.lowercase, colNames.get(((LinkEqualCriteria) criteria).getSecondAttribute()))));
-						}
-					} else if (getReference(link, ((LinkEqualCriteria) criteria).getAttribute()).isNumericType()) {
-						try {
-							Integer.parseInt(((LinkEqualCriteria) criteria).getValue());
-							result.append(String.format(mapper.fg.equal, attcn, ((LinkEqualCriteria) criteria).getValue()));
-						} catch (NumberFormatException e) {
-							result.append(String.format(mapper.fg.equal, attcn, enquote(((LinkEqualCriteria) criteria).getValue())));
-						}
-					} else if (((LinkEqualCriteria) criteria).isCasesensitive()) {
-						result.append(String.format(mapper.fg.equal, attcn, enquote(((LinkEqualCriteria) criteria).getValue())));
-					} else {
-						result.append(String.format(mapper.fg.equalignorecase, attcn, enquote(((LinkEqualCriteria) criteria).getValue().toUpperCase())));
-					}
-				} else if (criteria instanceof LinkContainCriteria) {
-					if (((LinkContainCriteria) criteria).isCasesensitive()) {
-						result.append(String.format(mapper.fg.contain, attcn, escape(((LinkContainCriteria) criteria).getValue())));
-					} else {
-						result.append(String.format(mapper.fg.contain, String.format(mapper.fg.lowercase, attcn),
-								escape(((LinkContainCriteria) criteria).getValue().toLowerCase())));
-					}
-				} else if (criteria instanceof LinkEndCriteria) {
-					if (((LinkEndCriteria) criteria).isCasesensitive()) {
-						result.append(String.format(mapper.fg.endwith, attcn, escape(((LinkEndCriteria) criteria).getValue())));
-					} else {
-						result.append(String.format(mapper.fg.endwith, String.format(mapper.fg.lowercase, attcn),
-								escape(((LinkEndCriteria) criteria).getValue().toLowerCase())));
-					}
-				} else if (criteria instanceof LinkGreaterStrictCriteria) {
-					if (getReference(link, ((LinkGreaterStrictCriteria) criteria).getAttribute()).isNumericType()) {
-						try {
-							Integer.parseInt(((LinkGreaterStrictCriteria) criteria).getValue());
-							result.append(String.format(mapper.fg.greater, attcn, ((LinkGreaterStrictCriteria) criteria).getValue()));
-						} catch (NumberFormatException e) {
-							result.append(String.format(mapper.fg.greater, attcn, enquote(((LinkGreaterStrictCriteria) criteria).getValue())));
-						}
-					} else {
-						result.append(String.format(mapper.fg.greater, attcn, enquote(((LinkGreaterStrictCriteria) criteria).getValue())));
-					}
-				} else if (criteria instanceof LinkGreaterThanCriteria) {
-					if (getReference(link, ((LinkGreaterThanCriteria) criteria).getAttribute()).isNumericType()) {
-						try {
-							Integer.parseInt(((LinkGreaterThanCriteria) criteria).getValue());
-							result.append(String.format(mapper.fg.greaterorequal, attcn, ((LinkGreaterThanCriteria) criteria).getValue()));
-						} catch (NumberFormatException e) {
-							result.append(String.format(mapper.fg.greaterorequal, attcn, enquote(((LinkGreaterThanCriteria) criteria).getValue())));
-						}
-					} else {
-						result.append(String.format(mapper.fg.greaterorequal, attcn, enquote(((LinkGreaterThanCriteria) criteria).getValue())));
-					}
-				} else if (criteria instanceof LinkLowerStrictCriteria) {
-					if (getReference(link, ((LinkLowerStrictCriteria) criteria).getAttribute()).isNumericType()) {
-						try {
-							Integer.parseInt(((LinkLowerStrictCriteria) criteria).getValue());
-							result.append(String.format(mapper.fg.lower, attcn, ((LinkLowerStrictCriteria) criteria).getValue()));
-						} catch (NumberFormatException e) {
-							result.append(String.format(mapper.fg.lower, attcn, enquote(((LinkLowerStrictCriteria) criteria).getValue())));
-						}
-					} else {
-						result.append(String.format(mapper.fg.lower, attcn, enquote(((LinkLowerStrictCriteria) criteria).getValue())));
-					}
-				} else if (criteria instanceof LinkLowerThanCriteria) {
-					if (getReference(link, ((LinkLowerThanCriteria) criteria).getAttribute()).isNumericType()) {
-						try {
-							Integer.parseInt(((LinkLowerThanCriteria) criteria).getValue());
-							result.append(String.format(mapper.fg.lowerorequal, attcn, ((LinkLowerThanCriteria) criteria).getValue()));
-						} catch (NumberFormatException e) {
-							result.append(String.format(mapper.fg.lowerorequal, attcn, enquote(((LinkLowerThanCriteria) criteria).getValue())));
-						}
-					} else {
-						result.append(String.format(mapper.fg.lowerorequal, attcn, enquote(((LinkLowerThanCriteria) criteria).getValue())));
-					}
-				} else if (criteria instanceof LinkStartCriteria) {
-					if (((LinkStartCriteria) criteria).isCasesensitive()) {
-						result.append(String.format(mapper.fg.startwith, attcn, escape(((LinkStartCriteria) criteria).getValue())));
-					} else {
-						result.append(String.format(mapper.fg.startwith, String.format(mapper.fg.lowercase, attcn), escape(((LinkStartCriteria) criteria).getValue().toLowerCase())));
-					}
+			} else if (criteria instanceof LinkEndCriteria) {
+				if (((LinkEndCriteria) criteria).isCasesensitive()) {
+					subWhere.append(String.format(mapper.fg.endwith, col, escape(((LinkEndCriteria) criteria).getValue())));
+				} else {
+					subWhere.append(String.format(mapper.fg.endwith, String.format(mapper.fg.lowercase, col),
+							escape(((LinkEndCriteria) criteria).getValue().toLowerCase())));
 				}
-				if (ei.deleteCol != null) {
-					result.append(mapper.fg.and);
-					result.append(refalias);
-					result.append('.');
-					result.append(ei.deleteCol);
-					result.append(mapper.fg.equaldelfalse);
-				}
-				if (l.deleteCol != null) {
-					result.append(mapper.fg.and);
-					result.append(alias);
-					result.append('.');
-					result.append(l.deleteCol);
-					result.append(mapper.fg.equaldelfalse);
-				}
-				if ((l.deleteCol != null) || (ei.deleteCol != null)) {
-					result.append(mapper.fg.parout);
+			} else if (criteria instanceof LinkGreaterStrictCriteria) {
+				subWhere.append(String.format(mapper.fg.greater, col, value));
+			} else if (criteria instanceof LinkGreaterThanCriteria) {
+				subWhere.append(String.format(mapper.fg.greaterorequal, col, value));
+			} else if (criteria instanceof LinkLowerStrictCriteria) {
+				subWhere.append(String.format(mapper.fg.lower, col, value));
+			} else if (criteria instanceof LinkLowerThanCriteria) {
+				subWhere.append(String.format(mapper.fg.lowerorequal, col, value));
+			} else if (criteria instanceof LinkStartCriteria) {
+				if (((LinkStartCriteria) criteria).isCasesensitive()) {
+					subWhere.append(String.format(mapper.fg.startwith, col, escape(((LinkStartCriteria) criteria).getValue())));
+				} else {
+					subWhere.append(String.format(mapper.fg.startwith, String.format(mapper.fg.lowercase, col), escape(((LinkStartCriteria) criteria).getValue().toLowerCase())));
 				}
 			}
+			result.append(String.format(mapper.fg.inset, attcn, 
+					String.format(mapper.fg.select, join.getAlias() + join.getId(), join.toString(mapper), subWhere.toString())));
 		} else if (criteria instanceof LowerStrictCriteria) {
 			if (getReference(((LowerStrictCriteria) criteria).getAttribute()).isNumericType()) {
 				try {

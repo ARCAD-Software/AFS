@@ -63,6 +63,11 @@ public class LinkCriteria extends AbstractSearchCriteria implements Cloneable, I
 		this(id, linkCode, attribute);
 		this.ignoreSubdivision = ignoreSubdivision;
 	}
+	
+	public LinkCriteria(int id, String linkCode, String attribute, boolean ignoreSubdivision, boolean deleted) {
+		this(id, linkCode, attribute, ignoreSubdivision);
+		this.deleted = deleted;
+	}
 
 	public LinkCriteria() {
 		super();

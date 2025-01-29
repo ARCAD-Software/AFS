@@ -24,7 +24,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
@@ -39,54 +38,15 @@ import com.arcadsoftware.beanmap.BeanMapPartialList;
 import com.arcadsoftware.crypt.Crypto;
 import com.arcadsoftware.dbutils.QueryRunnerEx;
 import com.arcadsoftware.metadata.AbstractMapperService;
-import com.arcadsoftware.metadata.Element;
 import com.arcadsoftware.metadata.MetaDataAttribute;
 import com.arcadsoftware.metadata.MetaDataEntity;
 import com.arcadsoftware.metadata.MetaDataLink;
 import com.arcadsoftware.metadata.ReferenceLine;
-import com.arcadsoftware.metadata.criteria.AbstractLinkTestCriteria;
-import com.arcadsoftware.metadata.criteria.AfterCriteria;
 import com.arcadsoftware.metadata.criteria.AndCriteria;
-import com.arcadsoftware.metadata.criteria.AttributeEqualsCriteria;
-import com.arcadsoftware.metadata.criteria.AttributeLowerCriteria;
-import com.arcadsoftware.metadata.criteria.AttributeLowerOrEqualsCriteria;
-import com.arcadsoftware.metadata.criteria.BeforeCriteria;
-import com.arcadsoftware.metadata.criteria.BetweenCriteria;
-import com.arcadsoftware.metadata.criteria.ChangedCriteria;
 import com.arcadsoftware.metadata.criteria.ConstantCriteria;
-import com.arcadsoftware.metadata.criteria.ContainCriteria;
-import com.arcadsoftware.metadata.criteria.DeletedCriteria;
-import com.arcadsoftware.metadata.criteria.EndCriteria;
-import com.arcadsoftware.metadata.criteria.EqualCriteria;
-import com.arcadsoftware.metadata.criteria.GreaterStrictCriteria;
-import com.arcadsoftware.metadata.criteria.GreaterThanCriteria;
-import com.arcadsoftware.metadata.criteria.HasRightCriteria;
 import com.arcadsoftware.metadata.criteria.ISearchCriteria;
 import com.arcadsoftware.metadata.criteria.IdEqualCriteria;
-import com.arcadsoftware.metadata.criteria.IdGreaterStrictCriteria;
-import com.arcadsoftware.metadata.criteria.IdGreaterThanCriteria;
 import com.arcadsoftware.metadata.criteria.InListCriteria;
-import com.arcadsoftware.metadata.criteria.IdLowerStrictCriteria;
-import com.arcadsoftware.metadata.criteria.IdLowerThanCriteria;
-import com.arcadsoftware.metadata.criteria.IsNullCriteria;
-import com.arcadsoftware.metadata.criteria.IsTrueCriteria;
-import com.arcadsoftware.metadata.criteria.LinkContainCriteria;
-import com.arcadsoftware.metadata.criteria.LinkCriteria;
-import com.arcadsoftware.metadata.criteria.LinkEndCriteria;
-import com.arcadsoftware.metadata.criteria.LinkEqualCriteria;
-import com.arcadsoftware.metadata.criteria.LinkGreaterStrictCriteria;
-import com.arcadsoftware.metadata.criteria.LinkGreaterThanCriteria;
-import com.arcadsoftware.metadata.criteria.LinkLowerStrictCriteria;
-import com.arcadsoftware.metadata.criteria.LinkLowerThanCriteria;
-import com.arcadsoftware.metadata.criteria.LinkStartCriteria;
-import com.arcadsoftware.metadata.criteria.LowerStrictCriteria;
-import com.arcadsoftware.metadata.criteria.LowerThanCriteria;
-import com.arcadsoftware.metadata.criteria.NotCriteria;
-import com.arcadsoftware.metadata.criteria.OrCriteria;
-import com.arcadsoftware.metadata.criteria.PreGeneratedCriteria;
-import com.arcadsoftware.metadata.criteria.StartCriteria;
-import com.arcadsoftware.metadata.criteria.SubstCriteria;
-import com.arcadsoftware.metadata.criteria.UnlinkCriteria;
 import com.arcadsoftware.metadata.sql.internal.Activator;
 import com.arcadsoftware.metadata.sql.internal.BeanMapHandler;
 import com.arcadsoftware.metadata.sql.internal.BeanMapListHandler;
@@ -606,7 +566,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		if (hardDelete || (e.deleteCol == null)) {
 			// Generate where clause before the joins...
 			String where = context.generateCriteria(criteria, true).toString();
-			return update(String.format(fg.delete_hardex, context.generateJoins(), where), new Object[0]);
+			return update(String.format(fg.delete_hardex, context.generateJoins(true), where), new Object[0]);
 		}
 		// An SQL limitation may prevent the usage of joins in updates...
 		final Boolean hasjoins = context.hasReferences();
@@ -649,7 +609,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		if (hasjoins) {
 			// Generate where clause before the joins...
 			StringBuilder where = context.generateCriteria(criteria, true);
-			return update(String.format(fg.update_join, DEFAULT_TABLEALIAS, lcols, context.generateJoins(), where.toString()), vals);
+			return update(String.format(fg.update_join, DEFAULT_TABLEALIAS, lcols, context.generateJoins(true), where.toString()), vals);
 		}
 		for (ReferenceLine ref: context.getReferences()) {
 			String code = ref.getCode();
@@ -661,7 +621,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 				colNames.put(code, col);
 			}
 		}
-		return update(String.format(fg.updateex, e.table, lcols, context.generateCriteria(criteria, true).toString()), vals);
+		return update(String.format(fg.updateex, e.table + fg.as + DEFAULT_TABLEALIAS, lcols, context.generateCriteria(criteria, true).toString()), vals);
 	}
 
 	@Override
@@ -715,7 +675,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		}
 		StringBuilder where = context.generateCriteria(criteria, true);
 		if (hasjoins) {
-			return update(String.format(fg.update_join, DEFAULT_TABLEALIAS, lcols, context.generateJoins(), where.toString()), vals);
+			return update(String.format(fg.update_join, DEFAULT_TABLEALIAS, lcols, context.generateJoins(true), where.toString()), vals);
 		}
 		return update(String.format(fg.updateex, e.table, lcols, where.toString()), vals);
 	}
@@ -786,7 +746,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 			return update(String.format(fg.updateex, e.table, lcols, fg.true_cond), values.toArray(new Object[values.size()])) > 0;
 		}
 		if (hasjoins) {
-			return update(String.format(fg.update_join, DEFAULT_TABLEALIAS, lcols, context.generateJoins(), where.toString()), //
+			return update(String.format(fg.update_join, DEFAULT_TABLEALIAS, lcols, context.generateJoins(false), where.toString()), //
 					values.toArray(new Object[values.size()])) > 0;
 		}
 		// Joins map is not used here (the criteria reduction does not own any joins... it is only used to avoid NPE.
@@ -806,7 +766,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		if (link.isRecursive()) {
 			// Test if this new element does not create a cycle...
 			if (l.sql_rectest == null) {
-				String rec_alias = RECURCIVE_PREFIX + link.getCode();
+				String rec_alias = "r_" + link.getCode(); //$NON-NLS-1$
 				if (l.sql_rec == null) {
 					l.sql_rec = String.format(fg.recursive, rec_alias, l.table, l.destCol, l.sourceCol);
 				}
@@ -880,7 +840,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		}
 		StringBuilder cols = context.generateColumns(attributes, deleted);
 		StringBuilder where = context.generateCriteria(new IdEqualCriteria(itemId), deleted);
-		return completeForeignAttributes(attributes, query(String.format(fg.select, cols.toString(), context.generateJoins(), where.toString()), entity.getType(), null));
+		return completeForeignAttributes(attributes, query(String.format(fg.select, cols.toString(), context.generateJoins(deleted), where.toString()), entity.getType(), null));
 	}
 
 	@Override
@@ -893,45 +853,45 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		if (distinct) {
 			cols.insert(0, fg.distinct);
 		}
-		String orderCols = context.generateOrders(orders);
+		String orderCols = context.generateOrders(orders, deleted);
 		StringBuilder where = context.generateCriteria(criteria, deleted);
 		String query;
 		if (((page == 0) && (limit <= 0)) || (fg.partial == null) || (fg.partial.length() == 0)) {
 			// Pas de pagination (pas nécessaire ou not supporté par le SGDB).
 			if (where.length() == 0) {
 				if (orderCols.length() == 0) {
-					query = ((SQLCriteriaContext) context).formatQuery(fg.selectall, cols.toString(), context.generateJoins());
+					query = ((SQLCriteriaContext) context).formatQuery(fg.selectall, cols.toString(), context.generateJoins(deleted));
 				} else {
-					query = ((SQLCriteriaContext) context).formatQuery(fg.selectallorder, cols.toString(), context.generateJoins(), orderCols);
+					query = ((SQLCriteriaContext) context).formatQuery(fg.selectallorder, cols.toString(), context.generateJoins(deleted), orderCols);
 				}
 			} else if (orderCols.length() == 0) {
-				query = ((SQLCriteriaContext) context).formatQuery(fg.select, cols.toString(), context.generateJoins(), where.toString());
+				query = ((SQLCriteriaContext) context).formatQuery(fg.select, cols.toString(), context.generateJoins(deleted), where.toString());
 			} else {
-				query = ((SQLCriteriaContext) context).formatQuery(fg.selectorder, cols.toString(), context.generateJoins(), where.toString(), orderCols);
+				query = ((SQLCriteriaContext) context).formatQuery(fg.selectorder, cols.toString(), context.generateJoins(deleted), where.toString(), orderCols);
 			}
 		} else {
 			if (where.length() == 0) {
 				if (orderCols.length() == 0) {
-					query = ((SQLCriteriaContext) context).formatQuery(fg.partialall, cols.toString(), context.generateJoins(), //
+					query = ((SQLCriteriaContext) context).formatQuery(fg.partialall, cols.toString(), context.generateJoins(deleted), //
 							page, // first element to return
 							limit, // number of element to return
 							page + limit + 1, // first element to not return.
 							context.getEntityInfo().idCol);
 				} else {
-					query = ((SQLCriteriaContext) context).formatQuery(fg.partialallorder, cols.toString(), context.generateJoins(), //
+					query = ((SQLCriteriaContext) context).formatQuery(fg.partialallorder, cols.toString(), context.generateJoins(deleted), //
 							page, // first element to return
 							limit, // number of element to return
 							page + limit + 1, // first element to not return.
 							orderCols.toString(), context.getEntityInfo().idCol);
 				}
 			} else if (orderCols.length() == 0) {
-				query = ((SQLCriteriaContext) context).formatQuery(fg.partial, cols.toString(), context.generateJoins(), where.toString(), //
+				query = ((SQLCriteriaContext) context).formatQuery(fg.partial, cols.toString(), context.generateJoins(deleted), where.toString(), //
 				page, // first element to return
 				limit, // number of element to return
 				page + limit + 1, // first element to not return.
 				context.getEntityInfo().idCol);
 			} else {
-				query = ((SQLCriteriaContext) context).formatQuery(fg.partialorder, cols.toString(), context.generateJoins(), where.toString(), //
+				query = ((SQLCriteriaContext) context).formatQuery(fg.partialorder, cols.toString(), context.generateJoins(deleted), where.toString(), //
 						page, // first element to return
 						limit, // number of element to return
 						page + limit + 1, // first element to not return.
@@ -963,9 +923,9 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		final StringBuilder where = context.generateCriteria(criteria, deleted);
 		final String query;
 		if (where.length() == 0) {
-			query = ((SQLCriteriaContext) context).formatQuery(fg.selectall, cols.toString(), context.generateJoins());
+			query = ((SQLCriteriaContext) context).formatQuery(fg.selectall, cols.toString(), context.generateJoins(deleted));
 		} else {
-			query = ((SQLCriteriaContext) context).formatQuery(fg.select, cols.toString(), context.generateJoins(), where.toString());
+			query = ((SQLCriteriaContext) context).formatQuery(fg.select, cols.toString(), context.generateJoins(deleted), where.toString());
 		}
 		return completeForeignAttributes(attributes, query(query, context.getEntity().getType(), null));
 	}
@@ -984,9 +944,9 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		}
 		StringBuilder where = context.generateCriteria(criteria, deleted);
 		if (where.isEmpty()) {
-			return count(((SQLCriteriaContext) context).formatQuery(fg.selectall, col, context.generateJoins()), null);
+			return count(((SQLCriteriaContext) context).formatQuery(fg.selectall, col, context.generateJoins(deleted)), null);
 		}
-		return count(((SQLCriteriaContext) context).formatQuery(fg.select, col, context.generateJoins(), where.toString()), null);
+		return count(((SQLCriteriaContext) context).formatQuery(fg.select, col, context.generateJoins(deleted), where.toString()), null);
 	}
 
 	@Override
@@ -1006,87 +966,80 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		if (mlq.rec_alias != null) {
 			context.addQueryContext(mlq.rec_alias, mlq.rec_query);
 		}
-		context.initJoinTree(mlq.join);
-		StringBuilder cols = new StringBuilder();
-		if (distinct) {
-			cols.append(fg.distinct);
-		}
-		final HashMap<String, String> colNames = new HashMap<String, String>();
-		final StringBuilder orderCols = new StringBuilder();
 		final MetaDataEntity targetEntity = context.getEntity();
 		if (targetEntity == null) {
 			return new BeanMapPartialList();
 		}
-		final StringBuilder where = new StringBuilder(mlq.where);
+		final StringBuilder cols;
+		final StringBuilder where;
+		final String orderCols;
 		final EntityInfo tei = getEntityInfo(targetEntity); 
+		JoinElement join = context.initJoinTree(mlq.linkAlias, mlq.join, tei, mlq.linkCol, deleted);
 		if (tei == null) {
 			// Just get the list of ID to pass to the foreign mapper...
+			cols = new StringBuilder();
 			cols.append(mlq.linkAlias);
 			cols.append('.');
 			cols.append(mlq.linkCol);
 			cols.append(fg.asid);
+			where = new StringBuilder(mlq.where);
+			orderCols = ""; //$NON-NLS-1$
 		} else {
-			joins.add(DEFAULT_TABLEALIAS, String.format(fg.joinref, tei.table, DEFAULT_TABLEALIAS, tei.idCol, 
-					mlq.linkAlias, mlq.linkCol));
-			generateColumns(context.getEntity(), tei, attributes, joins, colNames, cols, DEFAULT_TABLEALIAS);
-			generateOrders(orders, colNames, orderCols);
-			generateContextCols(tei, context, joins, colNames, DEFAULT_TABLEALIAS);
-			if ((criteria != null) && !ConstantCriteria.TRUE.equals(criteria)) {
-				criteria = getLocalCriteria(criteria, context);
-				if (ConstantCriteria.FALSE.equals(criteria)) {
-					return new BeanMapPartialList();
+			cols = context.generateColumns(tei, join, attributes, deleted);
+			orderCols = context.generateOrders(orders, deleted);
+			where = context.generateCriteria(criteria, deleted);
+			if (!mlq.where.isEmpty()) {
+				if (!where.isEmpty()) {
+					where.append(fg.and);
 				}
-				if (!ConstantCriteria.TRUE.equals(criteria)) {
-					if (where.length() > 0) {
-						where.append(fg.and);
-					}
-					generateCriteria(tei, criteria, context, colNames, joins, where);
-				}
+				where.append(mlq.where);
 			}
-			generateDeleteTest(tei, deleted, cols, where);
+		}
+		if (distinct) {
+			cols.insert(0, fg.distinct);
 		}
 		String query;
 		boolean softPagination = false;
 		if (((page == 0) && (limit <= 0)) || (fg.partial == null) || (fg.partial.length() == 0) || (tei == null)) {
 			softPagination = (fg.partial == null) || (fg.partial.length() == 0);
 			// Pas de pagination (pas nécessaire ou non supporté par le SGDB).
-			if (where.length() == 0) {
-				if (orderCols.length() == 0) {
-					query = ((SQLCriteriaContext) context).formatQuery(fg.selectall, cols.toString(), context.generateJoins());
+			if (where.isEmpty()) {
+				if (orderCols.isEmpty()) {
+					query = ((SQLCriteriaContext) context).formatQuery(fg.selectall, cols.toString(), context.generateJoins(deleted));
 				} else {
-					query = ((SQLCriteriaContext) context).formatQuery(fg.selectallorder, cols.toString(), context.generateJoins(), orderCols.toString());
+					query = ((SQLCriteriaContext) context).formatQuery(fg.selectallorder, cols.toString(), context.generateJoins(deleted), orderCols);
 				}
-			} else if (orderCols.length() == 0) {
-				query = ((SQLCriteriaContext) context).formatQuery(fg.select, cols.toString(), context.generateJoins(), where.toString());
+			} else if (orderCols.isEmpty()) {
+				query = ((SQLCriteriaContext) context).formatQuery(fg.select, cols.toString(), context.generateJoins(deleted), where.toString());
 			} else {
-				query = ((SQLCriteriaContext) context).formatQuery(fg.selectorder, cols.toString(), context.generateJoins(), where.toString(), orderCols.toString());
+				query = ((SQLCriteriaContext) context).formatQuery(fg.selectorder, cols.toString(), context.generateJoins(deleted), where.toString(), orderCols);
 			}
 		} else if (where.isEmpty()) {
 			if (orderCols.isEmpty()) {
-				query = ((SQLCriteriaContext) context).formatQuery(fg.partialall, cols.toString(), context.generateJoins(), //
+				query = ((SQLCriteriaContext) context).formatQuery(fg.partialall, cols.toString(), context.generateJoins(deleted), //
 						page, // first element to return
 						limit, // number of element to return
 						page + limit + 1, // first element to not return.
 						tei.idCol);
 			} else {
-				query = ((SQLCriteriaContext) context).formatQuery(fg.partialallorder, cols.toString(), context.generateJoins(), //
+				query = ((SQLCriteriaContext) context).formatQuery(fg.partialallorder, cols.toString(), context.generateJoins(deleted), //
 						page, // first element to return
 						limit, // number of element to return
 						page + limit + 1, // first element to not return.
-						orderCols.toString(), tei.idCol);
+						orderCols, tei.idCol);
 			}
 		} else if (orderCols.isEmpty()) {
-			query = ((SQLCriteriaContext) context).formatQuery(fg.partial, cols.toString(), context.generateJoins(), where.toString(), //
+			query = ((SQLCriteriaContext) context).formatQuery(fg.partial, cols.toString(), context.generateJoins(deleted), where.toString(), //
 			page, // first element to return
 			limit, // number of element to return
 			page + limit + 1, // first element to not return.
 			tei.idCol);
 		} else {
-			query = ((SQLCriteriaContext) context).formatQuery(fg.partialorder, cols.toString(), context.generateJoins(), where.toString(), //
+			query = ((SQLCriteriaContext) context).formatQuery(fg.partialorder, cols.toString(), context.generateJoins(deleted), where.toString(), //
 					page, // first element to return
 					limit, // number of element to return
 					page + limit + 1, // first element to not return.
-					orderCols.toString(), tei.idCol);
+					orderCols, tei.idCol);
 		}
 		BeanMapList result;
 		if (limit < 0) {
@@ -1179,34 +1132,32 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 			context.addQueryContext(mlq.rec_alias, mlq.rec_query);
 		}
 		final EntityInfo e = getEntityInfo(context.getEntity());
-		context.initJoinTree(mlq.join);
-		final StringBuilder where = new StringBuilder(mlq.where);
+		String alias = context.initJoinTree(mlq.linkAlias, mlq.join, e, mlq.linkCol, deleted).getAlias();
+		final StringBuilder where;
 		final String col;
 		if (e == null) {
 			col = fg.count;
+			where = new StringBuilder(mlq.where);
 			// Link "extra-mapper"...
 			// FIXME This ignore the distinct constraint !!!
 			// FIXME Ignore the criteria clause !!!
 			// FIXME This assume that the linked data are not deleted !!!
 		} else {
-			joins.add(DEFAULT_TABLEALIAS, String.format(fg.join_inner, e.table, DEFAULT_TABLEALIAS, e.idCol, 
-					mlq.linkAlias + '.' + mlq.linkCol));
 			// A distinct clause need columns... but as long as we select the ID primary key in each request
 			// this information is enough to count distinct selection.
 			if (distinct) {
-				col = String.format(fg.count_distinct, DEFAULT_TABLEALIAS + '.' + e.idCol);
+				col = String.format(fg.count_distinct, alias + '.' + e.idCol);
 			} else {
 				col = fg.count;
 			}
-			if (criteria != null) {
-				criteria = getLocalCriteria(criteria, context);
-				if (ConstantCriteria.FALSE.equals(criteria)) {
-					return 0;
+			where = context.generateCriteria(criteria, deleted);
+			if (!mlq.where.isEmpty()) {
+				if (!where.isEmpty()) {
+					where.append(fg.and);
 				}
-				where.append(fg.and);
+				where.append(mlq.where);
 			}
-			context.generateCriteria(criteria, deleted, where);
 		}
-		return count(((SQLCriteriaContext) context).formatQuery(fg.select, col, context.generateJoins(), where.toString()), new Object[] {sourceId});
+		return count(((SQLCriteriaContext) context).formatQuery(fg.select, col, context.generateJoins(deleted), where.toString()), new Object[] {sourceId});
 	}
 }

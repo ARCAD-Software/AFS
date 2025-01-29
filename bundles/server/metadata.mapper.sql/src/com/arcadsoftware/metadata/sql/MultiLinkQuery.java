@@ -28,6 +28,7 @@ import com.arcadsoftware.metadata.MetaDataLink;
  */
 public class MultiLinkQuery {
 
+	private static final String RECURCIVE_PREFIX = "r_"; //$NON-NLS-1$
 	private static final String DEFAULT_LINKALIASPREFIX = "l_"; //$NON-NLS-1$
 	private static final String LNKALS_INRECQUERY = "rl"; //$NON-NLS-1$
 
@@ -159,7 +160,7 @@ public class MultiLinkQuery {
 				final LinkInfo rli = csei.links.get(recLink.getCode());
 				// If the recursive link is unknown or incomplete, process like a normal link.
 				if ((rli != null) && rli.isComplete()) {
-					rec_alias = MapperSQLService.RECURCIVE_PREFIX + alias;
+					rec_alias = RECURCIVE_PREFIX + alias;
 					final String firstSelect;
 					if (joins == null) {
 						firstSelect = mapper.fg.select_const;
@@ -283,7 +284,7 @@ public class MultiLinkQuery {
 					// If the recursive link is unknown or incomplete, process like a normal link.
 					if ((rfli != null) && rfli.isComplete()) {
 						alias++;
-						rec_alias = MapperSQLService.RECURCIVE_PREFIX + alias;
+						rec_alias = RECURCIVE_PREFIX + alias;
 						final StringBuilder del = new StringBuilder();
 						// check if current entity items are not deleted too.
 						if ((!deleted) && (fei.deleteCol != null)) {
