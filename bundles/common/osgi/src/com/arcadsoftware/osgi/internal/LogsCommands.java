@@ -26,7 +26,8 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
-import org.osgi.service.log.LogService;
+
+import com.arcadsoftware.osgi.AbstractActivator;
 
 public class LogsCommands implements CommandProvider {
 
@@ -92,7 +93,7 @@ public class LogsCommands implements CommandProvider {
 				ci.println(e.getLocalizedMessage());
 			}
 		} else {
-			configLog(LogService.LOG_INFO, message.toString(), null);
+			configLog(AbstractActivator.LOG_INFO, message.toString(), null);
 		}
 		ci.println(Messages.getString("osgi.MessageLogged")); //$NON-NLS-1$
 	}
@@ -105,7 +106,7 @@ public class LogsCommands implements CommandProvider {
 				message.append(s);
 				s = ci.nextArgument();
 			}
-			configLog(LogService.LOG_DEBUG, message.toString(), null);
+			configLog(AbstractActivator.LOG_DEBUG, message.toString(), null);
 			ci.println(Messages.getString("osgi.MessageLogged")); //$NON-NLS-1$
 		
 	}

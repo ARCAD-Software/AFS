@@ -18,34 +18,57 @@ import java.util.ArrayList;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
-import org.osgi.service.log.LogService;
+
+import com.arcadsoftware.osgi.AbstractActivator;
+
+import org.osgi.service.log.Logger;
+import org.osgi.service.log.LoggerFactory;
 
 /**
  * This tracker is useful to log a message to all available LogServices.
  */
-public class LogTracker extends ServiceTracker<LogService, LogService> {
+public class LogTracker extends ServiceTracker<LoggerFactory, Logger> {
 
-	private ArrayList<WaitingLogEntry> tempMessages = new ArrayList<WaitingLogEntry>();
+	private final ArrayList<WaitingLogEntry> tempMessages = new ArrayList<WaitingLogEntry>();
+	
+	private final BundleContext context;
+	private final String name;
 	
 	public LogTracker(BundleContext context) {
-		super(context, LogService.class, null);
+		super(context, LoggerFactory.class, null);
+		this.context = context;
+		name = context.getBundle().getSymbolicName();
+	}
+	
+	public LogTracker(BundleContext context, String name) {
+		super(context, LoggerFactory.class, null);
+		this.context = context;
+		this.name = name;
 	}
 
 	@Override
-	public LogService addingService(ServiceReference<LogService> reference) {
-		LogService logger = super.addingService(reference);
-		if (logger != null) {
+	public Logger addingService(ServiceReference<LoggerFactory> reference) {
+		LoggerFactory loggerFactory = context.getService(reference);
+		if (loggerFactory != null) {
+			Logger logger = loggerFactory.getLogger(context.getBundle(), name, Logger.class);
 			synchronized (this) {
 				try {
 					for (WaitingLogEntry entry : tempMessages) {
-						logger.log(entry.getReference(), entry.getLevel(), entry.getMessage(), entry.getException());
+						log(logger, entry.getLevel(), entry.getMessage(), entry.getObjects());
 					}
 				} finally {
 					tempMessages.clear();
 				}
 			}
+			
 		}
-		return logger;
+		return null;
+	}
+
+	@Override
+	public void removedService(ServiceReference<LoggerFactory> reference, Logger service) {
+		// TODO Auto-generated method stub
+		super.removedService(reference, service);
 	}
 
 	/**
@@ -56,38 +79,61 @@ public class LogTracker extends ServiceTracker<LogService, LogService> {
 	 * @param message
 	 * @param exception
 	 */
-	public void log(ServiceReference<?> reference, int level, String message, Throwable exception) {
-		ServiceReference<LogService>[] references = getServiceReferences();
-		int size = 0;
-		if (references != null) {
-			size = references.length;
-			for (ServiceReference<LogService> logref : references) {
-				LogService logger = getService(logref);
-				if (logger == null) {
-					size--;
-				} else {
+	public void log(int level, String message, Object... objects) {
+		Object[] loggers = getServices();
+		boolean logged = false;
+		if (loggers != null) {
+			for (Object logger : loggers) {
+				if (logger instanceof Logger) {
 					try {
-						logger.log(reference, level, message, exception);
+						log((Logger) logger, level, message, objects);
+						logged = true;
 					} catch (Exception e) {
 						e.printStackTrace();
-						size--;
 					}
 				}
 			}
 		} 
-		// There is no OSGi log service implemented...
-		if (size == 0) {
-			if (level >= LogService.LOG_ERROR) {
+		// There is no OSGi log service implemented... yet.
+		if (!logged) {
+			if (level >= AbstractActivator.LOG_ERROR) {
 				System.err.println(message);
 			} else {
 				System.out.println(message);
 			}
-			if (exception != null) { 
-				exception.printStackTrace();
+			for (Object o: objects) {
+				if (o instanceof Throwable) {
+					((Throwable) o).printStackTrace();
+				}
 			}
-			synchronized (this) {
-				tempMessages.add(new WaitingLogEntry(reference,level,message,exception));
+			if (tempMessages.size() < 2000) {
+				synchronized (this) {
+					tempMessages.add(new WaitingLogEntry(level, message, objects));
+				}
 			}
+		}
+	}
+
+	private void log(Logger logger, int level, String message, Object[] objects) {
+		switch (level) {
+		case AbstractActivator.LOG_AUDIT:
+			logger.audit(message, objects);
+			break;
+		case AbstractActivator.LOG_ERROR:
+			logger.error(message, objects);
+			break;
+		case AbstractActivator.LOG_WARNING:
+			logger.warn(message, objects);
+			break;
+		case AbstractActivator.LOG_INFO:
+			logger.info(message, objects);
+			break;
+		case AbstractActivator.LOG_DEBUG:
+			logger.debug(message, objects);
+			break;
+		case AbstractActivator.LOG_TRACE:
+			logger.trace(message, objects);
+			break;
 		}
 	}
 }

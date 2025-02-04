@@ -13,15 +13,12 @@
  *******************************************************************************/
 package com.arcadsoftware.osgi.internal;
 
-import java.util.Timer;
-
 import org.eclipse.core.runtime.adaptor.EclipseStarter;
 import org.eclipse.osgi.framework.console.CommandProvider;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
 import com.arcadsoftware.osgi.AbstractConfiguredActivator;
-import com.arcadsoftware.osgi.ISystemParameters;
 
 /**
  * This bundle activator provide some useful console commands.
@@ -42,8 +39,6 @@ public class Activator extends AbstractConfiguredActivator implements Runnable {
 		return instance;
 	}
 	
-	private SystemParameters sysTester;
-	private Timer timer;
 	private StartTaskManager taskManager;
 	private volatile boolean shutdown;
 
@@ -52,12 +47,9 @@ public class Activator extends AbstractConfiguredActivator implements Runnable {
 		instance = this;
 		super.start(context);
 		Runtime.getRuntime().addShutdownHook(new Thread(this));
-		sysTester = new SystemParameters(this);
 		// Tracker de Tache de démarrage multi-contraintes.
 		taskManager = new StartTaskManager(this);
 		registerService(CommandProvider.class.getName(), taskManager);
-		// Service de protection de license...
-		registerService(ISystemParameters.clazz, sysTester);
 		// Console command provider...
 		if ("true".equalsIgnoreCase(context.getProperty(CONFIGCMD)) || //$NON-NLS-1$
 				(context.getBundle().getEntry("/.classpath") != null)) { //$NON-NLS-1$
@@ -66,14 +58,7 @@ public class Activator extends AbstractConfiguredActivator implements Runnable {
 		LogsCommands logc = new LogsCommands(this, context);
 		ServiceRegistration<CommandProvider> sr = registerService(CommandProvider.class, logc);
 		logc.setServiceRef(sr.getReference());
-		if (timer != null) {
-			timer.cancel();
-		}
 		registerService(CommandProvider.class, new SystemCommands(context));
-		// Timer pour tester les paramètres d'activation du système.
-		timer = new Timer("System Process Monitor"); //$NON-NLS-1$
-		timer.schedule(new SystemTestTask(getContext(),sysTester,(ConfigurationTracker) getConfigurationTracker()), 600000, 21600000); 
-		// dans 10 minutes puis toutes les 6 heures
 	}
 
 	@Override
@@ -84,10 +69,6 @@ public class Activator extends AbstractConfiguredActivator implements Runnable {
 			taskManager = null;
 		}
 		super.stop(context);
-		if (timer != null) {
-			timer.cancel();
-			timer = null;
-		}
 		if (instance == this) {
 			instance = null;
 		}

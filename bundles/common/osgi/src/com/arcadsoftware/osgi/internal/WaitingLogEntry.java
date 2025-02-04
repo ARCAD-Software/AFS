@@ -13,62 +13,32 @@
  *******************************************************************************/
 package com.arcadsoftware.osgi.internal;
 
-import org.osgi.framework.ServiceReference;
-
 /**
  * Temp log entry, waiting to be logged.
+ * @see LogTracker
  */
 public class WaitingLogEntry {
 
-	private ServiceReference<?> reference;
-	private int level;
-	private String message;
-	private Throwable exception;
+	private final int level;
+	private final String message;
+	private final Object[] objects;
 
-	/**
-	 * @param exception
-	 * @param level
-	 * @param message
-	 * @param reference
-	 */
-	public WaitingLogEntry(ServiceReference<?> reference, int level, String message, Throwable exception) {
+	public WaitingLogEntry(int level, String message, Object... objects) {
 		super();
-		this.exception = exception;
+		this.objects = objects;
 		this.level = level;
 		this.message = message;
-		this.reference = reference;
-	}
-
-	public ServiceReference<?> getReference() {
-		return reference;
-	}
-
-	public void setReference(ServiceReference<?> reference) {
-		this.reference = reference;
 	}
 
 	public int getLevel() {
 		return level;
 	}
 
-	public void setLevel(int level) {
-		this.level = level;
-	}
-
 	public String getMessage() {
 		return message;
 	}
 
-	public void setMessage(String message) {
-		this.message = message;
+	public Object[] getObjects() {
+		return objects;
 	}
-
-	public Throwable getException() {
-		return exception;
-	}
-
-	public void setException(Throwable exception) {
-		this.exception = exception;
-	}
-	
 }
