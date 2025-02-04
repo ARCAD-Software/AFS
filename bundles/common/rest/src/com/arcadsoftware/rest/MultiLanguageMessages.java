@@ -62,6 +62,15 @@ public class MultiLanguageMessages extends MultiLocaleMessages {
 	}
 	
 	/**
+	 * Get the current JVM Language.
+	 * 
+	 * @return
+	 */
+	public static Language getLocalLanguage() {
+		return toLanguage(Locale.getDefault());
+	}
+	
+	/**
 	 * Return the language code part of the Restlet Language object.
 	 * 
 	 * @param language
