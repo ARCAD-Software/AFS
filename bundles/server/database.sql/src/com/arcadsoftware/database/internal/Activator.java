@@ -324,7 +324,7 @@ public class Activator extends AbstractConfiguredActivator {
 			info(parameters.getType() + Messages.Activator_DataSource_Declared + parameters.getId());
 			fireDSChangeEvent(IDataSourceEvent.TOPIC_ADD, parameters.getId(), parameters.getType(), parameters.getUrl(), parameters.getDialect(), ds);
 		} else {
-			info(parameters.getId() + ": " + Messages.Activator_ConnectionWith + parameters.getType() + Messages.Activator_NotImplemented, null); //$NON-NLS-1$
+			info(parameters.getId() + ": " + Messages.Activator_ConnectionWith + parameters.getType() + Messages.Activator_NotImplemented); //$NON-NLS-1$
 			postponeDataSources.add(parameters);
 		}
 	}

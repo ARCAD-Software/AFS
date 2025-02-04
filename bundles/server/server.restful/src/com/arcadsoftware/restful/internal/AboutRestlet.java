@@ -30,7 +30,6 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
 
-import com.arcadsoftware.osgi.ISystemParameters;
 import com.arcadsoftware.rest.OSGiApplication;
 
 /**
@@ -82,14 +81,7 @@ public class AboutRestlet extends Restlet {
 		String applicationlic_URL = ""; //$NON-NLS-1$
 		String applicationUsage = ""; //$NON-NLS-1$
 		String applicationURL = ""; //$NON-NLS-1$
-		String sysparam = ""; //$NON-NLS-1$
-		ServiceReference<ISystemParameters> sr = activator.getContext().getServiceReference(ISystemParameters.class);
-		if (sr != null) {
-			ISystemParameters sp = activator.getContext().getService(sr);
-			if (sp != null) {
-				sysparam = sp.getSystemParameters();
-			}
-		}
+		String sysparam = getSystemParameters(); //$NON-NLS-1$
 		if (getApplication() != null) {
 			if (getApplication().getName() != null) {
 				applicationName = getApplication().getName();
@@ -303,6 +295,24 @@ public class AboutRestlet extends Restlet {
 		response.setStatus(Status.SUCCESS_OK);
 	}
 	
+	private String getSystemParameters() {
+		try {
+			Class<?> clazz = AboutRestlet.class.getClassLoader().loadClass("com.arcadsoftware.runtime.ISystemParameters");
+			ServiceReference<?> sr = activator.getContext().getServiceReference(clazz);
+			if (sr != null) {
+				Object sp = activator.getContext().getService(sr);
+				if (sp != null) {
+					java.lang.reflect.Method m = clazz.getMethod("getSystemParameters");
+					Object s = m.invoke(sr);
+					if (s != null) {
+						return s.toString();
+					}
+				}
+			}
+		} catch (Exception e) {}
+		return ""; //$NON-NLS-1$
+	}
+
 	private String escapeXML(String text) {
 		if (text == null) {
 			return ""; //$NON-NLS-1$

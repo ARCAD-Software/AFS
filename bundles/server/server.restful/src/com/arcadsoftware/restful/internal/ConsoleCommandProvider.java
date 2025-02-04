@@ -369,8 +369,8 @@ public class ConsoleCommandProvider implements CommandProvider {
 		MessageDigest md5 = MessageDigest.getInstance("MD5"); //$NON-NLS-1$
 		for (int i = 0; i < chain.length; i++) {
 			X509Certificate cert = chain[i];
-			ci.println(" " + (i + 1) + Messages.getString("ConsoleCommandProvider.Subject") + cert.getSubjectDN()); //$NON-NLS-1$ //$NON-NLS-2$
-			ci.println("   Issuer  " + cert.getIssuerDN()); //$NON-NLS-1$
+			ci.println(" " + (i + 1) + Messages.getString("ConsoleCommandProvider.Subject") + cert.getSubjectX500Principal().getName()); //$NON-NLS-1$ //$NON-NLS-2$
+			ci.println("   Issuer  " + cert.getIssuerX500Principal().getName()); //$NON-NLS-1$
 			sha1.update(cert.getEncoded());
 			ci.println("   sha1    " + toHexString(sha1.digest())); //$NON-NLS-1$
 			md5.update(cert.getEncoded());

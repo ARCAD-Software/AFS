@@ -607,7 +607,7 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 							serverProps.getkSPwd(), //
 							serverProps.getkSType()).testKeyStore(serverProps.getKeyAlias(), serverProps.getKeyPwd());
 					if (result != null) {
-						error("Invalid KeyStore: " + result, null);
+						error("Invalid KeyStore: " + result);
 						return false;
 					}
 				} else {
@@ -622,7 +622,7 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 							serverProps.gettSPwd(), //
 							serverProps.gettSType()).testKeyStore();
 					if (result != null) {
-						error("Invalid TrustStore: " + result, null);
+						error("Invalid TrustStore: " + result);
 						return false;
 					}
 				} else {
