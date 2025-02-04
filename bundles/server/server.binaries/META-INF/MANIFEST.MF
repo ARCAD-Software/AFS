@@ -7,7 +7,7 @@ Bundle-Activator: com.arcadsoftware.server.binaries.internal.Activator
 Bundle-Vendor: ARCAD Software
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Import-Package: com.arcadsoftware.crypt;version="[1.3.0,2.0.0)",
- com.arcadsoftware.osgi;version="[1.3.1,2.0.0)",
+ com.arcadsoftware.osgi;version="[1.3.1,3.0.0)",
  com.arcadsoftware.rest;version="[3.0.0,4.0.0)",
  javax.servlet.http,
  org.apache.commons.fileupload;version="[1.4.0,2.0.0)",

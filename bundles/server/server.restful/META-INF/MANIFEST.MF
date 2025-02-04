@@ -8,13 +8,14 @@ Bundle-License-Name: Eclipse Public License Version 2.0
 Bundle-DocURL: https://github.com/ARCAD-Software/AFS/wiki
 Bundle-Copyright: This API is reusable in the terms of the license EPL 2.0.
 Bundle-SymbolicName: com.arcadsoftware.server.restful;singleton:=true
-Bundle-Version: 3.1.1.qualifier
+Bundle-Version: 3.2.0.qualifier
 Bundle-Activator: com.arcadsoftware.restful.internal.Activator
 Bundle-Vendor: ARCAD Software
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Import-Package: com.arcadsoftware.crypt;version="[1.0.0,2.0.0)",
- com.arcadsoftware.osgi;version="[1.1.2,2.0.0)",
+ com.arcadsoftware.osgi;version="[2.0.0,3.0.0)",
  com.arcadsoftware.rest;version="[3.0.0,4.0.0)",
+ com.arcadsoftware.runtime;version="[1.0.0,2.0.0)";resolution:=optional,
  com.thoughtworks.xstream;version="[1.4.200,1.5.0)",
  com.thoughtworks.xstream.converters;version="[1.4.200,1.5.0)",
  com.thoughtworks.xstream.converters.extended;version="[1.4.200,1.5.0)",

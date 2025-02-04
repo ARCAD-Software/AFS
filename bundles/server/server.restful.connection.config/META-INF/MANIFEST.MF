@@ -7,7 +7,7 @@ Bundle-Activator: com.arcadsoftware.restful.connection.config.internal.Activator
 Bundle-Vendor: ARCAD Software
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Import-Package: com.arcadsoftware.crypt;version="[1.0.0,2.0.0)",
- com.arcadsoftware.osgi;version="[1.0.2,2.0.0)",
+ com.arcadsoftware.osgi;version="[1.0.2,3.0.0)",
  com.arcadsoftware.rest;version="[3.0.0,4.0.0)",
  com.arcadsoftware.rest.connection;version="[2.0.0,3.0.0)",
  com.arcadsoftware.rest.console;version="[2.0.0,3.0.0)",

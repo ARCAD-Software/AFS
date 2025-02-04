@@ -12,7 +12,7 @@ Import-Package: com.arcadsoftware.beanmap;version="[2.0.0,3.0.0)",
  com.arcadsoftware.dbutils;version="[1.0.0,2.0.0)",
  com.arcadsoftware.metadata;version="[1.2.0,2.0.0)",
  com.arcadsoftware.metadata.criteria;version="[1.0.0,2.0.0)",
- com.arcadsoftware.osgi;version="[1.0.2,2.0.0)",
+ com.arcadsoftware.osgi;version="[1.0.2,3.0.0)",
  com.arcadsoftware.rest.connection;version="[2.0.0,3.0.0)",
  javax.sql,
  javax.sql.rowset;resolution:=optional,
@@ -30,7 +30,7 @@ Import-Package: com.arcadsoftware.beanmap;version="[2.0.0,3.0.0)",
  org.restlet.data;version="[2.4.3,3.0.0)",
  org.restlet.resource;version="[2.4.3,3.0.0)",
  org.restlet.routing;version="[2.4.3,3.0.0)"
-Export-Package: com.arcadsoftware.metadata.sql;version="1.1.0"
+Export-Package: com.arcadsoftware.metadata.sql;version="2.0.0"
 Automatic-Module-Name: com.arcadsoftware.metadata.mapper.sql
 Bundle-ActivationPolicy: lazy
 Bundle-License: https://www.eclipse.org/legal/epl-2.0
