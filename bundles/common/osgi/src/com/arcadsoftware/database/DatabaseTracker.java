@@ -21,7 +21,6 @@ import javax.sql.DataSource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
 import com.arcadsoftware.osgi.internal.Activator;
@@ -134,7 +133,7 @@ public class DatabaseTracker extends ServiceTracker<DataSource, Object> {
 			try {
 				return ((DataSource)service).getConnection();
 			} catch (SQLException e) {
-				Activator.getInstance().log(getServiceReference(),LogService.LOG_ERROR,e.getLocalizedMessage(),e);
+				Activator.getInstance().log(getServiceReference(),Activator.LOG_ERROR,e.getLocalizedMessage(),e);
 				return null;
 			}
 		}

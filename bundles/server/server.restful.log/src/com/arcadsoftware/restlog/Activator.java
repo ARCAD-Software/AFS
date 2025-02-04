@@ -20,9 +20,9 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.log.LogEntry;
+import org.osgi.service.log.LogLevel;
 import org.osgi.service.log.LogListener;
 import org.osgi.service.log.LogReaderService;
-import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import org.restlet.Context;
@@ -55,7 +55,7 @@ public class Activator extends AbstractConfiguredActivator implements ServiceTra
 	private ServiceTracker<LogReaderService, LogReaderService> tracker;
 	private final Stack<LogEntry> lastLog = new Stack<LogEntry>();
 	private int limit = 200;
-	private int level = LogService.LOG_INFO;
+	private LogLevel level = LogLevel.INFO;
 
 	@Override
 	public void start(BundleContext context) throws Exception {
@@ -88,7 +88,49 @@ public class Activator extends AbstractConfiguredActivator implements ServiceTra
 	public void updatedConfiguration(Dictionary<String, Object> properties) {
 		if (properties != null) {
 			limit = parseIntegerParameter(properties.get(PROP_STACKLIMIT), 100);
-			level = parseIntegerParameter(properties.get(PROP_LOWESTLEVEL), LogService.LOG_WARNING);
+			switch (parseIntegerParameter(properties.get(PROP_LOWESTLEVEL), -1)) {
+			case 0:
+				level = LogLevel.AUDIT;
+				break;
+			case 1:
+				level = LogLevel.ERROR;
+				break;
+			case 2:
+				level = LogLevel.WARN;
+				break;
+			case 3:
+				level = LogLevel.INFO;
+				break;
+			case 4:
+				level = LogLevel.DEBUG;
+				break;
+			case 5:
+				level = LogLevel.TRACE;
+				break;
+			default:
+				switch (parseStringParameter(properties.get(PROP_LOWESTLEVEL), "").toLowerCase()) {
+				case "audit":
+					level = LogLevel.AUDIT;
+					break;
+				case "err":
+				case "error":
+					level = LogLevel.ERROR;
+					break;
+				case "warn":
+				case "warning":
+					level = LogLevel.WARN;
+					break;
+				case "dbg":
+				case "debug":
+					level = LogLevel.DEBUG;
+					break;
+				case "trace":
+					level = LogLevel.TRACE;
+					break;
+				default:
+					level = LogLevel.INFO;
+				}
+			}
 		}
 	}
 
@@ -139,7 +181,7 @@ public class Activator extends AbstractConfiguredActivator implements ServiceTra
 
 	@Override
 	public void logged(LogEntry entry) {
-		if ((entry.getLevel() <= level) &&
+		if (level.implies(entry.getLogLevel()) &&
 				(lastLog.isEmpty() || (entry != lastLog.lastElement()))) {
 			lastLog.push(entry);
 			if (lastLog.size() > limit) {
@@ -154,7 +196,7 @@ public class Activator extends AbstractConfiguredActivator implements ServiceTra
 		return result;
 	}
 
-	public int getLevel() {
+	public LogLevel getLevel() {
 		return level;
 	}
 }

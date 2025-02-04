@@ -30,6 +30,7 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
 
+import com.arcadsoftware.osgi.ISystemParameters;
 import com.arcadsoftware.rest.OSGiApplication;
 
 /**
@@ -297,16 +298,11 @@ public class AboutRestlet extends Restlet {
 	
 	private String getSystemParameters() {
 		try {
-			Class<?> clazz = AboutRestlet.class.getClassLoader().loadClass("com.arcadsoftware.runtime.ISystemParameters");
-			ServiceReference<?> sr = activator.getContext().getServiceReference(clazz);
+			ServiceReference<ISystemParameters> sr = activator.getContext().getServiceReference(ISystemParameters.class);
 			if (sr != null) {
-				Object sp = activator.getContext().getService(sr);
+				ISystemParameters sp = activator.getContext().getService(sr);
 				if (sp != null) {
-					java.lang.reflect.Method m = clazz.getMethod("getSystemParameters");
-					Object s = m.invoke(sr);
-					if (s != null) {
-						return s.toString();
-					}
+					return sp.getSystemParameters();
 				}
 			}
 		} catch (Exception e) {}

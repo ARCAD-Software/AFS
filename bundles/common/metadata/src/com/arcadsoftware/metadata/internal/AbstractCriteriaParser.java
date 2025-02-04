@@ -46,7 +46,6 @@ import com.arcadsoftware.metadata.criteria.OrCriteria;
 import com.arcadsoftware.metadata.criteria.PreGeneratedCriteria;
 import com.arcadsoftware.metadata.criteria.StartCriteria;
 import com.arcadsoftware.metadata.criteria.SubstCriteria;
-import com.arcadsoftware.metadata.criteria.UnlinkCriteria;
 import com.arcadsoftware.metadata.criteria.natural.Token;
 import com.arcadsoftware.osgi.ISODateFormater;
 
@@ -286,9 +285,9 @@ public abstract class AbstractCriteriaParser {
 	
 	protected ISearchCriteria unlink(String linkCode, Token rl, int value) {
 		if (rl != null) {
-			return new UnlinkCriteria(value, linkCode, rl.image);
+			return new NotCriteria(new LinkCriteria(value, linkCode, rl.image));
 		}
-		return new UnlinkCriteria(value, linkCode);
+		return new NotCriteria(new LinkCriteria(value, linkCode));
 	}
 	
 	protected ISearchCriteria hasRight(String att, Token r, Token p) {

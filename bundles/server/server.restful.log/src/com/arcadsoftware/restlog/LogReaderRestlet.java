@@ -18,10 +18,9 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 
 import org.osgi.service.log.LogEntry;
-import org.osgi.service.log.LogService;
+import org.osgi.service.log.LogLevel;
 import org.restlet.Context;
 import org.restlet.Restlet;
-import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
@@ -65,7 +64,7 @@ public class LogReaderRestlet extends Restlet {
 		}
 		LogEntry[] log = activator.getLog();
 		MediaType media = request.getClientInfo().getPreferredMediaType(SUPPORTEDMEDIATYPES);
-		int level = getLevel(request);
+		LogLevel level = getLevel(request);
 		String bundle = getBundle(request);
 		if (MediaType.TEXT_XML.equals(media) || MediaType.APPLICATION_XML.equals(media)) {
 			StringBuffer res = new StringBuffer();
@@ -74,7 +73,7 @@ public class LogReaderRestlet extends Restlet {
 			for (LogEntry entry: log) {
 				if (isListable(level, bundle, entry)) {
 					res.append("<entry level=\""); //$NON-NLS-1$;
-					res.append(convertLevel(entry.getLevel()));
+					res.append(convertLevel(entry.getLogLevel()));
 					res.append("\">"); //$NON-NLS-1$;
 					String mes = entry.getMessage();
 					if (mes == null) {
@@ -109,7 +108,7 @@ public class LogReaderRestlet extends Restlet {
 						res.append(',');
 					}
 					res.append("{\"level\":\""); //$NON-NLS-1$
-					res.append(convertLevel(entry.getLevel()));
+					res.append(convertLevel(entry.getLogLevel()));
 					res.append("\",message\":\""); //$NON-NLS-1$
 					res.append(escapeJSON(entry.getMessage()));
 					if (entry.getBundle() != null) {
@@ -144,10 +143,13 @@ public class LogReaderRestlet extends Restlet {
 			for (LogEntry entry: log) {
 				if (isListable(level, bundle, entry)) {
 					res.append("<div class=\"tt\""); //$NON-NLS-1$
-					switch (entry.getLevel()) {
-					case LogService.LOG_ERROR: res.append(" style=\"color: red;\""); break; //$NON-NLS-1$
-					case LogService.LOG_WARNING: res.append(" style=\"color: orange;\""); break; //$NON-NLS-1$
-					case LogService.LOG_DEBUG: res.append(" style=\"color: #333333;\""); break; //$NON-NLS-1$
+					switch (entry.getLogLevel()) {
+					case AUDIT:
+					case ERROR: res.append(" style=\"color: red;\""); break; //$NON-NLS-1$
+					case WARN: res.append(" style=\"color: orange;\""); break; //$NON-NLS-1$
+					case TRACE:
+					case DEBUG: res.append(" style=\"color: #333333;\""); break; //$NON-NLS-1$
+					default:
 					}
 					res.append('>');
 					res.append(entry.getMessage());
@@ -221,20 +223,22 @@ public class LogReaderRestlet extends Restlet {
 		return request.getResourceRef().getQueryAsForm(true).getFirstValue("bundle"); //$NON-NLS-1$
 	}
 
-	protected int getLevel(Request request) {
+	protected LogLevel getLevel(Request request) {
 		return activator.getLevel();
 	}
 
-	protected boolean isListable(int level, String bundle, LogEntry entry) {
-		return (entry != null) && (entry.getLevel() <= level) && ((bundle == null) || bundle.equalsIgnoreCase(entry.getBundle().getSymbolicName()));
+	protected boolean isListable(LogLevel level, String bundle, LogEntry entry) {
+		return (entry != null) && (level.implies(entry.getLogLevel())) && ((bundle == null) || bundle.equalsIgnoreCase(entry.getBundle().getSymbolicName()));
 	}
 
-	private Object convertLevel(int level) {
+	private String convertLevel(LogLevel level) {
 		switch (level) {
-		case LogService.LOG_DEBUG: return "DEBUG"; //$NON-NLS-1$
-		case LogService.LOG_ERROR: return "ERROR"; //$NON-NLS-1$
-		case LogService.LOG_INFO: return "INFO"; //$NON-NLS-1$
-		case LogService.LOG_WARNING: return "WARNING"; //$NON-NLS-1$
+		case AUDIT: return "DEBUG"; //$NON-NLS-1$
+		case ERROR: return "DEBUG"; //$NON-NLS-1$
+		case WARN: return "DEBUG"; //$NON-NLS-1$
+		case INFO: return "DEBUG"; //$NON-NLS-1$
+		case DEBUG: return "DEBUG"; //$NON-NLS-1$
+		case TRACE: return "DEBUG"; //$NON-NLS-1$
 		default: return "Unknown";  //$NON-NLS-1$
 		}
 	}

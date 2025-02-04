@@ -18,7 +18,8 @@ import java.util.HashMap;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.log.LogService;
+import org.osgi.service.log.Logger;
+import org.osgi.service.log.LoggerFactory;
 import org.osgi.util.tracker.ServiceTracker;
 import org.restlet.routing.Router;
 import org.restlet.routing.Template;
@@ -141,13 +142,13 @@ public class BranchTracker extends ServiceTracker<IBranch, IBranch> {
 			try {
 				BundleContext context = application.getBundleContext();
 				if (context != null) {
-					Collection<ServiceReference<LogService>> srs = context.getServiceReferences(LogService.class, null);
+					Collection<ServiceReference<LoggerFactory>> srs = context.getServiceReferences(LoggerFactory.class, null);
 					if ((srs != null) && (srs.size() >= 1)) {
-						for (ServiceReference<LogService> sr: srs) {
-							LogService s = context.getService(sr);
-							if (s != null) {
-								s.log(LogService.LOG_ERROR, "Unable to attach a Branch: " + e.getLocalizedMessage(), e);
-								return;
+						for (ServiceReference<LoggerFactory> sr: srs) {
+							LoggerFactory lf = context.getService(sr);
+							if (lf != null) {
+								Logger l = lf.getLogger(BranchTracker.class);
+								l.error("Unable to attach a Branch: " + e.getLocalizedMessage(), e);
 							}
 						}
 					}

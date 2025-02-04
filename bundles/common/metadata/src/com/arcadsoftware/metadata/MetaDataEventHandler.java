@@ -161,7 +161,7 @@ public abstract class MetaDataEventHandler implements EventHandler {
 		if (o instanceof BeanMap) {
 			return (BeanMap)o;
 		}
-		getActivator().error(Messages.BeanMapEventHandler_Log_No_BeanMap, null);
+		getActivator().error(Messages.BeanMapEventHandler_Log_No_BeanMap);
 		return null;
 	}
 
@@ -177,7 +177,7 @@ public abstract class MetaDataEventHandler implements EventHandler {
 		if (o instanceof BeanMapList) {
 			return (BeanMapList)o;
 		}
-		getActivator().error(Messages.MetaDataEventHandler_Error_SelectionEventWithOutSelection, null);
+		getActivator().error(Messages.MetaDataEventHandler_Error_SelectionEventWithOutSelection);
 		return null;
 	}
 
@@ -191,7 +191,7 @@ public abstract class MetaDataEventHandler implements EventHandler {
 		if (o instanceof BeanMap) {
 			return (BeanMap)o;
 		}
-		getActivator().warn(Messages.BeanMapEventHandler_Log_No_BeanMap, null);
+		getActivator().warn(Messages.BeanMapEventHandler_Log_No_BeanMap);
 		return null;
 	}
 
@@ -227,7 +227,7 @@ public abstract class MetaDataEventHandler implements EventHandler {
 		if (o instanceof BeanMap) {
 			return (BeanMap)o;
 		}
-		getActivator().error(Messages.BeanMapEventHandler_Log_No_second_BeanMap, null);
+		getActivator().error(Messages.BeanMapEventHandler_Log_No_second_BeanMap);
 		return null;
 	}
 	
