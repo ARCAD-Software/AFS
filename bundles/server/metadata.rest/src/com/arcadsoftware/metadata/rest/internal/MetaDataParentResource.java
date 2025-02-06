@@ -307,14 +307,14 @@ public class MetaDataParentResource extends DataParentResource {
 				} else {
 					MetaDataAttribute a = att.getLastAttribute();
 					if ((a != null) && (a.getRightRead(false) != null)) {
-						// TODO Ce test devrait être complété par un test sur la jointure !
+						// TODO This test should be supplemented by a test on the joint!
 						MetaDataEntity e = (MetaDataEntity) a.getParent();
 						if (!e.getMapper().test(e, a.getRightRead(false), getUser())) {
 							itt.remove();
 							continue;
 						}
 					}
-					// Si la colonne n'est pas sélectionnée on l'ajoute.
+					// If the column is not selected it is added.
 					if (!attributes.contains(att)) {
 						attributes.add(att);
 					}
@@ -337,9 +337,9 @@ public class MetaDataParentResource extends DataParentResource {
 		int first = getFirst(form);
 		int number = getPageCount(form, first);
 		// check other parameters... 
-		boolean deleted = isParameter(form, "deleted"); //$NON-NLS-1$
-		boolean distincts = isParameter(form, "distincts"); //$NON-NLS-1$
-		boolean translate = !isParameter(form, "notranslation"); //$NON-NLS-1$
+		final boolean deleted = isParameter(form, "deleted"); //$NON-NLS-1$
+		final boolean distincts = isParameter(form, "distincts"); //$NON-NLS-1$
+		final boolean translate = !isParameter(form, "notranslation"); //$NON-NLS-1$
 		if (translate) {
 			List<ReferenceLine> allattributes = new ArrayList<ReferenceLine>(attributes);
 			for(ReferenceLine rl: attributes) {

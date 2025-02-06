@@ -23,6 +23,8 @@ public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "com.arcadsoftware.metadata.rest.internal.messages"; //$NON-NLS-1$
 
 	public static String Activator_Debug_EventNotFired;
+	public static String Undelete_Undeleted;
+	public static String Link_Exists;
 
 	static {
 		// initialize resource bundle

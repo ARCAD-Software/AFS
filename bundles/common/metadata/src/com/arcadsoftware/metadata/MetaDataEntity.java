@@ -1560,7 +1560,7 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 			if (t == null) {
 				tests.put(test.getCode(), new MetaDataTest(test, this));
 			} else {
-				// TODO Ne respecte pas les valeurs booléenne nulles !!!
+				// TODO Does not fulfill the null Boolean values.
 				t.injectValues(test);
 			}
 		}
@@ -3065,23 +3065,39 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 		if ((codes == null) || (codes.length == 0)) {
 			return null;
 		}
-		ArrayList<MetaDataLink> result = new ArrayList<>(codes.length);
+		List<MetaDataLink> result = new ArrayList<>(codes.length);
+		getLinkChain(result, codes);
+		if (result.isEmpty()) {
+			return null;
+		}
+		return result;
+	}
+	
+	/**
+	 * Get a list of link according to the given chain of code. 
+	 * 
+	 * <p>
+	 * The returned links are all atomic link (not combined with the "combo" metadata).
+	 * This method can be used to resolve a single combined link by passing a single code as parameter.
+	 *  
+	 * @param links the resulting list 
+	 * @param codes a list of chained link codes.
+	 * @return null if one of the code does not exist or if the chain is broken.
+	 */
+	public void getLinkChain(List<MetaDataLink> links, String... codes) {
 		MetaDataEntity e = this;
 		for (String code: codes) {
 			if ((code != null) && !code.isEmpty()) {
 				MetaDataLink l = e.getLink(code);
 				if (l == null) {
-					return null;
+					return;
 				}
-				l.addAtomicLinks(result);
-				if (!result.isEmpty()) {
-					e = result.get(result.size() - 1).getRefEntity();
+				l.addAtomicLinks(links);
+				if (!links.isEmpty()) {
+					e = links.get(links.size() - 1).getRefEntity();
 				}
 			}
 		}
-		if (result.isEmpty()) {
-			return null;
-		}
-		return result;
+		
 	}
 }

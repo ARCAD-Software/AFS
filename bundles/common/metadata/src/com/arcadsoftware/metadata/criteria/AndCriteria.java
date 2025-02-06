@@ -112,9 +112,9 @@ public class AndCriteria extends AbstractSearchCriteria implements Cloneable {
 		// Reduction rules :
 		// T and x -> x
 		// F and x -> F
-		// TODO x and x -> x
 		// x and not(x) -> F
 		// (x and (y and z)) -> (x and y and z)
+		// TODO x and x -> x
 		// TODO (x and (y or x)) -> x
 		ArrayList<ISearchCriteria> reduced = new ArrayList<ISearchCriteria>();
 		for(ISearchCriteria criteria: criterias) {
@@ -124,19 +124,19 @@ public class AndCriteria extends AbstractSearchCriteria implements Cloneable {
 					if (ConstantCriteria.FALSE.equals(reduce)) {
 						return reduce; // Return False.
 					} else if (reduce instanceof AndCriteria) {
-						reduced.addAll(((AndCriteria)reduce).criterias);
+						reduced.addAll(((AndCriteria) reduce).criterias);
 					} else {
 						reduced.add(reduce);
 					}
 				}
 			}
 		}
-		switch(reduced.size()) {
+		switch (reduced.size()) {
 			case 0: return ConstantCriteria.TRUE;
 			case 1: return reduced.get(0);
 			case 2: 
 				if (reduced.get(0) instanceof NotCriteria) {
-					if (((NotCriteria)reduced.get(0)).getCriteria().equals(reduced.get(1))) {
+					if (((NotCriteria) reduced.get(0)).getCriteria().equals(reduced.get(1))) {
 						return ConstantCriteria.FALSE;
 					}
 				} else if (reduced.get(1) instanceof NotCriteria) {
@@ -151,9 +151,9 @@ public class AndCriteria extends AbstractSearchCriteria implements Cloneable {
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		AndCriteria result = new AndCriteria();
-		for(ISearchCriteria criteria: criterias) {
+		for (ISearchCriteria criteria: criterias) {
 			if (criteria != null) {
-				result.criterias.add((ISearchCriteria)criteria.clone());
+				result.criterias.add((ISearchCriteria) criteria.clone());
 			}
 		}
 		return result;
@@ -161,11 +161,11 @@ public class AndCriteria extends AbstractSearchCriteria implements Cloneable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if ((obj instanceof AndCriteria) && (((AndCriteria)obj).criterias.size() == criterias.size())) {
+		if ((obj instanceof AndCriteria) && (((AndCriteria) obj).criterias.size() == criterias.size())) {
 			for(ISearchCriteria criteria: criterias) {
 				if (criteria != null) {
 					boolean stop = true;
-					for(ISearchCriteria objcriteria:((AndCriteria)obj).criterias) {
+					for (ISearchCriteria objcriteria:((AndCriteria) obj).criterias) {
 						if (criteria.equals(objcriteria)) {
 							stop = false;
 							break;
@@ -187,7 +187,12 @@ public class AndCriteria extends AbstractSearchCriteria implements Cloneable {
 	 * @param criteria
 	 */
 	public void add(ISearchCriteria criteria) {
-		criterias.add(criteria);
+		if (criteria != null) {
+			if (criterias == null) {
+				criterias = new ArrayList<ISearchCriteria>();
+			}
+			criterias.add(criteria);
+		}
 	}
 
 	/**

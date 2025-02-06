@@ -354,7 +354,7 @@ public class MetaDataLink extends Element {
 	 * @param link
 	 * @return true if a error occurs.
 	 */
-	protected boolean addAtomicLinks(ArrayList<MetaDataLink> result) {
+	protected boolean addAtomicLinks(List<MetaDataLink> result) {
 		String combo = getMetadata().getString(MetaDataEntity.METADATA_COMBOLINK);
 		if ((combo == null) || combo.isEmpty()) {
 			result.add(this);
