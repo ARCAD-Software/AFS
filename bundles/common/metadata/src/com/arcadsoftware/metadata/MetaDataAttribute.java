@@ -334,6 +334,15 @@ public class MetaDataAttribute extends Element {
 	}
 
 	/**
+	 * @return true if this attribute is a String based attribute (like "String" "email", "url", etc...).
+	 */
+	public boolean isString() {
+		return TYPE_STRING.equalsIgnoreCase(getType()) || //
+				TYPE_EMAIL.equalsIgnoreCase(getType()) || //
+				TYPE_URL.equalsIgnoreCase(getType());
+	}
+
+	/**
 	 * Translate the Attribute name to the given client user language.
 	 * 
 	 * <p>

@@ -14,6 +14,7 @@
 package com.arcadsoftware.metadata.xml;
 
 import com.arcadsoftware.metadata.criteria.AbstractLinkTestCriteria;
+import com.arcadsoftware.metadata.criteria.AbstractStringSearchCriteria;
 import com.arcadsoftware.metadata.criteria.AfterCriteria;
 import com.arcadsoftware.metadata.criteria.AndCriteria;
 import com.arcadsoftware.metadata.criteria.AttributeEqualsCriteria;
@@ -100,17 +101,11 @@ public class XmlCriteriaStream extends XStreamCompact {
 		xs.useAttributeFor(GreaterStrictCriteria.class, "attribute"); //$NON-NLS-1$
 		xs.useAttributeFor(GreaterStrictCriteria.class, "value"); //$NON-NLS-1$
 		xs.alias("contains", ContainCriteria.class); //$NON-NLS-1$
-		xs.useAttributeFor(ContainCriteria.class, "attribute"); //$NON-NLS-1$
-		xs.useAttributeFor(ContainCriteria.class, "value"); //$NON-NLS-1$
-		xs.useAttributeFor(ContainCriteria.class, "casesensitive"); //$NON-NLS-1$
 		xs.alias("starts", StartCriteria.class); //$NON-NLS-1$
-		xs.useAttributeFor(StartCriteria.class, "attribute"); //$NON-NLS-1$
-		xs.useAttributeFor(StartCriteria.class, "value"); //$NON-NLS-1$
-		xs.useAttributeFor(StartCriteria.class, "casesensitive"); //$NON-NLS-1$
 		xs.alias("ends", EndCriteria.class); //$NON-NLS-1$
-		xs.useAttributeFor(EndCriteria.class, "attribute"); //$NON-NLS-1$
-		xs.useAttributeFor(EndCriteria.class, "value"); //$NON-NLS-1$
-		xs.useAttributeFor(EndCriteria.class, "casesensitive"); //$NON-NLS-1$
+		xs.useAttributeFor(AbstractStringSearchCriteria.class, "attribute"); //$NON-NLS-1$
+		xs.useAttributeFor(AbstractStringSearchCriteria.class, "value"); //$NON-NLS-1$
+		xs.useAttributeFor(AbstractStringSearchCriteria.class, "casesensitive"); //$NON-NLS-1$
 		xs.alias("linkto", LinkCriteria.class); //$NON-NLS-1$ // Changed from "link" to "linkto" in version 2.0.0
 		xs.useAttributeFor(LinkCriteria.class, "attribute"); //$NON-NLS-1$
 		xs.useAttributeFor(LinkCriteria.class, "linkCode"); //$NON-NLS-1$

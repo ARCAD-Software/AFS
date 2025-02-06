@@ -296,7 +296,7 @@ public class ReferenceLine extends ArrayList<Element> implements Comparable<Refe
 	 */
 	public boolean isFinal() {
 		Element element = getLast();
-		return (element != null) && (element instanceof MetaDataAttribute) && !((MetaDataAttribute)element).isReference();
+		return (element != null) && (element instanceof MetaDataAttribute) && !((MetaDataAttribute) element).isReference();
 	}
 
 	/**
@@ -324,7 +324,7 @@ public class ReferenceLine extends ArrayList<Element> implements Comparable<Refe
 			return false;
 		}
 		Element element = getLast();
-		if ((element instanceof MetaDataAttribute) && !((MetaDataAttribute)element).isReference()) {
+		if ((element instanceof MetaDataAttribute) && !((MetaDataAttribute) element).isReference()) {
 			return true;
 		}
 		MetaDataEntity entity;

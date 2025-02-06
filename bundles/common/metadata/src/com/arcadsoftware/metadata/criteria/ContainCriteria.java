@@ -13,20 +13,12 @@
  *******************************************************************************/
 package com.arcadsoftware.metadata.criteria;
 
-import com.arcadsoftware.beanmap.BeanMap;
-import com.arcadsoftware.metadata.ReferenceLine;
-import com.arcadsoftware.metadata.internal.Activator;
 import com.arcadsoftware.metadata.internal.Messages;
-import com.arcadsoftware.rest.connection.IConnectionUserBean;
 
 /**
  * Test if a String attribute value contains the given text.
  */
-public class ContainCriteria extends AbstractSearchCriteria implements Cloneable, IAttributeCriteria {
-
-	private String attribute;
-	private String value;
-	private boolean casesensitive;
+public class ContainCriteria extends AbstractStringSearchCriteria {
 
 	/**
 	 * Default constructor
@@ -37,115 +29,39 @@ public class ContainCriteria extends AbstractSearchCriteria implements Cloneable
 	
 	/**
 	 * @param attribute 
-	 * @param string
-	 * @param generator associated generator.
+	 * @param value
 	 */
 	public ContainCriteria(String attribute, String value) {
-		super();
-		this.attribute = attribute;
-		this.value = value;
+		super(attribute, value);
 	}
 	
 	/**
 	 * @param attribute 
-	 * @param string
-	 * @param generator associated generator.
+	 * @param value
+	 * @param casesensitive
 	 */
 	public ContainCriteria(String attribute, String value, boolean cs) {
-		super();
-		this.attribute = attribute;
-		this.value = value;
-		this.casesensitive = cs;
+		super(attribute, value, cs);
 	}
 
 	@Override
-	public ISearchCriteria reduce(ICriteriaContext context) {
-		if (value == null) {
-			return ConstantCriteria.TRUE;
-		}
-		ReferenceLine refline = context.getEntity().getReferenceLine(attribute);
-		if (refline == null) {
-			return ConstantCriteria.FALSE;
-		}			
-		if (refline.isMultiLinkList()) {
-			Activator.getInstance().warn("\"Contains\" Criteria with multi-link references is not supported: " + toString());
-			return ConstantCriteria.FALSE;
-		}
-		if (refline.isLinkList()) {
-			String preLinkCode = refline.getPreLinkCodes();
-			if (preLinkCode.isEmpty()) {
-				preLinkCode = null;
-			}
-			String postLinkCode = refline.getPostLinkCodes();
-			if (postLinkCode.isEmpty()) {
-				Activator.getInstance().warn("Invalid \"Contains\" Criteria with terminal link reference: " + toString());
-			}
-			return new LinkContainCriteria(preLinkCode, refline.getFirstLinkCode(), postLinkCode, value, casesensitive).reduce(context);
-		}
-		context.useReference(refline);
-		return this;
+	public ContainCriteria clone() {
+		return new ContainCriteria(getAttribute(), getValue(), isCasesensitive());
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
-		return new ContainCriteria(attribute, value, casesensitive);
+	protected AbstractLinkTestCriteria getLinkBasedCriteria(String preLinkCode, String firstLinkCode,
+			String postLinkCode) {
+		return new LinkContainCriteria(preLinkCode, firstLinkCode, postLinkCode, getValue(), isCasesensitive());
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		return (obj instanceof ContainCriteria) &&
-		attribute.equals(((ContainCriteria)obj).attribute) &&
-		value.equals(((ContainCriteria)obj).value) &&
-		(casesensitive == ((ContainCriteria)obj).casesensitive);
-	}
-
-	public boolean isCasesensitive() {
-		return casesensitive;
-	}
-
-	
-	public boolean test(BeanMap bean, IConnectionUserBean currentUser) {
-		String s = bean.getString(attribute);
-		if (s == null) {
-			return false;
-		}
-		if (casesensitive) {
-			return s.contains(value);
-		}
-		return s.toLowerCase().contains(value.toLowerCase());
-	}
-
-	public String getAttribute() {
-		return attribute;
-	}
-
-	public String getValue() {
-		return value;
-	}
-
-	public void setAttribute(String code) {
-		attribute = code;
-	}
-
-	public void setValue(String value) {
-		this.value = value;
-	}
-
-	public void setCasesensitive(boolean casesensitive) {
-		this.casesensitive = casesensitive;
+	protected boolean test(String toTestValue, String againstValue) {
+		return toTestValue.contains(againstValue);
 	}
 
 	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder(attribute);
-		sb.append(Messages.Criteria_Contain);
-		if (casesensitive) {
-			sb.append(Messages.Criteria_CaseSensitive);
-		}
-		sb.append('"');
-		sb.append(value);
-		sb.append('"');
-		return sb.toString();
-	}
-	
+	protected String getCriteriaLabel() {
+		return Messages.Criteria_Contain;
+	}	
 }
