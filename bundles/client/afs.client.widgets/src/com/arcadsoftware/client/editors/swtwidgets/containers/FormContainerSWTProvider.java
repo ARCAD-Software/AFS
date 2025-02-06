@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2024 ARCAD Software.
+ * Copyright (c) 2025 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -178,7 +178,7 @@ public class FormContainerSWTProvider implements IContainerSWTProvider {
 			renderer.getToolkit().decorateFormHeading(form.getForm());
 			renderer.setFormToolBar(form.getToolBarManager());
 			final ArrayList<IAction> actions = new ArrayList<>();
-			// Il faut rattacher le ManagedForm au renderer pour gérer les sous
+			// Il faut rattacher le ManagedForm au renderer pour gï¿½rer les sous
 			// bindings et les bindings de tests
 			renderer.createSubContainer(this, managedForm.getMessageManager(), params, form.getBody(), actions);
 			for (final IAction action : actions) {

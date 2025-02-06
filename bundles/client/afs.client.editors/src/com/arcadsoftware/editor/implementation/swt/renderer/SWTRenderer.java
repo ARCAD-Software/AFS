@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2024 ARCAD Software.
+ * Copyright (c) 2025 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -131,10 +131,10 @@ public class SWTRenderer extends EditorEngine implements ISWTRenderer, ISelectio
 		IListChangeListener, IEditorChangeListener {
 
 	/*
-	 * not-TO-DO on the pipe... 2. Faire en sorte que tant que le BeanMap n'a pas été chargé l'éditeur est en mode
-	 * ReadOnly ! (Avec un binding sur l'état Enabled <--> la propriété enabled du Renderer... ). 3. DÃ©finir un éditeur
-	 * comme éditeur par défaut (prend le focus). 4. Finir la gestion des Links dans l'exécution de scripts. 5. A
-	 * éclater en plusieurs classes !
+	 * not-TO-DO on the pipe... 2. Faire en sorte que tant que le BeanMap n'a pas ï¿½tï¿½ chargï¿½ l'ï¿½diteur est en mode
+	 * ReadOnly ! (Avec un binding sur l'ï¿½tat Enabled <--> la propriï¿½tï¿½ enabled du Renderer... ). 3. DÃ©finir un ï¿½diteur
+	 * comme ï¿½diteur par dï¿½faut (prend le focus). 4. Finir la gestion des Links dans l'exï¿½cution de scripts. 5. A
+	 * ï¿½clater en plusieurs classes !
 	 */
 
 	private static final String ICONS_SLASH = "icons/"; //$NON-NLS-1$

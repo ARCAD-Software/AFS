@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2024 ARCAD Software.
+ * Copyright (c) 2025 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -85,7 +85,7 @@ public class InternalEditors implements IInternalEditors {
 					callback.process(renderer, internalRenderer, editorId, entityId);
 				}
 
-				// // TODO [DL] à enlever quand solution plus propre pour gérer les droits...
+				// // TODO [DL] ï¿½ enlever quand solution plus propre pour gï¿½rer les droits...
 				// if (editorId.equals("interventionId")) { //$NON-NLS-1$
 				// SWTRenderer internalRenderer = (SWTRenderer) internalEditor.getRenderer();
 				// BeanMap intervention = internalRenderer.loadBeanMap("intervention", entityId); //$NON-NLS-1$

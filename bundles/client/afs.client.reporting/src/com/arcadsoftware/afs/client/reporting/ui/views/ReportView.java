@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2024 ARCAD Software.
+ * Copyright (c) 2025 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -105,7 +105,7 @@ public class ReportView extends AbstractConnectedView {
 					final Action[] additionalActions = ReportView.this.getViewerActions();
 					final Action[] actions = new Action[superActions.length + additionalActions.length];
 					System.arraycopy(superActions, 0, actions, 0, superActions.length);
-					// Ajout de l'action d'affichage de l'éditeur de tris
+					// Ajout de l'action d'affichage de l'ï¿½diteur de tris
 					for (int i = 0; i < additionalActions.length; i++) {
 						actions[superActions.length + i] = additionalActions[i];
 					}

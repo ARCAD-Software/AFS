@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2024 ARCAD Software.
+ * Copyright (c) 2025 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -254,7 +254,7 @@ public class SSLKeyStoreManager {
 				// There is some untrusted Certificates...
 				// Untrusted certificates are stored into tm.getChain()
 			}
-			// TODO Filtrer les certificats qui seraient passés...
+			// TODO Filtrer les certificats qui seraient passï¿½s...
 			for (final X509Certificate cert : tm.getChain()) {
 				result.add(new CertificateInformation(cert));
 			}

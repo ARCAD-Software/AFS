@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2024 ARCAD Software.
+ * Copyright (c) 2025 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -65,9 +65,9 @@ public abstract class AbstractAFSStandardComposite extends AbstractArcadComposit
 	}
 
 	/**
-	 * Méthode permettant la validation des informations saisies.<br>
-	 * La surcharge de cette méthode permet de déclarer vos règles de validation de saisie.<br>
-	 * Pour intégrer l'appel de cette fonction à vos contrôle de saisie, vous pouvez utiliser les méthodes
+	 * Mï¿½thode permettant la validation des informations saisies.<br>
+	 * La surcharge de cette mï¿½thode permet de dï¿½clarer vos rï¿½gles de validation de saisie.<br>
+	 * Pour intï¿½grer l'appel de cette fonction ï¿½ vos contrï¿½le de saisie, vous pouvez utiliser les mï¿½thodes
 	 * "addCheckDataListeners()" disponible sur les Combo et les Text.
 	 *
 	 * @return boolean : <b>True</b> si les informations saisies sont valides, <b>false</b> sinon.
@@ -77,11 +77,11 @@ public abstract class AbstractAFSStandardComposite extends AbstractArcadComposit
 	}
 
 	/**
-	 * Méthode permettant d'ajouter un iSelectionListener et un ModifyListener déclenchant la validation de la données
+	 * Mï¿½thode permettant d'ajouter un iSelectionListener et un ModifyListener dï¿½clenchant la validation de la donnï¿½es
 	 * saisie pour une liste Combo.
 	 *
 	 * @param c
-	 *            Combo : Combo à mettre sous contrôle
+	 *            Combo : Combo ï¿½ mettre sous contrï¿½le
 	 */
 	protected void addCheckDataListeners(Combo c) {
 		c.addSelectionListener(new SelectionAdapter() {
@@ -99,11 +99,11 @@ public abstract class AbstractAFSStandardComposite extends AbstractArcadComposit
 	}
 
 	/**
-	 * Méthode permettant d'ajouter un ModifyListener déclenchant la validation de la données saisie pour un widget de
+	 * Mï¿½thode permettant d'ajouter un ModifyListener dï¿½clenchant la validation de la donnï¿½es saisie pour un widget de
 	 * type Text.
 	 *
 	 * @param c
-	 *            Text : Text à mettre sous contrôle
+	 *            Text : Text ï¿½ mettre sous contrï¿½le
 	 */
 	protected void addCheckDataListeners(Text t) {
 		t.addModifyListener(new ModifyListener() {
@@ -115,11 +115,11 @@ public abstract class AbstractAFSStandardComposite extends AbstractArcadComposit
 	}
 
 	/**
-	 * Méthode permettant d'ajouter un iSelectionListener déclenchant la validation de la données saisie pour un widget
+	 * Mï¿½thode permettant d'ajouter un iSelectionListener dï¿½clenchant la validation de la donnï¿½es saisie pour un widget
 	 * de type Button.
 	 *
 	 * @param spinner
-	 *            un {@link Spinner} à mettre sous contrôle
+	 *            un {@link Spinner} ï¿½ mettre sous contrï¿½le
 	 */
 	protected void addCheckDataListeners(Spinner spinner) {
 		spinner.addSelectionListener(new SelectionAdapter() {
@@ -131,11 +131,11 @@ public abstract class AbstractAFSStandardComposite extends AbstractArcadComposit
 	}
 
 	/**
-	 * Méthode permettant d'ajouter un iSelectionListener déclenchant la validation de la données saisie pour un widget
+	 * Mï¿½thode permettant d'ajouter un iSelectionListener dï¿½clenchant la validation de la donnï¿½es saisie pour un widget
 	 * de type Button.
 	 *
 	 * @param b
-	 *            Button : Button à mettre sous contrôle
+	 *            Button : Button ï¿½ mettre sous contrï¿½le
 	 */
 	protected void addCheckDataListeners(Button b) {
 		b.addSelectionListener(

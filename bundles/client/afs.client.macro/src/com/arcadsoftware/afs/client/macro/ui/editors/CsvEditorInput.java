@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2024 ARCAD Software.
+ * Copyright (c) 2025 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -82,7 +82,7 @@ public class CsvEditorInput implements IEditorInput {
 	}
 
 	/**
-	 * Ouverture de l'éditeur associé à un input.
+	 * Ouverture de l'ï¿½diteur associï¿½ ï¿½ un input.
 	 *
 	 * @param input
 	 * @return

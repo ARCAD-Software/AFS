@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2024 ARCAD Software.
+ * Copyright (c) 2025 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -12,7 +12,7 @@
  *     ARCAD Software - initial API and implementation
  *******************************************************************************/
 /*
- * Créé le 29 mars 2007
+ * Crï¿½ï¿½ le 29 mars 2007
  *
  */
 package com.arcadsoftware.afs.framework.ui;

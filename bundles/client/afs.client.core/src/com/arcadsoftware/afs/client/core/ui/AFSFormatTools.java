@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2024 ARCAD Software.
+ * Copyright (c) 2025 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -109,7 +109,7 @@ public class AFSFormatTools {
 			boolean readonly, String buttonText) {
 		new Label(parent, SWT.NONE).setText(label);
 		new Label(parent, SWT.NONE).setText(":"); //$NON-NLS-1$
-		// Création du composite de réception
+		// Crï¿½ation du composite de rï¿½ception
 		final Composite p = new Composite(parent, SWT.NONE);
 		final GridLayout layout = new GridLayout(2, false);
 		layout.marginWidth = 0;

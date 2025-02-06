@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2024 ARCAD Software.
+ * Copyright (c) 2025 ARCAD Software.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -103,7 +103,7 @@ public class HyperlinkRelatedBeanDecoratorSWTProvider implements IDecoratorSWTPr
 
 		BeanMap current = renderer.getCurrentBean();
 		while (current.getId() == 0) {
-			// FIXME BUG: Si le Beanmap ne peut pas tre chargé alors on FREEZE l'application.
+			// FIXME BUG: Si le Beanmap ne peut pas tre chargï¿½ alors on FREEZE l'application.
 			try {
 				Thread.sleep(50);
 			} catch (final InterruptedException e) {
