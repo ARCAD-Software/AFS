@@ -45,12 +45,12 @@ public abstract class LoggedUIPlugin extends AbstractUIPlugin implements ILogged
 
 	@Override
 	public void log(String message, Throwable e) {
-		getLog().log(new Status(IStatus.ERROR, getBundle().getSymbolicName(), message, e));
+		getLog().log(new Status(IStatus.INFO, getBundle().getSymbolicName(), message, e));
 	}
 
 	@Override
 	public void log(Throwable e) {
-		getLog().log(new Status(IStatus.ERROR, getBundle().getSymbolicName(), e.getLocalizedMessage(), e));
+		getLog().log(new Status(IStatus.INFO, getBundle().getSymbolicName(), e.getLocalizedMessage(), e));
 	}
 
 	@Override
@@ -156,8 +156,109 @@ public abstract class LoggedUIPlugin extends AbstractUIPlugin implements ILogged
 		return image;
 	}
 
-	public void manageMessage(Exception e) {
+	public void manageMessage(Exception e) {}
 
+	@Override
+	public void info(String message) {
+		getLog().log(new Status(IStatus.INFO, getBundle().getSymbolicName(), message));
 	}
 
+	@Override
+	public void info(String message, Throwable e) {
+		getLog().log(new Status(IStatus.INFO, getBundle().getSymbolicName(), message, e));
+	}
+
+	@Override
+	public void info(Throwable e) {
+		getLog().log(new Status(IStatus.INFO, getBundle().getSymbolicName(), e.getLocalizedMessage(), e));
+	}
+
+	@Override
+	public void info(String message, Object... objects) {
+		Throwable e = null;
+		if ((objects.length > 0) && (objects[objects.length - 1] instanceof Throwable)) {
+			e = ((Throwable) objects[objects.length - 1]);
+		}
+		getLog().log(new Status(IStatus.INFO, getBundle().getSymbolicName(), AbstractAFSUIPlugin.format(message, objects), e));
+	}
+
+	@Override
+	public void error(String message, Throwable e) {
+		getLog().log(new Status(IStatus.ERROR, getBundle().getSymbolicName(), message, e));
+	}
+
+	@Override
+	public void error(String message) {
+		getLog().log(new Status(IStatus.ERROR, getBundle().getSymbolicName(), message));
+	}
+
+	@Override
+	public void error(Throwable e) {
+		getLog().log(new Status(IStatus.ERROR, getBundle().getSymbolicName(), e.getLocalizedMessage(), e));
+	}
+
+	@Override
+	public void error(String message, Object... objects) {
+		Throwable e = null;
+		if ((objects.length > 0) && (objects[objects.length - 1] instanceof Throwable)) {
+			e = ((Throwable) objects[objects.length - 1]);
+		}
+		getLog().log(new Status(IStatus.ERROR, getBundle().getSymbolicName(), AbstractAFSUIPlugin.format(message, objects), e));
+	}
+
+	@Override
+	public void warn(Throwable e) {
+		getLog().log(new Status(IStatus.WARNING, getBundle().getSymbolicName(), e.getLocalizedMessage(), e));
+	}
+
+	@Override
+	public void warn(String message, Object... objects) {
+		Throwable e = null;
+		if ((objects.length > 0) && (objects[objects.length - 1] instanceof Throwable)) {
+			e = ((Throwable) objects[objects.length - 1]);
+		}
+		getLog().log(new Status(IStatus.WARNING, getBundle().getSymbolicName(), AbstractAFSUIPlugin.format(message, objects), e));
+	}
+
+	@Override
+	public void debug(String message, Object... objects) {
+		Throwable e = null;
+		if ((objects.length > 0) && (objects[objects.length - 1] instanceof Throwable)) {
+			e = ((Throwable) objects[objects.length - 1]);
+		}
+		getLog().log(new Status(IStatus.INFO, getBundle().getSymbolicName(), Activator.resString("Log.debug") + AbstractAFSUIPlugin.format(message, objects), e)); //$NON-NLS-1$
+	}
+
+	@Override
+	public void trace(String message) {}
+
+	@Override
+	public void trace(String message, Throwable e) {}
+
+	@Override
+	public void trace(Throwable e) {}
+
+	@Override
+	public void trace(String message, Object... objects) {}
+
+	@Override
+	public void audit(String message, Throwable e) {
+		error(message, e);	
+	}
+
+	@Override
+	public void audit(String message) {
+		error(message);	
+	}
+
+	@Override
+	public void audit(Throwable e) {
+		error(e);	
+	}
+
+	@Override
+	public void audit(String message, Object... objects) {
+		error(message, objects);	
+	}
+	
 }

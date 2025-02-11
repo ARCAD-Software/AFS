@@ -24,10 +24,9 @@ import com.arcadsoftware.afs.framework.ui.plugins.LoggedUIPlugin;
 
 public class Activator extends LoggedUIPlugin {
 
-	static private Activator instance = null;
+	static private Activator instance;
 
-	private boolean isSingleton = false;
-	// private ServiceTracker scriptTracker;
+	private boolean isSingleton;
 
 	/**
 	 * @return the instance
@@ -50,15 +49,10 @@ public class Activator extends LoggedUIPlugin {
 				isSingleton = true;
 			}
 		}
-		// TODO RAP
-		// scriptTracker = new ServiceTracker(context, IScriptManager.class.getName(), null);
-		// scriptTracker.open();
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		// scriptTracker.close();
-		// scriptTracker = null;
 		synchronized (this) {
 			if (isSingleton) {
 				instance = null;
@@ -67,29 +61,6 @@ public class Activator extends LoggedUIPlugin {
 		}
 		super.stop(context);
 	}
-
-	// public IScriptEngine openScriptEngine() {
-	// if (scriptTracker == null) {
-	// return null;
-	// }
-	// Object o = scriptTracker.getService();
-	// if (o instanceof IScriptManager) {
-	// return ((IScriptManager) o).open(IEngineProvider.LANGUAGE_JAVASCRIPT);
-	// }
-	// return null;
-	// }
-
-	// public void closeStriptEngine(IScriptEngine engine) {
-	// if (scriptTracker == null) {
-	// return;
-	// }
-	// // WARNING: If there is many Scriptmanager then we are not sure
-	// // that the closing manager is the one that open this engine !
-	// Object o = scriptTracker.getService();
-	// if (o instanceof IScriptManager) {
-	// ((IScriptManager) o).close(engine);
-	// }
-	// }
 
 	/**
 	 * Returns an image descriptor for the image file at the given plug-in relative path
@@ -100,12 +71,6 @@ public class Activator extends LoggedUIPlugin {
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return imageDescriptorFromPlugin(instance.getBundle().getSymbolicName(), path);
-	}
-
-	@Override
-	public void error(String message, Throwable e) {
-		// TODO Auto-generated method stub
-
 	}
 
 }

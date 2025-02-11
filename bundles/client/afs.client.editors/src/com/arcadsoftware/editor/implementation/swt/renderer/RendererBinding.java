@@ -24,8 +24,9 @@ import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.list.WritableList;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
-import org.eclipse.jface.databinding.swt.SWTObservables;
-import org.eclipse.jface.databinding.viewers.ViewersObservables;
+import org.eclipse.jface.databinding.swt.WidgetValueProperty;
+import org.eclipse.jface.databinding.swt.typed.WidgetProperties;
+import org.eclipse.jface.databinding.viewers.typed.ViewerProperties;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
@@ -64,6 +65,7 @@ import com.arcadsoftware.metadata.MetaDataLink;
 /**
  * This class is associated to a Renderer and manage data binding.
  */
+@SuppressWarnings("rawtypes")
 public class RendererBinding implements IRendererBinding {
 
 	private static final String WIDGET_NOT_OBSERVABLE_ERROR = "Widget not observable ! Try manual binding."; //$NON-NLS-1$
@@ -317,7 +319,7 @@ public class RendererBinding implements IRendererBinding {
 	public void bindElement(Element element, ISelectionProvider selection) throws IllegalArgumentException {
 		if (element instanceof MetaDataAttribute) {
 			final IObservableValue dataObservable = getObservableAttribute((MetaDataAttribute) element);
-			final IObservableValue valueObservable = ViewersObservables.observeSingleSelection(selection);
+			final IObservableValue valueObservable = ViewerProperties.singleSelection().observe(selection);
 			final Binding binding = bindingContext.bindValue(valueObservable, dataObservable, null, null);
 			if ((renderer.getCurrentMessageManager() != null) && (selection instanceof Viewer)) {
 				renderer.addManagedControl(binding, element, ((Viewer) selection).getControl());
@@ -325,7 +327,7 @@ public class RendererBinding implements IRendererBinding {
 		} else if (element instanceof MetaDataLink) {
 			final IObservableList dataObservable = getObservableLink((MetaDataLink) element, true, null);
 			// Create Widget part Observable Pattern...
-			final IObservableList listObservable = ViewersObservables.observeMultiSelection(selection);
+			final IObservableList listObservable = ViewerProperties.multiplePostSelection().observe(selection);
 			// Bind the observable parts...
 			final Binding binding = bindingContext.bindList(listObservable, dataObservable, null, null);
 			if ((renderer.getCurrentMessageManager() != null) && (selection instanceof Viewer)) {
@@ -432,29 +434,45 @@ public class RendererBinding implements IRendererBinding {
 				try {
 					// l'observation se fait sur l'evenement Modify et non sur la selection
 					// (comportement standard)
-					valueObservable = SWTObservables.observeText(widget, SWT.Modify);
+					valueObservable = WidgetProperties.text(SWT.Modify).observe(widget); // observeText(widget, SWT.Modify);
 				} catch (final IllegalArgumentException e2) {
 					Activator.getInstance().debug(WIDGET_NOT_OBSERVABLE_ERROR, e2);
 				}
 				// Traitement particulier des Text et des StyledText non pris en charge
 				// pris en charge en version 3.6 mais pas comme on le desire
-			} else if ((widget instanceof Button) || (widget instanceof Spinner) || (widget instanceof Scale)) {
+			} else if (widget instanceof Button) {
 				try {
 					// l'observation se fait sur selection du widget on non surt le text
 					// de ce dernier
-					valueObservable = SWTObservables.observeSelection(widget);
+					valueObservable = WidgetProperties.buttonSelection().observe((Button) widget);
+				} catch (final IllegalArgumentException e) {
+					Activator.getInstance().debug(WIDGET_NOT_OBSERVABLE_ERROR, e);
+				}
+			} else if (widget instanceof Spinner) {
+				try {
+					// l'observation se fait sur selection du widget on non surt le text
+					// de ce dernier
+					valueObservable = WidgetProperties.spinnerSelection().observe((Spinner) widget);
+				} catch (final IllegalArgumentException e) {
+					Activator.getInstance().debug(WIDGET_NOT_OBSERVABLE_ERROR, e);
+				}
+			} else if (widget instanceof Scale) {
+				try {
+					// l'observation se fait sur selection du widget on non surt le text
+					// de ce dernier
+					valueObservable = WidgetProperties.scaleSelection().observe((Scale) widget);
 				} catch (final IllegalArgumentException e) {
 					Activator.getInstance().debug(WIDGET_NOT_OBSERVABLE_ERROR, e);
 				}
 			} else {
 				try {
-					valueObservable = SWTObservables.observeText(widget);
+					valueObservable = WidgetProperties.text().observe(widget);
 				} catch (final IllegalArgumentException e) {
 					try {
-						valueObservable = SWTObservables.observeText(widget, SWT.Modify);
+						valueObservable = WidgetProperties.text(SWT.Modify).observe(widget);
 					} catch (final IllegalArgumentException e2) {
 						try {
-							valueObservable = SWTObservables.observeSelection(widget);
+							valueObservable = WidgetProperties.widgetSelection().observe(widget);
 						} catch (final IllegalArgumentException e3) {
 							Activator.getInstance().debug(WIDGET_NOT_OBSERVABLE_ERROR, e2);
 						}
@@ -471,7 +489,7 @@ public class RendererBinding implements IRendererBinding {
 		} else if (element instanceof MetaDataLink) {
 			final IObservableList dataObservable = getObservableLink((MetaDataLink) element, true, null);
 			// Create Widget part Observable Pattern...
-			final IObservableList listObservable = SWTObservables.observeItems(widget);
+			final IObservableList listObservable = WidgetProperties.items().observe(widget);
 			// Bind the observable parts...
 			final Binding binding = bindingContext.bindList(listObservable, dataObservable, null, null);
 			if (renderer.getCurrentMessageManager() != null) {

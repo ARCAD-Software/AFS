@@ -13,6 +13,7 @@
  *******************************************************************************/
 package com.arcadsoftware.afs.client.core.internal;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.runtime.IStatus;
@@ -29,8 +30,73 @@ import com.arcadsoftware.osgi.ILoggedPlugin;
  */
 public class BaseActivator extends Plugin implements ILoggedPlugin {
 
-	// The plug-in ID
+	public static String format(String message, Object... objects) {
+		if (message == null) {
+			return ""; //$NON-NLS-1$
+		}
+		StringBuilder sb = new StringBuilder();
+		int i = message.indexOf('{');
+		int p = 0;
+		int x = 0;
+		while (i >= 0) {
+			if ((i < message.length() - 1) && (message.charAt(i + 1) == '}')) {
+				if ((i > 0) && (message.charAt(i - 1) == '\\')) {
+					if ((i > 1) && (message.charAt(i - 2) == '\\')) {
+						// Just remove le second '\' character and process to the placeholder replacement.
+						sb.append(message.substring(p, i - 1));
+						sb.append(format(x++, objects));
+						p = i + 2;
+					}
+				}
+			}
+			i = message.indexOf('{', i + 1);
+		}
+		if (p < message.length()) {
+			sb.append(message.substring(p));
+		}
+		return sb.toString();
+	}
+	
+	private static Object format(int i, Object[] objects) {
+		if ((i < objects.length)) {
+			Object o = objects[i];
+			if (o == null) {
+				return "null"; //$NON-NLS-1$
+			}
+			Class<?> c = o.getClass();
+			if (c.isArray()) {
+				if (c == byte[].class) {
+					return Arrays.toString((byte[]) o);
+				}
+				if (c == short[].class) {
+					return Arrays.toString((short[]) o);
+				}
+				if (c == int[].class) {
+					return Arrays.toString((int[]) o);
+				}
+				if (c == long[].class) {
+					return Arrays.toString((long[]) o);
+				}
+				if (c == float[].class) {
+					return Arrays.toString((float[]) o);
+				}
+				if (c == double[].class) {
+					return Arrays.toString((double[]) o);
+				} 
+				if (c == boolean[].class) {
+					return Arrays.toString((boolean[]) o);
+				} 
+				if (c == char[].class) {
+					return Arrays.toString((char[]) o);
+				}
+				return Arrays.deepToString((Object[]) o);
+			}
+			return o.toString();
+		}
+		return null;
+	}
 
+	// The plug-in ID
 	public static final String TITLE = ""; //$NON-NLS-1$
 
 	private static final String LOGDEBUG_RESOURCE = "Log.debug";
@@ -143,12 +209,105 @@ public class BaseActivator extends Plugin implements ILoggedPlugin {
 	@Override
 	public void error(String message, Throwable e) {
 		getLog().log(new Status(IStatus.ERROR, getBundle().getSymbolicName(), message, e));
-
 	}
 
 	public void error(String message) {
 		getLog().log(new Status(IStatus.ERROR, getBundle().getSymbolicName(), message));
+	}
 
+	@Override
+	public void info(String message) {
+		getLog().log(new Status(IStatus.INFO, getBundle().getSymbolicName(), message));
+	}
+
+	@Override
+	public void info(String message, Throwable e) {
+		getLog().log(new Status(IStatus.INFO, getBundle().getSymbolicName(), message, e));
+	}
+
+	@Override
+	public void info(Throwable e) {
+		getLog().log(new Status(IStatus.INFO, getBundle().getSymbolicName(), e.getLocalizedMessage(), e));
+	}
+	
+	@Override
+	public void info(String message, Object... objects) {
+		Throwable e = null;
+		if ((objects.length > 0) && (objects[objects.length - 1] instanceof Throwable)) {
+			e = ((Throwable) objects[objects.length - 1]);
+		}
+		getLog().log(new Status(IStatus.INFO, getBundle().getSymbolicName(), format(message, objects), e));
+	}
+
+	@Override
+	public void error(Throwable e) {
+		getLog().log(new Status(IStatus.ERROR, getBundle().getSymbolicName(), e.getLocalizedMessage(), e));
+	}
+
+	@Override
+	public void error(String message, Object... objects) {
+		Throwable e = null;
+		if ((objects.length > 0) && (objects[objects.length - 1] instanceof Throwable)) {
+			e = ((Throwable) objects[objects.length - 1]);
+		}
+		getLog().log(new Status(IStatus.ERROR, getBundle().getSymbolicName(), format(message, objects), e));
+	}
+
+	@Override
+	public void warn(Throwable e) {
+		getLog().log(new Status(IStatus.WARNING, getBundle().getSymbolicName(), e.getLocalizedMessage(), e));
+	}
+
+	@Override
+	public void warn(String message, Object... objects) {
+		Throwable e = null;
+		if ((objects.length > 0) && (objects[objects.length - 1] instanceof Throwable)) {
+			e = ((Throwable) objects[objects.length - 1]);
+		}
+		getLog().log(new Status(IStatus.WARNING, getBundle().getSymbolicName(), format(message, objects), e));
+	}
+
+	@Override
+	public void debug(String message, Object... objects) {
+		if (isDebugging()) {
+			Throwable e = null;
+			if ((objects.length > 0) && (objects[objects.length - 1] instanceof Throwable)) {
+				e = ((Throwable) objects[objects.length - 1]);
+			}
+			getLog().log(new Status(IStatus.INFO, getBundle().getSymbolicName(), Resources.resString(LOGDEBUG_RESOURCE) + format(message, objects), e)); //$NON-NLS-1$
+		}
+	}
+
+	@Override
+	public void trace(String message) {}
+
+	@Override
+	public void trace(String message, Throwable e) {}
+
+	@Override
+	public void trace(Throwable e) {}
+
+	@Override
+	public void trace(String message, Object... objects) {}
+
+	@Override
+	public void audit(String message, Throwable e) {
+		error(message, e);
+	}
+
+	@Override
+	public void audit(String message) {
+		error(message);
+	}
+
+	@Override
+	public void audit(Throwable e) {
+		error(e);
+	}
+
+	@Override
+	public void audit(String message, Object... objects) {
+		error(message, objects);
 	}
 
 }
