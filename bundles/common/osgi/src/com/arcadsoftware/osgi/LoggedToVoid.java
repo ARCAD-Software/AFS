@@ -52,4 +52,58 @@ public final class LoggedToVoid implements ILoggedPlugin {
 	@Override
 	public void debug(Throwable e) {}
 
+	@Override
+	public void info(String message) {}
+
+	@Override
+	public void info(String message, Throwable e) {}
+
+	@Override
+	public void info(Throwable e) {}
+
+	@Override
+	public void info(String message, Object... objects) {}
+
+	@Override
+	public void error(String message) {}
+
+	@Override
+	public void error(Throwable e) {}
+
+	@Override
+	public void error(String message, Object... objects) {}
+
+	@Override
+	public void warn(Throwable e) {}
+
+	@Override
+	public void warn(String message, Object... objects) {}
+
+	@Override
+	public void debug(String message, Object... objects) {}
+
+	@Override
+	public void trace(String message) {}
+
+	@Override
+	public void trace(String message, Throwable e) {}
+
+	@Override
+	public void trace(Throwable e) {}
+
+	@Override
+	public void trace(String message, Object... objects) {}
+
+	@Override
+	public void audit(String message, Throwable e) {}
+
+	@Override
+	public void audit(String message) {}
+
+	@Override
+	public void audit(Throwable e) {}
+
+	@Override
+	public void audit(String message, Object... objects) {}
+
 }

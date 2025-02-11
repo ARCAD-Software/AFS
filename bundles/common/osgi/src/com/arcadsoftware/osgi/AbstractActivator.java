@@ -835,29 +835,17 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 		log(sr, level, message, null);
 	}
 
-	/**
-	 * Log a simple information level message.
-	 * 
-	 * @param message The string message to log
-	 */
+	@Override
 	public void log(String message) {
 		log(null, LOG_INFO, message, null);
 	}
 
-	/**
-	 * Logs at Info level
-	 * 
-	 * @param message
-	 * @param e 
-	 */
+	@Override
 	public void log(String message, Throwable e) {
 		log(null, LOG_INFO, message, e);
 	}
 
-	/**
-	 * Log the description of the given Exception at info level.
-	 * @param e The exception to log.
-	 */
+	@Override
 	public void log(Throwable e) {
 		if (e != null) {
 			log(null, LOG_INFO, e.getLocalizedMessage(), e);
@@ -877,65 +865,24 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 		log(sr, LOG_TRACE, message, null);
 	}
 
-	/**
-	 * Logs a debug message.
-	 * 
-	 * @param message
-	 *            Human readable message or <code>null</code>.
-	 */
+	@Override
 	public void trace(String message) {
 		log(null, LOG_TRACE, message, null);
 	}
 
-	/**
-	 * Logs a debug message.
-	 * 
-	 * @param message
-	 *            Human readable string describing the condition or <code>null</code>.
-	 * @param e
-	 *            the thrown exception or <code>null</code>.
-	 */
+	@Override
 	public void trace(String message, Throwable e) {
 		log(null, LOG_TRACE, message, e);
 	}
 	
-	/**
-	 * Log an Exception to the debug level.
-	 * 
-	 * @param e the exception, may be null. 
-	 */
+	@Override
 	public void trace(Throwable e) {
 		if (e != null) {
 			log(null, LOG_TRACE, e.getLocalizedMessage(), e);
 		}
 	}
 	
-	/**
-	 * Trace a formatted message with the OSGi the LoggerFactory once the Logger determines the log
-	 * level is enabled. Use a left curly bracket (<code>'{'</code> &#92;u007B)
-	 * followed by a right curly bracket (<code>'}'</code> &#92;u007D) as a place
-	 * holder for an argument: <code>"{}"</code>. If you need to use the literal
-	 * <code>"{}"</code> in the formatted message, precede the place holder with a
-	 * reverse solidus ({@code '\'} &#92;u005C): <code>"\{}"</code>. If you need to
-	 * place a backslash before the place holder, precede the reverse solidus with a
-	 * reverse solidus: <code>"\\{}"</code>.
-	 * <p>
-	 * You can also add a {@code Throwable} and/or {@code ServiceReference} to the
-	 * generated {@link LogEntry} by passing them to the logging methods as
-	 * additional arguments. If the last argument is a {@code Throwable} or a
-	 * {@code ServiceReference}, it is added to the generated {@link LogEntry} and
-	 * then, if the next to last argument is a {@code ServiceReference} or
-	 * {@code Throwable} and not the same type as the last argument, it is also
-	 * added to the generated {@link LogEntry}. These arguments will not be used as
-	 * message arguments. For example:
-	 * 
-	 * @param level The severity of the message. This should be one of the
-	 *        defined log levels but may be any integer that is interpreted in a
-	 *        user defined way.
-	 * @param message Human readable string describing the condition or
-	 *        <code>null</code>.
-	 * @param arguments The arguments to format into the message.
-	 */
+	@Override
 	public void trace(String message, Object... objects) {
 		log(LOG_TRACE, message, objects);
 	}
@@ -953,65 +900,24 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 		log(sr, LOG_DEBUG, message, null);
 	}
 
-	/**
-	 * Logs a debug message.
-	 * 
-	 * @param message
-	 *            Human readable message or <code>null</code>.
-	 */
+	@Override
 	public void debug(String message) {
 		log(null, LOG_DEBUG, message, null);
 	}
 
-	/**
-	 * Logs a debug message.
-	 * 
-	 * @param message
-	 *            Human readable string describing the condition or <code>null</code>.
-	 * @param e
-	 *            the thrown exception or <code>null</code>.
-	 */
+	@Override
 	public void debug(String message, Throwable e) {
 		log(null, LOG_DEBUG, message, e);
 	}
 	
-	/**
-	 * Log an Exception to the debug level.
-	 * 
-	 * @param e the exception, may be null. 
-	 */
+	@Override
 	public void debug(Throwable e) {
 		if (e != null) {
 			log(null, LOG_DEBUG, e.getLocalizedMessage(), e);
 		}
 	}
 	
-	/**
-	 * Log at the Debug level a formatted message with the OSGi the LoggerFactory once the Logger determines the log
-	 * level is enabled. Use a left curly bracket (<code>'{'</code> &#92;u007B)
-	 * followed by a right curly bracket (<code>'}'</code> &#92;u007D) as a place
-	 * holder for an argument: <code>"{}"</code>. If you need to use the literal
-	 * <code>"{}"</code> in the formatted message, precede the place holder with a
-	 * reverse solidus ({@code '\'} &#92;u005C): <code>"\{}"</code>. If you need to
-	 * place a backslash before the place holder, precede the reverse solidus with a
-	 * reverse solidus: <code>"\\{}"</code>.
-	 * <p>
-	 * You can also add a {@code Throwable} and/or {@code ServiceReference} to the
-	 * generated {@link LogEntry} by passing them to the logging methods as
-	 * additional arguments. If the last argument is a {@code Throwable} or a
-	 * {@code ServiceReference}, it is added to the generated {@link LogEntry} and
-	 * then, if the next to last argument is a {@code ServiceReference} or
-	 * {@code Throwable} and not the same type as the last argument, it is also
-	 * added to the generated {@link LogEntry}. These arguments will not be used as
-	 * message arguments. For example:
-	 * 
-	 * @param level The severity of the message. This should be one of the
-	 *        defined log levels but may be any integer that is interpreted in a
-	 *        user defined way.
-	 * @param message Human readable string describing the condition or
-	 *        <code>null</code>.
-	 * @param arguments The arguments to format into the message.
-	 */
+	@Override
 	public void debug(String message, Object... objects) {
 		log(LOG_DEBUG, message, objects);
 	}
@@ -1029,63 +935,24 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 		log(sr, LOG_INFO, message, null);
 	}
 
-	/**
-	 * Logs an informal message.
-	 * 
-	 * @param message
-	 *            Human readable string describing the condition or <code>null</code>.
-	 */
+	@Override
 	public void info(String message) {
 		log(null, LOG_INFO, message, null);
 	}
 	
-	/**
-	 * Logs an informal message.
-	 * 
-	 * @param message
-	 * @param e
-	 */
+	@Override
 	public void info(String message, Throwable e) {
 		log(null, LOG_INFO, message, e);
 	}
 	
-	/**
-	 * Log an Exception to the info level.
-	 * 
-	 * @param e the exception, may be null. 
-	 */
+	@Override
 	public void info(Throwable e) {
 		if (e != null) {
 			log(null, LOG_INFO, e.getLocalizedMessage(), e);
 		}
 	}
 	
-	/**
-	 * Log a formatted message with the OSGi the LoggerFactory once the Logger determines the log
-	 * level INFO is enabled. Use a left curly bracket (<code>'{'</code> &#92;u007B)
-	 * followed by a right curly bracket (<code>'}'</code> &#92;u007D) as a place
-	 * holder for an argument: <code>"{}"</code>. If you need to use the literal
-	 * <code>"{}"</code> in the formatted message, precede the place holder with a
-	 * reverse solidus ({@code '\'} &#92;u005C): <code>"\{}"</code>. If you need to
-	 * place a backslash before the place holder, precede the reverse solidus with a
-	 * reverse solidus: <code>"\\{}"</code>.
-	 * <p>
-	 * You can also add a {@code Throwable} and/or {@code ServiceReference} to the
-	 * generated {@link LogEntry} by passing them to the logging methods as
-	 * additional arguments. If the last argument is a {@code Throwable} or a
-	 * {@code ServiceReference}, it is added to the generated {@link LogEntry} and
-	 * then, if the next to last argument is a {@code ServiceReference} or
-	 * {@code Throwable} and not the same type as the last argument, it is also
-	 * added to the generated {@link LogEntry}. These arguments will not be used as
-	 * message arguments. For example:
-	 * 
-	 * @param level The severity of the message. This should be one of the
-	 *        defined log levels but may be any integer that is interpreted in a
-	 *        user defined way.
-	 * @param message Human readable string describing the condition or
-	 *        <code>null</code>.
-	 * @param arguments The arguments to format into the message.
-	 */
+	@Override
 	public void info(String message, Object... objects) {
 		log(LOG_INFO, message, objects);
 	}
@@ -1105,64 +972,24 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 		log(sr, LOG_WARNING, message, e);
 	}
 
-	/**
-	 * Logs a warning message.
-	 * 
-	 * @param message
-	 *            Human readable string describing the condition or <code>null</code>.
-	 * @param e
-	 *            The exception that reflects the condition or <code>null</code>.
-	 */
+	@Override
 	public void warn(String message, Throwable e) {
 		log(null, LOG_WARNING, message, e);
 	}
 
-	/**
-	 * Log a Warning message.
-	 * 
-	 * @param message
-	 */
+	@Override
 	public void warn(String message) {
 		log(null, LOG_WARNING, message, null);
 	}
 
-	/**
-	 * Log an Exception at the Warning level.
-	 * 
-	 * @param e may be null.
-	 */
+	@Override
 	public void warn(Throwable e) {
 		if (e != null) {
 			log(null, LOG_WARNING, e.getLocalizedMessage(), e);
 		}
 	}
 	
-	/**
-	 * Log a formatted message with the OSGi the LoggerFactory once the Logger determines the log
-	 * level WARN is enabled. Use a left curly bracket (<code>'{'</code> &#92;u007B)
-	 * followed by a right curly bracket (<code>'}'</code> &#92;u007D) as a place
-	 * holder for an argument: <code>"{}"</code>. If you need to use the literal
-	 * <code>"{}"</code> in the formatted message, precede the place holder with a
-	 * reverse solidus ({@code '\'} &#92;u005C): <code>"\{}"</code>. If you need to
-	 * place a backslash before the place holder, precede the reverse solidus with a
-	 * reverse solidus: <code>"\\{}"</code>.
-	 * <p>
-	 * You can also add a {@code Throwable} and/or {@code ServiceReference} to the
-	 * generated {@link LogEntry} by passing them to the logging methods as
-	 * additional arguments. If the last argument is a {@code Throwable} or a
-	 * {@code ServiceReference}, it is added to the generated {@link LogEntry} and
-	 * then, if the next to last argument is a {@code ServiceReference} or
-	 * {@code Throwable} and not the same type as the last argument, it is also
-	 * added to the generated {@link LogEntry}. These arguments will not be used as
-	 * message arguments. For example:
-	 * 
-	 * @param level The severity of the message. This should be one of the
-	 *        defined log levels but may be any integer that is interpreted in a
-	 *        user defined way.
-	 * @param message Human readable string describing the condition or
-	 *        <code>null</code>.
-	 * @param arguments The arguments to format into the message.
-	 */
+	@Override
 	public void warn(String message, Object... objects) {
 		log(LOG_WARNING, message, objects);
 	}
@@ -1182,68 +1009,24 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 		log(sr, LOG_ERROR, message, e);
 	}
 
-	/**
-	 * Logs a error message.
-	 * 
-	 * @param message
-	 *            Human readable string describing the condition or <code>null</code>.
-	 * @param e
-	 *            The exception that reflects the condition or <code>null</code>.
-	 */
+	@Override
 	public void error(String message, Throwable e) {
 		log(null, LOG_ERROR, message, e);
 	}
 
-	/**
-	 * Logs a error message.
-	 * 
-	 * @param message
-	 *            Human readable string describing the condition or <code>null</code>.
-	 * @param e
-	 *            The exception that reflects the condition or <code>null</code>.
-	 */
+	@Override
 	public void error(String message) {
 		log(null, LOG_ERROR, message);
 	}
 
-	/**
-	 * Logs a error.
-	 * 
-	 * @param e
-	 *            The exception that reflects the condition or <code>null</code>.
-	 */
+	@Override
 	public void error(Throwable e) {
 		if (e != null) {
 			log(null, LOG_ERROR, e.getLocalizedMessage(), e);
 		}
 	}
 	
-	/**
-	 * Log a formatted message with the OSGi the LoggerFactory once the Logger determines the log
-	 * level ERROR is enabled. Use a left curly bracket (<code>'{'</code> &#92;u007B)
-	 * followed by a right curly bracket (<code>'}'</code> &#92;u007D) as a place
-	 * holder for an argument: <code>"{}"</code>. If you need to use the literal
-	 * <code>"{}"</code> in the formatted message, precede the place holder with a
-	 * reverse solidus ({@code '\'} &#92;u005C): <code>"\{}"</code>. If you need to
-	 * place a backslash before the place holder, precede the reverse solidus with a
-	 * reverse solidus: <code>"\\{}"</code>.
-	 * <p>
-	 * You can also add a {@code Throwable} and/or {@code ServiceReference} to the
-	 * generated {@link LogEntry} by passing them to the logging methods as
-	 * additional arguments. If the last argument is a {@code Throwable} or a
-	 * {@code ServiceReference}, it is added to the generated {@link LogEntry} and
-	 * then, if the next to last argument is a {@code ServiceReference} or
-	 * {@code Throwable} and not the same type as the last argument, it is also
-	 * added to the generated {@link LogEntry}. These arguments will not be used as
-	 * message arguments. For example:
-	 * 
-	 * @param level The severity of the message. This should be one of the
-	 *        defined log levels but may be any integer that is interpreted in a
-	 *        user defined way.
-	 * @param message Human readable string describing the condition or
-	 *        <code>null</code>.
-	 * @param arguments The arguments to format into the message.
-	 */
+	@Override
 	public void error(String message, Object... objects) {
 		log(LOG_ERROR, message, objects);
 	}
@@ -1263,68 +1046,24 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 		log(sr, LOG_AUDIT, message, e);
 	}
 
-	/**
-	 * Logs a error message.
-	 * 
-	 * @param message
-	 *            Human readable string describing the condition or <code>null</code>.
-	 * @param e
-	 *            The exception that reflects the condition or <code>null</code>.
-	 */
+	@Override
 	public void audit(String message, Throwable e) {
 		log(null, LOG_AUDIT, message, e);
 	}
 
-	/**
-	 * Logs a error message.
-	 * 
-	 * @param message
-	 *            Human readable string describing the condition or <code>null</code>.
-	 * @param e
-	 *            The exception that reflects the condition or <code>null</code>.
-	 */
+	@Override
 	public void audit(String message) {
 		log(null, LOG_AUDIT, message);
 	}
 
-	/**
-	 * Logs a error.
-	 * 
-	 * @param e
-	 *            The exception that reflects the condition or <code>null</code>.
-	 */
+	@Override
 	public void audit(Throwable e) {
 		if (e != null) {
 			log(null, LOG_AUDIT, e.getLocalizedMessage(), e);
 		}
 	}
 	
-	/**
-	 * Log a formatted message with the OSGi the LoggerFactory et to top most level.
-	 * Use a left curly bracket (<code>'{'</code> &#92;u007B)
-	 * followed by a right curly bracket (<code>'}'</code> &#92;u007D) as a place
-	 * holder for an argument: <code>"{}"</code>. If you need to use the literal
-	 * <code>"{}"</code> in the formatted message, precede the place holder with a
-	 * reverse solidus ({@code '\'} &#92;u005C): <code>"\{}"</code>. If you need to
-	 * place a backslash before the place holder, precede the reverse solidus with a
-	 * reverse solidus: <code>"\\{}"</code>.
-	 * <p>
-	 * You can also add a {@code Throwable} and/or {@code ServiceReference} to the
-	 * generated {@link LogEntry} by passing them to the logging methods as
-	 * additional arguments. If the last argument is a {@code Throwable} or a
-	 * {@code ServiceReference}, it is added to the generated {@link LogEntry} and
-	 * then, if the next to last argument is a {@code ServiceReference} or
-	 * {@code Throwable} and not the same type as the last argument, it is also
-	 * added to the generated {@link LogEntry}. These arguments will not be used as
-	 * message arguments. For example:
-	 * 
-	 * @param level The severity of the message. This should be one of the
-	 *        defined log levels but may be any integer that is interpreted in a
-	 *        user defined way.
-	 * @param message Human readable string describing the condition or
-	 *        <code>null</code>.
-	 * @param arguments The arguments to format into the message.
-	 */
+	@Override
 	public void audit(String message, Object... objects) {
 		log(LOG_AUDIT, message, objects);
 	}
@@ -1366,8 +1105,7 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 		}
 		return false;
 	}
-	
-	
+		
 	/**
 	 * Test if the specified bundles are started.
 	 * 
@@ -1385,8 +1123,7 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 		}
 		return true;
 	}
-	
-	
+		
 	/**
 	 * Run the given <code>runnable</code> when the bundle will be started.
 	 * 
@@ -1443,9 +1180,8 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 				});
 			} 
 		}
-	}	
-	
-	
+	}
+		
 	/**
 	 * Adds the specified {@code BundleListener} object to the context bundle's
 	 * list of listeners if not already present. BundleListener objects are

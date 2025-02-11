@@ -122,7 +122,7 @@ public abstract class IncomingEmailProcessTask extends TimerTask {
 		timing = timing * 60000;
 		Timer timer = new Timer("Incoming Email Process"); //$NON-NLS-1$
 		task.setTiming(timing);
-		logger.log(String.format(Messages.Activator_Info_mailer_starting, // 
+		logger.info(String.format(Messages.Activator_Info_mailer_starting, // 
 				STARTING_DELAY_FACTOR * timing / 60000));
 		timer.schedule(task, STARTING_DELAY_FACTOR * timing*1L, timing);
 		return timer;
@@ -219,7 +219,7 @@ public abstract class IncomingEmailProcessTask extends TimerTask {
 				brokecount--;
 			}
 			if (brokecount > 0) {
-				logger.log(String.format(Messages.EmailProcessTask_Error_bad_configuration,brokecount));
+				logger.info(String.format(Messages.EmailProcessTask_Error_bad_configuration,brokecount));
 			} else {
 				logger.warn(String.format(Messages.EmailProcessTask_Error_bad_configuration,brokecount));
 			}
@@ -267,7 +267,7 @@ public abstract class IncomingEmailProcessTask extends TimerTask {
 			try {
 				Store store = session.getStore(type);
 				if (store == null) {
-					logger.error(Messages.EmailProcessTask_Error_invalid_protocol + type, null);
+					logger.error(Messages.EmailProcessTask_Error_invalid_protocol + type);
 					brokecount = DEFAULT_BROKECOUNT;
 				} else {
 					// Connection...
@@ -304,7 +304,7 @@ public abstract class IncomingEmailProcessTask extends TimerTask {
 											// Le message n'est pas récupérable en l'état.
 											someCErrors = true;
 											cErrorText.append(String.format(Messages.EmailProcessTask_Error_text,message.getSender(),message.getSubject()));
-											logger.warn(Messages.EmailProcessTask_Error_generic + message.getErrorMessage(), null);
+											logger.warn(Messages.EmailProcessTask_Error_generic + message.getErrorMessage());
 										}
 									}
 								} catch (Throwable e) {
@@ -335,7 +335,7 @@ public abstract class IncomingEmailProcessTask extends TimerTask {
 							folder.close(true);
 						}
 					} else {
-						logger.error(Messages.EmailProcessTask_Error_folder_not_exist + folderName, null);
+						logger.error(Messages.EmailProcessTask_Error_folder_not_exist + folderName);
 						brokecount = DEFAULT_BROKECOUNT;
 					}
 				}
@@ -356,7 +356,7 @@ public abstract class IncomingEmailProcessTask extends TimerTask {
 				logger.error(Messages.EmailProcessTask_Error_Mailbox_management + e.getLocalizedMessage() + Messages.EmailProcessTask_Debug_Date + new Date().toString() + ")", e); //$NON-NLS-2$
 			}
 		} else {
-			logger.error(Messages.EmailProcessTask_Error_null_session, null);
+			logger.error(Messages.EmailProcessTask_Error_null_session);
 			brokecount = DEFAULT_BROKECOUNT;
 		}
 		// Log the run.
@@ -367,7 +367,7 @@ public abstract class IncomingEmailProcessTask extends TimerTask {
 				logger.debug(String.format(Messages.EmailProcessTask_debug_Log_process, runCount, startTime, i, nbe));
 			}
 			if (i > 100) {
-				logger.log(String.format(Messages.EmailProcessTask_Debug_treatment_too_long, startTime, timing));
+				logger.info(String.format(Messages.EmailProcessTask_Debug_treatment_too_long, startTime, timing));
 			}
 		}
 	}
@@ -382,7 +382,7 @@ public abstract class IncomingEmailProcessTask extends TimerTask {
 		        		.setProvider(BouncyCastleProvider.PROVIDER_NAME)));
 			} catch (Exception e) {
 				// erreur de décryptage ou message non crypté !
-				logger.log(e);
+				logger.info(e);
 			}
 		}
 		return msg;

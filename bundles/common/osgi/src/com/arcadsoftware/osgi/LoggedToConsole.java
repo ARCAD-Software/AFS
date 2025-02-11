@@ -83,4 +83,131 @@ public class LoggedToConsole implements ILoggedPlugin {
 		ci.println("[DEBUG] " + message);
 	}
 
+	@Override
+	public void info(String message) {
+		ci.println(message);
+	}
+
+	@Override
+	public void info(String message, Throwable e) {
+		ci.println(message);
+		if (e != null) {
+			ci.printStackTrace(e);
+		}
+	}
+
+	@Override
+	public void info(Throwable e) {
+		if (e != null) {
+			ci.printStackTrace(e);
+		}
+	}
+
+	@Override
+	public void error(String message) {
+		ci.println("[ERROR] " + message);
+	}
+
+	@Override
+	public void error(Throwable e) {
+		if (e != null) {
+			ci.printStackTrace(e);
+		}
+	}
+
+	@Override
+	public void warn(Throwable e) {
+		if (e != null) {
+			ci.printStackTrace(e);
+		}
+	}
+
+	@Override
+	public void trace(String message) {
+		ci.println("[TRACE] " + message);
+	}
+
+	@Override
+	public void trace(String message, Throwable e) {
+		ci.println("[TRACE] " + message);
+		if (e != null) {
+			ci.printStackTrace(e);
+		}
+	}
+
+	@Override
+	public void trace(Throwable e) {
+		if (e != null) {
+			ci.printStackTrace(e);
+		}
+	}
+
+	@Override
+	public void audit(String message, Throwable e) {
+		ci.println("[AUDIT] " + message);
+		if (e != null) {
+			ci.printStackTrace(e);
+		}
+	}
+
+	@Override
+	public void audit(String message) {
+		ci.println("[AUDIT] " + message);
+	}
+
+	@Override
+	public void audit(Throwable e) {
+		if (e != null) {
+			ci.printStackTrace(e);
+		}
+	}
+
+	@Override
+	public void trace(String message, Object... objects) {
+		ci.println("[TRACE] " + AbstractLoggerFacade.format(message, objects));
+		if ((objects.length > 0) && (objects[objects.length - 1] instanceof Throwable)) {
+			ci.printStackTrace((Throwable) objects[objects.length - 1]);
+		}
+	}
+
+	@Override
+	public void debug(String message, Object... objects) {
+		ci.println("[DEBUG] " + AbstractLoggerFacade.format(message, objects));
+		if ((objects.length > 0) && (objects[objects.length - 1] instanceof Throwable)) {
+			ci.printStackTrace((Throwable) objects[objects.length - 1]);
+		}
+	}
+
+	@Override
+	public void info(String message, Object... objects) {
+		ci.println(AbstractLoggerFacade.format(message, objects));
+		if ((objects.length > 0) && (objects[objects.length - 1] instanceof Throwable)) {
+			ci.printStackTrace((Throwable) objects[objects.length - 1]);
+		}
+	}
+
+	@Override
+	public void warn(String message, Object... objects) {
+		ci.println("[WARNING] " + AbstractLoggerFacade.format(message, objects));
+		if ((objects.length > 0) && (objects[objects.length - 1] instanceof Throwable)) {
+			ci.printStackTrace((Throwable) objects[objects.length - 1]);
+		}
+	}
+
+	@Override
+	public void error(String message, Object... objects) {
+		ci.println("[ERROR] " + AbstractLoggerFacade.format(message, objects));
+		if ((objects.length > 0) && (objects[objects.length - 1] instanceof Throwable)) {
+			ci.printStackTrace((Throwable) objects[objects.length - 1]);
+		}
+	}
+
+	@Override
+	public void audit(String message, Object... objects) {
+		ci.println("[AUDIT] " + AbstractLoggerFacade.format(message, objects));
+		if ((objects.length > 0) && (objects[objects.length - 1] instanceof Throwable)) {
+			ci.printStackTrace((Throwable) objects[objects.length - 1]);
+		}
+	}
+
 }

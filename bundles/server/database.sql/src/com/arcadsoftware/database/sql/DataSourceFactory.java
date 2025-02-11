@@ -89,7 +89,7 @@ public class DataSourceFactory {
 					((DataSource) ds).setLoginTimeout(parameters.getTimeOut());
 					return (DataSource) ds;
 				} else {
-					activator.error(parameters.getUrl() + Messages.Activator_NotValidJNDI, null);
+					activator.error(parameters.getUrl() + Messages.Activator_NotValidJNDI);
 				}
 			} catch (Exception e) {
 				activator.error(Messages.Activator_Error + parameters.getUrl() , e);

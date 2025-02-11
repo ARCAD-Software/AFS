@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: H2 Database manager
 Bundle-SymbolicName: com.arcadsoftware.database.sql.h2;singleton:=true
-Bundle-Version: 3.1.0.qualifier
+Bundle-Version: 3.2.0.qualifier
 Bundle-Vendor: ARCAD Software
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Import-Package: com.arcadsoftware.database;version="[1.0.2,2.0.0)",
@@ -11,8 +11,6 @@ Import-Package: com.arcadsoftware.database;version="[1.0.2,2.0.0)",
  javax.management;resolution:=optional,
  javax.naming,
  javax.naming.spi,
- javax.servlet,
- javax.servlet.http,
  javax.sql,
  javax.transaction.xa,
  org.eclipse.osgi.framework.console;version="[1.0.0,2.0.0)",

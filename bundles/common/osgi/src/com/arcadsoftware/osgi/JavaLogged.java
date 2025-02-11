@@ -184,4 +184,118 @@ public class JavaLogged implements ILoggedPlugin {
 		logger.log(Level.FINE, e.getLocalizedMessage(), e);
 	}
 
+	@Override
+	public void info(String message) {
+		logger.info(message);
+	}
+
+	@Override
+	public void info(String message, Throwable e) {
+		logger.log(Level.INFO, message, e);
+	}
+
+	@Override
+	public void info(Throwable e) {
+		logger.log(Level.INFO, e.getLocalizedMessage(), e);
+	}
+
+	@Override
+	public void info(String message, Object... objects) {
+		Throwable e = null;
+		if ((objects.length > 0) && (objects[objects.length - 1] instanceof Throwable)) {
+			e = (Throwable) objects[objects.length - 1];
+		}		
+		logger.log(Level.INFO, AbstractLoggerFacade.format(message, objects), e);
+	}
+
+	@Override
+	public void error(String message) {
+		logger.severe(message);
+	}
+
+	@Override
+	public void error(Throwable e) {
+		logger.log(Level.SEVERE, e.getLocalizedMessage(), e);
+	}
+
+	@Override
+	public void error(String message, Object... objects) {
+		Throwable e = null;
+		if ((objects.length > 0) && (objects[objects.length - 1] instanceof Throwable)) {
+			e = (Throwable) objects[objects.length - 1];
+		}		
+		logger.log(Level.SEVERE, AbstractLoggerFacade.format(message, objects), e);
+	}
+
+	@Override
+	public void warn(Throwable e) {
+		logger.log(Level.WARNING, e.getLocalizedMessage(), e);
+	}
+
+	@Override
+	public void warn(String message, Object... objects) {
+		Throwable e = null;
+		if ((objects.length > 0) && (objects[objects.length - 1] instanceof Throwable)) {
+			e = (Throwable) objects[objects.length - 1];
+		}		
+		logger.log(Level.WARNING, AbstractLoggerFacade.format(message, objects), e);
+	}
+
+	@Override
+	public void debug(String message, Object... objects) {
+		Throwable e = null;
+		if ((objects.length > 0) && (objects[objects.length - 1] instanceof Throwable)) {
+			e = (Throwable) objects[objects.length - 1];
+		}		
+		logger.log(Level.FINE, AbstractLoggerFacade.format(message, objects), e);
+	}
+
+	@Override
+	public void trace(String message) {
+		logger.finer(message);
+	}
+
+	@Override
+	public void trace(String message, Throwable e) {
+		logger.log(Level.FINER, message, e);
+	}
+
+	@Override
+	public void trace(Throwable e) {
+		logger.log(Level.FINER, e.getLocalizedMessage(), e);
+	}
+
+	@Override
+	public void trace(String message, Object... objects) {
+		Throwable e = null;
+		if ((objects.length > 0) && (objects[objects.length - 1] instanceof Throwable)) {
+			e = (Throwable) objects[objects.length - 1];
+		}		
+		logger.log(Level.FINER, AbstractLoggerFacade.format(message, objects), e);
+	}
+
+	@Override
+	public void audit(String message, Throwable e) {
+		logger.log(Level.SEVERE, message, e);
+	}
+
+	@Override
+	public void audit(String message) {
+		logger.severe(message);
+	}
+
+	@Override
+	public void audit(Throwable e) {
+		logger.log(Level.SEVERE, e.getLocalizedMessage(), e);
+	}
+
+	@Override
+	public void audit(String message, Object... objects) {
+		Throwable e = null;
+		if ((objects.length > 0) && (objects[objects.length - 1] instanceof Throwable)) {
+			e = (Throwable) objects[objects.length - 1];
+		}		
+		logger.log(Level.SEVERE, AbstractLoggerFacade.format(message, objects), e);
+	}
+
 }

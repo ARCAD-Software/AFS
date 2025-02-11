@@ -75,7 +75,7 @@ public class XmlRegistry implements IEntityRegistry {
 	
 	public void loadContainer(String name, File file) {
 		if (!file.isFile()) {
-			activator.error(String.format(Messages.XmlRegistry_NotAFile,file.getAbsolutePath()), null);
+			activator.error(String.format(Messages.XmlRegistry_NotAFile,file.getAbsolutePath()));
 			return;
 		}
 		loadContainer(name, loadXml(file));
@@ -284,7 +284,7 @@ public class XmlRegistry implements IEntityRegistry {
 			if (result != null) {
 				return result;
 			}
-			activator.error(Messages.XMLRegistry_ErrorDuringLoadingProcess + file.getAbsolutePath() + Messages.XmlRegistry_NoEntitiesDeclared, null);
+			activator.error(Messages.XMLRegistry_ErrorDuringLoadingProcess + file.getAbsolutePath() + Messages.XmlRegistry_NoEntitiesDeclared);
 			return null;
 		} catch (Exception e) {
 			activator.error(Messages.XMLRegistry_ErrorDuringLoadingProcess + file.getAbsolutePath(), e);
@@ -340,7 +340,7 @@ public class XmlRegistry implements IEntityRegistry {
 		// Teste si l'entité n'existe pas déjà dans un autre registre...
 		MetaDataEntity entity = MetaDataEntity.loadEntity(type);
 		if ((entity != null) && (entity.getRegistry() != null) && (entity.getRegistry() != this)) {
-			activator.error(String.format(Messages.XmlRegistry_EntityBelongToAnotherRegistry, type, entity.getRegistry().toString()), null);
+			activator.error(String.format(Messages.XmlRegistry_EntityBelongToAnotherRegistry, type, entity.getRegistry().toString()));
 			return;
 		}
 		// Construction de l'entité en fonction de ses déclarations...
@@ -422,7 +422,7 @@ public class XmlRegistry implements IEntityRegistry {
 		try {
 			ServiceReference sf = getContext().getServiceReference(EventAdmin.class.getName());
 			if (sf == null) {
-				activator.log("No Event Service available when throwing event: " + topic);
+				activator.info("No Event Service available when throwing event: " + topic);
 				return;
 			}
 			EventAdmin ea = (EventAdmin) getContext().getService(sf);

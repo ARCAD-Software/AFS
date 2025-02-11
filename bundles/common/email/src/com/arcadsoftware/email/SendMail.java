@@ -558,7 +558,7 @@ public class SendMail implements ISendMail {
 				}
 			}
 			if (host == null) {
-				logger.warn(Messages.SendMail_Error_NoSMTPServer + subject, null);
+				logger.warn(Messages.SendMail_Error_NoSMTPServer + subject);
 			}
 			if ((login != null) && (login.length() == 0)) {
 				login = null;
@@ -618,7 +618,7 @@ public class SendMail implements ISendMail {
         try {
 			if (keyStore.containsAlias(signAlias)) {
 				if (!Collections.addAll(certList, keyStore.getCertificateChain(signAlias))) {
-					logger.error("Unable to Sign the EMAIL Message, alias not found: " + signAlias, null);
+					logger.error("Unable to Sign the EMAIL Message, alias not found: " + signAlias);
 					return msg;
 				}
 				Key sk = keyStore.getKey(signAlias, signPassword);

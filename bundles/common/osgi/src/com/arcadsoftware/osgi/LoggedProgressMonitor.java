@@ -25,12 +25,20 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 public class LoggedProgressMonitor implements IProgressMonitor {
 
 	/**
+	 * A top most error message (Value 0).
+	 * 
+	 * <p>
+	 * This log entry indicates the bundle or service may not be functional.
+	 */
+	public static final int LOG_AUDIT = AbstractActivator.LOG_AUDIT;
+
+	/**
 	 * An error message (Value 1).
 	 * 
 	 * <p>
 	 * This log entry indicates the bundle or service may not be functional.
 	 */
-	public static final int LOG_ERROR = org.osgi.service.log.LogService.LOG_ERROR;
+	public static final int LOG_ERROR = AbstractActivator.LOG_ERROR;
 
 	/**
 	 * A warning message (Value 2).
@@ -39,7 +47,7 @@ public class LoggedProgressMonitor implements IProgressMonitor {
 	 * This log entry indicates a bundle or service is still functioning but may experience problems in the future
 	 * because of the warning condition.
 	 */
-	public static final int LOG_WARNING = org.osgi.service.log.LogService.LOG_WARNING;
+	public static final int LOG_WARNING = AbstractActivator.LOG_WARNING;
 	
 	/**
 	 * An informational message (Value 3).
@@ -47,7 +55,7 @@ public class LoggedProgressMonitor implements IProgressMonitor {
 	 * <p>
 	 * This log entry may be the result of any change in the bundle or service and does not indicate a problem.
 	 */
-	public static final int LOG_INFO = org.osgi.service.log.LogService.LOG_INFO;
+	public static final int LOG_INFO = AbstractActivator.LOG_INFO;
 	
 	/**
 	 * A debugging message (Value 4).
@@ -55,7 +63,15 @@ public class LoggedProgressMonitor implements IProgressMonitor {
 	 * <p>
 	 * This log entry is used for problem determination and may be irrelevant to anyone but the bundle developer.
 	 */
-	public static final int LOG_DEBUG = org.osgi.service.log.LogService.LOG_DEBUG;
+	public static final int LOG_DEBUG = AbstractActivator.LOG_DEBUG;
+	
+	/**
+	 * A trace message (Value 5).
+	 * 
+	 * <p>
+	 * This log entry is used for problem determination and may be irrelevant to anyone but the bundle developer.
+	 */
+	public static final int LOG_TRACE = AbstractActivator.LOG_TRACE;
 	
 	private final ILoggedPlugin logger;
 	private final boolean logProgression;
@@ -183,13 +199,19 @@ public class LoggedProgressMonitor implements IProgressMonitor {
 			logger.debug(prefix + message);
 			break;
 		case LOG_INFO:
-			logger.log(prefix + message);
+			logger.info(prefix + message);
 			break;
 		case LOG_WARNING:
 			logger.warn(prefix + message);
 			break;
 		case LOG_ERROR:
-			logger.error(prefix + message, null);
+			logger.error(prefix + message);
+			break;
+		case LOG_AUDIT:
+			logger.audit(prefix + message);
+			break;
+		case LOG_TRACE:
+			logger.trace(prefix + message);
 			break;
 		}
 	}

@@ -30,12 +30,12 @@ public abstract class LoggedPluginAdapter implements ILoggedPlugin {
 	
 	@Override
 	public void warn(String message) {
-		this.warn(message, null);
+		this.warn(message, (Throwable) null);
 	}
 
 	@Override
 	public void debug(String message) {
-		this.debug(message, null);
+		this.debug(message, (Throwable) null);
 	}
 
 	@Override

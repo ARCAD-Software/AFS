@@ -13,6 +13,8 @@
  *******************************************************************************/
 package com.arcadsoftware.osgi;
 
+import java.util.Arrays;
+
 /**
  * This class implement a facade that can be used as a singleton to log message into
  * project that can be used into OSGi framework and pure Java Application. This façade can be
@@ -30,6 +32,72 @@ package com.arcadsoftware.osgi;
  */
 public class AbstractLoggerFacade implements ILoggedPlugin {
 
+	protected static String format(String message, Object... objects) {
+		if (message == null) {
+			return ""; //$NON-NLS-1$
+		}
+		StringBuilder sb = new StringBuilder();
+		int i = message.indexOf('{');
+		int p = 0;
+		int x = 0;
+		while (i >= 0) {
+			if ((i < message.length() - 1) && (message.charAt(i + 1) == '}')) {
+				if ((i > 0) && (message.charAt(i - 1) == '\\')) {
+					if ((i > 1) && (message.charAt(i - 2) == '\\')) {
+						// Just remove le second '\' character and process to the placeholder replacement.
+						sb.append(message.substring(p, i - 1));
+						sb.append(format(x++, objects));
+						p = i + 2;
+					}
+				}
+			}
+			i = message.indexOf('{', i + 1);
+		}
+		if (p < message.length()) {
+			sb.append(message.substring(p));
+		}
+		return sb.toString();
+	}
+	
+	private static Object format(int i, Object[] objects) {
+		if ((i < objects.length)) {
+			Object o = objects[i];
+			if (o == null) {
+				return "null"; //$NON-NLS-1$
+			}
+			Class<?> c = o.getClass();
+			if (c.isArray()) {
+				if (c == byte[].class) {
+					return Arrays.toString((byte[]) o);
+				}
+				if (c == short[].class) {
+					return Arrays.toString((short[]) o);
+				}
+				if (c == int[].class) {
+					return Arrays.toString((int[]) o);
+				}
+				if (c == long[].class) {
+					return Arrays.toString((long[]) o);
+				}
+				if (c == float[].class) {
+					return Arrays.toString((float[]) o);
+				}
+				if (c == double[].class) {
+					return Arrays.toString((double[]) o);
+				} 
+				if (c == boolean[].class) {
+					return Arrays.toString((boolean[]) o);
+				} 
+				if (c == char[].class) {
+					return Arrays.toString((char[]) o);
+				}
+				return Arrays.deepToString((Object[]) o);
+			}
+			return o.toString();
+		}
+		return null;
+	}
+
 	/**
 	 * Allow to print debug information about timing executions.
 	 * 
@@ -37,14 +105,6 @@ public class AbstractLoggerFacade implements ILoggedPlugin {
 	 * The log level must be set to DEBUG.
 	 */
 	public static final boolean TIMINGTRACE = "true".equalsIgnoreCase(System.getProperty("com.arcadsoftware.trace.timing")); //$NON-NLS-1$ //$NON-NLS-2$
-	
-	/**
-	 * Allow to add debug informations.
-	 * 
-	 * <p>
-	 * The log level must be set to DEBUG.
-	 */
-	public static final boolean TRACE = "true".equalsIgnoreCase(System.getProperty("com.arcadsoftware.trace")); //$NON-NLS-1$ //$NON-NLS-2$
 
 	private final ILoggedPlugin activator;
 	
@@ -68,7 +128,7 @@ public class AbstractLoggerFacade implements ILoggedPlugin {
 		if (activator == null) {
 			System.out.println(message);
 		} else {
-			activator.log(message);
+			activator.info(message);
 		}
 	}
 
@@ -80,7 +140,7 @@ public class AbstractLoggerFacade implements ILoggedPlugin {
 				e.printStackTrace(System.out);
 			}
 		} else {
-			activator.log(message, e);
+			activator.info(message, e);
 		}
 	}
 
@@ -91,18 +151,21 @@ public class AbstractLoggerFacade implements ILoggedPlugin {
 				e.printStackTrace(System.out);
 			}
 		} else {
-			activator.log(e);
+			activator.info(e);
 		}
 	}
 
+	@Override
 	public void info(String message) {
 		log(message);
 	}
 
+	@Override
 	public void info(String message, Throwable e) {
 		log(message, e);
 	}
 
+	@Override
 	public void info(Throwable e) {
 		log(e);
 	}
@@ -119,6 +182,7 @@ public class AbstractLoggerFacade implements ILoggedPlugin {
 		}
 	}
 
+	@Override
 	public void error(Throwable e) {
 		if (e != null) {
 			if (activator == null) {
@@ -126,6 +190,15 @@ public class AbstractLoggerFacade implements ILoggedPlugin {
 			} else {
 				activator.error(e.getLocalizedMessage(), e);
 			}
+		}
+	}
+
+	@Override
+	public void error(String message) {
+		if (activator == null) {
+			System.err.println(message);
+		} else {
+			activator.error(message);
 		}
 	}
 
@@ -147,6 +220,17 @@ public class AbstractLoggerFacade implements ILoggedPlugin {
 			}
 		} else {
 			activator.warn(message, e);
+		}
+	}
+
+	@Override
+	public void warn(Throwable e) {
+		if (activator == null) {
+			if (e != null) {
+				e.printStackTrace(System.out);
+			}
+		} else {
+			activator.warn(e);
 		}
 	}
 
@@ -194,36 +278,141 @@ public class AbstractLoggerFacade implements ILoggedPlugin {
 			debug(String.format("Timing \"%s\" in %dms.", message, System.currentTimeMillis() - t)); //$NON-NLS-1$
 		}
 	}
-	
-	/**
-	 * Log a detailed debug message. Only if the system property com.arcadsoftware.trace is true.
-	 * 
-	 * <p>
-	 * For performance reasons the parameter are not not necessarily converted into string. This occurs only 
-	 * if the message is effectively sent to the log, if the TRACE property is set to <b>true</b>.
-	 * 
-	 * @param message The message will be assembled from the given object list, only and only if the TRACE is activated.
-	 * @see AbstractLoggerFacade#TIMINGTRACE
-	 */
-	public void trace(Object... message) {
-		if (TRACE) {
-			StringBuilder sb = new StringBuilder();
-			for(Object o: message) {
-				sb.append(o);
+
+	@Override
+	public void trace(String message) {
+		if (activator == null) {
+			System.out.println("[TRACE] " + message); //$NON-NLS-1$
+		} else {
+			activator.trace(message);
+		}
+	}
+
+	@Override
+	public void trace(String message, Throwable e) {
+		if (activator == null) {
+			System.out.println("[TRACE] " + message); //$NON-NLS-1$
+			if (e != null) {
+				e.printStackTrace(System.out);
 			}
-			debug(sb.toString());
+		} else {
+			activator.trace(message, e);
 		}
 	}
 
-	/**
-	 * Log a stack trace only if the "trace" system property is set.
-	 * 
-	 * @param e
-	 */
+	@Override
 	public void trace(Throwable e) {
-		if (TRACE) {
-			debug(e);
+		if (activator == null) {
+			if (e != null) {
+				e.printStackTrace(System.out);
+			}
+		} else {
+			activator.trace(e);
 		}
 	}
 
+	@Override
+	public void audit(String message, Throwable e) {
+		if (activator == null) {
+			System.err.println(message);
+			if (e != null) {
+				e.printStackTrace(System.out);
+			}
+		} else {
+			activator.audit(message, e);
+		}
+	}
+
+	@Override
+	public void audit(String message) {
+		if (activator == null) {
+			System.err.println(message);
+		} else {
+			activator.audit(message);
+		}
+	}
+
+	@Override
+	public void audit(Throwable e) {
+		if (activator == null) {
+			if (e != null) {
+				e.printStackTrace();
+			}
+		} else {
+			activator.audit(e);
+		}
+	}
+
+	@Override
+	public void audit(String message, Object... objects) {
+		if (activator == null) {
+			System.err.println(format(message, objects));
+			if ((objects.length > 0) && (objects[objects.length - 1] instanceof Throwable)) {
+				((Throwable) objects[objects.length - 1]).printStackTrace(System.out);
+			}
+		} else {
+			activator.audit(message, objects);
+		}
+	}
+
+	@Override
+	public void error(String message, Object... objects) {
+		if (activator == null) {
+			System.err.println(format(message, objects));
+			if ((objects.length > 0) && (objects[objects.length - 1] instanceof Throwable)) {
+				((Throwable) objects[objects.length - 1]).printStackTrace(System.out);
+			}
+		} else {
+			activator.error(message, objects);
+		}
+	}
+
+	@Override
+	public void warn(String message, Object... objects) {
+		if (activator == null) {
+			System.out.println("[WARNING] " + format(message, objects));
+			if ((objects.length > 0) && (objects[objects.length - 1] instanceof Throwable)) {
+				((Throwable) objects[objects.length - 1]).printStackTrace(System.out);
+			}
+		} else {
+			activator.warn(message, objects);
+		}
+	}
+
+	@Override
+	public void info(String message, Object... objects) {
+		if (activator == null) {
+			System.out.println(format(message, objects));
+			if ((objects.length > 0) && (objects[objects.length - 1] instanceof Throwable)) {
+				((Throwable) objects[objects.length - 1]).printStackTrace(System.out);
+			}
+		} else {
+			activator.info(message, objects);
+		}
+	}
+
+	@Override
+	public void debug(String message, Object... objects) {
+		if (activator == null) {
+			System.out.println("[DEBUG] " + format(message, objects));
+			if ((objects.length > 0) && (objects[objects.length - 1] instanceof Throwable)) {
+				((Throwable) objects[objects.length - 1]).printStackTrace(System.out);
+			}
+		} else {
+			activator.debug(message, objects);
+		}
+	}
+
+	@Override
+	public void trace(String message, Object... objects) {
+		if (activator == null) {
+			System.out.println("[TRACE] " + format(message, objects));
+			if ((objects.length > 0) && (objects[objects.length - 1] instanceof Throwable)) {
+				((Throwable) objects[objects.length - 1]).printStackTrace(System.out);
+			}
+		} else {
+			activator.trace(message, objects);
+		}
+	}
+	
 }

@@ -106,9 +106,9 @@ public interface ICommandLinePrinter extends ILoggedPlugin {
 	 * if the message is effectively sent to the log, if the TRACE property is set to <b>true</b>.
 	 * 
 	 * @param message The message will be assembled from the given object list, only and only if the TRACE is activated.
-	 * @see AbstractLoggerFacade#TIMINGTRACE
+	 * @param objects The parameter that need to be assembled with the message.
 	 */
-	public void trace(Object... message);
+	public void trace(String message, Object... objects);
 
 	/**
 	 * Log a stack trace only if the "trace" system property is set.

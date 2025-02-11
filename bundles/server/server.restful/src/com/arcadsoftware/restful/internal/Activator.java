@@ -84,7 +84,6 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 	private ServiceRegistration<IBranch> rootReg;
 	private ServiceRegistration<CommandProvider> consoleReg;
 	private ServiceRegistration<IRestServerMonitor> monitorReg;
-	private volatile HTTPServiceTracker httpTracker;
 	private ServiceRegistration<OSGiApplication> appService;
 	private MultiLanguageMessages messages;
 	private volatile ServerProperties serverProps;
@@ -124,8 +123,6 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 		consoleReg = context.registerService(CommandProvider.class, new ConsoleCommandProvider(this), new Hashtable<String, Object>());
 	    // Prepare a Root branch to add the About Restlet.
 		rootReg = context.registerService(IBranch.class, new RootBranch(this), RootBranch.properties(RootBranch.ROOTBRANCH));
-		// 
-		httpTracker = new HTTPServiceTracker(this);
 		// Wait until "Equinox Common" is started.
 		if (isCommonStarted()) {
 			proceedDelayedBundleScan();
@@ -190,11 +187,6 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 		}
 		if (component != null) {
 			stopServer();
-		}
-		if (httpTracker != null) {
-			httpTracker.removeservlet();
-			httpTracker.close();
-			httpTracker = null;
 		}
         OSGiClientHelper.setActivator(null);
         super.stop(context);
@@ -333,11 +325,7 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 	}
 
 	private synchronized void startServer() {
-		if ((serverProps == null) || serverProps.isServerInactive()) {
-			if (httpTracker != null) {
-				httpTracker.addServlet();
-			}
-		} else {
+		if ((serverProps != null) && !serverProps.isServerInactive()) {
 			// Create a new Restlet component and add a HTTP server connector to it
 			final StringBuilder httplogger = new StringBuilder();
 			boolean https = false;
@@ -687,11 +675,7 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 				}
 			} else {
 				// Stopping old server instance.
-				if (serverProps.isServerInactive()) {
-					if (httpTracker != null) {
-						httpTracker.removeservlet();
-					}
-				} else {
+				if (!serverProps.isServerInactive()) {
 					stopServer();
 				}
 				// Update parameters
@@ -801,14 +785,10 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 		if (serverProps == null) {
 			return false;
 		}
-		if (serverProps.isServerInactive()) {
-			if (httpTracker != null) {
-				httpTracker.removeservlet();
-			}
-		} else {
+		if (!serverProps.isServerInactive()) {
 			stopServer();
 		}
 		startServer();
-		return (component != null) || (serverProps.isServerInactive() && (httpTracker != null));
+		return component != null;
 	}
 }
