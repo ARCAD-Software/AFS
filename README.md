@@ -1,10 +1,10 @@
-# AFS-OS release version 2023.7.38.
+# AFS-OS release version 2023.7.39.
 
-Release date Tue Jan 28 09:41:03 CET 2025.
+Release date Thu Feb 13 15:05:50 CET 2025.
 
-Link to the update site of [Version 2023.7.38](https://github.com/ARCAD-Software/AFS/releases/download/2023.7.38/).
+Link to the update site of [Version 2023.7.39](https://github.com/ARCAD-Software/AFS/releases/download/2023.7.39/).
 
-3 Bundles modified in this release.
+2 Bundles modified in this release.
 
 
 
@@ -40,15 +40,15 @@ Bundle Symbolic Name | Modification | Version
 
 Bundle Symbolic Name | Modification | Version
 -------------------- | ------------ | -------
-[com.arcadsoftware.beanmap](bundles/common/beanmap) | **Upgraded** from version 1.3.10 | **1.3.11**
+[com.arcadsoftware.beanmap](bundles/common/beanmap) | Not changed | 1.3.11
 [com.arcadsoftware.cleanup](bundles/common/cleanup) | Not changed | 1.4.2
 [com.arcadsoftware.cm.simple](bundles/common/cm.simple) | Not changed | 1.5.4
 [com.arcadsoftware.crypt](bundles/common/crypt) | Not changed | 1.8.6
 [com.arcadsoftware.crypt.xml](bundles/common/crypt.xml) | Not changed | 1.1.4
 [com.arcadsoftware.email](bundles/common/email) | Not changed | 1.4.3
 [com.arcadsoftware.groovy.security](bundles/common/groovy.security) | Not changed | 1.1.5
-[com.arcadsoftware.metadata](bundles/common/metadata) | **Upgraded** from version 1.6.2 | **1.6.3**
-[com.arcadsoftware.osgi](bundles/common/osgi) | **Upgraded** from version 1.9.8 | **1.9.9**
+[com.arcadsoftware.metadata](bundles/common/metadata) | Not changed | 1.6.3
+[com.arcadsoftware.osgi](bundles/common/osgi) | Not changed | 1.9.9
 [com.arcadsoftware.rest](bundles/common/rest) | Not changed | 3.1.8
 [com.arcadsoftware.ssh](bundles/common/ssh) | Not changed | 1.2.5
 
@@ -59,8 +59,8 @@ Bundle Symbolic Name | Modification | Version
 Bundle Symbolic Name | Modification | Version
 -------------------- | ------------ | -------
 [org.restlet.base](bundles/repack/org.restlet.base) | Not changed | 2.4.301
-[org.restlet.server](bundles/repack/org.restlet.server) | Not changed | 2.4.303
-[org.restlet.server.jmx](bundles/repack/org.restlet.server.jmx) | Not changed | 2.4.302
+[org.restlet.server](bundles/repack/org.restlet.server) | **Upgraded** from version 2.4.303 | **2.4.304**
+[org.restlet.server.jmx](bundles/repack/org.restlet.server.jmx) | **Upgraded** from version 2.4.302 | **2.4.303**
 [xstream](bundles/repack/xstream) | Not changed | 1.4.211
 
 
