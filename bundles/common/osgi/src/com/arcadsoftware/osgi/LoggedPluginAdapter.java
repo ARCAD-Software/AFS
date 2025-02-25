@@ -14,7 +14,11 @@
 package com.arcadsoftware.osgi;
 
 /**
- * @deprecated Extends one of the existing implementation like SysOutLogged. 
+ * @see SysOutLogged
+ * @see LoggedToVoid
+ * @see LoggedToConsole
+ * @see JavaLogged
+ * @deprecated Extends one of the existing implementation like SysOutLogged.
  */
 public abstract class LoggedPluginAdapter implements ILoggedPlugin {
 	

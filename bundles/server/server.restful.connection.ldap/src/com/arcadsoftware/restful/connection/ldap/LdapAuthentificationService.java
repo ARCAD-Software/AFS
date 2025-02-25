@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -224,7 +225,7 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 		this.activator = activator;
 		base = getProp(props, PROP_DNBASE, null);
 		if (base == null) { // Blindage !
-			throw new NullPointerException("The property configuration \"dn.base\"  must be set.");
+			throw new NullPointerException("The property configuration \"dn.base\" must be set.");
 		}
 		int initialConnections = getProp(props, PROP_POOLINITSIZE, 1);
 		if (initialConnections < 1) {
@@ -265,51 +266,7 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 				}
 			}
 		}
-		switch (getProp(props, PROP_BINDTYPE, "direct").toLowerCase()) { //$NON-NLS-1$
-		case "1": //$NON-NLS-1$
-		case "s": //$NON-NLS-1$
-		case "smpl": //$NON-NLS-1$
-		case "simple": //$NON-NLS-1$
-			bindKind = BINDKIND_SIMPLE;
-			break;
-		case "2": //$NON-NLS-1$
-		case "plain": //$NON-NLS-1$
-			bindKind = BINDTYPE_PLAIN;
-			break;
-		case "3": //$NON-NLS-1$
-		case "dmd5": //$NON-NLS-1$
-		case "digest-md5": //$NON-NLS-1$
-			bindKind = BINDTYPE_DIGESTMD5;
-			break;
-		case "4": //$NON-NLS-1$
-		case "cmd5": //$NON-NLS-1$
-		case "cram-md5": //$NON-NLS-1$
-			bindKind = BINDTYPE_CRAMMD5;
-			break;
-		case "5": //$NON-NLS-1$
-		case "ssha1": //$NON-NLS-1$
-		case "scram-sha-1": //$NON-NLS-1$
-			bindKind = BINDTYPE_SCRAMSHA1;
-			break;
-		case "6": //$NON-NLS-1$
-		case "ssha256": //$NON-NLS-1$
-		case "scram-sha-256": //$NON-NLS-1$
-			bindKind = BINDTYPE_SCRAMSHA256;
-			break;
-		case "7": //$NON-NLS-1$
-		case "ssha512": //$NON-NLS-1$
-		case "scram-sha-512": //$NON-NLS-1$
-			bindKind = BINDTYPE_SCRAMSHA512;
-			break;
-		case "8": //$NON-NLS-1$
-		case "gssapi": //$NON-NLS-1$
-		case "kerberos": //$NON-NLS-1$
-			bindKind = BINDTYPE_GSSAPI;
-			break;
-		default: // direct
-			bindKind = BINDKIND_SIMPLE;
-			break;
-		}
+		bindKind = getBindKind(getProp(props, PROP_BINDTYPE, "direct"));
 		Enumeration<String> keys = props.keys();
 		while (keys.hasMoreElements()) {
 			String key = keys.nextElement();
@@ -370,6 +327,48 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 		connectionPool.setHealthCheckIntervalMillis(5000L);
 		connectionPool.setMinimumAvailableConnectionGoal(minAvailableGoal);
 		connectionPool.setCreateIfNecessary(true);
+	}
+
+	private int getBindKind(String bk) {
+		if (bk == null) {
+			return BINDKIND_SIMPLE;
+		}
+		switch (bk.toLowerCase()) { //$NON-NLS-1$
+		case "1": //$NON-NLS-1$
+		case "s": //$NON-NLS-1$
+		case "smpl": //$NON-NLS-1$
+		case "simple": //$NON-NLS-1$
+			return BINDKIND_SIMPLE;
+		case "2": //$NON-NLS-1$
+		case "plain": //$NON-NLS-1$
+			return BINDTYPE_PLAIN;
+		case "3": //$NON-NLS-1$
+		case "dmd5": //$NON-NLS-1$
+		case "digest-md5": //$NON-NLS-1$
+			return BINDTYPE_DIGESTMD5;
+		case "4": //$NON-NLS-1$
+		case "cmd5": //$NON-NLS-1$
+		case "cram-md5": //$NON-NLS-1$
+			return BINDTYPE_CRAMMD5;
+		case "5": //$NON-NLS-1$
+		case "ssha1": //$NON-NLS-1$
+		case "scram-sha-1": //$NON-NLS-1$
+			return BINDTYPE_SCRAMSHA1;
+		case "6": //$NON-NLS-1$
+		case "ssha256": //$NON-NLS-1$
+		case "scram-sha-256": //$NON-NLS-1$
+			return BINDTYPE_SCRAMSHA256;
+		case "7": //$NON-NLS-1$
+		case "ssha512": //$NON-NLS-1$
+		case "scram-sha-512": //$NON-NLS-1$
+			return BINDTYPE_SCRAMSHA512;
+		case "8": //$NON-NLS-1$
+		case "gssapi": //$NON-NLS-1$
+		case "kerberos": //$NON-NLS-1$
+			return BINDTYPE_GSSAPI;
+		default: // direct
+			return BINDKIND_SIMPLE;
+		}
 	}
 
 	private FailoverServerSet getServerSet(final Dictionary<String, Object> props, final ConfiguredSSLContext sslConf, BindRequest bindRequest) {
@@ -496,7 +495,7 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 		try {
 			return connectionPool.getConnection();
 		} catch (LDAPException e) {
-			activator.error("There is an connection in the LDAP connection pool, check your configuration or the LDAP may be down): "+ e.getLocalizedMessage(), e);
+			activator.error("There is an error when asking for a connection in the LDAP connection pool (Check your configuration or the LDAP Server may be down): "+ e.getLocalizedMessage(), e);
 			activator.info("LDAP Diagnostic Message: " + e.getDiagnosticMessage());
 			return null;
 		}
@@ -923,7 +922,7 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 					if ((profiles != null) && !profiles.isEmpty()) {
 						for (BeanMap profile: profiles) {
 							entityUser.dataLinkTo(user, "profiles", profile);
-							// TODO add a method dataLinkTo(BeanMap, linkCode, ISearchCriteria) to crate a multi-association in one operation.
+							// TODO add a method dataLinkTo(BeanMap, linkCode, ISearchCriteria) to create a multi-association in one operation.
 						}
 					}
 				}
@@ -966,5 +965,69 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 				closeConnection(cn, e);
 			}
 		}
+	}
+	
+	public void bind(String login, String password) {
+		bind(Integer.toString(bindKind), login, password);
+	}
+	
+	public void bind(String type, String login, String password) {
+		if ((type == null) || (login == null) || (password == null)) {
+			System.out.println("Usage: bind <type> <login> <password>");
+		}
+		System.out.println("OS charset: " + Charset.defaultCharset().toString());
+		System.out.println("Binding user: >" + login + "<.");
+		System.out.println("With password: >" + password + "<.");
+		int bk = getBindKind(type);
+		try {
+			BindRequest br = getBindRequest(bk, login, password.toCharArray());
+			if (br == null) {
+				System.out.println("Unable o create a Bind request.");
+				return;
+			}
+			LDAPConnection cn = getConnection();
+			LDAPException exception = null;
+			try {
+				BindResult result = null;
+				try {
+					result = cn.bind(br);
+				} catch (LDAPException e) {
+					if (e.getResultCode() == ResultCode.BUSY) {
+						try {
+							for (int i = busy; i > 0; i--) {
+								System.out.println("LDAP server is busy... wait 2 sec...");
+								Thread.sleep(2000);
+								try {
+									result = cn.bind(br);
+								} catch (LDAPException ee) {
+									if (ee.getResultCode() != ResultCode.BUSY) {
+										e = ee;
+										break;
+									}
+								}
+							}
+						} catch (InterruptedException ie) {
+							// ok, we end here...
+						}
+					}
+					exception = e;
+				}
+				if (result != null) {
+					System.out.println("Bind successfull...");
+					System.out.println("Details:");
+					System.out.println(result.toString());
+				}
+			} finally {
+				closeConnection(cn, exception);
+			}
+			if (exception != null) {
+				System.out.println("An error occurs during the LDAP binding: "  + exception.getLocalizedMessage());
+				System.out.println(exception.getDiagnosticMessage());
+			}
+		} catch (LDAPException e) {
+			System.out.println("An error occurs during the LDAP binding pre-process: "  + e.getLocalizedMessage());
+			activator.info(e);
+		}
+		
 	}
 }

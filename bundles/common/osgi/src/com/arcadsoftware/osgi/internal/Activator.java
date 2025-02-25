@@ -30,8 +30,6 @@ public class Activator extends AbstractConfiguredActivator implements Runnable {
 	protected static final String PROP_CONFIGSYSTEMKEY = "system.key"; //$NON-NLS-1$
 	protected static final String PROP_CONFIGDATE = "limitation"; //$NON-NLS-1$
 	protected static final String PROP_CONFIGDATELAST = "checksum"; //$NON-NLS-1$
-
-	private static final String CONFIGCMD = "com.arcadsoftware.config.commands"; //$NON-NLS-1$
 	
 	private static Activator instance;
 
@@ -51,10 +49,7 @@ public class Activator extends AbstractConfiguredActivator implements Runnable {
 		taskManager = new StartTaskManager(this);
 		registerService(CommandProvider.class.getName(), taskManager);
 		// Console command provider...
-		if ("true".equalsIgnoreCase(context.getProperty(CONFIGCMD)) || //$NON-NLS-1$
-				(context.getBundle().getEntry("/.classpath") != null)) { //$NON-NLS-1$
-			registerService(CommandProvider.class.getName(), new ConfigCommands(context));
-		}
+		registerService(CommandProvider.class.getName(), new ConfigCommands(context));
 		LogsCommands logc = new LogsCommands(this, context);
 		ServiceRegistration<CommandProvider> sr = registerService(CommandProvider.class, logc);
 		logc.setServiceRef(sr.getReference());

@@ -25,7 +25,9 @@ import com.arcadsoftware.osgi.internal.Messages;
  * A helper static class to convert a Date to and from String in the ISO 8601 format, with the unique format:
  * 
  * <p>
- * <code>yyyy-mm-ddThh:mn:ss,msZ</code>
+ * <code>yyyy-mm-ddThh:mn:ss,SSSz</code>
+ * <br/>or<br/>
+ * <code>yyyy-mm-ddThh:mn:ss</code>
  * 
  * <p>
  * With international decimal representation according to ISO 8601:1-2019 section 3.1.3.9 Decimal sign.

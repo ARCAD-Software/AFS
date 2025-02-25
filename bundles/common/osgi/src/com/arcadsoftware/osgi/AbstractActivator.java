@@ -130,6 +130,7 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 	 * @return the value returned by the action's run method.
 	 * @throws NullPointerException if the action is null.
 	 */
+	@Deprecated
 	public static <T> T doPrivileged(PrivilegedAction<T> action) {
 		if (System.getSecurityManager() != null) {
 			return AccessController.doPrivileged(action);

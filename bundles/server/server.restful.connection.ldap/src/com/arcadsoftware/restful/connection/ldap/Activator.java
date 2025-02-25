@@ -19,6 +19,7 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
 
+import org.apache.felix.service.command.CommandProcessor;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.util.tracker.ServiceTracker;
@@ -62,7 +63,6 @@ public class Activator extends AbstractConfiguredActivator {
 
 	private ServiceTracker<IConnectionCache, IConnectionCache> connectionCacheTracker;
 	private ServiceRegistration<IAuthentificationService> ldas;
-	private LdapAuthentificationService ldap;
 	private boolean caseSensitive;
 	private HashMap<Integer, BeanMap> authCache;
 	private HashMap<String, Integer> authCacheLogin;
@@ -98,9 +98,6 @@ public class Activator extends AbstractConfiguredActivator {
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
-		if (ldap != null) {
-			ldap.close();
-		}
 		eventtracker.close();
 		connectionCacheTracker.close();
 		ldas = null;
@@ -228,10 +225,6 @@ public class Activator extends AbstractConfiguredActivator {
 			if (ldas != null) {
 				unregister(ldas);
 				ldas = null;
-				if (ldap != null) {
-					ldap.close();
-					ldap = null;
-				}
 			}
 			purgeConnectionCache();
 			caseSensitive = parseBooleanParameter(properties.get(PROP_LOGIN_CASESENSITIVE), true);
@@ -241,8 +234,9 @@ public class Activator extends AbstractConfiguredActivator {
 					Dictionary<String, Object> props = new Hashtable<>();
 					props.put(LdapAuthentificationService.ENTITYNAME, LDAPAUTH);
 					props.put(LdapAuthentificationService.PRIORITY, 5);
-					ldap = new LdapAuthentificationService(this, properties);
-					ldas = registerService(IAuthentificationService.class, ldap, props);
+					props.put(CommandProcessor.COMMAND_SCOPE, "arcad"); //$NON-NLS-1$
+					props.put(CommandProcessor.COMMAND_FUNCTION, new String[] {"bind"}); //$NON-NLS-1$
+					ldas = registerService(IAuthentificationService.class, new LdapAuthentificationService(this, properties), props);
 				} catch (LDAPException | ConfiguredSSLContextException e) {
 					error("LDAP Connection invalid configuration.", e);
 				}
@@ -370,10 +364,6 @@ public class Activator extends AbstractConfiguredActivator {
 				authCacheLogin.put(oldlogin, oldUid);
 			}
 		}
-	}
-
-	public LdapAuthentificationService getLdapAccess() {
-		return ldap;
 	}
 
 	public Collection<String> getAuthLogins() {

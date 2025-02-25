@@ -254,24 +254,24 @@ public abstract class AbstractMapperService<T extends ICriteriaContext> implemen
 	}
 
 	private ISearchCriteria getTestCriteria(ReferenceLine attributeTest, Object value, T context) {
-		context.useReference(attributeTest);
+		ISearchCriteria result;
 		// note that the following criteria do not need to be reduced.
 		if (value == null) {
-			return new IsNullCriteria(attributeTest.getCode());
-		}
-		if (value instanceof Integer) {
-			return new EqualCriteria(attributeTest.getCode(), (Integer) value);
-		}
-		if (value instanceof Boolean) {
+			result = new IsNullCriteria(attributeTest.getCode());
+		} else if (value instanceof Integer) {
+			result = new EqualCriteria(attributeTest.getCode(), (Integer) value);
+		} else if (value instanceof Boolean) {
 			if ((Boolean) value) {
-				return new IsTrueCriteria(attributeTest.getCode());
+				result = new IsTrueCriteria(attributeTest.getCode());
+			} else {
+				result = new NotCriteria(new IsTrueCriteria(attributeTest.getCode()));
 			}
-			return new NotCriteria(new IsTrueCriteria(attributeTest.getCode()));
+		} else if (value instanceof Date) {
+			result = new EqualCriteria(attributeTest.getCode(), ISODateFormater.toString((Date) value));
+		} else {
+			result = new EqualCriteria(attributeTest.getCode(), value.toString());
 		}
-		if (value instanceof Date) {
-			return new EqualCriteria(attributeTest.getCode(), ISODateFormater.toString((Date) value));
-		}
-		return new EqualCriteria(attributeTest.getCode(), value.toString());
+		return result.reduce(context);
 	}
 
 	/**

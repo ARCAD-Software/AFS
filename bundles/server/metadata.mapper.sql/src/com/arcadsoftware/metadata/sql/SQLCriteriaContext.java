@@ -296,12 +296,11 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 	
 	private String buildAttributeColName(ReferenceLine reference, EntityInfo lastInfo, JoinElement join, boolean innerJoin, boolean deleted) {
 		String currentCol = null;
-		String code = null;
 		for (int i = 0; i < reference.size(); i++) {
 			Element e = reference.get(i);
 			if (e instanceof MetaDataAttribute) {
 				// Manage non final references...
-				currentCol = lastInfo.attributesCols.get(code);
+				currentCol = lastInfo.attributesCols.get(e.getCode());
 				if (currentCol == null) {
 					return null;
 				}

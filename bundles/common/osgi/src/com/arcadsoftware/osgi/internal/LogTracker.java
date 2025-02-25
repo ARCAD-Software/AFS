@@ -60,15 +60,9 @@ public class LogTracker extends ServiceTracker<LoggerFactory, Logger> {
 					tempMessages.clear();
 				}
 			}
-			
+			return logger;
 		}
 		return null;
-	}
-
-	@Override
-	public void removedService(ServiceReference<LoggerFactory> reference, Logger service) {
-		// TODO Auto-generated method stub
-		super.removedService(reference, service);
 	}
 
 	/**
@@ -93,10 +87,10 @@ public class LogTracker extends ServiceTracker<LoggerFactory, Logger> {
 					}
 				}
 			}
-		} 
+		}
 		// There is no OSGi log service implemented... yet.
 		if (!logged) {
-			if (level >= AbstractActivator.LOG_ERROR) {
+			if (level <= AbstractActivator.LOG_ERROR) {
 				System.err.println(message);
 			} else {
 				System.out.println(message);
