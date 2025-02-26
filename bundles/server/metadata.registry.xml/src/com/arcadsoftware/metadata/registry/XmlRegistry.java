@@ -100,7 +100,7 @@ public class XmlRegistry implements IEntityRegistry {
 		}
 	}
 	
-	public void loadContainer(String name, List<MetaDataEntity> declarations) {
+	public synchronized void loadContainer(String name, List<MetaDataEntity> declarations) {
 		if ((declarations == null) || (declarations.size() == 0)) {
 			return;
 		}
@@ -130,12 +130,19 @@ public class XmlRegistry implements IEntityRegistry {
 	private List<MetaDataEntity> preprocessDeclarations(List<MetaDataEntity> declarations) {
 		ArrayList<MetaDataEntity> result = new ArrayList<MetaDataEntity>(declarations.size());
 		for (MetaDataEntity e: declarations) {
-			result.add(e);
 			// If this entity is autoLink=true then add update from all other links targeting this entity.
 			if (e.getMetadata().contains(MetaDataEntity.METADATA_AUTOLINK)) {
 				for (MetaDataEntity ee: entities.values()) {
 					for (MetaDataLink l: ee.getLinks().values()) {
-						if (e.getType().equals(l.getType())) {
+						if (e.equalsType(l)) {
+							result.add(createUpdateLink(e.getType(), e.getVersion(), BeanMapList.getListTag(ee.getType()), ee.getType(), MetaDataEntity.METADATA_AUTOLINK, l.getCode()));
+							break;
+						}
+					}
+				}				
+				for (MetaDataEntity ee: result) {
+					for (MetaDataLink l: ee.getLinks().values()) {
+						if (e.equalsType(l)) {
 							result.add(createUpdateLink(e.getType(), e.getVersion(), BeanMapList.getListTag(ee.getType()), ee.getType(), MetaDataEntity.METADATA_AUTOLINK, l.getCode()));
 							break;
 						}
@@ -149,23 +156,50 @@ public class XmlRegistry implements IEntityRegistry {
 						result.add(createUpdateLink(e.getType(), e.getVersion(), BeanMapList.getListTag(a.getCode()), ee.getType(), MetaDataEntity.METADATA_REVERSELINK, a.getCode()));
 					}
 				}
+				for (MetaDataEntity ee: result) {
+					for (MetaDataAttribute a: ee.getAttributesFromType(e.getType())) {
+						result.add(createUpdateLink(e.getType(), e.getVersion(), BeanMapList.getListTag(a.getCode()), ee.getType(), MetaDataEntity.METADATA_REVERSELINK, a.getCode()));
+					}
+				}
 			}
 			// For all attributes reverseLink = true, Create an Update for the target entity.
 			for (MetaDataAttribute a: e.getAttributes().values()) {
 				if (a.getMetadata().contains(MetaDataEntity.METADATA_REVERSELINK)) {
 					result.add(createUpdateLink(a.getType(), Integer.MAX_VALUE, BeanMapList.getListTag(e.getType()), e.getType(), MetaDataEntity.METADATA_REVERSELINK, a.getCode()));
+				} else {
+					MetaDataEntity ee = entities.get(a.getType());
+					if (ee == null) {
+						for (MetaDataEntity x: result) {
+							if (x.equalsType(a)) {
+								ee = x;
+								break;
+							}
+						}
+					}
+					if ((ee != null) && ee.getMetadata().contains(MetaDataEntity.METADATA_REVERSELINK)) {
+						result.add(createUpdateLink(a.getType(), ee.getVersion(), BeanMapList.getListTag(e.getType()), e.getType(), MetaDataEntity.METADATA_REVERSELINK, a.getCode()));
+					}
 				}
 			}
 			// For all Entities with autolink = true linked to this entity...
 			for (MetaDataLink l: e.getLinks().values()) {
 				MetaDataEntity ee = entities.get(l.getType());
-				if ((ee != null) && e.getMetadata().contains(MetaDataEntity.METADATA_AUTOLINK)) {
+				if (ee == null) {
+					for (MetaDataEntity x: result) {
+						if (x.equalsType(l)) {
+							ee = x;
+							break;
+						}
+					}
+				}
+				if ((ee != null) && ee.getMetadata().contains(MetaDataEntity.METADATA_AUTOLINK)) {
 					String code = BeanMapList.getListTag(e.getType());
 					if (ee.getLink(code) == null) {
 						result.add(createUpdateLink(ee.getType(), ee.getVersion(), code, e.getType(), MetaDataEntity.METADATA_AUTOLINK, l.getCode()));
 					}
 				}
 			}
+			result.add(e);
 		}
 		return result;
 	}
