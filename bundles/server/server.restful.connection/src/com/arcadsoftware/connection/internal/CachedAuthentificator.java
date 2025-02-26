@@ -13,7 +13,9 @@
  *******************************************************************************/
 package com.arcadsoftware.connection.internal;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.GregorianCalendar;
@@ -101,7 +103,7 @@ public class CachedAuthentificator extends Authenticator {
         }
         // Utilisation du Schema Basic.
         if (ChallengeScheme.HTTP_BASIC.equals(cr.getScheme())) {
-        	return basicCachedAuthenticate(services, request, response, timing);
+        	return basicCachedAuthenticate(services, request, response, cr, timing);
         }
         // utilisation d'un autre schema.
         boolean manage_error = true;
@@ -141,9 +143,22 @@ public class CachedAuthentificator extends Authenticator {
 		return false;
 	}
 
-	private boolean basicCachedAuthenticate(IAuthentificationService[] services, Request request, Response response, long timing) {
-        String identifier = request.getChallengeResponse().getIdentifier();
-        char[] secret = request.getChallengeResponse().getSecret();
+	private boolean basicCachedAuthenticate(IAuthentificationService[] services, Request request, Response response, ChallengeResponse challenge, long timing) {
+		byte[] credentialsEncoded = Base64.getDecoder().decode(challenge.getRawValue());
+		// Use UTF-8 as the default charset used for credential in BASIC HTTP authenticate header.
+        String credentials = new String(credentialsEncoded, StandardCharsets.UTF_8);
+        int separator = credentials.indexOf(':');
+        // Restlet already log an information about missing separator... 
+        if (separator > 0) {
+            challenge.setIdentifier(credentials.substring(0, separator));
+            challenge.setSecret(credentials.substring(separator + 1));
+        } else {
+            challenge.setIdentifier(credentials);
+            challenge.setSecret(new char[0]);
+        }
+		String identifier = challenge.getIdentifier();
+        char[] secret = challenge.getSecret();
+		
 		// Ici on vérifie les paramètres d'identification en déléguant le processus 
 		// à un service OSGi qualifié, c'est ce service qui décide lui-même s'il est qualifié ou pas.
 		// Pour un même utilisateur plusieurs logins et services différents peuvent être employés.
@@ -328,7 +343,11 @@ public class CachedAuthentificator extends Authenticator {
         	}
         }
         if (isSomeBasic) {
-        	result.add(new ChallengeRequest(ChallengeScheme.HTTP_BASIC, activator.getRealm()));
+        	ChallengeRequest cr = new ChallengeRequest(ChallengeScheme.HTTP_BASIC, activator.getRealm());
+        	cr.getParameters().add("charset", "UTF-8");
+        	// Force the inclusion of the UTF-8 charset preference.
+        	cr.setRawValue("Basic realm=\""+activator.getRealm()+"\", charset=\"UTF-8\"");
+        	result.add(cr);
         }
         return result;
 	}
