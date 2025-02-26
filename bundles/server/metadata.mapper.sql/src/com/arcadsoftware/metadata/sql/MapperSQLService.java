@@ -604,7 +604,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 			lcols += fg.columnsep + DEFAULT_TABLEALIAS + '.' + e.updateCol + fg.paramset;
 		}
 		if (criteria == null) {
-			return update(String.format(fg.updateex, e.table, lcols, fg.true_cond), vals);
+			return update(String.format(fg.updateex, e.table, DEFAULT_TABLEALIAS, lcols, fg.true_cond), vals);
 		}
 		if (hasjoins) {
 			// Generate where clause before the joins...
@@ -621,7 +621,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 				colNames.put(code, col);
 			}
 		}
-		return update(String.format(fg.updateex, e.table + fg.as + DEFAULT_TABLEALIAS, lcols, context.generateCriteria(criteria, true).toString()), vals);
+		return update(String.format(fg.updateex, e.table, DEFAULT_TABLEALIAS, lcols, context.generateCriteria(criteria, true).toString()), vals);
 	}
 
 	@Override
@@ -671,13 +671,13 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 			lcols += fg.columnsep + DEFAULT_TABLEALIAS + '.' + e.updateCol + fg.paramset;
 		}
 		if (criteria == null) {
-			return update(String.format(fg.updateex, e.table, lcols, fg.true_cond), vals);
+			return update(String.format(fg.updateex, e.table, DEFAULT_TABLEALIAS, lcols, fg.true_cond), vals);
 		}
 		StringBuilder where = context.generateCriteria(criteria, true);
 		if (hasjoins) {
 			return update(String.format(fg.update_join, DEFAULT_TABLEALIAS, lcols, context.generateJoins(true), where.toString()), vals);
 		}
-		return update(String.format(fg.updateex, e.table, lcols, where.toString()), vals);
+		return update(String.format(fg.updateex, e.table, DEFAULT_TABLEALIAS, lcols, where.toString()), vals);
 	}
 
 	@Override
@@ -743,14 +743,14 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		}
 		StringBuilder where = context.generateCriteria(criteria, false);
 		if (where.isEmpty()) {
-			return update(String.format(fg.updateex, e.table, lcols, fg.true_cond), values.toArray(new Object[values.size()])) > 0;
+			return update(String.format(fg.updateex, e.table, DEFAULT_TABLEALIAS, lcols, fg.true_cond), values.toArray(new Object[values.size()])) > 0;
 		}
 		if (hasjoins) {
 			return update(String.format(fg.update_join, DEFAULT_TABLEALIAS, lcols, context.generateJoins(false), where.toString()), //
 					values.toArray(new Object[values.size()])) > 0;
 		}
 		// Joins map is not used here (the criteria reduction does not own any joins... it is only used to avoid NPE.
-		return update(String.format(fg.updateex, e.table, lcols, where.toString()), values.toArray(new Object[values.size()])) > 0;
+		return update(String.format(fg.updateex, e.table, DEFAULT_TABLEALIAS, lcols, where.toString()), values.toArray(new Object[values.size()])) > 0;
 	}
 
 	@Override

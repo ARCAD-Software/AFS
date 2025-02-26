@@ -112,15 +112,15 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 	/**
 	 * @return False if this SQL Context is not operational, basically, if and only if the given original entity, belong to the given SQL mapper.
 	 */
-	public boolean isValid() {
+	protected boolean isValid() {
 		return entityInfo != null;
 	}
 	
-	public EntityInfo getEntityInfo() {
+	protected EntityInfo getEntityInfo() {
 		return entityInfo;
 	}
 	
-	public String generateJoins(boolean deleted) {
+	protected String generateJoins(boolean deleted) {
 		init(deleted);
 		return joinTree.toString(mapper);
 	}
@@ -156,7 +156,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 	 * @param value
 	 * @return
 	 */
-	protected String escape(String value) {
+	private String escape(String value) {
 		return mapper.esc.escape(value);
 	}
 
@@ -165,7 +165,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 	 * 
 	 * @param sql
 	 */
-	public JoinElement initJoinTree(String alias, String sql, EntityInfo entity, String parentCol, boolean deleted) {
+	protected JoinElement initJoinTree(String alias, String sql, EntityInfo entity, String parentCol, boolean deleted) {
 		if (joinTree == null) {
 			joinTree = new JoinElement(alias, sql);
 			JoinElement result;
@@ -173,7 +173,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 				result = joinTree;
 				entity = entityInfo;
 			} else {
-				result = joinTree.add(entity, parentCol, deleted);
+				result = joinTree.add(entity, alias + '.' + parentCol, deleted);
 			}
 			for (ReferenceLine rf: getReferences()) {
 				String code = rf.getCode();
@@ -191,12 +191,8 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 		return null;
 	}
 
-	public JoinElement addJoin(EntityInfo e, String parentCol, boolean deleted) {
-		return joinTree.add(e, parentCol, deleted);
-	}
-
 	/**
-	 * Generate the Select columns clause.
+	 * Generate the Selected columns clause.
 	 * 
 	 * @param entity
 	 * @param entityInfo
@@ -206,12 +202,21 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 	 * @param result
 	 * @param prefix
 	 */
-	public StringBuilder generateColumns(List<ReferenceLine> attributes, boolean deleted) {
+	protected StringBuilder generateColumns(List<ReferenceLine> attributes, boolean deleted) {
 		init(deleted);
 		return generateColumns(entityInfo, joinTree, attributes, deleted);
 	}
 	
-	public StringBuilder generateColumns(EntityInfo e, JoinElement join, List<ReferenceLine> attributes, boolean deleted) {
+	/**
+	 * Generate the Selected columns clause, without initialization of the SQL context.
+	 * 
+	 * @param e
+	 * @param join
+	 * @param attributes
+	 * @param deleted
+	 * @return
+	 */
+	protected StringBuilder generateColumns(EntityInfo e, JoinElement join, List<ReferenceLine> attributes, boolean deleted) {
 		StringBuilder result = new StringBuilder(join.getAlias());
 		result.append('.');
 		result.append(e.idCol);
@@ -258,7 +263,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 	 * @param orders
 	 * @return the Order SQL clause.
 	 */
-	public String generateOrders(List<ReferenceLine> orders, boolean deleted) {
+	protected String generateOrders(List<ReferenceLine> orders, boolean deleted) {
 		init(deleted);
 		StringBuilder result = new StringBuilder();
 		if (orders != null) {
@@ -290,7 +295,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 	 * @param innerJoin if false the reference is computed through "left outer joins" and is then optional. 
 	 * @return The SQL column representation.
 	 */
-	protected String buildAttributeColName(ReferenceLine reference, boolean innerJoin, boolean deleted) {
+	private String buildAttributeColName(ReferenceLine reference, boolean innerJoin, boolean deleted) {
 		return buildAttributeColName(reference, entityInfo, joinTree, innerJoin, deleted);
 	}
 	
@@ -355,7 +360,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 					return null;
 				}
 				lastInfo = mapper.getEntityInfo(entity);
-				result = result.add(lastInfo, result.getAlias() + col, deleted);
+				result = result.add(lastInfo, result.getAlias() + '.' + col, deleted);
 				if (innerJoin) {
 					result.setInner();
 				}
@@ -366,7 +371,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 		return result;
 	}
 
-	protected String getSubDivision(MetaDataEntity entity, boolean deleted) {
+	private String getSubDivision(MetaDataEntity entity, boolean deleted) {
 		final MetaDataLink link = entity.getFirstRecursiveLink();
 		if (link == null) {
 			return null;
@@ -507,7 +512,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 	 * @param result The SQL "where" clause, must be not null. 
 	 * @return the "result" param.
 	 */
-	protected StringBuilder generateCriteria(ISearchCriteria criteria, boolean deleted, StringBuilder result) {
+	private StringBuilder generateCriteria(ISearchCriteria criteria, boolean deleted, StringBuilder result) {
 		init(deleted);
 		if (criteria instanceof AfterCriteria) {
 			result.append(String.format(mapper.fg.greater, 
@@ -956,7 +961,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 	 * @param context
 	 * @return
 	 */
-	protected ISearchCriteria getLocalCriteria(ISearchCriteria criteria) {
+	private ISearchCriteria getLocalCriteria(ISearchCriteria criteria) {
 		if (isMapperUnique()) {
 			return criteria;
 		}
@@ -969,7 +974,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 	 * @param key An unique key identifying this SQL code.
 	 * @param query The SQL code which will be added before the final query.
 	 */
-	public void addQueryContext(String key, String query) {
+	protected void addQueryContext(String key, String query) {
 		queryContextes.put(key, query);
 	}
 	
@@ -980,7 +985,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 	 * @param objects
 	 * @return
 	 */
-	public String formatQuery(String format, Object... objects) {
+	protected String formatQuery(String format, Object... objects) {
 		StringBuilder sb = new StringBuilder();
 		for (String q: queryContextes.values()) {
 			sb.append(q);
@@ -988,14 +993,5 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 		}
 		sb.append(String.format(format, objects));
 		return sb.toString();
-	}
-	
-	/**
-	 * This context contain some specific query prefixex that require to be added to the final SQL query.
-	 * 
-	 * @return
-	 */
-	public boolean hasQueryContextes() {
-		return !queryContextes.isEmpty();
 	}
 }
