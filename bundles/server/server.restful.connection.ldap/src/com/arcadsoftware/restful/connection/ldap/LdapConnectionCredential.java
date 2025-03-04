@@ -53,6 +53,10 @@ public class LdapConnectionCredential implements IConnectionCredential, IUpdatab
 	@Override
 	public boolean authenticate(IConnectionUserBean user, String login, char[] secret) {
 		LDAPConnection cn = parent.getConnection();
+		if (cn == null) {
+			parent.getActivator().error("Unable to get a valid connection to the LDAP server.");
+			return false;
+		}
 		LDAPException e = null;
 		locked = false;
 		outOfDate = false;

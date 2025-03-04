@@ -547,7 +547,7 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 	
 	protected BindResult bind(final LDAPConnection cn, String userlogin, char[] secret) throws LDAPException {
 		final String dn = getUserDN(cn, userlogin);
-		if (dn == null) {
+		if ((dn == null) || (cn == null)) {
 			return null;
 		}
 		final BindRequest br = getBindRequest(dn, secret);
