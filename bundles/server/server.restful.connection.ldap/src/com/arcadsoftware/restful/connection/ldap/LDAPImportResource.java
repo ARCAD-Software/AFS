@@ -66,15 +66,22 @@ public class LDAPImportResource extends LDAPUserLinkedResource {
 		if (isExisting()) {
 			StringBuilder sb = new StringBuilder();
 			if (!hasRight(30)) { // = User listing
-				sb.append(" The Right to list Users.");
+				sb.append(" The Right to list Users");
 			}
 			if (!hasRight(31)) { // = User Create
-				sb.append(" The Right to create Users.");
+				if (!sb.isEmpty()) {
+					sb.append(',');
+				}
+				sb.append(" The Right to create Users");
 			}
 			if (!hasRight(38)) { // = Login Create
-				sb.append(" The Right to manage Users' logins.");
+				if (!sb.isEmpty()) {
+					sb.append(',');
+				}
+				sb.append(" The Right to manage Users' logins");
 			}
-			if (sb.length() > 0) {
+			if (!sb.isEmpty()) {
+				sb.append('.');
 				throw new ResourceException(Status.CLIENT_ERROR_FORBIDDEN, "You must have the following Right(s) to be able to import users from the LDAP Database:" + sb.toString());
 			}
 			getAllowedMethods().add(Method.GET);

@@ -534,7 +534,7 @@ public class MetaDataParentResource extends DataParentResource {
 			getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST, Activator.getMessage("error.missingattributes", language)); //$NON-NLS-1$
 			return null;
 		case 1:
-			// B. Validation de l'unicité des valeurs.
+			// B. Validation of uniqueness of values.
 			for (MetaDataAttribute attribute: list) {
 				if (attribute.getMetadata().getBoolean(MetaDataEntity.METADATA_UNIQUE)) {
 					Object value = result.get(attribute.getCode());
@@ -556,7 +556,7 @@ public class MetaDataParentResource extends DataParentResource {
 			result = getMapper().create(getEntity(),list,getEntity().getValues(list,result));
 		}
 		if ((result == null) || (result.getId() == 0)) {
-			// Echec de la création.
+			// Creation fail.
 			getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST, Activator.getMessage("error.badattributes", language)); //$NON-NLS-1$
 			return null;
 		}
