@@ -18,6 +18,7 @@ import java.net.Proxy;
 import java.net.Proxy.Type;
 import java.net.SocketAddress;
 import java.util.Dictionary;
+import java.util.Map;
 
 /**
  * Simple wrapper around the Java Proxy class, allowing to declare the proxy properties in a configuration properties file.
@@ -50,7 +51,40 @@ public class ConfiguredProxy {
 		}
 	}
 	
+	public ConfiguredProxy(Map<String, Object> props) {
+		this(getType(props.get(PROP_PROXY_TYPE)), props);
+	}
+	
+	public ConfiguredProxy(String type, Map<String, Object> props) {
+		this(getType(type), props);
+	}
+	
+	public ConfiguredProxy(Type type, Map<String, Object> props) {
+		super();
+		SocketAddress a = getAddress(props);
+		if ((type != Type.DIRECT) && (a != null)) {
+			proxy = new Proxy(type, a);
+		} else {
+			proxy = null;
+		}
+	}
+	
 	private SocketAddress getAddress(Dictionary<String, Object> props) {
+		Object o = props.get(PROP_PROXY_HOSTNAME);
+		if (o != null) {
+			Object po = props.get(PROP_PROXY_PORT);
+			int p = 8080;
+			if (po != null) {
+				try {
+					p = Integer.parseInt(po.toString());
+				} catch (NumberFormatException e) {}
+			}
+			return new InetSocketAddress(o.toString(), p);
+		}
+		return null;
+	}
+	
+	private SocketAddress getAddress(Map<String, Object> props) {
 		Object o = props.get(PROP_PROXY_HOSTNAME);
 		if (o != null) {
 			Object po = props.get(PROP_PROXY_PORT);
