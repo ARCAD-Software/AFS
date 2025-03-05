@@ -95,7 +95,7 @@ public abstract class AbstractMapperService<T extends ICriteriaContext> implemen
 	 * @see IMapperService#PROP_SUPPORT_PAGINATION
 	 * @see IMapperService#PROP_SUPPORT_SOFTDELETION
 	 */
-	public static Dictionary<String, ?> mapperProperties(String domainMame, boolean softdeletion, boolean pagination,
+	public static Dictionary<String, Object> mapperProperties(String domainMame, boolean softdeletion, boolean pagination,
 			boolean multilink, boolean extrarefs, boolean groups) {
 		final Hashtable<String, Object> props = new Hashtable<>();
 		props.put(PROP_DOMAINNAME, domainMame);

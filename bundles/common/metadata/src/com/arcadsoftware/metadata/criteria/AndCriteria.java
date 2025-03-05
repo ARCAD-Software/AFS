@@ -59,20 +59,23 @@ public class AndCriteria extends AbstractSearchCriteria implements Cloneable {
 	 * - if one or the other are AndCriteria.
 	 * - if one or the other are ConstantCriteria
 	 * 
-	 * @param criteriaToClone if this criteria is an AndCriteria it will be cloned. 
+	 * @param criteriaToClone if this criteria is an AndCriteria it will be cloned, if not it is <strong>not</strong> cloned ! 
 	 * @param criteria the criteria to add. It may be changed and will not be cloned.
 	 * @return a conjunction of the to criteria.
 	 * @throws CloneNotSupportedException
 	 */
-	public static ISearchCriteria and(ISearchCriteria criteriaToClone,ISearchCriteria criteria) throws CloneNotSupportedException {
-		if (ConstantCriteria.TRUE.equals(criteriaToClone)) {
+	public static ISearchCriteria and(ISearchCriteria criteriaToClone, ISearchCriteria criteria) throws CloneNotSupportedException {
+		if ((criteriaToClone == null) || (ConstantCriteria.TRUE.equals(criteriaToClone))) {
 			return criteria;
 		}
-		if (ConstantCriteria.TRUE.equals(criteria)) {
+		if ((criteria == null) || (ConstantCriteria.TRUE.equals(criteria))) {
 			return criteriaToClone;
 		}
+		if (ConstantCriteria.FALSE.equals(criteriaToClone) || ConstantCriteria.FALSE.equals(criteria)) {
+			return ConstantCriteria.FALSE;
+		}
 		if (criteriaToClone instanceof AndCriteria) {
-			AndCriteria result = (AndCriteria)criteriaToClone.clone();
+			AndCriteria result = (AndCriteria) criteriaToClone.clone();
 			if (criteria instanceof AndCriteria) {
 				result.criterias.addAll(((AndCriteria)criteria).criterias);
 			} else if (criteria instanceof ConstantCriteria) {
@@ -86,22 +89,15 @@ public class AndCriteria extends AbstractSearchCriteria implements Cloneable {
 		} 
 		if (criteria instanceof AndCriteria) {
 			if (criteriaToClone instanceof ConstantCriteria) {
-				if (!((ConstantCriteria)criteriaToClone).isValue()) {
+				if (!((ConstantCriteria) criteriaToClone).isValue()) {
 					return ConstantCriteria.FALSE;
 				}// else ignore the criteria
 			} else if (criteriaToClone != null) {
-				((AndCriteria)criteria).criterias.add((ISearchCriteria)criteriaToClone.clone());
+				((AndCriteria) criteria).criterias.add((ISearchCriteria) criteriaToClone.clone());
 			}
-			return (AndCriteria)criteria;
+			return (AndCriteria) criteria;
 		}
-		AndCriteria result = new AndCriteria();
-		if (criteriaToClone != null) {
-			result.criterias.add(criteriaToClone); // We don't clone here (because we don't change the contain of the criteria.
-		}
-		if (criteria != null) {
-			result.criterias.add(criteria);
-		}
-		return result;
+		return new AndCriteria(criteriaToClone, criteria);
 	}
 
 	@Override

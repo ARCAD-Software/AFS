@@ -59,7 +59,7 @@ public class MessageBundleTracker extends FileBundleTracker {
 			try {
 				MessageManager.addPropertyFile(resultFile);
 			} catch (IOException e) {
-				getActivator().log(e);
+				getActivator().info(e);
 			}
 		}
 	}
