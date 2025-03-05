@@ -28,6 +28,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.apache.felix.service.command.CommandProcessor;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -59,7 +60,7 @@ import com.arcadsoftware.rest.connection.RightInfo;
  */
 public class Activator extends AbstractActivator implements BundleListener, IConnectionInfoService, IProfileRightsListService {
 
-	public static final String USER = "user"; //$NON-NLS-1$
+	private static final String USER = "user"; //$NON-NLS-1$
 	private static final String USER_TITLE = "title.name"; //$NON-NLS-1$
 	private static final String USER_FIRSTNAME = "firstname"; //$NON-NLS-1$
 	private static final String USER_LASTNAME = "lastname"; //$NON-NLS-1$
@@ -67,17 +68,16 @@ public class Activator extends AbstractActivator implements BundleListener, ICon
 	private static final String USER_CLIENT = "client"; //$NON-NLS-1$
 	private static final String USER_ATTRIBUTES = USER_TITLE + ' ' + USER_FIRSTNAME + ' ' + USER_LASTNAME + ' ' + USER_CLIENT + ' ' + USER_PRINCIPAL;
 	private static final String USERRIGHT = "userRight"; //$NON-NLS-1$
-	public static final String RIGHT = "right"; //$NON-NLS-1$
-	public static final String RIGHTCATEGORY = "list/rightcategory"; //$NON-NLS-1$
-	public static final String RIGHT_CODE = "code"; //$NON-NLS-1$
-	public static final String RIGHT_NAME = "name"; //$NON-NLS-1$
-	public static final String RIGHT_CATEGORY = "category"; //$NON-NLS-1$
-	public static final String RIGHT_PARAMTYPE = "paramType"; //$NON-NLS-1$
-	public static final String PARAM = "param"; //$NON-NLS-1$
-	public static final String RIGHTANDPARAM = RIGHT + ' ' + PARAM;
 	private static final String DEFAULTRIGHTSFILENAME = "/META-INF/rights.xml"; //$NON-NLS-1$
 	private static final String RIGHTSHEADER = "Arcad-Rights"; //$NON-NLS-1$
 	private static final String EQUINOX_COMMON = "org.eclipse.equinox.common"; //$NON-NLS-1$
+	protected static final String RIGHT = "right"; //$NON-NLS-1$
+	protected static final String RIGHTCATEGORY = "list/rightcategory"; //$NON-NLS-1$
+	protected static final String RIGHT_CODE = "code"; //$NON-NLS-1$
+	protected static final String RIGHT_NAME = "name"; //$NON-NLS-1$
+	protected static final String RIGHT_CATEGORY = "category"; //$NON-NLS-1$
+	private static final String PARAM = "param"; //$NON-NLS-1$
+	private static final String RIGHTANDPARAM = RIGHT + ' ' + PARAM;
 
 	private final HashMap<Integer, BeanMap> rights = new HashMap<Integer, BeanMap>();;
 	private final HashMap<Integer, BeanMap> rightscategories = new HashMap<Integer, BeanMap>();
@@ -87,8 +87,10 @@ public class Activator extends AbstractActivator implements BundleListener, ICon
 	@Override
 	public void start(BundleContext bundleContext) throws Exception {
 		super.start(bundleContext);
-		registerService(RightsMapperService.clazz, new RightsMapperService(this), //
-				RightsMapperService.mapperProperties("mem:rights", false, true, false, false, false)); //$NON-NLS-1$
+		Dictionary<String, Object> props = RightsMapperService.mapperProperties("mem:rights", false, true, false, false, false); //$NON-NLS-1$
+		props.put(CommandProcessor.COMMAND_SCOPE, "arcad"); //$NON-NLS-1$
+		props.put(CommandProcessor.COMMAND_FUNCTION, new String[] {"rights"}); //$NON-NLS-1$
+		registerService(RightsMapperService.clazz, new RightsMapperService(this), props);
 		registerService(IConnectionInfoService.clazz, this);
 		registerService(IProfileRightsListService.class, this);
 		if (isCommonStarted()) {
@@ -221,7 +223,7 @@ public class Activator extends AbstractActivator implements BundleListener, ICon
 				// on affecte le pseudo attribut "category." de la valeur courante de la catégorie si elle
 				// a déjà été chargée.
 				synchronized (rightscategories) {
-					bean.addAll(RIGHT_CATEGORY + '.',rightscategories.get(bean.get(RIGHT_CATEGORY)));
+					bean.addAll(RIGHT_CATEGORY + '.', rightscategories.get(bean.get(RIGHT_CATEGORY)));
 				}
 				return true;
 			}

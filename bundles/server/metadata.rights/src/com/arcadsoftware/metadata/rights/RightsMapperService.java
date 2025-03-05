@@ -13,6 +13,7 @@
  *******************************************************************************/
 package com.arcadsoftware.metadata.rights;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -252,4 +253,29 @@ public class RightsMapperService extends AbstractMapperService<CriteriaContextBa
 		return new CriteriaContextBasic(entity, currentUser);
 	}
 
+	public void rights() {
+		System.out.println("Currently defined Access Rights:"); //$NON-NLS-1$
+		ArrayList<BeanMap> rights = new ArrayList<>(activator.getRights());
+		Collections.sort(rights);
+		for (BeanMap b: rights) {
+			System.out.println(b.getId() + " - " + b.getString(Activator.RIGHT_CODE) + " [" + b.getString(Activator.RIGHT_CATEGORY) + ']'); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+	}
+	
+	public void rights(String prefix) {
+		if ((prefix == null) || prefix.isBlank()) {
+			rights();
+			return;
+		}
+		System.out.println("Currently defined Access Rights starting with " + prefix + ":"); //$NON-NLS-1$
+		prefix = prefix.toLowerCase();
+		ArrayList<BeanMap> rights = new ArrayList<>(activator.getRights());
+		Collections.sort(rights);
+		for (BeanMap b: rights) {
+			String code =  b.getString(Activator.RIGHT_CODE);
+			if (code.toLowerCase().startsWith(prefix)) {
+				System.out.println(b.getId() + " - " +code + " [" + b.getString(Activator.RIGHT_CATEGORY) + ']'); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		}
+	}
 }
