@@ -13,9 +13,13 @@
  *******************************************************************************/
 package com.arcadsoftware.crypt;
 
+import java.net.Authenticator;
 import java.net.InetSocketAddress;
+import java.net.PasswordAuthentication;
 import java.net.Proxy;
 import java.net.Proxy.Type;
+import java.net.http.HttpClient;
+import java.net.ProxySelector;
 import java.net.SocketAddress;
 import java.util.Dictionary;
 import java.util.Map;
@@ -23,15 +27,46 @@ import java.util.Map;
 /**
  * Simple wrapper around the Java Proxy class, allowing to declare the proxy properties in a configuration properties file.
  * 
+ * <p>
+ * This class assume that the followinfg properties are defined in the given configuration.
+ * 
+ * <ul>
+ * <li>
+ * </ul>
+ * 
  * @author ARCAD Software
  */
 public class ConfiguredProxy {
+	
+	private class ProxyAuthenticator extends Authenticator {
 
+		private final String proxyUser;
+		private final char[] proxyPassword;
+
+		protected ProxyAuthenticator(String proxyUser, char[] proxyPassword) {
+			super();
+			this.proxyUser = proxyUser;
+			this.proxyPassword = proxyPassword;
+		}
+		
+		@Override
+        protected PasswordAuthentication getPasswordAuthentication() {
+            // Verify that the authentication request is for the proxy
+			if (getRequestorType() == RequestorType.PROXY) {
+				return new PasswordAuthentication(proxyUser, proxyPassword);
+            }
+            return super.getPasswordAuthentication();
+        }
+    };
 	public static final String PROP_PROXY_TYPE = "proxy.type"; //$NON-NLS-1$
 	public static final String PROP_PROXY_HOSTNAME = "proxy.hostname"; //$NON-NLS-1$
 	public static final String PROP_PROXY_PORT = "proxy.port"; //$NON-NLS-1$
+	public static final String PROP_PROXY_LOGIN = "proxy.login"; //$NON-NLS-1$
+	public static final String PROP_PROXY_PASSWORD = "proxy.password"; //$NON-NLS-1$
 	
 	private final Proxy proxy;
+	private final ProxySelector proxySelector;
+	private final Authenticator authenticator;
 	
 	public ConfiguredProxy(Dictionary<String, Object> props) {
 		this(getType(props.get(PROP_PROXY_TYPE)), props);
@@ -43,11 +78,15 @@ public class ConfiguredProxy {
 	
 	public ConfiguredProxy(Type type, Dictionary<String, Object> props) {
 		super();
-		SocketAddress a = getAddress(props);
+		InetSocketAddress a = getAddress(props);
 		if ((type != Type.DIRECT) && (a != null)) {
 			proxy = new Proxy(type, a);
+			proxySelector = ProxySelector.of(a);
+			authenticator = createAuthenticator(props.get(PROP_PROXY_LOGIN), props.get(PROP_PROXY_PASSWORD));
 		} else {
 			proxy = null;
+			proxySelector = null;
+			authenticator = null;
 		}
 	}
 	
@@ -61,15 +100,26 @@ public class ConfiguredProxy {
 	
 	public ConfiguredProxy(Type type, Map<String, Object> props) {
 		super();
-		SocketAddress a = getAddress(props);
+		InetSocketAddress a = getAddress(props);
 		if ((type != Type.DIRECT) && (a != null)) {
 			proxy = new Proxy(type, a);
+			proxySelector = ProxySelector.of(a);
+			authenticator = createAuthenticator(props.get(PROP_PROXY_LOGIN), props.get(PROP_PROXY_PASSWORD));
 		} else {
 			proxy = null;
+			proxySelector = null;
+			authenticator = null;
 		}
 	}
 	
-	private SocketAddress getAddress(Dictionary<String, Object> props) {
+	private Authenticator createAuthenticator(Object login, Object pwd) {
+		if ((login instanceof String) && !((String) login).isEmpty()) {
+			return new ProxyAuthenticator((String) login, Crypto.decrypt((String) pwd));
+		}
+		return null;
+	}
+
+	private InetSocketAddress getAddress(Dictionary<String, Object> props) {
 		Object o = props.get(PROP_PROXY_HOSTNAME);
 		if (o != null) {
 			Object po = props.get(PROP_PROXY_PORT);
@@ -84,7 +134,7 @@ public class ConfiguredProxy {
 		return null;
 	}
 	
-	private SocketAddress getAddress(Map<String, Object> props) {
+	private InetSocketAddress getAddress(Map<String, Object> props) {
 		Object o = props.get(PROP_PROXY_HOSTNAME);
 		if (o != null) {
 			Object po = props.get(PROP_PROXY_PORT);
@@ -121,7 +171,49 @@ public class ConfiguredProxy {
 		return proxy != null;
 	}
 	
+	/**
+	 * Get the Proxy Object.
+	 *  
+	 * @return null if there is no proxy configured.
+	 */
 	public Proxy getProxy() {
 		return proxy;
+	}
+	
+	/**
+	 * Get the ProxySelector object corresponding to the configuration.
+	 * 
+	 * @return null if there is no proxy configured.
+	 */
+	public ProxySelector getProxySelector() {
+		return proxySelector;
+	}
+	
+	/**
+	 * Get the Proxy Authenticator.
+	 * 
+	 * @return null if there is no proxy authentication configured.
+	 */
+	public Authenticator getAuthenticator() {
+		return authenticator;
+	}
+	
+	/**
+	 * Build an HTTP client Builder pre-configured to work through the configured proxy.
+	 * 
+	 * @return never return null.
+	 */
+	public HttpClient.Builder getHttpClientBuilder() {
+		if (proxySelector == null) {
+			// Use JVM default Proxy configuration...
+			return HttpClient.newBuilder();
+		}
+		if (authenticator == null) {
+			return HttpClient.newBuilder()
+	                .proxy(proxySelector);
+		}
+		return HttpClient.newBuilder()
+                .proxy(proxySelector)
+                .authenticator(authenticator);
 	}
 }
