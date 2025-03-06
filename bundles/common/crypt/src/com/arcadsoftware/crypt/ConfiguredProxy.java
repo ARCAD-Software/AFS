@@ -65,7 +65,7 @@ public class ConfiguredProxy {
 	public static final String PROP_PROXY_PASSWORD = "proxy.password"; //$NON-NLS-1$
 	
 	private final Proxy proxy;
-	private final Authenticator authenticator;
+	private final ProxyAuthenticator authenticator;
 	
 	/**
 	 * Create the required Proxy client objects from the given configuration.
