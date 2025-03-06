@@ -25,10 +25,12 @@ import java.util.Map;
  * Simple wrapper around the Java Proxy class, allowing to declare the proxy properties in a configuration properties file.
  * 
  * <p>
- * This class assume that the followinfg properties are defined in the given configuration.
+ * This class assume that the followinfg properties are defined in the given configuration. Note that these properties may be prefixed by any string.
  * 
  * <ul>
- * <li>
+ * <li>proxy.type
+ * <li>proxy.hostname and proxy.port (default value 8080).
+ * <li>proxy.login and proxy.password (may be encrypted with the master key).
  * </ul>
  * 
  * @author ARCAD Software
@@ -55,6 +57,7 @@ public class ConfiguredProxy {
             return super.getPasswordAuthentication();
         }
     };
+    
 	public static final String PROP_PROXY_TYPE = "proxy.type"; //$NON-NLS-1$
 	public static final String PROP_PROXY_HOSTNAME = "proxy.hostname"; //$NON-NLS-1$
 	public static final String PROP_PROXY_PORT = "proxy.port"; //$NON-NLS-1$
@@ -64,57 +67,157 @@ public class ConfiguredProxy {
 	private final Proxy proxy;
 	private final Authenticator authenticator;
 	
+	/**
+	 * Create the required Proxy client objects from the given configuration.
+	 * 
+	 * @param props the configuration properties.
+	 */
 	public ConfiguredProxy(Dictionary<String, Object> props) {
-		this(getType(props.get(PROP_PROXY_TYPE)), props);
+		this("", getType(props.get(PROP_PROXY_TYPE)), props); //$NON-NLS-1$
 	}
 	
+	/**
+	 * Create the required Proxy client objects from the given configuration.
+	 * 
+	 * @param props the configuration properties.
+	 * @param prefix a prefix which is appended to the properties names. 
+	 */
+	public ConfiguredProxy(Dictionary<String, Object> props, String prefix) {
+		this(prefix, getType(props.get(prefix + PROP_PROXY_TYPE)), props);
+	}
+
+	/**
+	 * Create the required Proxy client objects from the given configuration.
+	 * 
+	 * @param type The proxy type (http, https, tpc or socks).
+	 * @param props the configuration properties.
+	 */
 	public ConfiguredProxy(String type, Dictionary<String, Object> props) {
-		this(getType(type), props);
+		this("", getType(type), props); //$NON-NLS-1$
 	}
 	
+	/**
+	 * Create the required Proxy client objects from the given configuration.
+	 * 
+	 * @param prefix a prefix which is appended to the properties names. 
+	 * @param type The proxy type (http, https, tpc or socks).
+	 * @param props the configuration properties.
+	 */
+	public ConfiguredProxy(String prefix, String type, Dictionary<String, Object> props) {
+		this(prefix, getType(type), props);
+	}
+
+	/**
+	 * Create the required Proxy client objects from the given configuration.
+	 * 
+	 * @param type The proxy type.
+	 * @param props the configuration properties.
+	 */
 	public ConfiguredProxy(Type type, Dictionary<String, Object> props) {
+		this("", type, props); //$NON-NLS-1$
+	}
+
+	/**
+	 * Create the required Proxy client objects from the given configuration.
+	 * 
+	 * @param prefix a prefix which is appended to the properties names. 
+	 * @param type The proxy type.
+	 * @param props the configuration properties.
+	 */
+	public ConfiguredProxy(String prefix, Type type, Dictionary<String, Object> props) {
 		super();
-		InetSocketAddress a = getAddress(props);
+		InetSocketAddress a = getAddress(prefix, props);
 		if ((type != Type.DIRECT) && (a != null)) {
 			proxy = new Proxy(type, a);
-			authenticator = createAuthenticator(props.get(PROP_PROXY_LOGIN), props.get(PROP_PROXY_PASSWORD));
+			authenticator = createAuthenticator(props.get(prefix + PROP_PROXY_LOGIN), props.get(prefix + PROP_PROXY_PASSWORD));
 		} else {
 			proxy = null;
 			authenticator = null;
 		}
 	}
 	
+	/**
+	 * Create the required Proxy client objects from the given configuration.
+	 * 
+	 * @param props the configuration properties.
+	 */
 	public ConfiguredProxy(Map<String, Object> props) {
-		this(getType(props.get(PROP_PROXY_TYPE)), props);
+		this("", getType(props.get(PROP_PROXY_TYPE)), props); //$NON-NLS-1$
 	}
 	
+	/**
+	 * Create the required Proxy client objects from the given configuration.
+	 * 
+	 * @param props the configuration properties.
+	 * @param prefix a prefix which is appended to the properties names. 
+	 */
+	public ConfiguredProxy(Map<String, Object> props, String prefix) {
+		this(prefix, getType(props.get(prefix + PROP_PROXY_TYPE)), props);
+	}
+	
+	/**
+	 * Create the required Proxy client objects from the given configuration.
+	 * 
+	 * @param type The proxy type (http, https, tpc or socks).
+	 * @param props the configuration properties.
+	 */
 	public ConfiguredProxy(String type, Map<String, Object> props) {
-		this(getType(type), props);
+		this("", getType(type), props); //$NON-NLS-1$
+	}
+
+	/**
+	 * Create the required Proxy client objects from the given configuration.
+	 * 
+	 * @param prefix a prefix which is appended to the properties names. 
+	 * @param type The proxy type (http, https, tpc or socks).
+	 * @param props the configuration properties.
+	 */
+	public ConfiguredProxy(String prefix, String type, Map<String, Object> props) {
+		this(prefix, getType(type), props);
 	}
 	
+
+	/**
+	 * Create the required Proxy client objects from the given configuration.
+	 * 
+	 * @param type The proxy type.
+	 * @param props the configuration properties.
+	 */
 	public ConfiguredProxy(Type type, Map<String, Object> props) {
+		this("", type, props); //$NON-NLS-1$
+	}
+	
+
+	/**
+	 * Create the required Proxy client objects from the given configuration.
+	 * 
+	 * @param prefix a prefix which is appended to the properties names. 
+	 * @param type The proxy type.
+	 * @param props the configuration properties.
+	 */
+	public ConfiguredProxy(String prefix, Type type, Map<String, Object> props) {
 		super();
-		InetSocketAddress a = getAddress(props);
+		InetSocketAddress a = getAddress(prefix, props);
 		if ((type != Type.DIRECT) && (a != null)) {
 			proxy = new Proxy(type, a);
-			authenticator = createAuthenticator(props.get(PROP_PROXY_LOGIN), props.get(PROP_PROXY_PASSWORD));
+			authenticator = createAuthenticator(props.get(prefix + PROP_PROXY_LOGIN), props.get(prefix + PROP_PROXY_PASSWORD));
 		} else {
 			proxy = null;
 			authenticator = null;
 		}
 	}
 	
-	private Authenticator createAuthenticator(Object login, Object pwd) {
+	private ProxyAuthenticator createAuthenticator(Object login, Object pwd) {
 		if ((login instanceof String) && !((String) login).isEmpty()) {
 			return new ProxyAuthenticator((String) login, Crypto.decrypt((String) pwd));
 		}
 		return null;
 	}
 
-	private InetSocketAddress getAddress(Dictionary<String, Object> props) {
-		Object o = props.get(PROP_PROXY_HOSTNAME);
+	private InetSocketAddress getAddress(String prefix, Dictionary<String, Object> props) {
+		Object o = props.get(prefix + PROP_PROXY_HOSTNAME);
 		if (o != null) {
-			Object po = props.get(PROP_PROXY_PORT);
+			Object po = props.get(prefix + PROP_PROXY_PORT);
 			int p = 8080;
 			if (po != null) {
 				try {
@@ -126,10 +229,10 @@ public class ConfiguredProxy {
 		return null;
 	}
 	
-	private InetSocketAddress getAddress(Map<String, Object> props) {
-		Object o = props.get(PROP_PROXY_HOSTNAME);
+	private InetSocketAddress getAddress(String prefix, Map<String, Object> props) {
+		Object o = props.get(prefix + PROP_PROXY_HOSTNAME);
 		if (o != null) {
-			Object po = props.get(PROP_PROXY_PORT);
+			Object po = props.get(prefix + PROP_PROXY_PORT);
 			int p = 8080;
 			if (po != null) {
 				try {
@@ -159,6 +262,9 @@ public class ConfiguredProxy {
 		return Type.DIRECT;
 	}
 	
+	/**
+	 * @return true is and only is a proxy connection is included in the given configuration. 
+	 */
 	public boolean isActive() {
 		return proxy != null;
 	}
@@ -179,5 +285,29 @@ public class ConfiguredProxy {
 	 */
 	public Authenticator getAuthenticator() {
 		return authenticator;
+	}
+
+	/**
+	 * Get the Proxy login if any.
+	 * 
+	 * @return null if there is no login in the configuration.
+	 */
+	public String getLogin() {
+		if (authenticator != null) {
+			return authenticator.proxyUser;
+		}
+		return null;
+	}
+	
+	/**
+	 * Get the Proxy password if any.
+	 * 
+	 * @return null if there is no password in the configuration.
+	 */
+	public char[] getPassword() {
+		if (authenticator != null) {
+			return authenticator.proxyPassword;
+		}
+		return null;
 	}
 }
