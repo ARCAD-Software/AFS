@@ -83,10 +83,8 @@ public class Activator extends AbstractFileRepositoryActivator implements ITrans
 
 	@Override
 	public boolean initializeConfiguration(Dictionary<String, Object> properties) {
-		if (properties != null) {
-			if (properties.get(PROP_WATCHPERIOD) == null) {
-				properties.put(PROP_WATCHPERIOD, 120);
-			}
+		if ((properties != null) && (properties.get(PROP_WATCHPERIOD) == null)) {
+			properties.put(PROP_WATCHPERIOD, 120);
 		}
 		return false;
 	}

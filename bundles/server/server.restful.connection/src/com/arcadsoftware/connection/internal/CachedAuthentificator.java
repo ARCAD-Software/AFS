@@ -346,7 +346,7 @@ public class CachedAuthentificator extends Authenticator {
         	ChallengeRequest cr = new ChallengeRequest(ChallengeScheme.HTTP_BASIC, activator.getRealm());
         	cr.getParameters().add("charset", "UTF-8");
         	// Force the inclusion of the UTF-8 charset preference.
-        	cr.setRawValue("Basic realm=\""+activator.getRealm()+"\", charset=\"UTF-8\"");
+        	cr.setRawValue("Basic realm=\"" + activator.getRealm() + "\", charset=\"UTF-8\"");
         	result.add(cr);
         }
         return result;
