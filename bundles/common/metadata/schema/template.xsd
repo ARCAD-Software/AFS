@@ -4,14 +4,12 @@
 	xmlns="http://xml.arcadsoftware.com/1.0.0/template.xsd"
 	elementFormDefault="qualified">
 
-	<xsd:import schemaLocation="./searchcriteria.xsd" />
+	<xsd:import schemaLocation="./entities.xsd" />
 
 	<xsd:element name="template" type="TemplateType">
 		<xsd:annotation>
 			<xsd:documentation>
-				Le Template représente un document quelconque, c'est à dire sans orientation fonctionnelle précise,
-				qui peut être associé à un type d'entité et qui peut contenir des mots clés qui seront remplacés par
-				les valeurs de la donnée lors de l'instanciation du template.</xsd:documentation>
+				The Template represents any document, that is to say without precise functional orientation, which can be associated with an entity type and which can contain keywords which will be replaced by the values ​​of the data when instantiating the template.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 
@@ -23,28 +21,25 @@
 						<xsd:element name="to" type="StringList" maxOccurs="1" minOccurs="0" />
 						<xsd:element name="cc" type="StringList" maxOccurs="1" minOccurs="0" />
 						<xsd:element name="bcc" type="StringList" maxOccurs="1" minOccurs="0" />
-						<!-- Autres implémentations : 
+						<!-- other implementation : 
 						- SMS: <element name="phones" type="template:StringList" maxOccurs="1" minOccurs="0" /> 
-						- MircoBloggage: Twitter/Facebook/Flickr/Digg 
-						- Messagerie instantanée: XMPP(Jabber)/MSN/ICQ/SIP
+						- MircoBlogging, RSS feeds... 
+						- Instant messaging: XMPP(Jabber)/SIP/Skype/teams...
 						 -->
 					</xsd:sequence>
 					<xsd:attribute name="activated" type="xsd:boolean" use="optional">
 						<xsd:annotation>
-							<xsd:documentation>Indique si cette notification est active ou pas. Les notification inactives restent accessibles
-								mais ne seront pas utilisé pour déclencher des messages.</xsd:documentation>
+							<xsd:documentation>Indicates whether this notification is active or not. Inactive notifications remain accessible but will not be used to trigger messages.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
 					<xsd:attribute name="periodic" type="xsd:boolean" use="optional">
 						<xsd:annotation>
-							<xsd:documentation>Indique si cette notification doit être testé périodiquement. Dans ce cas les valeurs du "script"
-								et de "event" n'entre pas en ligne de compte. Cependant les évènements et le script pruvent être utilisé en
-								parallèle pour un même template.</xsd:documentation>
+							<xsd:documentation>Indicates whether this notification should be tested periodically. In this case the values ​​of "script" and "event" are not taken into account. However, events and script can be used in parallel for the same template.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
 					<xsd:attribute name="category" use="optional" default="email">
 						<xsd:annotation>
-							<xsd:documentation>Détermine le vecteur d'expédition de la notification.</xsd:documentation>
+							<xsd:documentation>Determines the notification dispatch vector.</xsd:documentation>
 						</xsd:annotation>
 						<xsd:simpleType>
 							<xsd:restriction base="xsd:string">
