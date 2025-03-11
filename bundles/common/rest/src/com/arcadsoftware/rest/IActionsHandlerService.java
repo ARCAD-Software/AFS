@@ -18,7 +18,10 @@ import org.restlet.data.Language;
 import com.arcadsoftware.rest.connection.IConnectionUserBean;
 
 /**
- * Action Handlers are called each time the "action" service is called.
+ * This interface define an OGSI service.
+ * 
+ * <p>
+ * Action Handlers are called each time the "action" service is called from a REST web-services.
  * 
  * <p>
  * Due to state-less nature of the service a same action may be run many times with the same parameters.  
@@ -39,12 +42,13 @@ public interface IActionsHandlerService {
 	 * Return true if this handler will process the given action.
 	 * 
 	 * <p>
-	 * If true then the method run will be called.
+	 * If true then the method run could be called.
 	 * 
-	 * @param actionCode The Action code given by the user.
-	 * @param referenceNumber
-	 * @param user
-	 * @return
+	 * @param actionCode The identifier for the action requested by the user.
+	 * @param referenceNumber A reference number associated with the request.
+	 * @param user An object representing the user making the request.
+	 * @return true → The handler will process the action.
+	 *         false → The action is ignored, meaning another handler may process it.
 	 */
 	public boolean handle(String actionCode, String referenceNumber, IConnectionUserBean user);
 	
@@ -52,13 +56,13 @@ public interface IActionsHandlerService {
 	 * Execute the given action and collect a response from the server.
 	 * 
 	 * <p>
-	 * The message will be sent to the user.
+	 * The returned message will be sent to the user.
 	 *  
-	 * @param actionCode
-	 * @param referenceNumber
-	 * @param user
-	 * @param language
-	 * @return
+	 * @param actionCode The identifier for the action requested by the user.
+	 * @param referenceNumber A reference number associated with the request.
+	 * @param user An object representing the user making the request.
+	 * @param language The user requested language.
+	 * @return A String representing the response message.
 	 */
 	public String run(String actionCode, String referenceNumber, IConnectionUserBean user, Language language);
 	

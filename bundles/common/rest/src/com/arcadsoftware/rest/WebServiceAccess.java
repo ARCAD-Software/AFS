@@ -2115,7 +2115,7 @@ public class WebServiceAccess {
 			}
 		}
 		if (activator != null) {
-			activator.log(message.toString(), e);
+			activator.info(message.toString(), e);
 		} else {
 			// When used outside of OSGi.
 			System.err.println(message.toString());

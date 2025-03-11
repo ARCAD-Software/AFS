@@ -159,7 +159,7 @@ public class ConnectionHelper {
 		} catch (ServerErrorException e) {
 			if (e.isClientError()) {
 				if (activator != null) {
-					activator.log("Invalid SSO connection parameters.", e);
+					activator.info("Invalid SSO connection parameters.", e);
 				}
 				return false;
 			}
@@ -248,7 +248,7 @@ public class ConnectionHelper {
 		} catch (ServerErrorException e) {
 			if (e.isClientError()) {
 				if (activator != null) {
-					activator.log("Invalid SSO connection parameters.", e);
+					activator.info("Invalid SSO connection parameters.", e);
 				}
 				return false;
 			}
@@ -271,7 +271,7 @@ public class ConnectionHelper {
 		} catch (ServerErrorException e) {
 			if (e.isClientError()) {
 				if (activator != null) {
-					activator.log("Invalid SSO connection parameters.", e);
+					activator.info("Invalid SSO connection parameters.", e);
 				}
 				return false;
 			}
@@ -318,7 +318,7 @@ public class ConnectionHelper {
 				return;
 			} catch (IOException e) {
 				if (activator != null) {
-					activator.log(e.getLocalizedMessage(), e);
+					activator.info(e.getLocalizedMessage(), e);
 				}
 			} catch (URISyntaxException e) {
 				if (activator != null) {
@@ -330,7 +330,7 @@ public class ConnectionHelper {
 			Runtime.getRuntime().exec("xdg-open " + url);
 		} catch (IOException e) {
 			if (activator != null) {
-				activator.log(e.getLocalizedMessage(), e);
+				activator.info(e.getLocalizedMessage(), e);
 			}
 		}
 	}
