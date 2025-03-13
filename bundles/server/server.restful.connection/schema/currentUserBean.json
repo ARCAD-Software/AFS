@@ -1,0 +1,92 @@
+{ "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "http://json.arcadsoftware.com/schemas/currentUserBean.json",
+  "title": "Current User Attributes",
+  "description": "This document describe the current user as it is known in the application, this include the some informational properties, his/her access rights and some information about the application state.",
+  "type": "object",
+  "properties": {
+	"id": {
+		"description": "The internal User ID associated to the current one. This id may be used to edit the current user attribute through the /data/user/{id} web-service. If the current user is not identified in the application, this attribute is not included in the document.",
+		"type": "integer",
+		"exclusiveMinimum": 1
+	},
+	"principal": {
+		"description": "If used in this application, this attribute define the principal which the current user us attached to. If this attribute is not used in the application, it is not included in this document.",
+		"type": "integer",
+		"exclusiveMinimum": 1
+	},
+	"changePWD": {
+		"description": "If true this attribute indicate that the current user have to change his/her/their password. He/she/they have to change it. All other web-services of the application will be blocked until the password has been changed.",
+		"type": "boolean"
+	},
+	"canChangePWD": {
+		"description": "If true then the current user have the ability to change his/her/their own password through a call to method PUT of /currentuser. If false, this attribute is not included in the document and the user must use an external service to change the password.",
+		"type": "boolean"
+	},
+	"locked": {
+		"description": "This attribute is true if the current user is known by the application, but is blocked for another reason. All other web-services are not accessible to this user.",
+		"type": "boolean"
+	},
+	"login": {
+		"description": "This attribute give back the login the user is currently using, if any.",
+		"type": "string"
+	},
+	"fullname": {
+		"description": "This attribute is the human readable full name of the current user as defined in the application.",
+		"type": "string"
+	},
+	"profile": {
+		"description": "This object include the complete list of a.",
+		"type": "array",
+		"items": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"description": "The internal ID number associated to the given Access Right.",
+					"type": "integer",
+					"exclusiveMinimum": 1
+				},
+				"code": {
+					"description": "The code used to represent this access right.",
+					"type": "string"
+				},
+				"label": {
+					"description": "An human readable description of the access right.",
+					"type": "string"
+				}
+			}
+		}
+	},
+	"status": {
+		"type": "object",
+		"properties": {
+			"lifespawn": {
+				"description": "An estimation of the minimal duration (in minutes) of validity of the given plots.",
+				"type": "integer",
+				"exclusiveMinimum": 1
+			},
+			"plots": {
+				"description": "An estimation of the minimal duration (in minutes) of validity of the given plots.",
+				"type": "array",
+				"items": {
+					"type": "object",
+					"properties": {
+						"code": {
+							"description": "Informational plot code name.",
+							"type": "string"
+						},
+						"level": {
+							"description": "The level of the plot, there is multiple level from the less urgent to the most one: INFO, WARN, CRITICAL and BLOCKER.",
+							"type": "string"
+						},
+						"text": {
+							"description": "An HTML description of the plot.",
+							"type": "string"
+						}
+					}
+				}
+			}
+		}
+	},
+    "required": [ "profile", "status" ]
+  }
+}

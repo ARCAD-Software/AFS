@@ -105,24 +105,45 @@ public class AndCriteria extends AbstractSearchCriteria implements Cloneable {
 		if ((criterias == null) || (criterias.size() == 0)) {
 			return ConstantCriteria.TRUE;
 		}
-		// Reduction rules :
-		// T and x -> x
-		// F and x -> F
-		// x and not(x) -> F
-		// (x and (y and z)) -> (x and y and z)
-		// TODO x and x -> x
-		// TODO (x and (y or x)) -> x
+		// Reduction rules : (where "..." stand " and w [ and v [...]]"
+		// T and x ... -> x ...
+		// F and x ... -> F
+		// (x and (y and z ...) ...) -> (x and y and z ...)
+		// x and x ... -> x
+		// x and not(x) ... -> F
+		// TODO x and (y or x) ... -> x ...
 		ArrayList<ISearchCriteria> reduced = new ArrayList<ISearchCriteria>();
-		for(ISearchCriteria criteria: criterias) {
+		for (ISearchCriteria criteria: criterias) {
 			if (criteria != null) {
 				ISearchCriteria reduce = criteria.reduce(context);
 				if ((reduce != null) && !ConstantCriteria.TRUE.equals(reduce)) {
 					if (ConstantCriteria.FALSE.equals(reduce)) {
-						return reduce; // Return False.
-					} else if (reduce instanceof AndCriteria) {
+						return ConstantCriteria.FALSE;
+					} 
+					if (reduce instanceof AndCriteria) {
 						reduced.addAll(((AndCriteria) reduce).criterias);
+						// FIXME should test the reduction rules below to the whole list of sub-criteria...
 					} else {
-						reduced.add(reduce);
+						boolean toAdd = true;
+						ISearchCriteria notreduce = null;
+						if (reduce instanceof NotCriteria) {
+							notreduce = ((NotCriteria) reduce).getCriteria();
+						}
+						for (ISearchCriteria c: reduced) {
+							if (c.equals(reduce)) {
+								toAdd = false;
+								break;
+							}
+							if ((notreduce != null) && c.equals(notreduce)) {
+								return ConstantCriteria.FALSE;
+							}
+							if ((c instanceof NotCriteria) && ((NotCriteria) c).getCriteria().equals(reduce)) {
+								return ConstantCriteria.FALSE;
+							}
+						}
+						if (toAdd) {
+							reduced.add(reduce);
+						}
 					}
 				}
 			}
@@ -130,16 +151,6 @@ public class AndCriteria extends AbstractSearchCriteria implements Cloneable {
 		switch (reduced.size()) {
 			case 0: return ConstantCriteria.TRUE;
 			case 1: return reduced.get(0);
-			case 2: 
-				if (reduced.get(0) instanceof NotCriteria) {
-					if (((NotCriteria) reduced.get(0)).getCriteria().equals(reduced.get(1))) {
-						return ConstantCriteria.FALSE;
-					}
-				} else if (reduced.get(1) instanceof NotCriteria) {
-					if (((NotCriteria)reduced.get(1)).getCriteria().equals(reduced.get(0))) {
-						return ConstantCriteria.FALSE;
-					}
-				}
 		}
 		return new AndCriteria(reduced);
 	}

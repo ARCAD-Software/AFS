@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://xml.arcadsoftware.com/1.0.0/currentUserBean.xsd"
 	xmlns:tns="http://xml.arcadsoftware.com/1.0.0/currentUserBean.xsd" elementFormDefault="unqualified">
-
+	<!-- Schema version 1.2.0 -->
 	<element name="user">
 		<complexType>
-			<sequence maxOccurs="1" minOccurs="0">
+			<choice minOccurs="0" maxOccurs="unbounded">
 				<element name="profile">
 					<complexType>
 						<sequence>
@@ -18,7 +18,50 @@
 						<attribute name="limit" type="int" use="optional" />
 					</complexType>
 				</element>
-			</sequence>
+				<element name="status">
+					<complexType>
+						<choice minOccurs="0" maxOccurs="unbounded">
+							<element name="info">
+								<complexType>
+									<simpleContent>
+										<extension base="string">
+											<attribute name="code" use="required" type="string" />
+										</extension>
+									</simpleContent>	
+								</complexType>
+							</element>
+							<element name="warn">
+								<complexType>
+									<simpleContent>
+										<extension base="string">
+											<attribute name="code" use="required" type="string" />
+										</extension>
+									</simpleContent>	
+								</complexType>
+							</element>
+							<element name="critical">
+								<complexType>
+									<simpleContent>
+										<extension base="string">
+											<attribute name="code" use="required" type="string" />
+										</extension>
+									</simpleContent>	
+								</complexType>
+							</element>
+							<element name="blocker">
+								<complexType>
+									<simpleContent>
+										<extension base="string">
+											<attribute name="code" use="required" type="string" />
+										</extension>
+									</simpleContent>	
+								</complexType>
+							</element>
+						</choice>
+						<attribute name="lifespawn" type="int" use="optional" />
+					</complexType>
+				</element>
+			</choice>
 			<attribute name="id" type="int" />
 			<attribute name="login" type="string" use="optional" />
 			<attribute name="principal" type="int" use="optional" />

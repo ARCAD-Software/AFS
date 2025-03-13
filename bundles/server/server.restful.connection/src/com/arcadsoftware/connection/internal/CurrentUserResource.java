@@ -41,6 +41,7 @@ import org.restlet.resource.ResourceException;
 
 import com.arcadsoftware.crypt.Crypto;
 import com.arcadsoftware.rest.BaseResource;
+import com.arcadsoftware.rest.JSONSchemaRepresentation;
 import com.arcadsoftware.rest.OSGiResource;
 import com.arcadsoftware.rest.XMLRepresentation;
 import com.arcadsoftware.rest.connection.ApplicationStatePlot;
@@ -97,6 +98,13 @@ public class CurrentUserResource extends OSGiResource {
 			File file = Activator.getInstance().getSchema("/schema/currentUserBean.xsd"); //$NON-NLS-1$
 			if ((file != null) && file.isFile()) {
 				return XMLRepresentation.fromFile(file, MediaType.APPLICATION_W3C_SCHEMA);
+			}
+			throw new ResourceException(Status.CLIENT_ERROR_GONE);
+		}
+		if (JSONSchemaRepresentation.APPLICATION_JSON_SCHEMA.equals(variant.getMediaType())) {
+			File file = Activator.getInstance().getSchema("/schema/currentUserBean.json"); //$NON-NLS-1$
+			if ((file != null) && file.isFile()) {
+				return new JSONSchemaRepresentation(file);
 			}
 			throw new ResourceException(Status.CLIENT_ERROR_GONE);
 		}

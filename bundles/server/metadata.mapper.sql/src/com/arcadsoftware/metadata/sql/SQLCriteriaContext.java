@@ -940,7 +940,9 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 		}
 		// Add the not deleted test to the where clause.
 		if (!deleted && (entityInfo.deleteCol != null)) {
-			if (result.length() > 0) {
+			if (mapper.fg.true_cond.equals(result)) {
+				result.setLength(0);
+			} else if (result.length() > 0) {
 				result.append(mapper.fg.and);
 			}
 			result.append(MapperSQLService.DEFAULT_TABLEALIAS);

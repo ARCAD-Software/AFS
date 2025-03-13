@@ -342,7 +342,7 @@ public class MetaDataParentResource extends DataParentResource {
 		final boolean translate = !isParameter(form, "notranslation"); //$NON-NLS-1$
 		if (translate) {
 			List<ReferenceLine> allattributes = new ArrayList<ReferenceLine>(attributes);
-			for(ReferenceLine rl: attributes) {
+			for (ReferenceLine rl: attributes) {
 				if (rl.isTranslatable()) {
 					ReferenceLine trl = rl.getTranslateCode();
 					if ((trl != null) && !allattributes.contains(trl)) {
@@ -361,7 +361,7 @@ public class MetaDataParentResource extends DataParentResource {
 			((BeanMapPartialList) result).setRank(first);			
 		}
 		if (translate) {
-			for(ReferenceLine rl:attributes) {
+			for (ReferenceLine rl: attributes) {
 				if (rl.isTranslatable()) {
 					for (BeanMap bm: result) {
 						rl.translate(bm, language);

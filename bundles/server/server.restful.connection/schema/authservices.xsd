@@ -2,6 +2,8 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://xml.arcadsoftware.com/1.0.0/authservices.xsd"
 	xmlns:tns="http://xml.arcadsoftware.com/1.0.0/authservices.xsd" elementFormDefault="unqualified">
 
+	<!-- Schema version 1.1.0 -->
+
 	<annotation>
 		<documentation>
 			<p>This XML file define the current list of Authentification services available into the server.</p>
@@ -15,7 +17,7 @@
 	<element name="list">
 		<annotation>
 			<documentation>
-				This list can be empty if none authentification are currently declared on this server.
+				This list can be empty if none authentication are currently declared on this server.
 			</documentation>
 		</annotation>
 		<complexType>
@@ -23,7 +25,7 @@
 				<element name="string" type="string">
 					<annotation>
 						<documentation>
-							A Authentification service name.
+							A Authentication service name. This list is sorted by alphabetical order.
 						</documentation>
 					</annotation>
 				</element>

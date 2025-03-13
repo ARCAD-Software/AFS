@@ -60,24 +60,46 @@ public class OrCriteria extends AbstractSearchCriteria implements Cloneable {
 
 	@Override
 	public ISearchCriteria reduce(ICriteriaContext context) {
-		// Reduction rules :
-		// T or x -> T
-		// F or x -> x
-		// TODO x or x -> x
-		// x or not(x) -> T
-		// (x or (y or z)) -> (x or y or z)
-		// TODO (x or (y and x)) -> x
+		if ((criterias == null) || (criterias.size() == 0)) {
+			return ConstantCriteria.TRUE;
+		}
+		// Reduction rules : (where "..." stand " and w [ and v [...]]"
+		// T or x ... -> T
+		// F or x ... -> x ...
+		// x or x ... -> x ...
+		// x or not(x) ... -> T
+		// (x or (y or z ...) ...) -> (x or y or z ...)
+		// TODO (x or (y and x) ...) -> x ...
 		ArrayList<ISearchCriteria> reduced = new ArrayList<ISearchCriteria>();
-		for(ISearchCriteria criteria: criterias) {
+		for (ISearchCriteria criteria: criterias) {
 			if (criteria != null) {
 				ISearchCriteria reduce = criteria.reduce(context);
 				if ((reduce != null) && !ConstantCriteria.FALSE.equals(reduce)) {
 					if (ConstantCriteria.TRUE.equals(reduce)) {
-						return reduce;
+						return ConstantCriteria.TRUE;
 					} else if (reduce instanceof OrCriteria) {
-						reduced.addAll(((OrCriteria)reduce).criterias);
+						reduced.addAll(((OrCriteria) reduce).criterias);
 					} else {
-						reduced.add(reduce);
+						boolean toAdd = true;
+						ISearchCriteria notreduce = null;
+						if (reduce instanceof NotCriteria) {
+							notreduce = ((NotCriteria) reduce).getCriteria();
+						}
+						for (ISearchCriteria c: reduced) {
+							if (c.equals(reduce)) {
+								toAdd = false;
+								break;
+							}
+							if ((notreduce != null) && c.equals(notreduce)) {
+								return ConstantCriteria.TRUE;
+							}
+							if ((c instanceof NotCriteria) && ((NotCriteria) c).getCriteria().equals(reduce)) {
+								return ConstantCriteria.TRUE;
+							}
+						}
+						if (toAdd) {
+							reduced.add(reduce);
+						}
 					}
 				}
 			}
@@ -85,16 +107,6 @@ public class OrCriteria extends AbstractSearchCriteria implements Cloneable {
 		switch(reduced.size()) {
 			case 0: return new ConstantCriteria(false);
 			case 1: return reduced.get(0);
-			case 2: 
-				if (reduced.get(0) instanceof NotCriteria) {
-					if (((NotCriteria)reduced.get(0)).getCriteria().equals(reduced.get(1))) {
-						return ConstantCriteria.TRUE;
-					}
-				} else if (reduced.get(1) instanceof NotCriteria) {
-					if (((NotCriteria)reduced.get(1)).getCriteria().equals(reduced.get(0))) {
-						return ConstantCriteria.TRUE;
-					}
-				}
 		}
 		OrCriteria result = new OrCriteria();
 		result.criterias = reduced;

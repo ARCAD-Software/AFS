@@ -849,6 +849,9 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 			}
 			final char[] secret = challengeResponse.getSecret();
 			LDAPConnection cn = getConnection();
+			if (cn == null) {
+				return 0;
+			}
 			LDAPException e = null;
 			try {
 				BindResult br = bind(cn, identifier, secret);
