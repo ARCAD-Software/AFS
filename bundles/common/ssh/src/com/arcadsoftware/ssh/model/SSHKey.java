@@ -38,6 +38,9 @@ public class SSHKey implements IIdentifiedBean {
 
 	public SSHKey(final BeanMap beanmap) {
 		this.beanmap = beanmap;
+		if (beanmap == null) {
+			throw new NullPointerException("A BeanMap is required when creating a SSHKey !");
+		}
 	}
 
 	public BeanMap getBeanMap() {

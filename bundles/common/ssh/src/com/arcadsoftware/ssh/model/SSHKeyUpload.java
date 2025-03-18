@@ -42,6 +42,9 @@ public class SSHKeyUpload implements IIdentifiedBean {
 
 	public SSHKeyUpload(final BeanMap beanmap) {
 		this.beanmap = beanmap;
+		if (beanmap == null) {
+			throw new NullPointerException("A BeanMap is required when creating a SSHKeyUpload !");
+		}
 	}
 
 	public BeanMap getBeanmap() {

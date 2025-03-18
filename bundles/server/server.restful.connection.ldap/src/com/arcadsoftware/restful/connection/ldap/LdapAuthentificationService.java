@@ -775,11 +775,11 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 			// Ignore login already used.
 			if ((login != null) && (activator.getAuth(login) == 0)) {
 				BeanMap bm = new BeanMap(Activator.TYPE_USER, userID++);
-				for(Entry<String, List<String>> e: map.entrySet()) {
-					for(String att : e.getValue()) {
+				for (Entry<String, List<String>> e: map.entrySet()) {
+					for (String att : e.getValue()) {
 						// Add constants values (String, boolean or integer).
 						if (att.charAt(0) == '"') { // Constant String Value
-							bm.put(e.getKey(),att.substring(1, att.length() -1));
+							bm.put(e.getKey(), att.substring(1, att.length() -1));
 							break;
 						} else if ("true".equalsIgnoreCase(att) || "false".equalsIgnoreCase(att)) { //$NON-NLS-1$ //$NON-NLS-2$
 							bm.put(e.getKey(), "true".equalsIgnoreCase(att)); //$NON-NLS-1$

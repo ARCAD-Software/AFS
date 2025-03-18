@@ -49,6 +49,7 @@ public class Activator extends AbstractActivator {
 	protected static final String TYPE_PROFILERIGHT = "profileRight"; //$NON-NLS-1$
 	protected static final String TYPE_RIGHT = "right"; //$NON-NLS-1$
 	protected static final String LINK_PROFILES = "profiles"; //$NON-NLS-1$
+	protected static final String LINK_SUBPROFILES = "subprofiles"; //$NON-NLS-1$
 	protected static final String LINK_PROFILERIGHTS = "profilerights"; //$NON-NLS-1$
 	protected static final String LINK_USERS = "users"; //$NON-NLS-1$
 	protected static final String ALIAS_USERDB = "alias.userdb"; //$NON-NLS-1$
@@ -66,6 +67,10 @@ public class Activator extends AbstractActivator {
 		Dictionary<String, Object> props = new Hashtable<String, Object>();
 		props.put(IMetaDataLinkingListener.PROP_TYPE, TYPE_PROFILE);
 		props.put(IMetaDataLinkingListener.PROP_LINK, LINK_USERS);
+		registerService(IMetaDataLinkingListener.class, new LinkingListener(this), props);
+		props = new Hashtable<String, Object>();
+		props.put(IMetaDataLinkingListener.PROP_TYPE, TYPE_PROFILE);
+		props.put(IMetaDataLinkingListener.PROP_LINK, LINK_SUBPROFILES);
 		registerService(IMetaDataLinkingListener.class, new LinkingListener(this), props);
 		props = new Hashtable<String, Object>();
 		props.put(IMetaDataLinkingListener.PROP_TYPE, TYPE_USER);
