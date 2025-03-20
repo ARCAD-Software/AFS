@@ -581,7 +581,7 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 	/**
 	 * Get an acceptable Distinguished Name (DN) to be able to bind the given user login.
 	 * 
-	 * @param cn This connection must be already binded, Thi connection is used only if the "loginPattern" is not used and the "alreadybinded" flag is on. 
+	 * @param cn This connection must be already binded, This connection is used only if the "loginPattern" is not used and the "alreadybinded" flag is on. 
 	 * @param login A non null user login.
 	 * @return null if there is not DN corresponding to this user on the LDAP server.
 	 * @throws LDAPException
@@ -826,7 +826,7 @@ public class LdapAuthentificationService implements IBasicAuthentificationServic
 			try (FileInputStream fis = new FileInputStream(conf)) {
 				Properties props = new Properties();
 				props.load(fis);
-				for(Entry<Object, Object> e: props.entrySet()) {
+				for (Entry<Object, Object> e: props.entrySet()) {
 					if ((e.getKey() != null) && (e.getValue() != null)) {
 						addUserMap(map, e.getKey().toString(), e.getValue().toString().trim());
 					}

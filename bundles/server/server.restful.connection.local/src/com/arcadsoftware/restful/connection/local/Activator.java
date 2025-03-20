@@ -80,11 +80,10 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 	private static final String LIST_PUBLIC_PROPS = KEY_LOCKCOUNT_MAX + ' ' + PROP_CASESENSITIVE + ' ' + PROP_PWDDURATION;
 	private static final boolean DEFAULT_CASESENSITIVE = true;
 	private static final int PWD_DURATION = 3650; // in days = 10 years
-	private static final int LOCKCOUNT_MAX = 5; // Valeur par défaut du nombre de tentative.
-	// CETTE VALEUR DOIT RESTER A 5 PAR DEFAUT PARCE QUE LES BROWSERS FONT 
-	// SYSTEMATIQUEMENT UNE TENTATIVE AVANT D'OUVRIR LA DIALOGUE DE CONNECTION
-	// ET TELECHARGENT DIVERS OBJETS EN PARALELLE.
-	// De plus ce paramètre étant dans la configuration il n'y a AUCUNE raison de le modifier ici.
+	private static final int LOCKCOUNT_MAX = 5; // Default value for the number of attempts.
+	// THIS VALUE SHOULD REMAIN AT 5 BY DEFAULT BECAUSE BROWSERS SYSTEMATICALLY MAKE AN ATTEMPT 
+	// BEFORE OPENING THE CONNECTION DIALOGUE AND DOWNLOAD VARIOUS OBJECTS IN PARALEL.
+	// Furthermore, since this parameter is in the configuration, there is NO reason to modify it here.
 	protected static final MultiLanguageMessages messages = new MultiLanguageMessages(HTTP_MESSAGES, Activator.class.getClassLoader());
 	
 	public static String getMessage(String key, Language language) {
