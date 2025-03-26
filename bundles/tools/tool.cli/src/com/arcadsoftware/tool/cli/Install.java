@@ -38,7 +38,7 @@ public class Install {
 		String osn = System.getProperty("os.name"); //$NON-NLS-1$
 		if (osn != null) {
 			osn = osn.toLowerCase();
-			if (osn.startsWith("Windows")) { //$NON-NLS-1$
+			if (osn.startsWith("windows")) { //$NON-NLS-1$
 				platform = "win"; //$NON-NLS-1$
 			} else { // default:
 				platform = "unix"; //$NON-NLS-1$
