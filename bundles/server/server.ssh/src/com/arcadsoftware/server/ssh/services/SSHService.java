@@ -52,8 +52,6 @@ import com.arcadsoftware.ssh.model.SSHKey;
 import com.arcadsoftware.ssh.model.SSHKeyType;
 import com.arcadsoftware.ssh.model.SSHKeyUpload;
 
-import net.i2p.crypto.eddsa.EdDSASecurityProvider;
-
 @Component(service = SSHService.class)
 public class SSHService {
 
@@ -64,9 +62,6 @@ public class SSHService {
 	static {
 		CHMOD_600.add(PosixFilePermission.OWNER_READ);
 		CHMOD_600.add(PosixFilePermission.OWNER_WRITE);
-		if (Security.getProperty(EdDSASecurityProvider.PROVIDER_NAME) == null) {
-			Security.addProvider(new EdDSASecurityProvider());
-		}
 	}
 
 	private File keystoreDirectory;
