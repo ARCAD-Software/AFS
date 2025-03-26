@@ -13,6 +13,7 @@
  *******************************************************************************/
 package cli;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -62,34 +63,17 @@ public class GenMasterKey extends Command {
 	@Override
 	protected void initMasterKey() {
 		println("Master Key generation...");
-		if ((getConfigIniProperties().get("com.arcadsoftware.masterkey.fog") == null) && //$NON-NLS-1$
-				(getConfigIniProperties().get("com.arcadsoftware.masterkey") == null) && //$NON-NLS-1$
-				(getConfigIniProperties().get("com.arcadsoftware.masterkey.path") == null)) { //$NON-NLS-1$
-			// We can not use Crypto here !!!
-			String k;
-			if (isArgument("-d", "-def", "-defaut", "-default")) {
-				String osn = getArgumentValue(new String[] {"-on", "-osname"}, System.getProperty("os.name")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				String jh = getArgumentValue(new String[] {"-jh", "-javahome"}, System.getProperty("java.home")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				String hn = getArgumentValue(new String[] {"-hn", "-hostname"}, ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				if (hn.isEmpty()) {
-					hn = System.getProperty("user.name"); //$NON-NLS-1$
-					try {
-						String h = InetAddress.getLocalHost().getHostName();
-						if (!h.equals(InetAddress.getLocalHost().getHostAddress())) {
-							hn = h;
-						}
-					} catch (UnknownHostException e) {}
-				}
-				char[] dmkc = new char[osn.length() + RANDOMSTRING7.length() + hn.length() + RANDOMSTRING3.length() + jh.length()];
-				System.arraycopy(osn.toCharArray(), 0, dmkc, 0, osn.length());
-				System.arraycopy(RANDOMSTRING7.toCharArray(), 0, dmkc, osn.length(), RANDOMSTRING7.length());
-				System.arraycopy(hn.toCharArray(), 0, dmkc, osn.length() + RANDOMSTRING7.length(), hn.length());
-				System.arraycopy(RANDOMSTRING3.toCharArray(), 0, dmkc, osn.length() + RANDOMSTRING7.length() + hn.length(), RANDOMSTRING3.length());
-				System.arraycopy(jh.toCharArray(), 0, dmkc, osn.length() + RANDOMSTRING7.length() + hn.length() + RANDOMSTRING3.length(), jh.length());
-				k = new String(dmkc);
-			} else {
-				k = RandomGenerator.randomStringSecure(256);
+		String path = getConfigIniProperties().get("com.arcadsoftware.masterkey.path"); //$NON-NLS-1$
+		if (path != null) {
+			File kf = new File(path);
+			if (!kf.isFile()) {
+				kf.getParentFile().mkdirs();
+				save(kf, getKey());
 			}
+		} else if ((getConfigIniProperties().get("com.arcadsoftware.masterkey.fog") == null) && //$NON-NLS-1$
+				(getConfigIniProperties().get("com.arcadsoftware.masterkey") == null)) { //$NON-NLS-1$
+			// We can not use Crypto here !!!
+			String k = getKey();
 			String fkm = fogFork(k);
 			getConfigIniProperties().put("com.arcadsoftware.masterkey.fog", fkm); //$NON-NLS-²$
 			System.setProperty("com.arcadsoftware.masterkey.fog", fkm); //$NON-NLS-1$
@@ -103,9 +87,34 @@ public class GenMasterKey extends Command {
 		super.initMasterKey();
 	}
 
+	private String getKey() {
+		if (isArgument("-d", "-def", "-defaut", "-default")) {
+			String osn = getArgumentValue(new String[] {"-on", "-osname"}, System.getProperty("os.name")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			String jh = getArgumentValue(new String[] {"-jh", "-javahome"}, System.getProperty("java.home")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			String hn = getArgumentValue(new String[] {"-hn", "-hostname"}, ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			if (hn.isEmpty()) {
+				hn = System.getProperty("user.name"); //$NON-NLS-1$
+				try {
+					String h = InetAddress.getLocalHost().getHostName();
+					if (!h.equals(InetAddress.getLocalHost().getHostAddress())) {
+						hn = h;
+					}
+				} catch (UnknownHostException e) {}
+			}
+			char[] dmkc = new char[osn.length() + RANDOMSTRING7.length() + hn.length() + RANDOMSTRING3.length() + jh.length()];
+			System.arraycopy(osn.toCharArray(), 0, dmkc, 0, osn.length());
+			System.arraycopy(RANDOMSTRING7.toCharArray(), 0, dmkc, osn.length(), RANDOMSTRING7.length());
+			System.arraycopy(hn.toCharArray(), 0, dmkc, osn.length() + RANDOMSTRING7.length(), hn.length());
+			System.arraycopy(RANDOMSTRING3.toCharArray(), 0, dmkc, osn.length() + RANDOMSTRING7.length() + hn.length(), RANDOMSTRING3.length());
+			System.arraycopy(jh.toCharArray(), 0, dmkc, osn.length() + RANDOMSTRING7.length() + hn.length() + RANDOMSTRING3.length(), jh.length());
+			return new String(dmkc);
+		}
+		return RandomGenerator.randomStringSecure(256);
+	}
+
 	@Override
 	protected String getVersion() {
-		return "1.0.0"; //$NON-NLS-1$
+		return "1.1.0"; //$NON-NLS-1$
 	}
 
 	@Override

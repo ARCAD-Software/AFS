@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -388,6 +389,20 @@ public abstract class Command {
 			}
 		}
 		return false;
+	}
+	
+	protected boolean save(File target, String content) {
+		try (FileWriter fileWriter = new FileWriter(target)) {
+		    fileWriter.write(content);
+		    return true;
+		} catch (IOException e) {
+			printError("ERROR While recording fil file \"" + target.getName() + //$NON-NLS-1$
+					"\": " + e.getLocalizedMessage()); //$NON-NLS-1$
+			if (isArgument("-debug")) { //$NON-NLS-1$
+				e.printStackTrace();
+			}
+			return false;
+		}
 	}
 	
 	protected File getHomeDirectory() {
