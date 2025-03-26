@@ -6,9 +6,8 @@ Bundle-Version: 1.0.3.qualifier
 Eclipse-BundleShape: dir
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-17
-Require-Bundle: org.eclipse.jface;bundle-version="[3.10.0,4.0.0)";resolution:=optional,
- org.eclipse.osgi;bundle-version="[3.10.0,4.0.0)",
- org.eclipse.rap.jface;bundle-version="[3.6.0,4.0.0)";resolution:=optional
+Require-Bundle: org.eclipse.jface;bundle-version="[3.10.0,4.0.0)",
+ org.eclipse.osgi;bundle-version="[3.10.0,4.0.0)"
 Bundle-ClassPath: .
 Bundle-Vendor: ARCAD Software
 Automatic-Module-Name: com.arcadsoftware.afs.client.brands

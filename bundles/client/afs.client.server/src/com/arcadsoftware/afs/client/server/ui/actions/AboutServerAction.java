@@ -13,7 +13,6 @@
  *******************************************************************************/
 package com.arcadsoftware.afs.client.server.ui.actions;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 
@@ -42,7 +41,7 @@ public class AboutServerAction extends AbstractConnectedAction {
 		} catch (final Exception e) {
 			Activator.getInstance().error(e.getLocalizedMessage(), e);
 			MessageDialog.openError(Display.getDefault().getActiveShell(), "Exception", //$NON-NLS-1$
-					e.getMessage() + "\n\n" + ExceptionUtils.getStackTrace(e)); //$NON-NLS-1$
+					e.getLocalizedMessage()); /// never should stacktrace to end user !
 			return false;
 		}
 	}

@@ -16,8 +16,6 @@ package com.arcadsoftware.afs.client.core.ui.selectors;
 import java.util.Hashtable;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.eclipse.swt.graphics.Image;
 
 import com.arcadsoftware.afs.client.core.connection.DataAccessHelper;
@@ -64,10 +62,10 @@ public abstract class AbstractWSSearchSelector implements ISearchBeanMap {
 
 		final BeanMapList result = helper.getListFromPath(path.toString(), getType());
 		if (((result == null) || result.isEmpty()) && (helper.getLastMessage() != null)
-				&& StringUtils.isNotBlank(helper.getLastMessage().toString())) {
+				&& !helper.getLastMessage().toString().isBlank()) {
 			String message = helper.getLastMessage().toString();
 			if (helper.getLastCause() != null) {
-				message += "\n" + ExceptionUtils.getStackTrace(helper.getLastCause());
+				message += "\n" + helper.getLastCause().getLocalizedMessage();
 			}
 			Activator.getDefault().openError(message);
 			return null;

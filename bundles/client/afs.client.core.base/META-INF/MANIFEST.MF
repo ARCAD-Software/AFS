@@ -8,12 +8,12 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.net;bundle-version="[1.3.0,2.0.0)",
  xstream;bundle-version="[1.4.201,2.0.0)",
  org.restlet.base;bundle-version="[2.4.7,3.0.0)",
- com.arcadsoftware.afs.framework;bundle-version="[1.2.0,2.0.0)";visibility:=reexport,
  com.arcadsoftware.aev.core;bundle-version="[12.0.0,13.0.0)",
  com.arcadsoftware.metadata;bundle-version="[2.0.0,3.0.0)",
  com.arcadsoftware.crypt;bundle-version="[1.8.0,2.0.0)",
  com.arcadsoftware.osgi;bundle-version="[1.8.0,2.0.0)",
- com.arcadsoftware.rest;bundle-version="[3.0.0,4.0.0)"
+ com.arcadsoftware.rest;bundle-version="[3.0.0,4.0.0)",
+ com.arcadsoftware.afs.framework;bundle-version="[1.2.0,2.0.0)";visibility:=reexport
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ClassPath: .

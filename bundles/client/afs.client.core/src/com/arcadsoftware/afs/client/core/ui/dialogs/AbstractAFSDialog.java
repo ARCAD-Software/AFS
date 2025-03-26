@@ -15,7 +15,6 @@ package com.arcadsoftware.afs.client.core.ui.dialogs;
 
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
@@ -97,7 +96,7 @@ public abstract class AbstractAFSDialog extends ArcadDialog {
 		if (selectElement != null) {
 			final String bundleId = selectElement.getAttribute("bundleid"); //$NON-NLS-1$
 			final String path = selectElement.getAttribute("path"); //$NON-NLS-1$
-			if (StringUtils.isNotBlank(bundleId) && StringUtils.isNotBlank(path)) {
+			if (!bundleId.isBlank() && !path.isBlank()) {
 				Image result = ImageManager.getInstance().getImage(bundleId + ':' + path);
 				if (result != null) {
 					return result;

@@ -31,6 +31,8 @@
 		<unit id="org.eclipse.jface" version="0.0.0"/>
 		<unit id="org.eclipse.jface.databinding" version="0.0.0"/>
 		<unit id="org.eclipse.swt" version="0.0.0"/>
+		<unit id="org.eclipse.core.commands" version="0.0.0"/>
+		<unit id="org.eclipse.core.expressions" version="0.0.0"/>
 		<unit id="org.eclipse.core.runtime" version="0.0.0"/>
 		<unit id="org.eclipse.core.resources" version="0.0.0"/>
 		<unit id="org.eclipse.core.filesystem" version="0.0.0"/>
@@ -44,6 +46,7 @@
 		<unit id="org.eclipse.ui.views" version="0.0.0"/>
 		<unit id="org.eclipse.ui.tests.views.properties.tabbed" version="0.0.0"/>
 		<unit id="org.eclipse.ui.ide" version="0.0.0"/>
+		<unit id="org.eclipse.ui.workbench" version="0.0.0"/>
 	</location>
 	<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="false" type="InstallableUnit">
 		<repository location="https://github.com/ARCAD-Software/arcad-evolution/releases/download/latest/"/>
