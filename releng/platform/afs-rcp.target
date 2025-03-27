@@ -3,12 +3,7 @@
 <target includeMode="feature" name="AFS Platform" sequenceNumber="1">
 <locations>
 	<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="false" type="InstallableUnit">
-		<repository location="https://download.eclipse.org/releases/neon/201705151400/"/>
-		<unit id="javax.xml.stream" version="0.0.0"/>
-		<unit id="org.apache.commons.collections" version="0.0.0"/>
-		<unit id="org.apache.commons.lang" version="0.0.0"/>
-		<unit id="org.apache.commons.pool" version="0.0.0"/>
-		<unit id="org.apache.httpcomponents.httpcore" version="0.0.0"/>
+		<repository location="https://download.eclipse.org/eclipse/updates/4.34/"/>
 		<unit id="org.eclipse.e4.rcp.feature.group" version="0.0.0"/>
 		<unit id="org.eclipse.emf.common.feature.group" version="0.0.0"/>
 		<unit id="org.eclipse.emf.databinding.feature.group" version="0.0.0"/>
@@ -16,7 +11,6 @@
 		<unit id="org.eclipse.equinox.sdk.feature.group" version="0.0.0"/>
 		<unit id="org.eclipse.equinox.executable.feature.group" version="0.0.0"/>
 		<unit id="org.eclipse.platform.feature.group" version="0.0.0"/>
-		<unit id="org.slf4j.api" version="0.0.0"/>
 	</location>
 	<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="false" type="InstallableUnit">
 		<repository location="https://github.com/ARCAD-Software/arcad-evolution/releases/download/latest/"/>
@@ -25,38 +19,67 @@
 	</location>
 	<location includeDependencyDepth="infinite" includeDependencyScopes="import" includeSource="true" missingManifest="generate" type="Maven">
 		<dependencies>
+			<!-- SSH Key management bundle requirement -->
+			<dependency> <!-- https://mvnrepository.com/artifact/org.apache.sshd/sshd-osgi -->
+				<groupId>org.apache.sshd</groupId>
+				<artifactId>sshd-osgi</artifactId>
+				<version>2.14.0</version>
+			</dependency>
+	
 			<!-- Cryptography libraries -->
 			<dependency>
 				<groupId>org.bouncycastle</groupId>
-				<artifactId>bcmail-jdk15to18</artifactId>
-				<version>1.76</version>
+				<artifactId>bcjmail-jdk18on</artifactId>
+				<version>1.80</version>
 			</dependency>
 			<dependency>
 				<groupId>org.bouncycastle</groupId>
-				<artifactId>bcpg-jdk15to18</artifactId>
-				<version>1.76</version>
+				<artifactId>bcpg-jdk18on</artifactId>
+				<version>1.80</version>
 			</dependency>
 			<dependency>
 				<groupId>org.bouncycastle</groupId>
-				<artifactId>bcpkix-jdk15to18</artifactId>
-				<version>1.76</version>
+				<artifactId>bcpkix-jdk18on</artifactId>
+				<version>1.80</version>
 			</dependency>
 			<dependency>
 				<groupId>org.bouncycastle</groupId>
-				<artifactId>bcprov-jdk15to18</artifactId>
-				<version>1.76</version>
+				<artifactId>bcprov-jdk18on</artifactId>
+				<version>1.80</version>
 			</dependency>
 			<dependency>
 				<groupId>org.bouncycastle</groupId>
-				<artifactId>bcutil-jdk15to18</artifactId>
-				<version>1.76</version>
+				<artifactId>bcutil-jdk18on</artifactId>
+				<version>1.80</version>
 			</dependency>
+
+			<!-- XML SEC -->
+			<!-- https://mvnrepository.com/artifact/jakarta.xml.bind/jakarta.xml.bind-api -->
 			<dependency>
-				<groupId>org.apache.santuario</groupId>
-				<artifactId>xmlsec</artifactId>
-				<version>2.3.0</version>
+			    <groupId>jakarta.xml.bind</groupId>
+			    <artifactId>jakarta.xml.bind-api</artifactId>
+			    <version>4.0.2</version>
 			</dependency>
+			<!-- https://mvnrepository.com/artifact/org.apache.santuario/xmlsec -->
+			<dependency>
+			    <groupId>org.apache.santuario</groupId>
+			    <artifactId>xmlsec</artifactId>
+			    <version>4.0.3</version>
+			</dependency>
+			<!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
+			<dependency>
+			    <groupId>commons-codec</groupId>
+			    <artifactId>commons-codec</artifactId>
+			    <version>1.18.0</version>
+			</dependency>
+	
 			<!-- Restlet -->
+			<dependency>
+			    <groupId>javax.servlet</groupId>
+			    <artifactId>javax.servlet-api</artifactId>
+			    <version>4.0.1</version>
+			    <scope>provided</scope>
+			</dependency>
 			<dependency>
 				<groupId>commons-fileupload</groupId>
 				<artifactId>commons-fileupload</artifactId>
@@ -65,20 +88,33 @@
 			<dependency>
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
-				<version>2.13.0</version>
+				<version>2.18.0</version>
 			</dependency>
+	
 			<!-- Java Mail -->
-			<!-- https://mvnrepository.com/artifact/com.sun.activation/javax.activation -->
 			<dependency>
 			    <groupId>com.sun.activation</groupId>
-			    <artifactId>javax.activation</artifactId>
-			    <version>1.2.0</version>
+			    <artifactId>jakarta.activation</artifactId>
+			    <version>2.0.1</version>
 			</dependency>
 			<dependency>
-				<groupId>com.sun.mail</groupId>
-				<artifactId>javax.mail</artifactId>
-				<version>1.6.2</version>
+			    <groupId>jakarta.activation</groupId>
+			    <artifactId>jakarta.activation-api</artifactId>
+			    <version>2.1.3</version>
 			</dependency>
+			<dependency>
+			    <groupId>com.sun.mail</groupId>
+			    <artifactId>jakarta.mail</artifactId>
+			    <version>2.0.1</version>
+			</dependency>
+			
+			<!-- Groovy -->
+			<dependency>
+				<groupId>org.apache.groovy</groupId>
+				<artifactId>groovy</artifactId>
+				<version>4.0.25</version>
+			</dependency>
+			
 		</dependencies>
 	</location>
 
