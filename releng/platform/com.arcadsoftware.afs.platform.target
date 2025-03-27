@@ -57,6 +57,7 @@
 		<unit id="org.jdom" version="0.0.0"/>
 		<unit id="org.mortbay.jasper.apache-jsp" version="0.0.0"/>
 		<unit id="org.mortbay.jasper.apache-el" version="0.0.0"/>
+		<unit id="org.tukaani.xz" version="0.0.0"/>
 		<unit id="org.osgi.service.prefs" version="0.0.0"/>
 		<unit id="org.eclipse.compare.core" version="0.0.0"/>
 		<unit id="org.eclipse.core.commands" version="0.0.0"/>
