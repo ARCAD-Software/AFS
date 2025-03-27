@@ -126,6 +126,7 @@
 		<unit id="org.eclipse.ui" version="0.0.0"/>
 		<unit id="org.eclipse.ui.forms" version="0.0.0"/>
 		<unit id="org.eclipse.ui.ide" version="0.0.0"/>
+		<unit id="org.eclipse.ui.navigator" version="0.0.0"/>
 		<unit id="org.eclipse.ui.views" version="0.0.0"/>
 		<unit id="org.eclipse.ui.views.properties.tabbed" version="0.0.0"/>
 		<unit id="org.eclipse.ui.workbench" version="0.0.0"/>
