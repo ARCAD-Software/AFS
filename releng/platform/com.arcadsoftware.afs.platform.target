@@ -7,10 +7,16 @@
 	-->
 	<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="false" type="InstallableUnit">
 		<repository location="https://download.eclipse.org/eclipse/updates/4.34/"/>
+		<unit id="org.objectweb.asm" version="0.0.0"/>
+		<unit id="org.objectweb.asm.commons" version="0.0.0"/>
+		<unit id="org.objectweb.asm.tree" version="0.0.0"/>
+		<unit id="org.objectweb.asm.tree.analysis" version="0.0.0"/>
+		<unit id="org.objectweb.asm.util" version="0.0.0"/>
 		<unit id="org.apache.felix.gogo.command" version="0.0.0"/>
 		<unit id="org.apache.felix.gogo.runtime" version="0.0.0"/>
 		<unit id="org.apache.felix.gogo.shell" version="0.0.0"/>
 		<unit id="org.apache.felix.scr" version="0.0.0"/>
+		<unit id="org.apache.aries.spifly.dynamic.bundle" version="0.0.0"/>
 		<unit id="org.eclipse.equinox.common" version="0.0.0"/>
 		<unit id="org.eclipse.equinox.console.jaas.fragment" version="0.0.0"/>
 		<unit id="org.eclipse.equinox.console.ssh" version="0.0.0"/>
