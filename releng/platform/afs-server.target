@@ -16,9 +16,13 @@
 		<unit id="org.eclipse.equinox.simpleconfigurator" version="0.0.0"/>
 		<unit id="org.eclipse.equinox.simpleconfigurator.manipulator" version="0.0.0"/>
 		<unit id="org.eclipse.osgi" version="0.0.0"/>
+		<unit id="org.osgi.annotation.bundle" version="0.0.0"/>
+		<unit id="org.osgi.annotation.versioning" version="0.0.0"/>
 		<unit id="org.osgi.service.cm" version="0.0.0"/>
 		<unit id="org.osgi.service.component" version="0.0.0"/>
 		<unit id="org.osgi.service.component.annotations" version="0.0.0"/>
+		<unit id="org.osgi.service.metatype" version="0.0.0"/>
+		<unit id="org.osgi.service.metatype.annotations" version="0.0.0"/>
 		<unit id="org.osgi.service.event" version="0.0.0"/>
 		<unit id="org.osgi.util.function" version="0.0.0"/>
 		<unit id="org.osgi.util.promise" version="0.0.0"/>
