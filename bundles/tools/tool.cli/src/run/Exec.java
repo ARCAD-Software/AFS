@@ -157,7 +157,7 @@ public class Exec {
 			}
 		}
 		// Add a copy of this classes Jar...
-		File tools = getJar(toolsDir.listFiles(), "com.arcadsoftware.tool.cli-"); //$NON-NLS-1$
+		File tools = getJar(toolsDir.listFiles(), "com.arcadsoftware.tool.cli"); //$NON-NLS-1$
 		if (tools == null) {
 			System.err.println("ERROR: Tools program not found in home directory.");
 			System.exit(33);
