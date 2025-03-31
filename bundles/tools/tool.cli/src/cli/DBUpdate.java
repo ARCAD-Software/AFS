@@ -51,7 +51,7 @@ public final class DBUpdate extends DataSourceCommand {
 
 	@Override
 	protected String getVersion() {
-		return "1.0.2"; //$NON-NLS-1$
+		return "1.1.0"; //$NON-NLS-1$
 	}
 
 	@Override
@@ -132,7 +132,8 @@ public final class DBUpdate extends DataSourceCommand {
 				} catch (IOException e1) {
 					println("H2 Database backup created in file: " + backupFile.getAbsolutePath());
 				}
-				if (!isArgument("-ncdb", "-nocleandb")) { //$NON-NLS-1$ //$NON-NLS-2$
+				if (!isArgument("-ncdb", "-nocleandb") && (!url.startsWith("jdbc:h2:tcp") || isLocalH2Server())) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					println("Compact the H2 database and rebuild indexes.");
 					try {
 						try (PreparedStatement ps = connection.prepareStatement("drop all objects delete files")) { //$NON-NLS-1$
 							ps.execute();
@@ -149,7 +150,7 @@ public final class DBUpdate extends DataSourceCommand {
 						println("H2 Database deleted.");
 					}
 					try {
-						try (PreparedStatement ps = connection.prepareStatement("shutdown")) { //$NON-NLS-1$
+						try (PreparedStatement ps = connection.prepareStatement("shutdown compact")) { //$NON-NLS-1$
 							ps.execute();
 						}
 					} catch (SQLException e) {

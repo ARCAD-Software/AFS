@@ -296,6 +296,10 @@ public abstract class DataSourceCommand extends Command {
 		}
 	}
 	
+	protected boolean isLocalH2Server() {
+		return h2TCPServer != null;
+	}
+	
 	@Override
 	protected Map<String, String> getArgumentsDescription() {
 		HashMap<String, String> result = new HashMap<String, String>();
