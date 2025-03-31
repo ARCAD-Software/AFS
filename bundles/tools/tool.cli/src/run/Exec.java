@@ -52,18 +52,12 @@ public class Exec {
 		CP_SPE.put("cli.ChangeDBPassword", new String[] {
 				"org.ops4j.pax.logging.pax-logging-api_", //$NON-NLS-1$
 				"com.h2database_1.4", //$NON-NLS-1$
-				"com.sun.jna_", //$NON-NLS-1$
-				"com.sun.jna.platform_", //$NON-NLS-1$
-				"waffle_", //$NON-NLS-1$
 				PGSQL,
 				JT400
 		});
 		CP_SPE.put("cli.ConfigAdminUser", new String[] {
 				"org.ops4j.pax.logging.pax-logging-api_", //$NON-NLS-1$
 				"com.h2database_1.4", //$NON-NLS-1$
-				"com.sun.jna_", //$NON-NLS-1$
-				"com.sun.jna.platform_", //$NON-NLS-1$
-				"waffle_", //$NON-NLS-1$
 				PGSQL,
 				JT400
 		});
@@ -78,27 +72,18 @@ public class Exec {
 		CP_SPE.put("cli.DBMigration", new String[] {
 				"org.ops4j.pax.logging.pax-logging-api_", //$NON-NLS-1$
 				"com.h2database_1.4", //$NON-NLS-1$
-				"com.sun.jna_", //$NON-NLS-1$
-				"com.sun.jna.platform_", //$NON-NLS-1$
-				"waffle_", //$NON-NLS-1$
 				PGSQL,
 				JT400
 		});
 		CP_SPE.put("cli.DBUpdate", new String[] {
 				"org.ops4j.pax.logging.pax-logging-api_", //$NON-NLS-1$
 				"com.h2database_1.4", //$NON-NLS-1$
-				"com.sun.jna_", //$NON-NLS-1$
-				"com.sun.jna.platform_", //$NON-NLS-1$
-				"waffle_", //$NON-NLS-1$
 				PGSQL,
 				JT400
 		});
 		CP_SPE.put("cli.TestDB", new String[] {
 				"org.ops4j.pax.logging.pax-logging-api_", //$NON-NLS-1$
 				"com.h2database_1.4", //$NON-NLS-1$
-				"com.sun.jna_", //$NON-NLS-1$
-				"com.sun.jna.platform_", //$NON-NLS-1$
-				"waffle_", //$NON-NLS-1$
 				PGSQL,
 				JT400
 		});
@@ -165,9 +150,9 @@ public class Exec {
 		files.add(tools);
 		// Execute the command...
 		ClassLoader ccl = getClassLoader(files);
-		Thread.currentThread().setContextClassLoader(ccl);  
+		Thread.currentThread().setContextClassLoader(ccl);
 		try {
-			Class<?> c = Class.forName(classname, true , ccl);
+			Class<?> c = Class.forName(classname, true, ccl);
 			Constructor<?> cc = c.getConstructor(String[].class);
 			Object o = cc.newInstance((Object) arguments);
 			Method m = c.getMethod("exec");

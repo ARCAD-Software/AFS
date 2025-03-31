@@ -37,7 +37,6 @@ set tooljar=%current%\tools.target.jar
 
 set CP="%PRODUCT_HOME%\plugins\*;%tooljar%"
 set SCP="%tooljar%"
-echo %CP%
 set JAVA_PROPS=-Dorg.ops4j.pax.logging.DefaultServiceLog.level=ERROR
 
 REM show java version
