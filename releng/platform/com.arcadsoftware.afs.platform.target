@@ -42,7 +42,6 @@
 		<unit id="com.sun.jna" version="0.0.0"/>
 		<unit id="com.sun.jna.platform" version="0.0.0"/>
 		<!-- RCP dependancies -->
-		<unit id="bcpg" version="0.0.0"/>
 		<unit id="com.ibm.icu" version="0.0.0"/>
 		<unit id="com.sun.el.javax.el" version="0.0.0"/>
 		<unit id="jakarta.activation-api" version="0.0.0"/>
