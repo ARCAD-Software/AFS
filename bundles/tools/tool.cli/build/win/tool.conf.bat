@@ -41,7 +41,6 @@ set tooljar=%current%\com.arcadsoftware.tool.cli_3.0.0.jar
 
 :tooljarok
 set SCP="%tooljar%"
-echo %SCP%
 set JAVA_PROPS=
 
 REM show java version
