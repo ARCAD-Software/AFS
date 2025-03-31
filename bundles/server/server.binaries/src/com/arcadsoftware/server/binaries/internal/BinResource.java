@@ -166,6 +166,7 @@ public class BinResource extends OSGiResource {
 					} finally {
 						in.close();
 					}
+					Activator.getInstance().fileEventNew(category, id, file);
 					setStatus(Status.SUCCESS_CREATED);
 				}
 			} catch (IOException e) {
@@ -237,6 +238,7 @@ public class BinResource extends OSGiResource {
 						return null;
 					}
 					fileItem.write(file);
+					Activator.getInstance().fileEventNew(category, id, file);
 					setStatus(Status.SUCCESS_CREATED);
 				} else {
 					setStatus(Status.CLIENT_ERROR_BAD_REQUEST);

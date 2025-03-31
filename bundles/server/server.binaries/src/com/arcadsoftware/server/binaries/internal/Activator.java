@@ -357,7 +357,7 @@ public class Activator extends AbstractConfiguredActivator {
 	/**
 	 * Post an event after deleting a File.
 	 */
-	protected void fileEventDel(String category, int id,File file) {
+	protected void fileEventDel(String category, int id, File file) {
 		fileEvent(newEvent(FILE_EVENT_TYPE_DELETE, category, id, file));
 	}
 
@@ -400,6 +400,7 @@ public class Activator extends AbstractConfiguredActivator {
 			})) {
 				if (file.isFile()) {
 					if (file.delete()) {
+						fileEventDel(category, id, file);
 						deleted = true;
 					} else {
 						debug("Unable to delete file: " + file.getAbsolutePath());
