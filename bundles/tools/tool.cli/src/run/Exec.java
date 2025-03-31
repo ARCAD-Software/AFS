@@ -55,18 +55,12 @@ public class Exec {
 		CP_SPE.put("cli.ChangeDBPassword", new String[] {
 				H2,
 				H2_JTS,
-				"com.sun.jna_", //$NON-NLS-1$
-				"com.sun.jna.platform_", //$NON-NLS-1$
-				"waffle_", //$NON-NLS-1$
 				PGSQL,
 				JT400
 		});
 		CP_SPE.put("cli.ConfigAdminUser", new String[] {
 				H2,
 				H2_JTS,
-				"com.sun.jna_", //$NON-NLS-1$
-				"com.sun.jna.platform_", //$NON-NLS-1$
-				"waffle_", //$NON-NLS-1$
 				PGSQL,
 				JT400
 		});
@@ -81,27 +75,18 @@ public class Exec {
 		CP_SPE.put("cli.DBMigration", new String[] {
 				H2,
 				H2_JTS,
-				"com.sun.jna_", //$NON-NLS-1$
-				"com.sun.jna.platform_", //$NON-NLS-1$
-				"waffle_", //$NON-NLS-1$
 				PGSQL,
 				JT400
 		});
 		CP_SPE.put("cli.DBUpdate", new String[] {
 				H2,
 				H2_JTS,
-				"com.sun.jna_", //$NON-NLS-1$
-				"com.sun.jna.platform_", //$NON-NLS-1$
-				"waffle_", //$NON-NLS-1$
 				PGSQL,
 				JT400
 		});
 		CP_SPE.put("cli.TestDB", new String[] {
 				H2,
 				H2_JTS,
-				"com.sun.jna_", //$NON-NLS-1$
-				"com.sun.jna.platform_", //$NON-NLS-1$
-				"waffle_", //$NON-NLS-1$
 				PGSQL,
 				JT400
 		});
