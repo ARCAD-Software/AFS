@@ -25,6 +25,8 @@
 		<unit id="org.eclipse.equinox.metatype" version="0.0.0"/>
 		<unit id="org.eclipse.equinox.simpleconfigurator" version="0.0.0"/>
 		<unit id="org.eclipse.equinox.simpleconfigurator.manipulator" version="0.0.0"/>
+		<unit id="org.eclipse.equinox.frameworkadmin" version="0.0.0"/>
+		<unit id="org.eclipse.equinox.frameworkadmin.equinox" version="0.0.0"/>
 		<unit id="org.eclipse.equinox.supplement" version="0.0.0"/>
 		<unit id="org.eclipse.osgi" version="0.0.0"/>
 		<unit id="org.osgi.annotation.bundle" version="0.0.0"/>
