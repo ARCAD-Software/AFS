@@ -52,7 +52,7 @@ public final class DBMigration extends DataSourceCommand {
 
 	@Override
 	protected String getVersion() {
-		return "1.0.0"; //$NON-NLS-1$
+		return "1.1.0"; //$NON-NLS-1$
 	}
 
 	@Override
@@ -173,9 +173,19 @@ public final class DBMigration extends DataSourceCommand {
 				println("The original H2 database has been backup in the file: " + backupFile.getAbsolutePath());
 			}
 		}
+		File migrateDir = new File(getHomeDirectory(), "database/migrate");
+		if (!migrateDir.isDirectory()) {
+			migrateDir = new File(getHomeDirectory(), "sql/migrate"); //$NON-NLS-1$
+			if (!migrateDir.isDirectory()) {
+				printError("Migration SQL scripts not found.");
+				printError("The Database is not installed or must be updated according to the legacy database upgrade process.");
+				print("Consult the product documentatin and release notes for more information.");
+				return ERROR_CANCELLED;
+			}
+		}
 		// Remove the Constraints.
 		try {
-			runscript(pgconnection, new File("./database/migrate/drop_fk_constraints.sql"), true, true); //$NON-NLS-1$
+			runscript(pgconnection, new File(migrateDir, "drop_fk_constraints.sql"), true, true); //$NON-NLS-1$
 		} catch (Exception e) {
 			printError("Internal Error durin execution of \"drop_fk_constraints.sql\": " + e.getLocalizedMessage());
 			if (isArgument("-debug")) { //$NON-NLS-1$
@@ -198,7 +208,7 @@ public final class DBMigration extends DataSourceCommand {
 			resetDB2iSequences(connection, pgconnection);
 		} else {
 			try {
-				runscript(pgconnection, new File("./database/migrate/set_sequences.sql"), true); //$NON-NLS-1$
+				runscript(pgconnection, new File(migrateDir, "set_sequences.sql"), true); //$NON-NLS-1$
 			} catch (Exception e) {
 				printError("Internal Error during execution of \"set_sequences.sql\": " + e.getLocalizedMessage());
 				if (isArgument("-debug")) { //$NON-NLS-1$
@@ -210,7 +220,7 @@ public final class DBMigration extends DataSourceCommand {
 		println("The Sequence next value are updated to the new database content.");
 		// Restore contraints.
 		try {
-			runscript(pgconnection, new File("./database/migrate/create_fk_constraints.sql"), true, isDB2i); //$NON-NLS-1$
+			runscript(pgconnection, new File(migrateDir, "create_fk_constraints.sql"), true, isDB2i); //$NON-NLS-1$
 		} catch (Exception e) {
 			printError("Internal Error during execution of \"create_fk_constraints.sql\": " + e.getLocalizedMessage());
 			if (isArgument("-debug")) { //$NON-NLS-1$
