@@ -44,7 +44,7 @@ public final class DBUpdate extends DataSourceCommand {
 
 	@Override
 	protected String getVersion() {
-		return "1.0.3"; //$NON-NLS-1$
+		return "1.0.4"; //$NON-NLS-1$
 	}
 
 	@Override
@@ -76,11 +76,16 @@ public final class DBUpdate extends DataSourceCommand {
 		// H2 database Backup.
 		boolean close = false;
 		try {
-			final File upgradeDir = new File(getHomeDirectory(), "database/upgrade"); //$NON-NLS-1$
+			File upgradeDir = new File(getHomeDirectory(), "database/upgrade"); //$NON-NLS-1$
 			if (!upgradeDir.isDirectory()) {
 				printError("The Database is not installed or must be updated according to the previous database upgrade process.");
-				printError("Upgrade SQL script not found.");
-				return ERROR_CANCELLED;
+				upgradeDir = new File(getHomeDirectory(), "sql/upgrade"); //$NON-NLS-1$
+				if (!upgradeDir.isDirectory()) {
+					printError("Upgrade SQL script not found.");
+					printError("The Database is not installed or must be updated according to the legacy database upgrade process.");
+					print("Consult the product documentatin and release notes for more information.");
+					return ERROR_CANCELLED;
+				}
 			}
 			if (dataSourceType.startsWith("h2")) { //$NON-NLS-1$
 				String pwd = getArgumentValue(new String[] {"-p", "-password"}, connectionProperties.getProperty("password", null)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ 
