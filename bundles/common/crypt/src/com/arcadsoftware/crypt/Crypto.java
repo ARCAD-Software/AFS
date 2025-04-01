@@ -922,7 +922,7 @@ public final class Crypto {
 			int saltsize = getIntByte(buffer, 4);
 			int ivsize = getIntByte(buffer, 8);
 			int iterations = getIntByte(buffer, 12);
-			return (algorithm > 1) && (algorithm < 3) && (saltsize >= 1) && (ivsize >= 1) && (iterations >= 1);  
+			return (algorithm > 1) && (algorithm < 4) && (saltsize >= 1) && ((ivsize >= 1) || ((ivsize == 0) && (algorithm > 2))) && (iterations >= 1);  
 		} catch (IllegalArgumentException e) {
 			return false;
 		}
