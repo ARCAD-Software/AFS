@@ -36,10 +36,11 @@ public class Exec {
 	public static final String JT400 = "org.apache.servicemix.bundles.jt400_"; //$NON-NLS-1$
 
 	private static final String[] CP_BASE = new String[] {
-			"javax.servlet_", //$NON-NLS-1$
+			"javax.servlet-api_", //$NON-NLS-1$
 			"org.eclipse.osgi_", //$NON-NLS-1$
-			"org.eclipse.osgi.services_", //$NON-NLS-1$
-			"org.eclipse.osgi.util_", //$NON-NLS-1$
+			"org.eclipse.osgi.service.cm_", //$NON-NLS-1$
+			"org.eclipse.osgi.util.function_", //$NON-NLS-1$
+			"org.eclipse.osgi.util.promise_", //$NON-NLS-1$
 			"org.eclipse.equinox.common_", //$NON-NLS-1$
 			"bcprov", //$NON-NLS-1$
 			"bcpkix", //$NON-NLS-1$

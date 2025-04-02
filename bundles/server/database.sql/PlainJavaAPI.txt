@@ -11,7 +11,8 @@ Pour la construction uniquement (à cause de la partie non utilisable en Plain J
 - H2.
 - com.arcadsoftware.osgi.
 - org.eclipse.osgi.
-- org.eclipse.osgi.services.
-- Apache Commons DBCP.
+- org.eclipse.osgi.cm.
+- org.eclipse.osgi.jdbc.
+- Apache Commons DBUtil.
 
 
