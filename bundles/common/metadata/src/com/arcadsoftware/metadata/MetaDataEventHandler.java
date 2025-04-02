@@ -189,9 +189,9 @@ public abstract class MetaDataEventHandler implements EventHandler {
 	protected BeanMap getOldBeanMap(Event event) {
 		Object o = event.getProperty(EVENT_PROP_OLDBEANMAP);
 		if (o instanceof BeanMap) {
-			return (BeanMap)o;
+			return (BeanMap) o;
 		}
-		getActivator().warn(Messages.BeanMapEventHandler_Log_No_BeanMap);
+		getActivator().debug(Messages.BeanMapEventHandler_Log_No_BeanMap);
 		return null;
 	}
 
