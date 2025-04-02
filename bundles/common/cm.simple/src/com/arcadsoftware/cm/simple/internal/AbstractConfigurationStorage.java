@@ -219,7 +219,7 @@ public abstract class AbstractConfigurationStorage {
 		}
 	}
 
-	public void save(File rootStorage, Map<String, ? extends Hashtable<String, Object>> config, boolean useINI, boolean useCFG, boolean useJSON) throws IOException {
+	protected void save(File rootStorage, Map<String, ? extends Hashtable<String, Object>> config, boolean useINI, boolean useCFG, boolean useJSON) throws IOException {
 		File backup = null;
 		File root;
 		if (rootStorage.isFile()) {

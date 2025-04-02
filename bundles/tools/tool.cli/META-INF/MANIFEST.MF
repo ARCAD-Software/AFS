@@ -8,9 +8,9 @@ Bundle-Vendor: ARCAD Software
 Automatic-Module-Name: com.arcadsoftware.tool.cli
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Import-Package: com.arcadsoftware.cli;version="[1.0.0,2.0.0)",
- com.arcadsoftware.cm.simple;version="[1.2.0,2.0.0)",
+ com.arcadsoftware.cm.simple;version="[1.4.0,2.0.0)",
  com.arcadsoftware.crypt;version="[1.3.0,2.0.0)",
- com.arcadsoftware.osgi;version="[1.3.1,3.0.0)",
+ com.arcadsoftware.osgi;version="[2.0.0,3.0.0)",
  com.unboundid.asn1;version="[7.0.2,8.0.0)",
  com.unboundid.ldap.sdk;version="[7.0.2,8.0.0)",
  com.unboundid.ldap.sdk.controls;version="[7.0.2,8.0.0)",

@@ -198,6 +198,16 @@ public class ConfigurationStoreManager extends AbstractConfigurationStorage {
 	public void save() throws IOException {
 		save(root, confs, useINI, useCFG, useJSON);
 	}
+
+	/**
+	 * Update the configuration files.
+	 * 
+	 * @param iniFile the target .ini file that will store the copy of the current configuration 
+	 * @throws IOException
+	 */
+	public void saveTo(File iniFile) throws IOException {
+		save(iniFile, confs, true, false, false);
+	}
 	
 	/**
 	 * @return true if the configuration store is empty.

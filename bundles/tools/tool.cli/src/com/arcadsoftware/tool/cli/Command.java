@@ -390,6 +390,18 @@ public abstract class Command {
 		}
 		return false;
 	}
+
+	protected boolean saveOSGiConfigurationToINI(File targetIniFile) {
+		if (configuration != null) {
+			try {
+				configuration.saveTo(targetIniFile);
+				return true;
+			} catch (IOException e) {
+				printError("ERROR While recording the OSGi configuration: " + e.getLocalizedMessage());
+			}
+		}
+		return false;
+	}
 	
 	protected boolean save(File target, String content) {
 		try (FileWriter fileWriter = new FileWriter(target)) {
