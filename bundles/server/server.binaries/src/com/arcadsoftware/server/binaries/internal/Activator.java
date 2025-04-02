@@ -74,7 +74,7 @@ public class Activator extends AbstractConfiguredActivator {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		instance = this;
-		eventTracker = new ServiceTracker(context,EventAdmin.class.getName(),null);
+		eventTracker = new ServiceTracker(context, EventAdmin.class.getName(), null);
 		eventTracker.open();
 		binTransfer = new BinariesTranferService(this);
 		registerService(IBinariesTranferService.clazz, binTransfer);
@@ -333,11 +333,13 @@ public class Activator extends AbstractConfiguredActivator {
 		return new File(getDir(category), "dir" + Integer.toString(id / 1000)); //$NON-NLS-1$
 	}
 
-	private void fileEvent(Event event) {
+	private void fireEvent(Event event) {
 		if (eventTracker != null) {
-			EventAdmin ea = (EventAdmin)eventTracker.getService();
+			EventAdmin ea = (EventAdmin) eventTracker.getService();
 			if (ea != null) {
 				ea.postEvent(event);
+			} else {
+				info("No Event Admin service available to send Binaries Transfer Service events.");
 			}
 		}
 	}
@@ -358,14 +360,14 @@ public class Activator extends AbstractConfiguredActivator {
 	 * Post an event after deleting a File.
 	 */
 	protected void fileEventDel(String category, int id, File file) {
-		fileEvent(newEvent(FILE_EVENT_TYPE_DELETE, category, id, file));
+		fireEvent(newEvent(FILE_EVENT_TYPE_DELETE, category, id, file));
 	}
 
 	/**
 	 * Post an event after creating of modifying a File.
 	 */
 	protected void fileEventNew(String category, int id, File file) {
-		fileEvent(newEvent(FILE_EVENT_TYPE_CHANGE, category, id, file));
+		fireEvent(newEvent(FILE_EVENT_TYPE_CHANGE, category, id, file));
 	}
 
 	/**
@@ -385,6 +387,7 @@ public class Activator extends AbstractConfiguredActivator {
 				}
 			}
 		}
+		debug("No file found for: ", category, '/', id);
 		return null;
 	}
 
@@ -407,7 +410,7 @@ public class Activator extends AbstractConfiguredActivator {
 					}
 				}
 			}
-		}		
+		}
 		return deleted;
 	}
 	

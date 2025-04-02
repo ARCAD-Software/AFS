@@ -34,7 +34,7 @@ import com.arcadsoftware.osgi.IBinariesTranferService;
  */
 public class BinariesTranferService implements IBinariesTranferService {
 
-	private Activator activator;
+	private final Activator activator;
 
 	public BinariesTranferService(Activator activator) {
 		super();
@@ -223,30 +223,30 @@ public class BinariesTranferService implements IBinariesTranferService {
 			if (activator.removeFiles(category, id)) {
 				activator.fileEventDel(category, id, null);
 			}
-			if (file.isFile()) {
-				File target = new File(activator.getSubDir(category, id), Integer.toString(id) + '_' + file.getName());
-				// Test a directory path trasversal attack...
-				try {
-					if (!target.getCanonicalPath().startsWith(activator.getPath().getCanonicalPath())) {
-						activator.error("Invalid Path name : '" + target.getAbsolutePath() + "' does apears to be contained in: " + activator.getPath().getAbsolutePath());
-						return false;
-					}
-				} catch (IOException e) {
-					activator.error("Unable to get canonical path of: '" + target.getAbsolutePath() + "' does apears to be contained in: " + activator.getPath().getAbsolutePath(), e);
+			File target = new File(activator.getSubDir(category, id), Integer.toString(id) + '_' + file.getName());
+			// Test a directory path trasversal attack...
+			try {
+				if (!target.getCanonicalPath().startsWith(activator.getPath().getCanonicalPath())) {
+					activator.error("Invalid Path name : '", target.getAbsolutePath(), "' does apears to be contained in: ", activator.getPath().getAbsolutePath());
 					return false;
 				}
-				// Ensure that parent exists
-				File parent = target.getParentFile();
-				if ((parent != null) && !parent.exists()) {
-					parent.mkdirs();
-					if (!parent.exists()) {
-						Activator.getInstance().log(Activator.LOG_ERROR, parent.getAbsolutePath() + " could not be created");
-					}
+			} catch (IOException e) {
+				activator.error("Unable to get canonical path of: '", target.getAbsolutePath(), "' does apears to be contained in: ", activator.getPath().getAbsolutePath(), e);
+				return false;
+			}
+			// Ensure that parent exists
+			File parent = target.getParentFile();
+			if ((parent != null) && !parent.exists()) {
+				parent.mkdirs();
+				if (!parent.exists()) {
+					Activator.getInstance().error(parent.getAbsolutePath(), " could not be created");
 				}
-				if (copy(file, target)) {
-					activator.fileEventNew(category, id, target);
-					return true;
-				}
+			}
+			if (copy(file, target)) {
+				activator.fileEventNew(category, id, target);
+				return true;
+			} else {
+				activator.error("Unable to copy file: '", target.getAbsolutePath());
 			}
 		}
 		return false;

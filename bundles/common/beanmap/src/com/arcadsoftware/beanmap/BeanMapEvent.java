@@ -35,6 +35,6 @@ public class BeanMapEvent extends EventObject {
 	 * @see java.util.EventObject#getSource()
 	 */
 	public IBeanMap getSource() {
-		return (IBeanMap)source;
+		return (IBeanMap) source;
 	}
 }
