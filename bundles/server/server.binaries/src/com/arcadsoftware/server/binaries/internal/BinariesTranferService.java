@@ -227,11 +227,11 @@ public class BinariesTranferService implements IBinariesTranferService {
 			// Test a directory path trasversal attack...
 			try {
 				if (!target.getCanonicalPath().startsWith(activator.getPath().getCanonicalPath())) {
-					activator.error("Invalid Path name : '", target.getAbsolutePath(), "' does apears to be contained in: ", activator.getPath().getAbsolutePath());
+					activator.error("Invalid Path name : '{}' does apears to be contained in: {}.", target.getAbsolutePath(), activator.getPath().getAbsolutePath());
 					return false;
 				}
 			} catch (IOException e) {
-				activator.error("Unable to get canonical path of: '", target.getAbsolutePath(), "' does apears to be contained in: ", activator.getPath().getAbsolutePath(), e);
+				activator.error("Unable to get canonical path of: '{}' does apears to be contained in: {}.", target.getAbsolutePath(), activator.getPath().getAbsolutePath(), e);
 				return false;
 			}
 			// Ensure that parent exists
@@ -239,14 +239,14 @@ public class BinariesTranferService implements IBinariesTranferService {
 			if ((parent != null) && !parent.exists()) {
 				parent.mkdirs();
 				if (!parent.exists()) {
-					Activator.getInstance().error(parent.getAbsolutePath(), " could not be created");
+					Activator.getInstance().error("The Binary file '{}' could not be created.", parent.getAbsolutePath());
 				}
 			}
 			if (copy(file, target)) {
 				activator.fileEventNew(category, id, target);
 				return true;
 			} else {
-				activator.error("Unable to copy file: '", target.getAbsolutePath());
+				activator.error("Unable to copy file: '{}'.", target.getAbsolutePath());
 			}
 		}
 		return false;

@@ -387,7 +387,7 @@ public class Activator extends AbstractConfiguredActivator {
 				}
 			}
 		}
-		debug("No file found for: ", category, '/', id);
+		debug("No file found for: {}/{}", category, id);
 		return null;
 	}
 
@@ -406,7 +406,7 @@ public class Activator extends AbstractConfiguredActivator {
 						fileEventDel(category, id, file);
 						deleted = true;
 					} else {
-						debug("Unable to delete file: " + file.getAbsolutePath());
+						debug("Unable to delete file: {}", file.getAbsolutePath());
 					}
 				}
 			}
