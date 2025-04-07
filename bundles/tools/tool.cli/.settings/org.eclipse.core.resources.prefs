@@ -1,5 +1,6 @@
 eclipse.preferences.version=1
 encoding//build/win/confmigration.bat=US-ASCII
+encoding//build/win/confupdate.bat=US-ASCII
 encoding//build/win/dbmigration.bat=US-ASCII
 encoding//build/win/dbpwd.bat=US-ASCII
 encoding//build/win/dbupdate.bat=US-ASCII
