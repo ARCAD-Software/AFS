@@ -24,6 +24,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.restlet.Context;
+import org.restlet.data.Language;
 import org.restlet.routing.Router;
 
 import com.arcadsoftware.beanmap.BeanMap;
@@ -32,14 +33,17 @@ import com.arcadsoftware.metadata.IMapperService;
 import com.arcadsoftware.metadata.IMetaDataDeleteListener;
 import com.arcadsoftware.metadata.IMetaDataLinkingListener;
 import com.arcadsoftware.metadata.IMetaDataModifyListener;
+import com.arcadsoftware.metadata.IMetaDataUndeleteListener;
 import com.arcadsoftware.metadata.MetaDataEntity;
 import com.arcadsoftware.metadata.MetaDataEventHandler;
-import com.arcadsoftware.osgi.AbstractActivator;
+import com.arcadsoftware.osgi.AbstractConfiguredActivator;
+import com.arcadsoftware.rest.MultiLanguageMessages;
 import com.arcadsoftware.rest.RouteList;
 import com.arcadsoftware.rest.SimpleBranch;
+import com.arcadsoftware.rest.connection.IApplicationStateBroadcaster;
 import com.arcadsoftware.rest.connection.IConnectionCache;
 
-public class Activator extends AbstractActivator {
+public class Activator extends AbstractConfiguredActivator {
 
 	protected static final boolean UPDATEALLRIGHTPROFILE = !Boolean.getBoolean("com.arcadsoftware.profile.allrights.disabled");
 	protected static final boolean PROTECTADMINUSER = !Boolean.getBoolean("com.arcadsoftware.user.noadmin");
@@ -56,12 +60,27 @@ public class Activator extends AbstractActivator {
 	protected static final String METADATAPID = "com.arcadsoftware.metadata"; //$NON-NLS-1$
 	protected static final String JDBC_PREFIX = "jdbc:"; //$NON-NLS-1$
 	protected static final String USERDB = "userdb"; //$NON-NLS-1$
+	private static final MultiLanguageMessages TRANSLATE = new MultiLanguageMessages(Activator.class.getPackage().getName() + ".clientmessages", Activator.class.getClassLoader()); //$NON-NLS-1$
+	
+	public static String translate(String key, Language language) {
+		return TRANSLATE.get(key, language);
+	}
+	
+	public static String translate(String key, Language language, Object... o) {
+		return TRANSLATE.get(key, language, o);
+	}
+	
+	private int userMax;
+	private boolean userMaxlock;
 	
 	@Override
 	public void start(BundleContext bundleContext) throws Exception {
 		super.start(bundleContext);
+		// Application state informations...
+		registerService(IApplicationStateBroadcaster.class, new ApplicationStateBroadcaster(this));
 		// Listen to all Metadata change around the User <-> Rights linking... to purge connection caches... 
 		registerService(IMetaDataDeleteListener.class, new DeleteListener(this), IMetaDataDeleteListener.PROP_TYPE, TYPE_USER);
+		registerService(IMetaDataUndeleteListener.class, new UndeleteListener(this), IMetaDataDeleteListener.PROP_TYPE, TYPE_USER);
 		registerService(IMetaDataDeleteListener.class, new DeleteListener(this), IMetaDataDeleteListener.PROP_TYPE, TYPE_PROFILE);
 		registerService(IMetaDataDeleteListener.class, new DeleteListener(this), IMetaDataDeleteListener.PROP_TYPE, TYPE_PROFILERIGHT);
 		Dictionary<String, Object> props = new Hashtable<String, Object>();
@@ -136,6 +155,14 @@ public class Activator extends AbstractActivator {
 		}, SimpleBranch.properties(SimpleBranch.SECUREDBRANCH));
 	}
 
+	@Override
+	public void updatedConfiguration(Dictionary<String, Object> properties) {
+		if (properties != null) {
+			userMax = parseIntegerParameter(properties.get("max"), 0); //$NON-NLS-1$
+			userMaxlock = parseBooleanParameter(properties.get("max.lock")); //$NON-NLS-1$
+		}
+	}
+
 	/**
 	 * Try to update the first Profile from the database with the list of all rights declared onto this server...
 	 */
@@ -204,4 +231,13 @@ public class Activator extends AbstractActivator {
 			}
 		}, "User Profile ALL update").start();
 	}
+
+	public int getUserMax() {
+		return userMax;
+	}
+
+	public boolean isUserMaxlock() {
+		return userMaxlock;
+	}
+	
 }

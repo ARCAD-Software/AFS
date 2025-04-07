@@ -38,6 +38,13 @@ public class ModifyListener implements IMetaDataModifyListener {
 	@Override
 	public boolean testModification(MetaDataEntity entity, BeanMap originalItem, BeanMap modifiedItem,
 			List<MetaDataAttribute> attributes, IConnectionUserBean user, Language language) throws ResourceException {
+		if (activator.isUserMaxlock() && (activator.getUserMax() > 0) && // User maximal number activated,
+				(originalItem == null) && // this operation is a creation (POST),
+				Activator.TYPE_USER.equals(entity.getType()) && // and modified data is a user...
+				(activator.getUserMax() <= entity.dataCount())) { // maximal number of undeleted user is reach
+			activator.warn("Limit of maximal number of user reach ({} users).", activator.getUserMax());
+			throw new ResourceException(Status.SERVER_ERROR_INSUFFICIENT_STORAGE, String.format("The current number of user declared in the application reach the fixed limitation of %d users.", activator.getUserMax()));
+		}
 		return true;
 	}
 
