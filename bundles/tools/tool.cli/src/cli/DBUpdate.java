@@ -190,6 +190,8 @@ public final class DBUpdate extends DataSourceCommand {
 				if ("c".equalsIgnoreCase(res)) {
 					return ERROR_CANCELLED;
 				}
+			} else {
+				printWarn("The upgrade of the database may corrupt the data, depending on any special modifications made on it. A complete backup is recommended but this script does not have access to the backup tools of your database. This backup should have been done before to run it.");
 			}
 			String typ = "h2"; //$NON-NLS-1$
 			if ("postgresql".equals(dataSourceType)) { //$NON-NLS-1$
