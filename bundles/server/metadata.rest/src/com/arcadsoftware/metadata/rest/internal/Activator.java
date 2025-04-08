@@ -81,7 +81,7 @@ public class Activator extends AbstractActivator implements IEntityTesterService
 		linkingTracker.open();
 		selectionTracker = new ServiceTracker<IMetaDataSelectionListener, Object>(bundleContext, IMetaDataSelectionListener.clazz, null);
 		selectionTracker.open();
-		undeleteTracker = new ServiceTracker<IMetaDataUndeleteListener, Object>(bundleContext, IMetaDataSelectionListener.clazz, null);
+		undeleteTracker = new ServiceTracker<IMetaDataUndeleteListener, Object>(bundleContext, IMetaDataUndeleteListener.clazz, null);
 		undeleteTracker.open();
 	}
 
@@ -108,7 +108,7 @@ public class Activator extends AbstractActivator implements IEntityTesterService
 		ServiceReference<IMetaDataSelectionListener>[] refs = selectionTracker.getServiceReferences();
 		if (refs != null) {
 			for(ServiceReference<IMetaDataSelectionListener> ref: refs) {
-				Object o = ref.getProperty(IMetaDataModifyListener.PROP_TYPE);
+				Object o = ref.getProperty(IMetaDataSelectionListener.PROP_TYPE);
 				if ((o == null) || (type == null) || type.equals(o)) {
 					result.add((IMetaDataSelectionListener) selectionTracker.getService(ref));
 				}
@@ -150,7 +150,7 @@ public class Activator extends AbstractActivator implements IEntityTesterService
 		ServiceReference<IMetaDataUndeleteListener>[] refs = undeleteTracker.getServiceReferences();
 		if (refs != null) {
 			for (ServiceReference<IMetaDataUndeleteListener> ref: refs) {
-				Object o = ref.getProperty(IMetaDataDeleteListener.PROP_TYPE);
+				Object o = ref.getProperty(IMetaDataUndeleteListener.PROP_TYPE);
 				if ((o == null) || (type == null) || type.equals(o)) {
 					result.add((IMetaDataUndeleteListener) undeleteTracker.getService(ref));
 				}
