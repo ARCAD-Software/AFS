@@ -147,16 +147,6 @@ public class ConfigSection extends Section implements IActivableConsoleNode {
 		Dictionary props = null;
 		try {
 			String loc = null;
-			/*
-			Bundle[] bundles = Activator.getInstance().getContext().getBundles();
-			if (bundles != null) {
-				for (int i = 0; i < bundles.length; i++) {
-					if (bundles[i].getSymbolicName().equalsIgnoreCase(bid)) {
-						loc = bundles[i].getLocation();
-						break;
-					}
-				}
-			}*/
 			Configuration c = ca.getConfiguration(getPid(), loc);
 			if (c != null) {
 				props = c.getProperties();
