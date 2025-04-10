@@ -130,7 +130,7 @@ public class UpdateConfigIni extends Command {
 		result.put("[-o|-override]", //$NON-NLS-1$
 				"Override the existing properties in the new config.ini by the old values.");
 		result.put("[-ci|-configini] <path>", //$NON-NLS-1$
-				"Define the path of the previous config.ini file. The default value is \"./configuration/config.bak\".");
+				"Define the path of the previous config.ini backup file. The default value is \"./configuration/config.bak\".");
 		return result;
 	}
 

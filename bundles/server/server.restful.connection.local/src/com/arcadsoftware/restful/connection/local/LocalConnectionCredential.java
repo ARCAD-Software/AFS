@@ -46,6 +46,7 @@ public class LocalConnectionCredential implements IConnectionCredential, IUpdata
 		this.login = login;
 		// Prevalidation... (no more informations required)
 		// Because this identification mode is the really first one (native) it is not prefixed.
+		// Note that using ":" in a login in HTTP BASIC is not authorized.
 		uniqueid = login.replaceAll(":", "::"); //$NON-NLS-1$ //$NON-NLS-2$
 		id = auth.getId();
 		uid = auth.getInt(Activator.LOCALAUTH_USERID);

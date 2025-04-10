@@ -104,7 +104,7 @@ public class EncryptPassword extends Command {
 	@Override
 	protected Map<String, String> getArgumentsDescription() {
 		HashMap<String, String> result = new HashMap<String, String>();
-		result.put("[-gmk,-genmaster]", "If not already generated this option will generate a random master key used to encrypt all other secured datas.");
+		result.put("[-gmk,-genmasterkey]", "If not already generated this option will generate a random master key used to encrypt all other secured datas.");
 		result.put("[-k,-key [<pid>:]<property>]", "If used this parameter must match a property name of a configuration section (pid), the one in which the password must be changed.");
 		result.put("[-p,-password <new password>]", "The password to encrypt. If not defined the password will be prompted.");
 		result.put("[-f|-fog]", "Use the Fog encryption algorithm instead of the stronger one. Fog is not a secure algorithm but it is faster to decrypt and portable to other locations.");
