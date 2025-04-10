@@ -432,6 +432,10 @@ public abstract class Command {
 		return configuration.listAllConfigurations();
 	}
 	
+	protected void removeOSGiConfiguration(String pid) {
+		configuration.removeConfiguration(pid);
+	}
+	
 	protected String getProperty(Map<String, ?> props, String name, String defValue) {
 		Object o = props.get(name);
 		if (o != null) {
@@ -712,8 +716,8 @@ public abstract class Command {
 
 	protected String[] getArgumentValues(String[] args) {
 		ArrayList<String> result = new ArrayList<String>(arguments.length);
-		for(int i = 0; i < arguments.length; i++) {
-			for(String a: args) {
+		for (int i = 0; i < arguments.length; i++) {
+			for (String a: args) {
 				if (arguments[i].equalsIgnoreCase(a) && (i + 1 < arguments.length)) {
 					result.add(arguments[i + 1]);
 				} else {

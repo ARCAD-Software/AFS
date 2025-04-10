@@ -47,6 +47,8 @@ public class ConfUpdate extends Command {
 				"Create a copy of the current configuration into an .ini.bak file.");
 		result.put("[-c|-consume]", //$NON-NLS-1$
 				"Delete the new properties file after integration into the configuration.");
+		result.put("[-r|-remove <pid>]", //$NON-NLS-1$
+				"Delete the listed PID from the configuration (This parameter may be used repeatedly on tha same call).");
 		return result;
 	}
 
@@ -62,6 +64,10 @@ public class ConfUpdate extends Command {
 			}
 			println("Create a backup of the current configuration in: " + confFile.getAbsolutePath());
 			confFile.getParentFile().mkdirs();
+			if (!saveOSGiConfigurationToINI(confFile)) {
+				printError("Unable to create a backup file on the configuration.");
+				return ERROR_FILESYSTEM_ACCESS;
+			}
 		}
 		// Loading properties file with conversion orders.
 		String prop = getArgumentValue(new String[] {"-p", "-prop"}, ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -74,36 +80,52 @@ public class ConfUpdate extends Command {
 		} else {
 			pf = new File(prop);
 		}
-		if (!pf.isFile()) {
+		boolean modif = false;
+		if (pf.isFile()) {
+			// Apply conversion of the configuration.
+			println("Loading new configuration elements...");
+			ConfigurationStoreManager newConf = new ConfigurationStoreManager(pf);
+			newConf.setUseCFG(false);
+			newConf.setUseINI(true);
+			newConf.setUseJSON(false);
+			try {
+				newConf.load();
+				for (Configuration conf: newConf.listAllConfigurations()) {
+					println("Adding configuration: " + conf.getPid());
+					getOSGiConfiguration(conf.getPid()).putAll(conf);
+					modif = true;
+				}
+			} catch (IOException e) {
+				printError("Error while loading OSGi configuration: " + e.getLocalizedMessage());
+				return ERROR_FILESYSTEM_ACCESS;
+			}
+		} else if ((prop != null) && !prop.isEmpty()) {
 			printError("Unable to found the update properties file: " + pf.getAbsolutePath());
 			return ERROR_MISSING_FILE;
+		} else if (isArgument("-debug")) { //$NON-NLS-1$
+			println("Unable to found the update properties file: " + pf.getAbsolutePath());
 		}
-		// Apply conversion of the configuration.
-		println("Loading new configuration elements...");
-		ConfigurationStoreManager newConf = new ConfigurationStoreManager(pf);
-		newConf.setUseCFG(false);
-		newConf.setUseINI(true);
-		newConf.setUseJSON(false);
-		try {
-			newConf.load();
-			for (Configuration conf: newConf.listAllConfigurations()) {
-				println("Adding configuration: " + conf.getPid());
-				getOSGiConfiguration(conf.getPid()).putAll(conf);
-			}
-		} catch (IOException e) {
-			System.out.println("Error while loading OSGi configuration: " + e.getLocalizedMessage());
-			return ERROR_FILESYSTEM_ACCESS;
+		for (String p: getArgumentValues(new String[] {"-r", "-remove"})) {
+			removeOSGiConfiguration(p);
+			modif = true;
 		}
 		// Save the new configuration files.
-		println("Record the updated configuration...");
-		if (!saveOSGiConfiguration()) {
-			printError("Unable to save the new configuration.");
-			return ERROR_INVALID_CONFIGURATION;
+		if (modif) {
+			println("Record the updated configuration...");
+			if (!saveOSGiConfiguration()) {
+				printError("Unable to save the new configuration.");
+				return ERROR_INVALID_CONFIGURATION;
+			}
+		} else {
+			println("No modification applied to the current configuration.");
 		}
 		// Delete the property file.
-		if (isArgument("-c", "-consume") && !pf.delete()) { //$NON-NLS-1$ //$NON-NLS-2$
-			printError("Unable to delete the file: " + pf.getAbsolutePath());
-			return ERROR_FILESYSTEM_ACCESS;
+		if (isArgument("-c", "-consume") && pf.isFile()) { //$NON-NLS-1$ //$NON-NLS-2$
+			if (!pf.delete()) {
+				printError("Unable to delete the file: " + pf.getAbsolutePath());
+				return ERROR_FILESYSTEM_ACCESS;
+			}
+			println("Update file consumed.");
 		}
 		println("Configuration correctly updated.");
 		return 0;
