@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
-import org.osgi.framework.BundleContext;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
@@ -36,7 +36,7 @@ import com.arcadsoftware.metadata.MetaDataLink;
 import com.arcadsoftware.metadata.UpdateMetaDataEntity;
 import com.arcadsoftware.metadata.registry.internal.Messages;
 import com.arcadsoftware.metadata.xml.XmlMetaDataStream;
-import com.arcadsoftware.osgi.ILoggedPlugin;
+import com.arcadsoftware.osgi.AbstractActivator;
 
 /**
  * This class maintain and Entity repository where declaration come from XML files.
@@ -56,14 +56,13 @@ public class XmlRegistry implements IEntityRegistry {
 
 	public static final String TAG_ENTITIES = "entities"; //$NON-NLS-1$
 
-	private volatile HashMap<String, MetaDataEntity> entities;
-	private HashMap<String, List<MetaDataEntity>> entitiesDeclarations;
-	private HashMap<String, List<MetaDataEntity>> containersDeclarations;
-	private XmlMetaDataStream xs;
-	private ILoggedPlugin activator;
-	private BundleContext context;
+	private final HashMap<String, List<MetaDataEntity>> entitiesDeclarations;
+	private final HashMap<String, List<MetaDataEntity>> containersDeclarations;
+	private final XmlMetaDataStream xs;
+	private final AbstractActivator activator;
+	private final HashMap<String, MetaDataEntity> entities;
 
-	public XmlRegistry(ILoggedPlugin activator) {
+	public XmlRegistry(AbstractActivator activator) {
 		this.activator = activator;
 		entities = new HashMap<String, MetaDataEntity>();
 		entitiesDeclarations = new HashMap<String, List<MetaDataEntity>>();
@@ -449,35 +448,34 @@ public class XmlRegistry implements IEntityRegistry {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void fireEvent(String topic, MetaDataEntity entity, String codes) {
-		if (getContext() == null) {
-			return;
-		}
-		// Déclenchement des évènements.
-		try {
-			ServiceReference sf = getContext().getServiceReference(EventAdmin.class.getName());
-			if (sf == null) {
-				activator.info("No Event Service available when throwing event: " + topic);
-				return;
-			}
-			EventAdmin ea = (EventAdmin) getContext().getService(sf);
-			if (ea == null) {
-				activator.warn("No Event Service available when throwing event: " + topic);
-				return;
-			}
-			Properties properties = new Properties();
-			properties.put(MetaDataEventHandler.EVENT_PROP_ENTITY, entity);
-			properties.put(MetaDataEventHandler.EVENT_PROP_TYPE, entity.getType());
-			properties.put(MetaDataEventHandler.EVENT_PROP_REGISTRY, this);
-			if (codes != null) {
-				properties.put(MetaDataEventHandler.EVENT_PROP_CODES, codes);
-			}
+		if (activator.getContext().getBundle().getState() == Bundle.ACTIVE) {
+			// Déclenchement des évènements.
 			try {
-				ea.postEvent(new Event(topic, (Dictionary) properties));
-			} catch (SecurityException e) {
+				ServiceReference sf = activator.getContext().getServiceReference(EventAdmin.class);
+				if (sf == null) {
+					activator.info("No Event Service available when throwing event: " + topic);
+					return;
+				}
+				EventAdmin ea = (EventAdmin) activator.getContext().getService(sf);
+				if (ea == null) {
+					activator.warn("No Event Service available when throwing event: " + topic);
+					return;
+				}
+				Properties properties = new Properties();
+				properties.put(MetaDataEventHandler.EVENT_PROP_ENTITY, entity);
+				properties.put(MetaDataEventHandler.EVENT_PROP_TYPE, entity.getType());
+				properties.put(MetaDataEventHandler.EVENT_PROP_REGISTRY, this);
+				if (codes != null) {
+					properties.put(MetaDataEventHandler.EVENT_PROP_CODES, codes);
+				}
+				try {
+					ea.postEvent(new Event(topic, (Dictionary) properties));
+				} catch (SecurityException e) {
+					activator.debug(e);
+				}
+			} catch (IllegalStateException e) {
 				activator.debug(e);
 			}
-		} catch (IllegalStateException e) {
-			activator.debug(e);
 		}
 	}
 
@@ -585,26 +583,10 @@ public class XmlRegistry implements IEntityRegistry {
 	}
 
 	/**
-	 * The Bundle context is used to throw OSGi events.
-	 * 
-	 * @param context define the Bundle context associated to this service.
-	 */
-	public void setContext(BundleContext context) {
-		this.context = context;
-	}
-
-	/**
-	 * @return the bundle context associated to this service. May be null.
-	 */
-	public BundleContext getContext() {
-		return context;
-	}
-
-	/**
 	 * 
 	 * @return the Activator used to create this registry.
 	 */
-	public ILoggedPlugin getActivator() {
+	public AbstractActivator getActivator() {
 		return activator;
 	}
 

@@ -34,8 +34,7 @@ public class Activator extends AbstractFileRepositoryActivator {
 	public void start(BundleContext bundleContext) throws Exception {
 		super.start(bundleContext);
 		registry = new XmlRegistry(this);
-		registry.setContext(bundleContext);
-		rbl = new RegistryBundleListener(this,registry);
+		rbl = new RegistryBundleListener(this, registry);
 		// Register a Listener to hook Bundle start event.
 		bundleContext.addBundleListener(rbl);
 		// Register the Registry service for programmatically adding of Entities
@@ -44,8 +43,8 @@ public class Activator extends AbstractFileRepositoryActivator {
 
 	@Override
 	public void stop(BundleContext bundleContext) throws Exception {
-		super.stop(bundleContext);
 		bundleContext.removeBundleListener(rbl);
+		super.stop(bundleContext);
 	}
 
 	@Override
