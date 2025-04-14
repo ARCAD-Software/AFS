@@ -16,6 +16,8 @@ package com.arcadsoftware.crypt.internal;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -74,7 +76,32 @@ public class Activator implements BundleActivator {
 							}
 							if (!p.containsKey("com.arcadsoftware.masterkey.fog") && //$NON-NLS-1$
 									!p.containsKey("com.arcadsoftware.masterkey")) { //$NON-NLS-1$
-								p.put("com.arcadsoftware.masterkey.fog", Crypto.fog(temp, StandardCharsets.UTF_8)); //$NON-NLS-1$
+								boolean store = true;
+								if (p.containsKey("com.arcadsoftware.masterkey.path")) {
+									Object o = p.get("com.arcadsoftware.masterkey.path");
+									if (o != null) {
+										String s = o.toString().trim();
+										if (!s.isEmpty()) {
+											File mkf = new File(s);
+											if (!mkf.isFile()) {
+												mkf.getParentFile().mkdirs();
+												try {
+													if (mkf.createNewFile()) {
+														try (FileWriter fileWriter = new FileWriter(mkf)) {
+														    fileWriter.write(temp);
+														    store = false;
+														}
+													}
+												} catch (IOException e) {
+													// no log accessible here. 
+												}
+											}
+										}
+									}
+								}
+								if (store) {
+									p.put("com.arcadsoftware.masterkey.fog", Crypto.fog(temp, StandardCharsets.UTF_8)); //$NON-NLS-1$
+								}
 							}
 							if (!p.containsKey("com.arcadsoftware.salt.min.size")) { //$NON-NLS-1$
 								p.put("com.arcadsoftware.salt.min.size", Integer.toString(Crypto.SALTMINSIZE)); //$NON-NLS-1$
