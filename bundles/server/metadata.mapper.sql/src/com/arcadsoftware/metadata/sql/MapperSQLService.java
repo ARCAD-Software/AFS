@@ -954,6 +954,9 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 			boolean deleted, ISearchCriteria criteria, boolean distinct, boolean ignoreSubdivision, 
 			List<ReferenceLine> orders, int page, int limit, SQLCriteriaContext context) {
 		EntityInfo ei = getEntityInfo(links.get(0).getParent());
+		if (ei == null) {
+			return null;
+		}
 		final String mlqc = MultiLinkQuery.getCode(links, deleted, ignoreSubdivision);
 		MultiLinkQuery mlq = ei.sql_links.get(mlqc);
 		if (mlq == null) {
@@ -1078,6 +1081,9 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 			return false;
 		}
 		EntityInfo ei = getEntityInfo(links.get(0).getParent());
+		if (ei == null) {
+			return false;
+		}
 		final String mlqc = MultiLinkQuery.getCode(links, false, ignoreSubdivision);
 		MultiLinkQuery mlq = ei.sql_links.get(mlqc);
 		if (mlq == null) {
@@ -1119,6 +1125,9 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 	protected int doLinkCount(List<MetaDataLink> links, int sourceId, boolean deleted,  boolean ignoreSubdivision, ISearchCriteria criteria,
 			boolean distinct, SQLCriteriaContext context) {
 		EntityInfo ei = getEntityInfo(links.get(0).getParent());
+		if (ei == null) {
+			return 0;
+		}
 		final String mlqc = MultiLinkQuery.getCode(links, deleted, ignoreSubdivision);
 		MultiLinkQuery mlq = ei.sql_links.get(mlqc);
 		if (mlq == null) {
@@ -1136,9 +1145,13 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		final StringBuilder where;
 		final String col;
 		if (e == null) {
+			// Link to foreign entity...
 			col = fg.count;
-			where = new StringBuilder(mlq.where);
-			// Link "extra-mapper"...
+			if (!mlq.where.isEmpty()) {
+				where = new StringBuilder(mlq.where);
+			} else {
+				where = new StringBuilder(fg.true_cond);
+			}
 			// FIXME This ignore the distinct constraint !!!
 			// FIXME Ignore the criteria clause !!!
 			// FIXME This assume that the linked data are not deleted !!!
@@ -1150,7 +1163,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 			} else {
 				col = fg.count;
 			}
-			where = context.generateCriteria(criteria, deleted);
+			where = context.generateCriteria(criteria, true);
 			if (!mlq.where.isEmpty()) {
 				if (!where.isEmpty()) {
 					where.append(fg.and);
