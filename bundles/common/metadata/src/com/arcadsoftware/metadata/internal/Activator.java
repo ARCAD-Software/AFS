@@ -13,7 +13,9 @@
  *******************************************************************************/
 package com.arcadsoftware.metadata.internal;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -21,7 +23,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import org.eclipse.osgi.framework.console.CommandInterpreter;
 import org.eclipse.osgi.framework.console.CommandProvider;
 import org.osgi.framework.BundleContext;
@@ -32,6 +33,7 @@ import org.osgi.service.event.EventAdmin;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import org.restlet.data.Language;
+import org.restlet.resource.ResourceException;
 
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
@@ -112,6 +114,7 @@ public class Activator extends AbstractConfiguredActivator implements ServiceTra
 				return service;
 			}
 		});
+		// Register an Equinox Console command provider.
 		registerService(CommandProvider.class.getName(), this);
 	}
 
@@ -564,6 +567,10 @@ public class Activator extends AbstractConfiguredActivator implements ServiceTra
 	public void _entities(CommandInterpreter ci) throws Exception {
 		String param = ci.nextArgument();
 		if (param != null) {
+			if ("check".equalsIgnoreCase(param)) {
+				_entities_check(ci);
+				return;
+			}
 			if ("count".equalsIgnoreCase(param) || "cnt".equalsIgnoreCase(param)) {
 				ci.println("Data Counts:");
 				for (MetaDataEntity entity: getEntities()) {
@@ -591,6 +598,10 @@ public class Activator extends AbstractConfiguredActivator implements ServiceTra
 		}
 		MetaDataEntity entity = getEntity(type);
 		if (entity == null) {
+			if ("check".equalsIgnoreCase(type)) {
+				_entities_check(ci);
+				return;
+			}
 			ci.println(String.format("The entity \"%s\" is not registered.", type));
 			return;
 		}
@@ -765,6 +776,247 @@ public class Activator extends AbstractConfiguredActivator implements ServiceTra
 			ci.println("Unknown command: " + cmd);
 		} finally {
 			ci.println(String.format("Timing: %dms.", System.currentTimeMillis() - t));
+		}
+	}
+
+	public void _entity_check(CommandInterpreter ci) throws Exception {
+		_entities_check(ci);
+	}
+
+	public void _entities_check(CommandInterpreter ci) throws Exception {
+		String type = ci.nextArgument();
+		ci.println();
+		ci.println("This command allow to verify the current declaration of the MetaData Entities.");
+		ci.println("The result of this test depend on your current installation and the storage source (i.e. the database).");
+		ci.println("Some error related to this test may be only reported in the server log, and not in the console.");
+		ci.println("Please check your server log if it is not printed in this console.");
+		ci.println("[Comments into bracket are not necessarily a problem.]");
+		ci.println();
+		if (type != null) {
+			checkEntity(ci, getEntity(type));
+			ci.println();
+		} else {
+			for(MetaDataEntity e: getEntities()) {
+				checkEntity(ci, e);
+				ci.println();
+			}
+		}
+		ci.println("Verification terminated.");
+	}
+	
+	private void checkEntity(CommandInterpreter ci, MetaDataEntity entity) {
+		if (entity != null) {
+			ci.println(String.format("Diagnose the entity %s (Version %d), problems if any:", entity.getType(), entity.getVersion()));
+			boolean nopb = true;
+			if (entity.getMapper() == null) {
+				ci.println("  - No mapper available for domain: " + entity.getDomain());
+				nopb = false;
+			} else {
+				try {
+					int c = entity.dataCount(true, null, false, null);
+					if (c == 0) {
+						ci.println("  - [Empty entity in the storage source...]");
+						nopb = false;
+					}
+					int id = 0;
+					try {
+						BeanMapList list = entity.dataSelection(entity.getAllAttributes(), true, null, false, null, null, 0, 1);
+						if (list == null) {
+							ci.println("  - [Entity selection return null list...]");
+							nopb = false;
+						}
+						if (!list.isEmpty()) {
+							id = list.get(0).getId();
+						}
+						if (!entity.isReadOnly()) {
+							ArrayList<MetaDataAttribute> attributes = new ArrayList<>();
+							ArrayList<Object> values = new ArrayList<>();
+							boolean skip = false;
+							for (MetaDataAttribute a: entity.getAttributes().values()) {
+								if (!a.isLocalReference() && (a.getRefEntity() != null)) {
+									ci.println("  - [Attribute referencing foreign entity may slow down the data access: " + a.getCode() + ']');
+									nopb = false;
+								}
+								if (!a.isReadonly()) {
+									MetaDataEntity ref = a.getRefEntity();
+									if (ref != null) {
+										list = ref.dataSelection("", true, null, false, null, null, 0, 1);
+										if ((list == null) || list.isEmpty()) {
+											if (a.isMandatory()) {
+												ci.println("  - [Mandatory data can not be provided for the attribute: " + a.getCode() + ']');
+												nopb = false;
+												skip = true;
+											}
+										} else {
+											attributes.add(a);
+											values.add(list.get(0).getId());
+										}
+									} else if (a.isSimpleType()) {
+										switch(a.getType()) {
+										case MetaDataAttribute.TYPE_BOOLEAN:
+											attributes.add(a);
+											values.add(true);
+											break;
+										case MetaDataAttribute.TYPE_DATE:
+											attributes.add(a);
+											values.add(new Date());
+											break;
+										case MetaDataAttribute.TYPE_FLOAT:
+											attributes.add(a);
+											values.add(0.0d);
+											break;
+										case MetaDataAttribute.TYPE_ICON:
+										case MetaDataAttribute.TYPE_INT:
+										case MetaDataAttribute.TYPE_INTEGER:
+											attributes.add(a);
+											values.add(1);
+											break;
+										case MetaDataAttribute.TYPE_BIGINTEGER:
+											attributes.add(a);
+											values.add(BigInteger.valueOf(1l));
+											break;
+										case MetaDataAttribute.TYPE_LONG:
+											attributes.add(a);
+											values.add(1l);
+											break;
+										case MetaDataAttribute.TYPE_RANGE:
+											int i = 1;
+											if (a.getLength() > a.getPrecision()) {
+												if (i > a.getLength()) {
+													i = a.getLength();
+												} else if (i < a.getPrecision()) {
+													i = a.getPrecision();
+												}
+												attributes.add(a);
+												values.add(i);
+											} else {
+												ci.println("  - [Range attribute do not provide a correct set of acceptable values: " + a.getCode() + ']');
+												nopb = false;
+												if (a.isMandatory()) {
+													skip = true;
+												}
+											}
+											break;
+										case MetaDataAttribute.TYPE_EMAIL:
+											attributes.add(a);
+											values.add("contact@test.net"); //$NON-NLS-1$
+											break;
+										case MetaDataAttribute.TYPE_URL:
+											attributes.add(a);
+											values.add("https://www.arcadsoftware.com"); //$NON-NLS-1$
+											break;
+										case MetaDataAttribute.TYPE_STRING:
+											attributes.add(a);
+											if (a.getLength() > 0) {
+												values.add("x".repeat(a.getLength()));
+											} else {
+												ci.println(String.format("  - [The String attribute \"%s\" does not define a string limit length.]", a.getCode()));
+												nopb = false;
+												values.add("z");
+											}
+											break;
+										case MetaDataAttribute.TYPE_TRANSLATE:
+											break;
+										default:
+											ci.println(String.format("  - [Unkown simple type \"%s\" (contact AFS dev team).]", a.getType()));
+											nopb = false;
+											if (a.isMandatory()) {
+												skip = true;
+											}
+										}
+									} else {
+										ci.println(String.format("  - The attribute \"%s\" reference an unkown type \"%s\".", a.getCode(), a.getType()));
+										nopb = false;
+										if (a.isMandatory()) {
+											skip = true;
+										}
+									}
+								}
+							}
+							if (!skip) {
+								try {
+									BeanMap b = entity.dataCreate(attributes, values);
+									if (b == null) {
+										ci.println("  - Unable to create data with this attribute list [may be due to unique constraints...]: " + attributes.toString());
+										ci.println("    - with these values: " + values.toString());
+										nopb = false;
+									} else if (b.getId() <= 0) {
+										ci.println("  - Data creation returned an invalid ID, with this attribute list: " + attributes.toString());
+										ci.println("    - with these values: " + values.toString());
+										nopb = false;
+									} else {
+										try {
+											entity.dataDelete(b.getId(), true);
+										} catch (Throwable e) {
+											nopb = false;
+											ci.println("  - Unable to delete data with id: " + b.getId());
+											ci.println("    - with these values: " + values.toString());
+											if ((e.getCause() == null) || !(e instanceof ResourceException)) { 
+												ci.println("    - " + e.getLocalizedMessage());
+											}
+											while (e.getCause() != null) {
+												e = e.getCause();
+												ci.println("    - " + e.getLocalizedMessage());
+											}
+										}
+									}
+								} catch (Throwable e) {
+									nopb = false;
+									ci.println("  - Unable to create data with this attribute list [may be due to unique constraints...]: " + attributes.toString());
+									ci.println("    - with these values: " + values.toString());
+									if ((e.getCause() == null) || !(e instanceof ResourceException)) { 
+										ci.println("    - " + e.getLocalizedMessage());
+									}
+									while (e.getCause() != null) {
+										e = e.getCause();
+										ci.println("    - " + e.getLocalizedMessage());
+									}
+								}
+							}
+						}
+					} catch (Throwable e) {
+						nopb = false;
+						ci.println("  - Unable to select the attributes of the entity.");
+						if ((e.getCause() == null) || !(e instanceof ResourceException)) { 
+							ci.println("    - " + e.getLocalizedMessage());
+						}
+						while (e.getCause() != null) {
+							e = e.getCause();
+							ci.println("    - " + e.getLocalizedMessage());
+						}
+					}
+					if (id > 0) {
+						for (MetaDataLink link: entity.getLinks().values()) {
+							try {
+								link.dataCount(id);
+							} catch (Throwable e) {
+								nopb = false;
+								ci.println("  - Unable to reach the linked data: " + link.getCode());
+								if ((e.getCause() == null) || !(e instanceof ResourceException)) { 
+									ci.println("    - " + e.getLocalizedMessage());
+								}
+								while (e.getCause() != null) {
+									e = e.getCause();
+									ci.println("    - " + e.getLocalizedMessage());
+								}
+							}
+						}
+					}
+				} catch (Throwable e) {
+					nopb = false;
+					ci.println("  - Unable to reach the data of this entity on domain: " + entity.getDomain());
+					if ((e.getCause() == null) || !(e instanceof ResourceException)) { 
+						ci.println("    - " + e.getLocalizedMessage());
+					}
+					while (e.getCause() != null) {
+						e = e.getCause();
+						ci.println("    - " + e.getLocalizedMessage());
+					}
+				}
+			}
+			if (nopb) {
+				ci.println("  No problem found.");
+			}
 		}
 	}
 
