@@ -4,12 +4,6 @@
 	<param id="background-color-swt" value="22" />
 	<composite fillBoth="true" withMargin="true" border="false">
 		<input attribute="name" mandatory="true" />
-		<comboFixedValue attribute="keytype" readOnly="true">
-			<!-- Support for EdDSA suspended until we move to Java 17
-			<item index="0" value="EdDSA" />
-			 -->
-			<item index="0" value="RSA" />			
-		</comboFixedValue>
 		<input attribute="passphrase" isPassword="true" />
 		<input attribute="keycomment" />
 	</composite>
