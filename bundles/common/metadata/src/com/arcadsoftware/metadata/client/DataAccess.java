@@ -412,7 +412,7 @@ public class DataAccess {
 					result.setContent(rep.getText());
 				} catch (IOException e) {
 					if (activator != null) {
-						activator.log(e);
+						activator.info(e);
 					}
 				}
 				result.setLastModification(rep.getModificationDate());
@@ -486,7 +486,7 @@ public class DataAccess {
 					result.setContent(rep.getText());
 				} catch (IOException e) {
 					if (activator != null) {
-						activator.log(e);
+						activator.info(e);
 					}
 				}
 				result.setLastModification(rep.getModificationDate());
@@ -1873,7 +1873,7 @@ public class DataAccess {
 				return s;
 			} catch (IOException e) {
 				if (activator != null) {
-					activator.log(e);
+					activator.info(e);
 				}
 			} finally {
 				try {

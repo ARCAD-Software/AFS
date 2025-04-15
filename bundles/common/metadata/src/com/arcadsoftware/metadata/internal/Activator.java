@@ -952,11 +952,11 @@ public class Activator extends AbstractConfiguredActivator implements ServiceTra
 											ci.println("  - Unable to delete data with id: " + b.getId());
 											ci.println("    - with these values: " + values.toString());
 											if ((e.getCause() == null) || !(e instanceof ResourceException)) { 
-												ci.println("    - " + e.getLocalizedMessage());
+												ci.println("    - " + e.getLocalizedMessage()); //$NON-NLS-1$
 											}
 											while (e.getCause() != null) {
 												e = e.getCause();
-												ci.println("    - " + e.getLocalizedMessage());
+												ci.println("    - " + e.getLocalizedMessage()); //$NON-NLS-1$
 											}
 										}
 									}
@@ -965,11 +965,11 @@ public class Activator extends AbstractConfiguredActivator implements ServiceTra
 									ci.println("  - Unable to create data with this attribute list [may be due to unique constraints...]: " + attributes.toString());
 									ci.println("    - with these values: " + values.toString());
 									if ((e.getCause() == null) || !(e instanceof ResourceException)) { 
-										ci.println("    - " + e.getLocalizedMessage());
+										ci.println("    - " + e.getLocalizedMessage()); //$NON-NLS-1$
 									}
 									while (e.getCause() != null) {
 										e = e.getCause();
-										ci.println("    - " + e.getLocalizedMessage());
+										ci.println("    - " + e.getLocalizedMessage()); //$NON-NLS-1$
 									}
 								}
 							}
@@ -978,26 +978,44 @@ public class Activator extends AbstractConfiguredActivator implements ServiceTra
 						nopb = false;
 						ci.println("  - Unable to select the attributes of the entity.");
 						if ((e.getCause() == null) || !(e instanceof ResourceException)) { 
-							ci.println("    - " + e.getLocalizedMessage());
+							ci.println("    - " + e.getLocalizedMessage()); //$NON-NLS-1$
 						}
 						while (e.getCause() != null) {
 							e = e.getCause();
-							ci.println("    - " + e.getLocalizedMessage());
+							ci.println("    - " + e.getLocalizedMessage()); //$NON-NLS-1$
 						}
 					}
 					if (id > 0) {
+						boolean rec = false;
 						for (MetaDataLink link: entity.getLinks().values()) {
-							try {
-								link.dataCount(id);
-							} catch (Throwable e) {
-								nopb = false;
-								ci.println("  - Unable to reach the linked data: " + link.getCode());
-								if ((e.getCause() == null) || !(e instanceof ResourceException)) { 
-									ci.println("    - " + e.getLocalizedMessage());
+							MetaDataEntity re = link.getRefEntity();
+							if (re == null) {
+								ci.println(String.format("  - Linked entity not found in link \"%s\": %s", link.getCode(), link.getType()));
+							} else if (re.getMapper() == null) {
+								ci.println(String.format("  - Linked entity not initialized in link \"%s\": %s", link.getCode(), link.getType()));
+							} else {
+								if (!link.isLocal()) {
+									ci.println(String.format("  - [Link \"%s\" defined on different domain, may not be implemented: %s <> %s", link.getCode(), link.getParent().getDomain(), re.getDomain()));
 								}
-								while (e.getCause() != null) {
-									e = e.getCause();
-									ci.println("    - " + e.getLocalizedMessage());
+								if (link.isRecursive()) {
+									if (rec) {
+										ci.println(String.format("  - [Multiple recursive link on entity \"%s\", it may have unpredictable effects.]", link.getParent().getType()));
+									} else {
+										rec = true;
+									}
+								}
+								try {
+									link.dataCount(id);
+								} catch (Throwable e) {
+									nopb = false;
+									ci.println("  - Unable to reach the linked data: " + link.getCode());
+									if ((e.getCause() == null) || !(e instanceof ResourceException)) { 
+										ci.println("    - " + e.getLocalizedMessage()); //$NON-NLS-1$
+									}
+									while (e.getCause() != null) {
+										e = e.getCause();
+										ci.println("    - " + e.getLocalizedMessage()); //$NON-NLS-1$
+									}
 								}
 							}
 						}
@@ -1006,11 +1024,11 @@ public class Activator extends AbstractConfiguredActivator implements ServiceTra
 					nopb = false;
 					ci.println("  - Unable to reach the data of this entity on domain: " + entity.getDomain());
 					if ((e.getCause() == null) || !(e instanceof ResourceException)) { 
-						ci.println("    - " + e.getLocalizedMessage());
+						ci.println("    - " + e.getLocalizedMessage()); //$NON-NLS-1$
 					}
 					while (e.getCause() != null) {
 						e = e.getCause();
-						ci.println("    - " + e.getLocalizedMessage());
+						ci.println("    - " + e.getLocalizedMessage()); //$NON-NLS-1$
 					}
 				}
 			}

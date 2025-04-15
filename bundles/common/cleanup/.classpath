@@ -3,7 +3,5 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-17"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="plugin"/>
-	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/?project=cleanup&amp;ivyXmlPath=ivy.xml&amp;confs=default%2Clibs&amp;acceptedTypes=jar%2Cbundle&amp;alphaOrder=true&amp;resolveInWorkspace=false&amp;transitiveResolve=true&amp;readOSGiMetadata=false&amp;retrievedClasspath=true&amp;retrievedClasspathPattern=lib%2F%5Bartifact%5D-%5Brevision%5D.%5Bext%5D&amp;retrievedClasspathSync=true&amp;retrievedClasspathTypes=*"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
