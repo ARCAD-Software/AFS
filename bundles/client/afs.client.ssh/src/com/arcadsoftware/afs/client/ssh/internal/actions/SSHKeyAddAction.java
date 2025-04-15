@@ -101,14 +101,8 @@ public class SSHKeyAddAction extends AbstractConnectedWizardedAddAction {
 
 	@Override
 	public boolean saveBeanMap(final BeanMap beanMap) {
-		final SSHKey sshKey = new SSHKey(beanMap);
-
-		if (sshKey.getAlgorithm().equals("1")) {
-			sshKey.setType(SSHKeyType.RSA);
-		} else {
-			sshKey.setType(SSHKeyType.EDDSA);
-		}
-
+		final SSHKey sshKey = new SSHKey(beanMap);		
+		sshKey.setType(SSHKeyType.RSA);
 		if (sshKey.isEncrypted()) {
 			sshKey.setPassphrase(Crypto.fog(sshKey.getPassphrase(), StandardCharsets.UTF_8));
 		}

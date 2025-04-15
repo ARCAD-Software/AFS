@@ -25,6 +25,7 @@ import com.arcadsoftware.afs.client.ssh.ui.dialogs.SSHPublicKeyDialog;
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
 import com.arcadsoftware.ssh.model.SSHKey;
+import com.arcadsoftware.ssh.model.SSHKeyType;
 
 public class SSHKeyOpenPublicKeyAction extends AbstractConnectedBeanMapAction {
 
@@ -53,8 +54,14 @@ public class SSHKeyOpenPublicKeyAction extends AbstractConnectedBeanMapAction {
 		return RightManager.getInstance().getExpectedRights(ISSHRights.SSHKEY_EDIT);
 	}
 
-	public void openPublicKey(final BeanMap key) {
-		new SSHPublicKeyDialog(connection, new SSHKey(key)).open();
+	public void openPublicKey(final BeanMap bean) {
+		final SSHKey key = new SSHKey(bean);
+		if(key.getType() == SSHKeyType.EDDSA) {
+			Activator.getDefault().openWarning(Activator.resString("sshkey.eddsa.support.suspended"));
+		}
+		else {
+			new SSHPublicKeyDialog(connection, key).open();
+		}
 	}
 
 	@Override
