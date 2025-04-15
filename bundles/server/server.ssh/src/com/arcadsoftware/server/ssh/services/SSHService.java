@@ -42,8 +42,8 @@ import org.apache.sshd.common.util.security.SecurityUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.log.LogService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.crypt.Crypto;
@@ -56,8 +56,8 @@ import com.arcadsoftware.ssh.model.SSHKeyUpload;
 @Component(service = SSHService.class)
 public class SSHService {
 
-	private static final String PRIVATE_KEY_FILE = "private_key";
-	private static final String KEYSTORE_DIRECTORY = "./ssh/keystore";
+	private static final String PRIVATE_KEY_FILE = "private_key"; //$NON-NLS-1$
+	private static final String KEYSTORE_DIRECTORY = System.getProperty("com.arcadsoftware.ssh.keypath", "./files/ssh/keystore"); //$NON-NLS-1$ //$NON-NLS-2$
 	private static final HashSet<PosixFilePermission> CHMOD_600 = new HashSet<>(2);
 	
 	static {
@@ -65,53 +65,44 @@ public class SSHService {
 			try {
 				Security.addProvider(new BouncyCastleProvider());
 			} catch (Exception e) {
-				System.err.println("There is a problem with Bouncy Castle (AFS will fall back to JCE implementation): " + e.getLocalizedMessage());
+				LoggerFactory.getLogger(SSHService.class).error("There is a problem with Bouncy Castle (AFS will fall back to JCE implementation): " + e.getLocalizedMessage());
 			}
 		}
 		CHMOD_600.add(PosixFilePermission.OWNER_READ);
 		CHMOD_600.add(PosixFilePermission.OWNER_WRITE);
 	}
 
+	private final Logger log = LoggerFactory.getLogger(SSHService.class);
 	private File keystoreDirectory;
-	private LogService log;
 
 	@Activate
 	private void activate() {
 		// Invoke this method here to force the loading of EdDSASecurityProviderRegistrar
 		// with the correct classloader.
-		// Otherwise, the instantiation may take place later, when the context classloader cannot
-		// provide the net.i2p.crypto.eddsa.EdDSAKey class.
 		SecurityUtils.getKeyPairResourceParser();
 		try {
 			keystoreDirectory = new File(KEYSTORE_DIRECTORY).getCanonicalFile();
 		} catch (final IOException e) {
-			if (log != null) {
-				log.log(LogService.LOG_ERROR, "Error while revolving SSH keystore", e);
-			}
+			log.error("Error while revolving SSH keystore", e);
 			keystoreDirectory = new File(KEYSTORE_DIRECTORY).getAbsoluteFile();
 		}
 	}
 
-	@Reference
-	private void bindLog(final LogService log) {
-		this.log = log;
-	}
-
 	private String computeKeyFingerprint(final KeyPair keyPair) throws IOException, GeneralSecurityException {
 		final ByteArrayOutputStream publicKeyOutput = new ByteArrayOutputStream();
-		OpenSSHKeyPairResourceWriter.INSTANCE.writePublicKey(keyPair, "", publicKeyOutput);
+		OpenSSHKeyPairResourceWriter.INSTANCE.writePublicKey(keyPair, "", publicKeyOutput); //$NON-NLS-1$
 		publicKeyOutput.close();
-		final String publicKey = publicKeyOutput.toString(StandardCharsets.UTF_8.name()).split(" ")[1].trim();
-		final MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+		final String publicKey = publicKeyOutput.toString(StandardCharsets.UTF_8.name()).split(" ")[1].trim(); //$NON-NLS-1$
+		final MessageDigest messageDigest = MessageDigest.getInstance("MD5"); //$NON-NLS-1$
 		final byte[] digest = messageDigest.digest(Base64.getDecoder().decode(publicKey));
 		final StringBuilder toRet = new StringBuilder();
 		for (int i = 0; i < digest.length; i++) {
 			if (i != 0) {
-				toRet.append(":");
+				toRet.append(':');
 			}
 			final String hex = Integer.toHexString(digest[i] & 0xff);
 			if (hex.length() == 1) {
-				toRet.append("0");
+				toRet.append('0');
 			}
 			toRet.append(hex);
 		}
@@ -146,8 +137,8 @@ public class SSHService {
 		final File keyDirectory = getSSHKeyDirectory(key);
 		if (keyDirectory.isDirectory()) {
 			for (final File file : keyDirectory.listFiles()) {
-				if (file.isFile() && !file.setWritable(true) && (log != null)) {
-					log.log(LogService.LOG_WARNING, String.format("Cannot make file %s writable", file), null);
+				if (file.isFile() && !file.setWritable(true)) {
+					log.warn(String.format("Cannot make file %s writable", file));
 				}
 			}
 			FileUtils.deleteDirectory(keyDirectory);
@@ -166,9 +157,9 @@ public class SSHService {
 			encryption = null;
 		} else {
 			encryption = new OpenSSHKeyEncryptionContext();
-			encryption.setCipherName("AES");
-			encryption.setCipherMode("CTR");
-			encryption.setCipherType("256");
+			encryption.setCipherName("AES"); //$NON-NLS-1$
+			encryption.setCipherMode("CTR"); //$NON-NLS-1$
+			encryption.setCipherType("256"); //$NON-NLS-1$
 			encryption.setPassword(sshKey.getPassphrase());
 		}
 		final ByteArrayOutputStream privateKeyOutput = new ByteArrayOutputStream();
@@ -242,7 +233,7 @@ public class SSHService {
 	}
 
 	private File getSSHKeyDirectory(final SSHKey key) {
-		return new File(keystoreDirectory, "ks" + key.getId());
+		return new File(keystoreDirectory, "ks" + key.getId()); //$NON-NLS-1$
 	}
 
 	public SSHKey importKey(final SSHKeyUpload sshKeyUpload) throws SSHException {
@@ -349,16 +340,14 @@ public class SSHService {
 		try {
 			Files.setPosixFilePermissions(keyFile.toPath(), CHMOD_600);
 		} catch (final UnsupportedOperationException e) {
-			if (log != null) {
-				if (!keyFile.setReadable(true, true)) {
-					log.log(LogService.LOG_DEBUG, "Unable to change file mode read: " + keyFile);
-				}
-				if (!keyFile.setWritable(false, false)) {
-					log.log(LogService.LOG_DEBUG, "Unable to change file mode write: " + keyFile);
-				}
-				if (!keyFile.setExecutable(false, false)) {
-					log.log(LogService.LOG_DEBUG, "Unable to change file mode execute: " + keyFile);
-				}
+			if (!keyFile.setReadable(true, true)) {
+				log.debug("Unable to change file mode read: " + keyFile);
+			}
+			if (!keyFile.setWritable(false, false)) {
+				log.debug("Unable to change file mode write: " + keyFile);
+			}
+			if (!keyFile.setExecutable(false, false)) {
+				log.debug("Unable to change file mode execute: " + keyFile);
 			}
 		}
 	}

@@ -17,10 +17,11 @@ import java.io.IOException;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.log.LogService;
 import org.restlet.data.Language;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.metadata.IMetaDataDeleteListener;
@@ -29,17 +30,11 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
 import com.arcadsoftware.server.ssh.services.SSHService;
 import com.arcadsoftware.ssh.model.SSHKey;
 
-@Component(service = { IMetaDataDeleteListener.class }, property = IMetaDataDeleteListener.PROP_TYPE + "="
-		+ SSHKey.ENTITY)
+@Component(service = { IMetaDataDeleteListener.class }, property = IMetaDataDeleteListener.PROP_TYPE + "=" + SSHKey.ENTITY)
 public class SSHKeyListener implements IMetaDataDeleteListener {
 
-	private LogService log;
+	private Logger log = LoggerFactory.getLogger(SSHKeyListener.class);
 	private SSHService sshService;
-
-	@Reference
-	private void bindLog(final LogService log) {
-		this.log = log;
-	}
 
 	@Reference
 	private void bindSSHService(final SSHService sshService) {
@@ -52,9 +47,7 @@ public class SSHKeyListener implements IMetaDataDeleteListener {
 		try {
 			sshService.deleteKeyFiles(new SSHKey(originalItem));
 		} catch (final IOException e) {
-			if (log != null) {
-				log.log(LogService.LOG_ERROR, "SSHKey postDeletion failed", e);
-			}
+			log.error("SSHKey postDeletion failed", e);
 			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
 		}
 	}
