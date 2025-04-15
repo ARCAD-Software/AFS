@@ -101,13 +101,15 @@ public class Fragments {
 	public String delete_val;
 	public String notintoselect;
 	public String inset;
-	public String recursive;
-	public String recursive_alt;
+	public String rec_first;
+	public String rec_sub;
+	public String rec;
+	public String rec_alt;
 	public String select_const;
 	public String id;
 	public String isnullex;
-	public String recursive_link;
-	public String recursive_linkdel;
+	public String rec_link;
+	public String rec_linkdel;
 	public String source;
 	public String dest;
 	

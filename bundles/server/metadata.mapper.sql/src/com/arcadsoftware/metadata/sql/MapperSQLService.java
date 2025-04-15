@@ -131,7 +131,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 			if (parentProfiles == null) {
 				return null;
 			}
-			hasRightrecursiveRequest = String.format(fg.recursive_alt, "%1$s", //$NON-NLS-1$
+			hasRightrecursiveRequest = String.format(fg.rec_alt, "%1$s", //$NON-NLS-1$
 					String.format(fg.select,
 							profileCol, // selected column
 							profileRights.table + // table + join on undeleted profiles:
@@ -768,7 +768,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 			if (l.sql_rectest == null) {
 				String rec_alias = "r_" + link.getCode(); //$NON-NLS-1$
 				if (l.sql_rec == null) {
-					l.sql_rec = String.format(fg.recursive, rec_alias, l.table, l.destCol, l.sourceCol);
+					l.sql_rec = fg.rec_first + String.format(fg.rec, rec_alias, l.table, l.destCol, l.sourceCol);
 				}
 				l.sql_rectest = l.sql_rec + ' ' +
 						String.format(fg.select, "*", rec_alias, rec_alias + ".r = ?"); //$NON-NLS-1$ //$NON-NLS-2$

@@ -392,7 +392,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 			}
 			if (deleted && ((e.deleteCol != null) || (l.deleteCol != null))) {
 				// Do not cache this request !
-				addQueryContext(alias, String.format(mapper.fg.recursive_link, alias, e.table, e.idCol, l.table, l.sourceCol, l.destCol));
+				addQueryContext(alias, String.format(mapper.fg.rec_link, alias, e.table, e.idCol, l.table, l.sourceCol, l.destCol));
 				return alias;
 			}
 			String sourceCol = l.sourceCol;
@@ -400,9 +400,9 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 				sourceCol += mapper.fg.and + "z." + l.deleteCol + mapper.fg.equaldelfalse;
 			}
 			if ((e.deleteCol != null) && !deleted) {
-				e.sql_subselect = String.format(mapper.fg.recursive_link, alias, e.table, e.idCol, e.deleteCol, l.table, sourceCol, l.destCol);
+				e.sql_subselect = String.format(mapper.fg.rec_link, alias, e.table, e.idCol, e.deleteCol, l.table, sourceCol, l.destCol);
 			} else {
-				e.sql_subselect = String.format(mapper.fg.recursive_link, alias, e.table, e.idCol, l.table, sourceCol, l.destCol);
+				e.sql_subselect = String.format(mapper.fg.rec_link, alias, e.table, e.idCol, l.table, sourceCol, l.destCol);
 			}
 		}
 		addQueryContext(alias, e.sql_subselect);
@@ -940,7 +940,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 		}
 		// Add the not deleted test to the where clause.
 		if (!deleted && (entityInfo.deleteCol != null)) {
-			if (mapper.fg.true_cond.equals(result)) {
+			if (mapper.fg.true_cond.equals(result.toString())) {
 				result.setLength(0);
 			} else if (result.length() > 0) {
 				result.append(mapper.fg.and);
@@ -989,7 +989,14 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 	 */
 	protected String formatQuery(String format, Object... objects) {
 		StringBuilder sb = new StringBuilder();
+		boolean first = true;
 		for (String q: queryContextes.values()) {
+			if (first) {
+				first = false;
+				sb.append(mapper.fg.rec_first);
+			} else {
+				sb.append(mapper.fg.rec_sub);
+			}
 			sb.append(q);
 			sb.append(' ');
 		}

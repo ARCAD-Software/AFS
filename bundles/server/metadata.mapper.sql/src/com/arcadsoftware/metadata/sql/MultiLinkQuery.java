@@ -145,7 +145,7 @@ public class MultiLinkQuery {
 		StringBuilder joins = null;
 		StringBuilder where = null;
 		String rec_alias = null;
-		String rec_query = ""; //$NON-NLS-1$
+		StringBuilder rec_query = new StringBuilder();
 		String prev_col = null;
 		String prev_alias = null;
 		int alias = initial;
@@ -167,78 +167,89 @@ public class MultiLinkQuery {
 				break;
 			}
 			final String la = DEFAULT_LINKALIASPREFIX + alias++;
-			// Process recursive link based on the current parent entity...
-			final MetaDataLink recLink = cse.getFirstRecursiveLink();
-			if ((recLink != null) && !ignoreSubdivision) {
-				final LinkInfo rli = csei.links.get(recLink.getCode());
-				// If the recursive link is unknown or incomplete, process like a normal link.
-				if ((rli != null) && rli.isComplete()) {
-					rec_alias = RECURCIVE_PREFIX + alias;
-					final String firstSelect;
-					if (joins == null) {
-						firstSelect = mapper.fg.select_const;
-					} else {
-						// check if current entity items are not deleted too.
-						if ((!deleted) && (csei.deleteCol != null)) {
-							final String talias = DEFAULT_LINKALIASPREFIX + alias++;
-							joins.append(String.format(mapper.fg.join_inner, csei.table, talias, csei.idCol, prev_alias + '.' + prev_col));
-							joins.append(' ');
-							joins.append(mapper.fg.and);
-							joins.append(talias);
-							joins.append('.');
-							joins.append(csei.deleteCol);
-							joins.append(mapper.fg.equaldelfalse);
+			// Ignore recursive link if the current link is a non recursive link but with same target. 
+			if (l.isRecursive() || !cse.getType().equals(l.getType())) {
+				// Process recursive link based on the current parent entity...
+				final MetaDataLink recLink = cse.getFirstRecursiveLink();
+				if ((recLink != null) && !ignoreSubdivision) {
+					final LinkInfo rli = csei.links.get(recLink.getCode());
+					// If the recursive link is unknown or incomplete, process like a normal link.
+					if ((rli != null) && rli.isComplete()) {
+						rec_alias = RECURCIVE_PREFIX + alias;
+						final String firstSelect;
+						if (joins == null) {
+							firstSelect = mapper.fg.select_const;
+						} else {
+							// check if current entity items are not deleted too.
+							if ((!deleted) && (csei.deleteCol != null)) {
+								final String talias = DEFAULT_LINKALIASPREFIX + alias++;
+								joins.append(String.format(mapper.fg.join_inner, csei.table, talias, csei.idCol, prev_alias + '.' + prev_col));
+								joins.append(' ');
+								joins.append(mapper.fg.and);
+								joins.append(talias);
+								joins.append('.');
+								joins.append(csei.deleteCol);
+								joins.append(mapper.fg.equaldelfalse);
+							}
+							if ((where == null) || where.isEmpty()) {
+								firstSelect = String.format(mapper.fg.selectall, prev_alias + '.' + prev_col + mapper.fg.asid, joins.toString());
+							} else {
+								firstSelect = String.format(mapper.fg.select, prev_alias + '.' + prev_col + mapper.fg.asid, joins.toString(),
+										where.toString());
+							}
 						}
-						firstSelect = String.format(mapper.fg.select,
-								prev_alias + '.' + prev_col + mapper.fg.asid, joins.toString(),
-								where.toString());
+						final StringBuilder del = new StringBuilder();
+						if (!deleted) {
+							if (rli.deleteCol != null) {
+								del.append(mapper.fg.and);
+								del.append(LNKALS_INRECQUERY);
+								del.append('.');
+								del.append(rli.deleteCol);
+								del.append(mapper.fg.equaldelfalse);
+							}
+							// Test if the sub-elements are not deleted too.
+							if ((joins != null) && (csei.deleteCol != null)) {
+								final String talias = LNKALS_INRECQUERY + DEFAULT_LINKALIASPREFIX + alias++;
+								del.append(String.format(mapper.fg.join_inner, csei.table, talias, csei.idCol,
+										LNKALS_INRECQUERY + '.' + rli.sourceCol));
+								del.append(' ');
+								del.append(mapper.fg.and);
+								del.append(talias);
+								del.append('.');
+								del.append(csei.deleteCol);
+								del.append(mapper.fg.equaldelfalse);
+							}
+						}
+						if (rec_query.isEmpty()) {
+							rec_query.append(mapper.fg.rec_first);
+						} else {
+							rec_query.append(mapper.fg.rec_sub);
+						}
+						rec_query.append(String.format(mapper.fg.rec_alt, rec_alias, firstSelect, // 
+								rli.table, rli.destCol, rli.sourceCol, del.toString()));
+						// Reinitialize the joins chains from the recursive table,
+						joins = new StringBuilder(rec_alias);
+						where = new StringBuilder();
+						if (recLink.getCode().equals(l.getCode())) {
+							// The current link is the recursive one so we already have the target selection.
+							prev_alias = rec_alias;
+							prev_col = mapper.fg.id;
+						} else {
+							// And add the current link to the final selection.
+							prev_alias = la;
+							prev_col = cli.destCol;
+							joins.append(String.format(mapper.fg.join_inner, cli.table, la, cli.sourceCol, //
+									rec_alias + '.' + mapper.fg.id));
+							if ((!deleted) && (cli.deleteCol != null)) {
+								joins.append(mapper.fg.and);
+								joins.append(la);
+								joins.append('.');
+								joins.append(cli.deleteCol);
+								joins.append(mapper.fg.equaldelfalse);
+							}
+						}
+						continue;
 					}
-					final StringBuilder del = new StringBuilder();
-					if (!deleted) {
-						if (rli.deleteCol != null) {
-							del.append(mapper.fg.and);
-							del.append(LNKALS_INRECQUERY);
-							del.append('.');
-							del.append(rli.deleteCol);
-							del.append(mapper.fg.equaldelfalse);
-						}
-						// Test if the sub-elements are not deleted too.
-						if ((joins != null) && (csei.deleteCol != null)) {
-							final String talias = LNKALS_INRECQUERY + DEFAULT_LINKALIASPREFIX + alias++;
-							del.append(String.format(mapper.fg.join_inner, csei.table, talias, csei.idCol,
-									LNKALS_INRECQUERY + '.' + rli.sourceCol));
-							del.append(' ');
-							del.append(mapper.fg.and);
-							del.append(talias);
-							del.append('.');
-							del.append(csei.deleteCol);
-							del.append(mapper.fg.equaldelfalse);
-						}
-					}
-					rec_query += String.format(mapper.fg.recursive_alt, rec_alias, firstSelect, // 
-							rli.table, rli.destCol, rli.sourceCol, del.toString());
-					// Reinitialize the joins chains from the recursive table,
-					joins = new StringBuilder(rec_alias);
-					where = new StringBuilder();
-					if (recLink.getCode().equals(l.getCode())) {
-						// The current link is the recursive one so we already have the target selection.
-						prev_alias = rec_alias;
-						prev_col = mapper.fg.id;
-					} else {
-						// And add the current link to the final selection.
-						prev_alias = la;
-						prev_col = cli.destCol;
-						joins.append(String.format(mapper.fg.join_inner, cli.table, la, cli.sourceCol, //
-								rec_alias + '.' + mapper.fg.id));
-						if ((!deleted) && (cli.deleteCol != null)) {
-							joins.append(mapper.fg.and);
-							joins.append(la);
-							joins.append('.');
-							joins.append(cli.deleteCol);
-							joins.append(mapper.fg.equaldelfalse);
-						}
-					}
-					continue;
 				}
 			}
 			if (joins == null) {
@@ -325,8 +336,13 @@ public class MultiLinkQuery {
 						final String firstSelect = String.format(mapper.fg.select,
 								prev_alias + '.' + prev_col + mapper.fg.asid, joins.toString(),
 								where.toString());
-						rec_query += String.format(mapper.fg.recursive_alt, rec_alias, firstSelect, rfli.table,
-								rfli.destCol, rfli.sourceCol, del.toString());
+						if (rec_query.isEmpty()) {
+							rec_query.append(mapper.fg.rec_first);
+						} else {
+							rec_query.append(mapper.fg.rec_sub);
+						}
+						rec_query.append(String.format(mapper.fg.rec_alt, rec_alias, firstSelect, rfli.table,
+								rfli.destCol, rfli.sourceCol, del.toString()));
 						// Reinitialize the joins chains from the recursive table,
 						joins = new StringBuilder(rec_alias);
 						where = new StringBuilder();
@@ -336,7 +352,7 @@ public class MultiLinkQuery {
 				}
 			}
 		}
-		return new MultiLinkQuery(alias + 1, joins.toString(), where.toString(), rec_alias, rec_query, prev_alias, prev_col);
+		return new MultiLinkQuery(alias + 1, joins.toString(), where.toString(), rec_alias, rec_query.toString(), prev_alias, prev_col);
 	}
 	
 	public final int nextIncrement;
