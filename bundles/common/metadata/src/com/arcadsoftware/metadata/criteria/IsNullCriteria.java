@@ -51,7 +51,7 @@ public class IsNullCriteria extends AbstractSearchCriteria implements Cloneable,
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public IsNullCriteria clone() {
 		return new IsNullCriteria(attribute);
 	}
 

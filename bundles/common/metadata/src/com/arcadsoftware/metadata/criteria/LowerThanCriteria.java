@@ -78,7 +78,7 @@ public class LowerThanCriteria extends AbstractSearchCriteria implements Cloneab
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public LowerThanCriteria clone() {
 		return new LowerThanCriteria(attribute,value);
 	}
 

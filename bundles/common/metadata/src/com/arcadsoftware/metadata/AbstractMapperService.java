@@ -96,14 +96,14 @@ public abstract class AbstractMapperService<T extends ICriteriaContext> implemen
 	 * @see IMapperService#PROP_SUPPORT_SOFTDELETION
 	 */
 	public static Dictionary<String, Object> mapperProperties(String domainMame, boolean softdeletion, boolean pagination,
-			boolean multilink, boolean extrarefs, boolean groups) {
+			boolean multilink, boolean extrarefs, boolean subdivisions) {
 		final Hashtable<String, Object> props = new Hashtable<>();
 		props.put(PROP_DOMAINNAME, domainMame);
 		props.put(PROP_SUPPORT_SOFTDELETION, softdeletion);
 		props.put(PROP_SUPPORT_PAGINATION, pagination);
 		props.put(PROP_SUPPORT_MULTILINKREFERENCES, multilink);
 		props.put(PROP_SUPPORT_EXTRAREFERENCES, extrarefs);
-		props.put(PROP_SUPPORT_GROUPSENTITY, groups);
+		props.put(PROP_SUPPORT_SUBDIVISIONS, subdivisions);
 		return props;
 	}
 
@@ -556,142 +556,249 @@ public abstract class AbstractMapperService<T extends ICriteriaContext> implemen
 
 	@Override
 	public final BeanMap create(BeanMap item) {
+		return create(item, null);
+	}
+
+	@Override
+	public final BeanMap create(BeanMap item, IConnectionUserBean currentUser) {
 		final MetaDataEntity entity = getEntity(item.getType());
 		if (entity == null) {
 			return null;
 		}
 		final List<MetaDataAttribute> attlist = new ArrayList<>();
-		return create(entity, attlist, entity.getValues(item, attlist));
+		return create(entity, attlist, entity.getValues(item, attlist), currentUser);
 	}
 
 	@Override
 	public final BeanMap create(String type, String attributes, List<Object> values) {
+		return create(type, attributes, values, null);
+	}
+
+	@Override
+	public final BeanMap create(String type, String attributes, List<Object> values, IConnectionUserBean currentUser) {
 		final MetaDataEntity entity = getEntity(type);
 		if (entity == null) {
 			return null;
 		}
-		return create(entity, entity.getAttributes(attributes), values);
+		return create(entity, entity.getAttributes(attributes), values, currentUser);
 	}
 
 	@Override
 	public BeanMap create(MetaDataEntity entity, String attributes, Object... values) {
-		return create(entity, entity.getAttributes(attributes), list(values));
+		return create(entity, null, attributes, values);
+	}
+
+	@Override
+	public BeanMap create(MetaDataEntity entity, IConnectionUserBean currentUser, String attributes, Object... values) {
+		return create(entity, entity.getAttributes(attributes), list(values), currentUser);
 	}
 
 	@Override
 	public final BeanMap create(MetaDataEntity entity, String attributes, List<Object> values) {
+		return create(entity, attributes, values, null);
+	}
+
+	@Override
+	public final BeanMap create(MetaDataEntity entity, String attributes, List<Object> values, IConnectionUserBean currentUser) {
 		return create(entity, entity.getAttributes(attributes), values);
 	}
 
 	@Override
 	public final BeanMap create(MetaDataAttribute attribute, Object value) {
+		return create(attribute, value, (IConnectionUserBean) null);
+	}
+
+	@Override
+	public final BeanMap create(MetaDataAttribute attribute, Object value, IConnectionUserBean currentUser) {
 		if (attribute == null) {
 			return null;
 		}
-		return create(attribute.getParent(), list(attribute), list(value));
+		return create(attribute.getParent(), list(attribute), list(value), currentUser);
 	}
 
 	@Override
 	public final BeanMap create(List<MetaDataAttribute> attributes, List<Object> values) {
+		return create(attributes, values, null);
+	}
+
+	@Override
+	public final BeanMap create(List<MetaDataAttribute> attributes, List<Object> values, IConnectionUserBean currentUser) {
 		if ((attributes == null) || (attributes.size() == 0)) {
 			return null;
 		}
-		return create(attributes.get(0).getParent(), attributes, values);
+		return create(attributes.get(0).getParent(), attributes, values, currentUser);
+	}
+
+	@Override
+	public final BeanMap create(MetaDataEntity entity, List<MetaDataAttribute> attributes, List<Object> values) {
+		return create(entity, attributes, values, null);
 	}
 
 	@Override
 	public final boolean delete(BeanMap item, boolean hardDelete) {
+		return delete(item, hardDelete, null);
+	}
+
+	@Override
+	public final boolean delete(BeanMap item, boolean hardDelete, IConnectionUserBean currentUser) {
 		final MetaDataEntity entity = getEntity(item.getType());
 		if (entity == null) {
 			return false;
 		}
-		return delete(entity, item.getId(), hardDelete);
+		return delete(entity, item.getId(), hardDelete, currentUser);
 	}
 
 	@Override
 	public final boolean delete(String type, int itemId, boolean hardDelete) {
+		return delete(type, itemId, hardDelete, null);
+	}
+
+	@Override
+	public final boolean delete(String type, int itemId, boolean hardDelete, IConnectionUserBean currentUser) {
 		final MetaDataEntity entity = getEntity(type);
 		if (entity == null) {
 			return false;
 		}
-		return delete(entity, itemId, hardDelete);
+		return delete(entity, itemId, hardDelete, currentUser);
+	}
+	
+	@Override
+	public boolean delete(MetaDataEntity entity, int itemId, boolean hardDelete) {
+		return delete(entity, itemId, hardDelete, null);
 	}
 
 	@Override
 	public final boolean undelete(BeanMap item) {
+		return undelete(item, null);
+	}
+
+	@Override
+	public final boolean undelete(BeanMap item, IConnectionUserBean currentUser) {
 		final MetaDataEntity entity = getEntity(item.getType());
 		if (entity == null) {
 			return false;
 		}
-		return undelete(entity, item.getId());
+		return undelete(entity, item.getId(), currentUser);
 	}
 
 	@Override
 	public final boolean undelete(String type, int itemId) {
+		return undelete(type, itemId, null);
+	}
+
+	@Override
+	public final boolean undelete(String type, int itemId, IConnectionUserBean currentUser) {
 		final MetaDataEntity entity = getEntity(type);
 		if (entity == null) {
 			return false;
 		}
-		return undelete(entity, itemId);
+		return undelete(entity, itemId, currentUser);
 	}
 
+	// Default Implementation...
+	@Override
+	public boolean undelete(MetaDataEntity entity, int itemId) {
+		return undelete(entity, itemId, null);
+	}
+
+	// Default Implementation...
+	@Override
+	public boolean undelete(MetaDataEntity entity, int itemId, IConnectionUserBean currentUser) {
+		return false;
+	}
+	
 	@Override
 	public final boolean update(BeanMap item) {
+		return update(item, null);
+	}
+	
+	@Override
+	public final boolean update(BeanMap item, IConnectionUserBean currentUser) {
 		final MetaDataEntity entity = getEntity(item.getType());
 		if (entity == null) {
 			return false;
 		}
 		final List<MetaDataAttribute> attributes = new ArrayList<>();
-		return update(entity, item.getId(), attributes, entity.getValues(item, attributes));
+		return update(entity, item.getId(), attributes, entity.getValues(item, attributes), currentUser);
 	}
 
 	@Override
 	public final boolean update(String type, int itemId, String attributes, List<Object> values) {
+		return update(type, itemId, attributes, values, null);
+	}
+
+	@Override
+	public final boolean update(String type, int itemId, String attributes, List<Object> values, IConnectionUserBean currentUser) {
 		final MetaDataEntity entity = getEntity(type);
 		if (entity == null) {
 			return false;
 		}
-		return update(entity, itemId, entity.getAttributes(attributes), values);
+		return update(entity, itemId, entity.getAttributes(attributes), values, currentUser);
 	}
 
 	@Override
 	public final boolean update(MetaDataEntity entity, int itemId, String attributes, List<Object> values) {
-		return update(entity, itemId, entity.getAttributes(attributes), values);
+		return update(entity, itemId, entity.getAttributes(attributes), values, null);
+	}
+
+	@Override
+	public final boolean update(MetaDataEntity entity, int itemId, String attributes, List<Object> values, IConnectionUserBean currentUser) {
+		return update(entity, itemId, entity.getAttributes(attributes), values, currentUser);
 	}
 
 	@Override
 	public boolean update(MetaDataEntity entity, int itemId, String attributes, Object... values) {
-		return update(entity, itemId, entity.getAttributes(attributes), list(values));
+		return update(entity, itemId, entity.getAttributes(attributes), list(values), null);
+	}
+
+	@Override
+	public final boolean update(MetaDataEntity entity, IConnectionUserBean currentUser, int itemId, String attributes, Object... values) {
+		return update(entity, itemId, entity.getAttributes(attributes), list(values), currentUser);
 	}
 
 	@Override
 	public final boolean update(int itemId, MetaDataAttribute attribute, Object value) {
-		if (attribute == null) {
-			return false;
-		}
-		return update(attribute.getParent(), itemId, list(attribute), list(value));
+		return update(itemId, attribute, value, null);
 	}
 
 	@Override
-	public final boolean update(String type, String attributes, List<Object> values, String criteria) {
+	public final boolean update(int itemId, MetaDataAttribute attribute, Object value, IConnectionUserBean currentUser) {
+		if (attribute == null) {
+			return false;
+		}
+		return update(attribute.getParent(), itemId, list(attribute), list(value), currentUser);
+	}
+
+	@Override
+	public final boolean update(String type, String attributes, List<Object> values, String criteria, IConnectionUserBean currentUser) {
 		final MetaDataEntity entity = getEntity(type);
 		if (entity == null) {
 			return false;
 		}
-		return update(entity, entity.getAttributes(attributes), values, getCriteria(criteria));
+		return update(entity, entity.getAttributes(attributes), values, getCriteria(criteria), currentUser);
 	}
 
 	@Override
-	public final boolean update(MetaDataEntity entity, String[] attributes, List<Object> values, String criteria) {
-		return update(entity, entity.getAttributes(attributes), values, getCriteria(criteria));
+	public final boolean update(MetaDataEntity entity, String[] attributes, List<Object> values, String criteria, IConnectionUserBean currentUser) {
+		return update(entity, entity.getAttributes(attributes), values, getCriteria(criteria), currentUser);
 	}
 
 	@Override
 	public final boolean update(int itemId, List<MetaDataAttribute> attributes, List<Object> values) {
+		return update(itemId, attributes, values, null);
+	}
+
+	@Override
+	public final boolean update(int itemId, List<MetaDataAttribute> attributes, List<Object> values, IConnectionUserBean currentUser) {
 		if ((attributes == null) || (attributes.size() == 0)) {
 			return false;
 		}
-		return update(attributes.get(0).getParent(), itemId, attributes, values);
+		return update(attributes.get(0).getParent(), itemId, attributes, values, currentUser);
+	}
+
+	@Override
+	public final boolean update(MetaDataEntity entity, int itemId, List<MetaDataAttribute> attributes, List<Object> values) {
+		return update(entity, itemId, attributes, values, null);
 	}
 
 	@Override
@@ -879,6 +986,11 @@ public abstract class AbstractMapperService<T extends ICriteriaContext> implemen
 
 	@Override
 	public final boolean linkAdd(BeanMap source, String linkCode, int destId) {
+		return linkAdd(source, linkCode, destId, null);
+	}
+	
+	@Override
+	public final boolean linkAdd(BeanMap source, String linkCode, int destId, IConnectionUserBean currentUser) {
 		final MetaDataEntity entity = getEntity(source.getType());
 		if (entity == null) {
 			return false;
@@ -887,11 +999,16 @@ public abstract class AbstractMapperService<T extends ICriteriaContext> implemen
 		if (link == null) {
 			return false;
 		}
-		return linkAdd(link, source.getId(), destId);
+		return linkAdd(link, source.getId(), destId, currentUser);
 	}
 
 	@Override
 	public final boolean linkAdd(BeanMap source, String linkCode, BeanMap dest) {
+		return linkAdd(source, linkCode, dest, null);
+	}
+
+	@Override
+	public final boolean linkAdd(BeanMap source, String linkCode, BeanMap dest, IConnectionUserBean currentUser) {
 		final MetaDataEntity entity = getEntity(source.getType());
 		if (entity == null) {
 			return false;
@@ -900,11 +1017,16 @@ public abstract class AbstractMapperService<T extends ICriteriaContext> implemen
 		if (link == null) {
 			return false;
 		}
-		return linkAdd(link, source.getId(), dest.getId());
+		return linkAdd(link, source.getId(), dest.getId(), currentUser);
 	}
 
 	@Override
 	public final boolean linkAdd(String sourceType, String linkCode, int sourceId, int destId) {
+		return linkAdd(sourceType, linkCode, sourceId, destId, null);
+	}
+
+	@Override
+	public final boolean linkAdd(String sourceType, String linkCode, int sourceId, int destId, IConnectionUserBean currentUser) {
 		final MetaDataEntity entity = getEntity(sourceType);
 		if (entity == null) {
 			return false;
@@ -913,14 +1035,24 @@ public abstract class AbstractMapperService<T extends ICriteriaContext> implemen
 		if (link == null) {
 			return false;
 		}
-		return linkAdd(link, sourceId, destId);
+		return linkAdd(link, sourceId, destId, currentUser);
 	}
 
 	@Override
 	public final boolean linkAdd(MetaDataLink link, int sourceId, int destId) {
+		return linkAdd(link, sourceId, destId, null);
+	}
+
+	@Override
+	public final boolean linkAdd(MetaDataLink link, int sourceId, int destId, IConnectionUserBean currentUser) {
 		final String code = link.getMetadata().getString(MetaDataEntity.METADATA_REVERSELINK);
 		if (code == null) {
-			return doLinkAdd(link, sourceId, destId);
+			boolean result = doLinkAdd(link, sourceId, destId);
+			if (result && link.getMetadata().getBoolean(MetaDataEntity.METADATA_PUSHUPDATELINK)) {
+				touch(link.getParent(), sourceId, currentUser);
+				link.getRefEntity().getMapper().touch(link.getRefEntity(), destId, currentUser);
+			}
+			return result;
 		}
 		final MetaDataEntity e = link.getRefEntity();
 		if (e == null) {
@@ -930,7 +1062,11 @@ public abstract class AbstractMapperService<T extends ICriteriaContext> implemen
 		if ((att == null) || !link.getParent().equals(att.getRefEntity())) {
 			return false;
 		}
-		return e.getMapper().update(e, destId, list(att), list((Object) Integer.valueOf(sourceId)));
+		boolean result = e.getMapper().update(e, destId, list(att), list((Object) Integer.valueOf(sourceId)));
+		if (result && link.getMetadata().getBoolean(MetaDataEntity.METADATA_PUSHUPDATELINK)) {
+			touch(link.getParent(), sourceId, currentUser);
+		}
+		return result;
 	}
 
 	/**
@@ -987,6 +1123,11 @@ public abstract class AbstractMapperService<T extends ICriteriaContext> implemen
 
 	@Override
 	public final boolean linkRemove(String sourceType, String linkCode, int sourceId, int destId) {
+		return linkRemove(sourceType, linkCode, sourceId, destId, null);
+	}
+
+	@Override
+	public final boolean linkRemove(String sourceType, String linkCode, int sourceId, int destId, IConnectionUserBean currentUser) {
 		final MetaDataEntity entity = getEntity(sourceType);
 		if (entity == null) {
 			return false;
@@ -995,14 +1136,24 @@ public abstract class AbstractMapperService<T extends ICriteriaContext> implemen
 		if (link == null) {
 			return false;
 		}
-		return linkRemove(link, sourceId, destId);
+		return linkRemove(link, sourceId, destId, currentUser);
 	}
 
 	@Override
 	public final boolean linkRemove(MetaDataLink link, int sourceId, int destId) {
+		return linkRemove(link, sourceId, destId, null);
+	}
+
+	@Override
+	public final boolean linkRemove(MetaDataLink link, int sourceId, int destId, IConnectionUserBean currentUser) {
 		final String code = link.getMetadata().getString(MetaDataEntity.METADATA_REVERSELINK);
 		if (code == null) {
-			return doLinkRemove(link, sourceId, destId);
+			boolean result = doLinkRemove(link, sourceId, destId);
+			if (result && link.getMetadata().getBoolean(MetaDataEntity.METADATA_PUSHUPDATELINK)) {
+				touch(link.getParent(), sourceId, currentUser);
+				link.getRefEntity().getMapper().touch(link.getRefEntity(), destId, currentUser);
+			}
+			return result;
 		}
 		final MetaDataEntity e = link.getRefEntity();
 		if (e == null) {
@@ -1012,9 +1163,18 @@ public abstract class AbstractMapperService<T extends ICriteriaContext> implemen
 		if ((att == null) || !link.getParent().equals(att.getRefEntity())) {
 			return false;
 		}
-		return e.getMapper().update(e, destId, list(att), list((Object) null));
+		boolean result = e.getMapper().update(e, destId, list(att), list((Object) null));
+		if (result && link.getMetadata().getBoolean(MetaDataEntity.METADATA_PUSHUPDATELINK)) {
+			touch(link.getParent(), sourceId, currentUser);
+		}
+		return result;
 	}
 
+	@Override
+	public final boolean touch(MetaDataEntity entity, int id, IConnectionUserBean currentUser) {
+		return update(entity, id, new ArrayList<>(), new ArrayList<>(), currentUser);
+	}
+	
 	/**
 	 * Perform a link deletion between two entities.
 	 * <p>
@@ -1120,23 +1280,23 @@ public abstract class AbstractMapperService<T extends ICriteriaContext> implemen
 	}
 
 	@Override
-	public final boolean update(List<MetaDataAttribute> attributes, List<Object> values, ISearchCriteria criteria) {
+	public final boolean update(List<MetaDataAttribute> attributes, List<Object> values, ISearchCriteria criteria, IConnectionUserBean user) {
 		if ((attributes == null) || (attributes.size() == 0) || (values == null)
 				|| (values.size() != attributes.size()) || (criteria == null)) {
 			return false;
 		}
-		final T context = getContext(attributes.get(0).getParent(), null);
+		final T context = getContext(attributes.get(0).getParent(), user);
 		criteria = criteria.reduce(context);
 		if (ConstantCriteria.FALSE.equals(criteria)) {
 			return false;
 		}
 		return doUpdate(attributes, values, criteria, context);
 	}
-
+	
 	@Override
 	public final boolean update(MetaDataEntity entity, List<MetaDataAttribute> attributes, List<Object> values,
-			ISearchCriteria criteria) {
-		final T context = getContext(entity, null);
+			ISearchCriteria criteria, IConnectionUserBean user) {
+		final T context = getContext(entity, user);
 		if (criteria == null) {
 			criteria = ConstantCriteria.TRUE;
 		} else {
@@ -1468,12 +1628,6 @@ public abstract class AbstractMapperService<T extends ICriteriaContext> implemen
 		final T context = getContext(entity, null);
 		return doLinkSelection(links, sourceId, attributes, deleted, getTestCriteria(attributeTest, value, context),
 				false, ignoreSubdivision, null, 0, -1, context);
-	}
-
-	// Default Implementation...
-	@Override
-	public boolean undelete(MetaDataEntity entity, int itemId) {
-		return false;
 	}
 
 	@Override

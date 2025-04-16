@@ -421,6 +421,7 @@ Cloneable, Comparable<IBeanMap> {
 		return keys();
 	}
 
+	@Override
 	public Date getDate() {
 		if (!load()) {
 			return null;
@@ -428,10 +429,40 @@ Cloneable, Comparable<IBeanMap> {
 		return value.getDate();
 	}
 
+	@Override
 	public void setDate(Date date) {
-		update(new ArrayList<MetaDataAttribute>(), new ArrayList<Object>());
+		if (load()) {
+			value.setDate(date);
+			update(new ArrayList<MetaDataAttribute>(), new ArrayList<Object>());
+		}
 	}
 
+	@Override
+	public int getMUID() {
+		if (!load()) {
+			return 0;
+		}
+		return value.getMUID();
+	}
+
+	@Override
+	public void setMUID(int id) {
+		if (load()) {
+			value.setMUID(id);
+			update(new ArrayList<MetaDataAttribute>(), new ArrayList<Object>());
+		}
+	}
+
+	@Override
+	public void setModification(int uid, Date date) {
+		if (load()) {
+			value.setMUID(id);
+			value.setDate(date);
+			update(new ArrayList<MetaDataAttribute>(), new ArrayList<Object>());
+		}
+	}
+
+	@Override
 	public boolean moreRecent(IDatedBean bm) {
 		if (!load()) {
 			return false;

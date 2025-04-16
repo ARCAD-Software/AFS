@@ -18,6 +18,7 @@ import java.text.ParseException;
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
 import com.arcadsoftware.beanmap.BeanMapPartialList;
+import com.arcadsoftware.beanmap.IDatedBean;
 import com.arcadsoftware.osgi.ISODateFormater;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
@@ -66,6 +67,15 @@ public class BeanMapListUpdateConverter extends BeanMapListConverter implements 
 				listToUpdate.setDate(ISODateFormater.toDate(date));
 			} catch (ParseException e) {}
 		}
+		String muids = reader.getAttribute(IDatedBean.KEY_MUID);
+		if (muids != null) {
+			try {
+				int i = Integer.parseInt(muids);
+				if (i > 0) {
+					listToUpdate.setMUID(i);
+				}
+			} catch (NumberFormatException e) {}
+		}
 		BeanMapList newones = new BeanMapList(capacity);
         while (reader.hasMoreChildren()) {
             reader.moveDown();
@@ -82,7 +92,6 @@ public class BeanMapListUpdateConverter extends BeanMapListConverter implements 
         }
         listToUpdate.addAll(newones);
 		return listToUpdate;
-		//return super.unmarshal(reader, context);
 	}
 
 }

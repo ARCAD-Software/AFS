@@ -59,6 +59,7 @@ public class BeanMapConverter implements Converter {
 	@SuppressWarnings("rawtypes")
 	public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
 		int id = ((BeanMap) source).getId();
+		int muid = ((BeanMap) source).getMUID();
 		String type = ((BeanMap) source).getType();
 		Date date = ((BeanMap) source).getDate();
 		if (!useAttributes && addNulls) {
@@ -96,7 +97,16 @@ public class BeanMapConverter implements Converter {
 				writer.endNode();
 			}
 		}
-		if (((BeanMap)source).isDeleted()) {
+		if (muid > 0) {
+			if (useAttributes) {
+				writer.addAttribute(BeanMap.KEY_MUID, String.valueOf(muid));
+			} else {
+				((ExtendedHierarchicalStreamWriter) writer).startNode(BeanMap.KEY_DATE, String.class);
+				context.convertAnother(ISODateFormater.toString(date));
+				writer.endNode();
+			}
+		}
+		if (((BeanMap) source).isDeleted()) {
 			if (useAttributes) {
 				writer.addAttribute(BeanMap.KEY_DELETED, "true"); //$NON-NLS-1$
 			} else {
@@ -121,6 +131,7 @@ public class BeanMapConverter implements Converter {
 						!(BeanMap.KEY_TYPE.equals(key) || //
 								BeanMap.KEY_DATE.equals(key) || //
 								BeanMap.KEY_ID.equals(key) || //
+								BeanMap.KEY_MUID.equals(key) || //
 								BeanMap.KEY_DELETED.equals(key))) {
 					if (value instanceof Integer) {
 						writer.addAttribute(key, value.toString());
@@ -184,13 +195,13 @@ public class BeanMapConverter implements Converter {
 	}
 
 	public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
-		// Création BeanMap
+		// BeanMap creation
 		String type = reader.getAttribute(BeanMap.KEY_TYPE);
 		if (type == null) {
 			type = reader.getNodeName().replace(BeanMapList.SLASH_TAG, BeanMapList.SLASH_TYPE);
 		}
 		BeanMap result = new BeanMap(type);
-		// Recuperation valeur passées en attributs
+		// Get all value given as attributes.
 		for (int i = 0; i < reader.getAttributeCount(); i++) {
 			String key = reader.getAttributeName(i);
 			String val = reader.getAttribute(i);
@@ -200,6 +211,10 @@ public class BeanMapConverter implements Converter {
 				} catch (NumberFormatException e) {}
 			} else if (BeanMap.KEY_DELETED.equals(key)) {
 				result.setDeleted("true".equalsIgnoreCase(val)); //$NON-NLS-1$
+			} else if (BeanMap.KEY_MUID.equals(key)) {
+				try {
+					result.setMUID(Integer.parseInt(val));
+				} catch (NumberFormatException e) {}
 			} else if (BeanMap.KEY_DATE.equals(key)) {
 				try {
 					result.setDate(ISODateFormater.toDate(val));
@@ -210,7 +225,7 @@ public class BeanMapConverter implements Converter {
 				result.put(key.replace('_', '.'), xmlToValue(key,val));
 			}
 		}
-		// Recuperation autres valeurs
+		// Get all other values
 		while (reader.hasMoreChildren()) {
 			reader.moveDown();
 			String key = reader.getNodeName().replace('_', '.');
@@ -222,7 +237,7 @@ public class BeanMapConverter implements Converter {
 
 	protected Object readAttribute(HierarchicalStreamReader reader, UnmarshallingContext context, String key,
 			BeanMap result) {
-		// Tout élément avec des attributs est un BeanMap, ou une liste de BeanMap.
+		// Any element with attributes is a BeanMap or a BeanMapList...
 		if (reader.getAttributeCount() > 0) {
 			// BeanMapList....
 			if ((reader.getAttribute(BeanMap.KEY_TYPE) == null) && (reader.getAttribute(BeanMap.KEY_ID) == null)) {
@@ -241,20 +256,11 @@ public class BeanMapConverter implements Converter {
 			// We have an sub-beanMap object...
 			return context.convertAnother(result, BeanMap.class, thisConverter);
 		}
-		// Tentative de détection d'un nom de classe ou d'un alias...
-		/*
-		try { 
-			Class clazz = mapper.realClass(key); 
-			if (clazz != null) {
-				return context.convertAnother(result, clazz); 
-			} 
-		} catch (Exception e) {}
-		*/
-		// Dernière chance on l'encapsule dans un BeanMap.
+		// Build a BeanMap as a wrapper of the sub-tag.
 		if (reader.hasMoreChildren()) {
 			return context.convertAnother(result, BeanMap.class, thisConverter);
 		}
-		// Valeur basique.
+		// Return atomic value.
 		return xmlToValue(key,reader.getValue());
 	}
 
@@ -279,7 +285,7 @@ public class BeanMapConverter implements Converter {
 				return Integer.valueOf(value);
 			} catch (NumberFormatException e) {}
 		}
-		// Renvois d'une String...
+		// just return a String...
 		return value;
 	}
 

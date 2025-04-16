@@ -57,7 +57,7 @@ public class ConstantCriteria extends AbstractSearchCriteria implements Cloneabl
 	}
 	
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public ConstantCriteria clone() {
 		return new ConstantCriteria(value);
 	}
 

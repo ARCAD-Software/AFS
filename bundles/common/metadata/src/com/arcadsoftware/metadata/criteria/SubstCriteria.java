@@ -189,7 +189,7 @@ public class SubstCriteria extends AbstractSearchCriteria implements Cloneable {
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public SubstCriteria clone() {
 		return new SubstCriteria(code, criteria);
 	}
 

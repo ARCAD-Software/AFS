@@ -309,6 +309,21 @@ public class BeanMapObservable implements Map<String,Object>, IBeanMap, IIdentif
 	}
 
 	@Override
+	public int getMUID() {
+		return bm.getMUID();
+	}
+
+	@Override
+	public void setMUID(int id) {
+		bm.setMUID(id);
+	}
+
+	@Override
+	public void setModification(int uid, Date date) {
+		bm.setModification(uid, date);
+	}
+
+	@Override
 	protected Object clone() throws CloneNotSupportedException {
 		return new BeanMapObservable((BeanMap)bm.clone());
 	}

@@ -659,9 +659,9 @@ public class Activator extends AbstractConfiguredActivator implements ServiceTra
 					ci.print("\tSupport Extra ref = ");
 					ci.println(o);
 				}
-				o = se.getProperty(IMapperService.PROP_SUPPORT_GROUPSENTITY);
+				o = se.getProperty(IMapperService.PROP_SUPPORT_SUBDIVISIONS);
 				if (o != null) {
-					ci.print("\tSupport groups = ");
+					ci.print("\tSupport subdivisions = ");
 					ci.println(o);
 				}
 				o = se.getProperty(IMapperService.PROP_SUPPORT_MULTILINKREFERENCES);

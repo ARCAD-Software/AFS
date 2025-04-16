@@ -78,7 +78,7 @@ public class GreaterThanCriteria extends AbstractSearchCriteria implements Clone
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public GreaterThanCriteria clone() {
 		return new GreaterThanCriteria(attribute,value);
 	}
 

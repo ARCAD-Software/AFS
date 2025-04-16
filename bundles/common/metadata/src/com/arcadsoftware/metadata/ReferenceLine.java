@@ -255,7 +255,7 @@ public class ReferenceLine extends ArrayList<Element> implements Comparable<Refe
 	}
 
 	public ReferenceLine(String code, int length, boolean flaged) {
-		this(code,length);
+		this(code, length);
 		this.flaged = flaged;
 	}
 

@@ -273,11 +273,7 @@
 			</metadata>
 		</link>
 		<link type="user" code="users" readonly="true">
-			<metadata>
-				<sourceCol>URI_RIGHT</sourceCol>
-				<destCol>URI_USER</destCol>
-				<table>USER_RIGHTS</table>
-			</metadata>
+			<metadata/>
 		</link>
 	</update-entity>
 	<entity type="profileRight" domain="userdb" version="2" date="2022-01-17T00:00:00Z">

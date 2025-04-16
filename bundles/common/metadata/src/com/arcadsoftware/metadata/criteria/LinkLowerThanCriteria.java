@@ -75,7 +75,7 @@ public class LinkLowerThanCriteria extends AbstractLinkTestCriteria implements C
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public LinkLowerThanCriteria clone() {
 		return new LinkLowerThanCriteria(getReference(), getLinkCode(), getAttribute(), getValue(), isIgnoreSubdivision(), isDeletedLinks());
 	}
 

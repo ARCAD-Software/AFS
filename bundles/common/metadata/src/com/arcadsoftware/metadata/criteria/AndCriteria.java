@@ -64,7 +64,7 @@ public class AndCriteria extends AbstractSearchCriteria implements Cloneable {
 	 * @return a conjunction of the to criteria.
 	 * @throws CloneNotSupportedException
 	 */
-	public static ISearchCriteria and(ISearchCriteria criteriaToClone, ISearchCriteria criteria) throws CloneNotSupportedException {
+	public static ISearchCriteria and(ISearchCriteria criteriaToClone, ISearchCriteria criteria) {
 		if ((criteriaToClone == null) || (ConstantCriteria.TRUE.equals(criteriaToClone))) {
 			return criteria;
 		}
@@ -75,7 +75,7 @@ public class AndCriteria extends AbstractSearchCriteria implements Cloneable {
 			return ConstantCriteria.FALSE;
 		}
 		if (criteriaToClone instanceof AndCriteria) {
-			AndCriteria result = (AndCriteria) criteriaToClone.clone();
+			AndCriteria result = ((AndCriteria) criteriaToClone).clone();
 			if (criteria instanceof AndCriteria) {
 				result.criterias.addAll(((AndCriteria)criteria).criterias);
 			} else if (criteria instanceof ConstantCriteria) {
@@ -93,7 +93,9 @@ public class AndCriteria extends AbstractSearchCriteria implements Cloneable {
 					return ConstantCriteria.FALSE;
 				}// else ignore the criteria
 			} else if (criteriaToClone != null) {
-				((AndCriteria) criteria).criterias.add((ISearchCriteria) criteriaToClone.clone());
+				try {
+					((AndCriteria) criteria).criterias.add((ISearchCriteria) criteriaToClone.clone());
+				} catch (CloneNotSupportedException e) {}
 			}
 			return (AndCriteria) criteria;
 		}
@@ -156,11 +158,13 @@ public class AndCriteria extends AbstractSearchCriteria implements Cloneable {
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public AndCriteria clone() {
 		AndCriteria result = new AndCriteria();
 		for (ISearchCriteria criteria: criterias) {
 			if (criteria != null) {
-				result.criterias.add((ISearchCriteria) criteria.clone());
+				try {
+					result.criterias.add((ISearchCriteria) criteria.clone());
+				} catch (CloneNotSupportedException e) {}
 			}
 		}
 		return result;

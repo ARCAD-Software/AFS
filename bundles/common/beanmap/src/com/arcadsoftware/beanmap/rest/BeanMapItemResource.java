@@ -23,6 +23,8 @@ import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
 
 import com.arcadsoftware.beanmap.BeanMap;
+import com.arcadsoftware.beanmap.BeanMapList;
+import com.arcadsoftware.beanmap.xml.HTMLSimpleFormater;
 import com.arcadsoftware.beanmap.xml.JSonBeanMapStream;
 import com.arcadsoftware.beanmap.xml.XmlBeanMapStream;
 import com.arcadsoftware.rest.JSONRepresentation;
@@ -32,8 +34,8 @@ import com.arcadsoftware.rest.XMLRepresentation;
 /**
  * 
  * 
- * 
- * Creation Date: 2 août 2011
+ * @author ARCAD Software
+ * Creation Date: 2011-08-02
  */
 public abstract class BeanMapItemResource extends UserLinkedIdentifiedResource {
 
@@ -81,7 +83,7 @@ public abstract class BeanMapItemResource extends UserLinkedIdentifiedResource {
 	
 	@Override
 	protected Representation delete(Variant variant) throws ResourceException {
-		delete(new BeanMap(getType(),getId()));
+		delete(new BeanMap(getType(), getId()));
 		setStatus(Status.SUCCESS_NO_CONTENT);
 		return null;
 	}
@@ -109,10 +111,10 @@ public abstract class BeanMapItemResource extends UserLinkedIdentifiedResource {
 	}
 
 	protected BeanMap getBeanMap(Form form) {
-		return new BeanMap(getType(),getId(), form);
+		return new BeanMap(getType(), getId(), form);
 	}
 
-	protected boolean isParameter(Form form,String key) {
+	protected boolean isParameter(Form form, String key) {
 		String s = form.getFirstValue(key);
 		if (s == null) {
 			s = getAttribute(key);
@@ -143,8 +145,15 @@ public abstract class BeanMapItemResource extends UserLinkedIdentifiedResource {
 	}
 
 	protected Representation getHTMLRepresentation(Object object, boolean simple, Language language) {
-		// TODO A implémenter...
-		return new XMLRepresentation(new XmlBeanMapStream().toXML(object), language);
+		HTMLSimpleFormater formater = new HTMLSimpleFormater();
+		if (object instanceof BeanMapList) {
+			formater.append((BeanMapList) object);
+		} else if (object instanceof BeanMap) {
+			formater.append((BeanMap) object);
+		} else if (object != null) {
+			formater.append(object.toString());
+		}
+		return formater.toRepresentation(language);
 	}
 
 	/**

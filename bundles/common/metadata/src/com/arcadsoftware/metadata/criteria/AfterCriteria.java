@@ -145,8 +145,8 @@ public class AfterCriteria extends AbstractSearchCriteria implements Cloneable, 
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
-		return new AfterCriteria(attribute,value,trunc,years,months,days,hours,minuts);
+	public AfterCriteria clone() {
+		return new AfterCriteria(attribute, value, trunc, years, months, days, hours, minuts);
 	}
 
 	@Override

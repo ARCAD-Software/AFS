@@ -36,4 +36,9 @@ public class IdInListCriteria extends InListCriteria {
 		super(ids);
 	}
 
+	@Override
+	public IdInListCriteria clone() {
+		return new IdInListCriteria(getIds());
+	}
+
 }

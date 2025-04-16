@@ -23,6 +23,7 @@ import org.restlet.resource.ResourceException;
 
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
+import com.arcadsoftware.beanmap.xml.HTMLSimpleFormater;
 import com.arcadsoftware.beanmap.xml.JSonBeanMapStream;
 import com.arcadsoftware.beanmap.xml.XmlBeanMapStream;
 import com.arcadsoftware.rest.JSONRepresentation;
@@ -120,8 +121,15 @@ public abstract class BeanMapParentResource extends UserLinkedResource {
 	}
 
 	protected Representation getHTMLRepresentation(Object object, boolean simple, Language language) {
-		// TODO A implémenter...
-		return new XMLRepresentation(new XmlBeanMapStream().toXML(object), language);
+		HTMLSimpleFormater formater = new HTMLSimpleFormater();
+		if (object instanceof BeanMapList) {
+			formater.append((BeanMapList) object);
+		} else if (object instanceof BeanMap) {
+			formater.append((BeanMap) object);
+		} else if (object != null) {
+			formater.append(object.toString());
+		}
+		return formater.toRepresentation(language);
 	}
 
 	/**

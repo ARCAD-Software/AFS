@@ -74,7 +74,7 @@ public class LinkCriteria extends AbstractSearchCriteria implements Cloneable, I
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public LinkCriteria clone() {
 		return new LinkCriteria(id, linkCode, attribute, ignoreSubdivision);
 	}
 

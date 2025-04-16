@@ -75,11 +75,15 @@ public class NotCriteria extends AbstractSearchCriteria implements Cloneable {
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public NotCriteria clone() {
 		if (criteria == null) {
 			return new NotCriteria();
 		}
-		return new NotCriteria((ISearchCriteria) criteria.clone());
+		try {
+			return new NotCriteria((ISearchCriteria) criteria.clone());
+		} catch (CloneNotSupportedException e) {
+			return new NotCriteria(criteria);
+		}
 	}
 
 	@Override

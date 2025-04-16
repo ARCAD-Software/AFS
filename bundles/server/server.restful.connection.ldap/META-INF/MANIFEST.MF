@@ -6,10 +6,10 @@ Bundle-Version: 2.4.1.qualifier
 Bundle-Activator: com.arcadsoftware.restful.connection.ldap.Activator
 Bundle-Vendor: ARCAD Software
 Bundle-RequiredExecutionEnvironment: JavaSE-17
-Import-Package: com.arcadsoftware.beanmap;version="[2.0.0,3.0.0)",
- com.arcadsoftware.beanmap.xml;version="[2.0.0,3.0.0)",
+Import-Package: com.arcadsoftware.beanmap;version="[3.0.0,4.0.0)",
+ com.arcadsoftware.beanmap.xml;version="[3.0.0,4.0.0)",
  com.arcadsoftware.crypt;version="[1.0.0,2.0.0)",
- com.arcadsoftware.metadata;version="[1.0.0,2.0.0)",
+ com.arcadsoftware.metadata;version="[2.0.0,3.0.0)",
  com.arcadsoftware.metadata.criteria;version="[1.0.4,2.0.0)",
  com.arcadsoftware.osgi;version="[1.0.0,3.0.0)",
  com.arcadsoftware.rest;version="[3.0.0,4.0.0)",

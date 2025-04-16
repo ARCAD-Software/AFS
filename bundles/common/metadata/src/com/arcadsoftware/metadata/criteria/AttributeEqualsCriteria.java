@@ -106,7 +106,7 @@ public class AttributeEqualsCriteria extends AbstractSearchCriteria implements I
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public AttributeEqualsCriteria clone() {
 		return new AttributeEqualsCriteria(attribute, secondAttribute);
 	}
 

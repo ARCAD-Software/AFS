@@ -17,6 +17,12 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map.Entry;
 
+import org.restlet.data.CharacterSet;
+import org.restlet.data.Language;
+import org.restlet.data.MediaType;
+import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
+
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
 
@@ -76,6 +82,16 @@ public class HTMLSimpleFormater {
 	}
 
 	/**
+	 * Return a HTTP representation of this document.
+	 * 
+	 * @param language
+	 * @return
+	 */
+	public Representation toRepresentation(Language language) {
+		return new StringRepresentation(toString(), MediaType.TEXT_HTML, language, CharacterSet.UTF_8);
+	}
+	
+	/**
 	 * Consumer may implement this method to add HTTP link when weak references are stored into a BeanMap.
 	 * 
 	 * @param bean
@@ -89,6 +105,7 @@ public class HTMLSimpleFormater {
 	
 	/**
 	 * Consumer may implement this method to add HTTP link to BeanMap details in lists.
+	 * 
 	 * @param bean
 	 * @return
 	 */

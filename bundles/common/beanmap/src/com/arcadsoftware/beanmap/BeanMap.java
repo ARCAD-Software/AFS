@@ -40,6 +40,8 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.eclipse.core.runtime.IAdaptable;
 import org.restlet.data.Form;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.arcadsoftware.beanmap.internal.BeanMapFromJSON;
 import com.arcadsoftware.beanmap.xml.JSonBeanMapStream;
@@ -62,6 +64,7 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 		Cloneable, Serializable, Comparable<IBeanMap> {
 
 	private static final long serialVersionUID = 8028198902353463923L;
+	private static final Logger logger = LoggerFactory.getLogger(BeanMap.class);
 
 	/*
 	 * Shared Date Converter (use a pool of 20 SimpleFormater);
@@ -75,8 +78,6 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 					"yyyy-MM-dd HH:mm:ssa", //$NON-NLS-1$
 					"EEE MMM dd HH:mm:ss zzz yyyy" }); //$NON-NLS-1$;
 
-	private static final int NEW_BEAN_MAP_ID = 0;
-	
 	/**
 	 * Helper method.
 	 * 
@@ -130,6 +131,7 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 			}
 			return BeanMapFromJSON.parse(new BeanMap(), o);
 		} catch (JSONException e) {
+			logger.trace(e.getLocalizedMessage(), e);
 			return null;
 		}
 	}
@@ -149,15 +151,17 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 		try {
 			return BeanMapFromJSON.parse(new BeanMap(), new JSONObject(json));
 		} catch (JSONException e) {
+			logger.trace(e.getLocalizedMessage(), e);
 			return null;
 		}
 	}
 
 	// Technical attributes :
-	private int id = NEW_BEAN_MAP_ID;
+	private int id;
 	private String type;
 	private Date date;
 	private boolean deleted;
+	private int muid;
 	
 	// Other attributes :
 	private HashMap<String, Object> list;
@@ -313,6 +317,7 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 		}
 		if (beanMap instanceof IDatedBean) {
 			this.date = ((IDatedBean) beanMap).getDate();
+			this.muid = ((IDatedBean) beanMap).getMUID();
 		}
 		addAll(beanMap);
 	}
@@ -344,6 +349,16 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 						try {
 							id = Integer.parseInt(v.toString());
 						} catch (NumberFormatException ee) {
+							put(ks, v);
+						}
+					}
+				} else if (KEY_MUID.equals(ks)) {
+					if (v instanceof Integer) {
+						muid = (Integer) v;
+					} else {
+						try {
+							muid = Integer.parseInt(v.toString());
+						} catch (NumberFormatException z) {
 							put(ks, v);
 						}
 					}
@@ -431,6 +446,16 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 							put(ks, v);
 						}
 					}
+				} else if (KEY_MUID.equals(ks)) {
+					if (v instanceof Integer) {
+						muid = (Integer) v;
+					} else {
+						try {
+							muid = Integer.parseInt(v.toString());
+						} catch (NumberFormatException z) {
+							put(ks, v);
+						}
+					}
 				} else if (KEY_DATE.equals(ks)) {
 					if (v instanceof Date) {
 						date = (Date) v;
@@ -511,12 +536,8 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 				if (read != null) {
 					try {
 						put(property.getName(), read.invoke(bean));
-					} catch (IllegalArgumentException e) {
-						// FIXME Journalizer l'erreur quand on est en debug !
-					} catch (IllegalAccessException e) {
-						// FIXME Journalizer l'erreur quand on est en debug !
-					} catch (InvocationTargetException e) {
-						// FIXME Journalizer l'erreur quand on est en debug !
+					} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
+						logger.trace(e.getLocalizedMessage(), e);
 					}
 				}
 			}
@@ -581,7 +602,7 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 	 * @throws IntrospectionException
 	 */
 	public BeanMap(Object bean) throws IntrospectionException {
-		this(bean, null, NEW_BEAN_MAP_ID, Introspector.getBeanInfo(bean.getClass(), Object.class));
+		this(bean, null, 0, Introspector.getBeanInfo(bean.getClass(), Object.class));
 	}
 
 	/**
@@ -683,6 +704,7 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 		}
 	}
 
+	@Override
 	public Object get(String key) {
 		return list.get(key);
 	}
@@ -701,6 +723,7 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 		return result;
 	}
 
+	@Override
 	public <T> T get(String key, Class<T> clazz) {
 		Object result = list.get(key);
 		if (result == null) {
@@ -717,6 +740,7 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 				try {
 					result = Integer.decode(result.toString());
 				} catch (NumberFormatException e) {
+					logger.trace(e.getLocalizedMessage(), e);
 					return null;
 				}
 			}
@@ -734,13 +758,13 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 				try {
 					result = ISODateFormater.toDate(d);
 				} catch (ParseException e) {
-					// FIXME Journalizer l'erreur quand on est en debug !
+					logger.trace(e.getLocalizedMessage(), e);
 				}
 			} else {
 				try {
 					result = DATECONVERTER.fromString(d);
 				} catch (ConversionException e) {
-					// FIXME Journalizer l'erreur quand on est en debug !
+					logger.trace(e.getLocalizedMessage(), e);
 					return null;
 				}
 			}
@@ -751,6 +775,7 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 			try {
 				result = Float.valueOf(result.toString());
 			} catch (NumberFormatException e) {
+				logger.trace(e.getLocalizedMessage(), e);
 				return null;
 			}
 			if (clazz.isInstance(result)) {
@@ -811,6 +836,7 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 		this.id = id;
 	}
 
+	@Override
 	public String getType() {
 		return type;
 	}
@@ -828,12 +854,30 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 		this.type = type;
 	}
 	
+	@Override
 	public void setDate(Date date) {
 		this.date = date;
 	}
 
+	@Override
 	public Date getDate() {
 		return date;
+	}
+
+	@Override
+	public int getMUID() {
+		return muid;
+	}
+
+	@Override
+	public void setMUID(int id) {
+		muid = id;
+	}
+
+	@Override
+	public void setModification(int uid, Date date) {
+		setMUID(uid);
+		setDate(date);
 	}
 
 	/**
@@ -1100,7 +1144,7 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 					}
 					return loadFromXml(btype, (String) o);
 				} catch (Throwable e) {
-					// FIXME Journalizer l'erreur quand on est en debug !
+					logger.trace(e.getLocalizedMessage(), e);
 				}
 			} else if (o instanceof Integer) {
 				// Assume that the type is the key code ! 
@@ -1134,7 +1178,7 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 				try {
 					return BeanMapList.loadFromXml(key, (String) o);
 				} catch (Throwable e) {
-					// FIXME Journalizer l'erreur quand on est en debug !
+					logger.trace(e.getLocalizedMessage(), e);
 				}
 			}
 		}
@@ -1158,10 +1202,10 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 				try {
 					return loadFromXml(type, (String) o);
 				} catch (Throwable e) {
-					// FIXME Journalizer l'erreur quand on est en debug !
+					logger.trace(e.getLocalizedMessage(), e);
 				}
 			} else if (o instanceof Integer) {
-				// Reconstruit le beanmap... 
+				// Rebuild the beanmap... 
 				BeanMap b = new BeanMap(type, (Integer) o);
 				String prefix = key + "."; //$NON-NLS-1$
 				for (Entry<String, Object> e: entrySet()) {
@@ -1192,7 +1236,7 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 				try {
 					return BeanMapList.loadFromXml(type, (String) o);
 				} catch (Throwable e) {
-					// FIXME Journalizer l'erreur quand on est en debug !
+					logger.trace(e.getLocalizedMessage(), e);
 				}
 			}
 		}
@@ -1223,7 +1267,7 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 		else {
 			//Handles any other type (like Short)
 			final String value = String.valueOf(o);		
-			return 	"true".equalsIgnoreCase(value) || //$NON-NLS-1$
+			return "true".equalsIgnoreCase(value) || //$NON-NLS-1$
 					"yes".equalsIgnoreCase(value) || //$NON-NLS-1$
 					"1".equalsIgnoreCase(value); //$NON-NLS-1$
 		
@@ -1256,14 +1300,14 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 			try {
 				return ISODateFormater.toDate(s);
 			} catch (ParseException e) {
-				// FIXME Journalizer l'erreur quand on est en debug !
+				logger.trace(e.getLocalizedMessage(), e);
 			}
 		}
 		DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
 		try {
 			return df.parse(s);
 		} catch (ParseException e) {
-			// FIXME Journalizer l'erreur quand on est en debug !
+			logger.trace(e.getLocalizedMessage(), e);
 		}
 		return null;
 	}
@@ -1433,6 +1477,9 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 		if (date != null) {
 			form.add(KEY_DATE, ISODateFormater.toString(date));
 		}
+		if (muid > 0) {
+			form.add(KEY_MUID, Integer.toString(muid));
+		}
 		return form; 
 	}
 
@@ -1451,6 +1498,11 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 			if (KEY_ID.equalsIgnoreCase(key)) {
 				try {
 					id = Integer.parseInt(value);
+				} catch (NumberFormatException e) {}
+			}
+			if (KEY_MUID.equalsIgnoreCase(key)) {
+				try {
+					muid = Integer.parseInt(value);
 				} catch (NumberFormatException e) {}
 			}
 			// Récupération de la Date du BeanMap.
@@ -1485,10 +1537,10 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 							put(key,Long.valueOf(value.substring(6, value.length() - 7)));
 							continue;
 						} catch (Throwable e) {
-							// FIXME Journalizer l'erreur quand on est en debug !
+							logger.trace(e.getLocalizedMessage(), e);
 						}
 					}
-					// TODO a lot of "string" value which look like number shoulc not be converted in numbers...
+					// TODO A lot of "string" value which look like number should not be converted in numbers...
 					String lkey = key.toLowerCase();
 					if (lkey.contains("version") || //$NON-NLS-1$
 							lkey.contains("phone")) { //$NON-NLS-1$
@@ -1674,6 +1726,10 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 		result.append(id);
 		if (date != null) {
 			result.append('(');
+			if (muid > 0) {
+				result.append(muid);
+				result.append(':');
+			}
 			result.append(date);
 			result.append(')');
 		}
@@ -1718,7 +1774,7 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 	@SuppressWarnings("unchecked")
 	public BeanMap clone(int id) {
 		BeanMap result = new BeanMap(type, id);
-		result.setDate(date);
+		result.setModification(muid, date);
 		result.setDeleted(deleted);
 		result.list = (HashMap<String, Object>) list.clone();
 		return result;
@@ -1736,7 +1792,7 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 	@Override
 	public BeanMap clone() {
 		BeanMap result = duplicate();
-		result.setDate(date);
+		result.setModification(muid, date);
 		result.setDeleted(deleted);
 		result.list = (HashMap<String, Object>) list.clone();
 		return result;
@@ -1751,7 +1807,7 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 	 * @return true if the id of this BeanMap is null
 	 */
 	public boolean isNewBeanMap() {
-		return id == NEW_BEAN_MAP_ID;
+		return id == 0;
 	}
 
 	/**
@@ -1840,12 +1896,8 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 			if (write != null) {
 				try {
 					write.invoke(bean, getId());
-				} catch (IllegalArgumentException e) {
-					// FIXME Journalizer l'erreur quand on est en debug !
-				} catch (IllegalAccessException e) {
-					// FIXME Journalizer l'erreur quand on est en debug !
-				} catch (InvocationTargetException e) {
-					// FIXME Journalizer l'erreur quand on est en debug !
+				} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
+					logger.trace(e.getLocalizedMessage(), e);
 				}
 			}
 		}
@@ -1856,12 +1908,8 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 				if (write != null) {
 					try {
 						write.invoke(bean, e.getValue());
-					} catch (IllegalArgumentException e1) {
-						// FIXME Journalizer l'erreur quand on est en debug !
-					} catch (IllegalAccessException e1) {
-						// FIXME Journalizer l'erreur quand on est en debug !
-					} catch (InvocationTargetException e1) {
-						// FIXME Journalizer l'erreur quand on est en debug !
+					} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e1) {
+						logger.trace(e1.getLocalizedMessage(), e1);
 					}
 				}
 			}

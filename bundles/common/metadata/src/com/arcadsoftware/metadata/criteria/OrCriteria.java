@@ -114,11 +114,13 @@ public class OrCriteria extends AbstractSearchCriteria implements Cloneable {
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public OrCriteria clone() {
 		OrCriteria result = new OrCriteria();
 		for(ISearchCriteria criteria: criterias) {
 			if (criteria != null) {
-				result.criterias.add((ISearchCriteria)criteria.clone());
+				try {
+					result.criterias.add((ISearchCriteria) criteria.clone());
+				} catch (CloneNotSupportedException e) {}
 			}
 		}
 		return result;

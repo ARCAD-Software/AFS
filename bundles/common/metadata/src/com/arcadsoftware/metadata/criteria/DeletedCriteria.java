@@ -66,7 +66,7 @@ public class DeletedCriteria extends AbstractSearchCriteria implements IAttribut
 		return (o == null) || ((o instanceof IDeletableBean) && (((IDeletableBean) o).isDeleted()));
 	}
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public DeletedCriteria clone() {
 		return new DeletedCriteria(attribute);
 	}
 

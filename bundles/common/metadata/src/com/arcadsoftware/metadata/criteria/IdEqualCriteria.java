@@ -42,7 +42,7 @@ public class IdEqualCriteria extends AbstractSearchCriteria implements Cloneable
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public IdEqualCriteria clone() {
 		return new IdEqualCriteria(id);
 	}
 

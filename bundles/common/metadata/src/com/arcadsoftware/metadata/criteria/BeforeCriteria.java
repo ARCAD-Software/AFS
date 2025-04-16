@@ -89,7 +89,7 @@ public class BeforeCriteria extends AbstractSearchCriteria implements Cloneable,
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public BeforeCriteria clone() {
 		return new BeforeCriteria(attribute,value,trunc,years,months,days,hours,minuts);
 	}
 

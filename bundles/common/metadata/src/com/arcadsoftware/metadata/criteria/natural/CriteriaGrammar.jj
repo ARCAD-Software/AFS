@@ -108,6 +108,7 @@ TOKEN: // Operators
 | < SHARP: "#" >
 | < COLON: "," >
 | < STAR: "*" >
+| < CHANGE: "$" >
 }
 
 TOKEN:
@@ -200,6 +201,7 @@ ISearchCriteria simpleCriteria():
   | LOOKAHEAD(2) c = hasRightCriteria()
   | LOOKAHEAD(2) c = deletedCriteria()
   | LOOKAHEAD(lookaheaddateCriteria()) c = dateCriteria()
+  | LOOKAHEAD(2) c = changedByCriteria()
   | c = currentUserCriteria()
   | c = constantCriteria()
   | c = pregenCriteria()
@@ -605,4 +607,18 @@ ISearchCriteria constantCriteria():
 | < ALL > { return constant(true); }
 | < FALSE > { return constant(false); }
 | t = < INTEGER > { return constant(integer(t) != 0); }
+}
+
+ISearchCriteria changedByCriteria():
+{ Token t, p = null;
+  String v = null;
+}
+{ [ < DOT > { v = "."; }
+  | t = refline() {  v = t.image; }
+  ]
+  < CHANGE >
+  ( t = < INTEGER >
+  | t = < USER >
+  )
+  { return changedBy(v, t); }
 }

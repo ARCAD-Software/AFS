@@ -117,7 +117,7 @@ public class EqualCriteria extends AbstractSearchCriteria implements Cloneable, 
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public EqualCriteria clone() {
 		return new EqualCriteria(attribute, intval, value, casesensitive);
 	}
 

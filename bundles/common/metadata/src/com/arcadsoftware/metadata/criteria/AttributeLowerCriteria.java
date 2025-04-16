@@ -52,7 +52,7 @@ public class AttributeLowerCriteria extends AbstractSearchCriteria implements IA
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public AttributeLowerCriteria clone() {
 		return new AttributeLowerCriteria(attribute, secondAttribute);
 	}
 

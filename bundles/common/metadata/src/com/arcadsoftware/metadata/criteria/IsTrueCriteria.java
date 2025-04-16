@@ -45,7 +45,7 @@ public class IsTrueCriteria extends AbstractSearchCriteria implements Cloneable,
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public IsTrueCriteria clone() {
 		return new IsTrueCriteria(attribute);
 	}
 

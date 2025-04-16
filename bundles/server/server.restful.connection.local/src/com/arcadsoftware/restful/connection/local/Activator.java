@@ -524,7 +524,7 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 			if ((entity != null) && (entity.getMapper() != null)) {
 				entity.dataUpdate(AbstractMapperService.list(entity.getAttribute(LOCALAUTH_LOCKED)), //
 						AbstractMapperService.list((Object) Integer.valueOf(0)), //
-						new EqualCriteria(LOCALAUTH_USERID, uid));
+						new EqualCriteria(LOCALAUTH_USERID, uid), null);
 				return;
 			}
 		} catch (Exception e) {

@@ -58,7 +58,7 @@ public class UnlinkCriteria extends AbstractSearchCriteria implements Cloneable,
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public UnlinkCriteria clone() {
 		return new UnlinkCriteria(id, linkCode, attribute, ignoreSubdivision, deleted);
 	}
 

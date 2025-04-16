@@ -22,12 +22,17 @@ import java.util.Date;
  */
 public interface IDatedBean {
 
-
 	/**
 	 * The date attribute is an internal attribute that define the Bean date.
 	 * Its value is a Date converted with ISODateFormater.
 	 */
 	public static final String KEY_DATE = "date"; //$NON-NLS-1$
+
+	/**
+	 * The Modification User IDentifier attribute is an internal attribute that 
+	 * define the identifier of the owner of the Bean.
+	 */
+	public static final String KEY_MUID = "muid"; //$NON-NLS-1$
 
 	/**
 	 * The date store the last modification date of this bean. 
@@ -36,7 +41,6 @@ public interface IDatedBean {
 	 */
 	public Date getDate();
 	
-
 	/**
 	 * Set the last change date of the bean, this Date should not be null.
 	 * 
@@ -51,4 +55,27 @@ public interface IDatedBean {
 	 */
 	public boolean moreRecent(IDatedBean bm);
 
+	/**
+	 * The IDentifier of the User responsible of the Modification of this bean.
+	 *  
+	 * <p>
+	 * This value is optional an different from the ID of an IIdentifiedBean.
+	 *  
+	 * @return a negative or null value indicate that there is no known user associated to this data.
+	 * @see IIdentifiedBean#getId() 
+	 */
+	public int getMUID();
+	
+	/**
+	 * Set the Modification User IDentifier of this bean.
+	 * @param id
+	 */
+	public void setMUID(int id);
+	
+	/**
+	 * Set the modification information (the User and the date of the modification).
+	 * @param uid
+	 * @param date
+	 */
+	public void setModification(int uid, Date date);
 }

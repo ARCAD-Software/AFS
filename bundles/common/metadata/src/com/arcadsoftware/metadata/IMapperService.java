@@ -67,12 +67,11 @@ public interface IMapperService {
 
 	/**
 	 * OSGi service property. This property provide some information about the Mapper service functionality. This
-	 * property is true if the service support groups entities.
+	 * property is true if the service support recursives links (link targeting the same source in a recursive way.
 	 * <p>
-	 * Mapper that do not implement groups facilities can ignore the group method. No entities associated to theses
-	 * services should be delared as groups entities.
+	 * Mapper that do not implement subdivisions facilities can ignore the recursivity of links.
 	 */
-	public static final String PROP_SUPPORT_GROUPSENTITY = "groups"; //$NON-NLS-1$
+	public static final String PROP_SUPPORT_SUBDIVISIONS = "subdivisions"; //$NON-NLS-1$
 
 	/**
 	 * The OSGi service class identification.
@@ -120,6 +119,20 @@ public interface IMapperService {
 	 * @return the new item in a BeanMap with attributes and id or null if an error occurs.
 	 */
 	public BeanMap create(BeanMap item);
+	
+	/**
+	 * Create a new element into the storage base (This request return the new item created into the database).
+	 * 
+	 * <p>
+	 * The returned BeanMap possess a positive id, used as internal reference for subsequent calls.
+	 * 
+	 * @param item
+	 *            This BeanMap contains the information to store. Its Id will be forced to the created one.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return the new item in a BeanMap with attributes and id or null if an error occurs.
+	 */
+	public BeanMap create(BeanMap item, IConnectionUserBean currentUser);
 
 	/**
 	 * Create a new element into the storage base (This request return the new item created into the database).
@@ -140,6 +153,28 @@ public interface IMapperService {
 	 * @return the new item in a BeanMap with attributes and id or null if an error occurs.
 	 */
 	public BeanMap create(String type, String attributes, List<Object> values);
+
+	/**
+	 * Create a new element into the storage base (This request return the new item created into the database).
+	 * 
+	 * <p>
+	 * The returned BeanMap possess a positive id, used as internal reference for subsequent calls.
+	 * 
+	 * <p>
+	 * This is the caller responsibility to ensure that the attributes list correspond to the values list.
+	 * 
+	 * @param type
+	 *            the entity type of the element to be created
+	 * @param attributes
+	 *            the list of updated attributes codes
+	 * @param values
+	 *            the list of values in the same order than the attributes listed. some values can be null or need to be
+	 *            translated before to get stored.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return the new item in a BeanMap with attributes and id or null if an error occurs.
+	 */
+	public BeanMap create(String type, String attributes, List<Object> values, IConnectionUserBean currentUser);
 
 	/**
 	 * Create a new element into the storage base (This request return the new item created into the database).
@@ -171,9 +206,47 @@ public interface IMapperService {
 	 * @param values
 	 *            the list of values in the same order than the attributes listed. some values can be null or need to be
 	 *            translated before to get stored.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return the new item in a BeanMap with attributes and id or null if an error occurs.
+	 */
+	public BeanMap create(MetaDataEntity entity, String attributes, List<Object> values, IConnectionUserBean currentUser);
+
+	/**
+	 * Create a new element into the storage base (This request return the new item created into the database).
+	 * 
+	 * <p>
+	 * The returned BeanMap possess a positive id, used as internal reference for subsequent calls.
+	 * 
+	 * @param entity
+	 *            the entity of the element to be created
+	 * @param attributes
+	 *            the list of updated attributes codes
+	 * @param values
+	 *            the list of values in the same order than the attributes listed. some values can be null or need to be
+	 *            translated before to get stored.
 	 * @return the new item in a BeanMap with attributes and id or null if an error occurs.
 	 */
 	public BeanMap create(MetaDataEntity entity, String attributes, Object... values);
+
+	/**
+	 * Create a new element into the storage base (This request return the new item created into the database).
+	 * 
+	 * <p>
+	 * The returned BeanMap possess a positive id, used as internal reference for subsequent calls.
+	 * 
+	 * @param entity
+	 *            the entity of the element to be created
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @param attributes
+	 *            the list of updated attributes codes
+	 * @param values
+	 *            the list of values in the same order than the attributes listed. some values can be null or need to be
+	 *            translated before to get stored.
+	 * @return the new item in a BeanMap with attributes and id or null if an error occurs.
+	 */
+	public BeanMap create(MetaDataEntity entity, IConnectionUserBean currentUser, String attributes, Object... values);
 
 	/**
 	 * Create a new element into the storage base (This request return the new item created into the database).
@@ -195,6 +268,22 @@ public interface IMapperService {
 	 * <p>
 	 * The returned BeanMap possess a positive id, used as internal reference for subsequent calls.
 	 * 
+	 * @param attribute
+	 *            the attribute that is updated
+	 * @param values
+	 *            the corresponding value
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return the new item in a BeanMap with affected attributes and id or null if an error occurs.
+	 */
+	public BeanMap create(MetaDataAttribute attribute, Object value, IConnectionUserBean currentUser);
+
+	/**
+	 * Create a new element into the storage base (This request return the new item created into the database).
+	 * 
+	 * <p>
+	 * The returned BeanMap possess a positive id, used as internal reference for subsequent calls.
+	 * 
 	 * <p>
 	 * This is the caller responsibility to ensure that the attributes list correspond to the values list.
 	 * 
@@ -207,6 +296,25 @@ public interface IMapperService {
 	 */
 	public BeanMap create(List<MetaDataAttribute> attributes, List<Object> values);
 
+	/**
+	 * Create a new element into the storage base (This request return the new item created into the database).
+	 * 
+	 * <p>
+	 * The returned BeanMap possess a positive id, used as internal reference for subsequent calls.
+	 * 
+	 * <p>
+	 * This is the caller responsibility to ensure that the attributes list correspond to the values list.
+	 * 
+	 * @param attributes
+	 *            the list of updated attributes, this list can <b>not</b> be null.
+	 * @param values
+	 *            the list of values in the same order than the attributes listed. some values can be null or need to be
+	 *            translated before to get stored.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return the new item in a BeanMap with attributes and id or null if an error occurs.
+	 */
+	public BeanMap create(List<MetaDataAttribute> attributes, List<Object> values, IConnectionUserBean currentUser);
 
 	/**
 	 * Create a new element into the storage base (This request return the new item created into the database).
@@ -227,6 +335,28 @@ public interface IMapperService {
 	 * @return the new item in a BeanMap with attributes and id or null if an error occurs.
 	 */
 	public BeanMap create(MetaDataEntity entity, List<MetaDataAttribute> attributes, List<Object> values);
+
+	/**
+	 * Create a new element into the storage base (This request return the new item created into the database).
+	 * 
+	 * <p>
+	 * The returned BeanMap possess a positive id, used as internal reference for subsequent calls.
+	 * 
+	 * <p>
+	 * This is the caller responsibility to ensure that the attributes list correspond to the values list.
+	 * 
+	 * @param entity
+	 *            The entity.
+	 * @param attributes
+	 *            the list of updated attributes.
+	 * @param values
+	 *            the list of values in the same order than the attributes listed. some values can be null or need to be
+	 *            translated before to get stored.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return the new item in a BeanMap with attributes and id or null if an error occurs.
+	 */
+	public BeanMap create(MetaDataEntity entity, List<MetaDataAttribute> attributes, List<Object> values, IConnectionUserBean currentUser);
 
 	/**
 	 * Delete an item from the storage.
@@ -253,6 +383,25 @@ public interface IMapperService {
 	 * be undeleted. Hard deletion are not idempotent, multiples calls to theses method should not possible from
 	 * DELETE,PUT nor GET REST services.
 	 * 
+	 * @param item
+	 *            The BeanMap object to delete.
+	 * @param hardDelete
+	 *            True if the deletion must be an "hard deletion".
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return true if the item exist and has been deleted.
+	 * @see #undelete(BeanMap)
+	 */
+	public boolean delete(BeanMap item, boolean hardDelete, IConnectionUserBean currentUser);
+
+	/**
+	 * Delete an item from the storage.
+	 * 
+	 * <p>
+	 * If the mapper allow this operation, the deletion can be a soft or hard deletion. Soft deletion allow the item to
+	 * be undeleted. Hard deletion are not idempotent, multiples calls to theses method should not possible from
+	 * DELETE,PUT nor GET REST services.
+	 * 
 	 * @param type
 	 *            the entity type of the element to be deleted
 	 * @param itemId
@@ -263,6 +412,27 @@ public interface IMapperService {
 	 * @see #undelete(String, int)
 	 */
 	public boolean delete(String type, int itemId, boolean hardDelete);
+
+	/**
+	 * Delete an item from the storage.
+	 * 
+	 * <p>
+	 * If the mapper allow this operation, the deletion can be a soft or hard deletion. Soft deletion allow the item to
+	 * be undeleted. Hard deletion are not idempotent, multiples calls to theses method should not possible from
+	 * DELETE,PUT nor GET REST services.
+	 * 
+	 * @param type
+	 *            the entity type of the element to be deleted
+	 * @param itemId
+	 *            the item id to delete
+	 * @param hardDelete
+	 *            True if the deletion must be an "hard deletion".
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return true if the item exist and has been deleted.
+	 * @see #undelete(String, int)
+	 */
+	public boolean delete(String type, int itemId, boolean hardDelete, IConnectionUserBean currentUser);
 
 	/**
 	 * Delete an item from the storage.
@@ -282,6 +452,27 @@ public interface IMapperService {
 	 * @see #undelete(MetaDataEntity, int)
 	 */
 	public boolean delete(MetaDataEntity entity, int itemId, boolean hardDelete);
+
+	/**
+	 * Delete an item from the storage.
+	 * 
+	 * <p>
+	 * If the mapper allow this operation, the deletion can be a soft or hard deletion. Soft deletion allow the item to
+	 * be undeleted. Hard deletion are not idempotent, multiples calls to theses method should not possible from
+	 * DELETE, PUT nor GET REST services.
+	 * 
+	 * @param entity
+	 *            the entity of the element to be deleted
+	 * @param itemId
+	 *            the item id to delete
+	 * @param hardDelete
+	 *            True if the deletion must be an "hard deletion".
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return true if the item exist and has been deleted.
+	 * @see #undelete(MetaDataEntity, int)
+	 */
+	public boolean delete(MetaDataEntity entity, int itemId, boolean hardDelete, IConnectionUserBean currentUser);
 
 	/**
 	 * Delete a list of items from the storage.
@@ -328,6 +519,21 @@ public interface IMapperService {
 	 * @see #delete(BeanMap, boolean)
 	 */
 	public boolean undelete(BeanMap item);
+	
+	/**
+	 * Cancel a soft deletion operation.
+	 * 
+	 * <p>
+	 * Hard deletion are not reversible.
+	 * 
+	 * @param item
+	 *            The BeanMap object to undelete.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return True if the item has been successfully undeleted.
+	 * @see #delete(BeanMap, boolean)
+	 */
+	public boolean undelete(BeanMap item, IConnectionUserBean currentUser);
 
 	/**
 	 * Cancel a soft deletion operation.
@@ -350,6 +556,23 @@ public interface IMapperService {
 	 * <p>
 	 * Hard deletion are not reversible.
 	 * 
+	 * @param type
+	 *            the entity type of the element to be undeleted
+	 * @param itemId
+	 *            the item id to undelete
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return True if the item has been successfully undeleted.
+	 * @see #delete(String, int, boolean)
+	 */
+	public boolean undelete(String type, int itemId, IConnectionUserBean currentUser);
+
+	/**
+	 * Cancel a soft deletion operation.
+	 * 
+	 * <p>
+	 * Hard deletion are not reversible.
+	 * 
 	 * @param entity
 	 *            the entity of the element to be undeleted
 	 * @param itemId
@@ -358,6 +581,23 @@ public interface IMapperService {
 	 * @see #delete(MetaDataEntity, int, boolean)
 	 */
 	public boolean undelete(MetaDataEntity entity, int itemId);
+
+	/**
+	 * Cancel a soft deletion operation.
+	 * 
+	 * <p>
+	 * Hard deletion are not reversible.
+	 * 
+	 * @param entity
+	 *            the entity of the element to be undeleted
+	 * @param itemId
+	 *            the item id to undelete
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return True if the item has been successfully undeleted.
+	 * @see #delete(MetaDataEntity, int, boolean)
+	 */
+	public boolean undelete(MetaDataEntity entity, int itemId, IConnectionUserBean currentUser);
 
 	/**
 	 * Update an item into the storage.
@@ -381,6 +621,24 @@ public interface IMapperService {
 	 * <p>
 	 * Update operation can be called onto (soft) deleted items.
 	 * 
+	 * <p>
+	 * The whole content of the BeanMap object is going to be updated. So for optimization reasons it is preferable to
+	 * store into this object only the modified information.
+	 * 
+	 * @param item
+	 *            The BeanMap to update. Any attribute code used into this BeanMap will be updated into the storage.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return true if the item has been successfully updated.
+	 */
+	public boolean update(BeanMap item, IConnectionUserBean currentUser);
+
+	/**
+	 * Update an item into the storage.
+	 * 
+	 * <p>
+	 * Update operation can be called onto (soft) deleted items.
+	 * 
 	 * @param type
 	 *            The entity type to update
 	 * @param itemId
@@ -392,6 +650,26 @@ public interface IMapperService {
 	 * @return true if the item has been successfully updated.
 	 */
 	public boolean update(String type, int itemId, String attributes, List<Object> values);
+
+	/**
+	 * Update an item into the storage.
+	 * 
+	 * <p>
+	 * Update operation can be called onto (soft) deleted items.
+	 * 
+	 * @param type
+	 *            The entity type to update
+	 * @param itemId
+	 *            The item ID to update.
+	 * @param attributes
+	 *            The spaces separated, list of attributes codes to be updated.
+	 * @param values
+	 *            The corresponding list of values. This list length must be the same as the attribute list length.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return true if the item has been successfully updated.
+	 */
+	public boolean update(String type, int itemId, String attributes, List<Object> values, IConnectionUserBean currentUser);
 
 	/**
 	 * Update an item into the storage.
@@ -425,9 +703,49 @@ public interface IMapperService {
 	 *            The spaces separated, list of attributes codes to be updated.
 	 * @param values
 	 *            The corresponding list of values. This list length must be the same as the attribute list length.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return true if the item has been successfully updated.
+	 */
+	public boolean update(MetaDataEntity entity, int itemId, String attributes, List<Object> values, IConnectionUserBean currentUser);
+
+	/**
+	 * Update an item into the storage.
+	 * 
+	 * <p>
+	 * Update operation can be called onto (soft) deleted items.
+	 * 
+	 * @param entity
+	 *            The entity to update
+	 * @param itemId
+	 *            The item ID to update.
+	 * @param attributes
+	 *            The spaces separated, list of attributes codes to be updated.
+	 * @param values
+	 *            The corresponding list of values. This list length must be the same as the attribute list length.
 	 * @return true if the item has been successfully updated.
 	 */
 	public boolean update(MetaDataEntity entity, int itemId, String attributes, Object... values);
+
+	/**
+	 * Update an item into the storage.
+	 * 
+	 * <p>
+	 * Update operation can be called onto (soft) deleted items.
+	 * 
+	 * @param entity
+	 *            The entity to update
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @param itemId
+	 *            The item ID to update.
+	 * @param attributes
+	 *            The spaces separated, list of attributes codes to be updated.
+	 * @param values
+	 *            The corresponding list of values. This list length must be the same as the attribute list length.
+	 * @return true if the item has been successfully updated.
+	 */
+	public boolean update(MetaDataEntity entity, IConnectionUserBean currentUser, int itemId, String attributes, Object... values);
 
 	/**
 	 * Update an item into the storage.
@@ -447,6 +765,27 @@ public interface IMapperService {
 	 * @return true if the item has been successfully updated.
 	 */
 	public boolean update(int itemId, MetaDataAttribute attribute, Object value);
+
+	/**
+	 * Update an item into the storage.
+	 * 
+	 * <p>
+	 * Update operation can be called onto (soft) deleted items.
+	 * 
+	 * <p>
+	 * The entity to update is deducted from the parent entity of the given attribute.
+	 * 
+	 * @param itemId
+	 *            The item ID to update.
+	 * @param attribute
+	 *            The attribute to be updated.
+	 * @param value
+	 *            The corresponding value.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return true if the item has been successfully updated.
+	 */
+	public boolean update(int itemId, MetaDataAttribute attribute, Object value, IConnectionUserBean currentUser);
 
 	/**
 	 * Update an item into the storage.
@@ -479,12 +818,58 @@ public interface IMapperService {
 	 * @param itemId
 	 *            The item ID to update.
 	 * @param attributes
+	 *            The list of attributes to be updated, this list can <b>not</b> be null.
+	 * @param values
+	 *            The corresponding list of values. This list length must be the same as the attribute list length.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return true if the item has been successfully updated.
+	 */
+	public boolean update(int itemId, List<MetaDataAttribute> attributes, List<Object> values, IConnectionUserBean currentUser);
+
+	/**
+	 * Update an item into the storage.
+	 * 
+	 * <p>
+	 * Update operation can be called onto (soft) deleted items.
+	 * 
+	 * <p>
+	 * The entity to update is deducted from the parent entity of the given attributes.
+	 * 
+	 * @param entity
+	 *            The entity to update.
+	 * @param itemId
+	 *            The item ID to update.
+	 * @param attributes
 	 *            The list of attributes to be updated.
 	 * @param values
 	 *            The corresponding list of values. This list length must be the same as the attribute list length.
 	 * @return true if the item has been successfully updated.
 	 */
 	public boolean update(MetaDataEntity entity, int itemId, List<MetaDataAttribute> attributes, List<Object> values);
+
+	/**
+	 * Update an item into the storage.
+	 * 
+	 * <p>
+	 * Update operation can be called onto (soft) deleted items.
+	 * 
+	 * <p>
+	 * The entity to update is deducted from the parent entity of the given attributes.
+	 * 
+	 * @param entity
+	 *            The entity to update.
+	 * @param itemId
+	 *            The item ID to update.
+	 * @param attributes
+	 *            The list of attributes to be updated.
+	 * @param values
+	 *            The corresponding list of values. This list length must be the same as the attribute list length.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return true if the item has been successfully updated.
+	 */
+	public boolean update(MetaDataEntity entity, int itemId, List<MetaDataAttribute> attributes, List<Object> values, IConnectionUserBean currentUser);
 
 	/**
 	 * Update a set of items into the storage.
@@ -500,9 +885,11 @@ public interface IMapperService {
 	 *            The corresponding list of values. This list length must be the same as the attribute list length.
 	 * @param criteria
 	 *            A conditional selection of item to update.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
 	 * @return true if some of the items have been successfully updated.
 	 */
-	public boolean update(String type, String attributes, List<Object> values, String criteria);
+	public boolean update(String type, String attributes, List<Object> values, String criteria, IConnectionUserBean currentUser);
 
 	/**
 	 * Update a set of items into the storage.
@@ -513,7 +900,7 @@ public interface IMapperService {
 	 * <p>
 	 * The entity to update is deducted from the parent entity of the given attributes.
 	 * 
-	 * @param type
+	 * @param entity
 	 *            The entity to update.
 	 * @param attributes
 	 *            The list of attributes codes to be updated.
@@ -521,9 +908,11 @@ public interface IMapperService {
 	 *            The corresponding list of values. This list length must be the same as the attribute list length.
 	 * @param criteria
 	 *            A conditional selection of item to update.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
 	 * @return true if some of the items have been successfully updated.
 	 */
-	public boolean update(MetaDataEntity entity, String[] attributes, List<Object> values, String criteria);
+	public boolean update(MetaDataEntity entity, String[] attributes, List<Object> values, String criteria, IConnectionUserBean currentUser);
 
 	/**
 	 * Update a set of items into the storage.
@@ -540,9 +929,11 @@ public interface IMapperService {
 	 *            The corresponding list of values. This list length must be the same as the attribute list length.
 	 * @param criteria
 	 *            A conditional selection of item to update.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
 	 * @return true if some of the items have been successfully updated.
 	 */
-	public boolean update(List<MetaDataAttribute> attributes, List<Object> values, ISearchCriteria criteria);
+	public boolean update(List<MetaDataAttribute> attributes, List<Object> values, ISearchCriteria criteria, IConnectionUserBean currentUser);
 
 	/**
 	 * Update a set of items into the storage.
@@ -553,16 +944,18 @@ public interface IMapperService {
 	 * <p>
 	 * The entity to update is deducted from the parent entity of the given attributes.
 	 * 
-	 * @param entity
+	 * @param entity The entity to modify.
 	 * @param attributes
 	 *            The list of attributes to be updated.
 	 * @param values
 	 *            The corresponding list of values. This list length must be the same as the attribute list length.
 	 * @param criteria
 	 *            A conditional selection of item to update.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
 	 * @return true if some of the items have been successfully updated.
 	 */
-	public boolean update(MetaDataEntity entity, List<MetaDataAttribute> attributes, List<Object> values, ISearchCriteria criteria);
+	public boolean update(MetaDataEntity entity, List<MetaDataAttribute> attributes, List<Object> values, ISearchCriteria criteria, IConnectionUserBean currentUser);
 
 	/**
 	 * Select an item from the storage.
@@ -1196,11 +1589,49 @@ public interface IMapperService {
 	 *            The BeanMap object that is the origin of the link.
 	 * @param linkCode
 	 *            The link code defined for the origin entity.
+	 * @param destId
+	 *            the item id target of the link.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return true if the link has been created.
+	 */
+	public boolean linkAdd(BeanMap source, String linkCode, int destId, IConnectionUserBean currentUser);
+
+	/**
+	 * Add a link between two items. A link is an oriented relation that have an origin and a target. Some link can be
+	 * reversed, but both must be declared.
+	 * 
+	 * <p>
+	 * This link can be either as association (n-to-m relation) or a reversed reference (n-to-1 relation).
+	 * 
+	 * @param source
+	 *            The BeanMap object that is the origin of the link.
+	 * @param linkCode
+	 *            The link code defined for the origin entity.
 	 * @param dest
 	 *            The BeanMap object that is the target of the link.
 	 * @return true if the link has been created.
 	 */
 	public boolean linkAdd(BeanMap source, String linkCode, BeanMap dest);
+
+	/**
+	 * Add a link between two items. A link is an oriented relation that have an origin and a target. Some link can be
+	 * reversed, but both must be declared.
+	 * 
+	 * <p>
+	 * This link can be either as association (n-to-m relation) or a reversed reference (n-to-1 relation).
+	 * 
+	 * @param source
+	 *            The BeanMap object that is the origin of the link.
+	 * @param linkCode
+	 *            The link code defined for the origin entity.
+	 * @param dest
+	 *            The BeanMap object that is the target of the link.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return true if the link has been created.
+	 */
+	public boolean linkAdd(BeanMap source, String linkCode, BeanMap dest, IConnectionUserBean currentUser);
 
 	/**
 	 * Add a link between two items. A link is an oriented relation that have an origin and a target. Some link can be
@@ -1228,6 +1659,27 @@ public interface IMapperService {
 	 * <p>
 	 * This link can be either as association (n-to-m relation) or a reversed reference (n-to-1 relation).
 	 * 
+	 * @param sourceType
+	 *            The type of the origin entity.
+	 * @param linkCode
+	 *            The link code defined for the origin entity.
+	 * @param sourceId
+	 *            the item id origin of the link.
+	 * @param destId
+	 *            the item id target of the link.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return true if the link has been created.
+	 */
+	public boolean linkAdd(String sourceType, String linkCode, int sourceId, int destId, IConnectionUserBean currentUser);
+
+	/**
+	 * Add a link between two items. A link is an oriented relation that have an origin and a target. Some link can be
+	 * reversed, but both must be declared.
+	 * 
+	 * <p>
+	 * This link can be either as association (n-to-m relation) or a reversed reference (n-to-1 relation).
+	 * 
 	 * @param link
 	 *            The link metadata definition.
 	 * @param sourceId
@@ -1237,6 +1689,25 @@ public interface IMapperService {
 	 * @return true if the link has been created.
 	 */
 	public boolean linkAdd(MetaDataLink link, int sourceId, int destId);
+
+	/**
+	 * Add a link between two items. A link is an oriented relation that have an origin and a target. Some link can be
+	 * reversed, but both must be declared.
+	 * 
+	 * <p>
+	 * This link can be either as association (n-to-m relation) or a reversed reference (n-to-1 relation).
+	 * 
+	 * @param link
+	 *            The link metadata definition.
+	 * @param sourceId
+	 *            the item id origin of the link.
+	 * @param destId
+	 *            the item id target of the link.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return true if the link has been created.
+	 */
+	public boolean linkAdd(MetaDataLink link, int sourceId, int destId, IConnectionUserBean currentUser);
 
 	/**
 	 * Test if two item are linked with each other.
@@ -1327,6 +1798,27 @@ public interface IMapperService {
 	public boolean linkRemove(String sourceType, String linkCode, int sourceId, int destId);
 
 	/**
+	 * Remove a link between two items. A link is an oriented relation that have an origin and a target. Some link can
+	 * be reversed, but both must be declared.
+	 * 
+	 * <p>
+	 * This link can be either as association (n-to-m relation) or a reversed reference (n-to-1 relation).
+	 * 
+	 * @param sourceType
+	 *            The type of the origin entity.
+	 * @param linkCode
+	 *            The link code defined for the origin entity.
+	 * @param sourceId
+	 *            the item id origin of the link.
+	 * @param destId
+	 *            the item id target of the link.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return true if the link has been removed.
+	 */
+	public boolean linkRemove(String sourceType, String linkCode, int sourceId, int destId, IConnectionUserBean currentUser);
+
+	/**
 	 * Add a link between two items. A link is an oriented relation that have an origin and a target. Some link can be
 	 * reversed, but both must be declared.
 	 * 
@@ -1342,6 +1834,25 @@ public interface IMapperService {
 	 * @return true if the link has been removed.
 	 */
 	public boolean linkRemove(MetaDataLink link, int sourceId, int destId);
+
+	/**
+	 * Add a link between two items. A link is an oriented relation that have an origin and a target. Some link can be
+	 * reversed, but both must be declared.
+	 * 
+	 * <p>
+	 * This link can be either as association (n-to-m relation) or a reversed reference (n-to-1 relation).
+	 * 
+	 * @param link
+	 *            The link metadata definition.
+	 * @param sourceId
+	 *            the item id origin of the link.
+	 * @param destId
+	 *            the item id target of the link.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return true if the link has been removed.
+	 */
+	public boolean linkRemove(MetaDataLink link, int sourceId, int destId, IConnectionUserBean currentUser);
 
 	/**
 	 * Return the list of target items linked to the specified source item.
@@ -1607,4 +2118,16 @@ public interface IMapperService {
 	public int linkCount(List<MetaDataLink> links, int sourceId, boolean deleted, ISearchCriteria criteria, boolean distinct, boolean ignoreSubdivision,
 			IConnectionUserBean currentUser);
 
+	/**
+	 * Modify the last modification date and user of the given data, without any other modification.
+	 * 
+	 * @param entity
+	 *            The entity to update.
+	 * @param itemId
+	 *            The item ID to update.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return True if the data has been updated.
+	 */
+	public boolean touch(MetaDataEntity entity, int itemId, IConnectionUserBean currentUser);
 }

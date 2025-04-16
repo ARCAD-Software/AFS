@@ -22,6 +22,11 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.mapper.Mapper;
 
+/**
+ * This XSTream converter allow to modify an existing BeanMap with the content of the XML file.
+ * 
+ * @author ARCAD Software
+ */
 public class BeanMapUpdateConverter extends BeanMapConverter {
 
 	private BeanMap beanToUpdate;
@@ -54,6 +59,16 @@ public class BeanMapUpdateConverter extends BeanMapConverter {
 		if (id != 0) {
 			beanToUpdate.setId(id);
 		}
+		sid = reader.getAttribute(BeanMap.KEY_MUID);
+		if (sid != null) {
+			try {
+				int i = Integer.parseInt(sid);
+				if (i > 0) {
+					beanToUpdate.setMUID(i);
+				}
+			} catch (NumberFormatException e) {
+			}
+		}
 		String date = reader.getAttribute(BeanMap.KEY_DATE);
 		if (date != null) {
 			try {
@@ -68,7 +83,7 @@ public class BeanMapUpdateConverter extends BeanMapConverter {
 		for (int i = 0; i < reader.getAttributeCount(); i++) {
 			String key = reader.getAttributeName(i);
 			String val = reader.getAttribute(i);
-			if ((!BeanMap.KEY_ID.equals(key)) && (!BeanMap.KEY_DATE.equals(key)) && (!BeanMap.KEY_TYPE.equals(key))) {
+			if (!BeanMap.KEY_ID.equals(key) && !BeanMap.KEY_DATE.equals(key) && !BeanMap.KEY_TYPE.equals(key) && !BeanMap.KEY_MUID.equals(key)) {
 				beanToUpdate.put(key.replace('_', '.'), xmlToValue(key,val));
 			}
 		}

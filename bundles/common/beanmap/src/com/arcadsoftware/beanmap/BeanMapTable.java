@@ -192,7 +192,7 @@ public class BeanMapTable implements Serializable {
 	 * @param collection
 	 */
 	public void addAll(Collection<IBeanMap> collection) {
-		for (IBeanMap bean:collection) {
+		for (IBeanMap bean: collection) {
 			put(bean);
 		}
 	}

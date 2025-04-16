@@ -34,6 +34,8 @@ public final class BeanMapFromJSON {
 				bean.forceId(o.getInt(k));
 			} else if ("type".equals(k)) {
 				bean.setType(o.getString(k));
+			} else if ("muid".equals(k)) {
+				bean.setMUID(o.getInt(k));
 			} else if ("date".equals(k)) {
 				try {
 					bean.setDate(ISODateFormater.toDate(o.getString(k)));

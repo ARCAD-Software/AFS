@@ -147,7 +147,7 @@ public class Activator extends AbstractActivator implements EventHandler, Servic
 				Dictionary<String, Object> props = new Hashtable<String, Object>();
 				props.put(MapperSQLService.PROP_DOMAINNAME, domain);
 				props.put(MapperSQLService.PROP_SUPPORT_EXTRAREFERENCES, true);
-				props.put(MapperSQLService.PROP_SUPPORT_GROUPSENTITY, false);
+				props.put(MapperSQLService.PROP_SUPPORT_SUBDIVISIONS, true);
 				props.put(MapperSQLService.PROP_SUPPORT_MULTILINKREFERENCES, true);
 				props.put(MapperSQLService.PROP_SUPPORT_PAGINATION, true);
 				props.put(MapperSQLService.PROP_SUPPORT_SOFTDELETION, true);

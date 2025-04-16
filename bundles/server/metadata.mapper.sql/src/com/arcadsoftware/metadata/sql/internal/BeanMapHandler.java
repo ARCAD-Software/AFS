@@ -106,6 +106,8 @@ public class BeanMapHandler implements ResultSetHandler<Object> {
 				bean.forceId(rs.getInt(i));
 			} else if ("deleted".equals(name)) { //$NON-NLS-1$
 				bean.setDeleted(rs.getInt(i) != 0);
+			} else if ("muid".equals(name)) { //$NON-NLS-1$
+				bean.setMUID(rs.getInt(i));
 			} else if ("date".equals(name)) { //$NON-NLS-1$
 				Timestamp t = rs.getTimestamp(i);
 				if (t != null) {

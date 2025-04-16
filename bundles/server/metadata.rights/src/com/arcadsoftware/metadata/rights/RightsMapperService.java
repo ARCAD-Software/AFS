@@ -30,6 +30,7 @@ import com.arcadsoftware.metadata.criteria.AndCriteria;
 import com.arcadsoftware.metadata.criteria.CriteriaContextBasic;
 import com.arcadsoftware.metadata.criteria.EqualCriteria;
 import com.arcadsoftware.metadata.criteria.ISearchCriteria;
+import com.arcadsoftware.metadata.criteria.LinkCriteria;
 import com.arcadsoftware.rest.connection.IConnectionUserBean;
 
 /**
@@ -46,7 +47,7 @@ public class RightsMapperService extends AbstractMapperService<CriteriaContextBa
 	}
 
 	@Override
-	public BeanMap create(MetaDataEntity entity, List<MetaDataAttribute> attributes, List<Object> values) {
+	public BeanMap create(MetaDataEntity entity, List<MetaDataAttribute> attributes, List<Object> values, IConnectionUserBean currentUser) {
 		return null;
 	}
 
@@ -61,12 +62,17 @@ public class RightsMapperService extends AbstractMapperService<CriteriaContextBa
 	}
 
 	@Override
+	public boolean delete(MetaDataEntity entity, int itemId, boolean hardDelete, IConnectionUserBean currentUser) {
+		return false;
+	}
+
+	@Override
 	public int undelete(MetaDataEntity entity, ISearchCriteria criteria, IConnectionUserBean currentUser) {
 		return 0;
 	}
 
 	@Override
-	public boolean update(MetaDataEntity entity, int itemId, List<MetaDataAttribute> attributes, List<Object> values) {
+	public boolean update(MetaDataEntity entity, int itemId, List<MetaDataAttribute> attributes, List<Object> values, IConnectionUserBean currentUser) {
 		return false;
 	}
 
@@ -175,12 +181,42 @@ public class RightsMapperService extends AbstractMapperService<CriteriaContextBa
 	}
 
 	@Override
-	public boolean linkTest(List<MetaDataLink> links, int sourceId, int destId, boolean ignoseSubdivision) {
+	public boolean linkTest(List<MetaDataLink> links, int sourceId, int destId, boolean ignoreSubdivision) {
 		if ((links == null) || (links.size() != 1)) {
+			// TODO manage the completion of an external link (in a multi-link selection)...
 			return false;
 		}
-		BeanMap right = activator.getRightBean(destId);
-		return (right != null) && (right.getInt(Activator.RIGHT_CATEGORY) == sourceId);
+		MetaDataLink link = links.get(0);
+		MetaDataEntity e = link.getParent();
+		if (e.getMapper() != this) {
+			activator.error("Link Selection with RightsMapper on link: " + links.get(0) + " belong to " + e.toString());
+			return e.getMapper().linkTest(links, sourceId, destId, ignoreSubdivision);
+		}
+		// Manage only rightCategory.rights
+		if (Activator.RIGHTCATEGORY.equals(e.getType())) {
+			BeanMap right = activator.getRightBean(destId);
+			return (right != null) && (right.getInt(Activator.RIGHT_CATEGORY) == sourceId);
+		}
+		// Reverse other links..
+		if (Activator.RIGHT.equals(e.getType())) {
+			MetaDataEntity p = MetaDataEntity.loadEntity("profile"); //$NON-NLS-1$
+			if (p == null) {
+				return false;
+			}
+			MetaDataLink profileRights = p.getLink("rights"); //$NON-NLS-1$
+			if ("profiles".equals(link.getCode())) {
+				return p.getMapper().linkTest(list(profileRights), destId, sourceId, ignoreSubdivision);
+			}
+			if ("users".equals(link.getCode())) {
+				MetaDataEntity u = MetaDataEntity.loadEntity("user"); //$NON-NLS-1$
+				if (u == null) {
+					return false;
+				}
+				MetaDataLink userProfiles = p.getLink("profiles"); //$NON-NLS-1$
+				return p.getMapper().linkTest(list(userProfiles, profileRights), destId, sourceId, ignoreSubdivision);
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -190,46 +226,54 @@ public class RightsMapperService extends AbstractMapperService<CriteriaContextBa
 		if ((links == null) || links.isEmpty()) {
 			return new BeanMapList();
 		}
-		MetaDataEntity parent = links.get(0).getParent();
+		MetaDataLink link = links.get(0);
+		MetaDataEntity parent = link.getParent();
 		if (parent.getMapper() != this) {
 			activator.error("Link Selection with RightsMapper on link: " + links.get(0) + " belong to " + parent.toString());
-			return new BeanMapList();
+			return parent.getMapper().linkSelection(links, sourceId, attributes, deleted, criteria, distinct, ignoreSubdivision, orders, context.getCurrentUser(), page, limit);
 		}
-		MetaDataEntity refentity = links.get(links.size() - 1).getRefEntity();
-		if ((refentity == null) || (refentity.getMapper() == null)) {
-			return new BeanMapList();
-		}
-		if (refentity.getMapper() != this) {
-			return refentity.getMapper().linkSelection(links, sourceId, attributes, deleted, criteria, distinct, ignoreSubdivision, orders, context.getCurrentUser(), page, limit);
-		}
+		// Manage only rightCategory.rights
+		if (Activator.RIGHTCATEGORY.equals(parent.getType())) {
+			BeanMapList result = new BeanMapList();
+			for (BeanMap right: activator.getRights()) {
+				if (right.get(Activator.RIGHTCATEGORY).equals(sourceId) &&  criteria.test(right, context.getCurrentUser())) {
+					result.add(filterBean(right,attributes));
+				}
+			}
+			if ((orders != null) && (orders.size() > 0)) {
+				Collections.sort(result, new OrderComparator(orders));
+			} else {
+				Collections.sort(result);
+			}
+			if (limit < result.size()) {
+				BeanMapPartialList list = new BeanMapPartialList();
+				list.setRank(page);
+				list.setTotal(result.size());
+				limit = limit + page;
+				if (limit > result.size()) {
+					limit = result.size();
+				}
+				for(int i = page; i < limit;i++) {
+					list.add(result.get(i));
+				}
+				return list;
+			}
+			return result;
+		}		
 		if (!Activator.RIGHT.equals(context.getEntity().getType())) {
 			return new BeanMapList();
 		}
-		BeanMapList result = new BeanMapList();
-		for (BeanMap right:activator.getRights()) {
-			if (right.get(Activator.RIGHTCATEGORY).equals(sourceId) &&  criteria.test(right, context.getCurrentUser())) {
-				result.add(filterBean(right,attributes));
-			}
+		MetaDataEntity p = MetaDataEntity.loadEntity("profile"); //$NON-NLS-1$
+		if (p == null) {
+			return new BeanMapList();
 		}
-		if ((orders != null) && (orders.size() > 0)) {
-			Collections.sort(result, new OrderComparator(orders));
-		} else {
-			Collections.sort(result);
+		if ("profiles".equals(link.getCode())) { //$NON-NLS-1$
+			return p.getMapper().selection(attributes, deleted, AndCriteria.and(new LinkCriteria(sourceId, "rights"), criteria), distinct, orders, context.getCurrentUser(), page, limit); //$NON-NLS-1$ 
 		}
-		if (limit < result.size()) {
-			BeanMapPartialList list = new BeanMapPartialList();
-			list.setRank(page);
-			list.setTotal(result.size());
-			limit = limit + page;
-			if (limit > result.size()) {
-				limit = result.size();
-			}
-			for(int i = page; i < limit;i++) {
-				list.add(result.get(i));
-			}
-			return list;
+		if ("users".equals(link.getCode())) { //$NON-NLS-1$
+			return p.getMapper().selection(attributes, deleted, AndCriteria.and(new LinkCriteria(sourceId, "profiles.rights"), criteria), distinct, orders, context.getCurrentUser(), page, limit); //$NON-NLS-1$
 		}
-		return result;
+		return new BeanMapList();
 	}
 
 	@Override
@@ -238,12 +282,32 @@ public class RightsMapperService extends AbstractMapperService<CriteriaContextBa
 		if ((links == null) || links.isEmpty()) {
 			return 0;
 		}
-		if (context.getEntity().getType().equals(Activator.RIGHT)) {
+		MetaDataLink link = links.get(0);
+		MetaDataEntity parent = link.getParent();
+		if (parent.getMapper() != this) {
+			activator.error("Link Count with RightsMapper on link: " + links.get(0) + " belong to " + parent.toString());
+			return parent.getMapper().linkCount(links, id, deleted, criteria, distinct, ignoreSubdivision, context.getCurrentUser());
+		}
+		// Manage only rightCategory.rights
+		if (Activator.RIGHTCATEGORY.equals(parent.getType())) {
 			return doCount(deleted, new AndCriteria(criteria, new EqualCriteria(Activator.RIGHT_CATEGORY, id)), distinct, context);
 		}
-		MetaDataEntity refEntity = links.get(links.size() - 1).getRefEntity();
-		if ((refEntity != null) && (refEntity.getMapper() != null) && (refEntity.getMapper() != this)) {
-			return refEntity.getMapper().linkCount(links, id, deleted, criteria, distinct, ignoreSubdivision, context.getCurrentUser());
+		if (!Activator.RIGHT.equals(context.getEntity().getType())) {
+			return 0;
+		}
+		MetaDataEntity p = MetaDataEntity.loadEntity("profile"); //$NON-NLS-1$
+		if (p == null) {
+			return 0;
+		}
+		if ("profiles".equals(link.getCode())) { //$NON-NLS-1$
+			return p.getMapper().count(p, deleted, AndCriteria.and(new LinkCriteria(id, "rights"), criteria), distinct, context.getCurrentUser()); //$NON-NLS-1$
+		}
+		if ("users".equals(link.getCode())) { //$NON-NLS-1$
+			MetaDataEntity u = MetaDataEntity.loadEntity("user"); //$NON-NLS-1$
+			if (u == null) {
+				return 0;
+			}
+			return u.getMapper().count(u, deleted, AndCriteria.and(new LinkCriteria(id, "profiles.rights"), criteria), distinct, context.getCurrentUser()); //$NON-NLS-1$ 
 		}
 		return 0;
 	}

@@ -86,7 +86,7 @@ public class LinkEndCriteria extends AbstractLinkTestCriteria implements Cloneab
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public LinkEndCriteria clone() {
 		return new LinkEndCriteria(getReference(), getLinkCode(), getAttribute(), getValue(), isIgnoreSubdivision(), isDeletedLinks(), casesensitive);
 	}
 

@@ -47,6 +47,7 @@ public class EntityInfo {
 	protected static final String METADATA_DESTCOL = "destCol"; //$NON-NLS-1$
 	private static final String METADATA_COLPREFIX = "colPrefix"; //$NON-NLS-1$
 	private static final String METADATA_UPDATECOL = "updateCol"; //$NON-NLS-1$
+	private static final String METADATA_MUIDCOL = "muidCol"; //$NON-NLS-1$
 	private static final String METADATA_LOCKCOL = "lockCol"; //$NON-NLS-1$
 	private static final String METADATA_LOCKDATECOL = "lockDateCol"; //$NON-NLS-1$
 
@@ -57,6 +58,7 @@ public class EntityInfo {
 	public String updateCol;
 	public String lockCol;
 	public String lockDateCol;
+	public String muidCol;
 
 	public HashMap<String, String> attributesCols;
 	public HashMap<String, LinkInfo> links;
@@ -66,10 +68,11 @@ public class EntityInfo {
 	public String sql_delete;
 	public String sql_undelete;
 	public String sql_subselect;
-	public HashMap<String, MultiLinkQuery> sql_links;
+	public final HashMap<String, MultiLinkQuery> sql_links;
 	
 	public EntityInfo(MetaDataEntity entity, MapperSQLService mapper) {
 		super();
+		sql_links = new HashMap<>(); 
 		update(entity, mapper);
 	}
 	
@@ -82,7 +85,7 @@ public class EntityInfo {
 		sql_delete = null;
 		sql_undelete = null;
 		// FIXME as this cache depends on other entities it must be cleared when other entities are modified !
-		sql_links = new HashMap<>(); 
+		sql_links.clear(); 
 		BeanMap md = entity.getMetadata();
 		if (md != null) {
 			idCol = md.getString(METADATA_IDCOL);
@@ -112,6 +115,10 @@ public class EntityInfo {
 			lockDateCol = md.getString(METADATA_LOCKDATECOL);
 			if ((lockDateCol != null) && (lockDateCol.length() == 0)) {
 				lockDateCol = null;
+			}
+			muidCol = md.getString(METADATA_MUIDCOL);
+			if ((muidCol != null) && (muidCol.length() == 0)) {
+				muidCol = null;
 			}
 		}
 		attributesCols = new HashMap<String, String>();
@@ -249,6 +256,8 @@ public class EntityInfo {
 		s.append(deleteCol);
 		s.append("\nUpdateCol: "); //$NON-NLS-1$
 		s.append(updateCol);
+		s.append("\nMUIDCol: "); //$NON-NLS-1$
+		s.append(muidCol);
 		s.append("\nLockCol: "); //$NON-NLS-1$
 		s.append(lockCol);
 		s.append("\nAttributes: "); //$NON-NLS-1$

@@ -24,6 +24,7 @@ import com.arcadsoftware.metadata.criteria.AttributeLowerCriteria;
 import com.arcadsoftware.metadata.criteria.AttributeLowerOrEqualsCriteria;
 import com.arcadsoftware.metadata.criteria.BeforeCriteria;
 import com.arcadsoftware.metadata.criteria.BetweenCriteria;
+import com.arcadsoftware.metadata.criteria.ChangedByCriteria;
 import com.arcadsoftware.metadata.criteria.ChangedCriteria;
 import com.arcadsoftware.metadata.criteria.ConstantCriteria;
 import com.arcadsoftware.metadata.criteria.ContainCriteria;
@@ -88,10 +89,10 @@ public abstract class AbstractCriteriaParser {
 			return s;
 		}
 		if (s.charAt(0) == '"') {
-			return s.substring(1, s.length() - 1).replace("\"\"", "\"");
+			return s.substring(1, s.length() - 1).replace("\"\"", "\""); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		if (s.charAt(0) == '\'') {
-			return s.substring(1, s.length() - 1).replace("''", "'");
+			return s.substring(1, s.length() - 1).replace("''", "'"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return s;
 	}
@@ -108,11 +109,11 @@ public abstract class AbstractCriteriaParser {
 			return null;
 		}
 		if (d.length() == 10) {
-			d += "T00:00:00.0000Z";
+			d += "T00:00:00.0000Z"; //$NON-NLS-1$
 		} else if (d.length() == 16) {
-			d += ":00.0000Z";
+			d += ":00.0000Z"; //$NON-NLS-1$
 		} else if (d.length() == 19) {
-			d += ".0000Z";
+			d += ".0000Z"; //$NON-NLS-1$
 		}
 		try {
 			return ISODateFormater.toDate(d);
@@ -351,11 +352,22 @@ public abstract class AbstractCriteriaParser {
 	protected ISearchCriteria deleted(Token rl) {
 		if (rl != null) {
 			String ref = rl.image;
-			if (ref.toLowerCase().endsWith(".@deleted")) {
+			if (ref.toLowerCase().endsWith(".@deleted")) { //$NON-NLS-1$
 				ref = ref.substring(0, ref.length() - 9);
 			}
 			return new DeletedCriteria(ref);
 		}
 		return new DeletedCriteria();
+	}
+	
+	protected ISearchCriteria hasRight(String att, Token t) {
+		if (".".equals(att)) { //$NON-NLS-1$
+			att = null;
+		}
+		int id = 0;
+		if (!t.image.equalsIgnoreCase("@user")) { //$NON-NLS-1$
+			id = integer(t);
+		}
+		return new ChangedByCriteria(att, id);
 	}
 }

@@ -52,7 +52,7 @@ public class AttributeLowerOrEqualsCriteria extends AbstractSearchCriteria imple
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public AttributeLowerOrEqualsCriteria clone() {
 		return new AttributeLowerOrEqualsCriteria(attribute, secondAttribute);
 	}
 

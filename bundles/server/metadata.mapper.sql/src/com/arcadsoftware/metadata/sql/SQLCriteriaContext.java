@@ -33,6 +33,7 @@ import com.arcadsoftware.metadata.criteria.AttributeLowerCriteria;
 import com.arcadsoftware.metadata.criteria.AttributeLowerOrEqualsCriteria;
 import com.arcadsoftware.metadata.criteria.BeforeCriteria;
 import com.arcadsoftware.metadata.criteria.BetweenCriteria;
+import com.arcadsoftware.metadata.criteria.ChangedByCriteria;
 import com.arcadsoftware.metadata.criteria.ChangedCriteria;
 import com.arcadsoftware.metadata.criteria.ConstantCriteria;
 import com.arcadsoftware.metadata.criteria.ContainCriteria;
@@ -81,7 +82,7 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
  * <li>Store all the required joins if a tree structure allowing to minimize the joins operations.
  * </ul>
  * <p>
- * TODO Allow to define "cachable" contextes to be able to optinize the SQL request generation. 
+ * TODO Allow to define a "cache" of contexts to be able to optimize the SQL request generation. 
  * 
  * @author ARCAD Software
  */
@@ -90,6 +91,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 	private static final String SQL_JAVA_PREFIX = "j_"; //$NON-NLS-1$
 	private static final String SQL_JAVA_CRYPT_PREFIX = "z_"; //$NON-NLS-1$
 	private static final String SQL_DATECOL = SQL_JAVA_PREFIX + "date"; //$NON-NLS-1$
+	private static final String SQL_MUIDCOL = SQL_JAVA_PREFIX + "muid"; //$NON-NLS-1$
 	private static final String SQL_DELETECOL = SQL_JAVA_PREFIX + "deleted"; //$NON-NLS-1$
 	private static final String SQL_RECURCIVE_PREFIX = "rt_"; //$NON-NLS-1$
 
@@ -244,6 +246,14 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 			result.append(mapper.fg.as);
 			result.append(SQL_DATECOL);
 		}
+		if (e.muidCol != null) {
+			result.append(mapper.fg.columnsep);
+			result.append(join.getAlias());
+			result.append('.');
+			result.append(e.muidCol);
+			result.append(mapper.fg.as);
+			result.append(SQL_MUIDCOL);
+		}
 		if ((e.deleteCol != null) && deleted) {
 			result.append(mapper.fg.columnsep);
 			result.append(join.getAlias());
@@ -267,11 +277,12 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 		init(deleted);
 		StringBuilder result = new StringBuilder();
 		if (orders != null) {
-			for(ReferenceLine order: orders) {
+			for (ReferenceLine order: orders) {
 				// Assume that the columns are included in the selected columns and generateColumns is called before generateOrders.
 				String col = colNames.get(order.getCode());
 				// Avoid usage of complex column in the order clause.
 				// TODO Support order by complex columns (just remove constants).
+				// TODO Support ordering on updateCol ou muidCol...
 				if ((col != null) && (col.indexOf('+') < 0)) {
 					// we only sort by elements of the same domain and which are actually selected
 					if (result.length() > 0) {
@@ -428,7 +439,6 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 			where.append(mapper.fg.equaldelfalse);
 		}
 		JoinElement current = result;
-		// TODO Auto-generated method stub
 		for (MetaDataLink link: links) {
 			LinkInfo li = ei.links.get(link.getCode());
 			if (result == null) {
@@ -935,6 +945,33 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 				col = colNames.get(((InListCriteria) criteria).getAttribute());
 			}
 			result.append(String.format(mapper.fg.inset,  col, ((InListCriteria) criteria).getIds(mapper.fg.columnsep)));	
+		} else if (criteria instanceof ChangedByCriteria) {
+			String muidCol;
+			String attribute = ((ChangedByCriteria) criteria).getAttribute();
+			if (attribute == null) {
+				muidCol = MapperSQLService.DEFAULT_TABLEALIAS + '.' + entityInfo.muidCol;
+			} else {
+				ReferenceLine ref = getReference(attribute);
+				EntityInfo ae = mapper.getEntityInfo(ref.getLastAttribute().getRefEntity());
+				if (ae.muidCol == null) {
+					muidCol = null;
+				} else {
+					muidCol = getJoin(ref, true, deleted).getAlias() + '.' + ae.muidCol;
+				}
+			}
+			if (muidCol == null) {
+				result.append(mapper.fg.false_cond);
+			} else {
+				int uid = ((ChangedByCriteria) criteria).getUid();
+				if ((uid <= 0) && (getCurrentUser() != null)) {
+					uid = getCurrentUser().getId();
+				}
+				if (uid <= 0) {
+					result.append(mapper.fg.false_cond);
+				} else {
+					result.append(String.format(mapper.fg.equal, muidCol, String.valueOf(uid)));
+				}
+			}
 		} else if (criteria != null) {
 			Activator.getInstance().debug(String.format(Messages.MapperSQLService_UnknownCriteria, criteria.toString(), criteria.getClass().getName()));
 		}

@@ -143,7 +143,7 @@ public class HasRightCriteria extends AbstractSearchCriteria implements Cloneabl
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public HasRightCriteria clone() {
 		return new HasRightCriteria(attribute,right,param);
 	}
 

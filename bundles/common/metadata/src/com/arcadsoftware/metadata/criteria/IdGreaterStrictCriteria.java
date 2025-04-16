@@ -42,7 +42,7 @@ public class IdGreaterStrictCriteria extends AbstractSearchCriteria implements C
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public IdGreaterStrictCriteria clone() {
 		return new IdGreaterStrictCriteria(id);
 	}
 

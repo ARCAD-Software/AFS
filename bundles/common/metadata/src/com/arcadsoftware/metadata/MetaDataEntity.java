@@ -107,6 +107,15 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 	public static final String METADATA_AUTOLINK = "autoLink"; //$NON-NLS-1$
 
 	/**
+	 * This tag indicate that any link creation or suppression must update the target and the source entity Update and Modification User values.
+	 * 
+	 * <p>
+	 * The "pushUpdate" tag is only used at the link level. For "reverseLink" it just imply that the modification of the
+	 * attribute value is pushed to the target one. 
+	 */
+	public static final String METADATA_PUSHUPDATELINK = "pushUpdate"; //$NON-NLS-1$
+	
+	/**
 	 * This tag is used by client and GUI processes to visually order Attributes of an entity.
 	 * 
 	 * <p>
@@ -1660,14 +1669,30 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 	/**
 	 * @return the last structural modification change.
 	 */
+	@Override
 	public Date getDate() {
 		return date;
 	}
 
+	@Override
 	public void setDate(Date date) {
 		this.date = date;
 	}
 
+	@Override
+	public int getMUID() {
+		return 0;
+	}
+
+	@Override
+	public void setMUID(int id) {}
+
+	@Override
+	public void setModification(int uid, Date date) {
+		setDate(date);
+	}
+
+	@Override
 	public boolean moreRecent(IDatedBean bm) {
 		if (date == null) {
 			return bm.getDate() == null;
@@ -2246,6 +2271,7 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 	 * 
 	 * @param criteria
 	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
 	 * @param hardDelete
 	 *            True if the deletion must be an "hard deletion".
 	 * @return the number of deleted elements.
@@ -2282,7 +2308,7 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 	 * 
 	 * @param criteria
 	 * @param currentUser
-	 *            True if the deletion must be an "hard deletion".
+	 *            The connected user that is at the origin of this request. Can be null.
 	 * @return the number of undeleted elements.
 	 */
 	public int dataUndelete(ISearchCriteria criteria, IConnectionUserBean currentUser) {
@@ -2351,14 +2377,16 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 	 *            The corresponding list of values. This list length must be the same as the attribute list length.
 	 * @param criteria
 	 *            A conditional selection of item to update.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
 	 * @return true if some of the items have been successfully updated.
 	 */
-	public boolean dataUpdate(List<MetaDataAttribute> attributes, List<Object> values, ISearchCriteria criteria) {
+	public boolean dataUpdate(List<MetaDataAttribute> attributes, List<Object> values, ISearchCriteria criteria, IConnectionUserBean currentUser) {
 		IMapperService mapper = getMapper();
 		if (mapper == null) {
 			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataUpdate, getType()));
 		}
-		return mapper.update(this, attributes, values, criteria);
+		return mapper.update(this, attributes, values, criteria, currentUser);
 	}
 
 	/**

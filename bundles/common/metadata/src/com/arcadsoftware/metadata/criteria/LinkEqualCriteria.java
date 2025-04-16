@@ -92,7 +92,7 @@ public class LinkEqualCriteria extends AbstractLinkTestCriteria implements Clone
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public LinkEqualCriteria clone() {
 		return new LinkEqualCriteria(getReference(), getLinkCode(), getAttribute(), secondAttribute, getValue(), isIgnoreSubdivision(), isDeletedLinks(), casesensitive);
 	}
 	

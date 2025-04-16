@@ -22,6 +22,7 @@ import com.arcadsoftware.metadata.criteria.AttributeLowerCriteria;
 import com.arcadsoftware.metadata.criteria.AttributeLowerOrEqualsCriteria;
 import com.arcadsoftware.metadata.criteria.BeforeCriteria;
 import com.arcadsoftware.metadata.criteria.BetweenCriteria;
+import com.arcadsoftware.metadata.criteria.ChangedByCriteria;
 import com.arcadsoftware.metadata.criteria.ChangedCriteria;
 import com.arcadsoftware.metadata.criteria.ConstantCriteria;
 import com.arcadsoftware.metadata.criteria.ContainCriteria;
@@ -264,6 +265,9 @@ public class XmlCriteriaStream extends XStreamCompact {
 		xs.aliasAttribute("ignoreSubdivision", "nosub");
 		xs.aliasAttribute("ignoresubdivision", "nosub");
 		xs.aliasAttribute("linkcode", "linkCode");
+		xs.alias("changedby", ChangedByCriteria.class); //$NON-NLS-1$
+		xs.useAttributeFor(ChangedByCriteria.class, "uid"); //$NON-NLS-1$
+		xs.useAttributeFor(ChangedByCriteria.class, "attribute"); //$NON-NLS-1$
 		// For upcomming declarations, do not forget to add the dedicated mapping in the JsonCriteriaStream class.
 		return xs;
 	}

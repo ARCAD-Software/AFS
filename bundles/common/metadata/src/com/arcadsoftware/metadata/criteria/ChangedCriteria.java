@@ -102,7 +102,7 @@ public class ChangedCriteria extends AbstractSearchCriteria implements IAttribut
 		if (rl != null) {
 			context.useReference(rl);
 		}
-		return this; // objet non modifié...
+		return this; // unchanged object...
 	}
 
 	public Calendar getAfterCalendar() {
@@ -160,7 +160,7 @@ public class ChangedCriteria extends AbstractSearchCriteria implements IAttribut
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public ChangedCriteria clone() {
 		return new ChangedCriteria(attribute, after, before, trunc, afteryears, aftermonths, afterdays, 
 				afterhours, afterminuts, beforeyears, beforemonths, beforedays, beforehours, beforeminuts);
 	}

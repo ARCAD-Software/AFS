@@ -56,7 +56,7 @@ public class CurrentUserCriteria extends AbstractSearchCriteria implements Clone
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public CurrentUserCriteria clone() {
 		return new CurrentUserCriteria(attribute, linkCode, userAttribute);
 	}
 

@@ -19,6 +19,7 @@ import java.util.Date;
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
 import com.arcadsoftware.beanmap.BeanMapPartialList;
+import com.arcadsoftware.beanmap.IDatedBean;
 import com.arcadsoftware.osgi.ISODateFormater;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
@@ -33,7 +34,6 @@ import com.thoughtworks.xstream.mapper.Mapper;
 public class BeanMapListConverter implements Converter {
 
 	public static final String TAG_RANK = "rank"; //$NON-NLS-1$
-	public static final String TAG_DATE = "date"; //$NON-NLS-1$
 	public static final String TAG_TOTAL = "total"; //$NON-NLS-1$
 	public static final String TAG_COUNT = "count"; //$NON-NLS-1$
 	private static final String TAG_ITEMS = "items"; //$NON-NLS-1$
@@ -93,10 +93,20 @@ public class BeanMapListConverter implements Converter {
 			Date date = ((BeanMapList) source).getDate();
 			if (date != null) {
 				if (useAttributes) {
-					writer.addAttribute(TAG_DATE, ISODateFormater.toString(date));
+					writer.addAttribute(IDatedBean.KEY_DATE, ISODateFormater.toString(date));
 				} else {
-					((ExtendedHierarchicalStreamWriter) writer).startNode(TAG_DATE, String.class);
+					((ExtendedHierarchicalStreamWriter) writer).startNode(IDatedBean.KEY_DATE, String.class);
 					context.convertAnother(ISODateFormater.toString(date));
+					writer.endNode();
+				}
+			}
+			int muid = ((BeanMapList) source).getMUID();
+			if (muid > 0) {
+				if (useAttributes) {
+					writer.addAttribute(IDatedBean.KEY_MUID, String.valueOf(muid));
+				} else {
+					((ExtendedHierarchicalStreamWriter) writer).startNode(IDatedBean.KEY_MUID, Integer.class);
+					context.convertAnother(muid);
 					writer.endNode();
 				}
 			}
@@ -149,11 +159,20 @@ public class BeanMapListConverter implements Converter {
 		} else {
 			result = new BeanMapList(capacity);
 		}
-		String date = reader.getAttribute(TAG_DATE);
+		String date = reader.getAttribute(IDatedBean.KEY_DATE);
 		if (date != null) {
 			try {
 				result.setDate(ISODateFormater.toDate(date));
 			} catch (ParseException e) {}
+		}
+		String muids = reader.getAttribute(IDatedBean.KEY_MUID);
+		if (muids != null) {
+			try {
+				int i = Integer.parseInt(muids);
+				if (i > 0) {
+					((BeanMapPartialList) result).setMUID(i);
+				}
+			} catch (NumberFormatException e) {}
 		}
 		boolean items = false;
 		while (reader.hasMoreChildren()) {

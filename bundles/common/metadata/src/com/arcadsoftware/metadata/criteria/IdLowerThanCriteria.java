@@ -42,7 +42,7 @@ public class IdLowerThanCriteria extends AbstractSearchCriteria implements Clone
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public IdLowerThanCriteria clone() {
 		return new IdLowerThanCriteria(id);
 	}
 

@@ -292,7 +292,7 @@ public class BeanMapWebAccess {
 		wsa.post(address, params, new StreamRepresentation(MediaType.APPLICATION_OCTET_STREAM) {
 			@Override
 			public void write(OutputStream outputStream) throws IOException {
-				//Rien à faire !
+				// Nothing to do.
 			}
 			@Override
 			public InputStream getStream() throws IOException {

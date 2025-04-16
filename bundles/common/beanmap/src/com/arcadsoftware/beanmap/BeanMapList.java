@@ -23,6 +23,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -61,6 +62,7 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	private static final long serialVersionUID = 8051313140936350926L;
 
 	private Date date;
+	private int muid;
 
 	/**
 	 * Construct a pseudo list type that can be used to determine the resource base uri from a specific BeanMap type.
@@ -360,6 +362,30 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 		}
 		return result;
 	}
+	
+	/**
+	 * Filter the list, return only the BeanMap with a Modification User ID (MUID) equal to the given one.
+	 * 
+	 * @param uid A negative or null value return all BeanMap without a MUID.
+	 * @return
+	 */
+	public BeanMapList findMUID(int uid) {
+		BeanMapList result = new BeanMapList(1);
+		if (uid <= 0)  {
+			for (BeanMap bm : this) {
+				if ((bm != null) && (bm.getMUID() < 0)) {
+					result.add(bm);
+				}
+			}
+		} else {
+			for (BeanMap bm : this) {
+				if ((bm != null) && (bm.getMUID() == uid)) {
+					result.add(bm);
+				}
+			}
+		}
+		return result;
+	}
 
 	/**
 	 * Return the first BeanMap of the given type from this list.
@@ -395,6 +421,22 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	}
 
 	/**
+	 * Get the contained BeanMap with the more recent date.
+	 * 
+	 * @return null if there is no BeanMap with a date in this list.
+	 */
+	public BeanMap getMostRecent() {
+		BeanMap result = null;
+		for (BeanMap b: this) {
+			Date d = b.getDate();
+			if ((d != null) && ((result == null) || d.after(result.getDate()))) {
+				result = b;
+			}
+		}
+		return result;
+	}
+	
+	/**
 	 * <p>
 	 * Dated list can be cached. This date is supposed to be last modification date of the items of this list. This
 	 * suppose, last Item addition, remove, edition onto the server side.
@@ -404,10 +446,35 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	 * 
 	 * @return the last modification date of this list.
 	 */
+	@Override
 	public Date getDate() {
 		return date;
 	}
 
+	/**
+	 * Get the modification date of this list, this value is the date of the list, or the maximal value of the date of the contained BeanMap.
+	 * 
+	 * <p>
+	 * Direct modifications of this list may affect this date.
+	 * 
+	 * @return null if nothing possess a Date in this list.
+	 * @see #getDate()
+	 */
+	public Date getRealDate() {
+		Date result = date;
+		for (BeanMap b: this) {
+			if (result == null) {
+				result = b.getDate();
+			} else {
+				Date d = b.getDate();
+				if ((d != null) && d.after(result)) {
+					result = d;
+				}
+			}
+		}
+		return result;
+	}
+	
 	/**
 	 * Set the last modification date of the list.
 	 * 
@@ -416,8 +483,25 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	 * 
 	 * @param date
 	 */
+	@Override
 	public void setDate(Date date) {
 		this.date = date;
+	}
+
+	@Override
+	public int getMUID() {
+		return muid;
+	}
+
+	@Override
+	public void setMUID(int id) {
+		muid = id;
+	}
+
+	@Override
+	public void setModification(int uid, Date date) {
+		setMUID(uid);
+		setDate(date);
 	}
 
 	/**
@@ -715,9 +799,7 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 		return result;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.arcadsoftware.utils.IDatedBean#moreRecent(com.arcadsoftware.utils.IDatedBean)
-	 */
+	@Override
 	public boolean moreRecent(IDatedBean bm) {
 		return (date != null) && date.after(bm.getDate());
 	}
@@ -906,6 +988,51 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 		});
 	}
 
+	/**
+	 * Sort the BeanMap of this list in the ascendant (if "up" is true) or the descendant order of their modification dates.
+	 * 
+	 * @param up If true the the result is order in the ascendant order.
+	 */
+	public void sortByDate(final boolean up) {
+		final Comparator<BeanMap> comparator;
+		if (up) {
+			comparator = new Comparator<BeanMap>() {
+				@Override
+				public int compare(BeanMap o1, BeanMap o2) {
+					Date d1 = o1.getDate();
+					Date d2 = o2.getDate();
+					if (d1 == null) {
+						if (d2 == null) {
+							return 0;
+						}
+						return -1;
+					} else if (d2 == null) {
+						return 1;
+					}
+					return d1.compareTo(d2);
+				}
+			};
+		} else {
+			comparator = new Comparator<BeanMap>() {
+				@Override
+				public int compare(BeanMap o2, BeanMap o1) {
+					Date d1 = o1.getDate();
+					Date d2 = o2.getDate();
+					if (d1 == null) {
+						if (d2 == null) {
+							return 0;
+						}
+						return -1;
+					} else if (d2 == null) {
+						return 1;
+					}
+					return d1.compareTo(d2);
+				}
+			};
+		}
+		Collections.sort(this, comparator);
+	}
+	
 	@Override
 	public BeanMapList clone() {
 		BeanMapList result = new BeanMapList(this);

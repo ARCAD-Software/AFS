@@ -86,7 +86,7 @@ public class LinkStartCriteria extends AbstractLinkTestCriteria implements Clone
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public LinkStartCriteria clone() {
 		return new LinkStartCriteria(getReference(), getLinkCode(), getAttribute(), getValue(), isIgnoreSubdivision(), isDeletedLinks(), casesensitive);
 	}
 

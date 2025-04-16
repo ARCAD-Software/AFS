@@ -343,7 +343,7 @@ public class DataAccessServices implements IMapperService, IEntityRegistry {
 	@Override
 	public boolean update(int itemId, List<MetaDataAttribute> attributes, List<Object> values) {
 		try {
-			dao.put(getBeanMap(itemId,attributes,values));
+			dao.put(getBeanMap(itemId, attributes, values));
 			return true;
 		} catch (ServerErrorException e) {
 			logError(e);
@@ -355,7 +355,18 @@ public class DataAccessServices implements IMapperService, IEntityRegistry {
 	public boolean update(MetaDataEntity entity, int itemId,
 			List<MetaDataAttribute> attributes, List<Object> values) {
 		try {
-			dao.put(getBeanMap(entity.getType(),itemId,attributes,values));
+			dao.put(getBeanMap(entity.getType(), itemId, attributes, values));
+			return true;
+		} catch (ServerErrorException e) {
+			logError(e);
+			return false;
+		}
+	}
+
+	@Override
+	public boolean touch(MetaDataEntity entity, int itemId, IConnectionUserBean currentUser) {
+		try {
+			dao.put(getBeanMap(entity.getType(), itemId, new ArrayList<>(), new ArrayList<>()));
 			return true;
 		} catch (ServerErrorException e) {
 			logError(e);
@@ -366,25 +377,25 @@ public class DataAccessServices implements IMapperService, IEntityRegistry {
 	@Override
 	public boolean update(MetaDataEntity entity,
 			List<MetaDataAttribute> attributes, List<Object> values,
-			ISearchCriteria criteria) {
+			ISearchCriteria criteria, IConnectionUserBean currentUser) {
 		// TODO DataAccess does not implement multi-update !!!!
 		return false;
 	}
 
 	@Override
-	public boolean update(String type, String attributes, List<Object> values, String criteria) {
+	public boolean update(String type, String attributes, List<Object> values, String criteria, IConnectionUserBean currentUser) {
 		// TODO DataAccess does not implement multi-update !!!!
 		return false;
 	}
 
 	@Override
-	public boolean update(MetaDataEntity entity, String[] attributes, List<Object> values, String criteria) {
+	public boolean update(MetaDataEntity entity, String[] attributes, List<Object> values, String criteria, IConnectionUserBean currentUser) {
 		// TODO DataAccess does not implement multi-update !!!!
 		return false;
 	}
 
 	@Override
-	public boolean update(List<MetaDataAttribute> attributes, List<Object> values, ISearchCriteria criteria) {
+	public boolean update(List<MetaDataAttribute> attributes, List<Object> values, ISearchCriteria criteria, IConnectionUserBean currentUser) {
 		// TODO DataAccess does not implement multi-update !!!!
 		return false;
 	}
@@ -705,9 +716,6 @@ public class DataAccessServices implements IMapperService, IEntityRegistry {
 		} catch (ServerErrorException e) {
 			logError(e);
 			return false;
-		} catch (CloneNotSupportedException e) {
-			logError(e);
-			return false;
 		}
 	}
 
@@ -719,9 +727,6 @@ public class DataAccessServices implements IMapperService, IEntityRegistry {
 			BeanMapList list = dao.getList(entity.getType(), "", AndCriteria.and(criteria, new IdEqualCriteria(itemId)), null, 0, 1, deleted); //$NON-NLS-1$
 			return (list != null) && (list.size() > 0);
 		} catch (ServerErrorException e) {
-			logError(e);
-			return false;
-		} catch (CloneNotSupportedException e) {
 			logError(e);
 			return false;
 		}
@@ -1187,6 +1192,136 @@ public class DataAccessServices implements IMapperService, IEntityRegistry {
 			logError(e);
 		}
 		return 0;
+	}
+
+	@Override
+	public BeanMap create(BeanMap item, IConnectionUserBean currentUser) {
+		return create(item);
+	}
+
+	@Override
+	public BeanMap create(String type, String attributes, List<Object> values, IConnectionUserBean currentUser) {
+		return create(type, attributes, values);
+	}
+
+	@Override
+	public BeanMap create(MetaDataEntity entity, String attributes, List<Object> values, IConnectionUserBean currentUser) {
+		return create(entity, attributes, values);
+	}
+
+	@Override
+	public BeanMap create(MetaDataEntity entity, IConnectionUserBean currentUser, String attributes, Object... values) {
+		return create(entity, attributes, values);
+	}
+
+	@Override
+	public BeanMap create(MetaDataAttribute attribute, Object value, IConnectionUserBean currentUser) {
+		return create(attribute, value);
+	}
+
+	@Override
+	public BeanMap create(List<MetaDataAttribute> attributes, List<Object> values, IConnectionUserBean currentUser) {
+		return create(attributes, values);
+	}
+
+	@Override
+	public BeanMap create(MetaDataEntity entity, List<MetaDataAttribute> attributes, List<Object> values, IConnectionUserBean currentUser) {
+		return create(entity, attributes, values);
+	}
+
+	@Override
+	public boolean delete(BeanMap item, boolean hardDelete, IConnectionUserBean currentUser) {
+		return delete(item, hardDelete);
+	}
+
+	@Override
+	public boolean delete(String type, int itemId, boolean hardDelete, IConnectionUserBean currentUser) {
+		return delete(type, itemId, hardDelete);
+	}
+
+	@Override
+	public boolean delete(MetaDataEntity entity, int itemId, boolean hardDelete, IConnectionUserBean currentUser) {
+		return delete(entity, itemId, hardDelete);
+	}
+
+	@Override
+	public boolean undelete(BeanMap item, IConnectionUserBean currentUser) {
+		return undelete(item);
+	}
+
+	@Override
+	public boolean undelete(String type, int itemId, IConnectionUserBean currentUser) {
+		return undelete(type, itemId);
+	}
+
+	@Override
+	public boolean undelete(MetaDataEntity entity, int itemId, IConnectionUserBean currentUser) {
+		return undelete(entity, itemId);
+	}
+
+	@Override
+	public boolean update(BeanMap item, IConnectionUserBean currentUser) {
+		return update(item);
+	}
+
+	@Override
+	public boolean update(String type, int itemId, String attributes, List<Object> values, IConnectionUserBean currentUser) {
+		return update(type, itemId, attributes, values);
+	}
+
+	@Override
+	public boolean update(MetaDataEntity entity, int itemId, String attributes, List<Object> values, IConnectionUserBean currentUser) {
+		return update(entity, itemId, attributes, values);
+	}
+
+	@Override
+	public boolean update(MetaDataEntity entity, IConnectionUserBean currentUser, int itemId, String attributes, Object... values) {
+		return update(entity, itemId, attributes, values);
+	}
+
+	@Override
+	public boolean update(int itemId, MetaDataAttribute attribute, Object value, IConnectionUserBean currentUser) {
+		return update(itemId, attribute, value);
+	}
+
+	@Override
+	public boolean update(int itemId, List<MetaDataAttribute> attributes, List<Object> values, IConnectionUserBean currentUser) {
+		return update(itemId, attributes, values);
+	}
+
+	@Override
+	public boolean update(MetaDataEntity entity, int itemId, List<MetaDataAttribute> attributes, List<Object> values, IConnectionUserBean currentUser) {
+		return update(entity, itemId, attributes, values);
+	}
+
+	@Override
+	public boolean linkAdd(BeanMap source, String linkCode, int destId, IConnectionUserBean currentUser) {
+		return linkAdd(source, linkCode, destId);
+	}
+
+	@Override
+	public boolean linkAdd(BeanMap source, String linkCode, BeanMap dest, IConnectionUserBean currentUser) {
+		return linkAdd(source, linkCode, dest);
+	}
+
+	@Override
+	public boolean linkAdd(String sourceType, String linkCode, int sourceId, int destId, IConnectionUserBean currentUser) {
+		return linkAdd(sourceType, linkCode, sourceId, destId);
+	}
+
+	@Override
+	public boolean linkAdd(MetaDataLink link, int sourceId, int destId, IConnectionUserBean currentUser) {
+		return linkAdd(link, sourceId, destId);
+	}
+
+	@Override
+	public boolean linkRemove(String sourceType, String linkCode, int sourceId, int destId, IConnectionUserBean currentUser) {
+		return linkRemove(sourceType, linkCode, sourceId, destId);
+	}
+
+	@Override
+	public boolean linkRemove(MetaDataLink link, int sourceId, int destId, IConnectionUserBean currentUser) {
+		return linkRemove(link, sourceId, destId);
 	}
 
 }

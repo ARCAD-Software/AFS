@@ -163,7 +163,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 	 * @param values The values to be updated.
 	 * @return The updated list of values.
 	 */
-	protected List<Object> filterValues(EntityInfo e, List<MetaDataAttribute> attributes, List<String> cols, List<Object> values) {
+	protected List<Object> filterValues(EntityInfo e, List<MetaDataAttribute> attributes, List<String> cols, List<Object> values, IConnectionUserBean user) {
 		ArrayList<Object> result = new ArrayList<Object>(values.size());
 		int index = 0;
 		if ((attributes != null) && (attributes.size() > 0)) {
@@ -282,6 +282,14 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		if (e.updateCol != null) {
 			result.add(new Timestamp(System.currentTimeMillis()));
 			cols.add(e.updateCol);
+		}
+		if (e.muidCol != null) {
+			if ((user != null) && (user.getId() > 0)) {
+				result.add(user.getId());
+			} else {
+				result.add(null);
+			}
+			cols.add(e.muidCol);
 		}
 		return result;
 	}
@@ -528,7 +536,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 	}
 	
 	@Override
-	public boolean delete(MetaDataEntity entity, int itemId, boolean hardDelete) {
+	public boolean delete(MetaDataEntity entity, int itemId, boolean hardDelete, IConnectionUserBean currentUser) {
 		EntityInfo e = getEntityInfo(entity);
 		if (e == null) {
 			return false;
@@ -539,16 +547,37 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 			}
 			return update(e.sql_harddelete, new Object[] {itemId}) > 0;
 		}
+		final Object[] vals;
 		if (e.updateCol == null) {
-			if (e.sql_delete == null) {
-				e.sql_delete = String.format(fg.delete, e.table, e.deleteCol, e.idCol);
+			if (e.muidCol == null) {
+				vals = new Object[] {itemId};
+				if (e.sql_delete == null) {
+					e.sql_delete = String.format(fg.delete, e.table, e.deleteCol, e.idCol);
+				}
+			} else {
+				vals = new Object[] {null, itemId};
+				if ((currentUser != null) && (currentUser.getId() > 0)) {
+					vals[0] = currentUser.getId();
+				}
+				if (e.sql_delete == null) {
+					e.sql_delete = String.format(fg.delete_update, e.table, e.deleteCol, e.idCol, e.muidCol);
+				}
 			}
-			return update(e.sql_delete, new Object[] {itemId}) > 0;
+		} else if (e.muidCol == null) {
+			vals = new Object[] {new Timestamp(System.currentTimeMillis()), itemId};
+			if (e.sql_delete == null) {
+				e.sql_delete = String.format(fg.delete_update, e.table, e.deleteCol, e.idCol, e.updateCol);
+			}				
+		} else {
+			vals = new Object[] {new Timestamp(System.currentTimeMillis()), null, itemId};
+			if ((currentUser != null) && (currentUser.getId() > 0)) {
+				vals[1] = currentUser.getId();
+			}
+			if (e.sql_delete == null) {
+				e.sql_delete = String.format(fg.delete_update2, e.table, e.deleteCol, e.idCol, e.updateCol, e.muidCol);
+			}				
 		}
-		if (e.sql_delete == null) {
-			e.sql_delete = String.format(fg.delete_update, e.table, e.deleteCol, e.idCol, e.updateCol);
-		}
-		return update(e.sql_delete, new Object[] {new Timestamp(System.currentTimeMillis()), itemId}) > 0;
+		return update(e.sql_delete, vals) > 0;
 	}
 
 	@Override
@@ -576,40 +605,75 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 			BeanMapList list = doSelection(new ArrayList<ReferenceLine>(), false, criteria, false, null, 0, -1, context);
 			Activator.getInstance().debug(String.format(Messages.MapperSQLService_Info_MultiUpdateWithComplexCriteria,list.size(),context.getEntity().getType()));
 			int result = 0;
-			Object[] vals;
-			int idx = 0;
+			final Object[] vals;
 			if (e.updateCol == null) {
-				vals = new Object[] {0};
-				if (e.sql_delete == null) {
-					e.sql_delete = String.format(fg.delete, e.table, e.deleteCol, e.idCol);
+				if (e.muidCol == null) {
+					vals = new Object[] {0};
+					if (e.sql_delete == null) {
+						e.sql_delete = String.format(fg.delete, e.table, e.deleteCol, e.idCol);
+					}
+				} else {
+					vals = new Object[] {null, 0};
+					if ((currentUser != null) && (currentUser.getId() > 0)) {
+						vals[0] = currentUser.getId();
+					}
+					if (e.sql_delete == null) {
+						e.sql_delete = String.format(fg.delete_update, e.table, e.deleteCol, e.idCol, e.muidCol);
+					}
 				}
-			} else {
+			} else if (e.muidCol == null) {
 				vals = new Object[] {new Timestamp(System.currentTimeMillis()), 0};
 				if (e.sql_delete == null) {
 					e.sql_delete = String.format(fg.delete_update, e.table, e.deleteCol, e.idCol, e.updateCol);
 				}
+			} else {
+				vals = new Object[] {new Timestamp(System.currentTimeMillis()), null, 0};
+				if ((currentUser != null) && (currentUser.getId() > 0)) {
+					vals[1] = currentUser.getId();
+				}
+				if (e.sql_delete == null) {
+					e.sql_delete = String.format(fg.delete_update2, e.table, e.deleteCol, e.idCol, e.updateCol, e.muidCol);
+				}
 			}
 			for (BeanMap bean: list) {
-				vals[idx] = bean.getId();
+				vals[vals.length - 1] = bean.getId();
 				result += update(e.sql_delete, vals);
 			}
 			return result;
 		}
-		Object[] vals;
-		String lcols = DEFAULT_TABLEALIAS + '.' + e.deleteCol + fg.paramset;
-		if (e.updateCol == null) {
-			vals = new Object[] {fg.delete_val};
-		} else {
-			vals = new Object[] {fg.delete_val, new Timestamp(System.currentTimeMillis())};
-			lcols += fg.columnsep + DEFAULT_TABLEALIAS + '.' + e.updateCol + fg.paramset;
+		final ArrayList<Object> vals = new ArrayList<>();
+		vals.add(fg.delete_val);
+		final StringBuilder lcols = new StringBuilder(DEFAULT_TABLEALIAS); 
+		lcols.append('.');
+		lcols.append(e.deleteCol);
+		lcols.append(fg.paramset);
+		if (e.updateCol != null) {
+			vals.add(new Timestamp(System.currentTimeMillis()));
+			lcols.append(fg.columnsep);
+			lcols.append(DEFAULT_TABLEALIAS);
+			lcols.append('.');
+			lcols.append(e.updateCol);
+			lcols.append(fg.paramset);
+		}
+		if (e.muidCol != null) {
+			if ((currentUser != null) && (currentUser.getId() > 0)) {
+				vals.add(currentUser.getId());
+			} else {
+				vals.add(null);
+			}
+			lcols.append(fg.columnsep);
+			lcols.append(DEFAULT_TABLEALIAS);
+			lcols.append('.');
+			lcols.append(e.muidCol);
+			lcols.append(fg.paramset);
 		}
 		if (criteria == null) {
-			return update(String.format(fg.updateex, e.table, DEFAULT_TABLEALIAS, lcols, fg.true_cond), vals);
+			return update(String.format(fg.updateex, e.table, DEFAULT_TABLEALIAS, lcols.toString(), fg.true_cond), vals.toArray(new Object[0]));
 		}
 		if (hasjoins) {
 			// Generate where clause before the joins...
 			StringBuilder where = context.generateCriteria(criteria, true);
-			return update(String.format(fg.update_join, DEFAULT_TABLEALIAS, lcols, context.generateJoins(true), where.toString()), vals);
+			return update(String.format(fg.update_join, DEFAULT_TABLEALIAS, lcols.toString(), context.generateJoins(true), where.toString()), vals.toArray(new Object[0]));
 		}
 		for (ReferenceLine ref: context.getReferences()) {
 			String code = ref.getCode();
@@ -621,7 +685,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 				colNames.put(code, col);
 			}
 		}
-		return update(String.format(fg.updateex, e.table, DEFAULT_TABLEALIAS, lcols, context.generateCriteria(criteria, true).toString()), vals);
+		return update(String.format(fg.updateex, e.table, DEFAULT_TABLEALIAS, lcols.toString(), context.generateCriteria(criteria, true).toString()), vals.toArray(new Object[0]));
 	}
 
 	@Override
@@ -643,69 +707,121 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 			BeanMapList list = doSelection(new ArrayList<ReferenceLine>(), true, criteria, false, null, 0, -1, context);
 			Activator.getInstance().debug(String.format(Messages.MapperSQLService_Info_MultiUpdateWithComplexCriteria,list.size(),context.getEntity().getType()));
 			int result = 0;
-			Object[] vals;
-			int idx = 0;
+			final Object[] vals;
 			if (e.updateCol == null) {
-				vals = new Object[] {0};
-				if (e.sql_undelete == null) {
-					e.sql_undelete = String.format(fg.undelete, e.table, e.deleteCol, e.idCol);
+				if (e.muidCol == null) {
+					vals = new Object[] {0};
+					if (e.sql_undelete == null) {
+						e.sql_undelete = String.format(fg.undelete, e.table, e.deleteCol, e.idCol);
+					}
+				} else {
+					vals = new Object[] {null, 0};
+					if ((currentUser != null) && (currentUser.getId() > 0)) {
+						vals[0] = currentUser.getId();
+					}
+					if (e.sql_undelete == null) {
+						e.sql_undelete = String.format(fg.undelete_update, e.table, e.deleteCol, e.idCol, e.muidCol);
+					}
 				}
-			} else {
+			} else if (e.muidCol == null) {
 				vals = new Object[] {new Timestamp(System.currentTimeMillis()), 0};
 				if (e.sql_undelete == null) {
 					e.sql_undelete = String.format(fg.undelete_update, e.table, e.deleteCol, e.idCol, e.updateCol);
 				}
+			} else {
+				vals = new Object[] {new Timestamp(System.currentTimeMillis()), null, 0};
+				if ((currentUser != null) && (currentUser.getId() > 0)) {
+					vals[1] = currentUser.getId();
+				}
+				if (e.sql_undelete == null) {
+					e.sql_undelete = String.format(fg.undelete_update2, e.table, e.deleteCol, e.idCol, e.updateCol, e.muidCol);
+				}
 			}
 			for (BeanMap bean: list) {
-				vals[idx] = bean.getId();
+				vals[vals.length - 1] = bean.getId();
 				result += update(e.sql_undelete, vals);
 			}
 			return result;
 		}
-		Object[] vals;
-		String lcols = DEFAULT_TABLEALIAS + '.' + e.deleteCol + fg.paramset;
-		if (e.updateCol == null) {
-			vals = new Object[] {fg.undelete_val};
-		} else {
-			vals = new Object[] {fg.undelete_val, new Timestamp(System.currentTimeMillis())};
-			lcols += fg.columnsep + DEFAULT_TABLEALIAS + '.' + e.updateCol + fg.paramset;
+		final ArrayList<Object> vals = new ArrayList<>();
+		vals.add(fg.undelete_val);
+		final StringBuilder lcols = new StringBuilder(DEFAULT_TABLEALIAS);
+		lcols.append('.');
+		lcols.append(e.deleteCol);
+		lcols.append(fg.paramset);
+		if (e.updateCol != null) {
+			vals.add(new Timestamp(System.currentTimeMillis()));
+			lcols.append(fg.columnsep);
+			lcols.append(DEFAULT_TABLEALIAS);
+			lcols.append('.');
+			lcols.append(e.updateCol);
+			lcols.append(fg.paramset);
+		}
+		if ((e.muidCol != null) && (currentUser != null) && (currentUser.getId() > 0)) {
+			vals.add(currentUser.getId());
+			lcols.append(fg.columnsep);
+			lcols.append(DEFAULT_TABLEALIAS);
+			lcols.append('.');
+			lcols.append(e.muidCol);
+			lcols.append(fg.paramset);
 		}
 		if (criteria == null) {
-			return update(String.format(fg.updateex, e.table, DEFAULT_TABLEALIAS, lcols, fg.true_cond), vals);
+			return update(String.format(fg.updateex, e.table, DEFAULT_TABLEALIAS, lcols.toString(), fg.true_cond), vals.toArray(new Object[0]));
 		}
 		StringBuilder where = context.generateCriteria(criteria, true);
 		if (hasjoins) {
-			return update(String.format(fg.update_join, DEFAULT_TABLEALIAS, lcols, context.generateJoins(true), where.toString()), vals);
+			return update(String.format(fg.update_join, DEFAULT_TABLEALIAS, lcols.toString(), context.generateJoins(true), where.toString()), vals.toArray(new Object[0]));
 		}
-		return update(String.format(fg.updateex, e.table, DEFAULT_TABLEALIAS, lcols, where.toString()), vals);
+		return update(String.format(fg.updateex, e.table, DEFAULT_TABLEALIAS, lcols.toString(), where.toString()), vals.toArray(new Object[0]));
 	}
 
 	@Override
-	public boolean undelete(MetaDataEntity entity, int itemId) {
+	public boolean undelete(MetaDataEntity entity, int itemId, IConnectionUserBean currentUser) {
 		EntityInfo e = getEntityInfo(entity);
 		if ((e == null) || (e.deleteCol == null)) {
 			return false;
 		}
+		final Object[] vals;
 		if (e.updateCol == null) {
-			if (e.sql_undelete == null) {
-				e.sql_undelete = String.format(fg.undelete, e.table, e.deleteCol, e.idCol);
+			if (e.muidCol == null) {
+				vals = new Object[] {itemId};
+				if (e.sql_undelete == null) {
+					e.sql_undelete = String.format(fg.undelete, e.table, e.deleteCol, e.idCol);
+				}
+			} else {
+				vals = new Object[] {null, itemId};
+				if ((currentUser != null) && (currentUser.getId() > 0)) {
+					vals[0] = currentUser.getId();
+				}
+				if (e.sql_undelete == null) {
+					e.sql_undelete = String.format(fg.undelete_update, e.table, e.deleteCol, e.idCol, e.muidCol);
+				}
 			}
-			return update(e.sql_undelete, new Object[]{itemId}) > 0;
+		} else if (e.muidCol == null) {
+			vals = new Object[] {new Timestamp(System.currentTimeMillis()), itemId};
+			if (e.sql_undelete == null) {
+				e.sql_undelete = String.format(fg.undelete_update, e.table, e.deleteCol, e.idCol, e.updateCol);
+			}
+		} else {
+			vals = new Object[] {new Timestamp(System.currentTimeMillis()), null, itemId};
+			if ((currentUser != null) && (currentUser.getId() > 0)) {
+				vals[1] = currentUser.getId();
+			}
+			if (e.sql_undelete == null) {
+				e.sql_undelete = String.format(fg.undelete_update2, e.table, e.deleteCol, e.idCol, e.updateCol, e.muidCol);
+			}
 		}
-		if (e.sql_undelete == null) {
-			e.sql_undelete = String.format(fg.undelete_update, e.table, e.deleteCol, e.idCol, e.updateCol);
-		}
-		return update(e.sql_undelete, new Object[]{new Timestamp(System.currentTimeMillis()), itemId}) > 0;
+		return update(e.sql_undelete, vals) > 0;
 	}
 
 	@Override
-	public boolean update(MetaDataEntity entity, int itemId, List<MetaDataAttribute> attributes, List<Object> values) {
+	public boolean update(MetaDataEntity entity, int itemId, List<MetaDataAttribute> attributes, List<Object> values, IConnectionUserBean currentUser) {
 		EntityInfo e = getEntityInfo(entity);
 		if (e == null) {
 			return false;
 		}
 		ArrayList<String> cols = new ArrayList<String>();
-		values = filterValues(e, attributes, cols, values);
+		values = filterValues(e, attributes, cols, values, currentUser);
 		if (values.size() == 0) {
 			return false;
 		}
@@ -720,7 +836,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		}
 		EntityInfo e = context.getEntityInfo();
 		ArrayList<String> cols = new ArrayList<String>();
-		values = filterValues(e, attributes, cols, values);
+		values = filterValues(e, attributes, cols, values, context.getCurrentUser());
 		if (values.size() == 0) {
 			return false;
 		}
@@ -813,13 +929,13 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 	}
 
 	@Override
-	public BeanMap create(MetaDataEntity entity, List<MetaDataAttribute> attributes, List<Object> values) {
+	public BeanMap create(MetaDataEntity entity, List<MetaDataAttribute> attributes, List<Object> values, IConnectionUserBean currentUser) {
 		EntityInfo e = getEntityInfo(entity);
 		if (e == null) {
 			return null;
 		}
 		ArrayList<String> cols = new ArrayList<String>();
-		values = filterValues(e, attributes, cols, values);
+		values = filterValues(e, attributes, cols, values, currentUser);
 		if (e.deleteCol != null) {
 			cols.add(e.deleteCol);
 			values.add(fg.undelete_val);

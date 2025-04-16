@@ -87,7 +87,7 @@ public class LinkContainCriteria extends AbstractLinkTestCriteria implements Clo
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public LinkContainCriteria clone() {
 		return new LinkContainCriteria(getReference(), getLinkCode(), getAttribute(), getValue(), isIgnoreSubdivision(), isDeletedLinks(), casesensitive);
 	}
 

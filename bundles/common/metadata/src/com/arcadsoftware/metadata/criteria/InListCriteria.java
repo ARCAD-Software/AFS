@@ -73,7 +73,7 @@ public class InListCriteria extends AbstractSearchCriteria implements Cloneable,
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public InListCriteria clone() {
 		return new InListCriteria(attribute, ids);
 	}
 
