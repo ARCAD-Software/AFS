@@ -48,7 +48,7 @@ public class BeanMapWarper implements ISelection, IBeanMap, IIdentifiedBean, ITy
 	private final SWTRenderer renderer;
 	private boolean dirty;
 
-	private final ListenerList selListeners = new ListenerList();
+	private final ListenerList<ISelectionChangedListener> selListeners = new ListenerList<>();
 
 	public BeanMapWarper(SWTRenderer renderer) {
 		super();
@@ -72,8 +72,7 @@ public class BeanMapWarper implements ISelection, IBeanMap, IIdentifiedBean, ITy
 
 	private void fireChangedSelectionEvent() {
 		final SelectionChangedEvent event = new SelectionChangedEvent(renderer, this);
-		final Object[] listeners = selListeners.getListeners();
-		for (final Object listener : listeners) {
+		for (final Object listener : selListeners.getListeners()) {
 			final ISelectionChangedListener l = (ISelectionChangedListener) listener;
 			SafeRunnable.run(new SafeRunnable() {
 				@Override
@@ -90,10 +89,6 @@ public class BeanMapWarper implements ISelection, IBeanMap, IIdentifiedBean, ITy
 		fireChangedSelectionEvent();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ISelection#isEmpty()
-	 */
 	@Override
 	public boolean isEmpty() {
 		return source == null;
@@ -113,64 +108,36 @@ public class BeanMapWarper implements ISelection, IBeanMap, IIdentifiedBean, ITy
 		selListeners.add(listener);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.arcadsoftware.utils.IBeanMap#entrySet()
-	 */
 	@Override
 	public Set<Entry<String, Object>> entrySet() {
 		return current.entrySet();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.arcadsoftware.utils.IBeanMap#get(java.lang.String)
-	 */
 	@Override
 	public Object get(String key) {
 		return current.get(key);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.arcadsoftware.utils.IBeanMap#get(java.lang.String, java.lang.Class)
-	 */
 	@Override
 	public <T> T get(String key, Class<T> clazz) {
 		return current.get(key, clazz);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.arcadsoftware.utils.IBeanMap#getInt(java.lang.String)
-	 */
 	@Override
 	public int getInt(String key) {
 		return current.getInt(key);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.arcadsoftware.utils.IBeanMap#getString(java.lang.String)
-	 */
 	@Override
 	public String getString(String key) {
 		return current.getString(key);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.arcadsoftware.utils.IBeanMap#keys()
-	 */
 	@Override
 	public Set<String> keys() {
 		return current.keys();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.arcadsoftware.utils.IBeanMap#put(java.lang.String, java.lang.Object)
-	 */
 	@Override
 	public Object put(String key, Object value) {
 		// Just ignore non declared attributes.
@@ -213,37 +180,21 @@ public class BeanMapWarper implements ISelection, IBeanMap, IIdentifiedBean, ITy
 		return oldValue;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.arcadsoftware.utils.IBeanMap#size()
-	 */
 	@Override
 	public int size() {
 		return current.size();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.arcadsoftware.utils.IIdentifiedBean#getId()
-	 */
 	@Override
 	public int getId() {
 		return current.getId();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.arcadsoftware.utils.ITypedBean#equalsType(com.arcadsoftware.utils.ITypedBean)
-	 */
 	@Override
 	public boolean equalsType(ITypedBean bm) {
 		return current.equalsType(bm);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.arcadsoftware.utils.ITypedBean#getType()
-	 */
 	@Override
 	public String getType() {
 		if (renderer.getStructure() != null) {
@@ -252,10 +203,6 @@ public class BeanMapWarper implements ISelection, IBeanMap, IIdentifiedBean, ITy
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.arcadsoftware.utils.IDatedBean#getDate()
-	 */
 	@Override
 	public Date getDate() {
 		if (source != null) {
@@ -264,10 +211,6 @@ public class BeanMapWarper implements ISelection, IBeanMap, IIdentifiedBean, ITy
 		return current.getDate();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.arcadsoftware.utils.IDatedBean#moreRecent(com.arcadsoftware.utils.IDatedBean)
-	 */
 	@Override
 	public boolean moreRecent(IDatedBean bm) {
 		if (source != null) {
@@ -276,10 +219,6 @@ public class BeanMapWarper implements ISelection, IBeanMap, IIdentifiedBean, ITy
 		return current.moreRecent(bm);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.arcadsoftware.utils.IDatedBean#setDate(java.util.Date)
-	 */
 	@Override
 	public void setDate(Date date) {
 		current.setDate(date);
@@ -381,5 +320,20 @@ public class BeanMapWarper implements ISelection, IBeanMap, IIdentifiedBean, ITy
 
 	public void forceDirty() {
 		dirty = true;
+	}
+
+	@Override
+	public int getMUID() {
+		return current.getMUID();
+	}
+
+	@Override
+	public void setMUID(int id) {
+		current.setMUID(id);
+	}
+
+	@Override
+	public void setModification(int uid, Date date) {
+		current.setModification(uid, date);
 	}
 }
