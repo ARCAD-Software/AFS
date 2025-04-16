@@ -34,7 +34,6 @@ import java.security.interfaces.RSAKey;
 import java.util.Base64;
 import java.util.HashSet;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.sshd.common.NamedResource;
 import org.apache.sshd.common.config.keys.FilePasswordProvider;
 import org.apache.sshd.common.config.keys.writer.openssh.OpenSSHKeyEncryptionContext;
@@ -138,11 +137,17 @@ public class SSHService {
 		final File keyDirectory = getSSHKeyDirectory(key);
 		if (keyDirectory.isDirectory()) {
 			for (final File file : keyDirectory.listFiles()) {
-				if (file.isFile() && !file.setWritable(true)) {
-					log.warn(String.format("Cannot make file %s writable", file));
+				if (file.isFile()) {
+					if (!file.setWritable(true)) {
+						log.warn("Cannot make file \"{}\" writable", file);
+					} else if (!file.delete()) {
+						log.warn("Unable to delete file \"{}\".", file);
+					}
 				}
 			}
-			FileUtils.deleteDirectory(keyDirectory);
+			if (!keyDirectory.delete()) {
+				log.warn("Unable to delete directory \"{}\".", keyDirectory);
+			}
 		}
 	}
 

@@ -4,7 +4,6 @@
    <service>
       <provide interface="com.arcadsoftware.metadata.IMetaDataDeleteListener"/>
    </service>
-   <reference bind="bindLog" interface="org.osgi.service.log.LogService" name="Log"/>
    <reference bind="bindSSHService" interface="com.arcadsoftware.server.ssh.services.SSHService" name="SSHService"/>
    <implementation class="com.arcadsoftware.server.ssh.internal.listeners.SSHKeyListener"/>
 </scr:component>

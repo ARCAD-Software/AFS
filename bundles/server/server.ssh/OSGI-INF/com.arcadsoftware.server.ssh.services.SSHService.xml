@@ -3,6 +3,5 @@
    <service>
       <provide interface="com.arcadsoftware.server.ssh.services.SSHService"/>
    </service>
-   <reference bind="bindLog" interface="org.osgi.service.log.LogService" name="Log"/>
    <implementation class="com.arcadsoftware.server.ssh.services.SSHService"/>
 </scr:component>
