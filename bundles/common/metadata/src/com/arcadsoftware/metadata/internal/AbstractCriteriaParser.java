@@ -360,7 +360,7 @@ public abstract class AbstractCriteriaParser {
 		return new DeletedCriteria();
 	}
 	
-	protected ISearchCriteria hasRight(String att, Token t) {
+	protected ISearchCriteria changedBy(String att, Token t) {
 		if (".".equals(att)) { //$NON-NLS-1$
 			att = null;
 		}
