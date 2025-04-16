@@ -27,6 +27,7 @@ import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Security;
 import java.security.interfaces.RSAKey;
@@ -147,7 +148,12 @@ public class SSHService {
 
 	private void generateKeyPair(final SSHKey sshKey) throws IOException, GeneralSecurityException {
 		final SSHKeyType keyType = sshKey.getType();
-		final KeyPairGenerator generator = KeyPairGenerator.getInstance(keyType.getAlgorithm(), keyType.getProvider());
+		KeyPairGenerator generator;
+		try {
+			generator = KeyPairGenerator.getInstance(keyType.getAlgorithm(), keyType.getProvider());
+		} catch (NoSuchAlgorithmException e) {
+			generator = KeyPairGenerator.getInstance(keyType.getAlgorithm());
+		}
 		if (sshKey.getLength() > 0) {
 			generator.initialize(sshKey.getLength());
 		}
