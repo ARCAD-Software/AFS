@@ -17,7 +17,7 @@ public enum SSHKeyType {
 	
 	UNKNOWN("", 0, "", "", ""), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	RSA("RSA", 4096, "id_rsa", "id_rsa.pub", "BC"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	EDDSA("EdDSA", 0, "id_ed25519", "id_ed25519.pub", "EdDSA"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	EDDSA("EdDSA", 0, "id_ed25519", "id_ed25519.pub", "BC"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 	public static SSHKeyType fromAlgorithm(final String algo) {
 		if ((algo != null) && ! algo.isEmpty()) {
