@@ -553,7 +553,7 @@ public class MetaDataParentResource extends DataParentResource {
 			// TODO Process each of then (recursively, as it may include property like "subcode.subsubcode")  
 			
 			// Item creation.
-			result = getMapper().create(getEntity(),list,getEntity().getValues(list,result));
+			result = getMapper().create(getEntity(), list, getEntity().getValues(list,result), getUser());
 		}
 		if ((result == null) || (result.getId() == 0)) {
 			// Creation fail.
@@ -679,7 +679,7 @@ public class MetaDataParentResource extends DataParentResource {
 			}
 			broadcastUserAction("logDelete", item); //$NON-NLS-1$
 			if (!byPass) {
-				entity.getMapper().delete(item, hardelete);
+				entity.getMapper().delete(item, hardelete, getUser());
 			}
 			item.setDeleted(true);
 			Activator.getInstance().test(MetaDataTest.EVENTCODE_AFTERDELETE, entity, item, getUser(), language);

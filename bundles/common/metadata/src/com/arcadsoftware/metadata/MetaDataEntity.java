@@ -2201,7 +2201,7 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 	 * The returned BeanMap possess a positive id, used as internal reference for subsequent calls.
 	 * 
 	 * @param beanMap
-	 *            The beanMap taht you want to store
+	 *            The beanMap that you want to store
 	 * @return the new item in a BeanMap with attributes and id or null if an error occurs.
 	 */
 	public BeanMap dataCreate(BeanMap beanMap) {
@@ -2211,6 +2211,33 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 		}
 		List<MetaDataAttribute> attlist = new ArrayList<MetaDataAttribute>();
 		return mapper.create(this,attlist,getValues(beanMap, attlist));
+	}	
+
+	/**
+	 * Create a new element into the storage base (This request return the new item created into the database).
+	 * 
+	 * <p>
+	 * The returned BeanMap possess a positive id, used as internal reference for subsequent calls.
+	 * 
+	 * @param beanMap
+	 *            The beanMap that you want to store
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return the new item in a BeanMap with attributes and id or null if an error occurs.
+	 */
+	public BeanMap dataCreate(BeanMap beanMap, IConnectionUserBean currentUser) {
+		if (beanMap == null) {
+			return null;
+		}
+		IMapperService mapper = getMapper();
+		if (mapper == null) {
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataCreation,getType()));
+		}
+		if ((beanMap.getType() != null) && !type.equals(beanMap.getType())) {
+			Activator.getInstance().warn("The Beanmap \"{}\" appears to be created with the wrong entity \"{}\".", beanMap.getType(), type);
+		}
+		List<MetaDataAttribute> attlist = new ArrayList<MetaDataAttribute>();
+		return mapper.create(this, attlist, getValues(beanMap, attlist), currentUser);
 	}	
 	
 	/**
@@ -2237,6 +2264,31 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 		return mapper.create(this, attributes, values);
 	}
 	
+	/**
+	 * Create a new element into the storage base (This request return the new item created into the database).
+	 * 
+	 * <p>
+	 * The returned BeanMap possess a positive id, used as internal reference for subsequent calls.
+	 * 
+	 * <p>
+	 * This is the caller responsibility to ensure that the attributes list correspond to the values list.
+	 * 
+	 * @param attributes
+	 *            the list of updated attributes
+	 * @param values
+	 *            the list of values in the same order than the attributes listed. some values can be null or need to be
+	 *            translated before to get stored.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return the new item in a BeanMap with attributes and id or null if an error occurs.
+	 */
+	public BeanMap dataCreate(List<MetaDataAttribute> attributes, List<Object> values, IConnectionUserBean currentUser) {
+		IMapperService mapper = getMapper();
+		if (mapper == null) {
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataCreation,getType()));
+		}
+		return mapper.create(this, attributes, values, currentUser);
+	}
 
 	/**
 	 * Delete an item from the storage.
@@ -2259,6 +2311,28 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataDeletion,getType()));
 		}
 		return mapper.delete(this, itemId, hardDelete);
+	}
+
+	/**
+	 * Delete an item from the storage.
+	 * 
+	 * <p>
+	 * If the mapper allow this operation, the deletion will be a soft deletion. Soft deletion allow the item to
+	 * be undeleted.
+	 * 
+	 * @param itemId
+	 *            the item id to delete
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return true if the item exist and has been deleted.
+	 * @see #dataUndelete(int)
+	 */
+	public boolean dataDelete(int itemId, IConnectionUserBean currentUser) {
+		IMapperService mapper = getMapper();
+		if (mapper == null) {
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataDeletion,getType()));
+		}
+		return mapper.delete(this, itemId, false, currentUser);
 	}
 
 	/**
@@ -2301,6 +2375,27 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataDeletion,getType()));
 		}
 		return mapper.undelete(this, itemId);
+	}
+	
+	/**
+	 * Cancel a soft deletion operation.
+	 * 
+	 * <p>
+	 * Hard deletion are not reversible.
+	 * 
+	 * @param itemId
+	 *            the item id to undelete
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return True if the item has been successfully undeleted.
+	 * @see #delete(MetaDataEntity, int, boolean)
+	 */
+	public boolean dataUndelete(int itemId, IConnectionUserBean currentUser) {
+		IMapperService mapper = getMapper();
+		if (mapper == null) {
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataDeletion,getType()));
+		}
+		return mapper.undelete(this, itemId, currentUser);
 	}
 
 	/**
@@ -2364,6 +2459,29 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 		}
 		return mapper.update(beanMap);
 	}
+
+	/**
+	 * Update an item into the storage.
+	 * 
+	 * <p>
+	 * Update operation can be called onto (soft) deleted items.
+	 * 
+	 * @param beanMap
+	 *            The beanMap to update. Note that all the defined attributes will be updated into the database
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return true if the item has been successfully updated.
+	 */
+	public boolean dataUpdate(BeanMap beanMap, IConnectionUserBean currentUser) {
+		IMapperService mapper = getMapper();
+		if (mapper == null) {
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataUpdate,getType()));
+		}
+		if (beanMap.isEmpty()) {
+			return mapper.update(this, beanMap.getId(), null, currentUser);
+		}
+		return mapper.update(beanMap, currentUser);
+	}
 	
 	/**
 	 * Update a set of items into the storage.
@@ -2412,6 +2530,33 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 			return mapper.update(this, itemId, null);
 		}
 		return mapper.update(this, itemId, attributes, values);
+	}
+
+	/**
+	 * Update an item into the storage.
+	 * 
+	 * <p>
+	 * Update operation can be called onto (soft) deleted items.
+	 * 
+	 * @param itemId
+	 *            The item ID to update.
+	 * @param attributes
+	 *            The list of attributes to be updated.
+	 * @param values
+	 *            The corresponding list of values. This list length must be the same as the attribute list length.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return true if the item has been successfully updated.
+	 */
+	public boolean dataUpdate(int itemId, List<MetaDataAttribute> attributes, List<Object> values, IConnectionUserBean currentUser) {
+		IMapperService mapper = getMapper();
+		if (mapper == null) {
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataUpdate,getType()));
+		}
+		if ((attributes == null) || attributes.isEmpty()) {
+			return mapper.update(this, itemId, null, currentUser);
+		}
+		return mapper.update(this, itemId, attributes, values, currentUser);
 	}
 	
 	/**
@@ -2637,7 +2782,24 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 		}
 		return mapper.linkAdd(source, linkCode, dest);
 	}
-	
+
+	/**
+	 * Create a link between two data according to a predefined link.
+	 * 
+	 * @param source The origin of the reference.
+	 * @param linkCode The link code (must be defined into this entity).
+	 * @param dest The destination object of the link.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return true if the operation is a success.
+	 */
+	public boolean dataLinkTo(BeanMap source, String linkCode, BeanMap dest, IConnectionUserBean currentUser) {
+		IMapperService mapper = getMapper();
+		if (mapper == null) {
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataUpdate,getType()));
+		}
+		return mapper.linkAdd(source, linkCode, dest, currentUser);
+	}
 	
 	/**
 	 * Remove a link between two data according to a predefined link.
@@ -2655,7 +2817,24 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 		return mapper.linkRemove(source.getType(), linkCode, source.getId(), dest.getId());
 	}	
 	
-	
+	/**
+	 * Remove a link between two data according to a predefined link.
+	 * 
+	 * @param source The origin of the reference.
+	 * @param linkCode The link code (must be defined into this entity).
+	 * @param dest The destination object of the link.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return true if the operation is a success.
+	 */
+	public boolean dataLinkRemove(BeanMap source, String linkCode, BeanMap dest, IConnectionUserBean currentUser) {
+		IMapperService mapper = getMapper();
+		if (mapper == null) {
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataUpdate,getType()));
+		}
+		return mapper.linkRemove(source.getType(), linkCode, source.getId(), dest.getId());
+	}	
+		
 	/**
 	 * Return the first result of the selection.
 	 * 
@@ -2819,7 +2998,6 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 		}
 		return mapper.selection(this, attributes, deleted, criteria, distinct, orders, currentUser, page, limit);
 	}
-
 
 	/**
 	 * Select some items form an entity type according to a complex selection condition.

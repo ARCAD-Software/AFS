@@ -26,6 +26,7 @@ import com.arcadsoftware.metadata.criteria.ConstantCriteria;
 import com.arcadsoftware.metadata.criteria.ISearchCriteria;
 import com.arcadsoftware.metadata.internal.Activator;
 import com.arcadsoftware.metadata.internal.Messages;
+import com.arcadsoftware.rest.connection.IConnectionUserBean;
 
 public class MetaDataLink extends Element {
 
@@ -205,9 +206,9 @@ public class MetaDataLink extends Element {
 	/**
 	 * Link to data according to this link.
 	 * 
-	 * @param sourceid
-	 * @param destId
-	 * @return
+	 * @param sourceid The ID of the data corresponding in the Source entity.
+	 * @param destId The ID of the data corresponding in the Target entity.
+	 * @return True if the two data are now linked.
 	 */
 	public boolean dataLinkTo(int sourceId, int destId) {
 		if (isReadonly()) {
@@ -219,13 +220,36 @@ public class MetaDataLink extends Element {
 		}
 		return mapper.linkAdd(this, sourceId, destId);
 	}
+
+	/**
+	 * Link to data according to this link.
+	 * 
+	 * <p>
+	 * You have to pass the current user to the link creation if this link use the "pushUpdate" MetaData.
+	 * 
+	 * @param sourceid The ID of the data corresponding in the Source entity.
+	 * @param destId The ID of the data corresponding in the Target entity.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return True if the two data are now linked.
+	 */
+	public boolean dataLinkTo(int sourceId, int destId, IConnectionUserBean currentUser) {
+		if (isReadonly()) {
+			return false;
+		}
+		IMapperService mapper = getParent().getMapper();
+		if (mapper == null) {
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataUpdate,getType()));
+		}
+		return mapper.linkAdd(this, sourceId, destId, currentUser);
+	}
 	
 	/**
 	 * Test if a link exist between the two data.
 	 * 
-	 * @param sourceId
-	 * @param destId
-	 * @return
+	 * @param sourceid The ID of the data corresponding in the Source entity.
+	 * @param destId The ID of the data corresponding in the Target entity.
+	 * @return True if the two data are linked.
 	 */
 	public boolean dataTest(int sourceId, int destId) {
 		IMapperService mapper = getParent().getMapper();
@@ -238,9 +262,9 @@ public class MetaDataLink extends Element {
 	/**
 	 * Unlink two data.
 	 * 
-	 * @param sourceId
-	 * @param destId
-	 * @return
+	 * @param sourceid The ID of the data corresponding in the Source entity.
+	 * @param destId The ID of the data corresponding in the Target entity.
+	 * @return True if the two data are now unlinked.
 	 */
 	public boolean dataUnlink(int sourceId, int destId) {
 		if (isReadonly()) {
@@ -251,6 +275,29 @@ public class MetaDataLink extends Element {
 			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataDeletion,getType()));
 		}
 		return mapper.linkRemove(this, sourceId, destId);
+	}
+
+	/**
+	 * Unlink two data.
+	 * 
+	 * <p>
+	 * You have to pass the current user to the link creation if this link use the "pushUpdate" MetaData.
+	 * 
+	 * @param sourceid The ID of the data corresponding in the Source entity.
+	 * @param destId The ID of the data corresponding in the Target entity.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return True if the two data are now unlinked.
+	 */
+	public boolean dataUnlink(int sourceId, int destId, IConnectionUserBean currentUser) {
+		if (isReadonly()) {
+			return false;
+		}
+		IMapperService mapper = getParent().getMapper();
+		if (mapper == null) {
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataDeletion,getType()));
+		}
+		return mapper.linkRemove(this, sourceId, destId, currentUser);
 	}
 	
 	/**

@@ -389,7 +389,7 @@ public class MetaDataItemResource extends DataItemResource {
 				}
 				broadcastUserAction("logDelete", item); //$NON-NLS-1$
 				if (!bypass) {
-					entity.getMapper().delete(item, hardelete);
+					getMapper().delete(item, hardelete, getUser());
 				}
 				item.setDeleted(true);
 				Activator.getInstance().test(MetaDataTest.EVENTCODE_AFTERDELETE, entity, item, getUser(), language);
@@ -453,7 +453,7 @@ public class MetaDataItemResource extends DataItemResource {
 							if (deleteitems) {
 								broadcastUserAction("logDelete", item); //$NON-NLS-1$
 								if (!byPass) {
-									getEntity().getMapper().delete(linkedItem, hardelete);
+									getEntity().getMapper().delete(linkedItem, hardelete, getUser());
 									// Check if cascade deletion also removed the link.
 									if (!getEntity().getMapper().linkTest(link, item.getId(), linkedItem.getId())) {
 										fireEvent = true;
@@ -461,7 +461,7 @@ public class MetaDataItemResource extends DataItemResource {
 								}
 							}
 							if ((!byPass)
-									&& getEntity().getMapper().linkRemove(link, item.getId(), linkedItem.getId())) {
+									&& getEntity().getMapper().linkRemove(link, item.getId(), linkedItem.getId(), getUser())) {
 								fireEvent = true;
 							}
 							if (fireEvent) {
@@ -755,7 +755,7 @@ public class MetaDataItemResource extends DataItemResource {
 						}
 					}
 				}
-				entity.getMapper().undelete(item);
+				entity.getMapper().undelete(item, getUser());
 			case -1: // bypass...
 				item.setDeleted(false);
 			}
@@ -797,8 +797,8 @@ public class MetaDataItemResource extends DataItemResource {
 							// Removes the current element from the selection (avoids updates on the same value)
 							final EqualCriteria codeEqual = new EqualCriteria();
 							codeEqual.setAttribute(attribute.getCode());
-							if (MetaDataAttribute.TYPE_INTEGER.equals(attribute.getType())
-									|| MetaDataAttribute.TYPE_INT.equals(attribute.getType())) {
+							if (MetaDataAttribute.TYPE_INTEGER.equals(attribute.getType()) || //
+									MetaDataAttribute.TYPE_INT.equals(attribute.getType())) {
 								try {
 									codeEqual.setIntval(Integer.valueOf(value.toString()));
 								} catch (final NumberFormatException e) {
@@ -807,8 +807,7 @@ public class MetaDataItemResource extends DataItemResource {
 							} else {
 								codeEqual.setValue(value.toString());
 							}
-							if (getEntity().dataCount(false, new AndCriteria(invariantCriteria, codeEqual), false,
-									getUser()) > 0) {
+							if (getEntity().dataCount(false, new AndCriteria(invariantCriteria, codeEqual), false, getUser()) > 0) {
 								throw new ResourceException(Status.CLIENT_ERROR_PRECONDITION_FAILED, //
 										String.format(Activator.getMessage("error.uniqueattribute.update", language), //$NON-NLS-1$
 												attribute.getName(language), value, attribute.getCode()));
@@ -819,11 +818,10 @@ public class MetaDataItemResource extends DataItemResource {
 			}
 			values.forceId(item.getId());
 			values.setDeleted(item.isDeleted());
-			getMapper().update(values);
+			getMapper().update(values, getUser());
 		}
 		if (values.getId() == 0) {
-			getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST,
-					Activator.getMessage("error.badattributes", language)); //$NON-NLS-1$
+			getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST, Activator.getMessage("error.badattributes", language)); //$NON-NLS-1$
 			return null;
 		}
 		doPostUpdateTreatment(listeners, item, values, attlistex, language);
@@ -928,7 +926,7 @@ public class MetaDataItemResource extends DataItemResource {
 					}
 					if (doit) {
 						broadcastUserAction(link, "logUnlink", item, linked); //$NON-NLS-1$
-						if (bypass || getEntity().getMapper().linkRemove(link, item.getId(), linked.getId())) {
+						if (bypass || getEntity().getMapper().linkRemove(link, item.getId(), linked.getId(), getUser())) {
 							deleted = true;
 							Activator.getInstance().fireUnlinkEvent(getEntity(), link, item, linked, getUser());
 						}
@@ -1134,7 +1132,7 @@ public class MetaDataItemResource extends DataItemResource {
 						}
 					}
 					// FIXME If the attribute of a reverse-link is also declared as unique then its new value must be tested.
-					if (doit && getEntity().getMapper().linkAdd(link, item.getId(), linked.getId())) {
+					if (doit && getEntity().getMapper().linkAdd(link, item.getId(), linked.getId(), getUser())) {
 						broadcastUserAction(link, "logLink", item, linked); //$NON-NLS-1$
 						added = true;
 						Activator.getInstance().fireLinkEvent(getEntity(), link, item, linked, getUser());
