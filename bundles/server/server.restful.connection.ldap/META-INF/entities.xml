@@ -30,26 +30,23 @@
 			<logUpdate>Update of an LDAP login (%login%)</logUpdate>
 			<logDelete>Deletion of an LDAP login (%login%)</logDelete>
 		</metadata>
-		<attribute type="string" code="login" readonly="false"
-			listable="true" mandatory="true" length="255">
+		<attribute type="string" code="login" listable="true" mandatory="true" length="255">
 			<metadata>
 				<col>LDA_LOGIN</col>
 				<selectable>ldapauth/</selectable>
 			</metadata>
 		</attribute>
-		<attribute type="user" code="user" listable="true"
-			mandatory="true">
+		<attribute type="user" code="user" listable="true" mandatory="true">
 			<metadata>
 				<col>LDA_USER</col>
 				<reverseLink>true</reverseLink>
 			</metadata>
 		</attribute>
-		<attribute type="string" code="password" readonly="false"
-			listable="false" mandatory="false">
+		<attribute type="string" code="password" listable="false">
 			<metadata />
 		</attribute>
 	</entity>
-	<update-entity version="2" type="user">
+	<update-entity version="3" type="user">
 		<link type="ldapauth" code="ldapauths">
 			<metadata>
 				<reverseLink>user</reverseLink>

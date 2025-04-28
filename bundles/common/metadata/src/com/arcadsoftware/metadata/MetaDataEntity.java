@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.restlet.data.Form;
@@ -2005,6 +2006,108 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 	}
 
 	/**
+	 * Convert the given BeanMap into another one which is compliant with the constrains of this entity. Allowing to
+	 * use it to create or update the data. 
+	 * 
+	 * <p>
+	 * First, build the attributes list corresponding to the codes used into the original BeanMap.
+	 * Second, store the converted attributes values according to the attributes types.
+	 * 
+	 * <p>
+	 * References line, read-only and translatable attributes are ignored because theses attributes are not supposed to
+	 * be updated.
+	 * 
+	 * @param bean
+	 *            an BeanMap.
+	 * @param attributes
+	 *            the list to store the attributes of this entity used into the given form. May be null if this list is
+	 *            not used.
+	 * @return a BeanMap containing the attributes converted values and the other properties that do not correspond to
+	 *         attributes.
+	 */
+	public BeanMap filterBean(BeanMap bean, List<MetaDataAttribute> attributes) {
+		return filterBean(bean, attributes, false, false, false);
+	}
+	
+	/**
+	 * Convert the given BeanMap into another one which is compliant with the constrains of this entity. Allowing to
+	 * use it to create or update the data. 
+	 * 
+	 * <p>
+	 * First, build the attributes list corresponding to the codes used into the original BeanMap.
+	 * Second, store the converted attributes values according to the attributes types.
+	 * 
+	 * <p>
+	 * References line, read-only and translatable attributes are ignored because theses attributes are not supposed to
+	 * be updated.
+	 * 
+	 * @param bean
+	 *            an BeanMap.
+	 * @param attributes
+	 *            the list to store the attributes of this entity used into the given form. May be null if this list is
+	 *            not used.
+	 * @param references
+	 *            If true the references lines are merged into a sub BeanMap stored in the result.
+	 * @param readonly
+	 *            If true the read-only attributes are included in the result.
+	 * @param tranlatable
+	 *            If true the translatable attributes are included in the result.
+	 * @return a BeanMap containing the attributes converted values without the other properties that do not correspond to
+	 *         attributes.
+	 */
+	public BeanMap filterBean(BeanMap bean, List<MetaDataAttribute> attributes, boolean references, boolean readOnly, boolean translatable) {
+		BeanMap result = new BeanMap(getType());
+		if ((bean.getType() != null) && !type.equals(bean.getType())) {
+			return result;
+		}
+		for (Entry<String, Object> e: bean.entrySet()) {
+			MetaDataAttribute att = getAttribute(e.getKey());
+			if (att == null) {
+				if (references) {
+					int i = e.getKey().indexOf('.');
+					if (i > 0) {
+						String acode = e.getKey().substring(0, i);
+						att = getAttribute(acode);
+						if (att != null) {
+							ReferenceLine rl = getAttributeLine(e.getKey());
+							if ((rl != null) && (rl.getLastAttribute() != null)) {
+								BeanMap sbm = result.getBeanMap(acode);
+								if (sbm == null) {
+									if (attributes != null) {
+										attributes.add(att);
+									}
+									sbm = new BeanMap(att.getType());
+									result.put(acode, sbm);
+								}
+								if (e.getValue() == null) {
+									sbm.put(e.getKey().substring(i + 1), null);
+								} else {
+									sbm.put(e.getKey().substring(i + 1), rl.getLastAttribute().convertValue(e.getValue().toString()));
+								}
+								continue;
+							}
+						}
+					}
+				}
+			} else if (((!att.isReadonly()) || readOnly) && //
+					(e.getKey().indexOf('.') == -1) && //
+					((!att.isTranslatable()) || translatable)) {
+				// We ignore read-only attributes (plus any composed attribute that is
+				// not explicitly declared as read-only).
+				if (attributes != null) {
+					attributes.add(att);
+				}
+				if (e.getValue() == null) {
+					result.put(e.getKey(), null);
+				} else {
+					result.put(e.getKey(), att.convertValue(e.getValue().toString()));
+				}
+			}
+		}
+		return result;
+	}
+
+	/**
 	 * Execute the conversion in one step. First, build the attributes list corresponding to the codes used into the Form.
 	 * Second, create a BeanMap to store the converted attributes values according to the attributes types.
 	 * 
@@ -2015,7 +2118,8 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 	 * @param form
 	 *            an Request form.
 	 * @param attributes
-	 *            the list to store the attributes of this entity used into the given form.
+	 *            the list to store the attributes of this entity used into the given form. May be null if this list is
+	 *            not used.
 	 * @return a BeanMap containing the attributes converted values and the other properties that do not correspond to
 	 *         attributes.
 	 */
@@ -2030,7 +2134,8 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 	 * @param form
 	 *            an Request form.
 	 * @param attributes
-	 *            the list to store the attributes of this entity used into the given form.
+	 *            the list to store the attributes of this entity used into the given form. May be null if this list is
+	 *            not used.
 	 * @param references
 	 *            If true the references lines are merged into a sub BeanMap stored in the result.
 	 * @param readonly

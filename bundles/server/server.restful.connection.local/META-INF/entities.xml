@@ -29,8 +29,7 @@
 			<logUpdate>Update of a login stored in database (%login%)</logUpdate>
 			<logDelete>Deletion of a login stored in database (%login%)</logDelete>
 		</metadata>
-		<attribute type="string" code="login" listable="true"
-			mandatory="true" length="255">
+		<attribute type="string" code="login" listable="true" mandatory="true" length="255">
 			<metadata>
 				<col>LAU_LOGIN</col>
 			</metadata>
@@ -62,7 +61,7 @@
 		</attribute>
 	</entity>
 	
-	<update-entity version="2" type="user" domain="userdb">
+	<update-entity version="3" type="user" domain="userdb">
 		<link type="localauth" code="localauths">
 			<metadata>
 				<reverseLink>user</reverseLink>

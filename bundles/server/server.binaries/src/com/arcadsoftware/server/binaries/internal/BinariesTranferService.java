@@ -69,7 +69,7 @@ public class BinariesTranferService implements IBinariesTranferService {
 								size -= result;
 							}
 							if (size > 0) {
-								Activator.getInstance().error("File copy failed, incomplete file transfert (" + size + "b not copied).");
+								activator.error("File copy failed, incomplete file transfert (" + size + "b not copied).");
 								return false;
 							}
 						} finally {
@@ -86,7 +86,7 @@ public class BinariesTranferService implements IBinariesTranferService {
 			}
 			return true;
 		} catch (Exception e) {
-			Activator.getInstance().error(Messages.BinariesTranferService_Error_copy, e);
+			activator.error(Messages.BinariesTranferService_Error_copy + e.getLocalizedMessage(), e);
 			return false;
 		}
 	}
@@ -239,7 +239,7 @@ public class BinariesTranferService implements IBinariesTranferService {
 			if ((parent != null) && !parent.exists()) {
 				parent.mkdirs();
 				if (!parent.exists()) {
-					Activator.getInstance().error("The Binary file '{}' could not be created.", parent.getAbsolutePath());
+					activator.error("The Binary file '{}' could not be created.", parent.getAbsolutePath());
 				}
 			}
 			if (copy(file, target)) {
@@ -248,6 +248,8 @@ public class BinariesTranferService implements IBinariesTranferService {
 			} else {
 				activator.error("Unable to copy file: '{}'.", target.getAbsolutePath());
 			}
+		} else {
+			activator.warn("Unable to create \"binary\" file some required parameters are null, or the source file does not exists.");
 		}
 		return false;
 	}
@@ -273,29 +275,26 @@ public class BinariesTranferService implements IBinariesTranferService {
 				if (!target.getParentFile().exists()) {
 					target.getParentFile().mkdirs();
 				}
-				FileOutputStream out = new FileOutputStream(target);
-				try {
-					BufferedInputStream bin = new BufferedInputStream(stream);
-					BufferedOutputStream bout = new BufferedOutputStream(out);
-					try {
-						while (true) {
-							int datum = bin.read();
-							if (datum == -1)
-								break;
-							bout.write(datum);
+				try (FileOutputStream out = new FileOutputStream(target)) { 
+					try (BufferedInputStream bin = new BufferedInputStream(stream)) {
+						try (BufferedOutputStream bout = new BufferedOutputStream(out)) {
+							while (true) {
+								int datum = bin.read();
+								if (datum == -1)
+									break;
+								bout.write(datum);
+							}
+							bout.flush();
 						}
-						bout.flush();
-					} finally {
-						bout.close();
 					}
-				} finally {
-					out.close();
 				}
 				activator.fileEventNew(category, id, target);
 				return true;
 			} catch (Throwable e) {
-				Activator.getInstance().error(Messages.BinariesTranferService_Error_copy, e);
+				activator.error(Messages.BinariesTranferService_Error_copy + e.getLocalizedMessage(), e);
 			}
+		} else {
+			activator.warn("Unable to create \"binary\" file some required parameters are null.");
 		}
 		return false;
 	}

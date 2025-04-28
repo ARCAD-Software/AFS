@@ -11,17 +11,17 @@
 			<deleteCol>UST_DELETED</deleteCol>
 			<table>USER_TITLES</table>
 		</metadata>
-		<attribute type="translate" code="name" readonly="true" listable="true" mandatory="false" length="255">
+		<attribute type="translate" code="name" readonly="true" listable="true" length="255">
 			<metadata colrank="1" colsize="80" visible="true">
 			</metadata>
 		</attribute>
-		<link type="user" code="users" readonly="false">
+		<link type="user" code="users">
 			<metadata>
 				<reverseLink>title</reverseLink>
 			</metadata>
 		</link>
 	</entity>
-	<entity type="user" domain="userdb" version="2" date="2022-01-17T00:00:00Z">
+	<entity type="user" domain="userdb" version="3" date="2022-01-17T00:00:00Z">
 		<rights>
 			<create>
 				<hasright attribute="." right="31" />
@@ -58,33 +58,29 @@
 			<logUpdate>Update of a user (%fullname%)</logUpdate>
 			<logDelete>Deletion of a user (%fullname%)</logDelete>
 		</metadata>
-		<attribute type="string" code="firstname" readonly="false" listable="false" mandatory="false" length="255">
+		<attribute type="string" code="firstname" listable="false" length="255">
 			<metadata colrank="3" colsize="100" visible="true">
 				<col>USR_FIRSTNAME</col>
 				<ldap>givenName</ldap>
 			</metadata>
 		</attribute>
-		<attribute type="string" code="fullname" readonly="true"
-			listable="true" mandatory="false" length="513">
+		<attribute type="string" code="fullname" readonly="true" listable="true" length="513">
 			<metadata colrank="1" colsize="500" visible="true">
 				<col>~USR_FIRSTNAME + &apos; &apos; + ~USR_LASTNAME</col>
 			</metadata>
 		</attribute>
-		<attribute type="list/title" code="title" readonly="false"
-			listable="false" mandatory="false" length="1">
+		<attribute type="list/title" code="title" listable="false" length="1">
 			<metadata colrank="2" colsize="80" visible="true">
 				<col>USR_TITLE</col>
 			</metadata>
 		</attribute>
-		<attribute type="string" code="email" readonly="false"
-			listable="true" mandatory="false" length="255">
+		<attribute type="string" code="email" listable="true" length="255">
 			<metadata colrank="5" colsize="180" visible="false">
 				<col>USR_EMAIL</col>
 				<ldap>email mail</ldap>
 			</metadata>
 		</attribute>
-		<attribute type="string" code="lastname" readonly="false"
-			listable="false" mandatory="false" length="255">
+		<attribute type="string" code="lastname" listable="false" length="255">
 			<metadata colrank="4" colsize="140" visible="true">
 				<col>USR_LASTNAME</col>
 				<ldap>sn</ldap>
@@ -95,7 +91,7 @@
 				<combo>profiles profilerights</combo>
 			</metadata>
 		</link>
-		<link type="profile" code="profiles" readonly="false">
+		<link type="profile" code="profiles">
 			<rights>
 				<create>
 					<hasright attribute="." right="37" />
@@ -109,7 +105,7 @@
 				<logUnlink>The user "%fullname%" is not associated to the profile "%code%" anymore.</logUnlink>
 			</metadata>
 		</link>
-		<link type="usergroup" code="groups" readonly="false">
+		<link type="usergroup" code="groups">
 			<rights>
 				<create>
 					<hasright attribute="." right="38" />
@@ -149,31 +145,29 @@
 			<logUpdate>Update of a user profile ([%code%] %name%)</logUpdate>
 			<logDelete>Deletion of a user profile ([%code%] %name%)</logDelete>
 		</metadata>
-		<attribute type="string" code="code" readonly="false"
-			listable="true" mandatory="false" length="50">
+		<attribute type="string" code="code" listable="true" length="50">
 			<metadata colrank="1" colsize="150" visible="true">
 				<col>PRF_CODE</col>
 			</metadata>
 		</attribute>
-		<attribute type="string" code="name" readonly="false"
-			listable="true" mandatory="false" length="255">
+		<attribute type="string" code="name" listable="true" length="255">
 			<metadata colrank="2" colsize="200" visible="true">
 				<col>PRF_NAME</col>
 			</metadata>
 		</attribute>
-		<link type="profileRight" code="profilerights" readonly="false">
+		<link type="profileRight" code="profilerights">
 			<metadata>
 				<reverseLink>profile</reverseLink>
 			</metadata>
 		</link>
-		<link type="right" code="rights" readonly="false">
+		<link type="right" code="rights">
 			<metadata>
 				<sourceCol>PFR_PRF_ID</sourceCol>
 				<destCol>PFR_RIGHT</destCol>
 				<table>PROFILE_RIGHTS</table>
 			</metadata>
 		</link>
-		<link type="user" code="users" readonly="false">
+		<link type="user" code="users">
 			<metadata>
 				<sourceCol>UPF_PRF_ID</sourceCol>
 				<destCol>UPF_USR_ID</destCol>
@@ -222,14 +216,12 @@
 			<logUpdate>Update of a user group ([%code%] %name%)</logUpdate>
 			<logDelete>Deletion of a user group ([%code%] %name%)</logDelete>
 		</metadata>
-		<attribute type="string" code="code" readonly="false"
-			listable="true" mandatory="false" length="50">
+		<attribute type="string" code="code" listable="true" length="50">
 			<metadata colrank="1" colsize="150" visible="true">
 				<col>UGP_CODE</col>
 			</metadata>
 		</attribute>
-		<attribute type="string" code="name" readonly="false"
-			listable="true" mandatory="false" length="255">
+		<attribute type="string" code="name" listable="true" length="255">
 			<metadata colrank="2" colsize="200" visible="true">
 				<col>UGP_NAME</col>
 			</metadata>
@@ -248,7 +240,7 @@
 				<table>SUBUSERGROUPS</table>
 			</metadata>
 		</link>
-		<link type="user" code="users" readonly="false">
+		<link type="user" code="users">
 			<rights>
 				<create>
 					<hasright attribute="." right="38" />
@@ -292,20 +284,17 @@
 			<deleteCol>PFR_DELETED</deleteCol>
 			<table>PROFILE_RIGHTS</table>
 		</metadata>
-		<attribute type="integer" code="parameter" readonly="false"
-			listable="true" mandatory="false">
+		<attribute type="integer" code="parameter" listable="true">
 			<metadata colrank="3" visible="true">
 				<col>PFR_PARAMETER</col>
 			</metadata>
 		</attribute>
-		<attribute type="profile" code="profile" readonly="false"
-			listable="true" mandatory="false" length="1">
+		<attribute type="profile" code="profile" listable="true" length="1">
 			<metadata colrank="1" visible="true">
 				<col>PFR_PRF_ID</col>
 			</metadata>
 		</attribute>
-		<attribute type="right" code="right" readonly="false"
-			listable="true" mandatory="false">
+		<attribute type="right" code="right" listable="true">
 			<metadata colrank="2" colsize="400" visible="true">
 				<col>PFR_RIGHT</col>
 			</metadata>
