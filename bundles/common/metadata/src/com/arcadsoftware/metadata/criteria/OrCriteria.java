@@ -25,7 +25,7 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
  */
 public class OrCriteria extends AbstractSearchCriteria implements Cloneable {
 
-	private ArrayList<ISearchCriteria> criterias;
+	private final ArrayList<ISearchCriteria> criterias;
 	
 	/**
 	 * 
@@ -56,6 +56,10 @@ public class OrCriteria extends AbstractSearchCriteria implements Cloneable {
 		} else {
 			criterias = new ArrayList<ISearchCriteria>();
 		}
+	}
+	
+	private Object readResolve() {
+		return new OrCriteria();
 	}
 
 	@Override
@@ -105,22 +109,22 @@ public class OrCriteria extends AbstractSearchCriteria implements Cloneable {
 			}
 		}
 		switch(reduced.size()) {
-			case 0: return new ConstantCriteria(false);
+			case 0: return ConstantCriteria.FALSE;
 			case 1: return reduced.get(0);
 		}
-		OrCriteria result = new OrCriteria();
-		result.criterias = reduced;
-		return result;
+		return new OrCriteria(reduced);
 	}
 
 	@Override
 	public OrCriteria clone() {
 		OrCriteria result = new OrCriteria();
-		for(ISearchCriteria criteria: criterias) {
-			if (criteria != null) {
-				try {
-					result.criterias.add((ISearchCriteria) criteria.clone());
-				} catch (CloneNotSupportedException e) {}
+		if (criterias != null) {
+			for (ISearchCriteria criteria: criterias) {
+				if (criteria != null) {
+					try {
+						result.criterias.add((ISearchCriteria) criteria.clone());
+					} catch (CloneNotSupportedException e) {}
+				}
 			}
 		}
 		return result;
@@ -128,22 +132,30 @@ public class OrCriteria extends AbstractSearchCriteria implements Cloneable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if ((obj instanceof OrCriteria) && (((OrCriteria)obj).criterias.size() == criterias.size())) {
-			for(ISearchCriteria criteria: criterias) {
-				if (criteria != null) {
-					boolean stop = true;
-					for(ISearchCriteria objcriteria:((OrCriteria)obj).criterias) {
-						if (criteria.equals(objcriteria)) {
-							stop = false;
-							break;
+		if (obj instanceof OrCriteria) { 
+			if ((criterias == null) || criterias.isEmpty()) {
+				return (((OrCriteria) obj).criterias == null) || ((OrCriteria) obj).criterias.isEmpty(); 
+			}
+			if ((((OrCriteria) obj).criterias == null) || ((OrCriteria) obj).criterias.isEmpty()) {
+				return false;
+			}
+			if (((OrCriteria)obj).criterias.size() == criterias.size()) {
+				for (ISearchCriteria criteria: criterias) {
+					if (criteria != null) {
+						boolean stop = true;
+						for(ISearchCriteria objcriteria:((OrCriteria)obj).criterias) {
+							if (criteria.equals(objcriteria)) {
+								stop = false;
+								break;
+							}
+						}
+						if (stop) {
+							return false;
 						}
 					}
-					if (stop) {
-						return false;
-					}
 				}
+				return true;
 			}
-			return true;
 		}
 		return false;
 	}
@@ -154,17 +166,22 @@ public class OrCriteria extends AbstractSearchCriteria implements Cloneable {
 	 * @param criteria
 	 */
 	public void add(ISearchCriteria criteria) {
-		if (criteria != null) {
+		if ((criteria != null) && (criterias != null)) {
 			criterias.add(criteria);
 		}
 	}
 
+	/**
+	 * Get all the criterias contained in the disjunction.
+	 *  
+	 * @return Should not return null.
+	 */
 	public ArrayList<ISearchCriteria> getCriterias() {
 		return criterias;
 	}
 
 	/**
-	 * Return true if this dicjunction is empty.
+	 * Return true if this disjunction is empty.
 	 * @return
 	 */
 	public boolean isEmpty() {
@@ -184,13 +201,17 @@ public class OrCriteria extends AbstractSearchCriteria implements Cloneable {
 	public String toString() {
 		StringBuilder sb = new StringBuilder("("); //$NON-NLS-1$
 		boolean first = true;
-		for(ISearchCriteria ci:criterias) {
-			if (first) {
-				first = false;
-			} else {
-				sb.append(Messages.Criteria_Or);
+		if (criterias != null) {
+			for (ISearchCriteria ci: criterias) {
+				if (first) {
+					first = false;
+				} else {
+					sb.append(Messages.Criteria_Or);
+				}
+				sb.append(ci);
 			}
-			sb.append(ci);
+		} else {
+			sb.append('!');
 		}
 		sb.append(')');
 		return sb.toString();

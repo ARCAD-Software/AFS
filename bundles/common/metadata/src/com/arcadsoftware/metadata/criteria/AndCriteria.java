@@ -25,7 +25,7 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
  */
 public class AndCriteria extends AbstractSearchCriteria implements Cloneable {
 
-	private ArrayList<ISearchCriteria> criterias;
+	private final ArrayList<ISearchCriteria> criterias;
 	
 	public AndCriteria() {
 		super();
@@ -51,7 +51,11 @@ public class AndCriteria extends AbstractSearchCriteria implements Cloneable {
 			criterias = new ArrayList<ISearchCriteria>();
 		}
 	}
-
+	
+	private Object readResolve() {
+		return new AndCriteria();
+	}
+	
 	/**
 	 * Build an conjunction around the to criteria.
 	 * 
@@ -160,11 +164,13 @@ public class AndCriteria extends AbstractSearchCriteria implements Cloneable {
 	@Override
 	public AndCriteria clone() {
 		AndCriteria result = new AndCriteria();
-		for (ISearchCriteria criteria: criterias) {
-			if (criteria != null) {
-				try {
-					result.criterias.add((ISearchCriteria) criteria.clone());
-				} catch (CloneNotSupportedException e) {}
+		if (criterias != null) {
+			for (ISearchCriteria criteria: criterias) {
+				if (criteria != null) {
+					try {
+						result.criterias.add((ISearchCriteria) criteria.clone());
+					} catch (CloneNotSupportedException e) {}
+				}
 			}
 		}
 		return result;
@@ -172,22 +178,30 @@ public class AndCriteria extends AbstractSearchCriteria implements Cloneable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if ((obj instanceof AndCriteria) && (((AndCriteria) obj).criterias.size() == criterias.size())) {
-			for(ISearchCriteria criteria: criterias) {
-				if (criteria != null) {
-					boolean stop = true;
-					for (ISearchCriteria objcriteria:((AndCriteria) obj).criterias) {
-						if (criteria.equals(objcriteria)) {
-							stop = false;
-							break;
+		if (obj instanceof AndCriteria) {
+			if ((criterias == null) || criterias.isEmpty()) {
+				return (((AndCriteria) obj).criterias == null) || ((AndCriteria) obj).criterias.isEmpty(); 
+			}
+			if ((((AndCriteria) obj).criterias == null) || ((AndCriteria) obj).criterias.isEmpty()) {
+				return false;
+			}
+			if (((AndCriteria) obj).criterias.size() == criterias.size()) {
+				for (ISearchCriteria criteria: criterias) {
+					if (criteria != null) {
+						boolean stop = true;
+						for (ISearchCriteria objcriteria: ((AndCriteria) obj).criterias) {
+							if (criteria.equals(objcriteria)) {
+								stop = false;
+								break;
+							}
+						}
+						if (stop) {
+							return false;
 						}
 					}
-					if (stop) {
-						return false;
-					}
 				}
+				return true;
 			}
-			return true;
 		}
 		return false;
 	}
@@ -198,10 +212,7 @@ public class AndCriteria extends AbstractSearchCriteria implements Cloneable {
 	 * @param criteria
 	 */
 	public void add(ISearchCriteria criteria) {
-		if (criteria != null) {
-			if (criterias == null) {
-				criterias = new ArrayList<ISearchCriteria>();
-			}
+		if ((criteria != null) && (criterias != null)) {
 			criterias.add(criteria);
 		}
 	}
@@ -215,14 +226,21 @@ public class AndCriteria extends AbstractSearchCriteria implements Cloneable {
 	}
 	
 	public boolean test(BeanMap bean, IConnectionUserBean currentUser) {
-		for(ISearchCriteria ci:criterias) {
-			if ((ci != null) && !ci.test(bean, currentUser)) {
-				return false;
+		if (criterias != null) {
+			for (ISearchCriteria ci: criterias) {
+				if ((ci != null) && !ci.test(bean, currentUser)) {
+					return false;
+				}
 			}
 		}
 		return true;
 	}
 
+	/**
+	 * Get all the criterias contained in the conjunction.
+	 *  
+	 * @return Should not return null.
+	 */
 	public ArrayList<ISearchCriteria> getCriterias() {
 		return criterias;
 	}
@@ -231,13 +249,17 @@ public class AndCriteria extends AbstractSearchCriteria implements Cloneable {
 	public String toString() {
 		StringBuilder sb = new StringBuilder("("); //$NON-NLS-$ //$NON-NLS-1$
 		boolean first = true;
-		for(ISearchCriteria ci:criterias) {
-			if (first) {
-				first = false;
-			} else {
-				sb.append(Messages.Criteria_And);
+		if (criterias != null) {
+			for (ISearchCriteria ci: criterias) {
+				if (first) {
+					first = false;
+				} else {
+					sb.append(Messages.Criteria_And);
+				}
+				sb.append(ci);
 			}
-			sb.append(ci);
+		} else {
+			sb.append('!');
 		}
 		sb.append(')');
 		return sb.toString();
