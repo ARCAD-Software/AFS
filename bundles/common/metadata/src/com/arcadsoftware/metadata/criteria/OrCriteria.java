@@ -25,7 +25,7 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
  */
 public class OrCriteria extends AbstractSearchCriteria implements Cloneable {
 
-	private ArrayList<ISearchCriteria> criterias;
+	private final ArrayList<ISearchCriteria> criterias;
 	
 	/**
 	 * 
@@ -56,6 +56,10 @@ public class OrCriteria extends AbstractSearchCriteria implements Cloneable {
 		} else {
 			criterias = new ArrayList<ISearchCriteria>();
 		}
+	}
+
+	private Object readResolve() {
+		return new OrCriteria();
 	}
 
 	@Override
@@ -96,9 +100,7 @@ public class OrCriteria extends AbstractSearchCriteria implements Cloneable {
 					}
 				}
 		}
-		OrCriteria result = new OrCriteria();
-		result.criterias = reduced;
-		return result;
+		return new OrCriteria(reduced);
 	}
 
 	@Override

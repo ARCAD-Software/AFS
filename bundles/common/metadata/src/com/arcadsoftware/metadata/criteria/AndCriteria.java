@@ -25,7 +25,7 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
  */
 public class AndCriteria extends AbstractSearchCriteria implements Cloneable {
 
-	private ArrayList<ISearchCriteria> criterias;
+	private final ArrayList<ISearchCriteria> criterias;
 	
 	public AndCriteria() {
 		super();
@@ -52,6 +52,10 @@ public class AndCriteria extends AbstractSearchCriteria implements Cloneable {
 		}
 	}
 
+	private Object readResolve() {
+		return new AndCriteria();
+	}
+	
 	/**
 	 * Build an conjunction around the to criteria.
 	 * 
