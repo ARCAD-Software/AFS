@@ -220,9 +220,7 @@ public class MultiLinkQuery {
 								del.append(mapper.fg.equaldelfalse);
 							}
 						}
-						if (rec_query.isEmpty()) {
-							rec_query.append(mapper.fg.rec_first);
-						} else {
+						if (!rec_query.isEmpty()) {
 							rec_query.append(mapper.fg.rec_sub);
 						}
 						rec_query.append(String.format(mapper.fg.rec_alt, rec_alias, firstSelect, // 
@@ -336,9 +334,7 @@ public class MultiLinkQuery {
 						final String firstSelect = String.format(mapper.fg.select,
 								prev_alias + '.' + prev_col + mapper.fg.asid, joins.toString(),
 								where.toString());
-						if (rec_query.isEmpty()) {
-							rec_query.append(mapper.fg.rec_first);
-						} else {
+						if (!rec_query.isEmpty()) {
 							rec_query.append(mapper.fg.rec_sub);
 						}
 						rec_query.append(String.format(mapper.fg.rec_alt, rec_alias, firstSelect, rfli.table,
