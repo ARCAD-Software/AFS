@@ -223,7 +223,7 @@ public class ConfiguredProxy {
 
 	private InetSocketAddress getAddress(String prefix, Dictionary<String, Object> props) {
 		Object o = props.get(prefix + PROP_PROXY_HOSTNAME);
-		if (o != null) {
+		if ((o != null) && !o.toString().isBlank()) {
 			Object po = props.get(prefix + PROP_PROXY_PORT);
 			int p = 8080;
 			if (po != null) {
@@ -238,7 +238,7 @@ public class ConfiguredProxy {
 	
 	private InetSocketAddress getAddress(String prefix, Map<String, Object> props) {
 		Object o = props.get(prefix + PROP_PROXY_HOSTNAME);
-		if (o != null) {
+		if ((o != null) && !o.toString().isBlank()) {
 			Object po = props.get(prefix + PROP_PROXY_PORT);
 			int p = 8080;
 			if (po != null) {
