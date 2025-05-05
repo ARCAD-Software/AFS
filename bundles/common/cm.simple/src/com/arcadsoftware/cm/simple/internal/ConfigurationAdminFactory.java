@@ -219,7 +219,7 @@ public class ConfigurationAdminFactory implements ServiceFactory<ConfigurationAd
 						ConfigurationAdminFactory.this.activator.error("Error during configuration update.", e);
 					}
 				} else {
-					for(Dictionary<String, Object> p: confs) {
+					for (Dictionary<String, Object> p: confs) {
 						try {
 							service.updated(p);
 						} catch (Exception e) {

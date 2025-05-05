@@ -792,38 +792,46 @@ public class Activator extends AbstractConfiguredActivator implements ServiceTra
 		ci.println("Please check your server log if it is not printed in this console.");
 		ci.println("[Comments into bracket are not necessarily a problem.]");
 		ci.println();
+		boolean err = false;
 		if (type != null) {
-			checkEntity(ci, getEntity(type));
-			ci.println();
+			err = checkEntity(ci, getEntity(type));
 		} else {
 			for(MetaDataEntity e: getEntities()) {
-				checkEntity(ci, e);
-				ci.println();
+				if (checkEntity(ci, e)) {
+					err = true;
+					ci.println();
+				}
 			}
 		}
-		ci.println("Verification terminated.");
+		if (!err) {
+			ci.println("Verification terminated without any problem.");
+		}
 	}
 	
-	private void checkEntity(CommandInterpreter ci, MetaDataEntity entity) {
+	private boolean checkEntity(CommandInterpreter ci, MetaDataEntity entity) {
+		boolean err = false;
 		if (entity != null) {
-			ci.println(String.format("Diagnose the entity %s (Version %d), problems if any:", entity.getType(), entity.getVersion()));
-			boolean nopb = true;
 			if (entity.getMapper() == null) {
+				ci.println(String.format("The entity %s (Version %d) include the following problems:", entity.getType(), entity.getVersion()));
+				err = true;
 				ci.println("  - No mapper available for domain: " + entity.getDomain());
-				nopb = false;
 			} else {
 				try {
 					int c = entity.dataCount(true, null, false, null);
 					if (c == 0) {
+						ci.println(String.format("The entity %s (Version %d) include the following problems:", entity.getType(), entity.getVersion()));
+						err = true;
 						ci.println("  - [Empty entity in the storage source...]");
-						nopb = false;
 					}
 					int id = 0;
 					try {
 						BeanMapList list = entity.dataSelection(entity.getAllAttributes(), true, null, false, null, null, 0, 1);
 						if (list == null) {
+							if (!err) {
+								ci.println(String.format("The entity %s (Version %d) include the following problems:", entity.getType(), entity.getVersion()));
+								err = true;
+							}
 							ci.println("  - [Entity selection return null list...]");
-							nopb = false;
 						}
 						if (!list.isEmpty()) {
 							id = list.get(0).getId();
@@ -834,8 +842,11 @@ public class Activator extends AbstractConfiguredActivator implements ServiceTra
 							boolean skip = false;
 							for (MetaDataAttribute a: entity.getAttributes().values()) {
 								if (!a.isLocalReference() && (a.getRefEntity() != null)) {
+									if (!err) {
+										ci.println(String.format("The entity %s (Version %d) include the following problems:", entity.getType(), entity.getVersion()));
+										err = true;
+									}
 									ci.println("  - [Attribute referencing foreign entity may slow down the data access: " + a.getCode() + ']');
-									nopb = false;
 								}
 								if (!a.isReadonly()) {
 									MetaDataEntity ref = a.getRefEntity();
@@ -843,8 +854,11 @@ public class Activator extends AbstractConfiguredActivator implements ServiceTra
 										list = ref.dataSelection("", true, null, false, null, null, 0, 1);
 										if ((list == null) || list.isEmpty()) {
 											if (a.isMandatory()) {
+												if (!err) {
+													ci.println(String.format("The entity %s (Version %d) include the following problems:", entity.getType(), entity.getVersion()));
+													err = true;
+												}
 												ci.println("  - [Mandatory data can not be provided for the attribute: " + a.getCode() + ']');
-												nopb = false;
 												skip = true;
 											}
 										} else {
@@ -890,8 +904,11 @@ public class Activator extends AbstractConfiguredActivator implements ServiceTra
 												attributes.add(a);
 												values.add(i);
 											} else {
+												if (!err) {
+													ci.println(String.format("The entity %s (Version %d) include the following problems:", entity.getType(), entity.getVersion()));
+													err = true;
+												}
 												ci.println("  - [Range attribute do not provide a correct set of acceptable values: " + a.getCode() + ']');
-												nopb = false;
 												if (a.isMandatory()) {
 													skip = true;
 												}
@@ -910,23 +927,32 @@ public class Activator extends AbstractConfiguredActivator implements ServiceTra
 											if (a.getLength() > 0) {
 												values.add("x".repeat(a.getLength()));
 											} else {
+												if (!err) {
+													ci.println(String.format("The entity %s (Version %d) include the following problems:", entity.getType(), entity.getVersion()));
+													err = true;
+												}
 												ci.println(String.format("  - [The String attribute \"%s\" does not define a string limit length.]", a.getCode()));
-												nopb = false;
 												values.add("z");
 											}
 											break;
 										case MetaDataAttribute.TYPE_TRANSLATE:
 											break;
 										default:
+											if (!err) {
+												ci.println(String.format("The entity %s (Version %d) include the following problems:", entity.getType(), entity.getVersion()));
+												err = true;
+											}
 											ci.println(String.format("  - [Unkown simple type \"%s\" (contact AFS dev team).]", a.getType()));
-											nopb = false;
 											if (a.isMandatory()) {
 												skip = true;
 											}
 										}
 									} else {
+										if (!err) {
+											ci.println(String.format("The entity %s (Version %d) include the following problems:", entity.getType(), entity.getVersion()));
+											err = true;
+										}
 										ci.println(String.format("  - The attribute \"%s\" reference an unkown type \"%s\".", a.getCode(), a.getType()));
-										nopb = false;
 										if (a.isMandatory()) {
 											skip = true;
 										}
@@ -937,18 +963,27 @@ public class Activator extends AbstractConfiguredActivator implements ServiceTra
 								try {
 									BeanMap b = entity.dataCreate(attributes, values);
 									if (b == null) {
+										if (!err) {
+											ci.println(String.format("The entity %s (Version %d) include the following problems:", entity.getType(), entity.getVersion()));
+											err = true;
+										}
 										ci.println("  - Unable to create data with this attribute list [may be due to unique constraints...]: " + attributes.toString());
 										ci.println("    - with these values: " + values.toString());
-										nopb = false;
 									} else if (b.getId() <= 0) {
+										if (!err) {
+											ci.println(String.format("The entity %s (Version %d) include the following problems:", entity.getType(), entity.getVersion()));
+											err = true;
+										}
 										ci.println("  - Data creation returned an invalid ID, with this attribute list: " + attributes.toString());
 										ci.println("    - with these values: " + values.toString());
-										nopb = false;
 									} else {
 										try {
 											entity.dataDelete(b.getId(), true);
 										} catch (Throwable e) {
-											nopb = false;
+											if (!err) {
+												ci.println(String.format("The entity %s (Version %d) include the following problems:", entity.getType(), entity.getVersion()));
+												err = true;
+											}
 											ci.println("  - Unable to delete data with id: " + b.getId());
 											ci.println("    - with these values: " + values.toString());
 											if ((e.getCause() == null) || !(e instanceof ResourceException)) { 
@@ -961,7 +996,10 @@ public class Activator extends AbstractConfiguredActivator implements ServiceTra
 										}
 									}
 								} catch (Throwable e) {
-									nopb = false;
+									if (!err) {
+										ci.println(String.format("The entity %s (Version %d) include the following problems:", entity.getType(), entity.getVersion()));
+										err = true;
+									}
 									ci.println("  - Unable to create data with this attribute list [may be due to unique constraints...]: " + attributes.toString());
 									ci.println("    - with these values: " + values.toString());
 									if ((e.getCause() == null) || !(e instanceof ResourceException)) { 
@@ -975,7 +1013,10 @@ public class Activator extends AbstractConfiguredActivator implements ServiceTra
 							}
 						}
 					} catch (Throwable e) {
-						nopb = false;
+						if (!err) {
+							ci.println(String.format("The entity %s (Version %d) include the following problems:", entity.getType(), entity.getVersion()));
+							err = true;
+						}
 						ci.println("  - Unable to select the attributes of the entity.");
 						if ((e.getCause() == null) || !(e instanceof ResourceException)) { 
 							ci.println("    - " + e.getLocalizedMessage()); //$NON-NLS-1$
@@ -990,15 +1031,31 @@ public class Activator extends AbstractConfiguredActivator implements ServiceTra
 						for (MetaDataLink link: entity.getLinks().values()) {
 							MetaDataEntity re = link.getRefEntity();
 							if (re == null) {
+								if (!err) {
+									ci.println(String.format("The entity %s (Version %d) include the following problems:", entity.getType(), entity.getVersion()));
+									err = true;
+								}
 								ci.println(String.format("  - Linked entity not found in link \"%s\": %s", link.getCode(), link.getType()));
 							} else if (re.getMapper() == null) {
+								if (!err) {
+									ci.println(String.format("The entity %s (Version %d) include the following problems:", entity.getType(), entity.getVersion()));
+									err = true;
+								}
 								ci.println(String.format("  - Linked entity not initialized in link \"%s\": %s", link.getCode(), link.getType()));
 							} else {
 								if (!link.isLocal()) {
+									if (!err) {
+										ci.println(String.format("The entity %s (Version %d) include the following problems:", entity.getType(), entity.getVersion()));
+										err = true;
+									}
 									ci.println(String.format("  - [Link \"%s\" defined on different domain, may not be implemented: %s <> %s", link.getCode(), link.getParent().getDomain(), re.getDomain()));
 								}
 								if (link.isRecursive()) {
 									if (rec) {
+										if (!err) {
+											ci.println(String.format("The entity %s (Version %d) include the following problems:", entity.getType(), entity.getVersion()));
+											err = true;
+										}
 										ci.println(String.format("  - [Multiple recursive link on entity \"%s\", it may have unpredictable effects.]", link.getParent().getType()));
 									} else {
 										rec = true;
@@ -1007,7 +1064,10 @@ public class Activator extends AbstractConfiguredActivator implements ServiceTra
 								try {
 									link.dataCount(id);
 								} catch (Throwable e) {
-									nopb = false;
+									if (!err) {
+										ci.println(String.format("The entity %s (Version %d) include the following problems:", entity.getType(), entity.getVersion()));
+										err = true;
+									}
 									ci.println("  - Unable to reach the linked data: " + link.getCode());
 									if ((e.getCause() == null) || !(e instanceof ResourceException)) { 
 										ci.println("    - " + e.getLocalizedMessage()); //$NON-NLS-1$
@@ -1021,7 +1081,10 @@ public class Activator extends AbstractConfiguredActivator implements ServiceTra
 						}
 					}
 				} catch (Throwable e) {
-					nopb = false;
+					if (!err) {
+						ci.println(String.format("The entity %s (Version %d) include the following problems:", entity.getType(), entity.getVersion()));
+						err = true;
+					}
 					ci.println("  - Unable to reach the data of this entity on domain: " + entity.getDomain());
 					if ((e.getCause() == null) || !(e instanceof ResourceException)) { 
 						ci.println("    - " + e.getLocalizedMessage()); //$NON-NLS-1$
@@ -1032,10 +1095,8 @@ public class Activator extends AbstractConfiguredActivator implements ServiceTra
 					}
 				}
 			}
-			if (nopb) {
-				ci.println("  No problem found.");
-			}
 		}
+		return err;
 	}
 
 	public Map<String, String> getAliasesMap() {
