@@ -18,12 +18,15 @@ import java.util.Map.Entry;
 
 import javax.sql.DataSource;
 
+import org.osgi.framework.BundleContext;
 import org.postgresql.Driver;
 
 import com.arcadsoftware.database.IDataSourceInformations;
 import com.arcadsoftware.database.sql.DataSourceParameters;
 import com.arcadsoftware.database.sql.IDataSourceProvider;
+import com.arcadsoftware.osgi.ILoggedPlugin;
 import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
 public class DataSourceProvider implements IDataSourceProvider {
 
@@ -61,6 +64,16 @@ public class DataSourceProvider implements IDataSourceProvider {
 		for(Entry<String, Object> e: parameters.getParameters().entrySet()) {
 			conf.addDataSourceProperty(e.getKey(), e.getValue());
 		}
-		return new ExtendableHikariDataSource(activator, activator.getContext(), conf);
+		try {
+			Class<?> c = DataSourceProvider.class.getClassLoader().loadClass("com.arcadsoftware.database.sql.postgresql.internal.ExtendableHikariDataSource"); //$NON-NLS-1$
+			try {
+				return (DataSource) c.getConstructor(ILoggedPlugin.class, BundleContext.class, HikariConfig.class).newInstance(activator, activator.getContext(), conf);
+			} catch (Exception e) {
+				activator.error("Unable to use the Extended PostgreSQL datasource: " + e.getLocalizedMessage(), e);
+			}
+		} catch (Exception e) {
+			activator.trace("Extended PostgreSQL datasource not installed.", e);
+		}
+		return new HikariDataSource(conf);
 	}
 }

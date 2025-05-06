@@ -20,7 +20,7 @@ import com.arcadsoftware.metadata.internal.AbstractCriteriaParser;
 import com.arcadsoftware.metadata.internal.DateUnitList;
 import com.arcadsoftware.metadata.criteria.ISearchCriteria;
 
-@SuppressWarnings({ "unused", "serial", "rawtypes", "unchecked" })
+@SuppressWarnings({ "unused", "rawtypes", "unchecked" })
 public abstract class BaseCriteriaParser extends AbstractCriteriaParser {
   // All pure java code is in AbstractCriteriaParser this is better for debugging !
 }

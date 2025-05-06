@@ -296,10 +296,12 @@ public class MultiLinkQuery {
 			return null;
 		}
 		// Process recursive link on the final target entity, if available:
-		final MetaDataEntity finale = links.get(links.size() - 1).getRefEntity();
+		final MetaDataLink lastLink = links.get(links.size() - 1);
+		final MetaDataEntity finale = lastLink.getRefEntity();
 		if ((finale != null) && (!ignoreSubdivision)) {
+			// Do not process a recursive link resolution if this link is the previous one...
 			final MetaDataLink reclink = finale.getFirstRecursiveLink();
-			if (reclink != null) {
+			if ((reclink != null) && !reclink.equals(lastLink)) {
 				final EntityInfo fei = mapper.getEntityInfo(finale);
 				if (fei != null) {
 					final LinkInfo rfli = fei.links.get(reclink.getCode());
@@ -331,9 +333,13 @@ public class MultiLinkQuery {
 							del.append(fei.deleteCol);
 							del.append(mapper.fg.equaldelfalse);
 						}
-						final String firstSelect = String.format(mapper.fg.select,
-								prev_alias + '.' + prev_col + mapper.fg.asid, joins.toString(),
-								where.toString());
+						final String firstSelect;
+						if ((where == null) || where.isEmpty()) {
+							firstSelect = String.format(mapper.fg.selectall, prev_alias + '.' + prev_col + mapper.fg.asid, joins.toString());
+						} else {
+							firstSelect = String.format(mapper.fg.select, prev_alias + '.' + prev_col + mapper.fg.asid, joins.toString(),
+									where.toString());
+						}
 						if (!rec_query.isEmpty()) {
 							rec_query.append(mapper.fg.rec_sub);
 						}
