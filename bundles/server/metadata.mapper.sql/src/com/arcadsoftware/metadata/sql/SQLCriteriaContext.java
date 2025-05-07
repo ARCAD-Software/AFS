@@ -584,7 +584,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 					result.append(mapper.fg.false_cond);
 				} else {
 					result.append(mapper.fg.parin);
-					result.append(MapperSQLService.DEFAULT_TABLEALIAS);
+					result.append(joinTree.getAlias());
 					result.append('.');
 					result.append(entityInfo.deleteCol);
 					result.append(mapper.fg.equaldeltrue);
@@ -727,7 +727,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 				if (((HasRightCriteria) criteria).getAttribute() != null) {
 					col = colNames.get(((HasRightCriteria) criteria).getAttribute());
 				} else {
-					col = MapperSQLService.DEFAULT_TABLEALIAS + '.' + entityInfo.idCol;
+					col = getIdCol();
 				}
 				EntityInfo users = mapper.getEntityInfo(MetaDataEntity.loadEntity("user")); //$NON-NLS-1$
 				if (users == null) {
@@ -916,7 +916,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 			String dateCol;
 			String attribute = ((ChangedCriteria) criteria).getAttribute();
 			if (attribute == null) {
-				dateCol = MapperSQLService.DEFAULT_TABLEALIAS + '.' + entityInfo.updateCol;
+				dateCol = joinTree.getAlias() + '.' + entityInfo.updateCol;
 			} else {
 				ReferenceLine ref = getReference(attribute);
 				EntityInfo ae = mapper.getEntityInfo(ref.getLastAttribute().getRefEntity());
@@ -940,7 +940,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 		} else if (criteria instanceof InListCriteria) {
 			String col;
 			if (((InListCriteria) criteria).getAttribute() == null) {
-				col = MapperSQLService.DEFAULT_TABLEALIAS + '.' + entityInfo.idCol;
+				col = getIdCol();
 			} else {
 				col = colNames.get(((InListCriteria) criteria).getAttribute());
 			}
@@ -949,7 +949,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 			String muidCol;
 			String attribute = ((ChangedByCriteria) criteria).getAttribute();
 			if (attribute == null) {
-				muidCol = MapperSQLService.DEFAULT_TABLEALIAS + '.' + entityInfo.muidCol;
+				muidCol = joinTree.getAlias() + '.' + entityInfo.muidCol;
 			} else {
 				ReferenceLine ref = getReference(attribute);
 				EntityInfo ae = mapper.getEntityInfo(ref.getLastAttribute().getRefEntity());
@@ -982,7 +982,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 			} else if (result.length() > 0) {
 				result.append(mapper.fg.and);
 			}
-			result.append(MapperSQLService.DEFAULT_TABLEALIAS);
+			result.append(joinTree.getAlias());
 			result.append('.');
 			result.append(entityInfo.deleteCol);
 			result.append(mapper.fg.equaldelfalse);
@@ -991,7 +991,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 	}
 
 	private String getIdCol() {
-		return MapperSQLService.DEFAULT_TABLEALIAS + '.' + entityInfo.idCol;
+		return joinTree.getAlias() + '.' + entityInfo.idCol;
 	}
 	
 	/**

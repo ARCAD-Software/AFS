@@ -1103,6 +1103,10 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		if (ei == null) {
 			return null;
 		}
+		final MetaDataEntity targetEntity = context.getEntity();
+		if (targetEntity == null) {
+			return new BeanMapPartialList();
+		}
 		final String mlqc = MultiLinkQuery.getCode(links, deleted, ignoreSubdivision);
 		MultiLinkQuery mlq = ei.sql_links.get(mlqc);
 		if (mlq == null) {
@@ -1115,14 +1119,12 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		if (mlq.rec_alias != null) {
 			context.addQueryContext(mlq.rec_alias, mlq.rec_query);
 		}
-		final MetaDataEntity targetEntity = context.getEntity();
-		if (targetEntity == null) {
-			return new BeanMapPartialList();
-		}
 		final StringBuilder cols;
 		final StringBuilder where;
 		final String orderCols;
-		final EntityInfo tei = getEntityInfo(targetEntity); 
+		final EntityInfo tei = getEntityInfo(targetEntity);
+		// FIXME If the last link is a "reversed link" then the final entity alias is already the targeted one...
+		// In that case tei should be null !
 		JoinElement join = context.initJoinTree(mlq.linkAlias, mlq.join, tei, mlq.linkCol, deleted);
 		if (tei == null) {
 			// Just get the list of ID to pass to the foreign mapper...
@@ -1136,7 +1138,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		} else {
 			cols = context.generateColumns(tei, join, attributes, deleted);
 			orderCols = context.generateOrders(orders, deleted);
-			where = context.generateCriteria(criteria, deleted);
+			where = context.generateCriteria(criteria, deleted); // The deletion test is already done in the last join... 
 			if (!mlq.where.isEmpty()) {
 				if (!where.isEmpty()) {
 					where.append(fg.and);
