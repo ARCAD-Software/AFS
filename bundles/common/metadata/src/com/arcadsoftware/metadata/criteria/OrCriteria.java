@@ -23,7 +23,7 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
 /**
  * Disjunction of any criteria
  */
-public class OrCriteria extends AbstractSearchCriteria implements Cloneable {
+public class OrCriteria extends AbstractSearchCriteria implements Cloneable, ISubCriteria {
 
 	private final ArrayList<ISearchCriteria> criterias;
 	
@@ -56,10 +56,6 @@ public class OrCriteria extends AbstractSearchCriteria implements Cloneable {
 		} else {
 			criterias = new ArrayList<ISearchCriteria>();
 		}
-	}
-	
-	private Object readResolve() {
-		return new OrCriteria();
 	}
 
 	@Override
@@ -160,30 +156,19 @@ public class OrCriteria extends AbstractSearchCriteria implements Cloneable {
 		return false;
 	}
 	
-	/**
-	 * Add a new criteria to the disjunction.
-	 * 
-	 * @param criteria
-	 */
+	@Override
 	public void add(ISearchCriteria criteria) {
 		if ((criteria != null) && (criterias != null)) {
 			criterias.add(criteria);
 		}
 	}
 
-	/**
-	 * Get all the criterias contained in the disjunction.
-	 *  
-	 * @return Should not return null.
-	 */
+	@Override
 	public ArrayList<ISearchCriteria> getCriterias() {
 		return criterias;
 	}
 
-	/**
-	 * Return true if this disjunction is empty.
-	 * @return
-	 */
+	@Override
 	public boolean isEmpty() {
 		return (criterias == null) || criterias.isEmpty();
 	}
