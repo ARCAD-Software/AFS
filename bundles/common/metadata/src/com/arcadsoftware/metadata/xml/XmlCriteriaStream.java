@@ -57,6 +57,7 @@ import com.arcadsoftware.metadata.criteria.PreGeneratedCriteria;
 import com.arcadsoftware.metadata.criteria.StartCriteria;
 import com.arcadsoftware.metadata.criteria.SubstCriteria;
 import com.arcadsoftware.metadata.criteria.UnlinkCriteria;
+import com.arcadsoftware.metadata.internal.xml.AndOrCriteriaConverter;
 import com.arcadsoftware.metadata.internal.xml.ConstantCriteriaConverter;
 import com.arcadsoftware.metadata.internal.xml.InListCriteriaConverter;
 import com.arcadsoftware.metadata.internal.xml.NotCriteriaConverter;
@@ -71,9 +72,8 @@ public class XmlCriteriaStream extends XStreamCompact {
 	protected static XStreamCompact initialize(XStreamCompact xs) {
 		// Build all the necessary aliases...
 		xs.alias("or", OrCriteria.class); //$NON-NLS-1$
-		xs.addImplicitCollection(OrCriteria.class, "criterias"); //$NON-NLS-1$
 		xs.alias("and", AndCriteria.class); //$NON-NLS-1$
-		xs.addImplicitCollection(AndCriteria.class, "criterias"); //$NON-NLS-1$
+		xs.registerConverter(new AndOrCriteriaConverter(xs.getMapper()));
 		xs.alias("not", NotCriteria.class); //$NON-NLS-1$
 		xs.registerConverter(new NotCriteriaConverter(xs.getMapper()));
 		xs.alias("true", ConstantCriteria.class); //$NON-NLS-1$

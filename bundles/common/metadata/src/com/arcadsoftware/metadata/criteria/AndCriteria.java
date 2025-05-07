@@ -23,7 +23,7 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
 /**
  * Conjunction of any search criteria.
  */
-public class AndCriteria extends AbstractSearchCriteria implements Cloneable {
+public class AndCriteria extends AbstractSearchCriteria implements Cloneable, ISubCriteria {
 
 	private final ArrayList<ISearchCriteria> criterias;
 	
@@ -52,10 +52,6 @@ public class AndCriteria extends AbstractSearchCriteria implements Cloneable {
 		}
 	}
 
-	private Object readResolve() {
-		return new AndCriteria();
-	}
-	
 	/**
 	 * Build an conjunction around the to criteria.
 	 * 
@@ -184,20 +180,13 @@ public class AndCriteria extends AbstractSearchCriteria implements Cloneable {
 		}
 		return false;
 	}
-	
-	/**
-	 * Add a new criteria to the conjunction.
-	 * 
-	 * @param criteria
-	 */
+
+	@Override
 	public void add(ISearchCriteria criteria) {
 		criterias.add(criteria);
 	}
 
-	/**
-	 * Return true if this conjunction is empty.
-	 * @return
-	 */
+	@Override
 	public boolean isEmpty() {
 		return (criterias == null) || criterias.isEmpty();
 	}
@@ -211,6 +200,7 @@ public class AndCriteria extends AbstractSearchCriteria implements Cloneable {
 		return true;
 	}
 
+	@Override
 	public ArrayList<ISearchCriteria> getCriterias() {
 		return criterias;
 	}
