@@ -20,6 +20,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -105,6 +106,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 	
 	/**
 	 * Create or reuse a with SQL clause which can be used to get the list of profiles containing a given right+param.
+	 * 
 	 * <ul>
 	 * <li>%1$s = is the name of the recursive table of profile ids.
 	 * <li>%2$s = is the right value test ("is null" or "= X".
@@ -170,12 +172,12 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 			Iterator<MetaDataAttribute> itt = attributes.iterator();
 			while (itt.hasNext()) {
 				MetaDataAttribute att = itt.next();
-				if (att ==  null) {
+				if (att == null) {
 					itt.remove();
 				} else {
 					String col = e.attributesCols.get(att.getCode());
 					if ((col == null) || (col.indexOf(COLUMNPREFIX_PLACEHOLDER) >= 0)) {
-						// Blindage: Les colonnes composées devrait toujours être déclarées comme readonly.
+						// Shielding: Compound columns should always be declared as readonly.
 						itt.remove();
 					} else {
 						Object value = values.get(index);
@@ -295,13 +297,39 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 	}
 	
 	/**
+	 * Generate a list of attributes column selection (without aliases, without any other columns... 
+	 * 
+	 * @param e
+	 * @param prefix
+	 * @param atts
+	 * @return
+	 */
+	protected String getAttributeCols(EntityInfo e, String prefix, Collection<MetaDataAttribute> atts) {
+		if ((atts == null) || atts.isEmpty()) {
+			return prefix + e.idCol; 
+		}
+		StringBuilder result = new StringBuilder();
+		for (MetaDataAttribute a: atts) {
+			String col = e.attributesCols.get(a.getCode());
+			if ((col != null) && (col.indexOf(COLUMNPREFIX_PLACEHOLDER) == 0)) {
+				if (!result.isEmpty()) {
+					result.append(fg.columnsep);
+				}
+				result.append(prefix + col);
+			}
+		}
+		return result.toString();
+	}
+	
+	/**
 	 * Generate SQL columns list ready to Update operation.
+	 * 
 	 * @param cols
 	 * @return
 	 */
 	protected String listUpdateCols(List<String> cols) {
 		StringBuilder s = new StringBuilder();
-		for(String col:cols) {
+		for (String col: cols) {
 			if (s.length() > 0) {
 				s.append(fg.columnsep);
 			}
@@ -320,7 +348,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 	 */
 	protected String listCreateCols(List<String> cols, StringBuilder valCols) {
 		StringBuilder s = new StringBuilder();
-		for(String col: cols) {
+		for (String col: cols) {
 			if (s.length() > 0) {
 				s.append(fg.columnsep);
 				valCols.append(fg.columnsep);
@@ -333,6 +361,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 
 	/**
 	 * pretty print of Array... 
+	 * 
 	 * @param values
 	 * @return
 	 */
@@ -702,8 +731,8 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		// An SQL limitation may prevent the usage of joins in updates...
 		final Boolean hasjoins = context.hasReferences();
 		if (fg.update_join.isEmpty() && hasjoins) {
-			// on abandonne l'update par requête unique, le critère fait intervenir d'autres éléments.
-			// Il faut passer par une présélection
+			// we abandon the update by single request, the criterion involves other elements.
+			// You have to go through a pre-selection
 			BeanMapList list = doSelection(new ArrayList<ReferenceLine>(), true, criteria, false, null, 0, -1, context);
 			Activator.getInstance().debug(String.format(Messages.MapperSQLService_Info_MultiUpdateWithComplexCriteria,list.size(),context.getEntity().getType()));
 			int result = 0;
@@ -844,12 +873,12 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		final Boolean hasjoins = context.hasReferences();
 		String lcols = listUpdateCols(cols);
 		if ((fg.update_join.isEmpty() && hasjoins)) {
-			// on abandonne l'update par requête unique, le critère fait intervenir d'autres éléments.
-			// Il faut passer par une présélection
+			// we abandon the update by single request, the criterion involves other elements.
+			// You have to go through a pre-selection
 			BeanMapList list = doSelection(new ArrayList<ReferenceLine>(), false, criteria, false, null, 0, -1, context);
 			Activator.getInstance().debug(String.format(Messages.MapperSQLService_Info_MultiUpdateWithComplexCriteria,list.size(),context.getEntity().getType()));
 			int result = 0;
-			values.add(null); // prépare la place de l'id !
+			values.add(null); // prepare the place of the id!
 			Object[] vals = values.toArray(new Object[values.size()]);
 			for (BeanMap bean:list) {
 				vals[vals.length - 1] = bean.getId();
@@ -973,7 +1002,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		StringBuilder where = context.generateCriteria(criteria, deleted);
 		String query;
 		if (((page == 0) && (limit <= 0)) || (fg.partial == null) || (fg.partial.length() == 0)) {
-			// Pas de pagination (pas nécessaire ou not supporté par le SGDB).
+			// No pagination (not necessary or not supported by the DBMS).
 			if (where.length() == 0) {
 				if (orderCols.length() == 0) {
 					query = ((SQLCriteriaContext) context).formatQuery(fg.selectall, cols.toString(), context.generateJoins(deleted));
@@ -1051,10 +1080,11 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		if (!context.isValid()) {
 			return 0;
 		}
-		// utilisation de distinct
+		// usage of "distinct count"...
 		String col;
 		if (distinct) {
-			col = String.format(fg.count_distinct, DEFAULT_TABLEALIAS + '.' + context.getEntityInfo().idCol);
+			// (2025.05) Applied on the attributes of the data !? (note: this should require index for better performances.) 
+			col = String.format(fg.count_distinct, getAttributeCols(context.getEntityInfo(), DEFAULT_TABLEALIAS + '.', context.getEntity().getAttributes().values()));
 		} else {
 			col = fg.count;
 		}
@@ -1121,7 +1151,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		boolean softPagination = false;
 		if (((page == 0) && (limit <= 0)) || (fg.partial == null) || (fg.partial.length() == 0) || (tei == null)) {
 			softPagination = (fg.partial == null) || (fg.partial.length() == 0);
-			// Pas de pagination (pas nécessaire ou non supporté par le SGDB).
+			// No pagination (not necessary or not supported by the DBMS).
 			if (where.isEmpty()) {
 				if (orderCols.isEmpty()) {
 					query = ((SQLCriteriaContext) context).formatQuery(fg.selectall, cols.toString(), context.generateJoins(deleted));
@@ -1268,9 +1298,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 			} else {
 				where = new StringBuilder(fg.true_cond);
 			}
-			// FIXME This ignore the distinct constraint !!!
-			// FIXME Ignore the criteria clause !!!
-			// FIXME This assume that the linked data are not deleted !!!
+			// FIXME This ignore the distinct constraint and the criteria clause, and it assume that the linked data are not deleted !!!
 		} else {
 			// A distinct clause need columns... but as long as we select the ID primary key in each request
 			// this information is enough to count distinct selection.
