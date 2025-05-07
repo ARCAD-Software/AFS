@@ -1171,21 +1171,6 @@
 								</xsd:restriction>
 							</xsd:simpleType>
 						</xsd:element>
-						<xsd:element name="groupTable" type="xsd:string" maxOccurs="1" minOccurs="0">
-							<xsd:annotation>
-								<xsd:documentation>Used by SQL mappers, only in the context of an entity representing a group (see the "group" attribute), this tag designates the table for recording the contents of the groups (interval implementation of groups).</xsd:documentation>
-							</xsd:annotation>
-						</xsd:element>
-						<xsd:element name="groupMinCol" type="xsd:string" maxOccurs="1" minOccurs="0">
-							<xsd:annotation>
-								<xsd:documentation>Used in conjunction with the "groupTable" tag, designates the column containing the minimum limit of the group's capacity.</xsd:documentation>
-							</xsd:annotation>
-						</xsd:element>
-						<xsd:element name="groupMaxCol" type="xsd:string" maxOccurs="1" minOccurs="0">
-							<xsd:annotation>
-								<xsd:documentation>Used in conjunction with the "groupTable" tag, designates the column containing the maximum limit of the group's capacity.</xsd:documentation>
-							</xsd:annotation>
-						</xsd:element>
 						<xsd:element name="binary" type="xsd:string" maxOccurs="1" minOccurs="0">
 							<xsd:annotation>
 								<xsd:documentation>Indicates that the entity is associated with a binary file. The value of this tag indicates the category of the binary file for storage by the download service.</xsd:documentation>
@@ -1240,18 +1225,6 @@
 			<xsd:annotation>
 				<xsd:documentation>Indicates whether the entity supports locks against concurent modifications (Depending on the mapper implementation).</xsd:documentation>
 			</xsd:annotation>
-		</xsd:attribute>
-		<xsd:attribute name="groupType" use="optional">
-			<xsd:annotation>
-				<xsd:documentation>Indicates that this entity is a group and specifies the type of member entities.</xsd:documentation>
-			</xsd:annotation>
-			<xsd:simpleType>
-				<xsd:restriction base="xsd:string">
-					<xsd:minLength value="2" fixed="true" />
-					<xsd:maxLength value="40" fixed="true" />
-					<xsd:pattern value="[a-z][a-zA-Z0-9]*" />
-				</xsd:restriction>
-			</xsd:simpleType>
 		</xsd:attribute>
 		<xsd:attribute name="date" type="xsd:date" use="optional">
 			<xsd:annotation>

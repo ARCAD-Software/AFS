@@ -319,7 +319,6 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 	protected Boolean readonly; // this value need to be nullable
 	private Date date;
 	protected Boolean lockable; // this value need to be nullable
-	private String groupType;
 	private HashMap<String, MetaDataAttribute> attributes = new HashMap<String, MetaDataAttribute>();
 	private HashMap<String, MetaDataLink> links = new HashMap<String, MetaDataLink>();
 	private HashMap<String, MetaDataTest> tests = new HashMap<String, MetaDataTest>();
@@ -548,9 +547,6 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 		result.metadata.remove("updateCol"); //$NON-NLS-1$
 		result.metadata.remove("lockCol"); //$NON-NLS-1$
 		result.metadata.remove("lockDateCol"); //$NON-NLS-1$
-		result.metadata.remove("groupTable"); //$NON-NLS-1$
-		result.metadata.remove("groupMinCol"); //$NON-NLS-1$
-		result.metadata.remove("groupMaxCol"); //$NON-NLS-1$
 		result.metadata.remove(METADATA_EVENTONREAD);
 		result.metadata.remove(METADATA_EVENTONSELECTION);
 		result.metadata.remove("ldap"); //$NON-NLS-1$
@@ -642,35 +638,6 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 	 */
 	public void setLockable(boolean lockable) {
 		this.lockable = lockable;
-	}
-	
-	/**
-	 * @return true if this entity reprensent a Group entity.
-	 */
-	public boolean isGroup() {
-		return (groupType != null) && (groupType.length() > 0);
-	}
-
-	/**
-	 * The type of the group items. 
-	 * 
-	 * <p>This type is different from the group type itself.
-	 *   
-	 * @return null if this entity is not a group.
-	 */
-	public String getGroupType() {
-		return groupType;
-	}
-
-	/**
-	 * Define the type of element of this group entity.
-	 * 
-	 * <p>Null if this entity is not a group.
-	 * 
-	 * @param groupType
-	 */
-	public void setGroupType(String groupType) {
-		this.groupType = groupType;
 	}
 
 	/**
@@ -1526,9 +1493,6 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 		}
 		if (entity.lockable != null) {
 			lockable = entity.lockable;
-		}
-		if ((entity.groupType != null) && (entity.groupType.length() > 0)) {
-			groupType = entity.groupType;
 		}
 		if (entity.readonly != null) {
 			readonly = entity.readonly;

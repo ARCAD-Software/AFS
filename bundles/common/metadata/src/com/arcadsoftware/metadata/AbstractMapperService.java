@@ -85,12 +85,12 @@ public abstract class AbstractMapperService<T extends ICriteriaContext> implemen
 	 *            true if this Mapper support the multiple links references feature.
 	 * @param extrarefs
 	 *            true if this Mapper support the references to other Mappers feature.
-	 * @param groups
-	 *            true if this Mapper support the entities groups feature.
+	 * @param subdivisions
+	 *            true if this Mapper support the entities subdivisions feature.
 	 * @return the OSGi service properties.
 	 * @see IMapperService#PROP_DOMAINNAME
 	 * @see IMapperService#PROP_SUPPORT_EXTRAREFERENCES
-	 * @see IMapperService#PROP_SUPPORT_GROUPSENTITY
+	 * @see IMapperService#PROP_SUPPORT_SUBDIVISIONS
 	 * @see IMapperService#PROP_SUPPORT_MULTILINKREFERENCES
 	 * @see IMapperService#PROP_SUPPORT_PAGINATION
 	 * @see IMapperService#PROP_SUPPORT_SOFTDELETION

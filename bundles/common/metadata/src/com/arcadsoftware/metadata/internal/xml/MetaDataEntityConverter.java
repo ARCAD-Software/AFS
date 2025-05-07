@@ -47,7 +47,6 @@ public class MetaDataEntityConverter implements Converter {
 	protected static final String TAG_RIGHT_READ = "read"; //$NON-NLS-1$
 	protected static final String TAG_RIGHT_LIST = "list"; //$NON-NLS-1$
 	protected static final String TAG_READONLY = "readonly"; //$NON-NLS-1$
-	protected static final String TAG_GROUPTYPE = "group"; //$NON-NLS-1$
 	protected static final String TAG_LOCK = "lock" ; //$NON-NLS-1$
 	protected static final String TAG_NAME = "name" ; //$NON-NLS-1$
 	protected static final String TAG_DESCRIPTION = "description" ; //$NON-NLS-1$
@@ -82,10 +81,6 @@ public class MetaDataEntityConverter implements Converter {
 		}
 		if ((e.getName() != null) && (e.getName().length() > 0)) {
 			writer.addAttribute(TAG_NAME, e.getName());
-		}
-		String s = e.getGroupType();
-		if ((s != null) && (s.trim().length() > 0))  {
-			writer.addAttribute(TAG_GROUPTYPE, e.getGroupType());
 		}
 		if (e.isReadOnly()) {
 			writer.addAttribute(TAG_READONLY, "true"); //$NON-NLS-1$
@@ -204,10 +199,6 @@ public class MetaDataEntityConverter implements Converter {
 			try {
 				result.setDate(ISODateFormater.toDate(s));
 			} catch (ParseException e) {}
-		}
-		s = reader.getAttribute(TAG_GROUPTYPE);
-		if (s != null) {
-			result.setGroupType(s);
 		}
 		s = reader.getAttribute(TAG_READONLY);
 		if ("true".equalsIgnoreCase(s)) { //$NON-NLS-1$

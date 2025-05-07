@@ -24,7 +24,6 @@ public class Messages extends NLS {
 
 	public static String AbstractMapperService_Debug_ComplexCondition;
 	public static String AbstractMapperService_Error_InitializationFailed;
-	public static String AbstractMapperService_Error_NoMultidomainForInGroupCriteria;
 	public static String AbstractMapperService_Error_NoMultidomainForLinkEqualsCriteria;
 	public static String AbstractMapperService_Error_NoMultidomainForMultiAttributesCriteria;
 	public static String AbstractMapperService_Error_TooLargeSelection;
@@ -56,8 +55,6 @@ public class Messages extends NLS {
 	public static String Criteria_False;
 	public static String Criteria_Greater;
 	public static String Criteria_GreaterOrEqual;
-	public static String Criteria_Group;
-	public static String Criteria_GroupType;
 	public static String Criteria_HasRight;
 	public static String Criteria_Hour;
 	public static String Criteria_Id;

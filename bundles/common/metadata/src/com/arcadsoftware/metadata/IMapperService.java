@@ -33,16 +33,16 @@ public interface IMapperService {
 
 	/**
 	 * OSGi service property. This property provide some information about the Mapper service functionality. This
-	 * property is true if the service support soft deletion of items (and undeletion mechanisms).
+	 * property is true if the service support soft deletion of items (and un-deletion mechanisms).
 	 * <p>
-	 * Services that do not support soft deletion can ignore "harddelete" parameters and undeletion methods.
+	 * Services that do not support soft deletion can ignore "hard-delete" parameters and un-deletion methods.
 	 * 
 	 */
 	public static final String PROP_SUPPORT_SOFTDELETION = "softDeletion"; //$NON-NLS-1$
 
 	/**
 	 * OSGi service property. This property provide some information about the Mapper service functionality. This
-	 * property is true if the service support selection pagination nativelly.
+	 * property is true if the service support selection pagination natively.
 	 * <p>
 	 * The Mappers that do not support pagination must still truncate selection result.
 	 */
