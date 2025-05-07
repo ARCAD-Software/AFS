@@ -232,7 +232,7 @@ public class AndCriteria extends AbstractSearchCriteria implements Cloneable, IS
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder("("); //$NON-NLS-$ //$NON-NLS-1$
+		StringBuilder sb = new StringBuilder("("); //$NON-NLS-1$
 		boolean first = true;
 		if (criterias != null) {
 			for (ISearchCriteria ci: criterias) {

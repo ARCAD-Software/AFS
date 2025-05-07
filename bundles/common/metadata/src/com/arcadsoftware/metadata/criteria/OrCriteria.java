@@ -28,17 +28,22 @@ public class OrCriteria extends AbstractSearchCriteria implements Cloneable, ISu
 	private final ArrayList<ISearchCriteria> criterias;
 	
 	/**
-	 * 
+	 * Create an empty disjunction of criteria.
 	 */
 	public OrCriteria() {
 		super();
 		criterias = new ArrayList<ISearchCriteria>();
 	}
 
+	/**
+	 * Disjunction of the given criteria.
+	 * 
+	 * @param val
+	 */
 	public OrCriteria(ISearchCriteria... val) {
 		super();
 		criterias = new ArrayList<ISearchCriteria>(val.length);
-		for (ISearchCriteria v:val) {
+		for (ISearchCriteria v: val) {
 			if (v != null) {
 				criterias.add(v);
 			}
@@ -46,6 +51,8 @@ public class OrCriteria extends AbstractSearchCriteria implements Cloneable, ISu
 	}
 
 	/**
+	 * Disjunction of the given criteria.
+	 * 
 	 * @param values
 	 */
 	public OrCriteria(Collection<? extends ISearchCriteria> values) {
