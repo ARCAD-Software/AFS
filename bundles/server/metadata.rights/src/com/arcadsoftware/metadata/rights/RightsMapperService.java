@@ -15,6 +15,7 @@ package com.arcadsoftware.metadata.rights;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import com.arcadsoftware.beanmap.BeanMap;
@@ -165,13 +166,13 @@ public class RightsMapperService extends AbstractMapperService<CriteriaContextBa
 	@Override
 	public BeanMap doSelectionFirst(List<ReferenceLine> attributes, boolean deleted, ISearchCriteria criteria, CriteriaContextBasic context) {
 		if (Activator.RIGHT.equals(context.getEntity().getType())) {
-			for(BeanMap right: activator.getRights()) {
+			for (BeanMap right: activator.getRights()) {
 				if (criteria.test(right, context.getCurrentUser())) {
 					return filterBean(right,attributes);
 				}
 			}
 		} else {
-			for(BeanMap cat:activator.getRightCategories()) {
+			for (BeanMap cat: activator.getRightCategories()) {
 				if (criteria.test(cat, context.getCurrentUser())) {
 					return filterBean(cat,attributes);
 				}
@@ -341,5 +342,10 @@ public class RightsMapperService extends AbstractMapperService<CriteriaContextBa
 				System.out.println(b.getId() + " - " +code + " [" + b.getString(Activator.RIGHT_CATEGORY) + ']'); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
+	}
+
+	@Override
+	public Date lastModification(MetaDataEntity entity, boolean deleted) {
+		return entity.getDate();
 	}
 }

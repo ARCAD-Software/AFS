@@ -195,6 +195,7 @@ public class MetaDataItemResource extends DataItemResource {
 			final boolean deleted = isParameter(form, "deleted"); //$NON-NLS-1$
 			final boolean distincts = isParameter(form, "distincts"); //$NON-NLS-1$
 			// Execution de la sélection proprement dite.
+			// FIXME 
 			result = entity.dataSelection(new ArrayList<ReferenceLine>(), deleted, criteria, distincts, null, getUser(),
 					first, number);
 		}

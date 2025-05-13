@@ -1590,6 +1590,86 @@ public class WebServiceAccess {
 	}
 
 	/**
+	 * Touch a server resource to retrieve its last modification date.
+	 * 
+	 * <p>
+	 * Follow service redirections.
+	 * 
+	 * @param reference
+	 *            the service reference (may be on other server).
+	 * @return Null if this service do not provide a last-modification date.
+	 * @throws ServerErrorException
+	 *             if the server return an error. This error can be due to a client malformed request, connection
+	 *             problem or a server internal error.
+	 */
+	public Date head(String servicePath) throws ServerErrorException {
+		return head(getServerReference(servicePath));
+	}
+
+	/**
+	 * Touch a server resource to retrieve its last modification date.
+	 * 
+	 * <p>
+	 * Follow service redirections.
+	 * 
+	 * @param reference
+	 *            the service reference (may be on other server).
+	 * @return Null if this service do not provide a last-modification date.
+	 * @throws ServerErrorException
+	 *             if the server return an error. This error can be due to a client malformed request, connection
+	 *             problem or a server internal error.
+	 */
+	public Date head(Reference reference) throws ServerErrorException {
+		Request request = null;
+		Response response = null;
+		long t = 0;
+		int r = retry;
+		while (true) {
+			try {
+				t = System.currentTimeMillis();
+				response = null;
+				request = new Request(Method.HEAD, reference);
+				prepareClientInfo(request.getClientInfo());
+				// Ask to the client connector to handle the call
+				response = getClient().handle(preprocess(request));
+				// process the final response.
+				if ((response == null) || (response.getStatus() == null)) {
+					diagnose(request, response, System.currentTimeMillis() - t, r, null);
+					if (r <= 0) {
+						if ((response != null) && (response.getEntity() != null)) {
+							return response.getEntity().getModificationDate();
+						}
+						return null;
+					}
+				} else if (response.getStatus().isRedirection()) {
+					Reference ref = response.getLocationRef();
+					if (ref.isRelative()) {
+						ref.setBaseRef(getServerReference("/")); //$NON-NLS-1$
+					}
+					return head(ref);
+				} else if (!response.getStatus().isError()) {
+					if ((response != null) && (response.getEntity() != null)) {
+						return response.getEntity().getModificationDate();
+					}
+					return null;
+				} else {
+					diagnose(request, response, System.currentTimeMillis() - t, r, null);
+					if (isDefinitive(response, r)) {
+						return null;
+					}
+				}
+			} catch (Throwable e) {
+				diagnose(request, response, System.currentTimeMillis() - t, r, e);
+				if (r <= 0) {
+					throw new ServerErrorException(1005, new ErrorMessageBean(new Date(), Messages.WebServiceAccess_Error_Connection, e.getLocalizedMessage()));
+				}
+			}
+			r--;
+			sleep();
+		}
+	}
+
+	/**
 	 * Return a Form that content the parameters values.
 	 * 
 	 * <ul>

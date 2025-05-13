@@ -155,7 +155,7 @@ public class Activator extends AbstractActivator implements BundleListener, ICon
 					warn("Invalid or empty rights.xml file: " + file.getAbsolutePath());
 				}
 			} catch (Exception e) {
-				error("Error during Rights loading process", e); //$NON-NLS-1$
+				error("Error during Rights loading process", e);
 			}
 			if (!newRights.isEmpty()) {
 				sendNewRightsEvent(newRights, bundle.getSymbolicName());
@@ -331,7 +331,7 @@ public class Activator extends AbstractActivator implements BundleListener, ICon
 						}
 					}
 				} catch (SQLException e) {
-					debug("Unable to get user rigths with AFS eneities: " + e.getLocalizedMessage());
+					debug("Unable to get user rigths with AFS enetities: " + e.getLocalizedMessage());
 				}
 			}
 		} else {

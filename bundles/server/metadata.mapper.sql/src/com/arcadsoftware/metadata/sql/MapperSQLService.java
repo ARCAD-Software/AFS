@@ -442,10 +442,10 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 				return 0;
 			}
 			if (o instanceof Integer) {
-				return (Integer)o;
+				return (Integer) o;
 			} 
 			if (o instanceof Long) {
-				return Math.round((Long)o);
+				return Math.round((Long) o);
 			} 
 			try {
 				return Integer.valueOf(o.toString());
@@ -1318,5 +1318,39 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 			}
 		}
 		return count(((SQLCriteriaContext) context).formatQuery(fg.select, col, context.generateJoins(deleted), where.toString()), new Object[] {sourceId});
+	}
+
+	@Override
+	public Date lastModification(MetaDataEntity entity, boolean deleted) {
+		if (entity == null) {
+			return new Date(0);
+		}
+		final EntityInfo e = getEntityInfo(entity);
+		if (e == null) {
+			return new Date(0);
+		}
+		if (e.updateCol != null) {
+			final String sql;
+			if (!deleted && (e.deleteCol != null)) {
+				if (e.sql_selectmaxwhere == null) {
+					e.sql_selectmaxwhere = String.format(fg.select_maxwhere, e.updateCol, e.table, e.deleteCol + fg.equaldelfalse);
+				}
+				sql = e.sql_selectmaxwhere;
+			} else {
+				if (e.sql_selectmax == null) {
+					e.sql_selectmax = String.format(fg.select_maxwhere, e.updateCol, e.table);
+				}
+				sql = e.sql_selectmax;
+			}
+			try {
+				Timestamp date = runner.query(sql, new ScalarHandler<Timestamp>());
+				if (date != null) {
+					return new Date(date.getTime());
+				}
+			} catch (SQLException e1) {
+				Activator.getInstance().error("Error while getting the last date of modification of entity " + entity.getType() + "." + e1.getLocalizedMessage(), e1);
+			}
+		}
+		return entity.getDate();
 	}
 }

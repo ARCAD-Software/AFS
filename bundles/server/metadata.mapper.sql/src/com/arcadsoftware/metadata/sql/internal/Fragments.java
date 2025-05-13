@@ -114,6 +114,8 @@ public class Fragments {
 	public String rec_linkdel;
 	public String source;
 	public String dest;
+	public String select_max;
+	public String select_maxwhere;
 	
 	public Fragments(String name) {
 		// Reset this class...

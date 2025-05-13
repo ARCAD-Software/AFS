@@ -13,6 +13,7 @@
  *******************************************************************************/
 package com.arcadsoftware.metadata;
 
+import java.util.Date;
 import java.util.List;
 
 import com.arcadsoftware.beanmap.BeanMap;
@@ -2130,4 +2131,16 @@ public interface IMapperService {
 	 * @return True if the data has been updated.
 	 */
 	public boolean touch(MetaDataEntity entity, int itemId, IConnectionUserBean currentUser);
+	
+	/**
+	 * Get the last modification date of the date of the given entity.
+	 * 
+	 * <p>
+	 * If the content on the data is empty, then the lastmodification of the entity is returned.
+	 * 
+	 * @param entity The entity to test.
+	 * @param deleted if false the deleted items are ignored.
+	 * @return a non null date.
+	 */
+	public Date lastModification(MetaDataEntity entity, boolean deleted);
 }

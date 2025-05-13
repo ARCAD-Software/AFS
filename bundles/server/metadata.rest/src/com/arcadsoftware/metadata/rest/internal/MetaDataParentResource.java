@@ -14,7 +14,6 @@
 package com.arcadsoftware.metadata.rest.internal;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -190,7 +189,7 @@ public class MetaDataParentResource extends DataParentResource {
 		super.doInit();
 		if (isExisting()) {
 			getAllowedMethods().add(Method.PUT);
-			if (Method.HEAD.equals(getMethod()) && // 
+			if ((Method.HEAD.equals(getMethod()) || Method.GET.equals(getMethod())) && // 
 					(getEntity().getMetadata().getBoolean(MetaDataEntity.METADATA_UPDATABLE) || //
 							(getEntity().getMetadata().get("updateCol") != null))) { //$NON-NLS-1$
 				computeLastModificationDate();
@@ -199,55 +198,9 @@ public class MetaDataParentResource extends DataParentResource {
 	}
 
 	private void computeLastModificationDate() {
-		final Form form = getRequestForm();
-		ISearchCriteria criteria = getCriteria(this, form);
-		if (ConstantCriteria.TRUE.equals(criteria) || (criteria == null)) {
-			criteria = getEntity().getRightList();
-		} else {
-			ISearchCriteria rc = getEntity().getRightList();
-			if ((rc != null) && !ConstantCriteria.TRUE.equals(rc)) {
-				criteria = new AndCriteria(criteria, rc);
-			}
-		}
-		// Get the result offset.
-		int first = getFirst(form);
-		int number = getPageCount(form, first);
-		// check other parameters... 
-		boolean deleted = isParameter(form, "deleted"); //$NON-NLS-1$
-		boolean distincts = isParameter(form, "distincts"); //$NON-NLS-1$
-		List<ReferenceLine> orders = getEntity().getPublicAttributeLines(getColumns(form, "orders")); //$NON-NLS-1$
-		Iterator<ReferenceLine> itt = orders.iterator();
-		while (itt.hasNext()) {
-			ReferenceLine att = itt.next();
-			if (att.isEmpty()) {
-				itt.remove();
-			} else {
-				MetaDataAttribute a = att.getLastAttribute();
-				if ((a != null) && (a.getRightRead(false) != null)) {
-					// TODO Ce test devrait être complété par un test sur la jointure !
-					MetaDataEntity e = (MetaDataEntity) a.getParent();
-					if (!e.getMapper().test(e, a.getRightRead(false), getUser())) {
-						itt.remove();
-						continue;
-					}
-				}
-			}
-		}
-		BeanMapList result = getEntity().dataSelection(orders, deleted, criteria, distincts, orders, getUser(), first, number);
-		Date date = new Date(0l);
-		// Return EPOCH for empty lists...
-		if (result.size() > 0) {
-			for (IMetaDataSelectionListener listener: Activator.getInstance().getSelectionListener(getEntity().getType())) {
-				listener.onSelection(getEntity(), result, getUser(), Language.ENGLISH_US);
-			}
-			for (BeanMap b: result) {
-				Date d = b.getDate();
-				if ((d != null) && date.before(d)) {
-					date = d;
-				}
-			}
-		}
-		setLastModification(date);
+		// Do not use the actual select item modification but a global modification date for the select entity.
+		// this is not perfect but more accurate with side effect like soft-deletion and other kind of side effects. 
+		setLastModification(getEntity().getMapper().lastModification(getEntity(), true));
 	}
 
 	@Override
@@ -356,6 +309,7 @@ public class MetaDataParentResource extends DataParentResource {
 		int count = getEntity().getMapper().count(getEntity(), deleted, criteria, distincts, getUser());
 		// Process to selection...
 		BeanMapList result = getEntity().getMapper().selection(getEntity(), attributes, deleted, criteria, distincts, orders, getUser(), first, number);
+		result.setDate(getLastModification());
 		if (result instanceof BeanMapPartialList) {
 			((BeanMapPartialList) result).setTotal(count);
 			((BeanMapPartialList) result).setRank(first);			

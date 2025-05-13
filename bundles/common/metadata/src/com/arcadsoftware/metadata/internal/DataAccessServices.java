@@ -14,6 +14,7 @@
 package com.arcadsoftware.metadata.internal;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.arcadsoftware.beanmap.BeanMap;
@@ -1322,6 +1323,16 @@ public class DataAccessServices implements IMapperService, IEntityRegistry {
 	@Override
 	public boolean linkRemove(MetaDataLink link, int sourceId, int destId, IConnectionUserBean currentUser) {
 		return linkRemove(link, sourceId, destId);
+	}
+
+	@Override
+	public Date lastModification(MetaDataEntity entity, boolean deleted) {
+		try {
+			return dao.getWebServicesAccess().head("/data/" + entity.getType());
+		} catch (ServerErrorException e) {
+			logError(e);
+			return entity.getDate();
+		}
 	}
 
 }

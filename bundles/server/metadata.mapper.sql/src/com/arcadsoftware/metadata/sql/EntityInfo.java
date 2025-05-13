@@ -68,6 +68,8 @@ public class EntityInfo {
 	public String sql_delete;
 	public String sql_undelete;
 	public String sql_subselect;
+	public String sql_selectmax;
+	public String sql_selectmaxwhere;
 	public final HashMap<String, MultiLinkQuery> sql_links;
 	
 	public EntityInfo(MetaDataEntity entity, MapperSQLService mapper) {
@@ -84,6 +86,8 @@ public class EntityInfo {
 		sql_harddelete = null;
 		sql_delete = null;
 		sql_undelete = null;
+		sql_selectmax = null;
+		sql_selectmaxwhere = null;
 		// FIXME as this cache depends on other entities it must be cleared when other entities are modified !
 		sql_links.clear(); 
 		BeanMap md = entity.getMetadata();

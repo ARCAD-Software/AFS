@@ -823,6 +823,22 @@ public class Activator extends AbstractConfiguredActivator implements ServiceTra
 						err = true;
 						ci.println("  - [Empty entity in the storage source...]");
 					}
+					try {
+						Date d = entity.getMapper().lastModification(entity, true);
+						if (d == null) {
+							if (!err) {
+								ci.println(String.format("The entity %s (Version %d) include the following problems:", entity.getType(), entity.getVersion()));
+								err = true;
+							}
+							ci.println("  - [Last-Modification of the entity not correctly managed (return null).]");
+						}
+					} catch (Throwable e) {
+						if (!err) {
+							ci.println(String.format("The entity %s (Version %d) include the following problems:", entity.getType(), entity.getVersion()));
+							err = true;
+						}
+						ci.println("  - Unable to get the last modification date of the entity.");
+					}					
 					int id = 0;
 					try {
 						BeanMapList list = entity.dataSelection(entity.getAllAttributes(), true, null, false, null, null, 0, 1);
