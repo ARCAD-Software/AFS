@@ -2261,7 +2261,57 @@ public final class Crypto {
 		}
 		return true;
 	}
-	
+
+	/**
+	 * Test if the given string, is null, empty or a valid Email address representation.
+	 * 
+	 * @param email
+	 * @return
+	 */
+	public static boolean isEmailAddressValid(String email) {
+		if (email != null) {
+			email = email.trim();
+			if (!email.isEmpty()) {
+				// Must contain exactly one '@'
+				final int at = email.indexOf('@');
+		        if ((at <= 0) || (at != email.lastIndexOf('@'))) {
+		            return false;
+		        }
+		        final String name = email.substring(0, at);
+		        final String domain = email.substring(at + 1);
+		        // Local and domain parts must not be empty
+		        if (name.isEmpty() || domain.isEmpty()) {
+		            return false;
+		        }
+		        // Domain must contain at least one dot, and it should not be at the beginning or end
+		        final int dot = domain.indexOf('.');
+		        final int domainlastchar = domain.length() - 1;
+		        if ((dot <= 0) || (dot == domainlastchar)) {
+		            return false;
+		        }
+		        // Check for invalid characters (very basic check)
+		        for (char c: name.toCharArray()) {
+		        	if ((c < 32) || Character.isSpaceChar(c)) {
+		        		return false;
+		        	}
+		        }
+		        // Hyphens can not be used at the beginning and at the end of a domain name.
+		        int hyphen = domain.indexOf('-');
+		        if ((hyphen == 0) || (hyphen == domainlastchar)) {
+		            return false;
+		        }
+		        char prev = ' ';
+		        for (char c: domain.toCharArray()) {
+		            if ((!Character.isLetterOrDigit(c) && (c != '.') && (c != '-')) || ((c == '.') && (prev == '.'))) {
+		                return false;
+		            }
+		            prev = c;
+		        }
+			}
+		}
+		return true;
+	}
+
 	/**
 	 * Hash with the Whirlpool algorithm.
 	 * 

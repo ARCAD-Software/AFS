@@ -20,6 +20,7 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 
 import com.arcadsoftware.beanmap.BeanMap;
+import com.arcadsoftware.crypt.Crypto;
 import com.arcadsoftware.metadata.IMetaDataModifyListener;
 import com.arcadsoftware.metadata.MetaDataAttribute;
 import com.arcadsoftware.metadata.MetaDataEntity;
@@ -51,30 +52,33 @@ public class ModifyListener implements IMetaDataModifyListener {
 	@Override
 	public void postModification(MetaDataEntity entity, BeanMap originalItem, BeanMap modifiedItem,
 			List<MetaDataAttribute> attributes, IConnectionUserBean user, Language language) throws ResourceException {
-		// Purge the User cache only on update (no need to purge on creation).
-		if (originalItem != null) {
-			if (Activator.TYPE_USER.equals(entity.getType())) {
-				//Do that only in Update mode: ie originalItem is not null
+		if (Activator.TYPE_USER.equals(entity.getType())) {
+			if (!Crypto.isEmailAddressValid(modifiedItem.getString("email"))) {
+				throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Invalid user's Email address.");
+			}
+			// Purge the User cache only on update (no need to purge on creation).
+			if (originalItem != null) {
+				// Do that only in Update mode: ie originalItem is not null
 				for (IConnectionCache cache: activator.getServices(IConnectionCache.class)) {
 					if (cache != null) {
 						cache.purge(Activator.TYPE_USER, originalItem.getId());
 					}
 				}
-			} else {
-				if (Activator.TYPE_PROFILERIGHT.equals(entity.getType()) && (originalItem.getInt("profile") == 1)) {
-					Object v = modifiedItem.get("profile");
-					if ((v != null) && !v.equals(1)) {
-						throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "The Profile \"All Rights\" can not be modified.");
-					}
+			}
+		} else if (originalItem != null) {
+			// Purge the User cache only on update (no need to purge on creation).
+			if (Activator.TYPE_PROFILERIGHT.equals(entity.getType()) && (originalItem.getInt("profile") == 1)) {
+				Object v = modifiedItem.get("profile");
+				if ((v != null) && !v.equals(1)) {
+					throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "The Profile \"All Rights\" can not be modified.");
 				}
-				// Other modification may relate to some users so we purge the whole cache.
-				for (IConnectionCache cache: activator.getServices(IConnectionCache.class)) {
-					if (cache != null) {
-						cache.purgeAll(Activator.TYPE_USER);
-					}
+			}
+			// Other modification may relate to some users so we purge the whole cache.
+			for (IConnectionCache cache: activator.getServices(IConnectionCache.class)) {
+				if (cache != null) {
+					cache.purgeAll(Activator.TYPE_USER);
 				}
 			}
 		}
 	}
-
 }
