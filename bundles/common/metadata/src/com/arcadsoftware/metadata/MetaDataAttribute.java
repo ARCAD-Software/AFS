@@ -381,9 +381,9 @@ public class MetaDataAttribute extends Element {
 			}
 			return Boolean.FALSE;
 		}
-		// As the original Form may come from a JSON object conversion "null" values should be supported...
+		// FIXME As the original Form may come from a JSON object conversion "null" values should be supported...
 		if (value == null) {
-			return null;
+			value = ""; //$NON-NLS-1$
 		}
 		if (MetaDataAttribute.TYPE_DATE.equals(getType())) {
 			if (value.isEmpty()) {
