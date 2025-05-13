@@ -1338,7 +1338,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 				sql = e.sql_selectmaxwhere;
 			} else {
 				if (e.sql_selectmax == null) {
-					e.sql_selectmax = String.format(fg.select_maxwhere, e.updateCol, e.table);
+					e.sql_selectmax = String.format(fg.select_max, e.updateCol, e.table);
 				}
 				sql = e.sql_selectmax;
 			}

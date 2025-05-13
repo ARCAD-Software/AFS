@@ -837,7 +837,11 @@ public class Activator extends AbstractConfiguredActivator implements ServiceTra
 							ci.println(String.format("The entity %s (Version %d) include the following problems:", entity.getType(), entity.getVersion()));
 							err = true;
 						}
-						ci.println("  - Unable to get the last modification date of the entity.");
+						ci.println("  - Unable to get the last modification date of the entity: " + e.getLocalizedMessage());
+						while (e.getCause() != null) {
+							e = e.getCause();
+							ci.println("    - " + e.getLocalizedMessage()); //$NON-NLS-1$
+						}
 					}					
 					int id = 0;
 					try {
