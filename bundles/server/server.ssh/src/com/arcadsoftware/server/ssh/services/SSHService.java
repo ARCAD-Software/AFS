@@ -29,10 +29,10 @@ import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.Security;
 import java.security.interfaces.RSAKey;
 import java.util.Base64;
 import java.util.HashSet;
+import java.util.Iterator;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.sshd.common.NamedResource;
@@ -59,7 +59,7 @@ public class SSHService {
 	private static final String PRIVATE_KEY_FILE = "private_key";
 	private static final String KEYSTORE_DIRECTORY = "./ssh/keystore";
 	private static final HashSet<PosixFilePermission> CHMOD_600 = new HashSet<>(2);
-	
+
 	static {
 		CHMOD_600.add(PosixFilePermission.OWNER_READ);
 		CHMOD_600.add(PosixFilePermission.OWNER_WRITE);
@@ -70,9 +70,11 @@ public class SSHService {
 
 	@Activate
 	private void activate() {
-		// Invoke this method here to force the loading of EdDSASecurityProviderRegistrar
+		// Invoke this method here to force the loading of
+		// EdDSASecurityProviderRegistrar
 		// with the correct classloader.
-		// Otherwise, the instantiation may take place later, when the context classloader cannot
+		// Otherwise, the instantiation may take place later, when the context
+		// classloader cannot
 		// provide the net.i2p.crypto.eddsa.EdDSAKey class.
 		SecurityUtils.getKeyPairResourceParser();
 		try {
@@ -170,7 +172,8 @@ public class SSHService {
 			encryption.setPassword(sshKey.getPassphrase());
 		}
 		final ByteArrayOutputStream privateKeyOutput = new ByteArrayOutputStream();
-		OpenSSHKeyPairResourceWriter.INSTANCE.writePrivateKey(keyPair, sshKey.getComment(), encryption, privateKeyOutput);
+		OpenSSHKeyPairResourceWriter.INSTANCE.writePrivateKey(keyPair, sshKey.getComment(), encryption,
+				privateKeyOutput);
 		privateKeyOutput.close();
 		writePrivateKey(sshKey, privateKeyOutput.toByteArray());
 		sshKey.setFingerprint(computeKeyFingerprint(keyPair));
@@ -220,7 +223,7 @@ public class SSHService {
 	private File getPrivateKeyFile(final SSHKey sshKey) throws IOException {
 		final File dir = getSSHKeyDirectory(sshKey);
 		if (dir.isDirectory()) {
-			for (File f: dir.listFiles()) {
+			for (File f : dir.listFiles()) {
 				if (f.isFile()) {
 					String name = f.getName();
 					if (name.equals("id_rsa") || name.equals(PRIVATE_KEY_FILE)) { //$NON-NLS-1$
@@ -231,7 +234,7 @@ public class SSHService {
 		}
 		throw new IOException(String.format("Private key file for SSH key %d not found", sshKey.getId()));
 	}
-	
+
 	public byte[] getPublicKey(final SSHKey sshKey) throws IOException, GeneralSecurityException {
 		final ByteArrayOutputStream output = new ByteArrayOutputStream();
 		OpenSSHKeyPairResourceWriter.INSTANCE.writePublicKey(loadKeyPair(sshKey), sshKey.getComment(), output);
@@ -258,7 +261,8 @@ public class SSHService {
 		if (tempSSHKey.getType() == SSHKeyType.UNKNOWN) {
 			throw new SSHException(String.format("%s key type is not supported", keyPair.getPrivate().getAlgorithm()));
 		} else if (tempSSHKey.getType() == SSHKeyType.RSA && tempSSHKey.getLength() < 4096) {
-			throw new SSHException(String.format("RSA key length is too short (%d); it must be 4096", tempSSHKey.getLength()));
+			throw new SSHException(
+					String.format("RSA key length is too short (%d); it must be 4096", tempSSHKey.getLength()));
 		}
 		try {
 			tempSSHKey.setFingerprint(computeKeyFingerprint(keyPair));
@@ -272,7 +276,7 @@ public class SSHService {
 		try {
 			writePrivateKey(importedSSHKey, privateKeyBytes);
 			return importedSSHKey;
-		} catch (IOException | GeneralSecurityException e) {
+		} catch (IOException e) {
 			if (importedSSHKey.getId() > 0) {
 				delete(importedSSHKey);
 			}
@@ -283,7 +287,8 @@ public class SSHService {
 	private SSHKey insert(final BeanMap sshKeyBeanMap) throws SSHException {
 		final SSHKey tempSSHKey = new SSHKey(sshKeyBeanMap);
 		if (tempSSHKey.getType() == SSHKeyType.UNKNOWN) {
-			throw new SSHException(String.format("SSH key type %s is unknown", tempSSHKey.getAlgorithm()));
+			throw new SSHException(
+					String.format("SSH key type %s is unknown", tempSSHKey.getBeanMap().get(SSHKey.TYPE)));
 		}
 		tempSSHKey.setLength(tempSSHKey.getType().getLength());
 		MetaDataEntity e = getEntity();
@@ -332,14 +337,17 @@ public class SSHService {
 		} else {
 			password = null;
 		}
-		for (KeyPair keyPair : SecurityUtils.loadKeyPairIdentities(null, NamedResource.ofName(PRIVATE_KEY_FILE), input, password)) {
-			return keyPair;
+
+		final Iterator<KeyPair> identities = SecurityUtils
+				.loadKeyPairIdentities(null, NamedResource.ofName(PRIVATE_KEY_FILE), input, password).iterator();
+		if (identities.hasNext()) {
+			return identities.next();
 		}
+
 		throw new IOException("Cannot load invalid private key");
 	}
 
-	private void writePrivateKey(final SSHKey sshKey, final byte[] privateKeyBytes)
-			throws IOException, GeneralSecurityException {
+	private void writePrivateKey(final SSHKey sshKey, final byte[] privateKeyBytes) throws IOException {
 		final File keyDirectory = getSSHKeyDirectory(sshKey);
 		keyDirectory.mkdirs();
 		final File keyFile = new File(keyDirectory, PRIVATE_KEY_FILE);

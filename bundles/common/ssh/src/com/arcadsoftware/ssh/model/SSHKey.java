@@ -69,16 +69,8 @@ public class SSHKey implements IIdentifiedBean {
 		return beanmap.getString(PASSPHRASE);
 	}
 
-	public String getAlgorithm() {
-		return beanmap.getString(TYPE);
-	}
-
 	public SSHKeyType getType() {
-		try {
-			return SSHKeyType.fromAlgorithm(getAlgorithm());
-		} catch (final IllegalArgumentException e) {
-			return SSHKeyType.UNKNOWN;
-		}
+		return SSHKeyType.fromName(beanmap.getString(TYPE));
 	}
 
 	public boolean isEncrypted() {
@@ -106,6 +98,6 @@ public class SSHKey implements IIdentifiedBean {
 	}
 
 	public void setType(final SSHKeyType type) {
-		beanmap.put(TYPE, type.getAlgorithm());
+		beanmap.put(TYPE, type.getName());
 	}
 }
