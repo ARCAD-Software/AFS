@@ -70,13 +70,6 @@ public class SSHService {
 
 	@Activate
 	private void activate() {
-		// Invoke this method here to force the loading of
-		// EdDSASecurityProviderRegistrar
-		// with the correct classloader.
-		// Otherwise, the instantiation may take place later, when the context
-		// classloader cannot
-		// provide the net.i2p.crypto.eddsa.EdDSAKey class.
-		SecurityUtils.getKeyPairResourceParser();
 		try {
 			keystoreDirectory = new File(KEYSTORE_DIRECTORY).getCanonicalFile();
 		} catch (final IOException e) {
