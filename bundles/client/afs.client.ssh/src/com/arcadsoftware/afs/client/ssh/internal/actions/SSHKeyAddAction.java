@@ -103,7 +103,7 @@ public class SSHKeyAddAction extends AbstractConnectedWizardedAddAction {
 	public boolean saveBeanMap(final BeanMap beanMap) {
 		final SSHKey sshKey = new SSHKey(beanMap);
 
-		if (sshKey.getAlgorithm().equals("1")) {
+		if (beanMap.getInt(SSHKey.TYPE) == 1) {
 			sshKey.setType(SSHKeyType.RSA);
 		} else {
 			sshKey.setType(SSHKeyType.EDDSA);

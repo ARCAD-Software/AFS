@@ -12,7 +12,7 @@
     <attributeCode>name</attributeCode>
   </metadata>
   <attribute type="integer" code="keylength" readonly="false" listable="true" mandatory="false">
-    <metadata colrank="1" colsize="55">
+    <metadata colrank="1" colsize="75">
       <col>SHK_LENGTH</col>
       <visible>true</visible>
     </metadata>
@@ -37,7 +37,7 @@
     </metadata>
   </attribute>
   <attribute type="string" code="keytype" readonly="false" listable="true" mandatory="false" length="10">
-    <metadata colrank="1" colsize="45">
+    <metadata colrank="1" colsize="100">
       <col>SHK_TYPE</col>
       <visible>true</visible>
     </metadata>
