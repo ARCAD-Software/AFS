@@ -13,20 +13,23 @@
  *******************************************************************************/
 package com.arcadsoftware.server.properties.internal;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
+import org.restlet.data.CharacterSet;
 import org.restlet.data.Language;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ResourceException;
 import org.restlet.representation.Variant;
 
 import com.arcadsoftware.rest.JSONRepresentation;
 import com.arcadsoftware.rest.JsonStreamCompact;
 import com.arcadsoftware.rest.OSGiResource;
-import com.arcadsoftware.rest.XMLRepresentation;
-import com.arcadsoftware.rest.XStreamCompact;
 
 public class PropertiesResource extends OSGiResource {
 
@@ -57,14 +60,22 @@ public class PropertiesResource extends OSGiResource {
 	public Representation get(Variant variant) throws ResourceException {
 		// "Properties" (aka. plain text) is the default format if any format is acceptable.
 		// (Required for ascendent compatibility.)
-		if (isPrefered(getClientInfo().getAcceptedMediaTypes(),MediaType.ALL,1F)) {
+		if (isPrefered(getClientInfo().getAcceptedMediaTypes(), MediaType.ALL, 1F)) {
 			return new PropertiesRepresentation(pd.properties, domainname, pd.date, language);
 		}
 		if (isJSON(variant)) {
 			return new JSONRepresentation(new JsonStreamCompact().toXML(pd.properties), language, pd.date);
 		}
 		if (isXML(variant)) {
-			return new XMLRepresentation(new XStreamCompact().toXML(pd.properties), language, pd.date);
+			try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+				pd.properties.storeToXML(bos, domainname, StandardCharsets.UTF_8);
+				bos.flush();
+				StringRepresentation rep = new StringRepresentation(bos.toString(StandardCharsets.UTF_8), MediaType.APPLICATION_XML, language, CharacterSet.UTF_8);
+				rep.setModificationDate(pd.date);
+				return rep;
+			} catch (IOException e) {
+				getOSGiApplication().getActivator().error(e);
+			}
 		}
 		return new PropertiesRepresentation(pd.properties, domainname, pd.date, language);
 	}
