@@ -77,9 +77,6 @@ public class SSHService {
 
 	@Activate
 	private void activate() {
-		// Invoke this method here to force the loading of EdDSASecurityProviderRegistrar
-		// with the correct classloader.
-		SecurityUtils.getKeyPairResourceParser();
 		try {
 			keystoreDirectory = new File(KEYSTORE_DIRECTORY).getCanonicalFile();
 		} catch (final IOException e) {
