@@ -76,10 +76,15 @@ public class CurrentUserResource extends OSGiResource {
 			cc = (IConnectionCredential) getRequest().getAttributes().get(IConnectionCredential.CONNECTED_CREDENTIAL);
 			oldp = user.getPassword();
 			user = (ConnectionUserBean) user.clone();
-			if (cc instanceof IPatchUserCredential) {
-				((IPatchUserCredential) cc).patchUser(user);
-				if (user.getPassword() != null) {
-					oldp = user.getPassword();
+			if (cc != null) {
+				if (cc instanceof IPatchUserCredential) {
+					((IPatchUserCredential) cc).patchUser(user);
+					if (user.getPassword() != null) {
+						oldp = user.getPassword();
+					}
+				}
+				if (user.getCredentials().isEmpty()) {
+					user.addCredential(cc);
 				}
 			}
 		} catch (Exception e) {
@@ -124,12 +129,15 @@ public class CurrentUserResource extends OSGiResource {
 			}
 		}
 		ArrayList<ApplicationStatePlot> states = new ArrayList<>(stts.size());
-		int minspawn = Integer.MAX_VALUE;
+		int minspan = Integer.MAX_VALUE;
 		for (ApplicationStatePlot asp: stts.values()) {
 			states.add(asp);
-			if ((asp.getLifeSpan() > 0) && (asp.getLifeSpan() < minspawn)) {
-				minspawn = asp.getLifeSpan();
+			if ((asp.getLifeSpan() > 0) && (asp.getLifeSpan() < minspan)) {
+				minspan = asp.getLifeSpan();
 			}
+		}
+		if (minspan == Integer.MAX_VALUE) {
+			minspan = 2;
 		}
 		Collections.sort(states);
 		// Use a converter for that add a textual representation of the rights (use the database).
@@ -185,8 +193,8 @@ public class CurrentUserResource extends OSGiResource {
 			}
 			writer.endNode();
 			writer.startNode("status"); //$NON-NLS-1$
-			if (minspawn < Integer.MAX_VALUE) {
-				writer.addAttribute("lifespawn", Integer.toString(minspawn)); //$NON-NLS-1$
+			if (minspan < Integer.MAX_VALUE) {
+				writer.addAttribute("lifespan", Integer.toString(minspan)); //$NON-NLS-1$
 			}
 			for (ApplicationStatePlot plot: states) {
 				switch (plot.getLevel()) {
@@ -241,7 +249,7 @@ public class CurrentUserResource extends OSGiResource {
 				}
 				result.put("profile", p); //$NON-NLS-1$
 				JSONObject st = new JSONObject();
-				st.put("lifespawn", minspawn); //$NON-NLS-1$
+				st.put("lifespan", minspan); //$NON-NLS-1$
 				JSONArray plots = new JSONArray();
 				for (ApplicationStatePlot plot: states) {
 					plots.put(plot.toJSON());
@@ -294,9 +302,9 @@ public class CurrentUserResource extends OSGiResource {
 				sb.append("</ul><h3>"); //$NON-NLS-1$ 
 				sb.append(Activator.getMessage("currentuser_status", language)); //$NON-NLS-1$
 				sb.append("</h3>"); //$NON-NLS-1$ 
-				if (minspawn < Integer.MAX_VALUE) {
+				if (minspan < Integer.MAX_VALUE) {
 					sb.append("<p>"); //$NON-NLS-1$ 
-					sb.append(String.format(Activator.getMessage("currentuser_lifespawn", language), minspawn)); //$NON-NLS-1$
+					sb.append(String.format(Activator.getMessage("currentuser_lifespawn", language), minspan)); //$NON-NLS-1$
 					sb.append("</p>"); //$NON-NLS-1$ 
 				}
 				sb.append("<ul>"); //$NON-NLS-1$ 

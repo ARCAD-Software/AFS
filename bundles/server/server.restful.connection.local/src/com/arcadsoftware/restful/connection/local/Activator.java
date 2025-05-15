@@ -43,6 +43,7 @@ import com.arcadsoftware.metadata.criteria.EqualCriteria;
 import com.arcadsoftware.metadata.criteria.NotCriteria;
 import com.arcadsoftware.osgi.AbstractConfiguredActivator;
 import com.arcadsoftware.rest.MultiLanguageMessages;
+import com.arcadsoftware.rest.connection.IApplicationStateBroadcaster;
 import com.arcadsoftware.rest.connection.IConnectionCache;
 import com.arcadsoftware.rest.connection.IPasswordComplexityTester;
 
@@ -121,6 +122,8 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 		registerService(IMetaDataModifyListener.class, new LocalAuthModifyListener(this), IMetaDataModifyListener.PROP_TYPE, LOCALAUTH);
 		registerService(IMetaDataDeleteListener.class, new LocalAuthDeleteListener(this), IMetaDataDeleteListener.PROP_TYPE, LOCALAUTH);
 		registerService(IMetaDataSelectionListener.class, new LocalAuthSelectionListener(this), IMetaDataDeleteListener.PROP_TYPE, LOCALAUTH);
+		// Register Application Plots to inform user about the valibity of their password...
+		registerService(IApplicationStateBroadcaster.class, new ApplicationStateBroadcaster(this));
 		// Connection Cache access.
 		connectionCacheTracker = new ServiceTracker(context, IConnectionCache.class, null);
 		connectionCacheTracker.open();

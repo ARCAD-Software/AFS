@@ -13,6 +13,8 @@
  *******************************************************************************/
 package com.arcadsoftware.restful.connection.ldap;
 
+import java.util.Date;
+
 import org.restlet.data.Language;
 
 import com.arcadsoftware.rest.connection.AutoProfile;
@@ -27,6 +29,8 @@ import com.unboundid.ldap.sdk.LDAPException;
 import com.unboundid.ldap.sdk.ResultCode;
 import com.unboundid.ldap.sdk.controls.PasswordExpiredControl;
 import com.unboundid.ldap.sdk.controls.PasswordExpiringControl;
+import com.unboundid.ldap.sdk.experimental.DraftBeheraLDAPPasswordPolicy10ResponseControl;
+import com.unboundid.ldap.sdk.experimental.DraftBeheraLDAPPasswordPolicy10WarningType;
 
 public class LdapConnectionCredential implements IConnectionCredential, IUpdatableCredential {
 
@@ -35,8 +39,8 @@ public class LdapConnectionCredential implements IConnectionCredential, IUpdatab
 	private final String uid;
 	private final int userId;
 	private boolean locked;
-	private boolean outOfDate;
 	private char[] secret;
+	private Date limitation;
 	
 	public LdapConnectionCredential(LdapAuthentificationService parent, String login, int userId) {
 		super();
@@ -59,15 +63,23 @@ public class LdapConnectionCredential implements IConnectionCredential, IUpdatab
 		}
 		LDAPException e = null;
 		locked = false;
-		outOfDate = false;
+		limitation = null;
 		try {
 			BindResult br = parent.bind(cn, login, secret);
 			if (br != null) {
 				try {
-					if (PasswordExpiringControl.get(br) != null) {
-						outOfDate = true;
+					PasswordExpiringControl exp = PasswordExpiringControl.get(br);
+					if (exp != null) {
+						limitation = new Date(System.currentTimeMillis() + (exp.getSecondsUntilExpiration() * 1000l));
+					} else {
+						DraftBeheraLDAPPasswordPolicy10ResponseControl pwp = DraftBeheraLDAPPasswordPolicy10ResponseControl.get(br);
+						if ((pwp != null) && (pwp.getErrorType() == null) && //
+								(pwp.getWarningType() == DraftBeheraLDAPPasswordPolicy10WarningType.TIME_BEFORE_EXPIRATION)) {
+							// The warning value is the number of seconds until expiration.
+							limitation = new Date(System.currentTimeMillis() + (pwp.getWarningValue() * 1000l));
+						}
 					}
-				} catch (LDAPException e1) {
+				} catch (Exception e1) {
 					parent.getActivator().info(e1);
 				}
 				// The secret may have been changed and must be cached for potential other bind...
@@ -114,9 +126,13 @@ public class LdapConnectionCredential implements IConnectionCredential, IUpdatab
 
 	@Override
 	public boolean isOutOfDate() {
-		return outOfDate;
+		return (limitation != null) && limitation.before(new Date());
 	}
 
+	public Date getLimitation() {
+		return limitation;
+	}
+	
 	@Override
 	public int loadUserId() {
 		return userId;

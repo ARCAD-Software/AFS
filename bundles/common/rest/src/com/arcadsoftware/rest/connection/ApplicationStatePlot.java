@@ -117,6 +117,12 @@ public class ApplicationStatePlot implements Serializable, Comparable<Applicatio
 
 	@Override
 	public int compareTo(ApplicationStatePlot o) {
+		if (o == null) {
+			return 1;
+		}
+		if (!o.level.equals(level)) {
+			return o.level.compareTo(level);
+		}
 		int i = getCode().compareToIgnoreCase(o.getCode());
 		if (i == 0) {
 			return getLevel().ordinal() - o.getLevel().ordinal();
@@ -150,9 +156,9 @@ public class ApplicationStatePlot implements Serializable, Comparable<Applicatio
 			return hypertext;
 		}
 		if (hypertext == null) {
-			return '[' + code.toString() + "] " +  getLevel().toString(); //$NON-NLS-1$
+			return '[' + code + "] " + level.toString(); //$NON-NLS-1$
 		}
-		return '[' + code.toString() + "] " +  getLevel().toString() + " > " + hypertext; //$NON-NLS-1$ //$NON-NLS-2$
+		return '[' + code + "] " + level.toString() + " > " + hypertext; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	public JSONObject toJSON() {

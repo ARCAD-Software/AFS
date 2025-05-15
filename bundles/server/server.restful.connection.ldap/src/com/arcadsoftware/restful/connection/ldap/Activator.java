@@ -32,6 +32,7 @@ import com.arcadsoftware.rest.MultiLanguageMessages;
 import com.arcadsoftware.rest.RouteList;
 import com.arcadsoftware.rest.SimpleBranch;
 import com.arcadsoftware.rest.connection.ConnectionUserBean;
+import com.arcadsoftware.rest.connection.IApplicationStateBroadcaster;
 import com.arcadsoftware.rest.connection.IAuthentificationService;
 import com.arcadsoftware.rest.connection.IConnectionCache;
 import com.arcadsoftware.rest.connection.IConnectionUserBean;
@@ -50,23 +51,27 @@ import com.arcadsoftware.crypt.Crypto;
 
 public class Activator extends AbstractConfiguredActivator {
 
-	public static final String TYPE_USER = "user"; //$NON-NLS-1$
-	public static final String LDAPAUTH = "ldapauth"; //$NON-NLS-1$
-	public static final String LDAPAUTH_LOGIN = "login"; //$NON-NLS-1$
-	public static final String LDAPAUTH_USERID = "user"; //$NON-NLS-1$
+	protected static final String TYPE_USER = "user"; //$NON-NLS-1$
+	protected static final String LDAPAUTH = "ldapauth"; //$NON-NLS-1$
+	protected static final String LDAPAUTH_LOGIN = "login"; //$NON-NLS-1$
+	protected static final String LDAPAUTH_USERID = "user"; //$NON-NLS-1$
 	// Configuration properties:
 	private static final String PROP_LOGIN_CASESENSITIVE = "login.casesensitive"; //$NON-NLS-1$
 	// See LdapAuthentificationService for other properties !
 	// Import/export facilities:
-	public static final String USER_PROFILELINK = "profiles";
+	protected static final String USER_PROFILELINK = "profiles";
 	private static final String HTTP_MESSAGES = Activator.class.getPackage().getName() + ".clientmessages"; //$NON-NLS-1$
+	private static final MultiLanguageMessages messages = new MultiLanguageMessages(HTTP_MESSAGES, Activator.class.getClassLoader());
+	
+	public static String getMessage(String key, Language language) {
+		return messages.get(key, language);
+	}
 
 	private ServiceTracker<IConnectionCache, IConnectionCache> connectionCacheTracker;
 	private ServiceRegistration<IAuthentificationService> ldas;
 	private boolean caseSensitive;
 	private HashMap<Integer, BeanMap> authCache;
 	private HashMap<String, Integer> authCacheLogin;
-	private MultiLanguageMessages messages;
 	private BeanMapEventTracker eventtracker;
 	
 	@Override
@@ -74,7 +79,6 @@ public class Activator extends AbstractConfiguredActivator {
 		super.start(context);
 		caseSensitive = true;
 		eventtracker = new BeanMapEventTracker(context);
-		messages = new MultiLanguageMessages(HTTP_MESSAGES,Activator.class.getClassLoader());
 		// Connection Cache access.
 		connectionCacheTracker = new ServiceTracker<>(context, IConnectionCache.class, null);
 		connectionCacheTracker.open();
@@ -93,6 +97,7 @@ public class Activator extends AbstractConfiguredActivator {
 			}, SimpleBranch.properties(SimpleBranch.SECUREDBRANCH));
 		}
 		registerService(IMetaDataModifyListener.clazz, new LdapAuthModifyListener(this), IMetaDataModifyListener.PROP_TYPE, LDAPAUTH);
+		registerService(IApplicationStateBroadcaster.class, new ApplicationStateBroadcaster(this));
 	}
 
 	@Override
@@ -374,10 +379,6 @@ public class Activator extends AbstractConfiguredActivator {
 			}
 		}
 		return authCacheLogin.keySet();
-	}
-	
-	public String getMessage(String key, Language language) {
-		return messages.get(key, language);
 	}
 
 	public void fireBeanMapEvent(String topic, BeanMap bean, IConnectionUserBean user) {
