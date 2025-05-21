@@ -33,7 +33,15 @@ import java.util.stream.Stream;
 
 import run.Exec;
 
+/**
+ * This program deploy the tools script according to the current OS and installed AFS features. 
+ * 
+ * @author ARCAD Software
+ */
 public class Install {
+
+	public static final String DB2I = "com.arcadsoftware.database.sql.db2i_"; //$NON-NLS-1$
+	public static final String PGSQL = "com.arcadsoftware.database.sql.postgresql_"; //$NON-NLS-1$
 
 	public static void main(String[] args) {
 		String platform = null;
@@ -207,6 +215,7 @@ public class Install {
 		// Define if the application must be installed according to the required classpath.
 		boolean h2 = false;
 		boolean pgsql = false;
+		boolean db2i = false;
 		boolean ldap = false;
 		boolean rest = false;
 		for (File f: plugins.listFiles()) {
@@ -214,8 +223,10 @@ public class Install {
 				String fn = f.getName();
 				if (fn.startsWith(Exec.H2)) {
 					h2 = true;
-				} else if (fn.startsWith(Exec.PGSQL)) {
+				} else if (fn.startsWith(PGSQL)) {
 					pgsql = true;
+				} else if (fn.startsWith(DB2I)) {
+					db2i = true;
 				} else if (fn.startsWith(Exec.LDAP)) {
 					ldap = true;
 				} else if (fn.startsWith("com.arcadsoftware.server.restful")) { //$NON-NLS-1$
@@ -223,32 +234,24 @@ public class Install {
 				}
 			}
 		}
-		if (!h2) {
-			if (name.startsWith("h2")) { //$NON-NLS-1$
-				return false;
-			}
-			if (!pgsql && (name.startsWith("dbpwd") || //$NON-NLS-1$
+		if (!h2 && name.startsWith("h2")) { //$NON-NLS-1$
+			return false;
+		}
+		if (!h2 && !pgsql && !db2i && (name.startsWith("dbpwd") || //$NON-NLS-1$
 					name.startsWith("testds") || //$NON-NLS-1$
 					name.startsWith("setloginpwd") || //$NON-NLS-1$
 					name.startsWith("dbupdate"))) { //$NON-NLS-1$
-				return false;
-			}
+			return false;
 		}
-		if (!pgsql) {
-			if (name.startsWith("dbmigration")) { //$NON-NLS-1$
-				return false;
-			}
+		if (!pgsql && !db2i && name.startsWith("dbmigration")) { //$NON-NLS-1$
+			return false;
 		}
-		if (!ldap) {
-			if (name.startsWith("testldap")) { //$NON-NLS-1$
-				return false;
-			}
+		if (!ldap && name.startsWith("testldap")) { //$NON-NLS-1$
+			return false;
 		}
-		if (!rest) {
-			if (name.startsWith("testhttp") || //$NON-NLS-1$
-					name.startsWith("selfcerts")) { //$NON-NLS-1$
-				return false;
-			}
+		if (!rest && (name.startsWith("testhttp") || //$NON-NLS-1$
+					name.startsWith("selfcerts"))) { //$NON-NLS-1$
+			return false;
 		}
 		return true;
 	}
