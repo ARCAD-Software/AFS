@@ -1165,7 +1165,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 			} else {
 				query = ((SQLCriteriaContext) context).formatQuery(fg.selectorder, cols.toString(), context.generateJoins(deleted), where.toString(), orderCols);
 			}
-		} else if (where.isEmpty()) {
+		} else if (where.isEmpty() || fg.true_cond.equals(where.toString())) {
 			if (orderCols.isEmpty()) {
 				query = ((SQLCriteriaContext) context).formatQuery(fg.partialall, cols.toString(), context.generateJoins(deleted), //
 						page, // first element to return

@@ -107,7 +107,6 @@ public class Fragments {
 	public String rec_sub;
 	public String rec;
 	public String rec_alt;
-	public String select_const;
 	public String id;
 	public String isnullex;
 	public String rec_link;

@@ -178,7 +178,10 @@ public class MultiLinkQuery {
 						rec_alias = RECURCIVE_PREFIX + alias;
 						final String firstSelect;
 						if (joins == null) {
-							firstSelect = mapper.fg.select_const;
+							// As first selection we select the direct sub links (first level).
+							// This avoid to select the original source in the result.
+							firstSelect = String.format(mapper.fg.select, "fl." + rli.destCol + mapper.fg.asid, rli.table + " fl",
+									"fl." + rli.sourceCol + mapper.fg.paramequal);
 						} else {
 							// check if current entity items are not deleted too.
 							if ((!deleted) && (csei.deleteCol != null)) {
