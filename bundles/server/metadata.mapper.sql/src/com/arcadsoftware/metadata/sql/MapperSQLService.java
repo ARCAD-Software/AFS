@@ -1122,7 +1122,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		final StringBuilder cols;
 		final StringBuilder where;
 		final String orderCols;
-		final EntityInfo tei = getEntityInfo(targetEntity);
+		final EntityInfo tei = context.getEntityInfo();
 		// FIXME If the last link is a "reversed link" then the final entity alias is already the targeted one...
 		// In that case tei should be null !
 		JoinElement join = context.initJoinTree(mlq.linkAlias, mlq.join, tei, mlq.linkCol, deleted);
@@ -1138,7 +1138,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		} else {
 			cols = context.generateColumns(tei, join, attributes, deleted);
 			orderCols = context.generateOrders(orders, deleted);
-			where = context.generateCriteria(criteria, deleted); // The deletion test is already done in the last join... 
+			where = context.generateCriteria(join, criteria, deleted); // The deletion test is already done in the last join... 
 			if (!mlq.where.isEmpty()) {
 				if (!where.isEmpty()) {
 					where.append(fg.and);
@@ -1288,8 +1288,9 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		if (mlq.rec_alias != null) {
 			context.addQueryContext(mlq.rec_alias, mlq.rec_query);
 		}
-		final EntityInfo e = getEntityInfo(context.getEntity());
-		String alias = context.initJoinTree(mlq.linkAlias, mlq.join, e, mlq.linkCol, deleted).getAlias();
+		final EntityInfo e = context.getEntityInfo();
+		JoinElement initJoin = context.initJoinTree(mlq.linkAlias, mlq.join, e, mlq.linkCol, deleted);
+		String alias = initJoin.getAlias();
 		final StringBuilder where;
 		final String col;
 		if (e == null) {
@@ -1309,7 +1310,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 			} else {
 				col = fg.count;
 			}
-			where = context.generateCriteria(criteria, true);
+			where = context.generateCriteria(initJoin, criteria, true);
 			if (!mlq.where.isEmpty()) {
 				if (!where.isEmpty()) {
 					where.append(fg.and);

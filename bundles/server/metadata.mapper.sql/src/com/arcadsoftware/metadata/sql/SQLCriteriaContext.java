@@ -129,7 +129,8 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 	
 	private void init(boolean deleted) {
 		if (joinTree == null) {
-			joinTree = new JoinElement(MapperSQLService.DEFAULT_TABLEALIAS, String.format(mapper.fg.tablealias, entityInfo.table, MapperSQLService.DEFAULT_TABLEALIAS));
+			joinTree = new JoinElement(MapperSQLService.DEFAULT_TABLEALIAS, //
+					String.format(mapper.fg.tablealias, entityInfo.table, MapperSQLService.DEFAULT_TABLEALIAS));
 			for (ReferenceLine rf: getReferences()) {
 				String code = rf.getCode();
 				if (!colNames.containsKey(code)) {
@@ -164,6 +165,9 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 
 	/**
 	 * If the Form clause require a dedicated initialization, it must be called before any generate methods !
+	 * 
+	 * <p>
+	 * This method is mainly used for links selection where the first table od the selection is a link table of a recursive selection.
 	 * 
 	 * @param sql
 	 */
@@ -270,6 +274,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 	 * 
 	 * <p>
 	 * The Order columns are assumed to be already present in the selected ones. Must be called after generateColumns.
+	 * 
 	 * @param orders
 	 * @return the Order SQL clause.
 	 */
@@ -499,16 +504,20 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 	 */
 	protected StringBuilder generateCriteria(ISearchCriteria criteria, boolean deleted) {
 		init(deleted);
+		return generateCriteria(joinTree, criteria, deleted);
+	}
+	
+	protected StringBuilder generateCriteria(JoinElement join, ISearchCriteria criteria, boolean deleted) {
 		if ((criteria != null) && !ConstantCriteria.TRUE.equals(criteria)) {
 			criteria = getLocalCriteria(criteria);
 			if (ConstantCriteria.FALSE.equals(criteria)) {
 				return null;
 			}
 			if (ConstantCriteria.TRUE.equals(criteria)) {
-				return generateCriteria(null, deleted, new StringBuilder());
+				return generateCriteria(join, null, deleted, new StringBuilder());
 			}
 		}
-		return generateCriteria(criteria, deleted, new StringBuilder());
+		return generateCriteria(join, criteria, deleted, new StringBuilder());
 	}
 	
 	/**
@@ -517,12 +526,14 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 	 * <p>
 	 * This criteria must have been reduced, before to be passed to this method.
 	 * 
+	 * @param entityInfo The EntityInfo from which the test start from.
+	 * @param join The join corresponding to given EntityInfo.
 	 * @param criteria The search criteria to compute.
 	 * @param deleted False is the deletion flag must also be tested.
 	 * @param result The SQL "where" clause, must be not null. 
 	 * @return the "result" param.
 	 */
-	private StringBuilder generateCriteria(ISearchCriteria criteria, boolean deleted, StringBuilder result) {
+	private StringBuilder generateCriteria(JoinElement join, ISearchCriteria criteria, boolean deleted, StringBuilder result) {
 		init(deleted);
 		if (criteria instanceof AfterCriteria) {
 			result.append(String.format(mapper.fg.greater, 
@@ -533,19 +544,19 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 		} else if (criteria instanceof OrCriteria) {
 			Iterator<ISearchCriteria> itt = ((OrCriteria) criteria).getCriterias().iterator();
 			result.append(mapper.fg.parin);
-			generateCriteria(itt.next(), true, result);
+			generateCriteria(join, itt.next(), true, result);
 			while (itt.hasNext()) {
 				result.append(mapper.fg.or);
-				generateCriteria(itt.next(), true, result);
+				generateCriteria(join, itt.next(), true, result);
 			}
 			result.append(mapper.fg.parout);
 		} else if (criteria instanceof AndCriteria) {
 			Iterator<ISearchCriteria> itt = ((AndCriteria) criteria).getCriterias().iterator();
 			result.append(mapper.fg.parin);
-			generateCriteria(itt.next(), true, result);
+			generateCriteria(join, itt.next(), true, result);
 			while (itt.hasNext()) {
 				result.append(mapper.fg.and);
-				generateCriteria(itt.next(), true, result);
+				generateCriteria(join, itt.next(), true, result);
 			}
 			result.append(mapper.fg.parout);
 		} else if (criteria instanceof BeforeCriteria) {
@@ -584,7 +595,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 					result.append(mapper.fg.false_cond);
 				} else {
 					result.append(mapper.fg.parin);
-					result.append(joinTree.getAlias());
+					result.append(join.getAlias());
 					result.append('.');
 					result.append(entityInfo.deleteCol);
 					result.append(mapper.fg.equaldeltrue);
@@ -727,7 +738,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 				if (((HasRightCriteria) criteria).getAttribute() != null) {
 					col = colNames.get(((HasRightCriteria) criteria).getAttribute());
 				} else {
-					col = getIdCol();
+					col = join.getAlias() + '.' + entityInfo.idCol;
 				}
 				EntityInfo users = mapper.getEntityInfo(MetaDataEntity.loadEntity("user")); //$NON-NLS-1$
 				if (users == null) {
@@ -745,15 +756,15 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 								String.format(mapper.fg.join_inner, table, "r", mapper.fg.id, userProfiles.destCol))));
 			}
 		} else if (criteria instanceof IdEqualCriteria) {
-			result.append(String.format(mapper.fg.equal,  getIdCol(), ((IdEqualCriteria) criteria).getId()));
+			result.append(String.format(mapper.fg.equal,  join.getAlias() + '.' + entityInfo.idCol, ((IdEqualCriteria) criteria).getId()));
 		} else if (criteria instanceof IdGreaterThanCriteria) {
-			result.append(String.format(mapper.fg.greaterorequal,  getIdCol(), ((IdGreaterThanCriteria) criteria).getId()));	
+			result.append(String.format(mapper.fg.greaterorequal,  join.getAlias() + '.' + entityInfo.idCol, ((IdGreaterThanCriteria) criteria).getId()));	
 		} else if (criteria instanceof IdGreaterStrictCriteria) {
-			result.append(String.format(mapper.fg.greater,  getIdCol(), ((IdGreaterStrictCriteria) criteria).getId()));	
+			result.append(String.format(mapper.fg.greater,  join.getAlias() + '.' + entityInfo.idCol, ((IdGreaterStrictCriteria) criteria).getId()));	
 		} else if (criteria instanceof IdLowerThanCriteria) {
-			result.append(String.format(mapper.fg.lowerorequal,  getIdCol(), ((IdLowerThanCriteria) criteria).getId()));	
+			result.append(String.format(mapper.fg.lowerorequal,  join.getAlias() + '.' + entityInfo.idCol, ((IdLowerThanCriteria) criteria).getId()));	
 		} else if (criteria instanceof IdLowerStrictCriteria) {
-			result.append(String.format(mapper.fg.lower,  getIdCol(), ((IdLowerStrictCriteria) criteria).getId()));				
+			result.append(String.format(mapper.fg.lower,  join.getAlias() + '.' + entityInfo.idCol, ((IdLowerStrictCriteria) criteria).getId()));				
 		} else if (criteria instanceof IsNullCriteria) {
 			result.append(String.format(mapper.fg.isnull, colNames.get(((IsNullCriteria) criteria).getAttribute())));
 		} else if (criteria instanceof IsTrueCriteria) {
@@ -764,35 +775,35 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 			String attcn = colNames.get(((LinkCriteria) criteria).getAttribute());
 			String code;
 			if (attcn == null) {
-				attcn = getIdCol();
+				attcn = joinTree.getAlias() + '.' + entityInfo.idCol;
 				code = ((LinkCriteria) criteria).getLinkCode();
 			} else {
 				code = ((LinkCriteria) criteria).getAttribute() + '/' + ((LinkCriteria) criteria).getLinkCode();
 			}
 			StringBuilder subWhere = new StringBuilder();
 			StringBuilder lastCol = new StringBuilder();
-			JoinElement join = generateLinkJoins(getLinks(code), subWhere, lastCol, deleted, false);
+			JoinElement j = generateLinkJoins(getLinks(code), subWhere, lastCol, deleted, false);
 			if (!subWhere.isEmpty()) {
 				subWhere.append(mapper.fg.and);
 			}
 			subWhere.append(String.format(mapper.fg.equal, lastCol.toString(), Integer.toString(((LinkCriteria) criteria).getId())));
 			result.append(String.format(mapper.fg.inset, attcn, 
-					String.format(mapper.fg.select, join.getAlias() + join.getId(), join.toString(mapper), subWhere.toString())));
+					String.format(mapper.fg.select, j.getAlias() + j.getId(), j.toString(mapper), subWhere.toString())));
 		} else if (criteria instanceof AbstractLinkTestCriteria) {
 			String attcn = colNames.get(((AbstractLinkTestCriteria) criteria).getReference());
 			String code;
 			if (attcn == null) {
-				attcn = getIdCol();
+				attcn = joinTree.getAlias() + '.' + entityInfo.idCol;
 				code = ((AbstractLinkTestCriteria) criteria).getLinkCode();
 			} else {
 				code = ((AbstractLinkTestCriteria) criteria).getAttribute() + '/' + ((AbstractLinkTestCriteria) criteria).getLinkCode();
 			}
 			StringBuilder subWhere = new StringBuilder();
-			JoinElement join = generateLinkJoins(getLinks(code), subWhere, null, deleted, true);
+			JoinElement j = generateLinkJoins(getLinks(code), subWhere, null, deleted, true);
 			// Follow up the join to the targeted attribute used for the final test...
 			ReferenceLine refline = getLinkReference(code, ((AbstractLinkTestCriteria) criteria).getAttribute());
 			EntityInfo ei = mapper.getEntityInfo(refline.getOriginEntity());
-			JoinElement entityJoin = join.getLastet();
+			JoinElement entityJoin = j.getLastet();
 			String col = buildAttributeColName(refline, ei, entityJoin, false, deleted);
 			if (!subWhere.isEmpty()) {
 				subWhere.append(mapper.fg.and);
@@ -863,7 +874,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 				}
 			}
 			result.append(String.format(mapper.fg.inset, attcn, 
-					String.format(mapper.fg.select, join.getAlias() + join.getId(), join.toString(mapper), subWhere.toString())));
+					String.format(mapper.fg.select, j.getAlias() + j.getId(), j.toString(mapper), subWhere.toString())));
 		} else if (criteria instanceof LowerStrictCriteria) {
 			if (getReference(((LowerStrictCriteria) criteria).getAttribute()).isNumericType()) {
 				try {
@@ -916,7 +927,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 			String dateCol;
 			String attribute = ((ChangedCriteria) criteria).getAttribute();
 			if (attribute == null) {
-				dateCol = joinTree.getAlias() + '.' + entityInfo.updateCol;
+				dateCol = join.getAlias() + '.' + entityInfo.updateCol;
 			} else {
 				ReferenceLine ref = getReference(attribute);
 				EntityInfo ae = mapper.getEntityInfo(ref.getLastAttribute().getRefEntity());
@@ -940,7 +951,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 		} else if (criteria instanceof InListCriteria) {
 			String col;
 			if (((InListCriteria) criteria).getAttribute() == null) {
-				col = getIdCol();
+				col = join.getAlias() + '.' + entityInfo.idCol;
 			} else {
 				col = colNames.get(((InListCriteria) criteria).getAttribute());
 			}
@@ -949,7 +960,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 			String muidCol;
 			String attribute = ((ChangedByCriteria) criteria).getAttribute();
 			if (attribute == null) {
-				muidCol = joinTree.getAlias() + '.' + entityInfo.muidCol;
+				muidCol = join.getAlias() + '.' + entityInfo.muidCol;
 			} else {
 				ReferenceLine ref = getReference(attribute);
 				EntityInfo ae = mapper.getEntityInfo(ref.getLastAttribute().getRefEntity());
@@ -975,23 +986,22 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 		} else if (criteria != null) {
 			Activator.getInstance().debug(String.format(Messages.MapperSQLService_UnknownCriteria, criteria.toString(), criteria.getClass().getName()));
 		}
+		
 		// Add the not deleted test to the where clause.
-		if (!deleted && (entityInfo.deleteCol != null)) {
+		if (!deleted && (entityInfo.deleteCol != null) && //
+				// if and only if the selected item is not already a join (the test is added to the join).
+				(join == joinTree)) {
 			if (mapper.fg.true_cond.equals(result.toString())) {
 				result.setLength(0);
 			} else if (result.length() > 0) {
 				result.append(mapper.fg.and);
 			}
-			result.append(joinTree.getAlias());
+			result.append(join.getAlias());
 			result.append('.');
 			result.append(entityInfo.deleteCol);
 			result.append(mapper.fg.equaldelfalse);
 		}
 		return result;
-	}
-
-	private String getIdCol() {
-		return joinTree.getAlias() + '.' + entityInfo.idCol;
 	}
 	
 	/**
