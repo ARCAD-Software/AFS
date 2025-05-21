@@ -1,10 +1,10 @@
-# AFS-OS release version 2023.7.43.
+# AFS-OS release version 2023.7.44.
 
-Release date Wed May 07 15:49:57 CEST 2025.
+Release date Wed May 21 13:51:56 CEST 2025.
 
-Link to the update site of [Version 2023.7.43](https://github.com/ARCAD-Software/AFS/releases/download/2023.7.43/).
+Link to the update site of [Version 2023.7.44](https://github.com/ARCAD-Software/AFS/releases/download/2023.7.44/).
 
-4 Bundles modified in this release.
+3 Bundles modified in this release.
 
 
 
@@ -24,7 +24,7 @@ Bundle Symbolic Name | Modification | Version
 [com.arcadsoftware.afs.client.server](bundles/client/afs.client.server) | Not changed | 1.5.4
 [com.arcadsoftware.afs.client.server.admin.common](bundles/client/afs.client.server.admin.common) | Not changed | 1.3.3
 [com.arcadsoftware.afs.client.server.admin.common.actions](bundles/client/afs.client.server.admin.common.actions) | Not changed | 1.3.3
-[com.arcadsoftware.afs.client.ssh](bundles/client/afs.client.ssh) | Not changed | 2.2.6
+[com.arcadsoftware.afs.client.ssh](bundles/client/afs.client.ssh) | **Upgraded** from version 2.2.6 | **2.2.7**
 [com.arcadsoftware.afs.client.users](bundles/client/afs.client.users) | Not changed | 1.4.4
 [com.arcadsoftware.afs.client.widgets](bundles/client/afs.client.widgets) | Not changed | 1.2.4
 [com.arcadsoftware.afs.client.widgets.rcp](bundles/client/afs.client.widgets.rcp) | Not changed | 1.3.3
@@ -43,14 +43,14 @@ Bundle Symbolic Name | Modification | Version
 [com.arcadsoftware.beanmap](bundles/common/beanmap) | Not changed | 1.3.11
 [com.arcadsoftware.cleanup](bundles/common/cleanup) | Not changed | 1.4.2
 [com.arcadsoftware.cm.simple](bundles/common/cm.simple) | Not changed | 1.5.4
-[com.arcadsoftware.crypt](bundles/common/crypt) | **Upgraded** from version 1.8.8 | **1.8.9**
+[com.arcadsoftware.crypt](bundles/common/crypt) | Not changed | 1.8.9
 [com.arcadsoftware.crypt.xml](bundles/common/crypt.xml) | Not changed | 1.1.4
 [com.arcadsoftware.email](bundles/common/email) | Not changed | 1.4.3
 [com.arcadsoftware.groovy.security](bundles/common/groovy.security) | Not changed | 1.1.5
-[com.arcadsoftware.metadata](bundles/common/metadata) | **Upgraded** from version 1.6.3 | **1.6.4**
+[com.arcadsoftware.metadata](bundles/common/metadata) | Not changed | 1.6.4
 [com.arcadsoftware.osgi](bundles/common/osgi) | Not changed | 1.9.9
 [com.arcadsoftware.rest](bundles/common/rest) | Not changed | 3.1.8
-[com.arcadsoftware.ssh](bundles/common/ssh) | **Upgraded** from version 1.2.5 | **1.2.6**
+[com.arcadsoftware.ssh](bundles/common/ssh) | **Upgraded** from version 1.2.6 | **1.2.7**
 
 
 
@@ -92,7 +92,7 @@ Bundle Symbolic Name | Modification | Version
 [com.arcadsoftware.server.restful.log](bundles/server/server.restful.log) | Not changed | 1.2.0
 [com.arcadsoftware.server.scheduler](bundles/server/server.scheduler) | Not changed | 1.3.3
 [com.arcadsoftware.server.scheduler.impl](bundles/server/server.scheduler.impl) | Not changed | 1.3.3
-[com.arcadsoftware.server.ssh](bundles/server/server.ssh) | **Upgraded** from version 2.3.5 | **2.3.6**
+[com.arcadsoftware.server.ssh](bundles/server/server.ssh) | **Upgraded** from version 2.3.6 | **2.3.7**
 [com.arcadsoftware.server.web](bundles/server/server.web) | Not changed | 1.2.5
 
 
