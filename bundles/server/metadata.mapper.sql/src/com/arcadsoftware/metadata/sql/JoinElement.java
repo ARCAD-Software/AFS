@@ -165,6 +165,9 @@ public class JoinElement {
 		} else {
 			sb.append(String.format(mapper.fg.join, table, alias, id, refcol));
 		}
+		for (JoinElement c: children) {
+			c.toString(mapper, sb);
+		}
 	}
 
 	public ArrayList<JoinElement> getChildren() {

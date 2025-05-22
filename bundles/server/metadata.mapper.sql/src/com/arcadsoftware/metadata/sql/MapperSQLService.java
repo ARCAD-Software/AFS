@@ -913,9 +913,9 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 			if (l.sql_rectest == null) {
 				String rec_alias = "r_" + link.getCode(); //$NON-NLS-1$
 				if (l.sql_rec == null) {
-					l.sql_rec = fg.rec_first + String.format(fg.rec, rec_alias, l.table, l.destCol, l.sourceCol);
+					l.sql_rec = fg.rec_first + String.format(fg.rec_alt, rec_alias, fg.rec_init, l.table, l.destCol, l.sourceCol, ""); //$NON-NLS-1$
 				}
-				l.sql_rectest = l.sql_rec + ' ' +
+				l.sql_rectest = l.sql_rec +
 						String.format(fg.select, "*", rec_alias, rec_alias + ".r = ?"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			if (count(l.sql_rectest, new Object[] {destId, sourceId}) > 0) {
@@ -1099,7 +1099,8 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 	protected BeanMapList doLinkSelection(List<MetaDataLink> links, int sourceId, List<ReferenceLine> attributes,
 			boolean deleted, ISearchCriteria criteria, boolean distinct, boolean ignoreSubdivision, 
 			List<ReferenceLine> orders, int page, int limit, SQLCriteriaContext context) {
-		EntityInfo ei = getEntityInfo(links.get(0).getParent());
+		final MetaDataEntity sourceEntity = links.get(0).getParent();
+		EntityInfo ei = getEntityInfo(sourceEntity);
 		if (ei == null) {
 			return null;
 		}
@@ -1129,6 +1130,9 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		if (tei == null) {
 			// Just get the list of ID to pass to the foreign mapper...
 			cols = new StringBuilder();
+			if (distinct) {
+				cols.append(fg.distinct);
+			}
 			cols.append(mlq.linkAlias);
 			cols.append('.');
 			cols.append(mlq.linkCol);
@@ -1137,7 +1141,10 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 			orderCols = ""; //$NON-NLS-1$
 		} else {
 			cols = context.generateColumns(tei, join, attributes, deleted);
-			orderCols = context.generateOrders(orders, deleted);
+			if (distinct || (links.size() > 1) || sourceEntity.hasRecursiveLink() || targetEntity.hasRecursiveLink()) {
+				cols.insert(0, fg.distinct);
+			}
+			orderCols = context.generateOrders(join, orders, deleted);
 			where = context.generateCriteria(join, criteria, deleted); // The deletion test is already done in the last join... 
 			if (!mlq.where.isEmpty()) {
 				if (!where.isEmpty()) {
@@ -1145,9 +1152,6 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 				}
 				where.append(mlq.where);
 			}
-		}
-		if (distinct) {
-			cols.insert(0, fg.distinct);
 		}
 		String query;
 		boolean softPagination = false;
@@ -1272,7 +1276,8 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 	@Override
 	protected int doLinkCount(List<MetaDataLink> links, int sourceId, boolean deleted,  boolean ignoreSubdivision, ISearchCriteria criteria,
 			boolean distinct, SQLCriteriaContext context) {
-		EntityInfo ei = getEntityInfo(links.get(0).getParent());
+		final MetaDataEntity sourceEntity = links.get(0).getParent();
+		EntityInfo ei = getEntityInfo(sourceEntity);
 		if (ei == null) {
 			return 0;
 		}
@@ -1305,7 +1310,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		} else {
 			// A distinct clause need columns... but as long as we select the ID primary key in each request
 			// this information is enough to count distinct selection.
-			if (distinct) {
+			if (distinct || (links.size() > 1) || sourceEntity.hasRecursiveLink() || context.getEntity().hasRecursiveLink()) {
 				col = String.format(fg.count_distinct, alias + '.' + e.idCol);
 			} else {
 				col = fg.count;

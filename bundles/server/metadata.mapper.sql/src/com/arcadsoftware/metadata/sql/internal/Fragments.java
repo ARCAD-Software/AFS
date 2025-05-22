@@ -105,7 +105,7 @@ public class Fragments {
 	public String inset;
 	public String rec_first;
 	public String rec_sub;
-	public String rec;
+	public String rec_init;
 	public String rec_alt;
 	public String id;
 	public String isnullex;

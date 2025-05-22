@@ -149,7 +149,8 @@ public class MultiLinkQuery {
 		String prev_col = null;
 		String prev_alias = null;
 		int alias = initial;
-		for (final MetaDataLink l : links) {
+		for (int i = 0; i < links.size(); i++) {
+			final MetaDataLink l = links.get(i);
 			if (l == null) {
 				alias = 1;
 				break;
@@ -180,8 +181,13 @@ public class MultiLinkQuery {
 						if (joins == null) {
 							// As first selection we select the direct sub links (first level).
 							// This avoid to select the original source in the result.
-							firstSelect = String.format(mapper.fg.select, "fl." + rli.destCol + mapper.fg.asid, rli.table + " fl",
-									"fl." + rli.sourceCol + mapper.fg.paramequal);
+							if ((i+1 < links.size()) && !recLink.equals(links.get(i + 1))) {
+								firstSelect = String.format(mapper.fg.select, "fl." + rli.destCol + mapper.fg.asid, //$NON-NLS-1$
+										rli.table + " fl", //$NON-NLS-1$
+										"fl." + rli.sourceCol + mapper.fg.paramequal); //$NON-NLS-1$
+							} else {
+								firstSelect = mapper.fg.rec_init;
+							}
 						} else {
 							// check if current entity items are not deleted too.
 							if ((!deleted) && (csei.deleteCol != null)) {

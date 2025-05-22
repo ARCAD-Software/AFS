@@ -279,24 +279,64 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 	 * @return the Order SQL clause.
 	 */
 	protected String generateOrders(List<ReferenceLine> orders, boolean deleted) {
+		return generateOrders(joinTree, orders, deleted);
+	}
+	/**
+	 * Generate the SQL Order clause.
+	 * 
+	 * <p>
+	 * The Order columns are assumed to be already present in the selected ones. Must be called after generateColumns.
+	 * 
+	 * @param orders
+	 * @return the Order SQL clause.
+	 */
+	protected String generateOrders(JoinElement join, List<ReferenceLine> orders, boolean deleted) {
 		init(deleted);
 		StringBuilder result = new StringBuilder();
 		if (orders != null) {
 			for (ReferenceLine order: orders) {
-				// Assume that the columns are included in the selected columns and generateColumns is called before generateOrders.
-				String col = colNames.get(order.getCode());
-				// Avoid usage of complex column in the order clause.
-				// TODO Support order by complex columns (just remove constants).
-				// TODO Support ordering on updateCol ou muidCol...
-				if ((col != null) && (col.indexOf('+') < 0)) {
-					// we only sort by elements of the same domain and which are actually selected
+				if (ReferenceLine.ORDERBY_DATE.equals(order.getCode()) && (entityInfo.updateCol != null)) {
 					if (result.length() > 0) {
 						result.append(mapper.fg.columnsep);
 					}
-					if (order.isFlaged()) { //$NON-NLS-1$
-						result.append(String.format(mapper.fg.orderdesc, col));
+					if (order.isFlaged()) {
+						result.append(String.format(mapper.fg.orderdesc, join.getAlias() + '.' + entityInfo.updateCol));
 					} else {
-						result.append(String.format(mapper.fg.orderasc, col));
+						result.append(String.format(mapper.fg.orderasc, join.getAlias() + '.' + entityInfo.updateCol));
+					}
+				} else if (ReferenceLine.ORDERBY_MUID.equals(order.getCode()) && (entityInfo.muidCol != null)) {
+					if (result.length() > 0) {
+						result.append(mapper.fg.columnsep);
+					}
+					if (order.isFlaged()) {
+						result.append(String.format(mapper.fg.orderdesc, join.getAlias() + '.' + entityInfo.muidCol));
+					} else {
+						result.append(String.format(mapper.fg.orderasc, join.getAlias() + '.' + entityInfo.muidCol));
+					}
+				} else if (ReferenceLine.ORDERBY_ID.equals(order.getCode()) && (entityInfo.idCol != null)) {
+					if (result.length() > 0) {
+						result.append(mapper.fg.columnsep);
+					}
+					if (order.isFlaged()) {
+						result.append(String.format(mapper.fg.orderdesc, join.getAlias() + '.' + entityInfo.idCol));
+					} else {
+						result.append(String.format(mapper.fg.orderasc, join.getAlias() + '.' + entityInfo.idCol));
+					}
+				} else {
+					// Assume that the columns are included in the selected columns and generateColumns is called before generateOrders.
+					String col = colNames.get(order.getCode());
+					// Avoid usage of complex column in the order clause.
+					// TODO Support order by complex columns (just remove constants and operators...).
+					if ((col != null) && (col.indexOf('+') < 0)) {
+						// we only sort by elements of the same domain and which are actually selected
+						if (result.length() > 0) {
+							result.append(mapper.fg.columnsep);
+						}
+						if (order.isFlaged()) {
+							result.append(String.format(mapper.fg.orderdesc, col));
+						} else {
+							result.append(String.format(mapper.fg.orderasc, col));
+						}
 					}
 				}
 			}
@@ -387,106 +427,135 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 		return result;
 	}
 
-	private String getSubDivision(MetaDataEntity entity, boolean deleted) {
+	/**
+	 * @param entity the entity containing a subdivision.
+	 * @param ei The entityInfo of thie entity.
+	 * @param deleted false is deleted col must be tested.
+	 * @return null if this entity does not contain a subdivision, or return the alias of the resursive table.
+	 */
+	private String getSubDivision(MetaDataEntity entity, EntityInfo ei, boolean deleted) {
 		final MetaDataLink link = entity.getFirstRecursiveLink();
-		if (link == null) {
+		if ((link == null) || (ei == null)) {
 			return null;
 		}
-		final EntityInfo ei = mapper.getEntityInfo(entity);
-		if (ei == null) {
-			return null;
-		}
-		return getSubDivision(ei, link.getCode(), deleted);
-	}
-	
-	private String getSubDivision(EntityInfo e, String linkCode, boolean deleted) {
-		final String alias = SQL_RECURCIVE_PREFIX + e.table;
-		if (e.sql_subselect == null) {
-			LinkInfo l = e.links.get(linkCode);
+		final String alias = SQL_RECURCIVE_PREFIX + ei.table;
+		if (ei.sql_subselect == null) {
+			LinkInfo l = ei.links.get(link.getCode());
 			if (l == null) {
 				return null;
 			}
-			if (deleted && ((e.deleteCol != null) || (l.deleteCol != null))) {
+			if ((ei.deleteCol == null) && (l.deleteCol == null)) {
+				// selection independent from delete cols
+				ei.sql_subselect = String.format(mapper.fg.rec_link, alias, ei.table, ei.idCol, l.table, l.sourceCol, l.destCol);
+			} else if (deleted) {
 				// Do not cache this request !
-				addQueryContext(alias, String.format(mapper.fg.rec_link, alias, e.table, e.idCol, l.table, l.sourceCol, l.destCol));
+				addQueryContext(alias, String.format(mapper.fg.rec_link, alias, ei.table, ei.idCol, l.table, l.sourceCol, l.destCol));
 				return alias;
-			}
-			String sourceCol = l.sourceCol;
-			if ((l.deleteCol != null) && !deleted) {
-				sourceCol += mapper.fg.and + "z." + l.deleteCol + mapper.fg.equaldelfalse;
-			}
-			if ((e.deleteCol != null) && !deleted) {
-				e.sql_subselect = String.format(mapper.fg.rec_link, alias, e.table, e.idCol, e.deleteCol, l.table, sourceCol, l.destCol);
 			} else {
-				e.sql_subselect = String.format(mapper.fg.rec_link, alias, e.table, e.idCol, l.table, sourceCol, l.destCol);
-			}
+				final String linkDel;
+				if (l.deleteCol == null) {
+					linkDel = ""; //$NON-NLS-1$
+				} else {
+					linkDel = " where z." + l.deleteCol + mapper.fg.equaldelfalse; //$NON-NLS-1$
+				}
+				final String eDel;
+				if (ei.deleteCol == null) {
+					eDel = ""; //$NON-NLS-1$
+				} else {
+					eDel = " where r." + ei.deleteCol + mapper.fg.equaldelfalse; //$NON-NLS-1$
+				}
+				ei.sql_subselect = String.format(mapper.fg.rec_linkdel, alias, ei.table, ei.idCol, eDel, l.table, l.sourceCol, l.destCol, linkDel);
+			}			
 		}
-		addQueryContext(alias, e.sql_subselect);
+		addQueryContext(alias, ei.sql_subselect);
 		return alias;
 	}
 
+	/**
+	 * This approach will generate a "non recursive" table of the subdivisions by expending all transitive relations and include a reflective relation x -> x
+	 * to start with.
+	 * 
+	 * <p>
+	 * Note: this could be simplified with an initialization with id -> id where ID is the actual targeted element, when it is known !
+	 *  
+	 * @param links The chain of links to proceed.
+	 * @param where will content the where clause of the selection.
+	 * @param lastJoinCol If required, get the entity latest ID column, with correct prefix. 
+	 * @param endWithEntity if true the last join is targeting the latest entity table.
+	 * @param deleted if false the deletion of intermediaries entities is checked.
+	 * @return
+	 */
 	private JoinElement generateLinkJoins(List<MetaDataLink> links, StringBuilder where, StringBuilder lastJoinCol, boolean endWithEntity, boolean deleted) {
 		MetaDataEntity e = links.get(0).getParent();
 		EntityInfo ei = mapper.getEntityInfo(e);
 		JoinElement result = null;
-		String a = getSubDivision(e, deleted);
+		String a = getSubDivision(e, ei, deleted);
 		String parentCol = null;
 		if (a != null) {
-			result = new JoinElement(a, a, mapper.fg.source);
-			parentCol = a + '.' + mapper.fg.dest;
+			result = new JoinElement(a, a, mapper.fg.dest);
+			parentCol = a + '.' + mapper.fg.source;
 		} else if (!deleted && (ei.deleteCol != null)) {
-			result = new JoinElement("xa",ei.table + " xa", ei.idCol);
-			parentCol = "xa." + ei.idCol;
+			result = new JoinElement("xa", ei.table + " xa", ei.idCol); //$NON-NLS-1$ //$NON-NLS-2$
+			parentCol = "xa." + ei.idCol; //$NON-NLS-1$
 			if (!where.isEmpty()) {
 				where.append(mapper.fg.and);
 			}
+			where.append("xa."); //$NON-NLS-1$
 			where.append(ei.deleteCol);
 			where.append(mapper.fg.equaldelfalse);
 		}
 		JoinElement current = result;
 		for (MetaDataLink link: links) {
-			LinkInfo li = ei.links.get(link.getCode());
-			if (result == null) {
-				result = new JoinElement("la", li.table + " la", li.sourceCol);
-				parentCol = "la." + li.destCol;
-				current = result;
-				if (!deleted && (li.deleteCol != null)) {
-					if (!where.isEmpty()) {
-						where.append(mapper.fg.and);
+			// If the current link is the subdivision link of the current entity,
+			// then we have managed is with a recurvise conversion at the previous step, we must ignore it.
+			if (!link.isRecursive()) { 
+				LinkInfo li = ei.links.get(link.getCode());
+				if (result == null) {
+					result = new JoinElement("la", li.table + " la", li.sourceCol);
+					parentCol = "la." + li.destCol;
+					current = result;
+					if (!deleted && (li.deleteCol != null)) {
+						if (!where.isEmpty()) {
+							where.append(mapper.fg.and);
+						}
+						where.append(li.deleteCol);
+						where.append(mapper.fg.equaldelfalse);
 					}
-					where.append(li.deleteCol);
-					where.append(mapper.fg.equaldelfalse);
+				} else {
+					current = current.add(li, parentCol, deleted);
+					current.setInner();
+					parentCol = current.getAlias() + '.' + li.destCol;
 				}
-			} else {
-				current = current.add(li, parentCol, deleted);
-				current.setInner();
-				parentCol = current.getAlias() + '.' + li.destCol;
-			}
-			e = link.getRefEntity();
-			ei = mapper.getEntityInfo(e);
-			if (ei == null) {
-				// TODO support multi domain links...
-				break;
-			}
-			a = getSubDivision(e, deleted);
-			if (a != null) {
-				current = current.add(a, mapper.fg.source, parentCol);
-				current.setInner();
-				parentCol = current.getAlias() + '.' + mapper.fg.dest;
-			} else if (!deleted && (ei.deleteCol != null)) {
-				current = current.add(ei, parentCol, false);
-				current.setInner();
-				parentCol = current.getAlias() + '.' + ei.idCol;
+				e = link.getRefEntity();
+				ei = mapper.getEntityInfo(e);
+				if (ei == null) {
+					// TODO support multi domain links...
+					break;
+				}
+				a = getSubDivision(e, ei, deleted);
+				if (a != null) {
+					current = current.add(a, mapper.fg.dest, parentCol);
+					current.setInner();
+					parentCol = current.getAlias() + '.' + mapper.fg.source;
+				} else if (!deleted && (ei.deleteCol != null)) {
+					current = current.add(ei, parentCol, false);
+					current.setInner();
+					parentCol = current.getAlias() + '.' + ei.idCol;
+				}
 			}
 		}
 		if (endWithEntity && !parentCol.endsWith(ei.idCol)) {
 			// Ensure that this join is on the last entity... 
 			current = current.add(ei, parentCol, false);
 			current.setInner();
-			parentCol = current.getAlias() + '.' + ei.idCol;
-		}
-		if (lastJoinCol != null) {
 			// If the lastJoinAlias is required then this is because be need to use it to refer to last entity id.
+			if (lastJoinCol != null) {
+				lastJoinCol.append(current.getAlias());
+				lastJoinCol.append('.');
+				lastJoinCol.append(ei.idCol);
+			}
+		} else if (lastJoinCol != null) {
+			// The lastColJoin is the last "id" col used in chain. (the "target" of the last link, here).
 			lastJoinCol.append(parentCol);
 		}
 		return result;
@@ -742,18 +811,18 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 				}
 				EntityInfo users = mapper.getEntityInfo(MetaDataEntity.loadEntity("user")); //$NON-NLS-1$
 				if (users == null) {
-					// TODO get the user list from the foreign mappser...
+					// We should get the user list from the foreign mapper...
 					result.append(mapper.fg.false_cond);
 				}
-				LinkInfo userProfiles = users.links.get("profiles");
+				LinkInfo userProfiles = users.links.get("profiles"); //$NON-NLS-1$
 				if (userProfiles == null) {
-					// TODO get the user list from the foreign mappser...
+					// We should get the profile list from the foreign mapper...
 					result.append(mapper.fg.false_cond);
 				}
 				// Add a join on the User table (we do not test that eh users are deleted or not !!!)
 				result.append(String.format(mapper.fg.inset, col, //
 						String.format(mapper.fg.selectall, userProfiles.sourceCol, userProfiles.table + 
-								String.format(mapper.fg.join_inner, table, "r", mapper.fg.id, userProfiles.destCol))));
+								String.format(mapper.fg.join_inner, table, "r", mapper.fg.id, userProfiles.destCol)))); //$NON-NLS-1$
 			}
 		} else if (criteria instanceof IdEqualCriteria) {
 			result.append(String.format(mapper.fg.equal,  join.getAlias() + '.' + entityInfo.idCol, ((IdEqualCriteria) criteria).getId()));
@@ -775,31 +844,31 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 			String attcn = colNames.get(((LinkCriteria) criteria).getAttribute());
 			String code;
 			if (attcn == null) {
-				attcn = joinTree.getAlias() + '.' + entityInfo.idCol;
+				attcn = join.getAlias() + '.' + entityInfo.idCol;
 				code = ((LinkCriteria) criteria).getLinkCode();
 			} else {
 				code = ((LinkCriteria) criteria).getAttribute() + '/' + ((LinkCriteria) criteria).getLinkCode();
 			}
 			StringBuilder subWhere = new StringBuilder();
 			StringBuilder lastCol = new StringBuilder();
-			JoinElement j = generateLinkJoins(getLinks(code), subWhere, lastCol, deleted, false);
+			JoinElement j = generateLinkJoins(getLinks(code), subWhere, lastCol, false, deleted);
 			if (!subWhere.isEmpty()) {
 				subWhere.append(mapper.fg.and);
 			}
 			subWhere.append(String.format(mapper.fg.equal, lastCol.toString(), Integer.toString(((LinkCriteria) criteria).getId())));
 			result.append(String.format(mapper.fg.inset, attcn, 
-					String.format(mapper.fg.select, j.getAlias() + j.getId(), j.toString(mapper), subWhere.toString())));
+					String.format(mapper.fg.select, j.getAlias() + '.' + j.getId(), j.toString(mapper), subWhere.toString())));
 		} else if (criteria instanceof AbstractLinkTestCriteria) {
 			String attcn = colNames.get(((AbstractLinkTestCriteria) criteria).getReference());
 			String code;
 			if (attcn == null) {
-				attcn = joinTree.getAlias() + '.' + entityInfo.idCol;
+				attcn = join.getAlias() + '.' + entityInfo.idCol;
 				code = ((AbstractLinkTestCriteria) criteria).getLinkCode();
 			} else {
 				code = ((AbstractLinkTestCriteria) criteria).getAttribute() + '/' + ((AbstractLinkTestCriteria) criteria).getLinkCode();
 			}
 			StringBuilder subWhere = new StringBuilder();
-			JoinElement j = generateLinkJoins(getLinks(code), subWhere, null, deleted, true);
+			JoinElement j = generateLinkJoins(getLinks(code), subWhere, null, true, deleted);
 			// Follow up the join to the targeted attribute used for the final test...
 			ReferenceLine refline = getLinkReference(code, ((AbstractLinkTestCriteria) criteria).getAttribute());
 			EntityInfo ei = mapper.getEntityInfo(refline.getOriginEntity());
@@ -810,7 +879,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 			}
 			String scol = null;
 			if (criteria instanceof IAttributesCriteria) {
-				scol = colNames.get(((LinkEqualCriteria) criteria).getSecondAttribute());
+				scol = colNames.get(((IAttributesCriteria) criteria).getSecondAttribute());
 				// FIXME there is an ambiguity here !
 				if (scol == null) {
 					scol = buildAttributeColName(getLinkReference(code, ((IAttributesCriteria) criteria).getSecondAttribute()), //
@@ -826,7 +895,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 						try {
 							Float.parseFloat(value);
 						} catch (NumberFormatException ee) {
-							value = enquote(((LinkEqualCriteria) criteria).getValue());
+							value = enquote(((AbstractLinkTestCriteria) criteria).getValue());
 						}
 					}
 				}
