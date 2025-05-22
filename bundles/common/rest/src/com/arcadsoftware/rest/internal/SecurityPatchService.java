@@ -79,6 +79,14 @@ public class SecurityPatchService extends Service {
 					} else {
 						sb.append("; script-src 'self' 'unsafe-eval'"); //$NON-NLS-1$
 					}
+					v = System.getProperty("com.arcadsoftware.csp.script.elem.sources"); //$NON-NLS-1$
+					if ((v != null) && !v.trim().isEmpty()) {
+						sb.append("; script-src-elem " + v.trim()); //$NON-NLS-1$
+					}
+					v = System.getProperty("com.arcadsoftware.csp.script.attr.sources"); //$NON-NLS-1$
+					if ((v != null) && !v.trim().isEmpty()) {
+						sb.append("; script-src-attr " + v.trim()); //$NON-NLS-1$
+					}
 					// source: https://developer.mozilla.org/fr/docs/Web/HTTP/Headers/Content-Security-Policy
 					responseHeaders.add(new Header("Content-Security-Policy", sb.toString())); //$NON-NLS-1$
 					// For browser not ignoring Content-Security-Policy directive

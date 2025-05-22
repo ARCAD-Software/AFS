@@ -29,6 +29,4 @@ public class MxCompactDriver extends MXParserDriver {
 	public HierarchicalStreamWriter createWriter(Writer out) {
 		return new CompactWriter(out);
 	}
-
-	
 }
