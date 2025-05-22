@@ -257,13 +257,14 @@ public class XmlCriteriaStream extends XStreamCompact {
 		xs.alias("linkgreaterstrict", LinkLowerStrictCriteria.class); //$NON-NLS-1$
 		xs.alias("linkgreaterthan", LinkLowerThanCriteria.class); //$NON-NLS-1$
 		xs.useAttributeFor(LinkCriteria.class, "ignoreSubdivision"); //$NON-NLS-1$
-		xs.useAttributeFor(AbstractLinkTestCriteria.class, "ignoreSubdivision"); //$NON-NLS-1$
-		xs.useAttributeFor(UnlinkCriteria.class, "ignoreSubdivision"); //$NON-NLS-1$
 		xs.useAttributeFor(LinkCriteria.class, "deleted"); //$NON-NLS-1$
+		xs.aliasAttribute(LinkCriteria.class, "linkCode", "link");
+		xs.useAttributeFor(AbstractLinkTestCriteria.class, "ignoreSubdivision"); //$NON-NLS-1$
 		xs.useAttributeFor(AbstractLinkTestCriteria.class, "deleted"); //$NON-NLS-1$
+		xs.useAttributeFor(UnlinkCriteria.class, "ignoreSubdivision"); //$NON-NLS-1$
 		xs.useAttributeFor(UnlinkCriteria.class, "deleted"); //$NON-NLS-1$
-		xs.aliasAttribute("ignoreSubdivision", "nosub");
-		xs.aliasAttribute("ignoresubdivision", "nosub");
+		xs.aliasAttribute("nosub", "ignoreSubdivision");
+		xs.aliasAttribute("ignoresubdivision", "ignoreSubdivision");
 		xs.aliasAttribute("linkcode", "linkCode");
 		xs.alias("changedby", ChangedByCriteria.class); //$NON-NLS-1$
 		xs.useAttributeFor(ChangedByCriteria.class, "uid"); //$NON-NLS-1$
