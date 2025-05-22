@@ -35,6 +35,11 @@ import com.arcadsoftware.metadata.internal.Activator;
  */
 public class ReferenceLine extends ArrayList<Element> implements Comparable<ReferenceLine> {
 
+	
+	public static final String ORDERBY_DATE = "1"; //$NON-NLS-1$
+	public static final String ORDERBY_MUID = "2"; //$NON-NLS-1$
+	public static final String ORDERBY_ID = "3"; //$NON-NLS-1$
+	
 	/**
 	 * Empty list of references (immutable).
 	 */
@@ -202,7 +207,15 @@ public class ReferenceLine extends ArrayList<Element> implements Comparable<Refe
 		this.code = code;
 	}
 
-    /**
+    @Override
+	public boolean equals(Object o) {
+		if ((o instanceof ReferenceLine) && (code != null) && (((ReferenceLine) o).code != null)) {
+			return code.equals(((ReferenceLine) o).code);
+		}
+		return super.equals(o);
+	}
+
+	/**
      * Constructs an empty list with the specified initial capacity.
      *
      * @param code the reference line code.

@@ -976,8 +976,22 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 		List<ReferenceLine> result = new ArrayList<ReferenceLine>(codestab.length);
 		for (String code : codestab) {
 			ReferenceLine rl = getAttributeLine(code);
-			if ((rl != null) && !rl.isHidden()) {
-				result.add(rl);
+			if (rl != null) {
+				if (!rl.isHidden()) {
+					result.add(rl);
+				}
+			} else if ("!date".equalsIgnoreCase(code)) {
+				result.add(new ReferenceLine(ReferenceLine.ORDERBY_DATE, 0, true));
+			} else if ("date".equalsIgnoreCase(code)) {
+				result.add(new ReferenceLine(ReferenceLine.ORDERBY_DATE, 0, false));
+			} else if ("!muid".equalsIgnoreCase(code)) {
+				result.add(new ReferenceLine(ReferenceLine.ORDERBY_MUID, 0, true));
+			} else if ("muid".equalsIgnoreCase(code)) {
+				result.add(new ReferenceLine(ReferenceLine.ORDERBY_MUID, 0, false));
+			} else if ("!id".equalsIgnoreCase(code)) {
+				result.add(new ReferenceLine(ReferenceLine.ORDERBY_ID, 0, true));
+			} else if ("id".equalsIgnoreCase(code)) {
+				result.add(new ReferenceLine(ReferenceLine.ORDERBY_ID, 0, false));
 			}
 		}
 		return result;
