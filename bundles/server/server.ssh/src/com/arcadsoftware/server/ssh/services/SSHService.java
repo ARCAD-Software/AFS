@@ -29,6 +29,7 @@ import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.Security;
 import java.security.interfaces.RSAKey;
 import java.util.Base64;
 import java.util.HashSet;
@@ -40,6 +41,7 @@ import org.apache.sshd.common.config.keys.FilePasswordProvider;
 import org.apache.sshd.common.config.keys.writer.openssh.OpenSSHKeyEncryptionContext;
 import org.apache.sshd.common.config.keys.writer.openssh.OpenSSHKeyPairResourceWriter;
 import org.apache.sshd.common.util.security.SecurityUtils;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -61,6 +63,13 @@ public class SSHService {
 	private static final HashSet<PosixFilePermission> CHMOD_600 = new HashSet<>(2);
 
 	static {
+		if (Security.getProperty(BouncyCastleProvider.PROVIDER_NAME) == null) {
+			try {
+				Security.addProvider(new BouncyCastleProvider());
+			} catch (Exception e) {
+				
+			}
+		}
 		CHMOD_600.add(PosixFilePermission.OWNER_READ);
 		CHMOD_600.add(PosixFilePermission.OWNER_WRITE);
 	}
