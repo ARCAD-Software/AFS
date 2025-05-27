@@ -107,6 +107,13 @@ public class SSHService {
 		return toRet.toString();
 	}
 
+	/**
+	 * TODO Document interface.
+	 * 
+	 * @param sshKeyBeanMap
+	 * @return
+	 * @throws SSHException
+	 */
 	public SSHKey create(final BeanMap sshKeyBeanMap) throws SSHException {
 		final SSHKey newSSHKey = insert(sshKeyBeanMap);
 		try {
@@ -118,6 +125,12 @@ public class SSHService {
 		return newSSHKey;
 	}
 
+	/**
+	 * TODO Document interface.
+	 * 
+	 * @param sshKey
+	 * @return
+	 */
 	public boolean delete(final SSHKey sshKey) {
 		if (sshKey.getId() > 0) {
 			return getEntity().dataDelete(sshKey.getId(), true);
@@ -235,6 +248,14 @@ public class SSHService {
 		throw new IOException(String.format("Private key file for SSH key %d not found", sshKey.getId()));
 	}
 
+	/**
+	 * TODO Document interface.
+	 * 
+	 * @param sshKey
+	 * @return
+	 * @throws IOException
+	 * @throws GeneralSecurityException
+	 */
 	public byte[] getPublicKey(final SSHKey sshKey) throws IOException, GeneralSecurityException {
 		final ByteArrayOutputStream output = new ByteArrayOutputStream();
 		OpenSSHKeyPairResourceWriter.INSTANCE.writePublicKey(loadKeyPair(sshKey), sshKey.getComment(), output);
@@ -246,6 +267,13 @@ public class SSHService {
 		return new File(keystoreDirectory, "ks" + key.getId()); //$NON-NLS-1$
 	}
 
+	/**
+	 * TODO Document interface.
+	 * 
+	 * @param sshKeyUpload
+	 * @return
+	 * @throws SSHException
+	 */
 	public SSHKey importKey(final SSHKeyUpload sshKeyUpload) throws SSHException {
 		final KeyPair keyPair;
 		final byte[] privateKeyBytes = sshKeyUpload.getPrivateKey().getBytes(StandardCharsets.UTF_8);
@@ -259,15 +287,15 @@ public class SSHService {
 		tempSSHKey.setType(SSHKeyType.fromAlgorithm(keyPair.getPrivate().getAlgorithm()));
 		tempSSHKey.setLength(getKeyLength(keyPair));
 		if (tempSSHKey.getType() == SSHKeyType.UNKNOWN) {
-			throw new SSHException(String.format("%s key type is not supported", keyPair.getPrivate().getAlgorithm()));
-		} else if (tempSSHKey.getType() == SSHKeyType.RSA && tempSSHKey.getLength() < 4096) {
-			throw new SSHException(
-					String.format("RSA key length is too short (%d); it must be 4096", tempSSHKey.getLength()));
+			throw new SSHException(keyPair.getPrivate().getAlgorithm() + " key type is not supported");
+		} 
+		if (tempSSHKey.getType() == SSHKeyType.RSA && tempSSHKey.getLength() < 4096) {
+			throw new SSHException(String.format("RSA key length is too short (%d); it must be 4096", tempSSHKey.getLength()));
 		}
 		try {
 			tempSSHKey.setFingerprint(computeKeyFingerprint(keyPair));
 		} catch (IOException | GeneralSecurityException e) {
-			throw new SSHException("Error occurred while importing SSH key", e);
+			throw new SSHException("Error occurred while importing SSH key: " + e.getLocalizedMessage(), e);
 		}
 		if (sshKeyUpload.getPassphrase() != null) {
 			tempSSHKey.setPassphrase(Crypto.encrypt(sshKeyUpload.getPassphrase().toCharArray()));
@@ -280,15 +308,14 @@ public class SSHService {
 			if (importedSSHKey.getId() > 0) {
 				delete(importedSSHKey);
 			}
-			throw new SSHException("Error occurred while importing SSH key", e);
+			throw new SSHException("Error occurred while importing SSH key: " + e.getLocalizedMessage(), e);
 		}
 	}
 
 	private SSHKey insert(final BeanMap sshKeyBeanMap) throws SSHException {
 		final SSHKey tempSSHKey = new SSHKey(sshKeyBeanMap);
 		if (tempSSHKey.getType() == SSHKeyType.UNKNOWN) {
-			throw new SSHException(
-					String.format("SSH key type %s is unknown", tempSSHKey.getBeanMap().get(SSHKey.TYPE)));
+			throw new SSHException(String.format("SSH key type %s is unknown", tempSSHKey.getBeanMap().get(SSHKey.TYPE)));
 		}
 		tempSSHKey.setLength(tempSSHKey.getType().getLength());
 		MetaDataEntity e = getEntity();
@@ -329,6 +356,15 @@ public class SSHService {
 		return loadKeyPair(input, passphrase);
 	}
 
+	/**
+	 * TODO Document interface.
+	 * 
+	 * @param input
+	 * @param passphrase
+	 * @return
+	 * @throws IOException
+	 * @throws GeneralSecurityException
+	 */
 	public KeyPair loadKeyPair(final InputStream input, final String passphrase)
 			throws IOException, GeneralSecurityException {
 		final FilePasswordProvider password;
