@@ -1,8 +1,8 @@
-# AFS-OS release version 2023.7.45.
+# AFS-OS release version 2023.7.46.
 
-Release date Tue May 27 11:17:45 CEST 2025.
+Release date Tue May 27 17:43:13 CEST 2025.
 
-Link to the update site of [Version 2023.7.45](https://github.com/ARCAD-Software/AFS/releases/download/2023.7.45/).
+Link to the update site of [Version 2023.7.46](https://github.com/ARCAD-Software/AFS/releases/download/2023.7.46/).
 
 1 Bundles modified in this release.
 
@@ -92,7 +92,7 @@ Bundle Symbolic Name | Modification | Version
 [com.arcadsoftware.server.restful.log](bundles/server/server.restful.log) | Not changed | 1.2.0
 [com.arcadsoftware.server.scheduler](bundles/server/server.scheduler) | Not changed | 1.3.3
 [com.arcadsoftware.server.scheduler.impl](bundles/server/server.scheduler.impl) | Not changed | 1.3.3
-[com.arcadsoftware.server.ssh](bundles/server/server.ssh) | **Upgraded** from version 2.3.7 | **2.3.8**
+[com.arcadsoftware.server.ssh](bundles/server/server.ssh) | **Upgraded** from version 2.3.8 | **2.3.9**
 [com.arcadsoftware.server.web](bundles/server/server.web) | Not changed | 1.2.5
 
 
