@@ -33,7 +33,7 @@ import com.arcadsoftware.ssh.model.SSHKey;
 @Component(service = { IMetaDataDeleteListener.class }, property = IMetaDataDeleteListener.PROP_TYPE + "=" + SSHKey.ENTITY)
 public class SSHKeyListener implements IMetaDataDeleteListener {
 
-	private Logger log = LoggerFactory.getLogger(SSHKeyListener.class);
+	private final Logger log = LoggerFactory.getLogger(SSHKeyListener.class);
 	private SSHService sshService;
 
 	@Reference
