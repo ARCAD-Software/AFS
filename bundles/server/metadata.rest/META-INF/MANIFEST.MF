@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Metadata REST Services
 Bundle-SymbolicName: com.arcadsoftware.metadata.rest;singleton:=true
-Bundle-Version: 1.4.0.qualifier
+Bundle-Version: 2.0.0
 Bundle-Activator: com.arcadsoftware.metadata.rest.internal.Activator
 Bundle-Vendor: ARCAD Software
 Bundle-RequiredExecutionEnvironment: JavaSE-17
@@ -34,7 +34,7 @@ Import-Package: com.arcadsoftware.beanmap;version="[3.0.0,4.0.0)",
  org.restlet.resource;version="[2.4.3,3.0.0)",
  org.restlet.routing;version="[2.4.3,3.0.0)",
  org.restlet.util;version="[2.4.3,3.0.0)"
-Export-Package: com.arcadsoftware.metadata.rest;version="1.2.0"
+Export-Package: com.arcadsoftware.metadata.rest;version="1.3.0"
 Arcad-PropertiesDomain: data
 Automatic-Module-Name: com.arcadsoftware.metadata.rest
 Bundle-ActivationPolicy: lazy

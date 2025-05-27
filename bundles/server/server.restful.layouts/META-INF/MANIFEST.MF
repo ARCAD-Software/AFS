@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Dynamic Editors Layouts Repository
 Bundle-SymbolicName: com.arcadsoftware.server.restful.layouts;singleton:=true
 Bundle-Vendor: ARCAD Software
-Bundle-Version: 9.6.0.qualifier
+Bundle-Version: 9.7.0
 Bundle-Activator: com.arcadsoftware.server.restful.layouts.internal.Activator
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Import-Package: com.arcadsoftware.osgi;version="[1.0.1,3.0.0)",
