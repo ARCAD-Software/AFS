@@ -19,10 +19,19 @@ import com.arcadsoftware.osgi.AbstractActivator;
 
 public class Activator extends AbstractActivator {
 
+	private static Activator activator;
+	
+	public static final void logInfo(String message, Exception e) {
+		if (activator != null) {
+			activator.info(message, e);
+		}
+	}
+	
 	private MessageBundleTracker messageTraker;
 
 	@Override
 	public void start(BundleContext context) throws Exception {
+		activator = this;
 		super.start(context);
 		// Create the message Tracker;
 		messageTraker = new MessageBundleTracker(this);
