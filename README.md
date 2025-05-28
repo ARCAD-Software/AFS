@@ -27,24 +27,24 @@ You can retrieve these dependencies from the **pom.xml** file from the root of t
 
 To be able to run the server part you will have to include the following dependencies:
 
-* Bouncy Castle version 1.78.1.
-* Apache Santuario XMLSec version 2.3.4
+* Bouncy Castle version 1.80.
+* Apache Santuario XMLSec version 4.0.3
 * Apache Commons bundles:
-  * Commons FileUpload version 1.5
-  * Commons Codec version 1.15
-  * Commons DBUtils version 1.6
-  * and Commons io version 2.13.0
-* UnboundID LDAP SDK version 6.0.5
-* Java Mail version 1.6.2
-* HikariCP version 4.0.3 and the JDBC driver:
-  * H2Database version 1.4.199
-  * PostgreSQL version 42.5.5
-* Groovy version 3.0.8
-* and the Equinox OSGi framework, a version compatible with Java 8 and at least equal to version 4.19 is required. The required bundles are only the ones related to:
+  * Commons FileUpload version 1.5.0
+  * Commons Codec version 1.18.0
+  * Commons DBUtils version 1.8.1
+  * and Commons io version 2.18.0
+* Apache Jakarta Mail version 2.0.1
+* UnboundID LDAP SDK version 7.0.2
+* HikariCP version 6.2.1 and the JDBC driver:
+  * H2Database (light fork) version 2.3.232
+  * PostgreSQL version 42.7.5
+* Groovy version 4.0.25
+* and the Equinox OSGi framework, a version compatible with Java 17 and at least equal to version 4.19 is required. The required bundles are only the ones related to:
   * The Declarative Service.
   * The Event Admin Service.
-  * The Equinox console.
+  * The Felix Gogo console.
  
 ### RCP Client
 
-All the above dependencies are required, except the JDBC related ones and Groovy. You have to import Eclipse RCP version Neon or an above version compatible with Java 8.
+All the above dependencies are required, except the JDBC related ones and Groovy. You have to import Eclipse RCP version Neon or an above version compatible with Java 17.
