@@ -369,7 +369,7 @@ public class ConfiguredSSLContext {
 	}
 
 	private void addAllProps(Dictionary<String, Object> props, String propName,	ArrayList<String> list) {
-		for(String s: getProp(props, PROP_ENABLEDCIPHERSUITES, "").split(" ")) { //$NON-NLS-1$ //$NON-NLS-2$
+		for(String s: getProp(props, propName, "").split(" ")) { //$NON-NLS-1$ //$NON-NLS-2$
 			if (!s.isEmpty()) {
 				list.add(s.toLowerCase());
 			}
