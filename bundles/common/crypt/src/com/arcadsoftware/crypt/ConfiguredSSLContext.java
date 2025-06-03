@@ -56,12 +56,15 @@ import com.arcadsoftware.crypt.internal.WrapperSSLContext;
  * Allow to create SSL context with an homogeneous set of configuration properties.
  * 
  * <p>
- * This implementation does not stand on the default configuration of the JVM. i.e. No system properties are used to
+ * This implementation does <strong>not</strong> stand on the default configuration of the JVM. i.e. No system properties are used to
  * create the SSLContext nor the Socket factories.
  * 
  * <p>
  * By the way some specific TLS related task must be delayed to the actual protocol manager, like the "start TLS" 
  * option of the target Host name verification, as these operations depend on the actual connection protocol.
+ * 
+ * <p>
+ * All properties relative to this TLS Context start with "ssl." but can be prefixed by any required prefix.
  * 
  * @author ARCAD Software
  */
@@ -311,14 +314,24 @@ public class ConfiguredSSLContext {
 	 * @throws ConfiguredSSLContextException
 	 */
 	public ConfiguredSSLContext(Dictionary<String, Object> props) throws ConfiguredSSLContextException {
+		this("", props);
+	}
+	
+	/**
+	 * Create a new TLS configuration.
+	 * 
+	 * @param props
+	 * @throws ConfiguredSSLContextException
+	 */
+	public ConfiguredSSLContext(String prefix, Dictionary<String, Object> props) throws ConfiguredSSLContextException {
 		super();
 		properties = new HashMap<String, Object>();
 		if (props != null) {
 			Enumeration<String> keys = props.keys();
 			while(keys.hasMoreElements()) {
 				String k = keys.nextElement();
-				if (k.startsWith("ssl.")) { //$NON-NLS-1$
-					properties.put(k, props.get(k));
+				if (k.startsWith(prefix + "ssl.")) { //$NON-NLS-1$
+					properties.put(k.substring(prefix.length()), props.get(k));
 				}
 			}
 		}
@@ -330,17 +343,17 @@ public class ConfiguredSSLContext {
 		protocolsEnabled = new ArrayList<String>();
 		protocolsDisabled = new ArrayList<String>();
 		SSLContext ctx = null;
-		if (isActive(props)) {
-			String provider = getProp(props, PROP_SSL_PROVIDER);
-			String protocol = getProp(props, PROP_SSL_PREFEREDPROTOCOL, "TLSv1.3"); //$NON-NLS-1$
+		if (isActive(properties)) {
+			String provider = getProp(properties, PROP_SSL_PROVIDER);
+			String protocol = getProp(properties, PROP_SSL_PREFEREDPROTOCOL, "TLSv1.3"); //$NON-NLS-1$
 			try {
 				if (provider == null) {
 					ctx = SSLContext.getInstance(protocol);
 				} else {
 					ctx = SSLContext.getInstance(protocol, provider);
 				}
-				ctx.init(getKeyManagers(props, provider), getTrustManagers(props, provider),
-						getSecureRandom(props, provider));
+				ctx.init(getKeyManagers(properties, provider), getTrustManagers(properties, provider),
+						getSecureRandom(properties, provider));
 			} catch (KeyManagementException | NoSuchAlgorithmException | NoSuchProviderException e) {
 				throw new ConfiguredSSLContextException(e);
 			}
@@ -354,21 +367,21 @@ public class ConfiguredSSLContext {
 			forceUseClientMode = false;
 			useClientMode = false;
 		} else {
-			verifyHostname = getProp(props, PROP_VERIFYHOSTNAME, true);
-			startTLS = getProp(props, PROP_SSL_START, false);
-			wantClientAuth = getProp(props, PROP_WANTCLIENTAUTH, false);
-			needClientAuth = getProp(props, PROP_NEEDCLIENTAUTH, false);
-			forceUseClientMode = !getProp(props, PROP_USECLIENTMODE, "").isEmpty();
-			useClientMode = getProp(props, PROP_USECLIENTMODE, false);
-			addAllProps(props, PROP_ENABLEDCIPHERSUITES, cipherSuitesEnabled);
-			addAllProps(props, PROP_DISABLEDCIPHERSUITES, cipherSuitesDisabled);
-			addAllProps(props, PROP_ENABLEDPROTOCOLS, protocolsEnabled);
-			addAllProps(props, PROP_DISABLEDPROTOCOLS, protocolsDisabled);
+			verifyHostname = getProp(properties, PROP_VERIFYHOSTNAME, true);
+			startTLS = getProp(properties, PROP_SSL_START, false);
+			wantClientAuth = getProp(properties, PROP_WANTCLIENTAUTH, false);
+			needClientAuth = getProp(properties, PROP_NEEDCLIENTAUTH, false);
+			forceUseClientMode = !getProp(properties, PROP_USECLIENTMODE, "").isEmpty();
+			useClientMode = getProp(properties, PROP_USECLIENTMODE, false);
+			addAllProps(properties, PROP_ENABLEDCIPHERSUITES, cipherSuitesEnabled);
+			addAllProps(properties, PROP_DISABLEDCIPHERSUITES, cipherSuitesDisabled);
+			addAllProps(properties, PROP_ENABLEDPROTOCOLS, protocolsEnabled);
+			addAllProps(properties, PROP_DISABLEDPROTOCOLS, protocolsDisabled);
 			context = new WrapperSSLContext(ctx, this);
 		}
 	}
 
-	private void addAllProps(Dictionary<String, Object> props, String propName,	ArrayList<String> list) {
+	private void addAllProps(Map<String, Object> props, String propName,	ArrayList<String> list) {
 		for(String s: getProp(props, propName, "").split(" ")) { //$NON-NLS-1$ //$NON-NLS-2$
 			if (!s.isEmpty()) {
 				list.add(s.toLowerCase());
@@ -376,7 +389,7 @@ public class ConfiguredSSLContext {
 		}
 	}
 
-	private KeyManager[] getKeyManagers(Dictionary<String, Object> props, String provider)
+	private KeyManager[] getKeyManagers(Map<String, Object> props, String provider)
 			throws ConfiguredSSLContextException {
 		String ksFileName = getProp(props, PROP_KEYSTORE_PATH);
 		if (ksFileName == null) {
@@ -417,7 +430,7 @@ public class ConfiguredSSLContext {
 		}
 	}
 
-	private TrustManager[] getTrustManagers(Dictionary<String, Object> props, String provider)
+	private TrustManager[] getTrustManagers(Map<String, Object> props, String provider)
 			throws ConfiguredSSLContextException {
 		String tsFileName = getProp(props, PROP_TRUSTSTORE_PATH);
 		if (tsFileName == null) {
@@ -463,7 +476,7 @@ public class ConfiguredSSLContext {
 		}
 	}
 
-	private SecureRandom getSecureRandom(Dictionary<String, Object> props, String provider)
+	private SecureRandom getSecureRandom(Map<String, Object> props, String provider)
 			throws ConfiguredSSLContextException {
 		String random = getProp(props, PROP_SECURERANDOM);
 		if (random == null) {
@@ -479,7 +492,7 @@ public class ConfiguredSSLContext {
 		}
 	}
 
-	private boolean isActive(Dictionary<String, Object> props) {
+	private boolean isActive(Map<String, Object> props) {
 		// Test that the required props are not null AND not empty
 		return (getProp(props, PROP_TRUSTSTORE_PATH) != null) || (getProp(props, PROP_KEYSTORE_PATH) != null);
 	}
@@ -492,38 +505,27 @@ public class ConfiguredSSLContext {
 	 * @param defValue
 	 * @return
 	 */
-	private String getProp(Dictionary<String, Object> props, String name, String defValue) {
-		Object o = props.get(name);
-		if (o != null) {
-			String s = o.toString().trim();
-			if (!s.isEmpty()) {
-				return s;
-			}
-		}
-		return defValue;
-	}
-
-	private String getProp(Dictionary<String, Object> props, String name) {
-		return getProp(props, name, (String) null);
-	}
-
-	private char[] getProp(Dictionary<String, Object> props, String name, char[] defValue) {
-		Object o = props.get(name);
-		if (o != null) {
-			String s = o.toString().trim();
-			if (!s.isEmpty()) {
-				return Crypto.decrypt(s);
-			}
-		}
-		return defValue;
-	}
-
 	private String getProp(Map<String, Object> props, String name, String defValue) {
 		Object o = props.get(name);
 		if (o != null) {
 			String s = o.toString().trim();
 			if (!s.isEmpty()) {
 				return s;
+			}
+		}
+		return defValue;
+	}
+
+	private String getProp(Map<String, Object> props, String name) {
+		return getProp(props, name, (String) null);
+	}
+
+	private char[] getProp(Map<String, Object> props, String name, char[] defValue) {
+		Object o = props.get(name);
+		if (o != null) {
+			String s = o.toString().trim();
+			if (!s.isEmpty()) {
+				return Crypto.decrypt(s);
 			}
 		}
 		return defValue;
@@ -537,7 +539,7 @@ public class ConfiguredSSLContext {
 	 * @param defValue
 	 * @return
 	 */
-	private Boolean getProp(Dictionary<String, Object> props, String name, boolean defValue) {
+	private Boolean getProp(Map<String, Object> props, String name, boolean defValue) {
 		Object o = props.get(name);
 		if (o instanceof Boolean) {
 			return (Boolean) o;
@@ -756,25 +758,25 @@ public class ConfiguredSSLContext {
 	public Set<Entry<String, String>> getRestletParameters() {
 		HashMap<String, String> parameters = new HashMap<String, String>();
 		if (context != null) {
-			String ksFileName = getProp(properties, PROP_KEYSTORE_PATH, null);
-			if ((ksFileName != null) && new File(ksFileName).isFile()) {
+			String ksFileName = getProp(properties, PROP_KEYSTORE_PATH, ""); //$NON-NLS-1$
+			if (!ksFileName.isBlank() && new File(ksFileName).isFile()) {
 				parameters.put("keyStorePath", new File(ksFileName).getAbsolutePath()); //$NON-NLS-1$
-				String ksPwd = getProp(properties, PROP_KEYSTORE_PWD, null);
-				if (ksPwd != null) {
+				String ksPwd = getProp(properties, PROP_KEYSTORE_PWD, ""); //$NON-NLS-1$
+				if (!ksPwd.isEmpty()) {
 					parameters.put("keyStorePassword", ksPwd); //$NON-NLS-1$
 				}
 				String kpwd = getProp(properties, PROP_KEYSTORE_KEYPWD, ksPwd);
-				if (kpwd != null) {
+				if (!kpwd.isEmpty()) {
 					parameters.put("keyPassword", kpwd); //$NON-NLS-1$
 				}
 				parameters.put("keyStoreType", getProp(properties, PROP_KEYSTORE_TYPE, KeyStore.getDefaultType())); //$NON-NLS-1$
 				parameters.put("keyManagerAlgorithm", getProp(properties, PROP_KEYSTORE_ALGO, DEFAULT_STOREALGO)); //$NON-NLS-1$
 			}
-			String tsFileName = getProp(properties, PROP_TRUSTSTORE_PATH, null);
-			if ((tsFileName != null) && new File(tsFileName).isFile()) {
+			String tsFileName = getProp(properties, PROP_TRUSTSTORE_PATH, ""); //$NON-NLS-1$
+			if (!tsFileName.isBlank() && new File(tsFileName).isFile()) {
 				parameters.put("trustStorePath", new File(tsFileName).getAbsolutePath()); //$NON-NLS-1$
-				String tsPwd = getProp(properties, PROP_TRUSTSTORE_PWD, null);
-				if (tsPwd != null) {
+				String tsPwd = getProp(properties, PROP_TRUSTSTORE_PWD, ""); //$NON-NLS-1$
+				if (!tsPwd.isEmpty()) {
 					parameters.put("trustStorePassword", tsPwd); //$NON-NLS-1$
 				}
 				parameters.put("trustStoreType", getProp(properties, PROP_TRUSTSTORE_TYPE, KeyStore.getDefaultType())); //$NON-NLS-1$
