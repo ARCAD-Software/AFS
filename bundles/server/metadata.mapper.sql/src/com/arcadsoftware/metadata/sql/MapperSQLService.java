@@ -311,7 +311,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		StringBuilder result = new StringBuilder();
 		for (MetaDataAttribute a: atts) {
 			String col = e.attributesCols.get(a.getCode());
-			if ((col != null) && (col.indexOf(COLUMNPREFIX_PLACEHOLDER) == 0)) {
+			if ((col != null) && (col.indexOf(COLUMNPREFIX_PLACEHOLDER) < 0)) {
 				if (!result.isEmpty()) {
 					result.append(fg.columnsep);
 				}
@@ -1081,10 +1081,12 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 			return 0;
 		}
 		// usage of "distinct count"...
-		String col;
+		final String col;
 		if (distinct) {
-			// (2025.05) Applied on the attributes of the data !? (note: this should require index for better performances.) 
-			col = String.format(fg.count_distinct, getAttributeCols(context.getEntityInfo(), DEFAULT_TABLEALIAS + '.', context.getEntity().getAttributes().values()));
+			// FIXME The disctinct clause is only applied on the ID col but it should be done on the actual list od selected columns
+			// to return the correct number of duplicated data !
+			// (Example: x.id, x.att, z.other may be different if "z.other" is different iven if the x.id is the same.
+			col = String.format(fg.count_distinct, DEFAULT_TABLEALIAS + '.' + context.getEntityInfo().idCol);
 		} else {
 			col = fg.count;
 		}
