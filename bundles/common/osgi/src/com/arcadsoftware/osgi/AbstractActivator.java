@@ -1433,6 +1433,26 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 	}
 	
 	/**
+	 * Remove the corresponding configuration if it exists.
+	 * 
+	 * @param pid The bundle symbolic name of the configuration PID.
+	 */
+	public void removeConfiguration(final String pid) {
+		ConfigurationAdmin ca = getService(ConfigurationAdmin.class);
+		if (ca == null) {
+			return;
+		}
+		try {
+			Configuration c = ca.getConfiguration(pid, null);
+			if (c != null) {
+				c.delete();
+			}
+		} catch (IOException e) {
+			debug(e);
+		}
+	}
+	
+	/**
 	 * Resolve an internal URL from a Bundle (or even a local file system URL !) to an external file, on the local file system.
 	 * 
 	 * @param url
