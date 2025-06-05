@@ -661,11 +661,17 @@ public class MapperSQLService extends AbstractMapperService {
 					String.format(fg.datefunction, sdf.format(((BeforeCriteria) criteria).getCalendar().getTime()))));
 		} else if (criteria instanceof BetweenCriteria) {
 			result.append(fg.parin);
-			result.append(String.format(fg.greater, 
+			String op1 = fg.greater;
+			String op2 = fg.lower;
+			if (((BetweenCriteria) criteria).isIncludeLimits()) {
+				op1 = fg.greaterorequal;
+				op2 = fg.lowerorequal;
+			}
+			result.append(String.format(op1, 
 					colNames.get(((BetweenCriteria) criteria).getAttribute()),
 				String.format(fg.datefunction, sdf.format(((BetweenCriteria) criteria).getAfterCalendar().getTime()))));
 			result.append(fg.and);
-			result.append(String.format(fg.lower, 
+			result.append(String.format(op2, 
 					colNames.get(((BetweenCriteria) criteria).getAttribute()),
 					String.format(fg.datefunction, sdf.format(((BetweenCriteria) criteria).getBeforeCalendar().getTime()))));
 			result.append(fg.parout);
