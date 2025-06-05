@@ -182,7 +182,7 @@ public class RightsMapperService extends AbstractMapperService<CriteriaContextBa
 	}
 
 	@Override
-	public boolean linkTest(List<MetaDataLink> links, int sourceId, int destId, boolean ignoreSubdivision) {
+	public boolean linkTest(List<MetaDataLink> links, int sourceId, int destId, boolean deleted, boolean ignoreSubdivision) {
 		if ((links == null) || (links.size() != 1)) {
 			// TODO manage the completion of an external link (in a multi-link selection)...
 			return false;
@@ -206,7 +206,7 @@ public class RightsMapperService extends AbstractMapperService<CriteriaContextBa
 			}
 			MetaDataLink profileRights = p.getLink("rights"); //$NON-NLS-1$
 			if ("profiles".equals(link.getCode())) {
-				return p.getMapper().linkTest(list(profileRights), destId, sourceId, ignoreSubdivision);
+				return p.getMapper().linkTest(list(profileRights), destId, sourceId, deleted, ignoreSubdivision);
 			}
 			if ("users".equals(link.getCode())) {
 				MetaDataEntity u = MetaDataEntity.loadEntity("user"); //$NON-NLS-1$
@@ -214,7 +214,7 @@ public class RightsMapperService extends AbstractMapperService<CriteriaContextBa
 					return false;
 				}
 				MetaDataLink userProfiles = p.getLink("profiles"); //$NON-NLS-1$
-				return p.getMapper().linkTest(list(userProfiles, profileRights), destId, sourceId, ignoreSubdivision);
+				return p.getMapper().linkTest(list(userProfiles, profileRights), destId, sourceId, deleted, ignoreSubdivision);
 			}
 		}
 		return false;

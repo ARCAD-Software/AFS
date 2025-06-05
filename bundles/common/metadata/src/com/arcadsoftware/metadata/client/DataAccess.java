@@ -2157,7 +2157,7 @@ public class DataAccess {
 	 * @return True if the link exists.
 	 */
 	public boolean testLink(String type, int id, String linkCode, int subid) {
-		return testLink(type, id, linkCode, subid, false);
+		return testLink(type, id, linkCode, subid, false, false);
 	}
 
 	/**
@@ -2179,13 +2179,20 @@ public class DataAccess {
 	 *            If true only a direct is test. 
 	 * @return True if the link exists.
 	 */
-	public boolean testLink(String type, int id, String linkCode, int subid, boolean ignoseSubdivision) {
-		try {
-			if (ignoseSubdivision) {
-				wsa.get(PATH_DATA + type + '/' + id + '/' + linkCode + '/' + subid + "?norec=true", (Calendar) null);
+	public boolean testLink(String type, int id, String linkCode, int subid, boolean deleted, boolean ignoseSubdivision) {
+		StringBuilder path = new StringBuilder(PATH_DATA).append(type).append('/').append(id).append('/').append(linkCode).append('/').append(subid);
+		if (deleted) {
+			path.append("?deleted=true");
+		}
+		if (ignoseSubdivision) {
+			if (deleted) {
+				path.append("&norec=true");
 			} else {
-				wsa.get(PATH_DATA + type + '/' + id + '/' + linkCode + '/' + subid, (Calendar) null);
+				path.append("?norec=true");
 			}
+		}
+		try {
+			wsa.get(path.toString(), (Calendar) null);
 			return true;
 		} catch (ServerErrorException e) {
 			return false;

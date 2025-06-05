@@ -1085,10 +1085,11 @@ public class MetaDataItemResource extends DataItemResource {
 			return null;
 		}
 		final boolean ignoresubdivision = isParameter(form, "norec"); //$NON-NLS-1$
+		final boolean deleted = isParameter(form, "deleted"); //$NON-NLS-1$
 		boolean tested = false;
 		for (final BeanMap item : getItems()) {
 			for (final BeanMap linked : linkeds) {
-				if (getEntity().getMapper().linkTest(links, item.getId(), linked.getId(), ignoresubdivision)) {
+				if (getEntity().getMapper().linkTest(links, item.getId(), linked.getId(), deleted, ignoresubdivision)) {
 					tested = true;
 				}
 			}
