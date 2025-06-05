@@ -885,21 +885,26 @@ public class DataAccessServices implements IMapperService, IEntityRegistry {
 
 	@Override
 	public boolean linkTest(String sourceType, String linkCode, int sourceId, int destId) {
-		return dao.testLink(sourceType, sourceId, linkCode, destId, false);
+		return dao.testLink(sourceType, sourceId, linkCode, destId, false, false);
 	}
 
 	@Override
 	public boolean linkTest(MetaDataLink link, int sourceId, int destId) {
-		return dao.testLink(link.getParent().getType(), sourceId, link.getCode(), destId, false);
+		return dao.testLink(link.getParent().getType(), sourceId, link.getCode(), destId, false, false);
 	}
 
 	@Override
 	public boolean linkTest(MetaDataLink link, int sourceId, int destId, boolean ignoreSubdivision) {
-		return dao.testLink(link.getParent().getType(), sourceId, link.getCode(), destId, ignoreSubdivision);
+		return dao.testLink(link.getParent().getType(), sourceId, link.getCode(), destId, false, ignoreSubdivision);
 	}
 
 	@Override
-	public boolean linkTest(List<MetaDataLink> links, int sourceId, int destId, boolean ignoreSubdivision) {
+	public boolean linkTest(MetaDataLink link, int sourceId, int destId, boolean deleted, boolean ignoreSubdivision) {
+		return dao.testLink(link.getParent().getType(), sourceId, link.getCode(), destId, deleted, ignoreSubdivision);
+	}
+
+	@Override
+	public boolean linkTest(List<MetaDataLink> links, int sourceId, int destId, boolean deleted, boolean ignoreSubdivision) {
 		if (links == null) {
 			return false;
 		}
@@ -916,7 +921,12 @@ public class DataAccessServices implements IMapperService, IEntityRegistry {
 		if ((type == null) || linkCode.isEmpty()) {
 			return false;
 		}
-		return dao.testLink(type, sourceId, linkCode.toString(), destId, ignoreSubdivision);
+		return dao.testLink(type, sourceId, linkCode.toString(), destId, deleted, ignoreSubdivision);
+	}
+
+	@Override
+	public boolean linkTest(List<MetaDataLink> links, int sourceId, int destId, boolean ignoreSubdivision) {
+		return linkTest(links, sourceId, destId, false, ignoreSubdivision);
 	}
 	
 	@Override
