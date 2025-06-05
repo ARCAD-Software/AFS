@@ -1101,7 +1101,17 @@ public abstract class AbstractMapperService<T extends ICriteriaContext> implemen
 	}
 
 	@Override
-	public boolean linkTest(MetaDataLink link, int sourceId, int destId, boolean ignoreSubdivision) {
+	public final boolean linkTest(MetaDataLink link, int sourceId, int destId, boolean ignoreSubdivision) {
+		return linkTest(link, sourceId, destId, false, ignoreSubdivision);
+	}
+
+	@Override
+	public final boolean linkTest(List<MetaDataLink> links, int sourceId, int destId, boolean ignoreSubdivision) {
+		return linkTest(links, sourceId, destId, false, ignoreSubdivision);
+	}
+
+	@Override
+	public final boolean linkTest(MetaDataLink link, int sourceId, int destId, boolean deleted, boolean ignoreSubdivision) {
 		if (link == null) {
 			return false;
 		}
@@ -1118,7 +1128,7 @@ public abstract class AbstractMapperService<T extends ICriteriaContext> implemen
 			}
 			return e.getMapper().test(e, destId, new EqualCriteria(att.getCode(), sourceId), null);
 		}
-		return linkTest(link.getLinkChain(), sourceId, destId, ignoreSubdivision);
+		return linkTest(link.getLinkChain(), sourceId, destId, deleted, ignoreSubdivision);
 	}
 
 	@Override
