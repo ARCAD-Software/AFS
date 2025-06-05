@@ -327,6 +327,7 @@ public class BetweenCriteria extends AbstractSearchCriteria implements Cloneable
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder(attribute);
+		sb.append(' ');
 		if (includeLimits) {
 			sb.append(Messages.Criteria_BetweenEx);
 		} else {
