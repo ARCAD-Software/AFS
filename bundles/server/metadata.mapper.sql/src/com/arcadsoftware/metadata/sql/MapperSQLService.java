@@ -1229,7 +1229,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 
 
 	@Override
-	public boolean linkTest(List<MetaDataLink> links, int sourceId, int destId, boolean ignoreSubdivision) {
+	public boolean linkTest(List<MetaDataLink> links, int sourceId, int destId, boolean deleted, boolean ignoreSubdivision) {
 		// This method (and all "link tests") assume that soft-deleted items are not linked.
 		if ((links == null) || links.isEmpty()) {
 			return false;
@@ -1238,10 +1238,10 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		if (ei == null) {
 			return false;
 		}
-		final String mlqc = MultiLinkQuery.getCode(links, false, ignoreSubdivision);
+		final String mlqc = MultiLinkQuery.getCode(links, deleted, ignoreSubdivision);
 		MultiLinkQuery mlq = ei.sql_links.get(mlqc);
 		if (mlq == null) {
-			mlq = MultiLinkQuery.generate(this, links, false, ignoreSubdivision);
+			mlq = MultiLinkQuery.generate(this, links, deleted, ignoreSubdivision);
 			if (mlq == null) {
 				return false;
 			}
@@ -1250,7 +1250,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		final StringBuilder joins = new StringBuilder(mlq.join);
 		// Take into account soft deletion of the target entity... only if this entity depends on this mapper.
 		ei = getEntityInfo(links.get(links.size() - 1).getRefEntity());
-		if ((ei != null) && (ei.deleteCol != null)) {
+		if ((ei != null) && (ei.deleteCol != null) && !deleted) {
 			joins.append(String.format(fg.join_inner, ei.table, DEFAULT_TABLEALIAS, ei.idCol, mlq.linkAlias + '.' + mlq.linkCol));
 			joins.append(fg.and);
 			joins.append(DEFAULT_TABLEALIAS);
@@ -1267,8 +1267,10 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		where.append('.');
 		where.append(mlq.linkCol);
 		where.append(fg.paramequal);
-		final StringBuilder query = new StringBuilder(); 
+		final StringBuilder query = new StringBuilder();
+		// If there is a reacursion then initialize the query with it.
 		if (mlq.rec_alias != null) {
+			query.append(fg.rec_first);
 			query.append(mlq.rec_query);
 		}
 		query.append(String.format(fg.select, fg.count, joins.toString(), where.toString()));

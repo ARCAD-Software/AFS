@@ -1115,7 +1115,8 @@ public class MetaDataItemResource extends DataItemResource {
 		boolean added = false;
 		for (final BeanMap item : getItems()) {
 			for (final BeanMap linked : linkeds) {
-				if (getEntity().getMapper().linkTest(link, item.getId(), linked.getId())) {
+				// Check if a direct link exists (ignore subdivisions).
+				if (getEntity().getMapper().linkTest(link, item.getId(), linked.getId(), true)) {
 					// If the data are already linked we ignore this operation, but we return an "Ok" message.
 					Activator.getInstance().debug(Messages.Link_Exists + link.getParent().getType() + //
 							'.' + link.getCode() + " [" + item.getId() + " -> " + linked.getId() + ']'); //$NON-NLS-1$ //$NON-NLS-2$

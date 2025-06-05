@@ -1772,12 +1772,64 @@ public interface IMapperService {
 	 * The link can be either as association (n-to-m relation) or a reversed reference (n-to-1 relation).
 	 * 
 	 * @param links
+	 *            The chain of links to test.
 	 * @param sourceId
+	 *            the item id origin of the link.
 	 * @param destId
+	 *            the item id target of the link.
 	 * @param ignoreSubdivision
-	 * @return
+	 *            If false and if the link parent entity possess a recursive link then all the elements linked to 
+	 *            the sourceId plus all elements linked to any other source item linked, recursivelly to the
+	 *            sourceID one, will be tested.
+	 * @return true if the link exists.
 	 */
 	public boolean linkTest(List<MetaDataLink> links, int sourceId, int destId, boolean ignoreSubdivision);
+
+	/**
+	 * Test if two item are linked with each other.
+	 * 
+	 * <p>
+	 * The link can be either as association (n-to-m relation) or a reversed reference (n-to-1 relation).
+	 * 
+	 * @param link
+	 *            The link metadata definition.
+	 * @param sourceId
+	 *            the item id origin of the link.
+	 * @param destId
+	 *            the item id target of the link.
+	 * @param deleted
+	 *            True if the selected items can be deleted. If False, then only not deleted items will be listed.
+	 * @param ignoreSubdivision
+	 *            If false and if the link parent entity possess a recursive link then all the elements linked to 
+	 *            the sourceId plus all elements linked to any other source item linked, recursivelly to the
+	 *            sourceID one, will be tested.
+	 * @return true if the link exists.
+	 */
+	public boolean linkTest(MetaDataLink link, int sourceId, int destId, boolean deleted, boolean ignoreSubdivision);
+
+
+	/**
+	 * Perform a link test across a chain of multiple links.
+	 * 
+	 * <p>
+	 * The link can be either as association (n-to-m relation) or a reversed reference (n-to-1 relation).
+	 * 
+	 * @param links
+	 *            The chain of links to test.
+	 * @param sourceId
+	 *            the item id origin of the link.
+	 * @param destId
+	 *            the item id target of the link.
+	 * @param deleted
+	 *            True if the selected items can be deleted. If False, then only not deleted items will be listed.
+	 * @param ignoreSubdivision
+	 *            If false and if the link parent entity possess a recursive link then all the elements linked to 
+	 *            the sourceId plus all elements linked to any other source item linked, recursivelly to the
+	 *            sourceID one, will be tested.
+	 * @return true if the link exists.
+	 * @return
+	 */
+	public boolean linkTest(List<MetaDataLink> links, int sourceId, int destId, boolean deleted, boolean ignoreSubdivision);
 
 	/**
 	 * Remove a link between two items. A link is an oriented relation that have an origin and a target. Some link can
