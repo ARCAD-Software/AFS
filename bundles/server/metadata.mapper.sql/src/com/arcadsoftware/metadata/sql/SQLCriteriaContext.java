@@ -634,11 +634,17 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 					String.format(mapper.fg.datefunction, mapper.sdf.format(((BeforeCriteria) criteria).getCalendar().getTime()))));
 		} else if (criteria instanceof BetweenCriteria) {
 			result.append(mapper.fg.parin);
-			result.append(String.format(mapper.fg.greater, 
+			String op1 = mapper.fg.greater;
+			String op2 = mapper.fg.lower;
+			if (((BetweenCriteria) criteria).isIncludeLimits()) {
+				op1 = mapper.fg.greaterorequal;
+				op2 = mapper.fg.lowerorequal;
+			}
+			result.append(String.format(op1, 
 					colNames.get(((BetweenCriteria) criteria).getAttribute()),
 				String.format(mapper.fg.datefunction, mapper.sdf.format(((BetweenCriteria) criteria).getAfterCalendar().getTime()))));
 			result.append(mapper.fg.and);
-			result.append(String.format(mapper.fg.lower, 
+			result.append(String.format(op2, 
 					colNames.get(((BetweenCriteria) criteria).getAttribute()),
 					String.format(mapper.fg.datefunction, mapper.sdf.format(((BetweenCriteria) criteria).getBeforeCalendar().getTime()))));
 			result.append(mapper.fg.parout);
