@@ -111,7 +111,6 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 			Properties props = new Properties();
 			// Start the database server...
 			ArrayList<String> params = new ArrayList<String>();
-			int port = DEFAULT_PORT;
 			if (isTrue(properties.get(PROP_DISTANT))) {
 				params.add("-tcpAllowOthers"); //$NON-NLS-1$
 				//params.add("true"); //$NON-NLS-1$
@@ -138,23 +137,23 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 			} else {
 				props.put(PROP_CREATE, true);
 			}
+			int port = DEFAULT_PORT;
 			if (properties.get(PROP_PORT) != null) {
 				if (properties.get(PROP_PORT) instanceof Integer) {
 					port = (Integer)properties.get(PROP_PORT);
 				} else if (properties.get(PROP_PORT) instanceof String) {
 					try {
-						port = Integer.parseInt((String)properties.get(PROP_PORT));
+						port = Integer.parseInt((String) properties.get(PROP_PORT));
 					} catch (NumberFormatException e) {
-						port = 0;
+						port = DEFAULT_PORT;
 					}
 				}
 				if (port < 256) {
 					port = DEFAULT_PORT;
-				} else {
-					params.add("-tcpPort"); //$NON-NLS-1$
-					params.add(String.valueOf(port));
 				}
 			}
+			params.add("-tcpPort"); //$NON-NLS-1$
+			params.add(String.valueOf(port));
 			props.put(PROP_PORT, port);
 			props.put(PROP_EVENT_URL, "jdbc:h2:tcp://localhost:"+port+'/'); //$NON-NLS-1$
 			synchronized (this) {
