@@ -32,27 +32,27 @@
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcjmail-jdk18on</artifactId>
-			<version>1.80</version>
+			<version>1.81</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcpkix-jdk18on</artifactId>
-			<version>1.80</version>
+			<version>1.81</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcprov-jdk18on</artifactId>
-			<version>1.80</version>
+			<version>1.81</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcutil-jdk18on</artifactId>
-			<version>1.80</version>
+			<version>1.81</version>
 		</dependency>
 		<dependency> <!-- Not distributed: only here because required by Eclipse P2 (for RCP) -->
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcpg-jdk18on</artifactId>
-			<version>1.80</version>
+			<version>1.81</version>
 		</dependency>
 		
 		<!-- XML SEC -->
