@@ -29,6 +29,8 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import com.arcadsoftware.osgi.internal.Messages;
+
 /**
  * FileSystemTracker check an associated external directory to track files change (addition, deletion and modifications). 
  * 
@@ -69,8 +71,8 @@ public class FileSystemTracker extends TimerTask {
 		@Override
 		public boolean equals(Object value) {
 			return (value instanceof FileMark) && //
-				(((FileMark)value).len == len) && // possibilité de prendre en compte une approximation
-				(((FileMark)value).date == date);
+				(((FileMark) value).len == len) && // possibilité de prendre en compte une approximation
+				(((FileMark) value).date == date);
 		}
 		
 		public Date getDate() {
@@ -82,13 +84,13 @@ public class FileSystemTracker extends TimerTask {
 		}
 	}
 	
-	private AbstractActivator activator;
+	private final AbstractActivator activator;
+	private final IFileSystemTrackerCallBack callbacks;
 	private File baseDir;
 	private String extension;
 	private int delay;
 	private Timer timer;
 	private HashMap<String,FileMark> fileMap;
-	private IFileSystemTrackerCallBack callbacks;
 	
 	/**
 	 * Create a File system change tracker.
@@ -101,6 +103,7 @@ public class FileSystemTracker extends TimerTask {
 	public FileSystemTracker(AbstractActivator activator) {
 		super();
 		this.activator = activator;
+		callbacks = null;
 		fileMap = new HashMap<String, FileMark>();
 	}
 	
@@ -116,7 +119,8 @@ public class FileSystemTracker extends TimerTask {
 	 * @param callbacks the callback object associated to events, can be null if you override the corresponding methods.
 	 */
 	public FileSystemTracker(AbstractActivator activator, File baseDir, String extension, int delay, IFileSystemTrackerCallBack callbacks) {
-		this(activator);
+		super();
+		this.activator = activator;
 		this.extension = extension;
 		this.baseDir = baseDir;
 		this.callbacks = callbacks;
@@ -136,7 +140,8 @@ public class FileSystemTracker extends TimerTask {
 	 * @param callbacks the callback object associated to events, can be null if you override the corresponding methods.
 	 */
 	public FileSystemTracker(AbstractActivator activator, String baseDir, String extension, int delay, IFileSystemTrackerCallBack callbacks) {
-		this(activator);
+		super();
+		this.activator = activator;
 		this.extension = extension;
 		if ((baseDir != null) && (baseDir.length() > 0)) {
 			this.baseDir = new File(baseDir);
@@ -220,7 +225,6 @@ public class FileSystemTracker extends TimerTask {
 		} else {
 			properties.put(prefix + PROP_EXTENSION, extension);
 		}
-		
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		try {
 			ObjectOutputStream oos = new ObjectOutputStream(bos);
@@ -296,13 +300,13 @@ public class FileSystemTracker extends TimerTask {
 
 	@Override
 	public void run() {
-		//activator.debug(Messages.getString("osgi.FSStarting")); //$NON-NLS-1$
-		HashMap<String, FileMark> current = new HashMap<String, FileMark>(fileMap);
+		activator.debug(Messages.getString("osgi.FSStarting")); //$NON-NLS-1$
+		HashMap<String, FileMark> current = new HashMap<>(fileMap);
 		if (baseDir != null) {
-			checkDirectory(baseDir,"",current); //$NON-NLS-1$
+			checkDirectory(baseDir, "", current); //$NON-NLS-1$
 		}
 		// Process to deletions.
-		for(String name:current.keySet()) {
+		for (String name: current.keySet()) {
 			removeFile(name, new File(name));
 			fileMap.remove(name);
 		}
@@ -310,7 +314,7 @@ public class FileSystemTracker extends TimerTask {
 
 	private void checkDirectory(File dir, String baseDirName, HashMap<String, FileMark> current) {
 		if (dir.isDirectory()) {
-			for(String name: dir.list()) {
+			for (String name: dir.list()) {
 				File file = new File(dir,name);
 				String localName = baseDirName + name;
 				if (file.isDirectory()) {

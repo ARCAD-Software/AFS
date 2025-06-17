@@ -261,6 +261,8 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 				int delay = parseIntegerParameter(properties.get(PROP_ADMINLOCK), 0);
 				if (delay > 0) {
 					unlockDelay = delay * 60000l;
+				} else {
+					unlockDelay = 60000l;
 				}
 				// Try to unlock all admin account right now...
 				try {
