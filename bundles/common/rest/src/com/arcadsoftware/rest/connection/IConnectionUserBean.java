@@ -190,7 +190,7 @@ public interface IConnectionUserBean {
 	public String getLogin();
 	
 	/**
-	 * Get the suer Data Entity Type used to store the user information into the database.  
+	 * Get the user Data Entity Type used to store the user information into the database.  
 	 * @return The user entity Type.
 	 */
 	public String getUserType();

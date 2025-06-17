@@ -16,6 +16,7 @@ package com.arcadsoftware.osgi;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -217,7 +218,7 @@ public abstract class AbstractFileRepositoryActivator extends AbstractConfigured
 	 * @return null if the file does not exist into the internal repository.
 	 */
 	public File getInternalFile(String filekey, String langcode, Calendar fileLastModification) {
-		return getInternalFile(getFileName(filekey, langcode),fileLastModification);
+		return getInternalFile(getFileName(filekey, langcode), fileLastModification);
 	}
 	
 	/**
@@ -231,7 +232,7 @@ public abstract class AbstractFileRepositoryActivator extends AbstractConfigured
 		if (internalDir == null) {
 			return null;
 		}
-		return getbundleFile(getContext().getBundle(), internalDir + filename, fileLastModification);
+		return getBundleFile(getContext().getBundle(), internalDir + filename, fileLastModification);
 	}
 
 	/**
@@ -242,7 +243,7 @@ public abstract class AbstractFileRepositoryActivator extends AbstractConfigured
 	 * @param fileLastModification
 	 * @return
 	 */
-	protected File getbundleFile(Bundle bundle, String filepath, Calendar fileLastModification) {
+	protected File getBundleFile(Bundle bundle, String filepath, Calendar fileLastModification) {
 		// Extract the resource from the bundle jar:
 		URL url = bundle.getEntry(filepath);
 		if (url == null) {
@@ -405,8 +406,8 @@ public abstract class AbstractFileRepositoryActivator extends AbstractConfigured
 			foldername = "/" + foldername; //$NON-NLS-1$
 		}
 		ArrayList<String> files = new ArrayList<String>();
-		filesInternal(foldername,useExtension,recurse,files);
-		filesExternal(foldername,useExtension,recurse,files);
+		filesInternal(foldername, useExtension, recurse, files);
+		filesExternal(foldername, useExtension, recurse, files);
 		return files.toArray(new String[files.size()]);
 	}
 	
@@ -414,16 +415,17 @@ public abstract class AbstractFileRepositoryActivator extends AbstractConfigured
 		File folder = getExternalFile(foldername);
 		String[] extfiles = folder.list();
 		if (extfiles != null) {
+			String fileExtension = getFileExtension();
 			for (String name:extfiles) {
 				File file = new File(folder.getAbsolutePath() + '/' + name);
 				if (file.isFile()) {
-					if (!useExtension) {
+					if (!useExtension || (fileExtension == null)) {
 						name = foldername + name;
 						if (!files.contains(name)) {
 							files.add(name);
 						}
-					} else if (name.endsWith(getFileExtension())) {
-						name = foldername + name.substring(0, name.length() - getFileExtension().length());
+					} else if (name.endsWith(fileExtension)) {
+						name = foldername + name.substring(0, name.length() - fileExtension.length());
 						if (!files.contains(name)) {
 							files.add(name);
 						}
@@ -442,11 +444,11 @@ public abstract class AbstractFileRepositoryActivator extends AbstractConfigured
 	/**
 	 * Add the files from the given bundle to the list of files.
 	 * 
-	 * @param bundle
-	 * @param foldername
-	 * @param useExtension
-	 * @param recurse
-	 * @param files
+	 * @param bundle The source bundle.
+	 * @param foldername The sub-folder, under the "internalDir", may be null. 
+	 * @param useExtension If true only the file with the correct extension will be added.
+	 * @param recurse If true sub-folders files will be added too.
+	 * @param files the resulting list of file names.
 	 */
 	protected void addBundleFiles(Bundle bundle, String foldername, boolean useExtension, boolean recurse, ArrayList<String> files) {
 		if (internalDir == null) {
@@ -470,7 +472,12 @@ public abstract class AbstractFileRepositoryActivator extends AbstractConfigured
 		if (e == null) {
 			return;
 		}
-		String lcest = getFileExtension().toLowerCase();
+		String lcest = getFileExtension();
+		if (lcest == null) {
+			lcest = ""; //$NON-NLS-1$
+		} else {
+			lcest = lcest.toLowerCase();
+		}
 		while (e.hasMoreElements()) {
 			File file = getInternalFile(e.nextElement());
 			if (file.isFile()) {
@@ -481,7 +488,7 @@ public abstract class AbstractFileRepositoryActivator extends AbstractConfigured
 					}
 				} else if (name.toLowerCase().endsWith(lcest)) {
 					if (!files.contains(name)) {
-						files.add(foldername + name.substring(0, name.length() - getFileExtension().length()));
+						files.add(foldername + name.substring(0, name.length() - lcest.length()));
 					}
 				}
 			} else if (file.isDirectory() && recurse) {
@@ -490,6 +497,55 @@ public abstract class AbstractFileRepositoryActivator extends AbstractConfigured
 		}
 	}
 
+	/**
+	 * Copy an internal file to the corresponding external place.
+	 * 
+	 * @param filename
+	 * @param override If true and an external file already exists it will be overridden by the internal copy.
+	 * @return true if the file exists and has been copied.
+	 */
+	public boolean externalizeFile(String filename, boolean override) {
+		File intFile = getInternalFile(filename);
+		if (!intFile.isFile()) {
+			return false;
+		}
+		File extFile = getExternalFile(filename);
+		if (extFile.isFile()) {
+			if (!override) {
+				return false;
+			}
+			if (!extFile.delete()) {
+				debug("Unable to replace the external file (unable to delete it): " + extFile.getAbsolutePath());
+				return false;
+			}
+		}
+		try {
+			Files.copy(intFile.toPath(), extFile.toPath());
+			return true;
+		} catch (IOException e) {
+			warn("Unable to externalize the file: " + intFile.getAbsolutePath(), e);
+			return false;
+		}
+	}
+
+	/**
+	 * Copy all internal files to the corresponding external place.
+	 * 
+	 * @param useExtension if true only file with the declared extension will be copied.
+	 * @param override If true and an external file already exists it will be overridden by the internal copy.
+	 */
+	public int externalizeAllFiles(boolean useExtension, boolean override) {
+		int result = 0;
+		final ArrayList<String> files = new ArrayList<String>();
+		filesInternal(null, useExtension, true, files);
+		for (String filename: files) {
+			if (externalizeFile(filename, override)) {
+				result++;
+			}
+		}
+		return result;
+	}
+	
 	/**
 	 * Extender must provide the default directory name.
 	 * This directory can also be an bundle internal directory so that the default

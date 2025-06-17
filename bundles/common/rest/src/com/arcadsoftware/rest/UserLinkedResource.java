@@ -18,6 +18,7 @@ import org.osgi.framework.ServiceReference;
 import org.restlet.data.Parameter;
 import org.restlet.resource.ResourceException;
 
+import com.arcadsoftware.rest.connection.IConnectionCredential;
 import com.arcadsoftware.rest.connection.IConnectionUserBean;
 import com.arcadsoftware.rest.connection.IConnectionUserRepository;
 

@@ -134,7 +134,7 @@ public class Activator extends AbstractFileRepositoryActivator {
 						folder = folder.substring(0, folder.length() - 1);
 					}
 				}
-				result = getbundleFile(b, folder + filename, fileLastModification);
+				result = getBundleFile(b, folder + filename, fileLastModification);
 				if (result != null) {
 					return result;
 				}
