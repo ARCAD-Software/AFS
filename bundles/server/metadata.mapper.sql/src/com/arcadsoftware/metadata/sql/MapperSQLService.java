@@ -206,7 +206,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 									try {
 										value = Integer.valueOf(value.toString().trim());
 									} catch (Exception ee) {
-										Activator.getInstance().error("The attribute " + att.getParent() + "." + att.getCode() + " value can not be converted to Integer: \"" + value + '"');
+										Activator.getInstance().error(Messages.MapperSQLService_Attribute + att.getParent() + '.' + att.getCode() + Messages.MapperSQLService_ConvertToInteger + value + '"');
 									}
 								}
 							} else if (MetaDataAttribute.TYPE_EMAIL.equalsIgnoreCase(att.getType()) || //
@@ -238,13 +238,13 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 										try {
 											value = new Timestamp(ISODateFormater.toDate(s).getTime());
 										} catch (ParseException ee) {
-											Activator.getInstance().error("The attribute " + att.getParent() + "." + att.getCode() + " value can not be converted to TimeStamp: \"" + s + '"');
+											Activator.getInstance().error(Messages.MapperSQLService_Attribute + att.getParent() + '.' + att.getCode() + Messages.MapperSQLService_ConvertToTimeStamp + s + '"');
 										}
 									} else {
 										try {
 											value = new Timestamp(sdf.parse(s).getTime());
 										} catch (ParseException ee) {
-											Activator.getInstance().error("The attribute " + att.getParent() + "." + att.getCode() + " value can not be converted to TimeStamp: \"" + s + '"');
+											Activator.getInstance().error(Messages.MapperSQLService_Attribute + att.getParent() + '.' + att.getCode() + Messages.MapperSQLService_ConvertToTimeStamp + s + '"');
 										}
 									}
 								}
@@ -253,7 +253,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 									try {
 										value = Float.valueOf(value.toString().trim());
 									} catch (Exception ee) {
-										Activator.getInstance().error("The attribute " + att.getParent() + "." + att.getCode() + " value can not be converted to Float: \"" + value + '"');
+										Activator.getInstance().error(Messages.MapperSQLService_Attribute + att.getParent() + '.' + att.getCode() + Messages.MapperSQLService_ConvertToFloat + value + '"');
 									}
 								}
 							} else if (MetaDataAttribute.TYPE_LONG.equalsIgnoreCase(att.getType())) {
@@ -261,7 +261,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 									try {
 										value = Long.valueOf(value.toString().trim());
 									} catch (Exception ee) {
-										Activator.getInstance().error("The attribute " + att.getParent() + "." + att.getCode() + " value can not be converted to Long: \"" + value + '"');
+										Activator.getInstance().error(Messages.MapperSQLService_Attribute + att.getParent() + '.' + att.getCode() + Messages.MapperSQLService_ConvertToLong + value + '"');
 									}
 								}
 							} else if (MetaDataAttribute.TYPE_BIGINTEGER.equalsIgnoreCase(att.getType())) {
@@ -269,7 +269,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 									try {
 										value = new BigInteger(value.toString().trim());
 									} catch (Exception ee) {
-										Activator.getInstance().error("The attribute " + att.getParent() + "." + att.getCode() + " value can not be converted to BigInteger: \"" + value + '"');
+										Activator.getInstance().error(Messages.MapperSQLService_Attribute + att.getParent() + '.' + att.getCode() + Messages.MapperSQLService_ConvertToBigInteger + value + '"');
 									}
 								}
 							}
@@ -400,7 +400,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		} catch (SQLException e) {
 			Activator.getInstance().error(Messages.MapperSQLService_Error_Update + e.getLocalizedMessage(), e);
 			Activator.getInstance().debug(String.format(Messages.MapperSQLService_SQLError, query, arrayToString(values)));
-			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, Messages.MapperSQLService_Error_Update + e.getLocalizedMessage(), e);
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, Messages.MapperSQLService_Error_Update + Messages.MapperSQLService_InternalSQLError);
 		} finally {
 			Activator.getInstance().trace(query, t);
 		} 
@@ -421,7 +421,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		} catch (SQLException e) {
 			Activator.getInstance().error(Messages.MapperSQLService_Error_Insert + e.getLocalizedMessage(), e);
 			Activator.getInstance().debug(String.format(Messages.MapperSQLService_SQLError, query, arrayToString(values)));
-			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, Messages.MapperSQLService_Error_Insert + e.getLocalizedMessage(), e);
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, Messages.MapperSQLService_Error_Insert + Messages.MapperSQLService_InternalSQLError);
 		} finally {
 			Activator.getInstance().trace(query, t);
 		} 
@@ -455,7 +455,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		} catch (SQLException e) {
 			Activator.getInstance().error(Messages.MapperSQLService_Error_Count + e.getLocalizedMessage(), e);
 			Activator.getInstance().debug(String.format(Messages.MapperSQLService_SQLError, query, arrayToString(values)));
-			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, Messages.MapperSQLService_Error_Count + e.getLocalizedMessage(), e);
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, Messages.MapperSQLService_Error_Count + Messages.MapperSQLService_InternalSQLError);
 		} finally {
 			Activator.getInstance().trace(query, t);
 		} 
@@ -476,7 +476,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		} catch (SQLException e) {
 			Activator.getInstance().error(Messages.MapperSQLService_ItemSelection + e.getLocalizedMessage(), e);
 			Activator.getInstance().debug(String.format(Messages.MapperSQLService_SQLError, query, arrayToString(values)));
-			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, Messages.MapperSQLService_Error_ItemSelection + e.getLocalizedMessage(), e);
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, Messages.MapperSQLService_Error_ItemSelection + Messages.MapperSQLService_InternalSQLError);
 		} finally {
 			Activator.getInstance().trace(query, t);
 		}
@@ -503,7 +503,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		} catch (SQLException e) {
 			Activator.getInstance().error(Messages.MapperSQLService_Error_Selection + e.getLocalizedMessage(), e);
 			Activator.getInstance().debug(String.format(Messages.MapperSQLService_SQLError, query, arrayToString(values)));
-			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, Messages.MapperSQLService_Error_Selection + e.getLocalizedMessage(), e);
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, Messages.MapperSQLService_Error_Selection + Messages.MapperSQLService_InternalSQLError);
 		} finally {
 			Activator.getInstance().trace(query, t);
 		}
@@ -525,7 +525,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		} catch (SQLException e) {
 			Activator.getInstance().error(Messages.MapperSQLService_Error_Selection + e.getLocalizedMessage(), e);
 			Activator.getInstance().debug(String.format(Messages.MapperSQLService_SQLError, query, arrayToString(values)));
-			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, Messages.MapperSQLService_Error_Count + e.getLocalizedMessage(), e);
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, Messages.MapperSQLService_Error_Count + Messages.MapperSQLService_InternalSQLError);
 		} finally {
 			Activator.getInstance().trace(query, t);
 		}
@@ -1358,7 +1358,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 					return new Date(date.getTime());
 				}
 			} catch (SQLException e1) {
-				Activator.getInstance().error("Error while getting the last date of modification of entity " + entity.getType() + "." + e1.getLocalizedMessage(), e1);
+				Activator.getInstance().error(Messages.MapperSQLService_ErrorGetLastDateOfModification + entity.getType() + '.' + e1.getLocalizedMessage(), e1);
 			}
 		}
 		return entity.getDate();
