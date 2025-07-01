@@ -33,10 +33,10 @@ import com.arcadsoftware.osgi.ILoggedPlugin;
  */
 public class H2ConnectionWarper implements DataSource {
 
-	private ILoggedPlugin activator;
-	private String url;
-	private String login;
-	private char[] pwd;
+	private final ILoggedPlugin activator;
+	private final String url;
+	private final String login;
+	private final String pwd;
 	private PrintWriter logWriter;
 	private int timeout = 30;
 	
@@ -51,7 +51,7 @@ public class H2ConnectionWarper implements DataSource {
 		super();
 		this.activator = activator;
 		this.login = login;
-		this.pwd = pwd;
+		this.pwd = new String(pwd);
 		this.url = url;
 	}
 
@@ -61,7 +61,7 @@ public class H2ConnectionWarper implements DataSource {
 	public Connection getConnection() throws SQLException {
 		try {
 			Driver.load();
-		    return DriverManager.getConnection(url, login, new String(pwd));
+		    return DriverManager.getConnection(url, login, pwd);
 		} catch (SQLException e) {
 			activator.error(e.getLocalizedMessage(), e);
 		}
