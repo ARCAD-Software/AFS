@@ -631,12 +631,31 @@ public final class Crypto {
 	}
 	
 	/**
+	 * Encrypt the given binary data using the default Master Key.
+	 * 
+	 * @param bytes
+	 * @return null if there is a problem in the configuration of the Cryptographic properties.
+	 * @throws EncryptionError
+	 * @see #encrypt(String, char[], int)
+	 * @see #decrypt(String)
+	 */
+	public static String encrypt(byte[] bytes) {
+		try {
+			return encrypt(bytes, DEFAULTMASTERK, ENCRYPT_ALGORITHM);
+		} catch (IllegalStateException | InvalidKeyException | NoSuchAlgorithmException | InvalidAlgorithmParameterException
+				| IllegalBlockSizeException | InvalidKeySpecException e) {
+			throw new EncryptionError(e);
+		}
+	}
+	
+	/**
 	 * Encrypt the given text using the default Master Key.
 	 * 
 	 * @param text
 	 * @return null if there is a problem in the configuration of the Cryptographic properties.
-	 * @see #encrypt(String, char[], int)
 	 * @throws EncryptionError
+	 * @see #encrypt(byte[], char[], int)
+	 * @see #decryptBytes(String)
 	 */
 	public static String encrypt(char[] text) {
 		try {
@@ -664,8 +683,36 @@ public final class Crypto {
 	 * @throws InvalidAlgorithmParameterException
 	 * @throws IllegalBlockSizeException
 	 * @throws InvalidKeySpecException
+	 * @see #decrypt(String, char[])
 	 */
 	public static String encrypt(char[] text, char[] masterkey, int algorithm) throws NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, InvalidKeySpecException {
+		byte[] b = getBytes(text);
+		try {
+			return encrypt(b, masterkey, algorithm);
+		} finally {
+			clear(b);
+		}
+	}	
+	/**
+	 * Encrypt the given text, using the masterKey password. This method use salt and IV when possible.
+	 * 
+	 * <p>
+	 * The different currently implemented algorithms are :
+	 * <ol>
+	 * <li> AES-256 with CTR mode.
+	 * </ol>
+	 * @param bytes the clear binary data to encrypt, the caller is responsible to delete this information after encryption.
+	 * @param masterkey The master key in clear text, the caller is responsible to delete this information after encryption.
+	 * @param algorithm The algorithm version number to use, currently support only version 1 or 2, version 1 is not secured.
+	 * @return a non null Base64 encrypted buffer.
+	 * @throws NoSuchAlgorithmException
+	 * @throws InvalidKeyException
+	 * @throws InvalidAlgorithmParameterException
+	 * @throws IllegalBlockSizeException
+	 * @throws InvalidKeySpecException
+	 * @see #decryptBytes(String, char[])
+	 */
+	public static String encrypt(byte[] bytes, char[] masterkey, int algorithm) throws NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, InvalidKeySpecException {
         byte[] salt = new byte[SALTMINSIZE + SECURERANDOM.nextInt(SALTVARIATION)];
         SECURERANDOM.nextBytes(salt);
 		byte[] iv = new byte[16];
@@ -726,9 +773,8 @@ public final class Crypto {
 				throw new NoSuchAlgorithmException(String.format("The given Algorithn index reference (%d) is incorrect.", algorithm));
 			}
 			cipher.init(Cipher.ENCRYPT_MODE, secret, new IvParameterSpec(iv), SECURERANDOM);
-			byte[] b = getBytes(text);
 			try {
-				byte[] c = cipher.doFinal(b);
+				byte[] c = cipher.doFinal(bytes);
 				byte[] result = new byte[c.length + 16 + salt.length + iv.length];
 		        setIntByte(result, 0, algorithm);
 		        if (algorithm >= 2) {
@@ -745,7 +791,6 @@ public final class Crypto {
 		        System.arraycopy(salt, 0, result, 16 + iv.length + c.length, salt.length);
 				return Base64.getEncoder().encodeToString(result);
 			} finally {
-				clear(b);
 				clear(salt);
 				clear(iv);
 			}
@@ -799,6 +844,59 @@ public final class Crypto {
 		if (isFoggedString(text)) {
 			return unFog(text);
 		}
+		byte[] b = decryptImpl(text, masterkey);
+		try {
+			return getChars(b, StandardCharsets.UTF_8, 0);
+		} finally {
+			clear(b);
+		}
+	}
+
+	/**
+	 * Decrypt an encrypted text using the default master key.
+	 * 
+	 * @param text
+	 * @return null if the original test is not an encrypted byte array.
+	 * @see #encrypt(byte[])
+	 */
+	public static byte[] decryptBytes(String text) {
+		try {
+			return decryptBytes(text, DEFAULTMASTERK);
+		} catch (InvalidKeyException | NoSuchAlgorithmException | IllegalBlockSizeException | InvalidKeySpecException
+				| InvalidAlgorithmParameterException e) {
+			// the message was a clear text message (or is corrupted) !
+			return null;
+		}
+	}
+	
+	/**
+	 * Decrypt an encrypted binary data using the given key.
+	 * 
+	 * @param text
+	 * @param masterkey
+	 * @return
+	 * @throws NoSuchAlgorithmException 
+	 * @throws BadPaddingException 
+	 * @throws IllegalBlockSizeException 
+	 * @throws InvalidAlgorithmParameterException 
+	 * @throws InvalidKeyException 
+	 * @throws  
+	 * @see #encrypt(byte[], char[], int)
+	 */
+	public static byte[] decryptBytes(String text, char[] masterkey) throws NoSuchAlgorithmException, IllegalBlockSizeException, InvalidKeySpecException, InvalidKeyException, InvalidAlgorithmParameterException {
+		if (text == null) {
+			throw new InvalidKeyException();
+		}
+		if (text.isEmpty()) {
+			throw new InvalidKeyException();
+		}
+		if (isFoggedString(text)) {
+			throw new NoSuchAlgorithmException();
+		}
+		return decryptImpl(text, masterkey);
+	}
+	
+	private static byte[] decryptImpl(String text, char[] masterkey) throws NoSuchAlgorithmException, IllegalBlockSizeException, InvalidKeySpecException, InvalidKeyException, InvalidAlgorithmParameterException {
 		byte[] iv = null;
 		byte[] salt = null;
 		byte[] ct = null;
@@ -820,7 +918,7 @@ public final class Crypto {
 				iterations += CIPHERMINITERATIONS;
 			}
 			if ((algorithm > ENCRYPT_ALGORITHM) || (saltsize < 4) || (ivsize < 4) || (iterations < 1)) {
-				return decodeXE256(text).toCharArray();
+				throw new NoSuchAlgorithmException();
 			}
 			iv = new byte[ivsize];
 			salt = new byte[saltsize];
@@ -829,8 +927,7 @@ public final class Crypto {
 			System.arraycopy(buffer, 16 + ivsize, ct, 0, ct.length);
 			System.arraycopy(buffer, buffer.length - saltsize, salt, 0, saltsize);
 		} catch (Exception e) {
-			// the message was a clear text message (or is corrupted) !
-			return text.toCharArray();
+			throw new NoSuchAlgorithmException();
 		}
 		SecretKey secret;
 		Cipher cipher;
@@ -882,19 +979,13 @@ public final class Crypto {
 				break;
 			default: // invalid algorithms are detected earlier...
 				// the message was a clear text message (or is corrupted) !
-				return text.toCharArray();
+				throw new NoSuchAlgorithmException();
 			}
 			cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(iv), SECURERANDOM);
-			byte[] b = cipher.doFinal(ct);
-			try {
-				return getChars(b, StandardCharsets.UTF_8, 0);
-			} finally {
-				clear(b);
-			}
+			return cipher.doFinal(ct);
 		} catch (NoSuchPaddingException | BadPaddingException e) {
-			// Do not use padding here and UTF-8 should be supported... !
 			// the message was a clear text message (or is corrupted) !
-			return text.toCharArray();
+			throw new NoSuchAlgorithmException();
 		} finally {
 			reseedSecureRandom();
 		}
