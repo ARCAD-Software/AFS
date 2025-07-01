@@ -31,7 +31,7 @@ import com.arcadsoftware.rest.internal.SecurityPatchService;
  * The bundle that create this application is responsible from starting and stoping it.
  * 
  */
-public class OSGiApplication extends Application {
+public class OSGiApplication extends Application implements IRestOSGiApplication {
 
 	private volatile Router router;
 	private volatile Router root_router;
@@ -115,20 +115,12 @@ public class OSGiApplication extends Application {
 		}
 	}
 
-	/**
-	 * This router is the functional router used to attach the service of this application. This router is available
-	 * only when the application is active.
-	 * 
-	 * @return the root router.
-	 */
+	@Override
 	public Router getRouter() {
 		return router;
 	}
 
-	/**
-	 * This router is used when the application is switch into an inactive mode.
-	 * @return
-	 */
+	@Override
 	public Router getInactiveRouter() {
 		return inactive_router;
 	}
@@ -140,20 +132,13 @@ public class OSGiApplication extends Application {
 		return context;
 	}
 
-	/**
-	 * Define if the REST application is active or not. if inactive no resource are accessible. Any request get a 503 Error state. 
-	 * @param active
-	 *            the new active state
-	 */
+	@Override
 	public void setActive(boolean active) {
 		this.active = active;
 		activeChange();
 	}
 
-	/**
-	 * Define if the REST application is active or not. if inactive no resource are accessible. Any request get a 503 Error state. 
-	 * @return the active
-	 */
+	@Override
 	public boolean isActive() {
 		return active;
 	}

@@ -23,6 +23,7 @@ import java.util.Date;
 import org.eclipse.core.runtime.FileLocator;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 import org.restlet.data.MediaType;
 import org.restlet.representation.FileRepresentation;
 import org.restlet.representation.Representation;
@@ -137,7 +138,9 @@ public abstract class FileBundleResource extends UserLinkedResource {
 	/**
 	 * @return The Bundle Context from the bundle that actually content the files to download.
 	 */
-	protected abstract BundleContext getFileBundleContext();
+	protected BundleContext getFileBundleContext() {
+		return FrameworkUtil.getBundle(getClass()).getBundleContext();
+	}
 
 	/**
 	 * The file name is relative to the Root path within the bundle (default is a folder "files").
@@ -150,7 +153,7 @@ public abstract class FileBundleResource extends UserLinkedResource {
 	 * @see #rootPath()
 	 */
 	protected String getFilename() {
-		String result = getRequest().getResourceRef().getRemainingPart(true,false);
+		String result = getRequest().getResourceRef().getRemainingPart(true, false);
 		if ((result != null) && (result.length() > 0) && (result.charAt(0) != '/')) {
 			result = '/' + result;
 		}
