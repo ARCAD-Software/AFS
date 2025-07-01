@@ -16,7 +16,7 @@ package com.arcadsoftware.rest.console;
 /**
  * An action define a menu option or a button into the form used to give to the user the opportunity to run a process. 
  * 
- * 
+ * @author ARCAD Software
  */
 public class ConsoleAction extends ConsoleField {
 
@@ -29,6 +29,15 @@ public class ConsoleAction extends ConsoleField {
 		super();
 	}
 
+	/**
+	 * Create a default action (associated with an empty code).
+	 * 
+	 * <p>
+	 * You should define only one Action of this kind in your Form.
+	 * 
+	 * @param id The unique internal identifier of this action.
+	 * @param label The localized label of this action.
+	 */
 	public ConsoleAction(String id, String label) {
 		this();
 		this.id = id;
@@ -36,6 +45,13 @@ public class ConsoleAction extends ConsoleField {
 		setLabel(label);
 	}
 
+	/**
+	 * Create an action with a specific code.
+	 * 
+	 * @param id
+	 * @param code
+	 * @param label
+	 */
 	public ConsoleAction(String id, String code, String label) {
 		this();
 		this.id = id;
@@ -50,6 +66,16 @@ public class ConsoleAction extends ConsoleField {
 		setLabel(label);
 	}
 
+	/**
+	 * 
+	 * @param id
+	 * @param code
+	 * @param label The localized label of this action.
+	 * @param icon
+	 * @param hidden
+	 * @param help The localized Help message.
+	 * @param recall The recall delay define the time, in seconds, in witch this action can be thrown.
+	 */
 	public ConsoleAction(String id, String code, String label, int icon, boolean hidden, String help, int recall) {
 		this(id, code, label, icon, hidden, help);
 		this.recall = recall;
@@ -108,8 +134,10 @@ public class ConsoleAction extends ConsoleField {
 	}
 
 	/**
-	 * The recal delay define the time, in seconds, in witch this action can be thrown.
+	 * The recall delay define the time, in seconds, in witch this action can be thrown.
+	 * 
 	 * <p>For an hidden action the delay define the period for next call.
+	 * 
 	 * @return the recall delay in seconds.
 	 */
 	public int getRecall() {

@@ -47,6 +47,7 @@ import org.restlet.representation.FileRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 
+import com.arcadsoftware.crypt.Crypto;
 import com.arcadsoftware.osgi.ILoggedPlugin;
 import com.arcadsoftware.osgi.ISODateFormater;
 import com.arcadsoftware.rest.connection.NegotiateAuthenticationHelper;
@@ -84,8 +85,8 @@ public class WebServiceAccess {
 	 */
 	public static final Language LANGUAGE_GENERAL = new Language(Locale.getDefault().getLanguage());
 	
-	// SSL/TLS HTTPS Support.
 	private static final Preference<MediaType> MEDIATYPE_XML = new Preference<MediaType>(MediaType.APPLICATION_XML);
+	private static final Preference<MediaType> MEDIATYPE_JSON = new Preference<MediaType>(MediaType.APPLICATION_JSON);
 	private static final Preference<Language> PREFERENCE_LANGUAGE = new Preference<Language>(LANGUAGE);
 	private static final Preference<Language> PREFERENCE_LANGUAGE_GENERAL = new Preference<Language>(LANGUAGE_GENERAL, 0.5F);
 	private static final Preference<CharacterSet> PREFERENCE_CHARSET = new Preference<CharacterSet>(CharacterSet.UTF_8);
@@ -110,7 +111,7 @@ public class WebServiceAccess {
 	
 	private final ILoggedPlugin activator;
 	private final RestConnectionParameters parameters;
-	// TODO Be able to store many server addresses (cluster)...
+	// TODO Be able to store many server addresses (cluster) with failover rules...
 	private String address;
 	private String defaultServeraddress;
 	private Client client;
@@ -122,6 +123,7 @@ public class WebServiceAccess {
 	private String token;
 	private volatile XStreamCompact xs;
 	private int queryLimit = DEFAULTQUERYLIMIT;
+	private boolean json;
 
 	/**
 	 * Create a new WSA object with no log and default parameters.
@@ -412,6 +414,30 @@ public class WebServiceAccess {
 	}
 
 	/**
+	 * State if this client prefer response in JSON (or in XML).
+	 * 
+	 * <p>
+	 * Default is XML.
+	 * 
+	 * @return
+	 */
+	public boolean isUseJson() {
+		return json;
+	}
+
+	/**
+	 * Define if this client prefer response in JSON (or in XML).
+	 * 
+	 * <p>
+	 * Default is XML.
+	 * 
+	 * @param json
+	 */
+	public void setUseJson(boolean json) {
+		this.json = json;
+	}
+	
+	/**
 	 * Set the number of retry to success a request to the server.
 	 * 
 	 * @param retry
@@ -552,6 +578,7 @@ public class WebServiceAccess {
 	 * @param password
 	 */
 	public void setPassword(char[] password) {
+		Crypto.clear(this.password);
 		this.password = password;
 	}
 
@@ -1911,7 +1938,11 @@ public class WebServiceAccess {
 	 *            the client information to fill.
 	 */
 	protected void prepareClientInfo(ClientInfo clientInfo) {
-		clientInfo.getAcceptedMediaTypes().add(MEDIATYPE_XML);
+		if (json) {
+			clientInfo.getAcceptedMediaTypes().add(MEDIATYPE_JSON);
+		} else {
+			clientInfo.getAcceptedMediaTypes().add(MEDIATYPE_XML);
+		}
 		clientInfo.getAcceptedLanguages().add(PREFERENCE_LANGUAGE);
 		clientInfo.getAcceptedLanguages().add(PREFERENCE_LANGUAGE_GENERAL);
 		clientInfo.getAcceptedCharacterSets().add(PREFERENCE_CHARSET);

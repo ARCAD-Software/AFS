@@ -191,7 +191,7 @@ public abstract class AbstractConfigSection implements IRestConsoleSection {
 		String curSet = null;
 		List<Property> propsFields = getProperties();
 		if (propsFields != null) {
-			for(Property p:propsFields) {
+			for (Property p: propsFields) {
 				if ((p.setKey != null) && !p.setKey.equals(curSet)) {
 					form.add(new ConsoleSet(messages.get(p.setKey, language)));
 					curSet = p.setKey;
