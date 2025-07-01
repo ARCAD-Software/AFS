@@ -328,7 +328,7 @@ public class ConfiguredSSLContext {
 		properties = new HashMap<String, Object>();
 		if (props != null) {
 			Enumeration<String> keys = props.keys();
-			while(keys.hasMoreElements()) {
+			while (keys.hasMoreElements()) {
 				String k = keys.nextElement();
 				if (k.startsWith(prefix + "ssl.")) { //$NON-NLS-1$
 					properties.put(k.substring(prefix.length()), props.get(k));
