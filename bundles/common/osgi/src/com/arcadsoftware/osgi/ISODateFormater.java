@@ -14,6 +14,8 @@
 package com.arcadsoftware.osgi;
 
 import java.text.ParseException;
+import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -203,7 +205,7 @@ public final class ISODateFormater {
 	 */
 	static public String toString(Calendar calendar) {
 		calendar.set(Calendar.ZONE_OFFSET, 0);
-		return String.format("%04d-%02d-%02dT%02d:%02d:%02d" + MS_SEPARATOR + "%03dZ", //$NON-NLS-1$
+		return String.format("%04d-%02d-%02dT%02d:%02d:%02d" + MS_SEPARATOR + "%03dZ", //$NON-NLS-1$ //$NON-NLS-2$
 				calendar.get(Calendar.YEAR),
 				calendar.get(Calendar.MONTH) + 1,
 				calendar.get(Calendar.DAY_OF_MONTH),
@@ -211,6 +213,42 @@ public final class ISODateFormater {
 				calendar.get(Calendar.MINUTE),
 				calendar.get(Calendar.SECOND),
 				calendar.get(Calendar.MILLISECOND));
+	}
+	
+	/**
+	 * Convert a short date format "YYYYMMDD" into a GMT, ISO date formated string.
+	 *  
+	 * @param date a "YYYYMMDD" formated string.
+	 * @return an ISO date format, null if the data is not correctly formated.
+	 */
+	static public String shortDatetoString(String date) {
+		if ((date == null) || (date.length() != 8)) {
+			return null;
+		}
+		return String.format("%s-%s-%sT00:00:00" + MS_SEPARATOR + "000Z", //$NON-NLS-1$
+				date.substring(0, 4),
+				date.substring(4, 6),
+				date.substring(6));
+	}
+	
+	/**
+	 * Convert a short date format "YYYYMMDD" into an Instant.
+	 *  
+	 * @param date a "YYYYMMDD" formated string.
+	 * @return an Instant, null if the date is not correctly formated.
+	 */
+	static public Instant shortDatetoInstant(String date) {
+		if ((date == null) || (date.length() != 8)) {
+			return null;
+		}
+		try {
+			return Instant.parse(String.format("%s-%s-%sT00:00:00.00Z", //$NON-NLS-1$
+					date.substring(0, 4),
+					date.substring(4, 6),
+					date.substring(6)));
+		} catch (DateTimeParseException e) {
+			return null;
+		}
 	}
 	
 	/**
