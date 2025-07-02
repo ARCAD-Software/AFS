@@ -118,7 +118,7 @@ public class QueryRunnerEx extends QueryRunner {
 	        try {
 	        	if (idString != null) {
 		            try {
-		            	stmt = conn.prepareStatement(sql,new String[] {idString});
+		            	stmt = conn.prepareStatement(sql, new String[] {idString});
 		            	usedID = true;
 		            } catch (SQLException e) {
 		            	try  {

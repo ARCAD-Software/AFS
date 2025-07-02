@@ -172,6 +172,18 @@ public class MapperSQLService extends AbstractMapperService {
 			return joins.toString();
 		}
 	}
+	private static final int FORCECOLCASSE;
+
+	static {
+		String p = System.getProperty("com.arcadsoftware.mapper.sql.column.casse", "");
+		if ("upper".equalsIgnoreCase(p)) {
+			FORCECOLCASSE = 1;
+		} else if ("lower".equalsIgnoreCase(p)) {
+			FORCECOLCASSE = -1;
+		} else {
+			FORCECOLCASSE = 0;
+		}
+	}
 	
 	private final DataSource ds;
 	private final Fragments fg;
@@ -440,7 +452,14 @@ public class MapperSQLService extends AbstractMapperService {
 	protected int insert(String query, Object[] values, String idCol) {
 		long t = System.currentTimeMillis();
 		try {
-			return runner.insert(query, values, idCol);
+			switch (FORCECOLCASSE) {
+			case -1:
+				return runner.insert(query, values, idCol.toLowerCase());
+			case 1:
+				return runner.insert(query, values, idCol.toUpperCase());
+			default:
+				return runner.insert(query, values, idCol);
+			}
 		} catch (SQLException e) {
 			Activator.getInstance().error(Messages.MapperSQLService_Error_Insert + e.getLocalizedMessage(), e);
 			Activator.getInstance().debug(String.format(Messages.MapperSQLService_SQLError, query, arrayToString(values)));
