@@ -137,7 +137,7 @@ public class ConfiguredSSLContext {
 	public static final String PROP_TRUSTSTORE_TYPE = "ssl.truststore.type"; //$NON-NLS-1$
 
 	/**
-	 * The algorithm used by the Certificated contained into the Trusted Certificate Store.
+	 * The algorithm used by the Certificate contained into the Trusted Certificate Store.
 	 * <p>
 	 * The default value is the JVM default one, e.g. SunX509 with ORACLE JVM or ibmX509 with IBM one.
 	 * <p>
