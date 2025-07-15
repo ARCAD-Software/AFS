@@ -75,6 +75,9 @@ public class TestPasswordResource extends UserLinkedResource {
 					login = user.getLogin();
 				}
 			}
+			if (oldp == null) {
+				oldp = ""; //$NON-NLS-1$
+			}
 		} else if (oldp == null) {
 			if (login.equals(getUser().getLogin())) {
 				oldp = getUser().getPassword();
@@ -86,6 +89,8 @@ public class TestPasswordResource extends UserLinkedResource {
 						oldp = user.getPassword();
 					}
 				}
+			} else {
+				oldp = ""; //$NON-NLS-1$
 			}
 		}
 		if (login == null) {
@@ -105,7 +110,7 @@ public class TestPasswordResource extends UserLinkedResource {
 			password = p.toCharArray();
 		}
 		final char[] oldpassword;
-		if ((oldp == null) || (oldp.length() == 0)) {
+		if (oldp.length() == 0) {
 			oldpassword = null;
 		} else {
 			oldpassword = oldp.toCharArray();
