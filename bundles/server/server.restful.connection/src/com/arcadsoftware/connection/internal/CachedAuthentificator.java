@@ -212,7 +212,7 @@ public class CachedAuthentificator extends Authenticator {
 			// 3. On doit créer (ou recharger) les informations utilisateurs (elles sont périmées).
 			// si necessaire on purge le cache.
 			if (user != null) {
-				activator.cachePurge(user.getUserType(),user.getId());
+				activator.cachePurge(user.getUserType(), user.getId());
 			}
 			// Et on recharge les informations utilisateurs.
 			int id = credential.loadUserId();
@@ -248,6 +248,7 @@ public class CachedAuthentificator extends Authenticator {
 		clonedUser.setPassword(new String(secret));
 		clonedUser.setLogin(identifier);
 		credential.update(clonedUser);
+		clonedUser.addCredential(credential);
 		// Store the user in the request.
 		request.getAttributes().put(ConnectionUserBean.CONNECTED_USER, clonedUser);
 		request.getAttributes().put(ConnectionUserBean.CONNECTED_UNIQUEID, credential.getUniqueId());
