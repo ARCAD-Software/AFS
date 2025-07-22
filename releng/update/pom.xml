@@ -30,8 +30,7 @@
 									<goal>run</goal>
 								</goals>
 								<configuration>
-									<script>
-										https://gist.github.com/fbricon/3c718d03f55c3ceba5dea570af4af5f8</script>
+									<script>https://gist.github.com/RoiArthurB/09f25a09f8281c91f7144cec65d43394</script>
 									<args>
 										<arg>${project.basedir}</arg>
 									</args>
