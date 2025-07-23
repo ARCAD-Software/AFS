@@ -15,7 +15,9 @@ package com.arcadsoftware.metadata.internal;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
@@ -1343,6 +1345,20 @@ public class DataAccessServices implements IMapperService, IEntityRegistry {
 			logError(e);
 			return entity.getDate();
 		}
+	}
+
+	@Override
+	public long create(MetaDataEntity entity, List<MetaDataAttribute> attributes, Iterator<BeanMap> items, IConnectionUserBean currentUser) {
+		final AtomicLong i = new AtomicLong(0);
+		items.forEachRemaining(b -> { create(b); i.incrementAndGet(); });
+		return i.get();
+	}
+
+	@Override
+	public long create(String type, List<MetaDataAttribute> attributes, Iterator<BeanMap> items, IConnectionUserBean currentUser) {
+		final AtomicLong i = new AtomicLong(0);
+		items.forEachRemaining(b -> { create(b); i.incrementAndGet(); });
+		return i.get();
 	}
 
 }

@@ -16,6 +16,7 @@ package com.arcadsoftware.metadata.rights;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import com.arcadsoftware.beanmap.BeanMap;
@@ -50,6 +51,11 @@ public class RightsMapperService extends AbstractMapperService<CriteriaContextBa
 	@Override
 	public BeanMap create(MetaDataEntity entity, List<MetaDataAttribute> attributes, List<Object> values, IConnectionUserBean currentUser) {
 		return null;
+	}
+
+	@Override
+	public long create(MetaDataEntity entity, List<MetaDataAttribute> attributes, Iterator<BeanMap> items, IConnectionUserBean currentUser) {
+		return 0;
 	}
 
 	@Override
