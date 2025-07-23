@@ -47,6 +47,7 @@ public class OSGiApplication extends Application implements IRestOSGiApplication
 	private String licenseURL;
 	private String termsOfService;
 	private String webSite;
+	private String serverURL;
 	
 	/**
 	 * This Restlet Application can not be instantiated from IOC or Servlet bridges because it is binded to the bundle
@@ -61,6 +62,7 @@ public class OSGiApplication extends Application implements IRestOSGiApplication
 		super();
 		this.context = context;
 		this.activator = activator;
+		serverURL = "http://localhost/"; //$NON-NLS-1$
 		setActive(true);
 		// Add extended security headers patch.
 		getServices().set(new SecurityPatchService(this));
@@ -286,5 +288,13 @@ public class OSGiApplication extends Application implements IRestOSGiApplication
 	public void setLicenseURL(String licenseURL) {
 		this.licenseURL = licenseURL;
 	}
-	
+
+	@Override
+	public String getServerKnownURL() {
+		return serverURL;
+	}
+
+	public void setServerKnownURL(String url) {
+		serverURL = url;
+	}
 }
