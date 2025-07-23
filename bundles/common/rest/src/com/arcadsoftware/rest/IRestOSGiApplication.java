@@ -37,4 +37,9 @@ public interface IRestOSGiApplication {
 	 */
 	public boolean isActive();
 
+	/**
+	 * return the HTTP(s) server URL as the server know it (default value may be http://localhost/ !)
+	 * @return
+	 */
+	public String getServerKnownURL();
 }

@@ -415,6 +415,24 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 				OSGiApplication application = createApplication(serverProps.getPort() > 0, https);
 				// Activate the HTTP Strict-Transport-Security header.
 				application.setHttps(https);
+				String serverAddress = "localhost";
+				for (String dn: serverProps.getDomainNames()) {
+					if (!dn.equals("*")) {
+						serverAddress = dn;
+						break;
+					}
+				}
+				if (https) {
+					if (serverProps.getPortssl() != 443) {
+						serverAddress += ":" + serverProps.getPortssl(); //$NON-NLS-1$ 
+					}
+					application.setServerKnownURL("https://" + serverAddress + '/');
+				} else {
+					if (serverProps.getPort() != 80) {
+						serverAddress += ":" + serverProps.getPort(); //$NON-NLS-1$ 
+					}
+					application.setServerKnownURL("http://" + serverAddress + '/');
+				}
 		        component.getDefaultHost().attach(application);
 				// Now, let's start the component!
 		        // Note that the HTTP server connector is also automatically started.
@@ -440,6 +458,7 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 					httplogger.append(sslPortInfo);
 					httplogger.append('\n');
 				}
+				info("REST Server accessible through URL: " + application.getServerKnownURL());
 			} catch (Exception e) {
 				StringBuilder text = new StringBuilder(Messages.getString("Activator.StartingError")); //$NON-NLS-1$
 				if (serverProps.getPort() > 0) {
