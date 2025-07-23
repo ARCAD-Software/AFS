@@ -14,6 +14,7 @@
 package com.arcadsoftware.metadata;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import com.arcadsoftware.beanmap.BeanMap;
@@ -358,6 +359,36 @@ public interface IMapperService {
 	 * @return the new item in a BeanMap with attributes and id or null if an error occurs.
 	 */
 	public BeanMap create(MetaDataEntity entity, List<MetaDataAttribute> attributes, List<Object> values, IConnectionUserBean currentUser);
+	
+	/**
+	 * Create a set of elements into the storage base (This request does not return the ids of items created).
+	 * 
+	 * @param entity
+	 *            The entity.
+	 * @param attributes
+	 *            the list of updated attributes.
+	 * @param items
+	 *            A non null Stream of BeanMap containing the information to store.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return the number of items created.
+	 */
+	public long create(MetaDataEntity entity, List<MetaDataAttribute> attributes, Iterator<BeanMap> items, IConnectionUserBean currentUser);
+	
+	/**
+	 * Create a set of elements into the storage base (This request does not return the ids of items created).
+	 * 
+	 * @param type
+	 *            The entity type.
+	 * @param attributes
+	 *            the list of updated attributes.
+	 * @param items
+	 *            A non null Stream of BeanMap containing the information to store.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return the number of items created.
+	 */
+	public long create(String type, List<MetaDataAttribute> attributes, Iterator<BeanMap> items, IConnectionUserBean currentUser);
 
 	/**
 	 * Delete an item from the storage.

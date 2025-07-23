@@ -14,10 +14,14 @@
 package com.arcadsoftware.metadata.sql;
 
 import java.math.BigInteger;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -78,10 +82,10 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 	private static final int FORCECOLCASSE;
 
 	static {
-		String p = System.getProperty("com.arcadsoftware.mapper.sql.column.casse", "");
-		if ("upper".equalsIgnoreCase(p)) {
+		String p = System.getProperty("com.arcadsoftware.mapper.sql.column.casse", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		if ("upper".equalsIgnoreCase(p)) { //$NON-NLS-1$
 			FORCECOLCASSE = 1;
-		} else if ("lower".equalsIgnoreCase(p)) {
+		} else if ("lower".equalsIgnoreCase(p)) { //$NON-NLS-1$
 			FORCECOLCASSE = -1;
 		} else {
 			FORCECOLCASSE = 0;
@@ -192,101 +196,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 						// Shielding: Compound columns should always be declared as readonly.
 						itt.remove();
 					} else {
-						Object value = values.get(index);
-						if (value instanceof Date) {
-							value = new Timestamp(((Date) value).getTime());
-						} else if (value instanceof Calendar) {
-							value = new Timestamp(((Calendar) value).getTimeInMillis());
-						} else if (value instanceof Boolean) {
-							if ((Boolean) value) {
-								value = fg.true_val;
-							} else {
-								value = fg.false_val;
-							}
-						} else if (isEncrypted(att)) {
-							if (value instanceof String) {
-								value = Crypto.encrypt(((String) value).toCharArray());
-							} else if (value instanceof char[]) {
-								value = Crypto.encrypt((char[]) value);
-							}
-						}
-						if (convertValues && (value != null)) {
-							if (att.isReference() || //
-									MetaDataAttribute.TYPE_INTEGER.equalsIgnoreCase(att.getType()) || //
-									MetaDataAttribute.TYPE_INT.equalsIgnoreCase(att.getType())) {
-								if (!(value instanceof Integer)) {
-									try {
-										value = Integer.valueOf(value.toString().trim());
-									} catch (Exception ee) {
-										Activator.getInstance().error(Messages.MapperSQLService_Attribute + att.getParent() + '.' + att.getCode() + Messages.MapperSQLService_ConvertToInteger + value + '"');
-									}
-								}
-							} else if (MetaDataAttribute.TYPE_EMAIL.equalsIgnoreCase(att.getType()) || //
-									MetaDataAttribute.TYPE_STRING.equalsIgnoreCase(att.getType()) || //
-									MetaDataAttribute.TYPE_ICON.equalsIgnoreCase(att.getType()) || //
-									MetaDataAttribute.TYPE_URL.equalsIgnoreCase(att.getType())) {
-								if (!(value instanceof String)) {
-									value = value.toString();
-								}
-							} else if (MetaDataAttribute.TYPE_BOOLEAN.equalsIgnoreCase(att.getType())) {
-								if (!(value instanceof Integer)) {
-									if (value instanceof String) {
-										if (Boolean.valueOf((String) value)) {
-											value = fg.true_val;
-										} else {
-											value = fg.false_val;
-										}
-									}
-									// Other conversions ?
-								}							
-							} else if (MetaDataAttribute.TYPE_DATE.equalsIgnoreCase(att.getType())) {
-								if (value instanceof Integer) {
-									value = new Timestamp((Integer) value);
-								} else if (value instanceof Long) {
-									value = new Timestamp((Long) value);
-								} else {
-									String s = value.toString();
-									if (ISODateFormater.mayIsoDate(s)) {
-										try {
-											value = new Timestamp(ISODateFormater.toDate(s).getTime());
-										} catch (ParseException ee) {
-											Activator.getInstance().error(Messages.MapperSQLService_Attribute + att.getParent() + '.' + att.getCode() + Messages.MapperSQLService_ConvertToTimeStamp + s + '"');
-										}
-									} else {
-										try {
-											value = new Timestamp(sdf.parse(s).getTime());
-										} catch (ParseException ee) {
-											Activator.getInstance().error(Messages.MapperSQLService_Attribute + att.getParent() + '.' + att.getCode() + Messages.MapperSQLService_ConvertToTimeStamp + s + '"');
-										}
-									}
-								}
-							} else if (MetaDataAttribute.TYPE_FLOAT.equalsIgnoreCase(att.getType())) {
-								if (!(value instanceof Float)) {
-									try {
-										value = Float.valueOf(value.toString().trim());
-									} catch (Exception ee) {
-										Activator.getInstance().error(Messages.MapperSQLService_Attribute + att.getParent() + '.' + att.getCode() + Messages.MapperSQLService_ConvertToFloat + value + '"');
-									}
-								}
-							} else if (MetaDataAttribute.TYPE_LONG.equalsIgnoreCase(att.getType())) {
-								if (!(value instanceof Long)) {
-									try {
-										value = Long.valueOf(value.toString().trim());
-									} catch (Exception ee) {
-										Activator.getInstance().error(Messages.MapperSQLService_Attribute + att.getParent() + '.' + att.getCode() + Messages.MapperSQLService_ConvertToLong + value + '"');
-									}
-								}
-							} else if (MetaDataAttribute.TYPE_BIGINTEGER.equalsIgnoreCase(att.getType())) {
-								if (!(value instanceof BigInteger)) {
-									try {
-										value = new BigInteger(value.toString().trim());
-									} catch (Exception ee) {
-										Activator.getInstance().error(Messages.MapperSQLService_Attribute + att.getParent() + '.' + att.getCode() + Messages.MapperSQLService_ConvertToBigInteger + value + '"');
-									}
-								}
-							}
-						}
-						result.add(value);
+						result.add(filterValue(att, values.get(index)));
 						cols.add(col);
 					}
 				}
@@ -308,6 +218,170 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		return result;
 	}
 	
+	private int getSQLType(MetaDataAttribute att) {
+		if (isEncrypted(att) || att.isReference() || //
+				MetaDataAttribute.TYPE_INTEGER.equalsIgnoreCase(att.getType()) || //
+				MetaDataAttribute.TYPE_INT.equalsIgnoreCase(att.getType())) {
+			return Types.INTEGER;
+		}
+		if (MetaDataAttribute.TYPE_EMAIL.equalsIgnoreCase(att.getType()) || //
+				MetaDataAttribute.TYPE_STRING.equalsIgnoreCase(att.getType()) || //
+				MetaDataAttribute.TYPE_ICON.equalsIgnoreCase(att.getType()) || //
+				MetaDataAttribute.TYPE_URL.equalsIgnoreCase(att.getType())) {
+			return Types.VARCHAR;
+		}
+		if (MetaDataAttribute.TYPE_BOOLEAN.equalsIgnoreCase(att.getType())) {
+			return Types.INTEGER;
+		}							
+		if (MetaDataAttribute.TYPE_DATE.equalsIgnoreCase(att.getType())) {
+			return Types.TIMESTAMP;
+		}
+		if (MetaDataAttribute.TYPE_FLOAT.equalsIgnoreCase(att.getType())) {
+			return Types.FLOAT;
+		}
+		if (MetaDataAttribute.TYPE_LONG.equalsIgnoreCase(att.getType())) {
+			return Types.BIGINT;
+		}
+		if (MetaDataAttribute.TYPE_BIGINTEGER.equalsIgnoreCase(att.getType())) {
+			return Types.DECIMAL;
+		}
+		return Types.NULL;
+	}
+	
+	private Object filterValue(MetaDataAttribute att, Object value) {
+		// Encrypted data are always converted...
+		if (isEncrypted(att)) {
+			if (value instanceof String) {
+				return Crypto.encrypt(((String) value).toCharArray());
+			}
+			if (value instanceof char[]) {
+				return Crypto.encrypt((char[]) value);
+			}
+		}
+		if (!convertValues || (value == null)) {
+			return value;
+		}	
+		if (att.isReference() || //
+				MetaDataAttribute.TYPE_INTEGER.equalsIgnoreCase(att.getType()) || //
+				MetaDataAttribute.TYPE_INT.equalsIgnoreCase(att.getType())) {
+			if (value instanceof Integer) {
+				return value;
+			}
+			try {
+				return Integer.valueOf(value.toString().trim());
+			} catch (Exception ee) {
+				Activator.getInstance().error(Messages.MapperSQLService_Attribute + att.getParent() + '.' + att.getCode() + Messages.MapperSQLService_ConvertToInteger + value + '"');
+				return value;
+			}
+		}
+		if (MetaDataAttribute.TYPE_EMAIL.equalsIgnoreCase(att.getType()) || //
+				MetaDataAttribute.TYPE_STRING.equalsIgnoreCase(att.getType()) || //
+				MetaDataAttribute.TYPE_ICON.equalsIgnoreCase(att.getType()) || //
+				MetaDataAttribute.TYPE_URL.equalsIgnoreCase(att.getType())) {
+			if (value instanceof String) {
+				return value;
+			}
+			return value.toString();
+		}
+		if (MetaDataAttribute.TYPE_BOOLEAN.equalsIgnoreCase(att.getType())) {
+			if (value instanceof Boolean) {
+				if ((Boolean) value) {
+					return fg.true_val;
+				}
+				return fg.false_val;
+			}
+			if (value instanceof Integer) {
+				if (((Integer) value) == 0) {
+					return fg.false_val;
+				}
+				return fg.true_val;
+			}
+			if (value instanceof String) {
+				if (Boolean.valueOf((String) value)) {
+					return fg.true_val;
+				} else {
+					return fg.false_val;
+				}
+			}
+			// Other conversions ?
+		}							
+		if (MetaDataAttribute.TYPE_DATE.equalsIgnoreCase(att.getType())) {
+			if (value instanceof Integer) {
+				return new Timestamp((Integer) value);
+			}
+			if (value instanceof Long) {
+				return new Timestamp((Long) value);
+			}
+			if (value instanceof Date) {
+				return new Timestamp(((Date) value).getTime());
+			}
+			if (value instanceof Calendar) {
+				return new Timestamp(((Calendar) value).getTimeInMillis());
+			} 
+			if (value instanceof Instant) {
+				return new Timestamp(((Instant) value).toEpochMilli());
+			}
+			String s = value.toString();
+			if (ISODateFormater.mayIsoDate(s)) {
+				try {
+					return new Timestamp(ISODateFormater.toDate(s).getTime());
+				} catch (ParseException ee) {
+					Activator.getInstance().error(Messages.MapperSQLService_Attribute + att.getParent() + '.' + att.getCode() + Messages.MapperSQLService_ConvertToTimeStamp + s + '"');
+				}
+			}
+			try {
+				return new Timestamp(sdf.parse(s).getTime());
+			} catch (ParseException ee) {
+				Activator.getInstance().error(Messages.MapperSQLService_Attribute + att.getParent() + '.' + att.getCode() + Messages.MapperSQLService_ConvertToTimeStamp + s + '"');
+			}
+			return value;
+		}
+		if (MetaDataAttribute.TYPE_FLOAT.equalsIgnoreCase(att.getType())) {
+			if (value instanceof Float) {
+				return value;
+			}
+			try {
+				return Float.valueOf(value.toString().trim());
+			} catch (Exception ee) {
+				Activator.getInstance().error(Messages.MapperSQLService_Attribute + att.getParent() + '.' + att.getCode() + Messages.MapperSQLService_ConvertToFloat + value + '"');
+			}
+			return value;
+		}
+		if (MetaDataAttribute.TYPE_LONG.equalsIgnoreCase(att.getType())) {
+			if (value instanceof Long) {
+				return value;
+			}
+			if (value instanceof Integer) {
+				return Long.valueOf((Integer) value);
+			}
+			try {
+				return Long.valueOf(value.toString().trim());
+			} catch (Exception ee) {
+				Activator.getInstance().error(Messages.MapperSQLService_Attribute + att.getParent() + '.' + att.getCode() + Messages.MapperSQLService_ConvertToLong + value + '"');
+			}
+			return value;
+		}
+		if (MetaDataAttribute.TYPE_BIGINTEGER.equalsIgnoreCase(att.getType())) {
+			if (value instanceof BigInteger) {
+				return value;
+			}
+			if (value instanceof Integer) {
+				return BigInteger.valueOf((Integer) value);
+			}
+			if (value instanceof Long) {
+				return BigInteger.valueOf((Long) value);
+			}
+			try {
+				return new BigInteger(value.toString().trim());
+			} catch (Exception ee) {
+				Activator.getInstance().error(Messages.MapperSQLService_Attribute + att.getParent() + '.' + att.getCode() + Messages.MapperSQLService_ConvertToBigInteger + value + '"');
+			}
+			return value;
+		}
+		// Other Basic types to convert...
+		return value;
+	}
+
 	/**
 	 * Generate a list of attributes column selection (without aliases, without any other columns... 
 	 * 
@@ -992,7 +1066,102 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		return selection(entity, insert(String.format(fg.create, e.table, e.idCol, listCreateCols(cols, valCols), valCols.toString()), //
 				values.toArray(new Object[values.size()]), e.idCol), entity.getAllAttributes(), true);
 	}
-	
+
+	@Override
+	public long create(MetaDataEntity entity, List<MetaDataAttribute> attributes, Iterator<BeanMap> items, IConnectionUserBean currentUser) {
+		EntityInfo e = getEntityInfo(entity);
+		if (e == null) {
+			return 0;
+		}
+		StringBuilder cols = new StringBuilder();
+		StringBuilder valCols = new StringBuilder();
+		if (attributes == null) {
+			attributes = new ArrayList<>();
+		} else {
+			Iterator<MetaDataAttribute> itt = attributes.iterator();
+			while (itt.hasNext()) {
+				MetaDataAttribute att = itt.next();
+				if (att == null) {
+					itt.remove();
+				} else if (att.isReadonly()) {
+					itt.remove();
+				} else {
+					String col = e.attributesCols.get(att.getCode());
+					if ((col == null) || (col.indexOf(COLUMNPREFIX_PLACEHOLDER) >= 0)) {
+						// Shielding: Compound columns should always be declared as readonly.
+						itt.remove();
+					} else {
+						if (!cols.isEmpty()) {
+							cols.append(fg.columnsep);
+							valCols.append(fg.columnsep);
+						}
+						cols.append(col);
+						valCols.append(fg.paramex);	
+					}
+				}
+			}
+		}
+		/* Update Col is assumed to have a default...
+		if (e.updateCol != null) {
+			if (!cols.isEmpty()) {
+				cols.append(fg.columnsep);
+				valCols.append(fg.columnsep);
+			}
+			valCols.append(String.format(fg.datefunction, sdf.format(new Date())));
+			cols.append(e.updateCol);
+		} */
+		if ((e.muidCol != null) && (currentUser != null) && (currentUser.getId() > 0)) {
+			if (!cols.isEmpty()) {
+				cols.append(fg.columnsep);
+				valCols.append(fg.columnsep);
+			}
+			cols.append(e.muidCol);
+			valCols.append(currentUser.getId());
+		}
+		/* Delete col is assumed to have a default...
+		if (e.deleteCol != null) {
+			if (!cols.isEmpty()) {
+				cols.append(fg.columnsep);
+				valCols.append(fg.columnsep);
+			}
+			cols.append(e.deleteCol);
+			valCols.append(fg.undelete_val);
+		}*/
+		long result = 0;
+		try (Connection c = getDataSource().getConnection()) {
+			try (PreparedStatement ps = c.prepareStatement(String.format(fg.create, e.table, e.idCol, cols.toString(), valCols.toString()))) {
+				while (items.hasNext()) {
+					BeanMap value = items.next();
+					if (value != null) {
+						String type = value.getType();
+						if ((type == null) || (type.isEmpty() || type.equalsIgnoreCase(entity.getType()))) {
+							int i = 1;
+							for (MetaDataAttribute att: attributes) {
+								Object v = filterValue(att, value.get(att.getCode()));
+								if (v == null) {
+									ps.setNull(i++, getSQLType(att));
+								} else {
+									ps.setObject(i++, v);
+								}
+							}
+							ps.addBatch();
+							result++;
+							if ((result & 0x7F) == 0) { // = 128
+								ps.executeBatch();
+							}
+						}
+					}
+				}
+				if ((result & 0x7F) != 0) { // != 128
+					ps.executeBatch();
+				}
+			}
+		} catch (SQLException ee) {
+			Activator.getInstance().error("Batch Insertion error: " + ee.getLocalizedMessage(), ee);
+		}
+		return result;
+	}
+
 	@Override
 	public BeanMap selection(MetaDataEntity entity, int itemId, List<ReferenceLine> attributes, boolean deleted) {
 		SQLCriteriaContext context = getContext(entity, null);
@@ -1006,7 +1175,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		StringBuilder where = context.generateCriteria(new IdEqualCriteria(itemId), deleted);
 		return completeForeignAttributes(attributes, query(String.format(fg.select, cols.toString(), context.generateJoins(deleted), where.toString()), entity.getType(), null));
 	}
-
+	
 	@Override
 	protected BeanMapList doSelection(List<ReferenceLine> attributes, boolean deleted, ISearchCriteria criteria,
 			boolean distinct, List<ReferenceLine> orders, int page, int limit, SQLCriteriaContext context) {

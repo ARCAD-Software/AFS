@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -1683,6 +1684,15 @@ public abstract class AbstractMapperService<T extends ICriteriaContext> implemen
 		}
 		return doLinkSelection(links, sourceId, attributes, deleted, criteria, distinct, ignoreSubdivision, orders, page, limit,
 				context);
+	}
+
+	@Override
+	public long create(String type, List<MetaDataAttribute> attributes, Iterator<BeanMap> items, IConnectionUserBean currentUser) {
+		final MetaDataEntity entity = getEntity(type);
+		if (entity == null) {
+			return 0;
+		}
+		return create(entity, attributes, items, currentUser);
 	}
 
 }

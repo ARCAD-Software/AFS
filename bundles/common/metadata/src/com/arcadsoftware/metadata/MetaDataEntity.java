@@ -2272,7 +2272,7 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 	public BeanMap dataCreate(String attributes, Object... values) {
 		IMapperService mapper = getMapper();
 		if (mapper == null) {
-			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataCreation,getType()));
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataCreation, getType()));
 		}
 		return mapper.create(this, getAttributes(attributes), AbstractMapperService.list(values));
 	}
@@ -2290,7 +2290,7 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 	public BeanMap dataCreate(BeanMap beanMap) {
 		IMapperService mapper = getMapper();
 		if (mapper == null) {
-			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataCreation,getType()));
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataCreation, getType()));
 		}
 		List<MetaDataAttribute> attlist = new ArrayList<MetaDataAttribute>();
 		return mapper.create(this,attlist,getValues(beanMap, attlist));
@@ -2314,7 +2314,7 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 		}
 		IMapperService mapper = getMapper();
 		if (mapper == null) {
-			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataCreation,getType()));
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataCreation, getType()));
 		}
 		if ((beanMap.getType() != null) && !type.equals(beanMap.getType())) {
 			Activator.getInstance().warn("The Beanmap \"{}\" appears to be created with the wrong entity \"{}\".", beanMap.getType(), type);
@@ -2342,7 +2342,7 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 	public BeanMap dataCreate(List<MetaDataAttribute> attributes, List<Object> values) {
 		IMapperService mapper = getMapper();
 		if (mapper == null) {
-			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataCreation,getType()));
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataCreation, getType()));
 		}
 		return mapper.create(this, attributes, values);
 	}
@@ -2368,9 +2368,32 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 	public BeanMap dataCreate(List<MetaDataAttribute> attributes, List<Object> values, IConnectionUserBean currentUser) {
 		IMapperService mapper = getMapper();
 		if (mapper == null) {
-			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataCreation,getType()));
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataCreation, getType()));
 		}
 		return mapper.create(this, attributes, values, currentUser);
+	}
+	
+	/**
+	 * Create a list of element into the storage base (This request return the number of element created).
+	 * 
+	 * <p>
+	 * This is the caller responsibility to ensure that the attributes list correspond to the values in the list.
+	 * If some attributes are not found in the given BeanMap the corresponding values will be set to null (and not the default value defined in the database).
+	 * 
+	 * @param attributes
+	 *            the list of updated attributes, may be empty or null.
+	 * @param iterator
+	 *            An iterator allowing to get all the BeanMap to store.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return The number of items created, zero if an error occurs.
+	 */
+	public long dataCreate(List<MetaDataAttribute> attributes, Iterator<BeanMap> iterator, IConnectionUserBean currentUser) {
+		IMapperService mapper = getMapper();
+		if (mapper == null) {
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataCreation, getType()));
+		}
+		return mapper.create(this, attributes, iterator, currentUser);
 	}
 
 	/**
