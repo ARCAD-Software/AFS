@@ -30,7 +30,7 @@
 									<goal>run</goal>
 								</goals>
 								<configuration>
-									<script>./repoflattener.java</script>
+									<script>repoflattener.java</script>
 									<args>
 										<arg>${project.basedir}</arg>
 									</args>
