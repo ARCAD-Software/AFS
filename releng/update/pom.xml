@@ -30,13 +30,10 @@
 									<goal>run</goal>
 								</goals>
 								<configuration>
-									<script>https://gist.github.com/RoiArthurB/09f25a09f8281c91f7144cec65d43394</script>
+									<script>repoflattener.java</script>
 									<args>
 										<arg>${project.basedir}</arg>
 									</args>
-									<trusts>
-										<trust>https://gist.github.com</trust>
-									</trusts>
 								</configuration>
 							</execution>
 						</executions>
