@@ -19,6 +19,7 @@
 		<module>metadata.mapper.sql</module>
 		<module>metadata.mapper.sql.postgresql</module>
 		<module>metadata.server.user</module>
+		<module>metadata.server.user.usergroup</module>
 		<module>metadata.registry.xml</module>
 		<module>server.binaries</module>
 		<module>server.messages</module>

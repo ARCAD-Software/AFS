@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entities
+	xmlns="http://xml.arcadsoftware.com/1.0.0/entities.xsd"
+	xmlns:criteria="http://xml.arcadsoftware.com/1.0.0/searchcriteria.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xml.arcadsoftware.com/1.0.0/entities.xsd http://xml.arcadsoftware.com/1.0.0/entities.xsd">
+
+	<update-entity type="user" domain="userdb" version="3" date="2025-07-29T00:00:00Z">
+		<link type="usergroup" code="groups">
+			<rights>
+				<create>
+					<hasright attribute="." right="38" />
+				</create>
+			</rights>
+			<metadata>
+				<sourceCol>UGU_USR_ID</sourceCol>
+				<destCol>UGU_UGP_ID</destCol>
+				<table>USERGROUPS_USERS</table>
+				<logLink>The user "%fullname%" has been added to the group "%code%".</logLink>
+				<logUnlink>The user "%fullname%" has been removed from the group "%code%".</logUnlink>
+			</metadata>
+		</link>
+	</update-entity>
+
+	<entity type="usergroup" domain="userdb" version="1" date="2025-01-01T00:00:00Z">
+		<rights>
+			<create>
+				<hasright attribute="." right="39" />
+			</create>
+			<delete>
+				<hasright attribute="." right="39" />
+			</delete>
+			<update>
+				<or>
+					<hasright attribute="." right="39" />
+					<hasright attribute="." right="40" />
+				</or>
+			</update>
+		</rights>
+		<metadata>
+			<idCol>UGP_ID</idCol>
+			<colPrefix>UGP_</colPrefix>
+			<updateCol>UGP_UPDATE</updateCol>
+			<deleteCol>UGP_DELETED</deleteCol>
+			<table>USERGROUPS</table>
+			<logCreate>Creation of a new user group ([%code%] %name%)</logCreate>
+			<logUpdate>Update of a user group ([%code%] %name%)</logUpdate>
+			<logDelete>Deletion of a user group ([%code%] %name%)</logDelete>
+		</metadata>
+		<attribute type="string" code="code" listable="true" length="50">
+			<metadata colrank="1" colsize="150" visible="true">
+				<col>UGP_CODE</col>
+			</metadata>
+		</attribute>
+		<attribute type="string" code="name" listable="true" length="255">
+			<metadata colrank="2" colsize="200" visible="true">
+				<col>UGP_NAME</col>
+			</metadata>
+		</attribute>
+		<link type="usergroup" code="subgroups">
+			<metadata>
+				<sourceCol>SUG_PARENT</sourceCol>
+				<destCol>SUG_CHILD</destCol>
+				<table>SUBUSERGROUPS</table>
+			</metadata>
+		</link>
+		<link type="usergroup" code="parents" readonly="true">
+			<metadata norecursive="true">
+				<sourceCol>SUG_CHILD</sourceCol>
+				<destCol>SUG_PARENT</destCol>
+				<table>SUBUSERGROUPS</table>
+			</metadata>
+		</link>
+		<link type="user" code="users">
+			<rights>
+				<create>
+					<hasright attribute="." right="38" />
+				</create>
+			</rights>
+			<metadata>
+				<sourceCol>UGU_UGP_ID</sourceCol>
+				<destCol>UGU_USR_ID</destCol>
+				<table>USERGROUPS_USERS</table>
+				<logLink>The user "%fullname%" has been added to the group "%code%".</logLink>
+				<logUnlink>The user "%fullname%" has been removed from the group "%code%".</logUnlink>
+			</metadata>
+		</link>
+	</entity>
+
+</entities>
