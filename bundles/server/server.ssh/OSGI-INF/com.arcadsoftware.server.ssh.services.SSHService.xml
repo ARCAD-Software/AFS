@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="com.arcadsoftware.server.ssh.services.SSHService">
-   <service>
-      <provide interface="com.arcadsoftware.server.ssh.services.SSHService"/>
-   </service>
-   <implementation class="com.arcadsoftware.server.ssh.services.SSHService"/>
-</scr:component>

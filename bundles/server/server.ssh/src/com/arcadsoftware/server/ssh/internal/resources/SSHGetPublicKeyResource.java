@@ -22,13 +22,10 @@ import org.restlet.representation.StringRepresentation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
 
-import com.arcadsoftware.rest.Path;
 import com.arcadsoftware.rest.UserLinkedResource;
 import com.arcadsoftware.server.ssh.services.SSHService;
 import com.arcadsoftware.ssh.model.SSHKey;
-import com.arcadsoftware.ssh.model.SSHRoutes;
 
-@Path(SSHRoutes.PUBLIC_KEY)
 public class SSHGetPublicKeyResource extends UserLinkedResource {
 	@Override
 	protected Representation delete(final Variant variant) {
