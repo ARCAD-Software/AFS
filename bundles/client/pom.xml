@@ -64,11 +64,6 @@
 			                  <id>org.eclipse.jface.databinding</id>
 			                  <versionRange>0.0.0</versionRange>
 			                </requirement>
-			                <requirement>
-			                  <type>eclipse-plugin</type>
-			                  <id>com.arcadsoftware.afs.client.core.rcp</id>
-			                  <versionRange>0.0.0</versionRange>
-			                </requirement>
 			              </extraRequirements>
 			            </dependency-resolution>
 					</configuration>
