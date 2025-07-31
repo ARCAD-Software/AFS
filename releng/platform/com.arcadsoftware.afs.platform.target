@@ -32,7 +32,7 @@
 		<unit id="org.slf4j.api" version="0.0.0"/>
 	</location>
 	<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="false" type="InstallableUnit">
-		<repository location="https://github.com/ARCAD-Software/arcad-evolution/releases/download/12.0.3/"/>
+		<repository location="https://github.com/ARCAD-Software/arcad-evolution/releases/download/latest/"/>
 		<unit id="com.arcadsoftware.aev.core.services" version="0.0.0"/>
 		<unit id="com.arcadsoftware.aev.core.ui.rcp" version="0.0.0"/>
 		<unit id="com.arcadsoftware.aev.core" version="0.0.0"/>
