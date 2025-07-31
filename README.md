@@ -1,6 +1,6 @@
 # AFS-OS release version 2025.5.3.
 
-Release date Thu Jul 31 08:53:56 CEST 2025.
+Release date Thu Jul 31 09:02:24 CEST 2025.
 
 Link to the update site of [Version 2025.5.3](https://github.com/ARCAD-Software/AFS/releases/download/2025.5.3/).
 
@@ -80,6 +80,7 @@ Bundle Symbolic Name | Modification | Version
 [com.arcadsoftware.metadata.rest](bundles/server/metadata.rest) | Not changed | 2.0.1
 [com.arcadsoftware.metadata.rights](bundles/server/metadata.rights) | Not changed | 1.4.2
 [com.arcadsoftware.metadata.server.user](bundles/server/metadata.server.user) | **Upgraded** from version 1.3.0 | **1.3.1**
+[com.arcadsoftware.metadata.server.user.usergroup](bundles/server/metadata.server.user.usergroup) | **New Bundle** | **1.0.0**
 [com.arcadsoftware.server.binaries](bundles/server/server.binaries) | Not changed | 1.3.0
 [com.arcadsoftware.server.messages](bundles/server/server.messages) | Not changed | 1.3.1
 [com.arcadsoftware.server.properties](bundles/server/server.properties) | Not changed | 1.3.0
@@ -95,7 +96,6 @@ Bundle Symbolic Name | Modification | Version
 [com.arcadsoftware.server.scheduler.impl](bundles/server/server.scheduler.impl) | Not changed | 1.4.0
 [com.arcadsoftware.server.ssh](bundles/server/server.ssh) | Not changed | 3.0.0
 [com.arcadsoftware.server.web](bundles/server/server.web) | Not changed | 1.3.0
-[metadata.server.user.usergroup](bundles/server/metadata.server.user.usergroup) | **New Bundle** | **1.0.0**
 
 
 

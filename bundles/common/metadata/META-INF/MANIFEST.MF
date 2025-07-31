@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AFS Metadata services
 Bundle-SymbolicName: com.arcadsoftware.metadata
-Bundle-Version: 2.0.2.qualifier
+Bundle-Version: 2.0.2
 Bundle-Activator: com.arcadsoftware.metadata.internal.Activator
 Bundle-Vendor: ARCAD Software
 Bundle-RequiredExecutionEnvironment: JavaSE-17
