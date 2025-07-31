@@ -24,16 +24,13 @@ import com.arcadsoftware.beanmap.xml.JSonBeanMapStream;
 import com.arcadsoftware.beanmap.xml.XmlBeanMapStream;
 import com.arcadsoftware.crypt.Crypto;
 import com.arcadsoftware.rest.JSONRepresentation;
-import com.arcadsoftware.rest.Path;
 import com.arcadsoftware.rest.UserLinkedResource;
 import com.arcadsoftware.rest.XMLRepresentation;
 import com.arcadsoftware.server.ssh.services.SSHService;
 import com.arcadsoftware.ssh.model.SSHException;
 import com.arcadsoftware.ssh.model.SSHKey;
 import com.arcadsoftware.ssh.model.SSHKeyUpload;
-import com.arcadsoftware.ssh.model.SSHRoutes;
 
-@Path(SSHRoutes.IMPORT_KEY)
 public class SSHImportKeyResource extends UserLinkedResource {
 
 	@Override

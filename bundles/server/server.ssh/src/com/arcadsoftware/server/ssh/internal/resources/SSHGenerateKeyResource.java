@@ -22,13 +22,10 @@ import org.restlet.resource.ResourceException;
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.rest.BeanMapItemResource;
 import com.arcadsoftware.crypt.Crypto;
-import com.arcadsoftware.rest.Path;
 import com.arcadsoftware.server.ssh.services.SSHService;
 import com.arcadsoftware.ssh.model.SSHException;
 import com.arcadsoftware.ssh.model.SSHKey;
-import com.arcadsoftware.ssh.model.SSHRoutes;
 
-@Path(SSHRoutes.GENERATE_KEY)
 public class SSHGenerateKeyResource extends BeanMapItemResource {
 	
 	@Override

@@ -42,20 +42,16 @@ import org.apache.sshd.common.config.keys.writer.openssh.OpenSSHKeyEncryptionCon
 import org.apache.sshd.common.config.keys.writer.openssh.OpenSSHKeyPairResourceWriter;
 import org.apache.sshd.common.util.security.SecurityUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.log.LogService;
 
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.crypt.Crypto;
 import com.arcadsoftware.metadata.MetaDataEntity;
+import com.arcadsoftware.osgi.ILoggedPlugin;
 import com.arcadsoftware.ssh.model.SSHException;
 import com.arcadsoftware.ssh.model.SSHKey;
 import com.arcadsoftware.ssh.model.SSHKeyType;
 import com.arcadsoftware.ssh.model.SSHKeyUpload;
 
-@Component(service = SSHService.class)
 public class SSHService {
 
 	private static final String PRIVATE_KEY_FILE = "private_key";
@@ -63,35 +59,31 @@ public class SSHService {
 	private static final HashSet<PosixFilePermission> CHMOD_600 = new HashSet<>(2);
 
 	static {
-		if (Security.getProperty(BouncyCastleProvider.PROVIDER_NAME) == null) {
-			try {
-				Security.addProvider(new BouncyCastleProvider());
-			} catch (Exception e) {
-				
-			}
-		}
 		CHMOD_600.add(PosixFilePermission.OWNER_READ);
 		CHMOD_600.add(PosixFilePermission.OWNER_WRITE);
 	}
 
-	private File keystoreDirectory;
-	private LogService log;
+	private final ILoggedPlugin activator;
+	private final File keystoreDirectory;
 
-	@Activate
-	private void activate() {
-		try {
-			keystoreDirectory = new File(KEYSTORE_DIRECTORY).getCanonicalFile();
-		} catch (final IOException e) {
-			if (log != null) {
-				log.log(LogService.LOG_ERROR, "Error while revolving SSH keystore", e);
+	public SSHService(ILoggedPlugin activator) {
+		super();
+		this.activator = activator;
+		if (Security.getProperty(BouncyCastleProvider.PROVIDER_NAME) == null) {
+			try {
+				Security.addProvider(new BouncyCastleProvider());
+			} catch (Exception e) {
+				activator.error("There is a problem with Bouncy Castle (AFS will fall back to JCE implementation): " + e.getLocalizedMessage());
 			}
-			keystoreDirectory = new File(KEYSTORE_DIRECTORY).getAbsoluteFile();
 		}
-	}
-
-	@Reference
-	private void bindLog(final LogService log) {
-		this.log = log;
+		File f = null;
+		try {
+			f = new File(KEYSTORE_DIRECTORY).getCanonicalFile();
+		} catch (final IOException e) {
+			activator.error("Error while revolving SSH keystore", e);
+			f = new File(KEYSTORE_DIRECTORY).getAbsoluteFile();
+		}
+		keystoreDirectory = f;
 	}
 
 	private String computeKeyFingerprint(final KeyPair keyPair) throws IOException, GeneralSecurityException {
@@ -143,11 +135,17 @@ public class SSHService {
 		final File keyDirectory = getSSHKeyDirectory(key);
 		if (keyDirectory.isDirectory()) {
 			for (final File file : keyDirectory.listFiles()) {
-				if (file.isFile() && !file.setWritable(true) && (log != null)) {
-					log.log(LogService.LOG_WARNING, String.format("Cannot make file %s writable", file), null);
+				if (file.isFile()) {
+					if (!file.setWritable(true)) {
+						activator.warn("Cannot make file \"{}\" writable", file);
+					} else if (!file.delete()) {
+						activator.warn("Unable to delete file \"{}\".", file);
+					}
 				}
 			}
-			FileUtils.deleteDirectory(keyDirectory);
+			if (!keyDirectory.delete()) {
+				activator.warn("Unable to delete directory \"{}\".", keyDirectory);
+			}
 		}
 	}
 
@@ -357,16 +355,14 @@ public class SSHService {
 		try {
 			Files.setPosixFilePermissions(keyFile.toPath(), CHMOD_600);
 		} catch (final UnsupportedOperationException e) {
-			if (log != null) {
-				if (!keyFile.setReadable(true, true)) {
-					log.log(LogService.LOG_DEBUG, "Unable to change file mode read: " + keyFile);
-				}
-				if (!keyFile.setWritable(false, false)) {
-					log.log(LogService.LOG_DEBUG, "Unable to change file mode write: " + keyFile);
-				}
-				if (!keyFile.setExecutable(false, false)) {
-					log.log(LogService.LOG_DEBUG, "Unable to change file mode execute: " + keyFile);
-				}
+			if (!keyFile.setReadable(true, true)) {
+				activator.debug("Unable to change file mode read: " + keyFile);
+			}
+			if (!keyFile.setWritable(false, false)) {
+				activator.debug("Unable to change file mode write: " + keyFile);
+			}
+			if (!keyFile.setExecutable(false, false)) {
+				activator.debug("Unable to change file mode execute: " + keyFile);
 			}
 		}
 	}

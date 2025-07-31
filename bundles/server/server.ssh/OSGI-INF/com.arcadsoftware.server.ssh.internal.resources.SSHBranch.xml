@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="com.arcadsoftware.server.ssh.internal.resources.SSHBranch">
-   <property name="uri" value="/secure"/>
-   <service>
-      <provide interface="com.arcadsoftware.rest.IBranch"/>
-   </service>
-   <implementation class="com.arcadsoftware.server.ssh.internal.resources.SSHBranch"/>
-</scr:component>
