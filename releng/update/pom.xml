@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.arcadsoftware</groupId>
 		<artifactId>com.arcadsoftware.afs.releng</artifactId>
-		<version>2023.7.48</version>
+		<version>2023.7.49-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>com.arcadsoftware.afs.update</artifactId>
