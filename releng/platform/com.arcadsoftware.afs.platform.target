@@ -29,6 +29,7 @@
 		<unit id="org.eclipse.equinox.sdk.feature.group" version="0.0.0"/>
 		<unit id="org.eclipse.equinox.executable.feature.group" version="0.0.0"/>
 		<unit id="org.eclipse.platform.feature.group" version="0.0.0"/>
+		<unit id="org.eclipse.rcp.feature.group" version="0.0.0"/>
 		<unit id="org.slf4j.api" version="0.0.0"/>
 	</location>
 	<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="false" type="InstallableUnit">
