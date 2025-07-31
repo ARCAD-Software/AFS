@@ -258,6 +258,18 @@
 						<pomDependencies>consider</pomDependencies>
 			            <dependency-resolution>
 			              <optionalDependencies>ignore</optionalDependencies>
+			              <extraRequirements>
+			                <requirement>
+			                  <type>eclipse-plugin</type>
+			                  <id>org.eclipse.ui</id>
+			                  <versionRange>0.0.0</versionRange>
+			                </requirement>
+			                <requirement>
+			                  <type>eclipse-plugin</type>
+			                  <id>org.eclipse.ui.views</id>
+			                  <versionRange>0.0.0</versionRange>
+			                </requirement>
+			              </extraRequirements>
 			            </dependency-resolution>
 					</configuration>
 				</plugin>
