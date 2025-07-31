@@ -41,20 +41,16 @@ import org.apache.sshd.common.config.keys.writer.openssh.OpenSSHKeyEncryptionCon
 import org.apache.sshd.common.config.keys.writer.openssh.OpenSSHKeyPairResourceWriter;
 import org.apache.sshd.common.util.security.SecurityUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.crypt.Crypto;
 import com.arcadsoftware.metadata.MetaDataEntity;
+import com.arcadsoftware.osgi.ILoggedPlugin;
 import com.arcadsoftware.ssh.model.SSHException;
 import com.arcadsoftware.ssh.model.SSHKey;
 import com.arcadsoftware.ssh.model.SSHKeyType;
 import com.arcadsoftware.ssh.model.SSHKeyUpload;
 
-@Component(service = SSHService.class)
 public class SSHService {
 
 	private static final String PRIVATE_KEY_FILE = "private_key"; //$NON-NLS-1$
@@ -62,28 +58,31 @@ public class SSHService {
 	private static final HashSet<PosixFilePermission> CHMOD_600 = new HashSet<>(2);
 
 	static {
-		if (Security.getProperty(BouncyCastleProvider.PROVIDER_NAME) == null) {
-			try {
-				Security.addProvider(new BouncyCastleProvider());
-			} catch (Exception e) {
-				LoggerFactory.getLogger(SSHService.class).error("There is a problem with Bouncy Castle (AFS will fall back to JCE implementation): " + e.getLocalizedMessage());
-			}
-		}
 		CHMOD_600.add(PosixFilePermission.OWNER_READ);
 		CHMOD_600.add(PosixFilePermission.OWNER_WRITE);
 	}
 
-	private final Logger log = LoggerFactory.getLogger(SSHService.class);
-	private File keystoreDirectory;
+	private final ILoggedPlugin activator;
+	private final File keystoreDirectory;
 
-	@Activate
-	private void activate() {
-		try {
-			keystoreDirectory = new File(KEYSTORE_DIRECTORY).getCanonicalFile();
-		} catch (final IOException e) {
-			log.error("Error while revolving SSH keystore", e);
-			keystoreDirectory = new File(KEYSTORE_DIRECTORY).getAbsoluteFile();
+	public SSHService(ILoggedPlugin activator) {
+		super();
+		this.activator = activator;
+		if (Security.getProperty(BouncyCastleProvider.PROVIDER_NAME) == null) {
+			try {
+				Security.addProvider(new BouncyCastleProvider());
+			} catch (Exception e) {
+				activator.error("There is a problem with Bouncy Castle (AFS will fall back to JCE implementation): " + e.getLocalizedMessage());
+			}
 		}
+		File f = null;
+		try {
+			f = new File(KEYSTORE_DIRECTORY).getCanonicalFile();
+		} catch (final IOException e) {
+			activator.error("Error while revolving SSH keystore", e);
+			f = new File(KEYSTORE_DIRECTORY).getAbsoluteFile();
+		}
+		keystoreDirectory = f;
 	}
 
 	private String computeKeyFingerprint(final KeyPair keyPair) throws IOException, GeneralSecurityException {
@@ -150,14 +149,14 @@ public class SSHService {
 			for (final File file : keyDirectory.listFiles()) {
 				if (file.isFile()) {
 					if (!file.setWritable(true)) {
-						log.warn("Cannot make file \"{}\" writable", file);
+						activator.warn("Cannot make file \"{}\" writable", file);
 					} else if (!file.delete()) {
-						log.warn("Unable to delete file \"{}\".", file);
+						activator.warn("Unable to delete file \"{}\".", file);
 					}
 				}
 			}
 			if (!keyDirectory.delete()) {
-				log.warn("Unable to delete directory \"{}\".", keyDirectory);
+				activator.warn("Unable to delete directory \"{}\".", keyDirectory);
 			}
 		}
 	}
@@ -392,13 +391,13 @@ public class SSHService {
 			Files.setPosixFilePermissions(keyFile.toPath(), CHMOD_600);
 		} catch (final UnsupportedOperationException e) {
 			if (!keyFile.setReadable(true, true)) {
-				log.debug("Unable to change file mode read: " + keyFile);
+				activator.debug("Unable to change file mode read: " + keyFile);
 			}
 			if (!keyFile.setWritable(false, false)) {
-				log.debug("Unable to change file mode write: " + keyFile);
+				activator.debug("Unable to change file mode write: " + keyFile);
 			}
 			if (!keyFile.setExecutable(false, false)) {
-				log.debug("Unable to change file mode execute: " + keyFile);
+				activator.debug("Unable to change file mode execute: " + keyFile);
 			}
 		}
 	}
