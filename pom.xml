@@ -269,6 +269,21 @@
 			                  <id>org.eclipse.ui.views</id>
 			                  <versionRange>0.0.0</versionRange>
 			                </requirement>
+			                <requirement>
+			                  <type>eclipse-plugin</type>
+			                  <id>org.eclipse.ui.forms</id>
+			                  <versionRange>0.0.0</versionRange>
+			                </requirement>
+			                <requirement>
+			                  <type>eclipse-plugin</type>
+			                  <id>com.arcadsoftware.aev.core.ui.rcp</id>
+			                  <versionRange>0.0.0</versionRange>
+			                </requirement>
+			                <requirement>
+			                  <type>eclipse-plugin</type>
+			                  <id>org.eclipse.jface.databinding</id>
+			                  <versionRange>0.0.0</versionRange>
+			                </requirement>
 			              </extraRequirements>
 			            </dependency-resolution>
 					</configuration>
