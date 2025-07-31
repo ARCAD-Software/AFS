@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: AFS CLI Commands
 Bundle-SymbolicName: com.arcadsoftware.tool.cli
 Bundle-Version-Comment: Check the Batch and Shell scripts tool.conf.bat and tool.conf.sh to match this number when you change this version number.
-Bundle-Version: 3.0.1.qualifier
+Bundle-Version: 3.0.1
 Bundle-Vendor: ARCAD Software
 Automatic-Module-Name: com.arcadsoftware.tool.cli
 Bundle-RequiredExecutionEnvironment: JavaSE-17
