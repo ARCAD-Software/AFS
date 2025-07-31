@@ -9,6 +9,74 @@
 	<artifactId>com.arcadsoftware.afs.client</artifactId>
 	<packaging>pom</packaging>
 
+	<build>
+		<pluginManagement>
+  			<plugins>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>target-platform-configuration</artifactId>
+					<version>${tycho.version}</version>
+					<configuration>
+						<target>
+							<artifact>
+								<groupId>com.arcadsoftware</groupId>
+								<artifactId>com.arcadsoftware.afs.platform</artifactId>
+								<version>2023.7.49-SNAPSHOT</version>
+							</artifact>
+						</target>
+						<executionEnvironment>JavaSE-1.8</executionEnvironment>
+						<pomDependencies>consider</pomDependencies>
+			            <dependency-resolution>
+			              <optionalDependencies>ignore</optionalDependencies>
+			              <extraRequirements>
+			                <requirement>
+			                  <type>eclipse-plugin</type>
+			                  <id>org.eclipse.ui</id>
+			                  <versionRange>0.0.0</versionRange>
+			                </requirement>
+			                <requirement>
+			                  <type>eclipse-plugin</type>
+			                  <id>org.eclipse.ui.views</id>
+			                  <versionRange>0.0.0</versionRange>
+			                </requirement>
+			                <requirement>
+			                  <type>eclipse-plugin</type>
+			                  <id>org.eclipse.ui.views.properties.tabbed</id>
+			                  <versionRange>0.0.0</versionRange>
+			                </requirement>
+			                <requirement>
+			                  <type>eclipse-plugin</type>
+			                  <id>org.eclipse.ui.forms</id>
+			                  <versionRange>0.0.0</versionRange>
+			                </requirement>
+			                <requirement>
+			                  <type>eclipse-plugin</type>
+			                  <id>com.arcadsoftware.aev.core.ui.rcp</id>
+			                  <versionRange>0.0.0</versionRange>
+			                </requirement>
+			                <requirement>
+			                  <type>eclipse-plugin</type>
+			                  <id>org.eclipse.jface.databinding</id>
+			                  <versionRange>0.0.0</versionRange>
+			                </requirement>
+			                <requirement>
+			                  <type>eclipse-plugin</type>
+			                  <id>org.eclipse.jface.databinding</id>
+			                  <versionRange>0.0.0</versionRange>
+			                </requirement>
+			                <requirement>
+			                  <type>eclipse-plugin</type>
+			                  <id>com.arcadsoftware.afs.client.core.rcp</id>
+			                  <versionRange>0.0.0</versionRange>
+			                </requirement>
+			              </extraRequirements>
+			            </dependency-resolution>
+					</configuration>
+				</plugin>
+  			</plugins>
+		</pluginManagement>
+	</build>
+
 	<modules>
 		<module>afs.client.brands</module>
 		<module>afs.client.core.base</module>
