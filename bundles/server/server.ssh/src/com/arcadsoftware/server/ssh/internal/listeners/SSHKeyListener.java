@@ -15,7 +15,6 @@ package com.arcadsoftware.server.ssh.internal.listeners;
 
 import java.io.IOException;
 
-import org.osgi.service.log.LogService;
 import org.restlet.data.Language;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;

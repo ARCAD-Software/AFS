@@ -35,7 +35,6 @@ import java.util.Base64;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.sshd.common.NamedResource;
 import org.apache.sshd.common.config.keys.FilePasswordProvider;
 import org.apache.sshd.common.config.keys.writer.openssh.OpenSSHKeyEncryptionContext;
@@ -73,7 +72,7 @@ public class SSHService {
 			try {
 				Security.addProvider(new BouncyCastleProvider());
 			} catch (Exception e) {
-				activator.error("There is a problem with Bouncy Castle (AFS will fall back to JCE implementation): " + e.getLocalizedMessage());
+				activator.error("There is a problem with Bouncy Castle (AFS will fall back to JCE implementation): " + e.getLocalizedMessage(), e);
 			}
 		}
 		File f = null;
@@ -137,14 +136,14 @@ public class SSHService {
 			for (final File file : keyDirectory.listFiles()) {
 				if (file.isFile()) {
 					if (!file.setWritable(true)) {
-						activator.warn("Cannot make file \"{}\" writable", file);
+						activator.warn("Cannot make file writable: " + file.getAbsolutePath());
 					} else if (!file.delete()) {
-						activator.warn("Unable to delete file \"{}\".", file);
+						activator.warn("Unable to delete file : " + file.getAbsolutePath());
 					}
 				}
 			}
 			if (!keyDirectory.delete()) {
-				activator.warn("Unable to delete directory \"{}\".", keyDirectory);
+				activator.warn("Unable to delete directory: " + keyDirectory.getAbsolutePath());
 			}
 		}
 	}
