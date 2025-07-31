@@ -2,7 +2,7 @@
 <feature
       id="com.arcadsoftware.afs.client.rcp"
       label="AFS Client for RCP Generic Feature"
-      version="2025.5.4"
+      version="2025.5.4.qualifier"
       provider-name="ARCAD Software"
       plugin="com.arcadsoftware.afs.framework">
 
