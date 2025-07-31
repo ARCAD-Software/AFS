@@ -256,6 +256,9 @@
 						</target>
 						<executionEnvironment>JavaSE-1.8</executionEnvironment>
 						<pomDependencies>consider</pomDependencies>
+			            <dependency-resolution>
+			              <optionalDependencies>ignore</optionalDependencies>
+			            </dependency-resolution>
 					</configuration>
 				</plugin>
   			</plugins>
