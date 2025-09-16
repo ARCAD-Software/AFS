@@ -13,7 +13,8 @@
  *******************************************************************************/
 package com.arcadsoftware.afs.client.server.internals.ui.composites;
 
-import org.apache.commons.lang3.time.FastDateFormat;
+import java.text.SimpleDateFormat;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -26,7 +27,7 @@ import com.arcadsoftware.crypt.CertificateInformation;
 
 public class SSLLocalCertificateListComposite extends AbstractAFSStandardComposite {
 
-	private static final FastDateFormat DF = FastDateFormat.getInstance("yyyyMMdd - HH:mm:sss");
+	private static final SimpleDateFormat DF = new SimpleDateFormat("yyyyMMdd - HH:mm:ss");
 
 	private List certificateList;
 	private java.util.List<CertificateInformation> input;

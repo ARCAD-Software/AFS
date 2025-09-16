@@ -13,11 +13,11 @@
  *******************************************************************************/
 package com.arcadsoftware.afs.client.core.ui.selectors;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Hashtable;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.eclipse.swt.graphics.Image;
 
 import com.arcadsoftware.afs.client.core.connection.DataAccessHelper;
@@ -63,14 +63,17 @@ public abstract class AbstractWSSearchSelector implements ISearchBeanMap {
 		}
 
 		final BeanMapList result = helper.getListFromPath(path.toString(), getType());
-		if (((result == null) || result.isEmpty()) && (helper.getLastMessage() != null)
-				&& StringUtils.isNotBlank(helper.getLastMessage().toString())) {
-			String message = helper.getLastMessage().toString();
-			if (helper.getLastCause() != null) {
-				message += "\n" + ExceptionUtils.getStackTrace(helper.getLastCause());
+		if (((result == null) || result.isEmpty()) && (helper.getLastMessage() != null)) {
+			final String message = helper.getLastMessage().toString();
+			if (!message.trim().isEmpty()) {
+				if (helper.getLastCause() != null) {
+					final StringWriter sw = new StringWriter();
+					helper.getLastCause().printStackTrace(new PrintWriter(sw));
+					message += '\n' + sw.toString();
+				}
+				Activator.getDefault().openError(message);
+				return null;
 			}
-			Activator.getDefault().openError(message);
-			return null;
 		}
 		return select(connection, result);
 	}
