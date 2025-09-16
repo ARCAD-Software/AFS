@@ -46,6 +46,7 @@
 		<unit id="org.hsqldb.hsqldb" version="0.0.0"/>
 		<unit id="wrapped.com.google.re2j.re2j" version="0.0.0"/>
 		<unit id="wrapped.net.sf.jmimemagic.jmimemagic" version="0.0.0"/>
+		<unit id="org.apache.commons.lang3" version="0.0.0"/>
 	</location>
 </locations>
 </target>
