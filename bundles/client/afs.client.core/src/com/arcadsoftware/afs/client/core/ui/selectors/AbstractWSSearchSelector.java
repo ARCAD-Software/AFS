@@ -64,7 +64,7 @@ public abstract class AbstractWSSearchSelector implements ISearchBeanMap {
 
 		final BeanMapList result = helper.getListFromPath(path.toString(), getType());
 		if (((result == null) || result.isEmpty()) && (helper.getLastMessage() != null)) {
-			final String message = helper.getLastMessage().toString();
+			String message = helper.getLastMessage().toString();
 			if (!message.trim().isEmpty()) {
 				if (helper.getLastCause() != null) {
 					final StringWriter sw = new StringWriter();
