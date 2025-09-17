@@ -36,6 +36,8 @@ import com.arcadsoftware.metadata.IMetaDataModifyListener;
 import com.arcadsoftware.metadata.IMetaDataUndeleteListener;
 import com.arcadsoftware.metadata.MetaDataEntity;
 import com.arcadsoftware.metadata.MetaDataEventHandler;
+import com.arcadsoftware.metadata.criteria.AndCriteria;
+import com.arcadsoftware.metadata.criteria.EqualCriteria;
 import com.arcadsoftware.osgi.AbstractConfiguredActivator;
 import com.arcadsoftware.rest.MultiLanguageMessages;
 import com.arcadsoftware.rest.RouteList;
@@ -204,15 +206,18 @@ public class Activator extends AbstractConfiguredActivator {
 					return;
 				}
 				int changed = 0;
-				BeanMapList prs = profileRights.dataSelection("right", false, "profile", p.getId());
+				final BeanMapList prs = profileRights.dataSelection("right", false, "profile", p.getId());
 				debug(String.format("ALL Rigths Profile update: The profile \"ALL\" (id:%d) currently contain %d Rights.", p.getId(), prs.size()));
-				BeanMapList list = rights.dataSelection();
+				final BeanMapList list = rights.dataSelection();
 				debug(String.format("ALL Rigths Profile update: There is %d Rights to test.", list.size()));
+				final EqualCriteria req = new EqualCriteria("right", 0);
+				final AndCriteria test = new AndCriteria(new EqualCriteria("profile", p.getId()), req); 
 				for (BeanMap r: list) {
 					if ((r.getId() > 0) && (prs.getFirst("right", r.getId()) == null)) {
 						synchronized (Activator.this) {
 							// Add any missing right !
-							if (profileRights.dataCount(true, "right", r.getId()) == 0) {
+							req.setIntval(r.getId());
+							if (profileRights.dataCount(true, test, false, null) == 0) {
 								profileRights.dataCreate("profile right", p.getId(), r.getId());
 								changed++;
 							}
