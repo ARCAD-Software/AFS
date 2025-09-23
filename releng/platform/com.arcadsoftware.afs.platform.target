@@ -137,7 +137,7 @@
 		<unit id="org.eclipse.urischeme" version="0.0.0"/>
 	</location>
 	<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="false" type="InstallableUnit">
-		<repository location="https://github.com/ARCAD-Software/arcad-evolution/releases/download/latest/"/>
+		<repository location="https://github.com/ARCAD-Software/arcad-evolution/releases/download/12.0.6/"/>
 		<unit id="com.arcadsoftware.aev.core.services" version="0.0.0"/>
 		<unit id="com.arcadsoftware.aev.core.ui.rcp" version="0.0.0"/>
 		<unit id="com.arcadsoftware.aev.core" version="0.0.0"/>
