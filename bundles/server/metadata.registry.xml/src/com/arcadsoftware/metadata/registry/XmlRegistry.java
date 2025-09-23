@@ -448,7 +448,7 @@ public class XmlRegistry implements IEntityRegistry {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void fireEvent(String topic, MetaDataEntity entity, String codes) {
-		if (activator.getContext().getBundle().getState() == Bundle.ACTIVE) {
+		if ((activator.getContext() != null) && (activator.getContext().getBundle().getState() == Bundle.ACTIVE)) {
 			// Déclenchement des évènements.
 			try {
 				ServiceReference sf = activator.getContext().getServiceReference(EventAdmin.class);
