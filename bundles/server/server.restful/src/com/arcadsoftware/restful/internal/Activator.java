@@ -56,6 +56,7 @@ import com.arcadsoftware.crypt.InstallCertificates;
 import com.arcadsoftware.osgi.AbstractActivator;
 import com.arcadsoftware.rest.BranchTracker;
 import com.arcadsoftware.rest.IBranch;
+import com.arcadsoftware.rest.IRestOSGiApplication;
 import com.arcadsoftware.rest.IRestServerMonitor;
 import com.arcadsoftware.rest.MultiLanguageMessages;
 import com.arcadsoftware.rest.OSGiApplication;
@@ -85,6 +86,7 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 	private ServiceRegistration<CommandProvider> consoleReg;
 	private ServiceRegistration<IRestServerMonitor> monitorReg;
 	private ServiceRegistration<OSGiApplication> appService;
+	private ServiceRegistration<IRestOSGiApplication> appRestService;
 	private MultiLanguageMessages messages;
 	private volatile ServerProperties serverProps;
 	private volatile Date startDate;
@@ -197,6 +199,10 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 	}
 	
 	public OSGiApplication createApplication(boolean httpServer, boolean httpsServer) {
+		if (appRestService != null) {
+			appRestService.unregister();
+			appRestService = null;
+		}
 		if (appService != null) {
 			appService.unregister();
 			appService = null;
@@ -250,8 +256,6 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 		// prepare the unique Root branches tracker.
 		rootTracker = new BranchTracker(application, null);
 		restletTracker = new ServiceTracker<Restlet, Restlet>(getContext(), Restlet.class, new RestletServiceTrackerCustomizer(application, this));
-		// Register the Application service.
-		appService = getContext().registerService(OSGiApplication.class, application, new Hashtable<String, Object>());
 		return application;
 	}
 
@@ -303,6 +307,10 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 		if (appService != null) {
 			appService.unregister();
 			appService = null;
+		}
+		if (appRestService != null) {
+			appRestService.unregister();
+			appRestService = null;
 		}
 		// Inform the tracker that the application is about to be stoped.
 		if (rootTracker != null) {
@@ -438,7 +446,10 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 		        // Note that the HTTP server connector is also automatically started.
 				component.start();
 				// TODO Test if the servers are available...
-				
+				// Register the Application as a service. (Keep it for compatibility reasons.)
+				appService = getContext().registerService(OSGiApplication.class, application, new Hashtable<String, Object>());
+				// As it is better to register an Interface instead of the implementation class:
+				appRestService = getContext().registerService(IRestOSGiApplication.class, application, new Hashtable<String, Object>());
 				// Start the root branches tracker.
 				if (rootTracker != null) {
 					rootTracker.open();
