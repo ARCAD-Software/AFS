@@ -158,10 +158,10 @@ public class Exec {
 		}
 		// Add specific jar tools...
 		if ("com.arcadsoftware.tool.cli.DBH2BackupVersion14199".equals(classname)) {
-			File h2Driver = getJar(toolsDir.listFiles(), "h2-1"); //$NON-NLS-1$
+			File h2Driver = getJar(toolsDir.listFiles(), "com.h2database.light_1.4."); //$NON-NLS-1$
 			if (h2Driver == null) {
 				System.err.println(
-						"WARNING: The legacy H2 driver version 1.x must be present in the tools directory to be able to upgrade the database.");
+						"WARNING: The legacy H2 driver version 1.4.x must be present in the tools directory to be able to upgrade the database.");
 				return 36;
 			}
 			files.add(h2Driver);
