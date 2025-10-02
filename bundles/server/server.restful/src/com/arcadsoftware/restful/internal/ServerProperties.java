@@ -49,6 +49,8 @@ public class ServerProperties {
 	private static final String PROP_LICENSE_NAME = "license.name"; //$NON-NLS-1$
 	private static final String PROP_COPYRIGHT = "copyright"; //$NON-NLS-1$
 	private static final String PROP_URL = "website"; //$NON-NLS-1$
+	private static final String PROP_INTERFACE = "interface"; //$NON-NLS-1$
+	private static final String PROP_SYSTEMINTERFACE = "com.arcadsoftware.rest.interface"; //$NON-NLS-1$
 
 	private final int port;
 	private final int portssl;
@@ -81,11 +83,13 @@ public class ServerProperties {
 	private final String licenseURL;
 	private final String termsOfService;
 	private final String webSite;
+	private final String ethernetInterface;
 	
 	public ServerProperties(final Dictionary<String, ?> properties, final Bundle brandingBundle, final Bundle thisBundle) {
 		super();
 		port = getPortNumber(properties, PROP_PORTNUMBER);
 		portssl = getPortNumber(properties, PROP_PORTSSL);
+		ethernetInterface = getProperty(properties, PROP_INTERFACE, System.getProperty(PROP_SYSTEMINTERFACE, null));
 		// Branding bundle supersed name, author and version properties
 		if (brandingBundle != null) {
 			String s = brandingBundle.getHeaders().get(Constants.BUNDLE_NAME);
@@ -155,7 +159,11 @@ public class ServerProperties {
 		}
 		String dn = getProperty(properties, PROP_DOMAINNAME, getLocalhostName());
 		if (dn.equalsIgnoreCase("none")) { //$NON-NLS-1$
-			domainname = ""; //$NON-NLS-1$
+			if (ethernetInterface == null) {
+				domainname = ""; //$NON-NLS-1$
+			} else {
+				domainname = ethernetInterface;
+			}
 		} else {
 			domainname = dn;
 		}
@@ -184,6 +192,7 @@ public class ServerProperties {
 		super();
 		port = initPort("com.arcadsoftware.rest.port", "5252"); //$NON-NLS-1$ //$NON-NLS-2$
 		portssl = initPort("com.arcadsoftware.rest.sslport", "0"); //$NON-NLS-1$ //$NON-NLS-2$
+		ethernetInterface = System.getProperty(PROP_SYSTEMINTERFACE, null);
 		name = thisBundle.getHeaders().get(Constants.BUNDLE_NAME);
 		author = thisBundle.getHeaders().get(Constants.BUNDLE_VENDOR);
 		version = thisBundle.getVersion().toString();
@@ -496,6 +505,10 @@ public class ServerProperties {
 
 	public String getLicenseURL() {
 		return licenseURL;
+	}
+
+	public String getEthernetInterface() {
+		return ethernetInterface;
 	}
 
 }
