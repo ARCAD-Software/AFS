@@ -350,7 +350,7 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 				if (useHTTPS()) {
 					https = true;
 					Server server = new Server(component.getServers().getContext().createChildContext(), //
-							Arrays.asList(Protocol.HTTPS), null, serverProps.getPortssl(), component.getServers().getNext(), HttpsServerHelper.class.getName()); 
+							Arrays.asList(Protocol.HTTPS), serverProps.getEthernetInterface(), serverProps.getPortssl(), component.getServers().getNext(), HttpsServerHelper.class.getName()); 
 					if (!server.isAvailable()) {
 						throw new ServerConfigurationException("The HTTPS Server connector is not available. Please check the server configuration, some bundles may be absent or not started, correct the error and refresh this bundle.");
 					}
@@ -404,7 +404,7 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 				}
 				if (serverProps.getPort() > 0) {
 					Server server = new Server(component.getServers().getContext().createChildContext(), //
-							Arrays.asList(Protocol.HTTP), null, serverProps.getPort(), component.getServers().getNext(), HttpServerHelper.class.getName());
+							Arrays.asList(Protocol.HTTP), serverProps.getEthernetInterface(), serverProps.getPort(), component.getServers().getNext(), HttpServerHelper.class.getName());
 					if (!server.isAvailable()) {
 						throw new ServerConfigurationException("The HTTP Server connector is not available. Please check the server configuration, some bundles may be absent or not started, correct the error and refresh this bundle.");
 					}
