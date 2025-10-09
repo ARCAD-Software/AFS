@@ -511,18 +511,27 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 	}
 	
 	private void recordUserUnlockProcess(final int uid, long delay) {
-		final Timer t = new Timer("User Unlock management"); //$NON-NLS-1$
-		unlockTimers.put(uid, t);
-		t.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				unlockUser(uid, false);
+		if (unlockTimers.get(uid) == null) {
+			synchronized (unlockTimers) {
+				if (unlockTimers.get(uid) == null) {
+					final Timer t = new Timer("User Unlock management"); //$NON-NLS-1$
+					unlockTimers.put(uid, t);
+					t.schedule(new TimerTask() {
+						@Override
+						public void run() {
+							unlockUser(uid, false);
+						}
+					}, delay);
+				}
 			}
-		}, delay);
+		}
 	}
 	
 	private void unlockUser(final int uid, final boolean secondTry) {
-		Timer t = unlockTimers.remove(uid);
+		Timer t;
+		synchronized (unlockTimers) {
+			t = unlockTimers.remove(uid);
+		}
 		t.cancel();
 		try {
 			MetaDataEntity entity = MetaDataEntity.loadEntity(LOCALAUTH);
@@ -540,13 +549,6 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 			info("There was an error while trying to unlock a local User (another try will be run: " + e.getLocalizedMessage());
 			// if there is an error, we assume that this error is recoverable in a next attempt...
 		}
-		t = new Timer("User Unlock management (retry)"); //$NON-NLS-1$
-		unlockTimers.put(uid, t);
-		t.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				unlockUser(uid, true);
-			}
-		}, 15000);
+		recordUserUnlockProcess(uid, 15000);
 	}
 }
