@@ -952,6 +952,188 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 	}
 
 	@Override
+	public long update(List<MetaDataAttribute> attributes, Iterator<BeanMap> items, IConnectionUserBean currentUser) {
+		if ((attributes == null) || attributes.isEmpty() || (items == null) || !items.hasNext()) {
+			return 0;
+		}
+		final MetaDataEntity entity = attributes.get(0).getParent();
+		final EntityInfo e = getEntityInfo(entity);
+		if (e == null) {
+			return 0;
+		}
+		final StringBuilder udtcols = new StringBuilder();
+		Iterator<MetaDataAttribute> itt = attributes.iterator();
+		while (itt.hasNext()) {
+			MetaDataAttribute att = itt.next();
+			if (att == null) {
+				itt.remove();
+			} else if (att.isReadonly()) {
+				itt.remove();
+			} else {
+				String col = e.attributesCols.get(att.getCode());
+				if ((col == null) || (col.indexOf(COLUMNPREFIX_PLACEHOLDER) >= 0)) {
+					// Shielding: Compound columns should always be declared as readonly.
+					itt.remove();
+				} else {
+					if (!udtcols.isEmpty()) {
+						udtcols.append(fg.columnsep);
+					}
+					udtcols.append(col);
+					udtcols.append(fg.paramequal);	
+				}
+			}
+		}
+		if (e.updateCol != null) {
+			if (!udtcols.isEmpty()) {
+				udtcols.append(fg.columnsep);
+			}
+			udtcols.append(e.updateCol);
+			udtcols.append(fg.paramequal);
+		}
+		if ((e.muidCol != null) && (currentUser != null) && (currentUser.getId() > 0)) {
+			if (!udtcols.isEmpty()) {
+				udtcols.append(fg.columnsep);
+			}
+			udtcols.append(e.muidCol);
+			udtcols.append(" = "); //$NON-NLS-1$
+			udtcols.append(currentUser.getId());
+		}
+		long result = 0;
+		try (Connection c = getDataSource().getConnection()) {
+			try (PreparedStatement ps = c.prepareStatement(String.format(fg.update, e.table, udtcols.toString(), e.idCol))) {
+				while (items.hasNext()) {
+					BeanMap value = items.next();
+					if (value != null) {
+						String type = value.getType();
+						if ((type == null) || (type.isEmpty() || type.equalsIgnoreCase(entity.getType()))) {
+							int i = 1;
+							for (MetaDataAttribute att: attributes) {
+								Object v = filterValue(att, value.get(att.getCode()));
+								if (v == null) {
+									ps.setNull(i++, getSQLType(att));
+								} else {
+									ps.setObject(i++, v);
+								}
+							}
+							if (e.updateCol != null) {
+								ps.setTimestamp(i++, new Timestamp(System.currentTimeMillis()));
+							}
+							ps.setInt(i, value.getId());
+							ps.addBatch();
+							result++;
+							if ((result & 0x7F) == 0) { // = 128
+								ps.executeBatch();
+							}
+						}
+					}
+				}
+				if ((result & 0x7F) != 0) { // != 128
+					ps.executeBatch();
+				}
+			}
+		} catch (SQLException ee) {
+			Activator.getInstance().error("Batch Insertion error: " + ee.getLocalizedMessage(), ee);
+		}
+		return result;
+	}
+
+	@Override
+	public long update(List<MetaDataAttribute> attributes, Iterator<BeanMap> items, MetaDataAttribute testAttribute,
+			IConnectionUserBean currentUser) {
+		if ((attributes == null) || attributes.isEmpty() || (items == null) || !items.hasNext()) {
+			return 0;
+		}
+		final MetaDataEntity entity = attributes.get(0).getParent();
+		final EntityInfo e = getEntityInfo(entity);
+		if (e == null) {
+			return 0;
+		}
+		final StringBuilder udtcols = new StringBuilder();
+		Iterator<MetaDataAttribute> itt = attributes.iterator();
+		while (itt.hasNext()) {
+			MetaDataAttribute att = itt.next();
+			if (att == null) {
+				itt.remove();
+			} else if (att.isReadonly()) {
+				itt.remove();
+			} else {
+				String col = e.attributesCols.get(att.getCode());
+				if ((col == null) || (col.indexOf(COLUMNPREFIX_PLACEHOLDER) >= 0)) {
+					// Shielding: Compound columns should always be declared as readonly.
+					itt.remove();
+				} else {
+					if (!udtcols.isEmpty()) {
+						udtcols.append(fg.columnsep);
+					}
+					udtcols.append(col);
+					udtcols.append(fg.paramequal);	
+				}
+			}
+		}
+		if (e.updateCol != null) {
+			if (!udtcols.isEmpty()) {
+				udtcols.append(fg.columnsep);
+			}
+			udtcols.append(e.updateCol);
+			udtcols.append(fg.paramequal);
+		}
+		if ((e.muidCol != null) && (currentUser != null) && (currentUser.getId() > 0)) {
+			if (!udtcols.isEmpty()) {
+				udtcols.append(fg.columnsep);
+			}
+			udtcols.append(e.muidCol);
+			udtcols.append(" = "); //$NON-NLS-1$
+			udtcols.append(currentUser.getId());
+		}
+		String testcol = e.attributesCols.get(testAttribute.getCode());
+		if ((testcol == null) || (testcol.indexOf(COLUMNPREFIX_PLACEHOLDER) >= 0)) {
+			return 0;
+		}
+		long result = 0;
+		try (Connection c = getDataSource().getConnection()) {
+			try (PreparedStatement ps = c.prepareStatement(String.format(fg.update, e.table, udtcols.toString(), testcol))) {
+				while (items.hasNext()) {
+					BeanMap value = items.next();
+					if (value != null) {
+						String type = value.getType();
+						if ((type == null) || (type.isEmpty() || type.equalsIgnoreCase(entity.getType()))) {
+							int i = 1;
+							for (MetaDataAttribute att: attributes) {
+								Object v = filterValue(att, value.get(att.getCode()));
+								if (v == null) {
+									ps.setNull(i++, getSQLType(att));
+								} else {
+									ps.setObject(i++, v);
+								}
+							}
+							if (e.updateCol != null) {
+								ps.setTimestamp(i++, new Timestamp(System.currentTimeMillis()));
+							}
+							Object v = filterValue(testAttribute, value.get(testAttribute.getCode()));
+							if (v == null) {
+								ps.setNull(i++, getSQLType(testAttribute));
+							} else {
+								ps.setObject(i++, v);
+							}
+							ps.addBatch();
+							result++;
+							if ((result & 0x7F) == 0) { // = 128
+								ps.executeBatch();
+							}
+						}
+					}
+				}
+				if ((result & 0x7F) != 0) { // != 128
+					ps.executeBatch();
+				}
+			}
+		} catch (SQLException ee) {
+			Activator.getInstance().error("Batch Insertion error: " + ee.getLocalizedMessage(), ee);
+		}
+		return result;
+	}
+
+	@Override
 	protected boolean doUpdate(List<MetaDataAttribute> attributes, List<Object> values, ISearchCriteria criteria, SQLCriteriaContext context) {
 		if (!context.isValid()) {
 			return false;

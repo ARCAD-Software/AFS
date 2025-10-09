@@ -988,7 +988,42 @@ public interface IMapperService {
 	 * @return true if some of the items have been successfully updated.
 	 */
 	public boolean update(MetaDataEntity entity, List<MetaDataAttribute> attributes, List<Object> values, ISearchCriteria criteria, IConnectionUserBean currentUser);
-
+	
+	/**
+	 * Update a set of elements into the storage base.
+	 *
+	 * <p>
+	 * This method will use the ID of the BeanMap to identify the data to update. 
+	 * 
+	 * @param attributes
+	 *            A non null, non empty list of attributes to update.
+	 * @param items
+	 *            A non null Stream of BeanMap containing the information to update.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return the number of items updated.
+	 */
+	public long update(List<MetaDataAttribute> attributes, Iterator<BeanMap> items, IConnectionUserBean currentUser);
+	
+	/**
+	 * Update a set of elements into the storage base.
+	 *
+	 * <p>
+	 * This method will use the value of the "testAttribute" in the BeanMap to identify the data to update.
+	 * The ID are ignored. 
+	 * 
+	 * @param attributes
+	 *            A non null, non empty list of attributes to update.
+	 * @param items
+	 *            A non null Stream of BeanMap containing the information to update.
+	 * @param testAttribute
+	 *            A non null, non empty list of attributes to update.
+	 * @param currentUser
+	 *            The connected user that is at the origin of this request. Can be null.
+	 * @return the total number of items updated.
+	 */
+	public long update(List<MetaDataAttribute> attributes, Iterator<BeanMap> items, MetaDataAttribute testAttribute, IConnectionUserBean currentUser);
+	
 	/**
 	 * Select an item from the storage.
 	 * 

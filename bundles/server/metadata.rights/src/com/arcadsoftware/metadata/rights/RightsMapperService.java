@@ -99,6 +99,17 @@ public class RightsMapperService extends AbstractMapperService<CriteriaContextBa
 	}
 
 	@Override
+	public long update(List<MetaDataAttribute> attributes, Iterator<BeanMap> items, IConnectionUserBean currentUser) {
+		return 0;
+	}
+
+	@Override
+	public long update(List<MetaDataAttribute> attributes, Iterator<BeanMap> items, MetaDataAttribute testAttribute,
+			IConnectionUserBean currentUser) {
+		return 0;
+	}
+
+	@Override
 	public BeanMap selection(MetaDataEntity entity, int itemId, List<ReferenceLine> attributes, boolean deleted) {
 		BeanMap item;
 		if (Activator.RIGHT.equals(entity.getType())) {

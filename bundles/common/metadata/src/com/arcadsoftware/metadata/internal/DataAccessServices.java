@@ -1361,4 +1361,18 @@ public class DataAccessServices implements IMapperService, IEntityRegistry {
 		return i.get();
 	}
 
+	@Override
+	public long update(List<MetaDataAttribute> attributes, Iterator<BeanMap> items, IConnectionUserBean currentUser) {
+		final AtomicLong i = new AtomicLong(0);
+		items.forEachRemaining(b -> { update(b); i.incrementAndGet(); });
+		return i.get();
+	}
+
+	@Override
+	public long update(List<MetaDataAttribute> attributes, Iterator<BeanMap> items, MetaDataAttribute testAttribute,
+			IConnectionUserBean currentUser) {
+		// TODO DataAccess does not implement multi-update !!!!
+		return 0;
+	}
+
 }
