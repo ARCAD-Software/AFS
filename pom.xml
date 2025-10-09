@@ -13,6 +13,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>17</maven.compiler.source>
 		<maven.compiler.target>17</maven.compiler.target>
+		<maven.deloy.version>3.1.4</maven.deloy.version>
 		<tycho.version>4.0.13</tycho.version>
 		<tycho.extra.version>4.0.13</tycho.extra.version>
 		<keystore></keystore>
@@ -249,7 +250,7 @@
 		<plugin>
 			<groupId>org.apache.maven.plugins</groupId>
 			<artifactId>maven-deploy-plugin</artifactId>
-			<version>3.1.4</version>
+			<version>${maven.deloy.version}</version>
 			<configuration>
 				<skip>snapshots</skip>
 			</configuration>
@@ -284,6 +285,21 @@
 			</plugins>
 		</pluginManagement>
 	</build>
+
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>GitHub Packages</name>
+			<url>https://maven.pkg.github.com/ARCAD-Software/AFS</url>
+		</repository>
+	</distributionManagement>
+
+	<licenses>
+	    <license>
+	        <name>Eclipse Public License - v 2.0</name>
+	        <url>https://www.eclipse.org/legal/epl-2.0/</url>
+	    </license>
+	</licenses>
 
 	<modules>
 		<module>bundles</module>
