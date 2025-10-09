@@ -444,6 +444,9 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 	 * @see #registerService(java.lang.String[], java.lang.Object, java.util.Dictionary)
 	 */
 	public ServiceRegistration<?> registerService(String clazz, Object service, Dictionary<String, ?> properties) {
+		if (context == null) {
+			return null;
+		}
 		ServiceRegistration<?> reg = context.registerService(clazz, service, properties);
 		if (reg != null) {
 			serviceRegistrationList.add(reg);
@@ -477,6 +480,9 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 	 * @see #registerService(java.lang.String[], java.lang.Object, java.util.Dictionary)
 	 */
 	public <T> ServiceRegistration<T> registerService(Class<T> clazz, T service, Dictionary<String, ?> properties) {
+		if (context == null) {
+			return null;
+		}
 		ServiceRegistration<T> reg = context.registerService(clazz, service, properties);
 		if (reg != null) {
 			serviceRegistrationList.add(reg);
@@ -584,6 +590,9 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 	 * @see ServiceFactory
 	 */
 	public ServiceRegistration<?> registerService(String[] clazz, Object service, Dictionary<String, ?> properties) {
+		if (context == null) {
+			return null;
+		}
 		ServiceRegistration<?> reg = context.registerService(clazz, service, properties);
 		if (reg != null) {
 			serviceRegistrationList.add(reg);
@@ -1168,18 +1177,16 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 		}
 		if (isBundleStarted(symbolicNames)) {
 			runnable.run();
-		} else {
-			if (context != null) {
-				addBundleListener(new BundleListener() {
-					public void bundleChanged(BundleEvent event) {
-						if ((event.getType() == BundleEvent.STARTED) && isBundleStarted(symbolicNames)) {
-							runnable.run();
-							AbstractActivator.this.context.removeBundleListener(this);
-							AbstractActivator.this.bundleListenerList.remove(this);
-						}
+		} else if (context != null) {
+			addBundleListener(new BundleListener() {
+				public void bundleChanged(BundleEvent event) {
+					if ((event.getType() == BundleEvent.STARTED) && isBundleStarted(symbolicNames)) {
+						runnable.run();
+						AbstractActivator.this.context.removeBundleListener(this);
+						AbstractActivator.this.bundleListenerList.remove(this);
 					}
-				});
-			} 
+				}
+			});
 		}
 	}
 		
@@ -1195,7 +1202,7 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 	 * @param listener The {@code BundleListener} to be added.
 	 */
 	public void addBundleListener(final BundleListener bundleListener) {
-		if (!bundleListenerList.contains(bundleListener)) {
+		if (!bundleListenerList.contains(bundleListener) && (context != null)) {
 			bundleListenerList.add(bundleListener);
 			try {
 				context.addBundleListener(bundleListener);
@@ -1298,23 +1305,25 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 	 * @return an empty array if no services where found.
 	 */
 	public <T> List<T> getServices(Class<T> clazz) {
-		try {
-			Collection<ServiceReference<T>> srs = context.getServiceReferences(clazz, null);
-			if (srs != null) {
-				ArrayList<T> rs = new ArrayList<T>(srs.size());
-				for (ServiceReference<T> sr: srs) {
-					T r = context.getService(sr);
-					if (r != null) {
-						rs.add(r);
+		if (context != null) {
+			try {
+				Collection<ServiceReference<T>> srs = context.getServiceReferences(clazz, null);
+				if (srs != null) {
+					ArrayList<T> rs = new ArrayList<T>(srs.size());
+					for (ServiceReference<T> sr: srs) {
+						T r = context.getService(sr);
+						if (r != null) {
+							rs.add(r);
+						}
 					}
+					return rs;
 				}
-				return rs;
+			} catch (IllegalStateException e) {
+				debug(e);
+			} catch (InvalidSyntaxException e) {
+				debug(e);
 			}
-		} catch (IllegalStateException e) {
-			debug(e);
-		} catch (InvalidSyntaxException e) {
-			debug(e);
-		};
+		}
 		return new ArrayList<T>();
 	}
 	
@@ -1326,6 +1335,9 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 	 * @return null if no services are available.
 	 */
 	public Object getService(String clazz, String filter) {
+		if (context == null) {
+			return null;
+		}
 		ServiceReference<?>[] sr;
 		try {
 			sr = context.getServiceReferences(clazz, filter);
@@ -1346,6 +1358,9 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 	 * @return
 	 */
 	public <T> T getService(Class<T> serviceClass) {
+		if (context == null) {
+			return null;
+		}
 		ServiceReference<?>[] srs = null;
 		try {
 			srs = context.getServiceReferences(serviceClass.getName(), null);
