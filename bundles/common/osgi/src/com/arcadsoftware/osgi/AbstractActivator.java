@@ -1182,8 +1182,10 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 				public void bundleChanged(BundleEvent event) {
 					if ((event.getType() == BundleEvent.STARTED) && isBundleStarted(symbolicNames)) {
 						runnable.run();
-						AbstractActivator.this.context.removeBundleListener(this);
-						AbstractActivator.this.bundleListenerList.remove(this);
+						if (AbstractActivator.this.context != null) {
+							AbstractActivator.this.context.removeBundleListener(this);
+							AbstractActivator.this.bundleListenerList.remove(this);
+						}
 					}
 				}
 			});
