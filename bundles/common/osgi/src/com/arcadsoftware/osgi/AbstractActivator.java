@@ -411,6 +411,9 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 	 * @see #registerService(java.lang.String[], java.lang.Object, java.util.Dictionary)
 	 */
 	public ServiceRegistration<?> registerService(String clazz, Object service, Dictionary<String, ?> properties) {
+		if (context == null) {
+			return null;
+		}
 		ServiceRegistration<?> reg = context.registerService(clazz, service, properties);
 		if (reg != null) {
 			serviceRegistrationList.add(reg);
@@ -444,6 +447,9 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 	 * @see #registerService(java.lang.String[], java.lang.Object, java.util.Dictionary)
 	 */
 	public <T> ServiceRegistration<T> registerService(Class<T> clazz, T service, Dictionary<String, ?> properties) {
+		if (context == null) {
+			return null;
+		}
 		ServiceRegistration<T> reg = context.registerService(clazz, service, properties);
 		if (reg != null) {
 			serviceRegistrationList.add(reg);
@@ -477,6 +483,9 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 	 * @see #registerService(java.lang.String[], java.lang.Object, java.util.Dictionary)
 	 */
 	public <T> ServiceRegistration<T> registerService(Class<T> clazz, ServiceFactory<T> serviceFactory, Dictionary<String, ?> properties) {
+		if (context == null) {
+			return null;
+		}
 		ServiceRegistration<T> reg = context.registerService(clazz, serviceFactory, properties);
 		if (reg != null) {
 			serviceRegistrationList.add(reg);
@@ -551,6 +560,9 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 	 * @see ServiceFactory
 	 */
 	public ServiceRegistration<?> registerService(String[] clazz, Object service, Dictionary<String, ?> properties) {
+		if (context == null) {
+			return null;
+		}
 		ServiceRegistration<?> reg = context.registerService(clazz, service, properties);
 		if (reg != null) {
 			serviceRegistrationList.add(reg);
