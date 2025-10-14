@@ -50,6 +50,9 @@ public class Activator extends AbstractActivator {
 	protected static final String TYPE_PROFILE = "profile"; //$NON-NLS-1$
 	protected static final String TYPE_PROFILERIGHT = "profileRight"; //$NON-NLS-1$
 	protected static final String TYPE_RIGHT = "right"; //$NON-NLS-1$
+	protected static final String PROFILERIGHT_RIGHT = TYPE_RIGHT;
+	protected static final String PROFILERIGHT_PROFILE = TYPE_PROFILE;
+	protected static final String PROFILERIGHT_PROFILE_RIGHT = PROFILERIGHT_PROFILE + ' ' + PROFILERIGHT_RIGHT;
 	protected static final String LINK_PROFILES = "profiles"; //$NON-NLS-1$
 	protected static final String LINK_PROFILERIGHTS = "profilerights"; //$NON-NLS-1$
 	protected static final String LINK_USERS = "users"; //$NON-NLS-1$
@@ -163,11 +166,11 @@ public class Activator extends AbstractActivator {
 				}
 				MetaDataEntity rights = MetaDataEntity.loadEntity(TYPE_RIGHT);
 				if (rights == null) {
-					debug("ALL Rigths Profile update: Entity Right not yet declared.");
+					debug("ALL Rights Profile update: Entity Right not yet declared.");
 					return;
 				}
 				if (rights.getMapper() == null) {
-					debug("ALL Rigths Profile update: Entity Right mapper not activated.");
+					debug("ALL Rights Profile update: Entity Right mapper not activated.");
 					return;
 				}
 				final BeanMap p = profiles.dataSelectionFirst("", false, "code", "ALL"); //$NON-NLS-1 //$NON-NLS-2$$
@@ -176,32 +179,38 @@ public class Activator extends AbstractActivator {
 					return;
 				}
 				int changed = 0;
-				final BeanMapList prs = profileRights.dataSelection("right", false, "profile", p.getId());
-				debug(String.format("ALL Rigths Profile update: The profile \"ALL\" (id:%d) currently contain %d Rights.", p.getId(), prs.size()));
+				final BeanMapList prs = profileRights.dataSelection(PROFILERIGHT_RIGHT, true, PROFILERIGHT_PROFILE, p.getId());
+				debug(String.format("ALL Rights Profile update: The profile \"ALL\" (id:%d) currently contain %d Rights.", p.getId(), prs.size()));
 				final BeanMapList list = rights.dataSelection();
-				debug(String.format("ALL Rigths Profile update: There is %d Rights to test.", list.size()));
-				final EqualCriteria req = new EqualCriteria("right", 0);
-				final AndCriteria test = new AndCriteria(new EqualCriteria("profile", p.getId()), req); 
+				debug(String.format("ALL Rights Profile update: There is %d Rights to test.", list.size()));
+				final EqualCriteria req = new EqualCriteria(PROFILERIGHT_RIGHT, 0);
+				final AndCriteria test = new AndCriteria(new EqualCriteria(PROFILERIGHT_PROFILE, p.getId()), req); 
 				for (BeanMap r: list) {
-					if ((r.getId() > 0) && (prs.getFirst("right", r.getId()) == null)) {
+					if (r.getId() <= 0) {
+						warn("ALL Rights Profile update: Some Rights are defined with null or negative ID !");
+					} else if (prs.getFirst(PROFILERIGHT_RIGHT, r.getId()) == null) {
 						synchronized (Activator.this) {
 							// Add any missing right !
 							req.setIntval(r.getId());
 							if (profileRights.dataCount(true, test, false, null) == 0) {
-								profileRights.dataCreate("profile right", p.getId(), r.getId());
+								profileRights.dataCreate(PROFILERIGHT_PROFILE_RIGHT, p.getId(), r.getId());
 								changed++;
+							} else {
+								debug(String.format("ALL Rights Profile update: The right %d was not in the original profile but the database found it anyway !", r.getId()));
 							}
 						}
 					}
 				}
 				if (changed > 0) {
-					info(String.format("ALL Rigths Profile update: Profile updated. %d Rights added to Profile \"ALL\".", changed));
-					debug("ALL Rigths Profile update: Purge connection cache after Profile \"ALL\" update.");
+					info(String.format("ALL Rights Profile update: Profile updated. %d Rights added to Profile \"ALL\".", changed));
+					debug("ALL Rights Profile update: Purge connection cache after Profile \"ALL\" update.");
 					for (IConnectionCache cache: Activator.this.getServices(IConnectionCache.class)) {
 						if (cache != null) {
 							cache.purgeAll(Activator.TYPE_USER);
 						}
 					}
+				} else if (list.size() > prs.size()) {
+					warn("ALL Rights Profile Update: No right added to the profile but the list of rights is higher than the actual rights in this profile !");
 				}
 			}
 		}, "User Profile ALL update").start();
