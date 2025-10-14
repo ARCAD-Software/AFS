@@ -45,7 +45,7 @@ jobs:
       env: 
         KEY_PASSWORD: ${{ secrets.CODESIGN_KEY_PASSWORD }}
         KEYSTORE_PASSWORD: ${{ secrets.CODESIGN_KEYSTORE_PASSWORD }}
-		GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
          
     - name: Release and upload flat P2 website
       uses: softprops/action-gh-release@v1
