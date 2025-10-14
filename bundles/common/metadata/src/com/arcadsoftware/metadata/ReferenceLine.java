@@ -32,12 +32,32 @@ import com.arcadsoftware.metadata.internal.Activator;
 /**
  * A line is a chained list of EntityElement where the type of the element i is the same type that the parent of the element i+1
  *
+ * @author ARCAD Software
  */
 public class ReferenceLine extends ArrayList<Element> implements Comparable<ReferenceLine> {
 
-	
+	/**
+	 * Special kind of Reference Line used to represent the "Modification date" of the data.
+	 * 
+	 * <p>
+	 * Only usable to sort a selection.
+	 */
 	public static final String ORDERBY_DATE = "1"; //$NON-NLS-1$
+
+	/**
+	 * Special kind of Reference Line used to represent the "Modification user" of the data.
+	 * 
+	 * <p>
+	 * Only usable to sort a selection.
+	 */
 	public static final String ORDERBY_MUID = "2"; //$NON-NLS-1$
+
+	/**
+	 * Special kind of Reference Line used to represent the "Internal Identifier" of the data.
+	 * 
+	 * <p>
+	 * Only usable to sort a selection.
+	 */
 	public static final String ORDERBY_ID = "3"; //$NON-NLS-1$
 	
 	/**
@@ -207,14 +227,6 @@ public class ReferenceLine extends ArrayList<Element> implements Comparable<Refe
 		this.code = code;
 	}
 
-    @Override
-	public boolean equals(Object o) {
-		if ((o instanceof ReferenceLine) && (code != null) && (((ReferenceLine) o).code != null)) {
-			return code.equals(((ReferenceLine) o).code);
-		}
-		return super.equals(o);
-	}
-
 	/**
      * Constructs an empty list with the specified initial capacity.
      *
@@ -270,6 +282,14 @@ public class ReferenceLine extends ArrayList<Element> implements Comparable<Refe
 	public ReferenceLine(String code, int length, boolean flaged) {
 		this(code, length);
 		this.flaged = flaged;
+	}
+
+    @Override
+	public boolean equals(Object o) {
+		if ((o instanceof ReferenceLine) && (code != null) && (((ReferenceLine) o).code != null)) {
+			return code.equals(((ReferenceLine) o).code);
+		}
+		return super.equals(o);
 	}
 
 	/**
@@ -330,6 +350,16 @@ public class ReferenceLine extends ArrayList<Element> implements Comparable<Refe
 	 */
 	public boolean isSimple() {
 		return size() == 1;
+	}
+
+	/**
+	 * @return true if this reference line is a special one, and do not represent a chain of links or attributes.
+	 */
+	public boolean isSpecialCode() {
+		return isEmpty() && (code != null) && (code.length() == 1) && ( //
+				ORDERBY_DATE.equals(code) || //
+				ORDERBY_MUID.equals(code) || //
+				ORDERBY_ID.equals(code));
 	}
 	
 	public boolean makeFinal() {

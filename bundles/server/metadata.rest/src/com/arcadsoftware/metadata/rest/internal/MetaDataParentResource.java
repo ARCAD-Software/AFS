@@ -255,21 +255,23 @@ public class MetaDataParentResource extends DataParentResource {
 			itt = orders.iterator();
 			while (itt.hasNext()) {
 				ReferenceLine att = itt.next();
-				if (att.isEmpty()) {
-					itt.remove();
-				} else {
-					MetaDataAttribute a = att.getLastAttribute();
-					if ((a != null) && (a.getRightRead(false) != null)) {
-						// TODO This test should be supplemented by a test on the joint!
-						MetaDataEntity e = (MetaDataEntity) a.getParent();
-						if (!e.getMapper().test(e, a.getRightRead(false), getUser())) {
-							itt.remove();
-							continue;
+				if (!att.isSpecialCode()) { // Special reference line are ignored (order by modification date, etc.)
+					if (att.isEmpty()) {
+						itt.remove();
+					} else {
+						MetaDataAttribute a = att.getLastAttribute();
+						if ((a != null) && (a.getRightRead(false) != null)) {
+							// TODO This test should be supplemented by a test on the joint!
+							MetaDataEntity e = (MetaDataEntity) a.getParent();
+							if (!e.getMapper().test(e, a.getRightRead(false), getUser())) {
+								itt.remove();
+								continue;
+							}
 						}
-					}
-					// If the column is not selected it is added.
-					if (!attributes.contains(att)) {
-						attributes.add(att);
+						// If the column is not selected it is added.
+						if (!attributes.contains(att)) {
+							attributes.add(att);
+						}
 					}
 				}
 			}
