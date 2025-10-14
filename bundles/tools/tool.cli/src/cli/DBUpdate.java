@@ -435,6 +435,7 @@ public final class DBUpdate extends DataSourceCommand {
 		if (isArgument("-h2noupgrade", "-h2nup")) { //$NON-NLS-1$ //$NON-NLS-2$
 			return 0;
 		}
+		println("Checks if an upgrade of the H2 database is required...");
 		HashSet<String> dbids = new HashSet<>(); 
 		final String ds = getArgumentValue(new String[] {"-ds", "-datasource", "-ds.name"}, (String) null);
 		if (ds != null) {
@@ -454,115 +455,122 @@ public final class DBUpdate extends DataSourceCommand {
 		for (String id: dbids) {
 			// Check if h2 version 1.4 is present.
 			// and check if the Datasource is an H2 one.
-			if (isH2DataSource(id) && checkH2VersionUpgrade(id)) {
+			if (isH2DataSource(id)) {
 				File h2dbFile = getH2DBFile(id);
-				if (h2dbFile == null) {
-					printError("ERROR: The H2 datasource \"" + id +"\" seems to converted to the latest H2 Database Storage format. This operation can not be performed through a TCP connection. You will have to convert this database mannually. Please refer to the product installation guide for details.");
-					if (isArgument("-debug")) {
-						println("In case of problem due to a particular installtion constrain, this operation may be avoided by the usage of the command line optioon \"-h2noupgrade\". In that case woull will certainly have to fix the connection to some of the declared data-source in this installation. Please refer to the production installation guide for more information.");
+				// Chekc if we have an old format database of an incorrect mv.db format...
+				if (((h2dbFile != null) && h2dbFile.getName().toLowerCase().endsWith(".h2.db")) || //$NON-NLS-1$
+						 checkH2VersionUpgrade(id)) {
+					if (h2dbFile == null) {
+						printError("ERROR: The H2 datasource \"" + id +"\" seems to converted to the latest H2 Database Storage format. This operation can not be performed through a TCP connection. You will have to convert this database mannually. Please refer to the product installation guide for details.");
+						if (isArgument("-debug")) {
+							println("In case of problem due to a particular installtion constrain, this operation may be avoided by the usage of the command line optioon \"-h2noupgrade\". In that case woull will certainly have to fix the connection to some of the declared data-source in this installation. Please refer to the production installation guide for more information.");
+						}
+						continue;
 					}
-					continue;
-				}
-				if (printHeaderMessages) {
-					printHeaderMessages = false;
-					// Print important notification about following operations...
-					println("An upgraded of the H2 Database storage is required.");
-					println("This operation is done in two steps:");
-					println("First a Backup of the database is done with the older H2 Driver.");
-					println("Then a Restore of the database is done with the current H2 Driver.");
-					println("Once these operations are completed the database content update will start.");
-					println("");
-					if (isArgument("-debug")) {
-						println("In case of problem due to a particular installtion constrain, this operation may be avoided by the usage of the command line optioon \"-h2noupgrade\". In that case woull will certainly have to fix the connection to some of the declared data-source in this installation. Please refer to the production installation guide for more information.");
+					if (printHeaderMessages) {
+						printHeaderMessages = false;
+						// Print important notification about following operations...
+						println("An upgraded of the H2 Database storage is required.");
+						println("This operation is done in two steps:");
+						println("First a Backup of the database is done with the older H2 Driver.");
+						println("Then a Restore of the database is done with the current H2 Driver.");
+						println("Once these operations are completed the database content update will start.");
+						println("");
+						if (isArgument("-debug")) {
+							println("In case of problem due to a particular installtion constrain, this operation may be avoided by the usage of the command line optioon \"-h2noupgrade\". In that case woull will certainly have to fix the connection to some of the declared data-source in this installation. Please refer to the production installation guide for more information.");
+						}
 					}
-				}
-				// Backup the h2 1.4 database.
-				int i = h2dbFile.getName().indexOf('.');
-				if (i < 1) {
-					i = h2dbFile.getName().length();
-				}
-				File backup = new File(new File(h2dbFile.getParentFile(), "backup"), h2dbFile.getName().substring(0, i) + "_h2upgrade.sql");
-				backup.getParentFile().mkdirs();
-				if (backup.isFile()) {
-					if (isArgument("-debug")) {
-						println("A previous H2 upgrade backup file is present, removing this file...");
+					// Backup the h2 1.4 database.
+					int i = h2dbFile.getName().indexOf('.');
+					if (i < 1) {
+						i = h2dbFile.getName().length();
 					}
-					if (!backup.delete()) {
-						println("WARNING: Unable to delete the previous backup file: " + backup.getAbsolutePath());
+					File backup = new File(new File(h2dbFile.getParentFile(), "backup"), h2dbFile.getName().substring(0, i) + "_h2upgrade.sql");
+					backup.getParentFile().mkdirs();
+					if (backup.isFile()) {
+						if (isArgument("-debug")) {
+							println("A previous H2 upgrade backup file is present, removing this file...");
+						}
+						if (!backup.delete()) {
+							println("WARNING: Unable to delete the previous backup file: " + backup.getAbsolutePath());
+						}
 					}
-				}
-				ArrayList<String> args = new ArrayList<>();
-				args.add("com.arcadsoftware.tool.cli.DBH2BackupVersion14199"); //$NON-NLS-1$
-				boolean ignore = false;
-				for (String arg: getArguments()) {
-					if (ignore) {
-						ignore = false;
-					} else {
-						String alc = arg.toLowerCase();
-						if (!alc.startsWith("-ds:") && !alc.startsWith("-ds=") && //$NON-NLS-1$ //$NON-NLS-2$
-								!alc.startsWith("-ds.name:") && !alc.startsWith("-ds.name=") && //$NON-NLS-1$ //$NON-NLS-2$
-								!arg.toLowerCase().startsWith("-datasource:") && !arg.toLowerCase().startsWith("-datasource=")) { //$NON-NLS-1$ //$NON-NLS-2$
-							if (alc.equals("-ds") || alc.equals("-datasource") || alc.equals("-ds.name")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-								ignore = true;
-							} else {
-								args.add(arg);
+					ArrayList<String> args = new ArrayList<>();
+					args.add("com.arcadsoftware.tool.cli.DBH2BackupVersion14199"); //$NON-NLS-1$
+					boolean ignore = false;
+					for (String arg: getArguments()) {
+						if (ignore) {
+							ignore = false;
+						} else {
+							String alc = arg.toLowerCase();
+							if (!alc.startsWith("-ds:") && !alc.startsWith("-ds=") && //$NON-NLS-1$ //$NON-NLS-2$
+									!alc.startsWith("-ds.name:") && !alc.startsWith("-ds.name=") && //$NON-NLS-1$ //$NON-NLS-2$
+									!arg.toLowerCase().startsWith("-datasource:") && !arg.toLowerCase().startsWith("-datasource=")) { //$NON-NLS-1$ //$NON-NLS-2$
+								if (alc.equals("-ds") || alc.equals("-datasource") || alc.equals("-ds.name")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+									ignore = true;
+								} else {
+									args.add(arg);
+								}
 							}
 						}
 					}
-				}
-				args.add("-ds"); //$NON-NLS-1$
-				args.add(id);
-				args.add("-f");
-				args.add(backup.getAbsolutePath());
-				args.add("-p=");
-				args.add("-noExitIfNoError"); //$NON-NLS-1$
-				if (isArgument("-debug")) { //$NON-NLS-1$
-					args.add("-debug"); //$NON-NLS-1$
-					print("Executing command:");
-					for (String arg: args) {
-						print(" ");
-						print(arg);
-					}
-					println();
-				}
-				int result = Exec.exec(args.toArray(new String[0]));
-				if ((result != 0) || !backup.isFile()) {
-					printError("Unable the generate backup of the previous H2 Database file.");
+					args.add("-ds"); //$NON-NLS-1$
+					args.add(id);
+					args.add("-f");
+					args.add(backup.getAbsolutePath());
+					args.add("-p=");
+					args.add("-noExitIfNoError"); //$NON-NLS-1$
 					if (isArgument("-debug")) { //$NON-NLS-1$
-						println("Execution result code = " + result);
-					}
-					return result;
-				}
-				// Remove the H2 Database file physically (as no connection to it is possible).
-				File hardBackup = new File(h2dbFile.getParentFile(), "backup_" + h2dbFile.getName()); //$NON-NLS-1$
-				if (h2dbFile.renameTo(hardBackup)) {
-					println("The orignal database file of \"" + id + "\" has been renamed: " + hardBackup.getAbsolutePath());
-					println("(You will be able to remove this file when the installation process will be terninated.)");
-					h2dbFile = new File(h2dbFile.getParentFile(), h2dbFile.getName().replace(".mv.", ".trace.")); //$NON-NLS-1$ //$NON-NLS-2$
-					if (h2dbFile.isFile()) {
-						hardBackup = new File(h2dbFile.getParentFile(), "backup_" + h2dbFile.getName()); //$NON-NLS-1$
-						if (!h2dbFile.renameTo(hardBackup) && isArgument("-debug")) {
-							printError("Unable to rename Trace file: " + h2dbFile.getAbsolutePath());
+						args.add("-debug"); //$NON-NLS-1$
+						print("Executing command:");
+						for (String arg: args) {
+							print(" ");
+							print(arg);
 						}
+						println();
 					}
-				} else {
-					printError("ERROR: The H2 database file \"" + h2dbFile.getAbsolutePath() +"\" can not be seems to converted to the latest H2 Database Storage format. This operation can not be performed through a TCP connection. You will have to convert this database mannually. Please refer to the product installation guide for details.");
-					continue;
-				}
-				// Restore the DB with current version.
-				args.add("-fromx1");
-				if (isArgument("-debug")) { //$NON-NLS-1$
-					print("Executing command: cli.DBH2Restore");
-					for (String arg: args) {
-						print(" ");
-						print(arg);
+					int result = Exec.exec(args.toArray(new String[0]));
+					if ((result != 0) || !backup.isFile()) {
+						printError("Unable the generate backup of the previous H2 Database file.");
+						if (isArgument("-debug")) { //$NON-NLS-1$
+							println("Execution result code = " + result);
+						}
+						return result;
 					}
-					println();
+					// Remove the H2 Database file physically (as no connection to it is possible).
+					File hardBackup = new File(h2dbFile.getParentFile(), "backup_" + h2dbFile.getName()); //$NON-NLS-1$
+					if (h2dbFile.renameTo(hardBackup)) {
+						println("The orignal database file of \"" + id + "\" has been renamed: " + hardBackup.getAbsolutePath());
+						println("(You will be able to remove this file when the installation process will be terninated.)");
+						h2dbFile = new File(h2dbFile.getParentFile(), h2dbFile.getName().replace(".mv.", ".trace.")); //$NON-NLS-1$ //$NON-NLS-2$
+						if (h2dbFile.isFile()) {
+							hardBackup = new File(h2dbFile.getParentFile(), "backup_" + h2dbFile.getName()); //$NON-NLS-1$
+							if (!h2dbFile.renameTo(hardBackup) && isArgument("-debug")) {
+								printError("Unable to rename Trace file: " + h2dbFile.getAbsolutePath());
+							}
+						}
+					} else {
+						printError("ERROR: The H2 database file \"" + h2dbFile.getAbsolutePath() +"\" can not be seems to converted to the latest H2 Database Storage format. This operation can not be performed through a TCP connection. You will have to convert this database mannually. Please refer to the product installation guide for details.");
+						continue;
+					}
+					// Restore the DB with current version.
+					args.add("-fromx1");
+					if (isArgument("-debug")) { //$NON-NLS-1$
+						print("Executing command: cli.DBH2Restore");
+						for (String arg: args) {
+							print(" ");
+							print(arg);
+						}
+						println();
+					}
+					DBH2Restore c = new DBH2Restore(args.toArray(new String[0]));
+					c.exec();
+					println("The H2 Data Source \"" + id + "\" has been succefully upgraded to the latest H2 Database Storage format.");
 				}
-				DBH2Restore c = new DBH2Restore(args.toArray(new String[0]));
-				c.exec();
-				println("The H2 Data Source \"" + id + "\" has been succefully upgraded to the latest H2 Database Storage format.");
 			}
+		}
+		if (printHeaderMessages) {
+			println("No H2 upgrade required.");
 		}
 		return 0;
 	}
@@ -708,11 +716,22 @@ public final class DBUpdate extends DataSourceCommand {
 	}
 	
 	private File getH2DBFile(String dbid) {
-		File dbFile;
 		Hashtable<String, Object> props = getOSGiConfiguration("com.arcadsoftware.database.sql");
 		String url = (String) props.get(dbid + KEY_DATABASEURL);
+		File dbFile = computeH2DBFile(dbid, url, ".mv.db"); //$NON-NLS-1$
+		if (dbFile.isFile()) {
+			return dbFile;
+		}
+		dbFile = computeH2DBFile(dbid, url, ".h2.db"); //$NON-NLS-1$
+		if (dbFile.isFile()) {
+			return dbFile;
+		}
+		return null;
+	}
+
+	private File computeH2DBFile(String dbid, String url, String extension) {
 		if (url == null) {
-			dbFile = new File(getHomeDirectory(), "database/" + dbid + ".mv.db"); //$NON-NLS-1$ //$NON-NLS-2$
+			return new File(getHomeDirectory(), "database/" + dbid + extension); //$NON-NLS-1$
 		} else {
 			url = url.trim();
 			int i = 0;
@@ -740,18 +759,16 @@ public final class DBUpdate extends DataSourceCommand {
 				url = url.substring(i);
 			}
 			if (url.length() == 0) {
-				dbFile = new File(getHomeDirectory(), "database/" + dbid + ".mv.db"); //$NON-NLS-1$ //$NON-NLS-2$
-			} else if (((url.length() > 2) && (url.charAt(1) == ':')) || // windows path.
+				return new File(getHomeDirectory(), "database/" + dbid + extension); //$NON-NLS-1$
+			}
+			if (((url.length() > 2) && (url.charAt(1) == ':')) || // windows path.
 						(url.charAt(0) == '/') || (url.charAt(0) == '\\') || // absolute path.
 						(url.charAt(0) == '~')) { // user home dir.
-				dbFile = new File(url + ".mv.db"); //$NON-NLS-1$
-			} else {
-				dbFile = new File(getHomeDirectory(), url + ".mv.db"); //$NON-NLS-1$
+				return new File(url + extension);
 			}
+			return new File(getHomeDirectory(), url + extension);
 		}
-		if (dbFile.isFile()) {
-			return dbFile;
-		}
-		return null;
 	}
+	
+	
 }
