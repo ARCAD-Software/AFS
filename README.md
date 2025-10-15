@@ -1,10 +1,10 @@
 # AFS-OS release version 2023.7.52.
 
-Release date Wed Oct 15 17:25:05 CEST 2025.
+Release date Wed Oct 15 17:43:20 CEST 2025.
 
 Link to the update site of [Version 2023.7.52](https://github.com/ARCAD-Software/AFS/releases/download/2023.7.52/).
 
-0 Bundles modified in this release.
+4 Bundles modified in this release.
 
 
 
@@ -48,7 +48,7 @@ Bundle Symbolic Name | Modification | Version
 [com.arcadsoftware.email](bundles/common/email) | Not changed | 1.4.3
 [com.arcadsoftware.groovy.security](bundles/common/groovy.security) | Not changed | 1.1.5
 [com.arcadsoftware.metadata](bundles/common/metadata) | Not changed | 1.6.4
-[com.arcadsoftware.osgi](bundles/common/osgi) | Not changed | 1.9.10
+[com.arcadsoftware.osgi](bundles/common/osgi) | **Upgraded** from version 1.9.9 | **1.9.10**
 [com.arcadsoftware.rest](bundles/common/rest) | Not changed | 3.1.9
 [com.arcadsoftware.ssh](bundles/common/ssh) | Not changed | 1.2.7
 
@@ -78,7 +78,7 @@ Bundle Symbolic Name | Modification | Version
 [com.arcadsoftware.metadata.registry.xml](bundles/server/metadata.registry.xml) | Not changed | 1.2.5
 [com.arcadsoftware.metadata.rest](bundles/server/metadata.rest) | Not changed | 1.4.12
 [com.arcadsoftware.metadata.rights](bundles/server/metadata.rights) | Not changed | 1.3.3
-[com.arcadsoftware.metadata.server.user](bundles/server/metadata.server.user) | Not changed | 1.2.10
+[com.arcadsoftware.metadata.server.user](bundles/server/metadata.server.user) | **Upgraded** from version 1.2.9 | **1.2.10**
 [com.arcadsoftware.server.binaries](bundles/server/server.binaries) | Not changed | 1.2.8
 [com.arcadsoftware.server.messages](bundles/server/server.messages) | Not changed | 1.2.3
 [com.arcadsoftware.server.properties](bundles/server/server.properties) | Not changed | 1.2.3
@@ -86,7 +86,7 @@ Bundle Symbolic Name | Modification | Version
 [com.arcadsoftware.server.restful.connection](bundles/server/server.restful.connection) | Not changed | 2.1.9
 [com.arcadsoftware.server.restful.connection.config](bundles/server/server.restful.connection.config) | Not changed | 1.3.3
 [com.arcadsoftware.server.restful.connection.ldap](bundles/server/server.restful.connection.ldap) | Not changed | 2.4.8
-[com.arcadsoftware.server.restful.connection.local](bundles/server/server.restful.connection.local) | Not changed | 1.5.9
+[com.arcadsoftware.server.restful.connection.local](bundles/server/server.restful.connection.local) | **Upgraded** from version 1.5.8 | **1.5.9**
 [com.arcadsoftware.server.restful.console](bundles/server/server.restful.console) | Not changed | 1.4.5
 [com.arcadsoftware.server.restful.layouts](bundles/server/server.restful.layouts) | Not changed | 9.6.4
 [com.arcadsoftware.server.restful.log](bundles/server/server.restful.log) | Not changed | 1.2.0
@@ -110,7 +110,7 @@ Bundle Symbolic Name | Modification | Version
 
 Bundle Symbolic Name | Modification | Version
 -------------------- | ------------ | -------
-[com.arcadsoftware.tool.cli](bundles/tools/tool.cli) | Not changed | 2023.7.52
+[com.arcadsoftware.tool.cli](bundles/tools/tool.cli) | **Upgraded** from version 2.1.4 | **2023.7.52**
 
 
 

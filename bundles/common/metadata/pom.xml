@@ -4,12 +4,12 @@
 	<parent>
 		<groupId>com.arcadsoftware</groupId>
 		<artifactId>com.arcadsoftware.afs.common</artifactId>
-		<version>2023.7.53-SNAPSHOT</version>
+		<version>2023.7.52</version>
 	</parent>
 
 	<artifactId>com.arcadsoftware.metadata</artifactId>
 	<packaging>eclipse-plugin</packaging>
-	<version>1.6.4-SNAPSHOT</version>
+	<version>1.6.4</version>
 
 	<build>
 		<sourceDirectory>src</sourceDirectory>
