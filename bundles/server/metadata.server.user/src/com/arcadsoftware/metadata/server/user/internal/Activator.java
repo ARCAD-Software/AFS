@@ -146,7 +146,7 @@ public class Activator extends AbstractActivator {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				
+				updateAllRightProfileSync();
 			}
 		}, "User Profile ALL update").start();
 	}
@@ -198,15 +198,13 @@ public class Activator extends AbstractActivator {
 			if (r.getId() <= 0) {
 				warn("ALL Rights Profile update: Some Rights are defined with null or negative ID !");
 			} else if (prs.getFirst(PROFILERIGHT_RIGHT, r.getId()) == null) {
-				synchronized (Activator.this) {
-					// Add any missing right !
-					req.setIntval(r.getId());
-					if (profileRights.dataCount(true, test, false, null) == 0) {
-						profileRights.dataCreate(PROFILERIGHT_PROFILE_RIGHT, p.getId(), r.getId());
-						changed++;
-					} else {
-						debug(String.format("ALL Rights Profile update: The right %d was not in the original profile but the database found it anyway !", r.getId()));
-					}
+				// Add any missing right !
+				req.setIntval(r.getId());
+				if (profileRights.dataCount(true, test, false, null) == 0) {
+					profileRights.dataCreate(PROFILERIGHT_PROFILE_RIGHT, p.getId(), r.getId());
+					changed++;
+				} else {
+					debug(String.format("ALL Rights Profile update: The right %d was not in the original profile but the database found it anyway !", r.getId()));
 				}
 			}
 		}
