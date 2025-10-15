@@ -123,8 +123,8 @@ public class Activator extends AbstractActivator {
 				public void run() {
 					updateAllRightProfileSync();
 					// TODO Fix the order of synchronization to avoid multiple updates !
-					registerService(EventHandler.class, new AllRightProfileUpgrade(this), EventConstants.EVENT_TOPIC, MetaDataEventHandler.TOPIC_ENTITY_CREATED);
-					registerService(EventHandler.class, new AllRightProfileUpgrade(this), EventConstants.EVENT_TOPIC, "com/arcadsoftware/metadata/right/add"); //$NON-NLS-1$
+					Activator.this.registerService(EventHandler.class.getName(), new AllRightProfileUpgrade(Activator.this), EventConstants.EVENT_TOPIC, MetaDataEventHandler.TOPIC_ENTITY_CREATED);
+					Activator.this.registerService(EventHandler.class.getName(), new AllRightProfileUpgrade(Activator.this), EventConstants.EVENT_TOPIC, "com/arcadsoftware/metadata/right/add"); //$NON-NLS-1$
 				}
 			}, 9450);
 		}
