@@ -456,11 +456,11 @@ public final class DBUpdate extends DataSourceCommand {
 			// Check if h2 version 1.4 is present.
 			// and check if the Datasource is an H2 one.
 			if (isH2DataSource(id)) {
-				File h2dbFile = getH2DBFile(id);
-				// Chekc if we have an old format database of an incorrect mv.db format...
-				if (((h2dbFile != null) && h2dbFile.getName().toLowerCase().endsWith(".h2.db")) || //$NON-NLS-1$
-						 checkH2VersionUpgrade(id)) {
-					if (h2dbFile == null) {
+				File mvDBFile = getH2DBFile(id, ".mv.db"); //$NON-NLS-1$
+				File h2DBFile = getH2DBFile(id, ".h2.db"); //$NON-NLS-1$
+				// Check if we have an old format database of an incorrect mv.db format...
+				if ((h2DBFile != null) || checkH2VersionUpgrade(id)) {
+					if ((h2DBFile == null) && (mvDBFile == null)) {
 						printError("ERROR: The H2 datasource \"" + id +"\" seems to converted to the latest H2 Database Storage format. This operation can not be performed through a TCP connection. You will have to convert this database mannually. Please refer to the product installation guide for details.");
 						if (isArgument("-debug")) {
 							println("In case of problem due to a particular installtion constrain, this operation may be avoided by the usage of the command line optioon \"-h2noupgrade\". In that case woull will certainly have to fix the connection to some of the declared data-source in this installation. Please refer to the production installation guide for more information.");
@@ -475,17 +475,33 @@ public final class DBUpdate extends DataSourceCommand {
 						println("First a Backup of the database is done with the older H2 Driver.");
 						println("Then a Restore of the database is done with the current H2 Driver.");
 						println("Once these operations are completed the database content update will start.");
-						println("");
+						println();
 						if (isArgument("-debug")) {
 							println("In case of problem due to a particular installtion constrain, this operation may be avoided by the usage of the command line optioon \"-h2noupgrade\". In that case woull will certainly have to fix the connection to some of the declared data-source in this installation. Please refer to the production installation guide for more information.");
 						}
 					}
-					// Backup the h2 1.4 database.
-					int i = h2dbFile.getName().indexOf('.');
-					if (i < 1) {
-						i = h2dbFile.getName().length();
+					if ((h2DBFile != null) && (mvDBFile != null)) {
+						println("Two diferent database storage files (.h2.db and .mv.db) are located in the same folder. Assuming that the largest one is the correct one...");
+						if (mvDBFile.length() > h2DBFile.length()) {
+							File hardBackup = new File(h2DBFile.getParentFile(), h2DBFile.getName().substring(0, h2DBFile.getName().indexOf('.')) + ".h2.backup"); //$NON-NLS-1$
+							if (h2DBFile.renameTo(hardBackup)) {
+								println("The legacy H2 database file of \"" + id + "\" has been renamed: " + hardBackup.getAbsolutePath());
+								println("(You will be able to remove this file when the installation process will be terninated.)");
+								println();
+							} else {
+								printError("WARNING: The legacy H2 database file \"" + h2DBFile.getAbsolutePath() +"\" can not be moved. It should not interfere with the update and you should remove it after installation.");
+							}
+							h2DBFile = mvDBFile;
+						}
+					} else if (mvDBFile != null) {
+						h2DBFile = mvDBFile;
 					}
-					File backup = new File(new File(h2dbFile.getParentFile(), "backup"), h2dbFile.getName().substring(0, i) + "_h2upgrade.sql");
+					// Backup the h2 1.4 database.
+					int i = h2DBFile.getName().indexOf('.');
+					if (i < 1) {
+						i = h2DBFile.getName().length();
+					}
+					File backup = new File(new File(h2DBFile.getParentFile(), "backup"), h2DBFile.getName().substring(0, i) + "_h2upgrade.sql");
 					backup.getParentFile().mkdirs();
 					if (backup.isFile()) {
 						if (isArgument("-debug")) {
@@ -516,9 +532,9 @@ public final class DBUpdate extends DataSourceCommand {
 					}
 					args.add("-ds"); //$NON-NLS-1$
 					args.add(id);
-					args.add("-f");
+					args.add("-f"); //$NON-NLS-1$
 					args.add(backup.getAbsolutePath());
-					args.add("-p=");
+					args.add("-p="); //$NON-NLS-1$
 					args.add("-noExitIfNoError"); //$NON-NLS-1$
 					if (isArgument("-debug")) { //$NON-NLS-1$
 						args.add("-debug"); //$NON-NLS-1$
@@ -538,19 +554,21 @@ public final class DBUpdate extends DataSourceCommand {
 						return result;
 					}
 					// Remove the H2 Database file physically (as no connection to it is possible).
-					File hardBackup = new File(h2dbFile.getParentFile(), "backup_" + h2dbFile.getName()); //$NON-NLS-1$
-					if (h2dbFile.renameTo(hardBackup)) {
+					File hardBackup = new File(h2DBFile.getParentFile(), "backup_" + h2DBFile.getName()); //$NON-NLS-1$
+					if (h2DBFile.renameTo(hardBackup)) {
 						println("The orignal database file of \"" + id + "\" has been renamed: " + hardBackup.getAbsolutePath());
 						println("(You will be able to remove this file when the installation process will be terninated.)");
-						h2dbFile = new File(h2dbFile.getParentFile(), h2dbFile.getName().replace(".mv.", ".trace.")); //$NON-NLS-1$ //$NON-NLS-2$
-						if (h2dbFile.isFile()) {
-							hardBackup = new File(h2dbFile.getParentFile(), "backup_" + h2dbFile.getName()); //$NON-NLS-1$
-							if (!h2dbFile.renameTo(hardBackup) && isArgument("-debug")) {
-								printError("Unable to rename Trace file: " + h2dbFile.getAbsolutePath());
+						h2DBFile = new File(h2DBFile.getParentFile(), h2DBFile.getName().substring(0, h2DBFile.getName().indexOf('.')) + ".trace.db"); //$NON-NLS-1$ //$NON-NLS-2$
+						if (h2DBFile.isFile()) {
+							hardBackup = new File(h2DBFile.getParentFile(), "backup_" + h2DBFile.getName()); //$NON-NLS-1$
+							if (!h2DBFile.renameTo(hardBackup) && isArgument("-debug")) {
+								printError("Unable to rename Trace file: " + h2DBFile.getAbsolutePath());
+							} else if (isArgument("-debug")) { //$NON-NLS-1$
+								println("H2 trace file removed.");
 							}
 						}
 					} else {
-						printError("ERROR: The H2 database file \"" + h2dbFile.getAbsolutePath() +"\" can not be seems to converted to the latest H2 Database Storage format. This operation can not be performed through a TCP connection. You will have to convert this database mannually. Please refer to the product installation guide for details.");
+						printError("ERROR: The H2 database file \"" + h2DBFile.getAbsolutePath() +"\" can not be seems to converted to the latest H2 Database Storage format. This operation can not be performed through a TCP connection. You will have to convert this database mannually. Please refer to the product installation guide for details.");
 						continue;
 					}
 					// Restore the DB with current version.
@@ -714,24 +732,13 @@ public final class DBUpdate extends DataSourceCommand {
 			stopH2Server();
 		}
 	}
-	
-	private File getH2DBFile(String dbid) {
+
+	private File getH2DBFile(String dbid, String extension) {
 		Hashtable<String, Object> props = getOSGiConfiguration("com.arcadsoftware.database.sql");
 		String url = (String) props.get(dbid + KEY_DATABASEURL);
-		File dbFile = computeH2DBFile(dbid, url, ".mv.db"); //$NON-NLS-1$
-		if (dbFile.isFile()) {
-			return dbFile;
-		}
-		dbFile = computeH2DBFile(dbid, url, ".h2.db"); //$NON-NLS-1$
-		if (dbFile.isFile()) {
-			return dbFile;
-		}
-		return null;
-	}
-
-	private File computeH2DBFile(String dbid, String url, String extension) {
+		final File dbFile;
 		if (url == null) {
-			return new File(getHomeDirectory(), "database/" + dbid + extension); //$NON-NLS-1$
+			dbFile = new File(getHomeDirectory(), "database/" + dbid + extension); //$NON-NLS-1$
 		} else {
 			url = url.trim();
 			int i = 0;
@@ -759,15 +766,19 @@ public final class DBUpdate extends DataSourceCommand {
 				url = url.substring(i);
 			}
 			if (url.length() == 0) {
-				return new File(getHomeDirectory(), "database/" + dbid + extension); //$NON-NLS-1$
-			}
-			if (((url.length() > 2) && (url.charAt(1) == ':')) || // windows path.
+				dbFile = new File(getHomeDirectory(), "database/" + dbid + extension); //$NON-NLS-1$
+			} else if (((url.length() > 2) && (url.charAt(1) == ':')) || // windows path.
 						(url.charAt(0) == '/') || (url.charAt(0) == '\\') || // absolute path.
 						(url.charAt(0) == '~')) { // user home dir.
-				return new File(url + extension);
+				dbFile = new File(url + extension);
+			} else {
+				dbFile = new File(getHomeDirectory(), url + extension);
 			}
-			return new File(getHomeDirectory(), url + extension);
 		}
+		if (dbFile.isFile()) {
+			return dbFile;
+		}
+		return null;
 	}
 	
 	
