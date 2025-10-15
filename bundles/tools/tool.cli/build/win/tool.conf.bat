@@ -33,11 +33,15 @@ if "%JAVA_HOME%" == "" (
 :javaok
 
 set current=%~dp0.
-set tooljar=%current%\tools.target.jar
+set tooljar=%current%\com.arcadsoftware.tool.cli-2023.7.52.jar
 
-set CP="%PRODUCT_HOME%\plugins\*;%tooljar%"
+if exist %tooljar% goto tooljarok
+
+set tooljar=%current%\com.arcadsoftware.tool.cli_2023.7.52.jar
+
+:tooljarok
 set SCP="%tooljar%"
-set JAVA_PROPS=-Dorg.ops4j.pax.logging.DefaultServiceLog.level=ERROR
+set JAVA_PROPS=
 
 REM show java version
 %JAVA_CMD% -version

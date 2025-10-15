@@ -13,7 +13,7 @@
 #     ARCAD Software - initial API and implementation
 #*******************************************************************************
 # This configuration file define the local parameters
-# and will not be updated after first installation.
+# and should not be updated after first installation.
 set -e
 
 # resolve links
@@ -35,10 +35,18 @@ cd "$current"
 JAVA_CMD=$PRODUCT_HOME/jre/bin/java
 
 if [ ! -f "$JAVA_CMD" ]; then
+  JAVA_CMD=/lib/jvm/java-17-openjdk-amd64/bin/java
+fi
+
+if [ ! -f "$JAVA_CMD" ]; then
   JAVA_CMD=java
 fi
 
-tooljar="$current/tools.target.jar"
+tooljar="$current/com.arcadsoftware.tool.cli-2023.7.52.jar"
+
+if [ ! -f "$tooljar" ]; then
+  tooljar="$current/com.arcadsoftware.tool.cli_2023.7.52.jar"
+fi
 
 # Check that target executable exists
 if [ ! -f "$tooljar" ]; then
@@ -47,17 +55,13 @@ if [ ! -f "$tooljar" ]; then
   exit 1
 fi
 
-# Define here the path to all required jar:
-
-CP="$PRODUCT_HOME"/plugins/*:"$tooljar"
-
-# Define the path only with tools program:
+# Define here the path to the tool jar:
 
 SCP="$tooljar"
 
 # Define default Java properties
 
-JAVA_PROPS=-Dorg.ops4j.pax.logging.DefaultServiceLog.level=ERROR
+JAVA_PROPS=
 
 # show java version
 "$JAVA_CMD" -version
@@ -65,4 +69,4 @@ JAVA_PROPS=-Dorg.ops4j.pax.logging.DefaultServiceLog.level=ERROR
 export JAVA_CMD
 export JAVA_PROPS
 export PRODUCT_HOME
-export CP
+export SCP
