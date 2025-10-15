@@ -33,11 +33,11 @@ if "%JAVA_HOME%" == "" (
 :javaok
 
 set current=%~dp0.
-set tooljar=%current%\com.arcadsoftware.tool.cli-3.0.2.jar
+set tooljar=%current%\com.arcadsoftware.tool.cli-2025.5.6.jar
 
 if exist %tooljar% goto tooljarok
 
-set tooljar=%current%\com.arcadsoftware.tool.cli_3.0.2.jar
+set tooljar=%current%\com.arcadsoftware.tool.cli_2025.5.6.jar
 
 :tooljarok
 set SCP="%tooljar%"
