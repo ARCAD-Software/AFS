@@ -17,18 +17,19 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.eclipse.jetty.http.MultiPartConfig;
+import org.eclipse.jetty.http.MultiPart.Part;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
-import org.restlet.ext.fileupload.RestletFileUpload;
+import org.restlet.ext.jetty.MultiPartRepresentation;
 import org.restlet.representation.FileRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
@@ -72,49 +73,33 @@ public class AdminPropertiesResource extends UserLinkedResource {
 		file = Activator.getInstance().getExternalFile(filename);
 		file.getParentFile().mkdirs();
 		if (MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true)) {
-			// The Apache FileUpload project parses HTTP requests which
-			// conform to RFC 1867, "Form-based File Upload in HTML". That
-			// is, if an HTTP request is submitted using the POST method,
-			// and with a content type of "multipart/form-data", then
-			// FileUpload can parse that request, and get all uploaded files
-			// as FileItem.
-
-			// 1/ Create a factory for disk-based file items
-			DiskFileItemFactory factory = new DiskFileItemFactory();
-			factory.setSizeThreshold(1000240);
-			factory.setRepository(Activator.getInstance().getExternalFile("_tempdir")); //$NON-NLS-1$
-
-			// 2/ Create a new file upload handler based on the Restlet
-			// FileUpload extension that will parse Restlet requests and
-			// generates FileItems.
-			RestletFileUpload upload = new RestletFileUpload(factory);
 			try {
-				// 3/ Request is parsed by the handler which generates a
-				// list of FileItems
-				FileItem fileItem = null;
-				for (FileItem fitem : upload.parseRequest(getRequest())) {
-					if (fitem.getFieldName().equals("file")) { //$NON-NLS-1$
-						fileItem = fitem;
+				boolean found = false;
+				MultiPartRepresentation mprep = new MultiPartRepresentation(entity, new MultiPartConfig.Builder().build());
+				for (Part part : mprep.getParts()) {
+					if (part.getName().equals("file")) { //$NON-NLS-1$
+						// Delete any existing file.
+						if (file.exists()) {
+							if (!file.delete()) {
+								getOSGiApplication().getActivator().info("Unable to delete file: " + file.getAbsolutePath());
+							}
+						} else {
+							file.getParentFile().mkdirs();
+						}
+						part.writeTo(file.toPath());
+						found = true;
+						break;
 					}
 				}
 				// Set the status of the response.
-				if (fileItem != null) {
-					// Delete any existing file.
-					if ((file != null) && (file.exists())) {
-						if (!file.delete()) {
-							Activator.getInstance().info("Unable to remove old file: " + file.getAbsolutePath());
-						}
-					}
-					// Create new one.
-					fileItem.write(file);
+				if (found) {
 					setStatus(Status.SUCCESS_CREATED);
 				} else {
-					setStatus(Status.CLIENT_ERROR_BAD_REQUEST,
-							Messages.AdminPropertiesResource_EmptyFileError);
+					setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
 				}
 			} catch (Exception e) {
-				setStatus(Status.CLIENT_ERROR_BAD_REQUEST, Messages.AdminPropertiesResource_UploadError);
-				Activator.getInstance().error(Messages.AdminPropertiesResource_UploadError, e);
+				setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+				getOSGiApplication().getActivator().error(e.getLocalizedMessage(), e);
 			}
 		} else {
 			// on accepte n'importe quoi...
@@ -132,7 +117,7 @@ public class AdminPropertiesResource extends UserLinkedResource {
 			}
 			try {
 				long size = entity.getSize();
-				ReadableByteChannel in = entity.getChannel();
+				ReadableByteChannel in = Channels.newChannel(entity.getStream());
 				try {
 					FileOutputStream fos = new FileOutputStream(file);
 					try {

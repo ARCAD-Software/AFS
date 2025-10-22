@@ -13,21 +13,20 @@
  *******************************************************************************/
 package com.arcadsoftware.rest;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
 
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.eclipse.jetty.http.MultiPart.Part;
+import org.eclipse.jetty.http.MultiPartConfig;
 import org.restlet.Request;
 import org.restlet.data.ClientInfo;
 import org.restlet.data.Form;
@@ -38,7 +37,7 @@ import org.restlet.data.Method;
 import org.restlet.data.Parameter;
 import org.restlet.data.Preference;
 import org.restlet.data.Status;
-import org.restlet.ext.fileupload.RestletFileUpload;
+import org.restlet.ext.jetty.MultiPartRepresentation;
 import org.restlet.representation.EmptyRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.representation.Variant;
@@ -611,29 +610,22 @@ public abstract class BaseResource extends ServerResource {
 				} else if (entity.getMediaType().equals(MediaType.MULTIPART_FORM_DATA, true)) {
 					// Form-Data format for HTML forms.
 					requestForm = new Form();
-					final String encoding;
+					final Charset encoding;
 					if (entity.getCharacterSet() != null) {
-						encoding = entity.getCharacterSet().getName();
+						encoding = entity.getCharacterSet().toCharset();
 					} else {
-						encoding = "UTF-8"; //$NON-NLS-1$
+						encoding = StandardCharsets.UTF_8;
 					}
-					DiskFileItemFactory factory = new DiskFileItemFactory();
-					factory.setSizeThreshold(1000240);
-					factory.setRepository(new File("_tempdir")); //$NON-NLS-1$
-					RestletFileUpload upload = new RestletFileUpload(factory);
 					try {
-						for (FileItem item : upload.parseRequest(getRequest())) {
-							if (item.isFormField()) {
-								try {
-									requestForm.add(item.getFieldName(), item.getString(encoding));
-								} catch (UnsupportedEncodingException e) {
-									throw new ResourceException(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE, e.getLocalizedMessage());
-								}
+						MultiPartRepresentation mprep = new MultiPartRepresentation(entity, new MultiPartConfig.Builder().build());
+						for (Part part : mprep.getParts()) {
+							if (part.getName() != null) {
+								requestForm.add(part.getName(), part.getContentAsString(encoding));
 							} else {
-								requestForm.add(new FileItemParameter(item));
+								requestForm.add(new FileItemParameter(part));
 							}
 						}
-					} catch (FileUploadException e) {
+					} catch (IOException e) {
 						throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, e.getLocalizedMessage());
 					}
 				} else if (entity.getMediaType().equals(MediaType.APPLICATION_XML, true)) {

@@ -25,7 +25,7 @@ public class UndeleteListener implements IMetaDataUndeleteListener {
 				Activator.TYPE_USER.equals(entity.getType()) && // and modified data is a user...
 				(activator.getUserMax() <= entity.dataCount())) { // maximal number of undeleted user is reach
 			activator.warn("Limit of maximal number of user reach ({} users).", activator.getUserMax());
-			throw new ResourceException(Status.SERVER_ERROR_INSUFFICIENT_STORAGE, String.format("The current number of user declared in the application reach the fixed limitation of %d users.", activator.getUserMax()));
+			throw new ResourceException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE, String.format("The current number of user declared in the application reach the fixed limitation of %d users.", activator.getUserMax()));
 		}
 		return true;
 	}

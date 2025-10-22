@@ -18,6 +18,7 @@
 		<tycho.extra.version>4.0.13</tycho.extra.version>
 		<keystore></keystore>
 		<tycho.scmUrl>scm:git:https://github.com/ARCAD-Software/AFS.git</tycho.scmUrl>
+		<jetty.version>12.1.3</jetty.version>
 	</properties>
 
 	<!-- Add explicit dependencies not available on P2 repository -->
@@ -81,14 +82,187 @@
 		    <scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>commons-fileupload</groupId>
-			<artifactId>commons-fileupload</artifactId>
-			<version>1.6.0</version>
+		    <groupId>org.restlet</groupId>
+		    <artifactId>org.restlet</artifactId>
+		    <version>2.6.0</version>
 		</dependency>
 		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.20.0</version>
+		    <groupId>org.restlet</groupId>
+		    <artifactId>org.restlet.ext.jetty</artifactId>
+		    <version>2.6.0</version>
+		</dependency>
+
+		<!-- HTTP1.1 Jetty base Server and Client -->
+		<dependency>
+		    <groupId>org.eclipse.jetty</groupId>
+		    <artifactId>jetty-server</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty</groupId>
+		    <artifactId>jetty-http</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty</groupId>
+		    <artifactId>jetty-io</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty</groupId>
+		    <artifactId>jetty-util</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty</groupId>
+		    <artifactId>jetty-client</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		
+		<!-- (Optional) Remote monitoring of Jetty Server... -->
+		<dependency>
+		    <groupId>org.eclipse.jetty</groupId>
+		    <artifactId>jetty-jmx</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		
+		<!-- JETTY ALPN nogetiation between HTTP1.1 HTTP/2 and HTTP/3 -->
+		<dependency>
+		    <groupId>org.eclipse.jetty</groupId>
+		    <artifactId>jetty-alpn-client</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty</groupId>
+		    <artifactId>jetty-alpn-java-client</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.compression</groupId>
+		    <artifactId>jetty-compression-gzip</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.compression</groupId>
+		    <artifactId>jetty-compression-common</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty</groupId>
+		    <artifactId>jetty-alpn-server</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty</groupId>
+		    <artifactId>jetty-alpn-java-server</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		
+		<!-- Jetty HTTP/2 Server and client (support HTTP) -->
+		<dependency>
+		    <groupId>org.eclipse.jetty.http2</groupId>
+		    <artifactId>jetty-http2-server</artifactId>
+		    <version>${jetty.version}</version>
+		    <scope>test</scope>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.http2</groupId>
+		    <artifactId>jetty-http2-common</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.http2</groupId>
+		    <artifactId>jetty-http2-hpack</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.http2</groupId>
+		    <artifactId>jetty-http2-client-transport</artifactId>
+		    <version>${jetty.version}</version>
+		    <scope>test</scope>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.http2</groupId>
+		    <artifactId>jetty-http2-client</artifactId>
+		    <version>${jetty.version}</version>
+		    <scope>test</scope>
+		</dependency>
+		
+		<!-- Jetty HTTP/3 Server and Client (HTTPS only) -->
+		<dependency>
+		    <groupId>org.eclipse.jetty.http3</groupId>
+		    <artifactId>jetty-http3-server</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.http3</groupId>
+		    <artifactId>jetty-http3-common</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.http3</groupId>
+		    <artifactId>jetty-http3-qpack</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.http3</groupId>
+		    <artifactId>jetty-http3-client-transport</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.http3</groupId>
+		    <artifactId>jetty-http3-client</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.quic</groupId>
+		    <artifactId>jetty-quic-common</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.quic</groupId>
+		    <artifactId>jetty-quic-api</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.quic</groupId>
+		    <artifactId>jetty-quic-util</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.quic</groupId>
+		    <artifactId>jetty-quic-server</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.quic</groupId>
+		    <artifactId>jetty-quic-client</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.quic</groupId>
+		    <artifactId>jetty-quic-quiche-common</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.mortbay.jetty.quiche</groupId>
+		    <artifactId>jetty-quiche-native</artifactId>
+		    <version>0.24.5</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.quic</groupId>
+		    <artifactId>jetty-quic-quiche-server</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.quic</groupId>
+		    <artifactId>jetty-quic-quiche-jna</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.quic</groupId>
+		    <artifactId>jetty-quic-quiche-client</artifactId>
+		    <version>${jetty.version}</version>
 		</dependency>
 
 		<!-- LDAP Connection -->

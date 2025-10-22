@@ -290,7 +290,7 @@ public abstract class ProgressMonitoredRestlet extends Restlet implements Closea
 				if (MediaType.APPLICATION_W3C_SCHEMA.equals(media)) {
 					String xsd = getXSDText();
 					if (xsd == null) {
-						response.setStatus(Status.SERVER_ERROR_INSUFFICIENT_STORAGE);
+						response.setStatus(Status.SERVER_ERROR_NOT_IMPLEMENTED);
 					} else {
 						response.setEntity(new StringRepresentation(xsd, media, Language.ENGLISH_US, CharacterSet.UTF_8));
 						response.setStatus(Status.SUCCESS_OK);
@@ -331,7 +331,7 @@ public abstract class ProgressMonitoredRestlet extends Restlet implements Closea
 				if (MediaType.APPLICATION_W3C_SCHEMA.equals(media)) {
 					String xsd = getXSDText();
 					if (xsd == null) {
-						response.setStatus(Status.SERVER_ERROR_INSUFFICIENT_STORAGE);
+						response.setStatus(Status.SERVER_ERROR_NOT_IMPLEMENTED);
 					} else {
 						response.setEntity(new StringRepresentation(xsd, media, Language.ENGLISH_US, CharacterSet.UTF_8));
 						response.setStatus(Status.SUCCESS_OK);

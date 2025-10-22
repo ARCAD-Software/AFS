@@ -17,16 +17,17 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Date;
 
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.eclipse.jetty.http.MultiPartConfig;
+import org.eclipse.jetty.http.MultiPart.Part;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
-import org.restlet.ext.fileupload.RestletFileUpload;
+import org.restlet.ext.jetty.MultiPartRepresentation;
 import org.restlet.representation.EmptyRepresentation;
 import org.restlet.representation.FileRepresentation;
 import org.restlet.representation.Representation;
@@ -128,9 +129,9 @@ public class BinResource extends OSGiResource {
 			}
 			try {
 				long size = entity.getSize();
-				ReadableByteChannel in = entity.getChannel();
+				ReadableByteChannel in = Channels.newChannel(entity.getStream());
 				if (in == null) {
-					setStatus(Status.CLIENT_ERROR_UNPROCESSABLE_ENTITY, "The Request body is empty or can not reach the /bin resource.");
+					setStatus(Status.CLIENT_ERROR_NOT_ACCEPTABLE, "The Request body is empty or can not reach the /bin resource.");
 				} else {
 					try {
 						FileOutputStream fos = new FileOutputStream(file);
@@ -174,78 +175,56 @@ public class BinResource extends OSGiResource {
 				setStatus(Status.SERVER_ERROR_INTERNAL);
 			}
 		} else if (MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true)) {
-			// The Apache FileUpload project parses HTTP requests which
-			// conform to RFC 1867, "Form-based File Upload in HTML". That
-			// is, if an HTTP request is submitted using the POST method,
-			// and with a content type of "multipart/form-data", then
-			// FileUpload can parse that request, and get all uploaded files
-			// as FileItem.
-			// 1/ Create a factory for disk-based file items
-			DiskFileItemFactory factory = new DiskFileItemFactory();
-			//factory.setSizeThreshold(1000240);
-			int maxFileSize = Activator.getInstance().getMaxFileSize();
-			factory.setSizeThreshold(maxFileSize);
-			factory.setRepository(Activator.getInstance().getDir("_tempdir")); //$NON-NLS-1$
-			// 2/ Create a new file upload handler based on the Restlet
-			// FileUpload extension that will parse Restlet requests and
-			// generates FileItems.
-			RestletFileUpload upload = new RestletFileUpload(factory);
 			try {
-				// 3/ Request is parsed by the handler which generates a
-				// list of FileItems
-				FileItem fileItem = null;
-				for (FileItem fitem : upload.parseRequest(getRequest())) {
-					if ("file".equals(fitem.getFieldName())) { //$NON-NLS-1$
-						fileItem = fitem;
-						break;
-					}
-					if (fileItem == null) {
-						fileItem = fitem;
+				MultiPartRepresentation mprep = new MultiPartRepresentation(entity, 
+						new MultiPartConfig.Builder().location(Activator.getInstance().getDir("_tempdir").toPath())
+						.maxPartSize(Activator.getInstance().getMaxFileSize())
+						.build());
+				for (Part part : mprep.getParts()) {
+					if (part.getName().equals("file")) { //$NON-NLS-1$
+						// Delete any existing file.
+						Activator.getInstance().removeFiles(category, id);
+						// Create new one.
+						String name = part.getFileName();
+						if (name == null) {
+							name = ""; //$NON-NLS-1$
+						} else if ((name.indexOf('/') > -1) || (name.indexOf('\\') > -1)) {
+							name = new File(name).getName();
+						}
+						file = new File(Activator.getInstance().getSubDir(category, id), Integer.toString(id) + '_' + name);
+						// Test a directory path trasversal attack...
+						try {
+							if (!file.getCanonicalPath().startsWith(Activator.getInstance().getPath().getCanonicalPath())) {
+								Activator.getInstance().error("Invalid Path name : '" + file.getAbsolutePath() + "' does apears to be contained in: " + Activator.getInstance().getPath().getAbsolutePath());
+								setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+								return null;
+							}
+						} catch (IOException e) {
+							Activator.getInstance().error("Unable to get canonical path of: '" + file.getAbsolutePath() + "' does apears to be contained in: " + Activator.getInstance().getPath().getAbsolutePath(), e);
+							setStatus(Status.SERVER_ERROR_INTERNAL);
+							return null;
+						}
+						try {
+							file.getParentFile().mkdirs();
+							if (!file.createNewFile()) {
+								Activator.getInstance().debug("File already exists: " + file.getName());
+							}
+						} catch (Throwable e) {
+							Activator.getInstance().error(Messages.BinResource_Error_file_creation, e);
+							setStatus(Status.SERVER_ERROR_INTERNAL);
+							return null;
+						}
+						part.writeTo(file.toPath());
+						Activator.getInstance().fileEventNew(category, id, file);
+						setStatus(Status.SUCCESS_CREATED);
+						return null;
 					}
 				}
 				// Set the status of the response.
-				if (fileItem != null) {
-					// Delete any existing file.
-					Activator.getInstance().removeFiles(category, id);
-					// Create new one.
-					String name = fileItem.getName();
-					if (name == null) {
-						name = ""; //$NON-NLS-1$
-					} else if ((name.indexOf('/') > -1) || (name.indexOf('\\') > -1)) {
-						name = new File(name).getName();
-					}
-					file = new File(Activator.getInstance().getSubDir(category, id), Integer.toString(id) + '_' + name);
-					// Test a directory path trasversal attack...
-					try {
-						if (!file.getCanonicalPath().startsWith(Activator.getInstance().getPath().getCanonicalPath())) {
-							Activator.getInstance().error("Invalid Path name : '" + file.getAbsolutePath() + "' does apears to be contained in: " + Activator.getInstance().getPath().getAbsolutePath());
-							setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-							return null;
-						}
-					} catch (IOException e) {
-						Activator.getInstance().error("Unable to get canonical path of: '" + file.getAbsolutePath() + "' does apears to be contained in: " + Activator.getInstance().getPath().getAbsolutePath(), e);
-						setStatus(Status.SERVER_ERROR_INTERNAL);
-						return null;
-					}
-					try {
-						file.getParentFile().mkdirs();
-						if (!file.createNewFile()) {
-							Activator.getInstance().debug("File already exists: " + file.getName());
-						}
-					} catch (Throwable e) {
-						Activator.getInstance().error(Messages.BinResource_Error_file_creation, e);
-						setStatus(Status.SERVER_ERROR_INTERNAL);
-						return null;
-					}
-					fileItem.write(file);
-					Activator.getInstance().fileEventNew(category, id, file);
-					setStatus(Status.SUCCESS_CREATED);
-				} else {
-					setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-				}
+				setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
 			} catch (Exception e) {
 				setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-				Activator.getInstance().error(Messages.BinResource_Error, e);
+				getOSGiApplication().getActivator().error(e.getLocalizedMessage(), e);
 			}
 		}
 		return null;

@@ -16,11 +16,13 @@ package com.arcadsoftware.rest;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.InvalidFileNameException;
+import org.eclipse.jetty.http.HttpHeader;
+import org.eclipse.jetty.http.MultiPart.Part;
+import org.eclipse.jetty.io.Content;
 import org.restlet.data.Parameter;
 
 /**
@@ -37,11 +39,11 @@ import org.restlet.data.Parameter;
  */
 public class FileItemParameter extends Parameter {
 
-	private final FileItem item;
+	private final Part part;
 
-	public FileItemParameter(FileItem item) {
-		super(item.getFieldName(), ""); //$NON-NLS-1$
-		this.item = item;
+	public FileItemParameter(Part part) {
+		super(part.getName(), ""); //$NON-NLS-1$
+		this.part = part;
 	}
 
 	/**
@@ -52,7 +54,7 @@ public class FileItemParameter extends Parameter {
 	 *             if an error occurs.
 	 */
 	public InputStream getInputStream() throws IOException {
-		return item.getInputStream();
+		return Content.Source.asInputStream(part.getContentSource());
 	}
 
 	/**
@@ -61,7 +63,7 @@ public class FileItemParameter extends Parameter {
 	 * @return The content type passed by the browser or <code>null</code> if not defined.
 	 */
 	public String getFileContentType() {
-		return item.getContentType();
+		return part.getHeaders().get(HttpHeader.CONTENT_TYPE);
 	}
 
 	/**
@@ -75,7 +77,7 @@ public class FileItemParameter extends Parameter {
 	 *             intend to use the file name anyways, catch the exception and use InvalidFileNameException#getName().
 	 */
 	public String getFileName() {
-		return item.getName();
+		return part.getFileName();
 	}
 
 	/**
@@ -84,7 +86,7 @@ public class FileItemParameter extends Parameter {
 	 * @return <code>true</code> if the file contents will be read from memory; <code>false</code> otherwise.
 	 */
 	public boolean isFileInMemory() {
-		return item.isInMemory();
+		return true;
 	}
 
 	/**
@@ -93,7 +95,7 @@ public class FileItemParameter extends Parameter {
 	 * @return The size of the file item, in bytes.
 	 */
 	public long getFileSize() {
-		return item.getSize();
+		return part.getContentSource().getLength();
 	}
 
 	/**
@@ -104,7 +106,11 @@ public class FileItemParameter extends Parameter {
 	 * @return The contents of the file item as an array of bytes.
 	 */
 	public byte[] getFileContent() {
-		return item.get();
+		try {
+			return getInputStream().readAllBytes();
+		} catch (IOException e) {
+			return new byte[0];
+		}
 	}
 
 	/**
@@ -118,7 +124,21 @@ public class FileItemParameter extends Parameter {
 	 *             if the requested character encoding is not available.
 	 */
 	public String getFileString(String encoding) throws UnsupportedEncodingException {
-		return item.getString(encoding);
+		return getFileString(Charset.forName(encoding));
+	}
+
+	/**
+	 * Returns the contents of the file item as a String, using the specified encoding. This method uses {@link #get()}
+	 * to retrieve the contents of the item.
+	 *
+	 * @param encoding
+	 *            The character encoding to use.
+	 * @return The contents of the item, as a string.
+	 * @throws UnsupportedEncodingException
+	 *             if the requested character encoding is not available.
+	 */
+	public String getFileString(Charset encoding) throws UnsupportedEncodingException {
+		return part.getContentAsString(encoding);
 	}
 
 	/**
@@ -129,9 +149,9 @@ public class FileItemParameter extends Parameter {
 	 */
 	public String getFileString() {
 		try {
-			return item.getString("UTF8"); //$NON-NLS-1$
+			return getFileString(StandardCharsets.UTF_8);
 		} catch (UnsupportedEncodingException e) {
-			return item.getString();
+			return null;
 		}
 	}
 
@@ -150,7 +170,7 @@ public class FileItemParameter extends Parameter {
 	 *             if an error occurs.
 	 */
 	public void writeFile(File file) throws Exception {
-		item.write(file);
+		part.writeTo(file.toPath());
 	}
 
 	/**
@@ -159,17 +179,8 @@ public class FileItemParameter extends Parameter {
 	 * method can be used to ensure that this is done at an earlier time, thus preserving system resources.
 	 */
 	public void deleteTempStorage() {
-		item.delete();
-	}
-
-	/**
-	 * Returns an {@link java.io.OutputStream OutputStream} that can be used for storing the contents of the file.
-	 *
-	 * @return An {@link java.io.OutputStream OutputStream} that can be used for storing the contensts of the file.
-	 * @throws IOException
-	 *             if an error occurs.
-	 */
-	public OutputStream getFileOutputStream() throws IOException {
-		return item.getOutputStream();
+		try {
+			part.delete();
+		} catch (IOException e) {}
 	}
 }

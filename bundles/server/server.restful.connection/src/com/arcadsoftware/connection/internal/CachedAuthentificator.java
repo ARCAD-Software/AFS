@@ -259,7 +259,7 @@ public class CachedAuthentificator extends Authenticator {
 				if (!credential.authenticate(clonedUser, identifier, secret)) {
 					if (clonedUser.isLocked()) {
 						// Attention cette information peut favoriser une attaque DDOS.
-						response.setStatus(Status.CLIENT_ERROR_LOCKED, translateMessage(request, "locked")); //$NON-NLS-1$
+						response.setStatus(Status.CLIENT_ERROR_NOT_ACCEPTABLE, translateMessage(request, "locked")); //$NON-NLS-1$
 						broadcastLocked(clonedUser);
 					} else {
 						response.setStatus(Status.CLIENT_ERROR_FORBIDDEN, translateMessage(request, "wrong")); //$NON-NLS-1$
