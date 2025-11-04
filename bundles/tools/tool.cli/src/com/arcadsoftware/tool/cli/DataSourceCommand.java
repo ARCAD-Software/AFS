@@ -278,7 +278,7 @@ public abstract class DataSourceCommand extends Command {
 					h2TCPServer = Server.createTcpServer(params.toArray(new String[params.size()]));
 					h2TCPServer.start();
 					println("H2 Database Server Started...");
-				} catch (Exception e) {
+				} catch (Throwable e) { // There may have an NoClassDefFoundError if H2 is configured but not present.
 					h2TCPServer = null;
 					printError("Unable to start H2 Server: " + e.getLocalizedMessage());
 					if (isArgument("-debug")) { //$NON-NLS-1$
