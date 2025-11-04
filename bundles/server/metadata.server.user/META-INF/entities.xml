@@ -209,6 +209,9 @@
 			<updateCol>PFR_UPDDATE</updateCol>
 			<deleteCol>PFR_DELETED</deleteCol>
 			<table>PROFILE_RIGHTS</table>
+			<logCreate>Addition of a new right (#%right%) to profile #%profile%</logCreate>
+			<logUpdate>Modification of right-profile association between right #%right%) and profile #%profile%</logUpdate>
+			<logDelete>Right #%right% removed from profile #%profile%</logDelete>
 		</metadata>
 		<attribute type="integer" code="parameter" listable="true">
 			<metadata colrank="3" visible="true">
