@@ -14,12 +14,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.forms;bundle-version="[3.6.0,4.0.0)";visibility:=reexport,
  org.restlet.base;bundle-version="[2.4.7,3.0.0)",
  xstream;bundle-version="[1.4.201,2.0.0)",
- com.arcadsoftware.aev.core;bundle-version="[12.0.0,13.0.0)",
- com.arcadsoftware.aev.core.ui;bundle-version="[12.0.0,13.0.0)",
  com.arcadsoftware.aev.core.ui.rcp;bundle-version="[12.0.0,13.0.0)",
- com.arcadsoftware.osgi;bundle-version="[1.8.0,2.0.0)",
- com.arcadsoftware.metadata;bundle-version="[2.0.0,3.0.0)",
- com.arcadsoftware.afs.framework;bundle-version="[1.2.0,2.0.0)",
  com.arcadsoftware.afs.framework.ui;bundle-version="[1.4.0,2.0.0)"
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: com.arcadsoftware.editor.implementation.Activator

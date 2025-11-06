@@ -7,12 +7,12 @@ Bundle-Activator: com.arcadsoftware.afs.framework.ui.internal.Activator
 Bundle-Vendor: ARCAD Software
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
- org.restlet.base;bundle-version="[2.4.3,3.0.0)",
- com.arcadsoftware.aev.core;bundle-version="[12.0.0,13.0.0)",
- com.arcadsoftware.aev.core.ui;bundle-version="[12.0.0,13.0.0)",
- com.arcadsoftware.osgi;bundle-version="[1.8.0,2.0.0)",
- com.arcadsoftware.metadata;bundle-version="[2.0.0,3.0.0)",
- com.arcadsoftware.afs.framework;bundle-version="[1.2.0,2.0.0)",
+ org.restlet;bundle-version="2.6.0";visibility:=reexport,
+ com.arcadsoftware.aev.core;bundle-version="[12.0.0,13.0.0)";visibility:=reexport,
+ com.arcadsoftware.aev.core.ui;bundle-version="[12.0.0,13.0.0)";visibility:=reexport,
+ com.arcadsoftware.osgi;bundle-version="[1.8.0,2.0.0)";visibility:=reexport,
+ com.arcadsoftware.metadata;bundle-version="[2.0.0,3.0.0)";visibility:=reexport,
+ com.arcadsoftware.afs.framework;bundle-version="[1.2.0,2.0.0)";visibility:=reexport,
  com.arcadsoftware.afs.client.brands;bundle-version="[1.0.0,2.0.0)"
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
