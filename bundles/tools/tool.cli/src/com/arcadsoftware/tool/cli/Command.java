@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -404,7 +405,7 @@ public abstract class Command {
 	}
 	
 	protected boolean save(File target, String content) {
-		try (FileWriter fileWriter = new FileWriter(target)) {
+		try (FileWriter fileWriter = new FileWriter(target, StandardCharsets.UTF_8)) {
 		    fileWriter.write(content);
 		    return true;
 		} catch (IOException e) {
