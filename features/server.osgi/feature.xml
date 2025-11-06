@@ -415,10 +415,6 @@ version(s), and exceptions or additional permissions here}.&quot;
          version="0.0.0"/>
 
    <plugin
-         id="org.restlet.server"
-         version="0.0.0"/>
-
-   <plugin
          id="xstream"
          version="0.0.0"/>
 
@@ -427,7 +423,7 @@ version(s), and exceptions or additional permissions here}.&quot;
          version="0.0.0"/>
 
    <plugin
-         id="org.restlet.base"
+         id="org.restlet"
          version="0.0.0"/>
 
    <plugin

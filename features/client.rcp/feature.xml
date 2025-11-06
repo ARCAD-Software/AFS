@@ -465,7 +465,7 @@ version(s), and exceptions or additional permissions here}.&quot;
          version="0.0.0"/>
 
    <plugin
-         id="org.restlet.base"
+         id="org.restlet"
          download-size="0"
          install-size="0"
          version="0.0.0"/>

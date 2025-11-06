@@ -12,7 +12,6 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface.databinding;bundle-version="[1.2.0,2.0.0)";visibility:=reexport,
  org.eclipse.ui,
  org.eclipse.ui.forms;bundle-version="[3.6.0,4.0.0)";visibility:=reexport,
- org.restlet.base;bundle-version="[2.4.7,3.0.0)",
  xstream;bundle-version="[1.4.201,2.0.0)",
  com.arcadsoftware.aev.core.ui.rcp;bundle-version="[12.0.0,13.0.0)",
  com.arcadsoftware.afs.framework.ui;bundle-version="[1.4.0,2.0.0)"

@@ -154,8 +154,7 @@
       <plugin id="org.eclipse.ui.views"/>
       <plugin id="org.eclipse.ui.views.log"/>
       <plugin id="org.eclipse.ui.workbench"/>
-      <plugin id="org.restlet.base"/>
-      <plugin id="org.restlet.server" fragment="true"/>
+      <plugin id="org.restlet"/>
       <plugin id="org.tukaani.xz"/>
       <plugin id="org.w3c.css.sac"/>
       <plugin id="org.w3c.dom.events"/>
