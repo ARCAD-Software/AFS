@@ -463,6 +463,8 @@ public abstract class DataSourceCommand extends Command {
 			            	if (nopublic) {
 			            		sql = sql.replace("public.", ""); //$NON-NLS-1$ //$NON-NLS-2$
 			            	}
+			            	// Remove tabulation ! looks like there is a problem with it !
+			            	sql = sql.replace('\t', ' ');
 				            try {
 				            	st.execute(sql);
 				            } catch (SQLException e) {
