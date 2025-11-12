@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://xml.arcadsoftware.com/1.0.0/layouts/layout.xsd" xmlns="http://xml.arcadsoftware.com/1.0.0/layouts/layout.xsd" elementFormDefault="unqualified">
+    <xsd:element name="editor">
+    	<xsd:complexType>
+			<xsd:sequence maxOccurs="unbounded" minOccurs="0">
+				<xsd:choice>
+				</xsd:choice>
+			</xsd:sequence>
+    	</xsd:complexType>
+    </xsd:element>
+</xsd:schema>

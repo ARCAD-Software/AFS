@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://xml.arcadsoftware.com/1.0.0/template.xsd"
+	xmlns="http://xml.arcadsoftware.com/1.0.0/template.xsd"
+	elementFormDefault="qualified">
+
+	<xsd:import schemaLocation="./entities.xsd" />
+
+	<xsd:element name="template" type="TemplateType">
+		<xsd:annotation>
+			<xsd:documentation>
+				The Template represents any document, that is to say without precise functional orientation, which can be associated with an entity type and which can contain keywords which will be replaced by the values ​​of the data when instantiating the template.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+
+	<xsd:element name="notification">
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="ConditionalTemplateType">
+					<xsd:sequence>
+						<xsd:element name="to" type="StringList" maxOccurs="1" minOccurs="0" />
+						<xsd:element name="cc" type="StringList" maxOccurs="1" minOccurs="0" />
+						<xsd:element name="bcc" type="StringList" maxOccurs="1" minOccurs="0" />
+						<!-- other implementation : 
+						- SMS: <element name="phones" type="template:StringList" maxOccurs="1" minOccurs="0" /> 
+						- MircoBlogging, RSS feeds... 
+						- Instant messaging: XMPP(Jabber)/SIP/Skype/teams...
+						 -->
+					</xsd:sequence>
+					<xsd:attribute name="activated" type="xsd:boolean" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Indicates whether this notification is active or not. Inactive notifications remain accessible but will not be used to trigger messages.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="periodic" type="xsd:boolean" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Indicates whether this notification should be tested periodically. In this case the values ​​of "script" and "event" are not taken into account. However, events and script can be used in parallel for the same template.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="category" use="optional" default="email">
+						<xsd:annotation>
+							<xsd:documentation>Determines the notification dispatch vector.</xsd:documentation>
+						</xsd:annotation>
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:enumeration value="email" />
+								<xsd:enumeration value="sms" />
+								<xsd:enumeration value="all" />
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:attribute>
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:complexType name="TemplateType">
+		<xsd:sequence>
+			<xsd:element name="subject" type="xsd:string" maxOccurs="1" minOccurs="0" />
+			<xsd:element name="text" type="xsd:string" minOccurs="1" maxOccurs="1" />
+		</xsd:sequence>
+		<xsd:attribute name="primaryType" type="xsd:string" use="required" />
+		<xsd:attribute name="secondaryType" type="xsd:string" use="optional" />
+	</xsd:complexType>
+
+	<xsd:complexType name="ConditionalTemplateType">
+		<xsd:complexContent>
+			<xsd:extension base="TemplateType">
+				<xsd:sequence>
+					<xsd:element name="primaryCondition" maxOccurs="1" minOccurs="0">
+						<xsd:complexType>
+							<xsd:choice>
+								<xsd:group ref="criteria" />
+							</xsd:choice>
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="secondaryCondition" maxOccurs="1" minOccurs="0">
+						<xsd:complexType>
+							<xsd:choice>
+								<xsd:group ref="criteria" />
+							</xsd:choice>
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="script" type="xsd:string" maxOccurs="1" minOccurs="0" />
+				</xsd:sequence>
+				<xsd:attribute name="event" type="xsd:string" use="optional" />
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="StringList">
+		<xsd:sequence maxOccurs="unbounded" minOccurs="0">
+			<xsd:element name="string" type="xsd:string" />
+		</xsd:sequence>
+		<xsd:attribute name="list" type="xsd:integer" use="optional" />
+	</xsd:complexType>
+</xsd:schema>

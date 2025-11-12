@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <list xmlns="http://xml.arcadsoftware.com/1.0.0/rights.xsd"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://xml.arcadsoftware.com/1.0.0/rights.xsd http://xml.arcadsoftware.com/1.0.0/rights.xsd ">
+	xsi:schemaLocation="http://xml.arcadsoftware.com/1.0.0/rights.xsd https://raw.githubusercontent.com/ARCAD-Software/AFS/refs/heads/main/schemas/rights.xsd ">
 
 	<right id="30" category="3" code="user.read"/>
 	<right id="31" category="3" code="user.add"/>

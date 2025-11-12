@@ -2,7 +2,7 @@
 <entities xmlns="http://xml.arcadsoftware.com/1.0.0/entities.xsd"
 	xmlns:criteria="http://xml.arcadsoftware.com/1.0.0/searchcriteria.xsd"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://xml.arcadsoftware.com/1.0.0/entities.xsd http://xml.arcadsoftware.com/1.0.0/entities.xsd">
+	xsi:schemaLocation="http://xml.arcadsoftware.com/1.0.0/entities.xsd https://raw.githubusercontent.com/ARCAD-Software/AFS/refs/heads/main/schemas/entities.xsd">
 <entity domain="generic" version="2" date="2019-01-03T15:14:36Z" type="sshKey">
   <metadata>
     <idCol>SHK_ID</idCol>

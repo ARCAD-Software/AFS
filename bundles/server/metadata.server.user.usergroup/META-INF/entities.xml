@@ -3,7 +3,7 @@
 	xmlns="http://xml.arcadsoftware.com/1.0.0/entities.xsd"
 	xmlns:criteria="http://xml.arcadsoftware.com/1.0.0/searchcriteria.xsd"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://xml.arcadsoftware.com/1.0.0/entities.xsd http://xml.arcadsoftware.com/1.0.0/entities.xsd">
+	xsi:schemaLocation="http://xml.arcadsoftware.com/1.0.0/entities.xsd https://raw.githubusercontent.com/ARCAD-Software/AFS/refs/heads/main/schemas/entities.xsd">
 
 	<update-entity type="user" domain="userdb" version="3" date="2025-07-29T00:00:00Z">
 		<link type="usergroup" code="groups">

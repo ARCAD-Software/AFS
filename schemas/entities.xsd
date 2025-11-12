@@ -1,0 +1,1558 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://xml.arcadsoftware.com/1.0.0/entities.xsd"
+	xmlns="http://xml.arcadsoftware.com/1.0.0/entities.xsd"
+	elementFormDefault="qualified">
+
+	<xsd:group name="criterion">
+		<xsd:choice>
+			<xsd:element name="true">
+				<xsd:annotation>
+					<xsd:documentation>Represents a boolean constant true value. Used in a selection operation, this value is identical to an empty selection constraint, all results will be selected.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="false">
+				<xsd:annotation>
+					<xsd:documentation>Represents a boolean constant false value.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="constant" type="xsd:boolean">
+				<xsd:annotation>
+					<xsd:documentation>Represents a boolean constant value. Its value is defined by it contained text which may be "false" or "true".</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="or">
+				<xsd:annotation>
+					<xsd:documentation>
+						Define a conjunctive set of conditions.
+						<p>The content of this element is a sequence of conditions, its value is true if at least one of these condition is true.</p>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:choice>
+						<xsd:group ref="criteria"></xsd:group>
+					</xsd:choice>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="and">
+				<xsd:annotation>
+					<xsd:documentation>Define a disjunctive set of conditions.
+						<p>The content of this element is a sequence of conditions, its value is true if and only if all of these condition are true.</p>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:choice>
+						<xsd:group ref="criteria"></xsd:group>
+					</xsd:choice>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="not">
+				<xsd:annotation>
+					<xsd:documentation>Represent the negation of the contained condition.
+						<p>The value of this condition is the reciprocal of the value of the contained element.</p> 
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:choice>
+						<xsd:group ref="criterion"></xsd:group>
+					</xsd:choice>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="equals">
+				<xsd:annotation>
+					<xsd:documentation>Test if the given attribute value is equal to the given constant value.
+					<p>Note that if the constant is a numeric value the "intval" must be used in place of "value.</p>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+							Define the Entity attribute to be used to perform the test.
+							<p>This "name" may be a reference line, a list of attributes names separated with dot, where the
+							first name is an attribute from the relative entity, and all following ones are issued from the
+							entities in relation with each other. In the end the value tested here is the actual value of the
+							last attribute in the reference line.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="intval" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define a numerical (integer) value to test against the attribute value.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="value" type="xsd:string" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the constant value to test against the attribute value.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="isnull">
+				<xsd:annotation>
+					<xsd:documentation>Test if the current attribute value is null.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+							Define the Entity attribute to be used to perform the test.
+							<p>This "name" may be a reference line, a list of attributes names separated with dot, where the
+							first name is an attribute from the relative entity, and all following ones are issued from the
+							entities in relation with each other. In the end the value tested here is the actual value of the
+							last attribute in the reference line.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="lowerthan">
+				<xsd:annotation>
+					<xsd:documentation>Test if the numerical value of the given attribute is lower or equal to the given constant value.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+							Define the Entity attribute to be used to perform the test.
+							<p>This "name" may be a reference line, a list of attributes names separated with dot, where the
+							first name is an attribute from the relative entity, and all following ones are issued from the
+							entities in relation with each other. In the end the value tested here is the actual value of the
+							last attribute in the reference line.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="value" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>Define the constant value to test against the attribute value.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="greaterthan">
+				<xsd:annotation>
+					<xsd:documentation>Test if the numerical value of the given attribute is greater or equal to the given constant value.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+							Define the Entity attribute to be used to perform the test.
+							<p>This "name" may be a reference line, a list of attributes names separated with dot, where the
+							first name is an attribute from the relative entity, and all following ones are issued from the
+							entities in relation with each other. In the end the value tested here is the actual value of the
+							last attribute in the reference line.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="value" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>Define the constant value to test against the attribute value.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="lowerstrict">
+				<xsd:annotation>
+					<xsd:documentation>Test if the numerical value of the given attribute is lower than the given constant value.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+							Define the Entity attribute to be used to perform the test.
+							<p>This "name" may be a reference line, a list of attributes names separated with dot, where the
+							first name is an attribute from the relative entity, and all following ones are issued from the
+							entities in relation with each other. In the end the value tested here is the actual value of the
+							last attribute in the reference line.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="value" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>Define the constant value to test against the attribute value.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="greaterstrict">
+				<xsd:annotation>
+					<xsd:documentation>Test if the numerical value of the given attribute is greater than the given constant value.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+							Define the Entity attribute to be used to perform the test.
+							<p>This "name" may be a reference line, a list of attributes names separated with dot, where the
+							first name is an attribute from the relative entity, and all following ones are issued from the
+							entities in relation with each other. In the end the value tested here is the actual value of the
+							last attribute in the reference line.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="value" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>Define the constant value to test against the attribute value.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="linkto">
+				<xsd:annotation>
+					<xsd:documentation>
+					<p>Test that the relative entity, or the entity referenced through the given attribute is linked to a 
+					unique given element (ID).</p>
+					<p>This criteria can provide multiples identical, duplicated, results.</p>
+					<p><strong>Note that the negation of this criteria</strong> is not the common meaning of "Not linked to" 
+					it does not return all the data not linked to the given element ID, but the data linked to other elements, 
+					this include any data which may be linked with the designated element but which is also linked to another 
+					one, and exclude any data with no link at all.</p>
+					</xsd:documentation>
+					</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="linkCode" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+							<p>The code can be a line of references, a list of codes separated by periods. The first code 
+							in the line must be an attribute of the original entity and all subsequent codes must follow 
+							the references of the previous code.</p>
+							<p>In all cases the last code in the line must be the code of an association (link).</p>
+							<p>If the <strong>attribute</strong> is used then the link is relative to the attribute value. 
+							The attribute must be a reference and the <strong>linkcode</strong> is then relative to the 
+							attribute type.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+							<p>Define the Entity attribute to be used to perform the test. This parameter is optional, if 
+							omitted the test is performed against the relative entity.</p>
+							<p>This "name" may be a reference line, a list of attributes names separated with dot, where the
+							first name is an attribute from the relative entity, and all following ones are issued from the
+							entities in relation with each other. In the end the value tested here is the actual value of the
+							last attribute in the reference line.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="id" type="xsd:integer" use="required">
+						<xsd:annotation>
+							<xsd:documentation>Define the internal ID of the linked element.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="starts">
+				<xsd:annotation>
+					<xsd:documentation>Test if the given attribute value, which must be a string compatible data, starts with the given prefix.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence maxOccurs="1" minOccurs="1">
+						<xsd:element name="value" type="xsd:string">
+							<xsd:annotation>
+								<xsd:documentation>Define the prefix string to check.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+							<p>Define the Entity attribute to be used to perform the test.</p>
+							<p>This "name" may be a reference line, a list of attributes names separated with dot, where the
+							first name is an attribute from the relative entity, and all following ones are issued from the
+							entities in relation with each other. In the end the value tested here is the actual value of the
+							last attribute in the reference line.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="case" type="xsd:boolean" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define if the test must be case sensitive or not. The default value of this parameter is false.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="ends">
+				<xsd:annotation>
+					<xsd:documentation>Test if the given attribute value, which must be a string compatible data, ends with the given suffix.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence maxOccurs="1" minOccurs="1">
+						<xsd:element name="value" type="xsd:string">
+							<xsd:annotation>
+								<xsd:documentation>Define the suffix string to check.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+							Define the Entity attribute to be used to perform the test.
+							<p>This "name" may be a reference line, a list of attributes names separated with dot, where the
+							first name is an attribute from the relative entity, and all following ones are issued from the
+							entities in relation with each other. In the end the value tested here is the actual value of the
+							last attribute in the reference line.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="case" type="xsd:boolean" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define if the test must be case sensitive or not. The default value of this parameter is false.
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="contains">
+				<xsd:annotation>
+					<xsd:documentation>Test if the given attribute value, which must be a string compatible data, contains with the given text string.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence maxOccurs="1" minOccurs="1">
+						<xsd:element name="value" type="xsd:string">
+							<xsd:annotation>
+								<xsd:documentation>Define the sub text to check.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+							<p>Define the Entity attribute to be used to perform the test.</p>
+							<p>This "name" may be a reference line, a list of attributes names separated with dot, where the
+							first name is an attribute from the relative entity, and all following ones are issued from the
+							entities in relation with each other. In the end the value tested here is the actual value of the
+							last attribute in the reference line.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="case" type="xsd:boolean" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define if the test must be case sensitive or not. The default value of this parameter is false.
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="before">
+				<xsd:annotation>
+					<xsd:documentation>
+					<p>Test if the given attribute value, which must be a Date or compatible data, is set to an instant which 
+					take place before the instant defined by the combination of the temporal parameters.</p>
+					<p>Note that all the date are expressed in GMT time zone.</p>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+							<p>Define the Entity attribute to be used to perform the test.</p>
+							<p>This "name" may be a reference line, a list of attributes names separated with dot, where the
+							first name is an attribute from the relative entity, and all following ones are issued from the
+							entities in relation with each other. In the end the value tested here is the actual value of the
+							last attribute in the reference line.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="value" type="xsd:date" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define an absolute date constant. If the other parameter are used this date will be altered.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="trunc" type="xsd:boolean" default="false">
+						<xsd:annotation>
+							<xsd:documentation>If true only the Date part of the instant will be tested (the Time part will be ignored).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="years" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the year to compare with. If a <strong>value</strong> is specified then this parameter define a time shift, positive or negative, from the given date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="months" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the month in the year to compare with (from 1 to 12). If a <strong>value</strong> is specified then this parameter define a time shift, positive or negative, from the given date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="days" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the day in the month to compare with (from 1 to 31). If a <strong>value</strong> is specified then this parameter define a time shift, positive or negative, from the given date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="hours" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the hours to compare with (from 0 to 23). If a <strong>value</strong> is specified then this parameter define a time shift, positive or negative, from the given date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="minuts" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the minutes to compare with (from 0 to 59). If a <strong>value</strong> is specified then this parameter define a time shift, positive or negative, from the given date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="after">
+				<xsd:annotation>
+					<xsd:documentation>
+					<p>Test if the given attribute value, which must be a Date or compatible data, is set to an instant which 
+					take place after the instant defined by the combination of the temporal parameters.</p>
+					<p>Note that all the date are expressed in GMT time zone.</p>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+							Define the Entity attribute to be used to perform the test.
+							<p>This "name" may be a reference line, a list of attributes names separated with dot, where the
+							first name is an attribute from the relative entity, and all following ones are issued from the
+							entities in relation with each other. In the end the value tested here is the actual value of the
+							last attribute in the reference line.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="value" type="xsd:date" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define an absolute date constant. If the other parameter are used this date will be altered.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="trunc" type="xsd:boolean" default="false">
+						<xsd:annotation>
+							<xsd:documentation>If true only the Date part of the instant will be tested (the Time part will be ignored).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="years" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the year to compare with. If a <strong>value</strong> is specified then this parameter define a time shift, positive or negative, from the given date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="months" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the month in the year to compare with (from 1 to 12). If a <strong>value</strong> is specified then this parameter define a time shift, positive or negative, from the given date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="days" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the day in the month to compare with (from 1 to 31). If a <strong>value</strong> is specified then this parameter define a time shift, positive or negative, from the given date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="hours" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the hours to compare with (from 0 to 23). If a <strong>value</strong> is specified then this parameter define a time shift, positive or negative, from the given date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="minuts" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the minutes to compare with (from 0 to 59). If a <strong>value</strong> is specified then this parameter define a time shift, positive or negative, from the given date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="between">
+				<xsd:annotation>
+					<xsd:documentation>
+					<p>Test if the given attribute value, which must be a Date or compatible data, is set to an instant which 
+					take place between the instants defined by the combination of the temporal parameters.</p>
+					<p>Note that all the date are expressed in GMT time zone.</p>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+							Define the Entity attribute to be used to perform the test.
+							<p>This "name" may be a reference line, a list of attributes names separated with dot, where the
+							first name is an attribute from the relative entity, and all following ones are issued from the
+							entities in relation with each other. In the end the value tested here is the actual value of the
+							last attribute in the reference line.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="before" type="xsd:date" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define an absolute date constant used as the higher limit of the instant interval. If the other parameter are used this date will be altered.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="after" type="xsd:date" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define an absolute date constant used as the lower limit of the instant interval. If the other parameter are used this date will be altered.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="trunc" type="xsd:boolean" default="false">
+						<xsd:annotation>
+							<xsd:documentation>If true only the Date part of the instant will be tested (the Time part will be ignored).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="afteryears" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the year to compare with as the lower limit of the instant interval. If a <strong>after</strong> parameter is specified then this parameter define a time shift, positive or negative, from the given date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="aftermonths" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the month in the year to compare with (from 1 to 12) as the lower limit of the instant interval. If a <strong>after</strong> parameter is specified then this parameter define a time shift, positive or negative, from the given date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="afterdays" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the day in the month to compare with (from 1 to 31) as the lower limit of the instant interval. If a <strong>after</strong> parameter is specified then this parameter define a time shift, positive or negative, from the given date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="afterhours" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the hours to compare with (from 0 to 23) as the lower limit of the instant interval. If a <strong>after</strong> parameter is specified then this parameter define a time shift, positive or negative, from the given date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="afterminuts" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the minutes to compare with (from 0 to 59) as the lower limit of the instant interval. If a <strong>after</strong> parameter is specified then this parameter define a time shift, positive or negative, from the given date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="beforeyears" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the year to compare with as the higher limit of the instant interval. If a <strong>before</strong> parameter is specified then this parameter define a time shift, positive or negative, from the given date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="beforemonths" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the month in the year to compare with (from 1 to 12) as the higher limit of the instant interval. If a <strong>before</strong> parameter is specified then this parameter define a time shift, positive or negative, from the given date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="beforedays" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the day in the month to compare with (from 1 to 31) as the higher limit of the instant interval. If a <strong>before</strong> parameter is specified then this parameter define a time shift, positive or negative, from the given date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="beforehours" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the hours to compare with (from 0 to 23) as the higher limit of the instant interval. If a <strong>before</strong> parameter is specified then this parameter define a time shift, positive or negative, from the given date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="beforeminuts" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the minutes to compare with (from 0 to 59) as the higher limit of the instant interval. If a <strong>before</strong> parameter is specified then this parameter define a time shift, positive or negative, from the given date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="istrue">
+				<xsd:annotation>
+					<xsd:documentation>Test if the current value of the given attribute is an boolean true value.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+							<p>Define the Entity attribute to be used to perform the test.</p>
+							<p>This "name" may be a reference line, a list of attributes names separated with dot, where the
+							first name is an attribute from the relative entity, and all following ones are issued from the
+							entities in relation with each other. In the end the value tested here is the actual value of the
+							last attribute in the reference line.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="subst">
+				<xsd:annotation>
+					<xsd:documentation>
+					<p>This special criteria can be used as a place holder in a template document, or if the <strong>code</strong> parameter is set to one of the reserved code it can be replaced by the correspond access right test.</p>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="code" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+							<p>Defines the substitution code that will be used to replace this criterion when evaluating the condition.</p>
+							<p>Some reserved code may be used to substitute this condition with the corresponding access right test:</p>
+							<ul>
+							<li><strong><i>entity</i>.create</strong>: refer to the creation right of the given entity.</li>
+							<li><strong><i>entity</i>.update</strong>: refer to the update right of the given entity.</li>
+							<li><strong><i>entity</i>.list</strong>: refer to the list right of the given entity.</li>
+							<li><strong><i>entity</i>.read</strong>: refer to the read right of the given entity.</li>
+							<li><strong><i>entity</i>.delete</strong>: refer to the delete right of the given entity.</li>
+							<li><strong><i>entity</i>.<i>attribute</i>.update</strong>: refer to the update right of the given entity's attribute.</li>
+							<li><strong><i>entity</i>.<i>attribute</i>.read</strong>: refer to the read right of the given entity's attribute.</li>
+							<li><strong><i>entity</i>.<i>link</i>.create</strong>: refer to the create/delete right of the given entity's association link.</li>
+							<li><strong><i>entity</i>.<i>link</i>.list</strong>: refer to the delete right of the given entity's association link.</li>
+							</ul>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="idequal">
+				<xsd:annotation>
+					<xsd:documentation>Test the internal ID against the given value.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="id" type="xsd:positiveInteger" use="required">
+						<xsd:annotation>
+							<xsd:documentation>define a constant numerical, positive, value, representing the internal ID to test.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="linkequals">
+				<xsd:annotation>
+					<xsd:documentation>Perform an equality test through a linked entity. This allow to select element which are linked to 
+					any other element which validate the equality.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="reference" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+							<p>Define the Entity to be used to perform the test.</p>
+							<p>This "name" may be a reference line, a list of attributes names separated with dot, where the
+							first name is an attribute from the relative entity, and all following ones are issued from the
+							entities in relation with each other. In the end the entity tested here is the actual value of the
+							last attribute in the reference line.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="linkCode" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+							<p>Define the link code of an association (link).</p>
+							<p>If the <strong>reference</strong> parameter is used then the link is relative to this attribute value. 
+							The attribute must be a reference and the <strong>linkcode</strong> is then relative to the 
+							attribute type.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+							<p>Define the attribute to be used to perform the equality test. This attribute must correspond to one of 
+							the targeted entity of the used link.</p>
+							<p>This "attribute" may be a reference line, a list of attributes names separated with dot, where the
+							first name is an attribute from the relative entity, and all following ones are issued from the
+							entities in relation with each other. In the end the value tested here is the actual value of the
+							last attribute in the reference line.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="value" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>Define the constant value used to perform the equality test.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="equalsic">
+				<xsd:annotation>
+					<xsd:documentation>Tests the equality of a character string to the value of the designated attribute without taking into account case (difference between upper and lower case letters).</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+							<p>Define the Entity attribute to be used to perform the test.</p>
+							<p>This "name" may be a reference line, a list of attributes names separated with dot, where the
+							first name is an attribute from the relative entity, and all following ones are issued from the
+							entities in relation with each other. In the end the value tested here is the actual value of the
+							last attribute in the reference line.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="value" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>Define the constant value to test against the attribute value.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="hasright">
+				<xsd:annotation>
+					<xsd:documentation>Test if the current, or the given, user possess the given access Right number.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="attribute" type="xsd:string">
+						<xsd:annotation>
+							<xsd:documentation>
+							<p>If used this attribute define the Entity attribute to be used to perform the test. It must 
+							refer to an "user" entity element.</p>
+							<p>This "name" may be a reference line, a list of attributes names separated with dot, where the
+							first name is an attribute from the relative entity, and all following ones are issued from the
+							entities in relation with each other. In the end the value tested here is the actual value of the
+							last attribute in the reference line.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="right" type="xsd:int">
+						<xsd:annotation>
+							<xsd:documentation>Define the access Right number (ID) to test.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="param" type="xsd:int">
+						<xsd:annotation>
+							<xsd:documentation>Can be used with a access right using a parameter value, the test will be a 
+							success if and only if the user possess the corresponding right with this parameter value.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="currentuser">
+				<xsd:annotation>
+					<xsd:documentation>
+					<p>Compares the value of an attribute of the element to select to the value of an attribute of the current user, or, failing that, to the ID of the current user.</p>
+					<p>If used when the current user is not accessible this condition returns false.</p>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="userAttribute" type="xsd:string" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>
+							<p>This optional parameter defines which user attribute will be compared to the attribute to test. 
+							If no attribute (USER) is specified then the identifier of the current user will be compared.</p>
+							<p>This "attribute" may be a reference line, a list of attributes names separated with dot, where the
+							first name is an attribute from the <strong>user</strong> entity, and all following ones are issued from the
+							entities in relation with each other. In the end the value tested here is the actual value of the
+							last attribute in the reference line.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+							<p>Define the Entity attribute to be used to perform the test.</p>
+							<p>This "name" may be a reference line, a list of attributes names separated with dot, where the
+							first name is an attribute from the relative entity, and all following ones are issued from the
+							entities in relation with each other. In the end the value tested here is the actual value of the
+							last attribute in the reference line.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="pregen" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>
+					<p>This contition contain a hard coded condition, which must take into account the mapper syntax and 
+					internal constraint. It must be reserved to very specific usages that may not be implemented by any 
+					combination of other criteria.</p>
+					<p><strong>Please note, this type of condition is not portable and should only be used locally, for very specific uses.</strong></p>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="equalsattributes">
+				<xsd:annotation>
+					<xsd:documentation>Test if the values of the two attributes are equals.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+							Define the first Entity attribute to be used to perform the test.
+							<p>This "name" may be a reference line, a list of attributes names separated with dot, where the
+							first name is an attribute from the relative entity, and all following ones are issued from the
+							entities in relation with each other. In the end the value tested here is the actual value of the
+							last attribute in the reference line.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="secondAttribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+							Define the second Entity attribute to be used to perform the test.
+							<p>This "name" may be a reference line, a list of attributes names separated with dot, where the
+							first name is an attribute from the relative entity, and all following ones are issued from the
+							entities in relation with each other. In the end the value tested here is the actual value of the
+							last attribute in the reference line.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="lowerAttributes">
+				<xsd:annotation>
+					<xsd:documentation>Test the values of the two attributes, and validate that the value of the first attributes is strictly lower to the value of the second one.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+							Define the first Entity attribute to be used to perform the test.
+							<p>This "name" may be a reference line, a list of attributes names separated with dot, where the
+							first name is an attribute from the relative entity, and all following ones are issued from the
+							entities in relation with each other. In the end the value tested here is the actual value of the
+							last attribute in the reference line.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="secondAttribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+							Define the second Entity attribute to be used to perform the test.
+							<p>This "name" may be a reference line, a list of attributes names separated with dot, where the
+							first name is an attribute from the relative entity, and all following ones are issued from the
+							entities in relation with each other. In the end the value tested here is the actual value of the
+							last attribute in the reference line.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="lowerEqualsAttributes">
+				<xsd:annotation>
+					<xsd:documentation>Test the values of the two attributes, and validate that the value of the first attributes is lower or equals to the value of the second one.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+							Define the first Entity attribute to be used to perform the test.
+							<p>This "name" may be a reference line, a list of attributes names separated with dot, where the
+							first name is an attribute from the relative entity, and all following ones are issued from the
+							entities in relation with each other. In the end the value tested here is the actual value of the
+							last attribute in the reference line.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="secondAttribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+							Define the second Entity attribute to be used to perform the test.
+							<p>This "name" may be a reference line, a list of attributes names separated with dot, where the
+							first name is an attribute from the relative entity, and all following ones are issued from the
+							entities in relation with each other. In the end the value tested here is the actual value of the
+							last attribute in the reference line.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="changed">
+				<xsd:annotation>
+					<xsd:documentation>Test if the referenced element has been changed during the given interval of time. The "before" and "after" parameters are optionals, if ommited the current time will be used.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="before" type="xsd:date" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define an absolute date constant used as the higher limit of the instant interval. If the other parameter are used this date will be altered.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="after" type="xsd:date" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define an absolute date constant used as the lower limit of the instant interval. If the other parameter are used this date will be altered.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="trunc" type="xsd:boolean" default="false">
+						<xsd:annotation>
+							<xsd:documentation>If true only the Date part of the instant will be tested (the Time part will be ignored).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="afteryears" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the year to compare with as the lower limit of the instant interval. If a <strong>after</strong> parameter is specified then this parameter define a time shift, positive or negative, from the given date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="aftermonths" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the month in the year to compare with (from 1 to 12) as the lower limit of the instant interval. If a <strong>after</strong> parameter is specified then this parameter define a time shift, positive or negative, from the given date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="afterdays" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the day in the month to compare with (from 1 to 31) as the lower limit of the instant interval. If a <strong>after</strong> parameter is specified then this parameter define a time shift, positive or negative, from the given date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="afterhours" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the hours to compare with (from 0 to 23) as the lower limit of the instant interval. If a <strong>after</strong> parameter is specified then this parameter define a time shift, positive or negative, from the given date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="afterminuts" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the minutes to compare with (from 0 to 59) as the lower limit of the instant interval. If a <strong>after</strong> parameter is specified then this parameter define a time shift, positive or negative, from the given date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="beforeyears" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the year to compare with as the higher limit of the instant interval. If a <strong>before</strong> parameter is specified then this parameter define a time shift, positive or negative, from the given date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="beforemonths" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the month in the year to compare with (from 1 to 12) as the higher limit of the instant interval. If a <strong>before</strong> parameter is specified then this parameter define a time shift, positive or negative, from the given date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="beforedays" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the day in the month to compare with (from 1 to 31) as the higher limit of the instant interval. If a <strong>before</strong> parameter is specified then this parameter define a time shift, positive or negative, from the given date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="beforehours" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the hours to compare with (from 0 to 23) as the higher limit of the instant interval. If a <strong>before</strong> parameter is specified then this parameter define a time shift, positive or negative, from the given date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="beforeminuts" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Define the minutes to compare with (from 0 to 59) as the higher limit of the instant interval. If a <strong>before</strong> parameter is specified then this parameter define a time shift, positive or negative, from the given date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="deleted">
+				<xsd:annotation>
+					<xsd:documentation>Test if the referenced element is deleted (using soft deletion).</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="attribute" type="xsd:string" use="optional">
+						<xsd:annotation>
+										<xsd:documentation>
+										<p>Define the Entity attribute to be used to perform the test.</p>
+										<p>This "name" may be a reference line, a list of attributes names separated with dot, where the
+										first name is an attribute from the relative entity, and all following ones are issued from the
+										entities in relation with each other. In the end the element tested here is the actual deletion 
+										state of the last attribute in the reference line.</p>
+										</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="isin">
+				<xsd:annotation>
+					<xsd:documentation>This condition is used to perform a sub-selection on an already known list of element by listing their internal ID.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="ids" type="xsd:string">
+						<xsd:annotation>
+							<xsd:documentation>
+							<p>This attribute is the Internal IDs of object to return, each ones separated by comma.</p>
+							<p>For instance ids = "1,2,3" will only select the object with ID 1, 2 or 3.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="unlinkto">
+				<xsd:annotation>
+					<xsd:documentation>
+					<p>Tests for the absence of a link with the designated element.</p>
+					<p>This condition is validated if there is no link with the targeted element, this is verified if the referenced one is not linked to any data or if it is linked to any other elements.</p>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="linkCode" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+							<p>The code can be a line of references, a list of codes separated by periods. The first code 
+							in the line must be an attribute of the original entity and all subsequent codes must follow 
+							the references of the previous code.</p>
+							<p>In all cases the last code in the line must be the code of an association (link).</p>
+							<p>If the <strong>attribute</strong> is used then the link is relative to the attribute value. 
+							The attribute must be a reference and the <strong>linkcode</strong> is then relative to the 
+							attribute type.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="attribute" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+							<p>Define the Entity attribute to be used to perform the test. This parameter is optional, if 
+							omitted the test is performed against the relative entity.</p>
+							<p>This "name" may be a reference line, a list of attributes names separated with dot, where the
+							first name is an attribute from the relative entity, and all following ones are issued from the
+							entities in relation with each other. In the end the value tested here is the actual value of the
+							last attribute in the reference line.</p>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="id" type="xsd:integer" use="required">
+						<xsd:annotation>
+							<xsd:documentation>Define the internal ID of the non linked element.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:choice>
+	</xsd:group>
+
+	<xsd:group name="criteria">
+		<xsd:sequence>
+			<xsd:group ref="criterion" />
+		</xsd:sequence>
+	</xsd:group>
+
+	<xsd:element name="list">
+		<xsd:complexType>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:element ref="entity" />
+				<xsd:element ref="update-entity" />
+			</xsd:choice>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="entities">
+		<xsd:complexType>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:element ref="entity" />
+				<xsd:element ref="update-entity" />
+			</xsd:choice>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="entity" type="entityType" />
+
+	<xsd:element name="update-entity" type="entityType" />
+
+	<xsd:complexType name="entityType">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="attribute" minOccurs="0" maxOccurs="1" type="attributeType" />
+			<xsd:element name="link" minOccurs="0" maxOccurs="1" type="linkType" />
+			<xsd:element name="test" minOccurs="0" maxOccurs="1" type="testType" />
+			<xsd:element name="attributes" minOccurs="0" maxOccurs="1">
+				<xsd:complexType>
+					<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+						<xsd:element name="attribute" type="attributeType" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="links" minOccurs="0" maxOccurs="1">
+				<xsd:complexType>
+					<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+						<xsd:element name="link" type="linkType" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="tests" minOccurs="0" maxOccurs="1">
+				<xsd:complexType>
+					<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+						<xsd:element name="test" type="testType" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="rights" minOccurs="0" maxOccurs="1">
+				<xsd:complexType>
+					<xsd:sequence minOccurs="1" maxOccurs="1">
+						<xsd:element name="create" minOccurs="0" maxOccurs="1">
+							<xsd:annotation>
+								<xsd:documentation>
+									<p>Defines the test to run to validate that the current user has creation access rights on this entity.</p>
+									<p>If this entity is read-only then this condition is ignored.</p>
+									<p>If omitted this test fall back to the update test, if this test is also omitted the read is used. If none are defined then the creation is accepted without any other constraint.</p>
+								</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:choice>
+									<xsd:group ref="criteria" />
+								</xsd:choice>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="delete" minOccurs="0" maxOccurs="1">
+							<xsd:annotation>
+								<xsd:documentation>
+									<p>Defines the test to run to validate that the current user has deletion access rights on this entity.</p>
+									<p>If this entity is read-only then this condition is ignored.</p>
+									<p>If omitted this test fall back to the update test, if this test is also omitted the create is used, and if this test is also omitted then the read test is used. If none are defined then the deletion is accepted without any other constraint.</p>
+								</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:choice>
+									<xsd:group ref="criteria" />
+								</xsd:choice>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="update" minOccurs="0" maxOccurs="1">
+							<xsd:annotation>
+								<xsd:documentation>
+									<p>Defines the test to run to validate that the current user has update access rights on this entity.</p>
+									<p>If this entity is read-only then this condition is ignored.</p>
+									<p>If omitted this test fall back to the create test, if this test is also omitted the read is used. If none are defined then the update is accepted without any other constraint.</p>
+								</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:choice>
+									<xsd:group ref="criteria" />
+								</xsd:choice>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="read" minOccurs="0" maxOccurs="1">
+							<xsd:annotation>
+								<xsd:documentation>
+									<p>Defines the test to run to validate that the current user has read access rights on this entity.</p>
+									<p>If this test is omitted then the read operation is accepted without any other constraint.</p>
+								</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:choice>
+									<xsd:group ref="criteria" />
+								</xsd:choice>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="list" minOccurs="0" maxOccurs="1">
+							<xsd:annotation>
+								<xsd:documentation>
+									<p>Defines the test to run to validate that the current user has listing access rights on this entity.</p>
+									<p>If this entity is read-only then this condition is ignored.</p>
+									<p>If omitted this test fall back to the read test. If none are defined then the listing operation is accepted without any other constraint.</p>
+								</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:choice>
+									<xsd:group ref="criteria" />
+								</xsd:choice>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="metadata">
+				<xsd:annotation>
+					<xsd:documentation>
+						<p>The metadata define options and specific datas relatives to the services implemented by the server or the client interfaces.</p>
+						<p>The content of this tag is therefore directly dependent on the functionalities offered on the server. The list of possible values presented here is therefore only a sample of possible values.</p>
+						<p>Any value used that does not match any server service will be ignored until the corresponding service is activated.</p>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:choice minOccurs="0" maxOccurs="unbounded">
+						<xsd:element name="reverseLink" type="xsd:string" maxOccurs="1" minOccurs="0" fixed="true">
+							<xsd:annotation>
+								<xsd:documentation>Indicates that the entity is automatically enriched with an association pointing to any entity that references it. In other words any attribute whose type is the type of the current entity will generate an association in the present entity intended for its own entity. This type of association is called “reverse references” or “reverse links”.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="autoLink" type="xsd:string" maxOccurs="1" minOccurs="0" fixed="true">
+							<xsd:annotation>
+								<xsd:documentation>Indicates that any association declared as referencing the current entity will generate an inverse association in this entity. This association will be tagged as "autoLink".</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="eventOnSelection" type="xsd:string" maxOccurs="1" minOccurs="0" fixed="true">
+							<xsd:annotation>
+								<xsd:documentation>Indicates that selections from the /data/{type} web-service generate an event of type com/arcadsoftware/beanmap/selected. For performance reasons, events of this type are not triggered by default.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="eventOnRead" type="xsd:string" maxOccurs="1" minOccurs="0" fixed="true">
+							<xsd:annotation>
+								<xsd:documentation>Indicates that selections from the /data/{type}/{id}+ web-service generate an event of type com/arcadsoftware/beanmap/read. For performance reasons, events of this type are not triggered by default.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="table" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Used by SQL mappers to designate the database table used for data storage.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="idCol" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Used by SQL mappers to designate the internal identifier column (primary key) of the table used to store the data.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="deleteCol" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Used by SQL mappers to designate the column used to store logical deletion information. This column must be of Boolean or integer type depending on the SQL dialect used. This data is optional, in which case the mapper will use a complete deletion even if the user requests a logical deletion of the element.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="updateCol" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Used by SQL mappers to designate the column recording the last modification date. This column must be of type TIMESTAMP or DATE depending on the SQL dialect used; if omitted, the modified dates will not be recorded. This information is used to hide elements on the client side and avoids reloading, so it is especially useful for large data, containing several VARCHARs for example.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="lockCol" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Used by SQL mappers to designate the column declaring the element locked for exclusive use. The value of this column must be an Integer, it designates the user, or the group of users to whom the lock is assigned. This data is optional.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="lockDateCol" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Used in conjunction with the "lockCol" tag, it allows you to implement locks with an expiry date, otherwise the locks have unlimited validity. The column designated by this tag must be of type TIMESTAMP or DATE depending on the SQL dialect used, it contains the validity limit of the lock.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="colPrefix" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Used by SQL mappers, it designates a prefix that can be used for the automatic generation of new columns. This code is generally composed of three letters and the underscore character.</xsd:documentation>
+							</xsd:annotation>
+							<xsd:simpleType>
+								<xsd:restriction base="xsd:string">
+									<xsd:pattern value="[A-Z][A-Z,0-9][A-Z,0-9]_" />
+								</xsd:restriction>
+							</xsd:simpleType>
+						</xsd:element>
+						<xsd:element name="binary" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Indicates that the entity is associated with a binary file. The value of this tag indicates the category of the binary file for storage by the download service.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:any namespace="##other" />
+					</xsd:choice>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:choice>
+		<xsd:attribute name="type" use="required">
+			<xsd:annotation>
+				<xsd:documentation>
+					<p>Defines the entity type.</p>
+					<p>The type is a <strong>unique</strong> key which allows it to be identified on the entire platform. This identifier must use at least 2 character and cannot use any other letter than alphabetic and numerical characters. Moreorer some reserved word are forbidden, like for instance: entity, list, string, integer, float, boolean, date, bean and item.</p>
+				</xsd:documentation>
+			</xsd:annotation>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:minLength value="2" fixed="true" />
+					<xsd:maxLength value="40" fixed="true" />
+					<xsd:pattern value="[a-z][a-zA-Z0-9]*" />
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="domain" use="required">
+			<xsd:annotation>
+				<xsd:documentation>
+				<p>Defines the domain of the entity.</p>
+				<p>The domain is a key identifying entities that fall within the same application domain. Each domain is associated with a mapper (an OSGi service which ensures access to data linked to the entity). Thus the domain also defines the nature of the data linked to the entity, although this nature is relative to the mapper which will be used on the platform.</p>
+				</xsd:documentation>
+			</xsd:annotation>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:minLength value="2" fixed="true" />
+					<xsd:maxLength value="40" fixed="true" />
+					<xsd:pattern value="[a-z][:a-zA-Z0-9]*" />
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="version" type="xsd:positiveInteger" use="required">
+			<xsd:annotation>
+				<xsd:documentation>Defines the version level of the declaration.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="readonly" type="xsd:boolean" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Determines whether the entity will only be readable.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="lockable" type="xsd:boolean" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Indicates whether the entity supports locks against concurent modifications (Depending on the mapper implementation).</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="date" type="xsd:date" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Sets the date the entity was last modified. Otherwise this date will be deducted from the date of last modification of the file, or of the bundle containing this file.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:complexType name="attributeType">
+		<xsd:sequence minOccurs="0" maxOccurs="1">
+			<xsd:element name="rights" minOccurs="0" maxOccurs="1">
+				<xsd:complexType>
+					<xsd:sequence minOccurs="1" maxOccurs="1">
+						<xsd:element name="update" minOccurs="0" maxOccurs="1">
+							<xsd:complexType>
+								<xsd:choice>
+									<xsd:group ref="criteria" />
+								</xsd:choice>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="read" minOccurs="0" maxOccurs="1">
+							<xsd:complexType>
+								<xsd:choice>
+									<xsd:group ref="criteria" />
+								</xsd:choice>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="metadata" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						<p>The metadata define options and specific datas relatives to the services implemented by the server or the client interfaces.</p>
+						<p>The content of this tag is therefore directly dependent on the functionalities offered on the server. The list of possible values presented here is therefore only a sample of possible values.</p>
+						<p>Any value used that does not match any server service will be ignored until the corresponding service is activated.</p>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:choice minOccurs="0" maxOccurs="unbounded">
+						<!-- Ajouter ici les metadata applicable aux attributs... -->
+						<xsd:element name="col" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Designates the column of the storage area for columnar maps (including SQL mappers).</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="colrank" type="xsd:integer" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Designates the rank of the column when presenting the data in a table.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="colsize" type="xsd:integer" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Designates the size of the column (in pixels) when presenting the data in a table.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="reverseLink" type="xsd:string" maxOccurs="1" minOccurs="0" fixed="true">
+							<xsd:annotation>
+								<xsd:documentation>Indicates that the attribute will be used to automatically generate an association from the referenced entity (towards this entity). This type of association is called “Reverse references” or “Reverse link”.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="crypt" type="xsd:string" maxOccurs="1" minOccurs="0" fixed="true">
+							<xsd:annotation>
+								<xsd:documentation>Indicates that the attribute value will be encrypted (string) by the mapper before being saved in the storage area.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="visible" type="xsd:boolean" maxOccurs="1" minOccurs="0" fixed="true">
+							<xsd:annotation>
+								<xsd:documentation>Indicates that if the attribute is "listable" then it will be hidden in the list by default.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="hidden" type="xsd:boolean" maxOccurs="1" minOccurs="0" fixed="true">
+							<xsd:annotation>
+								<xsd:documentation>Indicates whether the attribute returned to the Client by the web services, or not (hidden).</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="generator" type="xsd:boolean" maxOccurs="1" minOccurs="0" fixed="true">
+							<xsd:annotation>
+								<xsd:documentation>Indicates that the value of this attribute is automatically generated, the identifier of the generation service is provided with the value.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:any namespace="##other" />
+					</xsd:choice>
+					<xsd:attribute name="colrank" type="xsd:integer">
+						<xsd:annotation>
+							<xsd:documentation>Designates the size of the column (in pixels) when presenting the data in a table.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="colsize" type="xsd:integer">
+						<xsd:annotation>
+							<xsd:documentation>Designates the size of the column (in pixels) when presenting the data in a table.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="visible" type="xsd:boolean">
+						<xsd:annotation>
+							<xsd:documentation>Indicates that if the attribute is "listable" then it will be hidden in the list by default.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:anyAttribute />
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="code" use="required">
+			<xsd:annotation>
+				<xsd:documentation>The code uniquely identifies an attribute within an entity. The code can only contain alphabetical characters, in lower case (other characters may be reserved for internal use of the management engine).</xsd:documentation>
+			</xsd:annotation>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:minLength value="2" fixed="true" />
+					<xsd:maxLength value="40" fixed="true" />
+					<xsd:pattern value="[a-z][a-zA-Z0-9]*" />
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="type" use="required">
+			<xsd:annotation>
+				<xsd:documentation>
+					<p>Define the attribute type.</p>
+					<p>There are two categories of attributes, atomic type attributes and references. References have a type which is an entity type. Atomic attributes are, in contrast, defined as those whose type is not that of an entity.</p>
+					<p>Certain atomic types also have particular semantics.</p>
+				</xsd:documentation>
+			</xsd:annotation>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:minLength value="2" fixed="true" />
+					<xsd:maxLength value="40" fixed="true" />
+					<xsd:pattern value="[a-z][a-zA-Z0-9]*" />
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="readonly" type="xsd:boolean" use="optional" default="false">
+			<xsd:annotation>
+				<xsd:documentation>Determines whether the attribute will only be readable.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="test" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Contains the groovy code of a test which will be executed when the attribute is modified (to check its consistency).</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="length" type="xsd:integer" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>
+					<p>Useless if the type is of the attribute is a reference. The semantics of this parameter vary depending on the atomic type of the attribute:</p>
+					<ul>
+						<li><strong>integer</strong>: specifies the maximum value accepted (any value greater than this will be reduced to this limit).</li>
+						<li><strong>string</strong>: specifies the maximum length of the string (any string greater than this will be truncated by the server).</li>
+						<li><strong>range</strong>: specifies the maximum value accepted (any value greater than this will be reduced to this limit).</li>
+						<li><strong>float</strong>: specifies the maximum value accepted (any value greater than this will be reduced to this limit).</li>
+					</ul>
+					<p>Any other type other than the standard atomic types and those cited above is treated as an "string" type if the value of length is greater than zero.</p>
+					<p>Any more advanced constraint must be implemented by a “test”.</p>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="precision" type="xsd:integer" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>
+					<p>Useless if the type is of the attribute is a reference. The semantics of this parameter vary depending on the atomic type of the attribute:</p>
+					<ul>
+						<li><strong>range</strong>: specifies the minimum accepted value (any lower value will be reduced to this limit).</li>
+						<li><strong>float</strong>: specifies the maximum number of decimal places after the decimal point (any value with a higher precision will be reduced to this precision).</li>
+					</ul>
+					<p>Any other type other than the standard atomic types and those cited above is treated as a "range" type if the precision value is greater than zero.</p>
+					<p>Any more advanced constraint must be implemented by a “test”.</p>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="mandatory" type="xsd:boolean" use="optional" default="false">
+			<xsd:annotation>
+				<xsd:documentation>Determines whether entering this attribute is required when creating data.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="listable" type="xsd:boolean" use="optional" default="true">
+			<xsd:annotation>
+				<xsd:documentation>Determines whether this attribute should be returned when a list of items is requested from the server.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:complexType name="linkType">
+		<xsd:sequence minOccurs="0" maxOccurs="1">
+			<xsd:element name="rights" minOccurs="0" maxOccurs="1">
+				<xsd:complexType>
+					<xsd:sequence minOccurs="1" maxOccurs="1">
+						<xsd:element name="create" minOccurs="0" maxOccurs="1">
+							<xsd:complexType>
+								<xsd:choice>
+									<xsd:group ref="criteria" />
+								</xsd:choice>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="list" minOccurs="0" maxOccurs="1">
+							<xsd:complexType>
+								<xsd:choice>
+									<xsd:group ref="criteria" />
+								</xsd:choice>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="metadata" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						<p>The metadata define options and specific datas relatives to the services implemented by the server or the client interfaces.</p>
+						<p>The content of this tag is therefore directly dependent on the functionalities offered on the server. The list of possible values presented here is therefore only a sample of possible values.</p>
+						<p>Any value used that does not match any server service will be ignored until the corresponding service is activated.</p>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:choice minOccurs="0" maxOccurs="unbounded">
+						<!-- Ajouter ici les metadata applicable aux associations... -->
+						<xsd:element name="reverseLink" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Indicates that the association is actually a "reverse reference" type association. The value of the tag designates an attribute of the entity referenced by the association. This attribute must have the current entity as type. The association will be automatically built by selecting the elements referencing the current data. No storage information is required for this type of association.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="autoLink" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Indicates that the association is actually a reverse association. The value of this tag designates the code of the corresponding association in the referenced entity. This association cannot also be an “autoLink” or a “reverseLink”.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="table" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Used by SQL mappers to designate the SQL table used for storing data relating to the association. This information is not useful for "reverseLink" associations.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="sourceCol" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Used by SQL mappers to designate the column designating the source identifier, corresponding to the entity data defining the association.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="destCol" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Used by SQL mappers to designate the column designating the destination identifier, corresponding to the entity data referenced by the association.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="deleteCol" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Used by SQL mappers to designate the column used to store logical deletion information. This column must be of Boolean or integer type depending on the SQL dialect used. This data is optional, in which case the mapper will use a complete deletion even if the user requests a logical deletion of the element.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:any namespace="##other" />
+					</xsd:choice>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="code" use="required">
+			<xsd:annotation>
+				<xsd:documentation>The code uniquely identifies an association within an entity. The code can only contain alphabetical characters, in lower case.</xsd:documentation>
+			</xsd:annotation>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:minLength value="2" fixed="true" />
+					<xsd:maxLength value="40" fixed="true" />
+					<xsd:pattern value="[a-z][a-zA-Z0-9]*" />
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="type" use="required">
+			<xsd:annotation>
+				<xsd:documentation>
+					<p>Defines the type of entity targeted by the association.</p>
+				</xsd:documentation>
+			</xsd:annotation>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:minLength value="2" fixed="true" />
+					<xsd:maxLength value="40" fixed="true" />
+					<xsd:pattern value="[a-z][a-zA-Z0-9]*" />
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="readonly" type="xsd:boolean" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Determines whether the association will only be readable.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="test" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Contains the groovy code of a test which will be executed when a new element is added to the association (to check its consistency).</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	
+	<xsd:complexType name="testType">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string">
+				<xsd:attribute name="code" use="required">
+					<xsd:annotation>
+						<xsd:documentation>The code uniquely identifies a test within an entity. The code can only contain alphabetical and numerical characters. By convention this name is generally in a plural form.</xsd:documentation>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:minLength value="2" fixed="true" />
+							<xsd:maxLength value="40" fixed="true" />
+							<xsd:pattern value="[a-z][a-zA-Z0-9]*" />
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+				<xsd:attribute name="event" use="required">
+					<xsd:annotation>
+						<xsd:documentation>
+							<p>Defines the list of events that will trigger the test. Each event is separated by a white space. The list of possible events depends on the entity but here is a list of standard events:</p>
+							<ul>
+								<li>beforeCreate</li>
+								<li>afterCreate</li>
+								<li>beforeUpdate</li>
+								<li>afterUpdate</li>
+								<li>beforeDelete</li>
+								<li>afterDelete</li>
+								<li>list</li>
+								<li>read</li>
+								<li>beforeUndelete</li>
+								<li>afterUndelete</li>
+							</ul>
+						</xsd:documentation>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:pattern value="(beforeCreate|afterCreate|beforeUpdate|afterUpdate|beforeDelete|afterDelete|list|read|beforeUndelete|afterUndelete)( (beforeCreate|afterCreate|beforeUpdate|afterUpdate|beforeDelete|afterDelete|list|read|beforeUndelete|afterUndelete))*" />
+							<xsd:whiteSpace value="preserve"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:simpleContent>	
+	</xsd:complexType>
+	
+</xsd:schema>
