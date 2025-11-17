@@ -339,6 +339,14 @@
 			<version>2.3.1</version>
 		</dependency>
 		
+		<!-- Required by AEV... -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.20.0</version>
+		</dependency>
+		
+		
 	</dependencies>
 
 	<build>
