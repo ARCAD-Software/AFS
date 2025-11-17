@@ -18,10 +18,30 @@ import org.codehaus.jettison.json.JSONObject;
 
 import com.arcadsoftware.osgi.ILoggedPlugin;
 
+/**
+ * Define an Client reader of Server Sent Event stream.
+ * 
+ * <p>
+ * This class store all the event as long as a listener is registered, then this event 
+ * will receive all the event stored and future events. 
+ * 
+ * @author ARCAD Software
+ */
 public class SSEReader implements Closeable {
 
+	/**
+	 * Define the callback used to receive the server events.
+	 * 
+	 * @author ARCAD Software
+	 */
 	public static interface ISSEventListener {
 		
+		/**
+		 * 
+		 * @param id may be zero if no identifier is sent by the server.
+		 * @param event
+		 * @param data
+		 */
 		public void serverSentEvent(long id, String event, JSONObject data);
 	}
 	
@@ -47,9 +67,9 @@ public class SSEReader implements Closeable {
 	private final ArrayList<ISSEventListener> listeners;
 	private final ArrayList<Event> waitingList;
 	private final HttpClient client;
-	private final HttpRequest request;
+	private final String url;
 	private volatile Event current;
-	private final CompletableFuture<Void> asyncOperation;
+	private volatile CompletableFuture<Void> asyncOperation;
 	
 	public SSEReader(ILoggedPlugin activator, String url, final Authenticator authenticator, final 	SSLContext sslContext) {
 		this(activator, url, authenticator, sslContext, null);
@@ -66,6 +86,7 @@ public class SSEReader implements Closeable {
 	public SSEReader(ILoggedPlugin activator, String url, final Authenticator authenticator, final 	SSLContext sslContext, final ISSEventListener listener) {
 		super();
 		this.activator = activator;
+		this.url = url;
 		listeners = new ArrayList<>();
 		Builder builder = HttpClient.newBuilder();
 		if (authenticator != null) {
@@ -75,17 +96,24 @@ public class SSEReader implements Closeable {
  			builder.sslContext(sslContext);
 		}
  		client = builder.build();
-		request = HttpRequest.newBuilder().GET()
-                .uri(URI.create(url))
-                .header("Accept", SSERepresentation.TEXT_EVENTSTREAM.getName())
-                .build();
 		addListener(listener);
 		waitingList = new ArrayList<>();
+		start(0);
+	}
+
+	protected void start(long id) {
 		current = new Event();
-		asyncOperation = client.sendAsync(request, HttpResponse.BodyHandlers.ofLines())
+		final HttpRequest.Builder builder = HttpRequest.newBuilder().GET()
+                .uri(URI.create(url))
+                .header("Accept", SSERepresentation.TEXT_EVENTSTREAM.getName());
+		if (id > 0) {
+			builder.header(SSERepresentation.LAST_EVENT_HEADER, Long.toString(id));
+		}
+		asyncOperation = client.sendAsync(builder.build(), HttpResponse.BodyHandlers.ofLines())
         		.thenAccept(response -> response.body().forEachOrdered(SSEReader.this::readLine))
         		.exceptionally(error -> {
         			SSEReader.this.logError(error);
+        			SSEReader.this.close();
         			return null;
         		});
 	}
@@ -156,6 +184,11 @@ public class SSEReader implements Closeable {
 		}
 	}
 
+	/**
+	 * Add a listener to the server event received.
+	 * 
+	 * @param listener
+	 */
 	public void addListener(ISSEventListener listener) {
 		if (listener != null) {
 			synchronized (listeners) {
@@ -164,6 +197,11 @@ public class SSEReader implements Closeable {
 		}
 	}
 	
+	/**
+	 * Remove a listener.
+	 * 
+	 * @param listener
+	 */
 	public void removeListener(ISSEventListener listener) {
 		if (listener != null) {
 			synchronized (listeners) {
@@ -189,7 +227,21 @@ public class SSEReader implements Closeable {
 		asyncOperation.cancel(true);
 	}
 	
+	/**
+	 * Return true is the connection to the server is closed or broken. 
+	 * @return
+	 */
 	public boolean isClosed() {
 		return asyncOperation.isDone();
+	}
+	
+	/**
+	 * Resume the connection to the Server to the given Event Identifier.
+	 * 
+	 * @param id a positive Event Identifier. Use zero to ignore it.
+	 */
+	public void resume(long id) {
+		close();
+		start(id);
 	}
 }
