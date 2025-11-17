@@ -255,6 +255,7 @@ public abstract class ProgressMonitoredRestlet extends Restlet implements Closea
 		final IConnectionUserBean user = (IConnectionUserBean) request.getAttributes().get(IConnectionUserBean.CONNECTED_USER);
 		if (user == null) {
 			response.setStatus(Status.SERVER_ERROR_INTERNAL, "For securirty reasons, an Authenticated user is required to permform longterm operation !");
+			return;
 		}
 		Form form;
 		Representation entity = request.getEntity();

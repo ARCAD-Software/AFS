@@ -14,7 +14,6 @@ import org.codehaus.jettison.json.JSONObject;
 import org.restlet.Response;
 import org.restlet.data.CacheDirective;
 import org.restlet.data.CharacterSet;
-import org.restlet.data.Header;
 import org.restlet.data.Language;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -49,6 +48,11 @@ public class SSERepresentation extends OutputRepresentation {
 	 */
 	public final static String LAST_EVENT_HEADER = "Last-Event-ID"; //$NON-NLS-1$
 	
+	/**
+	 * The "text/event-stream" is the Media type associated to Server Sent events.
+	 */
+	public final static MediaType TEXT_EVENTSTREAM = MediaType.register("text/event-stream", "Server Send Event stream"); //$NON-NLS-1$ //$NON-NLS-2$
+	
 	private static final record Event(String event, JSONObject data) {}
 	private static final JSONObject EMPTY_JSONOBJECT = new JSONObject();
 	private static final byte[] ID = "id: ".getBytes(StandardCharsets.UTF_8); //$NON-NLS-1$
@@ -61,9 +65,22 @@ public class SSERepresentation extends OutputRepresentation {
 	private final long pingDelay;
 	private final ConcurrentLinkedQueue<Event> queue;
 	private final AtomicLong id;
+	private volatile long queueMaxSize;
 	
 	/**
-	 * Create a new Server Send Event stream.
+	 * Pre-create a new Server Send Event stream.
+	 * 
+	 * <p>
+	 * In that case the SSErepresentation will have to be resumed when it is used for the first time.
+	 * 
+	 * @param language The Language used in this stream.
+	 */
+	public SSERepresentation(Language language) {
+		this(null, language, 0);
+	}
+	
+	/**
+	 * Create a new Server Send Event stream, just in time, when the client ask for it.
 	 * 
 	 * @param response The actual HTTP Response object, it require dedicated configuration to correctly process this representation.
 	 * @param language The Language used in this stream.
@@ -83,11 +100,9 @@ public class SSERepresentation extends OutputRepresentation {
 	 * @param pingDelay The delay of inactivity between each ping event, a null of negative value disable this message. The delay is given in milli-seconds.
 	 */
 	public SSERepresentation(Response response, Language language, long pingDelay) {
-		super(new MediaType("text/event-stream", "Server Send Event stream"));
+		super(TEXT_EVENTSTREAM);
 		setCharacterSet(CharacterSet.UTF_8);
 		setLanguages(Arrays.asList(language));
-		response.setCacheDirectives(Arrays.asList(CacheDirective.noCache()));
-		response.getHeaders().add(new Header("Connection", "keep⁻alive"));
 		working = new AtomicBoolean(true);
 		if (pingDelay < 10) {
 			this.pingDelay = 0;
@@ -97,6 +112,20 @@ public class SSERepresentation extends OutputRepresentation {
 		queue = new ConcurrentLinkedQueue<>();
 		id = new AtomicLong(1);
 		connected = new AtomicBoolean(false);
+		setResponse(response);
+	}
+
+	/**
+	 * Set the response with the required Headers and assign this representation as the entity of it.
+	 * 
+	 * @param response may be null.
+	 */
+	protected void setResponse(Response response) {
+		if (response != null) {
+			response.setCacheDirectives(Arrays.asList(CacheDirective.noCache()));
+			response.setEntity(this);
+			response.setStatus(Status.SUCCESS_OK);
+		}
 	}
 
 	@Override
@@ -122,8 +151,8 @@ public class SSERepresentation extends OutputRepresentation {
 						}
 					}
 				} else {
-					if (delay > 0) {
-						delay = 0;
+					if (pingDelay > 0) {
+						delay = pingDelay;
 					}
 					sendEvent(outputStream, event.event, event.data);
 				}
@@ -193,6 +222,9 @@ public class SSERepresentation extends OutputRepresentation {
 	 */
 	public void pushEvent(JSONObject data) {
 		queue.offer(new Event(null, data));
+		if ((queueMaxSize > 0) && (queue.size() > queueMaxSize)) {
+			queue.poll();
+		}
 	}
 	
 	/**
@@ -206,6 +238,9 @@ public class SSERepresentation extends OutputRepresentation {
 	 */
 	public void pushEvent(String event, JSONObject data) {
 		queue.offer(new Event(event, data));
+		if ((queueMaxSize > 0) && (queue.size() > queueMaxSize)) {
+			queue.poll();
+		}
 	}
 
 	/**
@@ -240,6 +275,11 @@ public class SSERepresentation extends OutputRepresentation {
 					throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Only JSON Object are allowed as Server Send Event Data.");
 				}
 			}
+			if (queueMaxSize > 0) {
+				while (queue.size() > queueMaxSize) {
+					queue.poll();
+				}
+			}
 		}
 	}
 	
@@ -251,8 +291,6 @@ public class SSERepresentation extends OutputRepresentation {
 	 * @return
 	 */
 	public int resume(final Response response, final long id) {
-		response.setCacheDirectives(Arrays.asList(CacheDirective.noCache()));
-		response.getHeaders().add(new Header("Connection", "keep⁻alive"));
 		int i = 0;
 		while (this.id.get() < id) {
 			this.id.incrementAndGet();
@@ -260,6 +298,8 @@ public class SSERepresentation extends OutputRepresentation {
 			i++;
 		}
 		working.set(true);
+		setAvailable(true);
+		setResponse(response);
 		return i;
 	}
 
@@ -270,9 +310,8 @@ public class SSERepresentation extends OutputRepresentation {
 	 * @see #resume(Response, long)
 	 */
 	public void resume(final Response response) {
-		response.setCacheDirectives(Arrays.asList(CacheDirective.noCache()));
-		response.getHeaders().add(new Header("Connection", "keep⁻alive"));
 		working.set(true);
+		setResponse(response);
 	}
 
 	/**
@@ -300,5 +339,34 @@ public class SSERepresentation extends OutputRepresentation {
 	 */
 	public boolean isConnected() {
 		return connected.get();
+	}
+
+	/**
+	 * Get the current limit of event waiting to be send to the client.
+	 * 
+	 * <p>
+	 * Default value is zero, there is no limitation.
+	 * 
+	 * <p>
+	 * Please note that setting no limitation may lead to memory leak.
+	 * 
+	 * @return
+	 */
+	public long getQueueMaxSize() {
+		return queueMaxSize;
+	}
+
+	/**
+	 * Set the limit of event stored in the waiting list. When this limit is reach
+	 * older message are removed even if they are not sent to the client.
+	 * 
+	 * @param queueMaxSize any value lower than 10 disable this limitation.
+	 */
+	public void setQueueMaxSize(long queueMaxSize) {
+		if (queueMaxSize < 10) {
+			this.queueMaxSize = 0;
+		} else {
+			this.queueMaxSize = queueMaxSize;
+		}
 	}
 }
