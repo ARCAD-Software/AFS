@@ -40,7 +40,8 @@ public class ModifyListener implements IMetaDataModifyListener {
 	public boolean testModification(MetaDataEntity entity, BeanMap originalItem, BeanMap modifiedItem,
 			List<MetaDataAttribute> attributes, IConnectionUserBean user, Language language) throws ResourceException {
 		if (Activator.TYPE_USER.equals(entity.getType())) {
-			if (!Crypto.isEmailAddressValid(modifiedItem.getString("email"))) {
+			final String email = modifiedItem.getString("email");
+			if ((email != null) && !email.isBlank() && !Crypto.isEmailAddressValid(email)) {
 				throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Invalid user's Email address.");
 			}
 			if (activator.isUserMaxlock() && (activator.getUserMax() > 0) && // User maximal number activated,
