@@ -58,7 +58,8 @@ public class ModifyListener implements IMetaDataModifyListener {
 	public void postModification(MetaDataEntity entity, BeanMap originalItem, BeanMap modifiedItem,
 			List<MetaDataAttribute> attributes, IConnectionUserBean user, Language language) throws ResourceException {
 		if (Activator.TYPE_USER.equals(entity.getType())) {
-			if (!Crypto.isEmailAddressValid(modifiedItem.getString("email"))) {
+			final String email = modifiedItem.getString("email");
+			if ((email != null) && !email.isBlank() && !Crypto.isEmailAddressValid(email)) {
 				throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Invalid user's Email address.");
 			}
 			// Purge the User cache only on update (no need to purge on creation).
