@@ -585,9 +585,7 @@ public abstract class BaseResource extends ServerResource {
 						// Do we manage what is sent ? Do we need to find an alternative of is this sufficient ?
 						JSONObject o = new JSONObject(entity.getText());
 						for (Object e : o.toMap().entrySet()) {
-							if (e instanceof Entry) {
-								@SuppressWarnings("rawtypes")
-								Entry en = (Entry) e;
+							if (e instanceof Entry en) {
 								// For Arrays, we instantiate Parameters with the same key and all the values present in the array
 								// { "list": ["element1","element2"] } will be transformed into { "list":"element1", "list":"element2" }
 								if (en.getValue() instanceof JSONArray) {

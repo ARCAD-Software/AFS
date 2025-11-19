@@ -717,9 +717,8 @@ public class MetaDataItemResource extends DataItemResource {
 			default:
 				return getRepresentation(variant, form, list, language, false);
 			}
-		} else {
-			return null;
 		}
+		return null;
 	}
 
 	private BeanMap put(Variant variant, Form form, MetaDataEntity entity, BeanMap item, BeanMap values,
