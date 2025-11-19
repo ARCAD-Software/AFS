@@ -39,12 +39,16 @@ public class ModifyListener implements IMetaDataModifyListener {
 	@Override
 	public boolean testModification(MetaDataEntity entity, BeanMap originalItem, BeanMap modifiedItem,
 			List<MetaDataAttribute> attributes, IConnectionUserBean user, Language language) throws ResourceException {
-		if (activator.isUserMaxlock() && (activator.getUserMax() > 0) && // User maximal number activated,
-				(originalItem == null) && // this operation is a creation (POST),
-				Activator.TYPE_USER.equals(entity.getType()) && // and modified data is a user...
-				(activator.getUserMax() <= entity.dataCount())) { // maximal number of undeleted user is reach
-			activator.warn("Limit of maximal number of user reach ({} users).", activator.getUserMax());
-			throw new ResourceException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE, String.format("The current number of user declared in the application reach the fixed limitation of %d users.", activator.getUserMax()));
+		if (Activator.TYPE_USER.equals(entity.getType())) {
+			if (!Crypto.isEmailAddressValid(modifiedItem.getString("email"))) {
+				throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Invalid user's Email address.");
+			}
+			if (activator.isUserMaxlock() && (activator.getUserMax() > 0) && // User maximal number activated,
+					(originalItem == null) && // this operation is a creation (POST),
+					(activator.getUserMax() <= entity.dataCount())) { // maximal number of undeleted user is reach
+				activator.warn("Limit of maximal number of user reach ({} users).", activator.getUserMax());
+				throw new ResourceException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE, String.format("The current number of user declared in the application reach the fixed limitation of %d users.", activator.getUserMax()));
+			}
 		}
 		return true;
 	}
