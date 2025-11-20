@@ -80,6 +80,9 @@ public final class DBH2Restore extends DataSourceCommand {
 					printError("Backup file not found: " + backupFile.getCanonicalPath());
 				} catch (IOException e) {
 					printError("Backup file not found: " + backupFile.getAbsolutePath());
+					if (isArgument("-debug")) { //$NON-NLS-1$
+						e.printStackTrace();
+					}
 				}
 				return ERROR_WRONG_PARAMETER;
 			}
@@ -103,11 +106,17 @@ public final class DBH2Restore extends DataSourceCommand {
 			StringBuilder extensions = new StringBuilder();
 			if (isArgument("-fromx1")) { //$NON-NLS-1$
 				extensions.append(" FROM_1X"); //$NON-NLS-1$
+				if (isArgument("-debug")) { //$NON-NLS-1$
+					println("Restore a backup file from H2 version 1.x.");
+				}
 			}
 			// Recreate the database connection:
 			try (Connection cn = DriverManager.getConnection(url, connectionProperties)) {
 				try {
 					if ((pwd != null) && !pwd.isEmpty()) {
+						if (isArgument("-debug")) { //$NON-NLS-1$
+							println("Restore an encrypted backup file...");
+						}
 						try (PreparedStatement ps = cn.prepareStatement("runscript from ? compression deflate cipher AES password ?" + extensions.toString())) { //$NON-NLS-1$
 							ps.setString(1, backupFile.getAbsolutePath());
 							ps.setString(2, pwd);

@@ -81,6 +81,9 @@ public class DBH2Backup extends DataSourceCommand {
 					}
 				}
 				if ((pwd != null) && !pwd.isEmpty()) {
+					if (isArgument("-debug")) { //$NON-NLS-1$
+						println("Create a \"secured\" backup file...");
+					}
 					try (PreparedStatement ps = connection.prepareStatement("script to ? compression deflate cipher AES password ?")) { //$NON-NLS-1$
 						ps.setString(1, backupFile.getAbsolutePath());
 						ps.setString(2, pwd);
@@ -94,7 +97,7 @@ public class DBH2Backup extends DataSourceCommand {
 					}
 				}
 			} catch (SQLException e) {
-				printError("Unable to backup the H2 database: " + e.getLocalizedMessage());
+				printError("Unable to create a backup of the H2 database: " + e.getLocalizedMessage());
 				if (isArgument("-debug")) { //$NON-NLS-1$
 					e.printStackTrace();
 				}

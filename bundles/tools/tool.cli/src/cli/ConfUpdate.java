@@ -90,6 +90,9 @@ public class ConfUpdate extends Command {
 			newConf.setUseJSON(false);
 			try {
 				newConf.load();
+				if (isArgument("-debug")) { //$NON-NLS-1$
+					println("New configuration loaded...");
+				}
 				for (Configuration conf: newConf.listAllConfigurations()) {
 					println("Adding configuration: " + conf.getPid());
 					getOSGiConfiguration(conf.getPid()).putAll(conf);

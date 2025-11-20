@@ -104,6 +104,9 @@ public final class DBUpdate extends DataSourceCommand {
 				}
 			}
 			if (dataSourceType.startsWith("h2")) { //$NON-NLS-1$
+				if (isArgument("-debug")) { //$NON-NLS-1$
+					println("Create a backup file of the H2 database...");
+				}
 				String pwd = getArgumentValue(new String[] {"-p", "-password"}, connectionProperties.getProperty("password", null)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ 
 				File backupFile = new File(getHomeDirectory(), String.format("database/backup/upgrade_%1$tY%1$tm%1$td_%1$tH%1$tM%1$tS.zip", new Date()));
 				try {
@@ -136,14 +139,14 @@ public final class DBUpdate extends DataSourceCommand {
 					println("H2 Database backup created in file: " + backupFile.getAbsolutePath());
 				}
 				if (!isArgument("-ncdb", "-nocleandb") && (!url.startsWith("jdbc:h2:tcp") || isLocalH2Server())) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					println("Compact the H2 database and rebuild indexes.");
+					println("Compact the H2 database and rebuild indexes...");
 					try {
 						try (PreparedStatement ps = connection.prepareStatement("drop all objects delete files")) { //$NON-NLS-1$
 							ps.execute();
 						}
 					} catch (SQLException e) {
 						printError("Unable to clean the H2 database: " + e.getLocalizedMessage());
-						printWarn("You may have to restore the previous backup.");
+						printWarn("You may have to restore the previous backup !");
 						if (isArgument("-debug")) { //$NON-NLS-1$
 							e.printStackTrace();
 						}
@@ -156,6 +159,9 @@ public final class DBUpdate extends DataSourceCommand {
 						try (PreparedStatement ps = connection.prepareStatement("shutdown compact")) { //$NON-NLS-1$
 							ps.execute();
 						}
+						if (isArgument("-debug")) { //$NON-NLS-1$
+							println("Connection to H2 closed to allow H2 to compact the database file.");
+						}
 					} catch (SQLException e) {
 						if (isArgument("-debug")) { //$NON-NLS-1$
 							e.printStackTrace();
@@ -167,6 +173,9 @@ public final class DBUpdate extends DataSourceCommand {
 					// Recreate the database connection:
 					try {
 						connection = DriverManager.getConnection(url, connectionProperties);
+						if (isArgument("-debug")) { //$NON-NLS-1$
+							println("Reconnected to the H2 database after compression.");
+						}
 					} catch (SQLException e) {
 						printError("Unable to reconnect to the H2 database: " + e.getLocalizedMessage());
 						printWarn("You may have to restore the previous backup.");
@@ -226,7 +235,7 @@ public final class DBUpdate extends DataSourceCommand {
 			switch (isDatabaseInitialized(connection)) {
 			case 2: // Database not created.
 				if (isArgument("-debug")) { //$NON-NLS-1$
-					println("(No ARCADDBV) Assuming the database is not created !");
+					println("(No ARCADDBV table) Assuming the database is not created !");
 				}
 				// Tester si la base de données n'est pas vide...
 				if (isDatabaseEmpty(typ, connection) || isArgument("-install", "-i")) { //$NON-NLS-1$ //$NON-NLS-2$
