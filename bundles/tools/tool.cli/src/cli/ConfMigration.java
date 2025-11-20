@@ -66,6 +66,9 @@ public class ConfMigration extends Command {
 		EquinoxConfigurations ec = new EquinoxConfigurations(getConfigurationRoot());
 		if (isArgument("-cfg")) { //$NON-NLS-1$
 			ec.forceCFG();
+			if (isArgument("-debug")) { //$NON-NLS-1$
+				println("Force usage of CFG files.");
+			}
 		}
 		try {
 			if (!ec.load(confFolder)) {

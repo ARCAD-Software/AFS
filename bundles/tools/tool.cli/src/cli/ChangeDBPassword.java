@@ -94,6 +94,9 @@ public final class ChangeDBPassword extends DataSourceCommand {
 		String pwd;
 		if (isArgument("-gen", "-generate")) {
 			pwd = new String(RandomGenerator.complexRandonPassword());
+			if (isArgument("-debug")) { //$NON-NLS-1$
+				println("New password randomly generated.");
+			}
 		} else if (newPwd == null) {
 			char[] pwdc = readSecret("Enter the new password used for the Data Source \"" + dataSourceID + "\": ");
 			if (pwdc == null) {
@@ -108,11 +111,17 @@ public final class ChangeDBPassword extends DataSourceCommand {
 			pwd = new String(pwdc);
 		} else {
 			pwd = new String(newPwd);
+			if (isArgument("-debug")) { //$NON-NLS-1$
+				println("Using password given in command line arguments.");
+			}
 		}
 		if (dataSourceType.startsWith("h2")) { //$NON-NLS-1$
 			try (PreparedStatement ps = connection.prepareStatement("ALTER USER \"" + login + "\" SET PASSWORD ?")) { //$NON-NLS-1$ //$NON-NLS-2$
 				ps.setString(1, pwd);
 				ps.executeUpdate();
+				if (isArgument("-debug")) { //$NON-NLS-1$
+					println("Password updated in H2 database.");
+				}
 			} catch (SQLException e) {
 				printError("ERROR Unable to change H2 database password: " + e.getLocalizedMessage());
 				return ERROR_DATABASE_CORRUPTED;
@@ -121,6 +130,9 @@ public final class ChangeDBPassword extends DataSourceCommand {
 			try (PreparedStatement ps = connection.prepareStatement("ALTER USER \"" + login + "\" WITH PASSWORD ?")) { //$NON-NLS-1$ //$NON-NLS-2$
 				ps.setString(1, pwd);
 				ps.executeUpdate();
+				if (isArgument("-debug")) { //$NON-NLS-1$
+					println("Password updated in PostgreSQL database.");
+				}
 			} catch (SQLException e) {
 				printError("ERROR Unable to change PostGreSQL database password: " + e.getLocalizedMessage());
 				return ERROR_DATABASE_CORRUPTED;
@@ -146,6 +158,9 @@ public final class ChangeDBPassword extends DataSourceCommand {
 					as400 = cons.newInstance(server, login, ((String) connectionProperties.get("user")).toCharArray());
 				}
 				clazz.getMethod("changePassword", char[].class, char[].class).invoke(as400, ((String) connectionProperties.get("user")).toCharArray(), pwd.toCharArray());
+				if (isArgument("-debug")) { //$NON-NLS-1$
+					println("Password updated in IBMi.");
+				}
 			} catch (Exception e) {
 				printError("ERROR Unable to change BD2i database password: " + e.getLocalizedMessage());
 				return ERROR_DATABASE_CORRUPTED;
@@ -156,7 +171,7 @@ public final class ChangeDBPassword extends DataSourceCommand {
 		}
 		println("Data source Password changed.");
 		confChanged.put(dataSourceID + KEY_DATABASEPWD, Crypto.encrypt(pwd.toCharArray()));
-		// TODO Tester une reconnection !?!??
+		// TODO Try to reconnect with the new password !?!??
 		return 0;
 	}
 }

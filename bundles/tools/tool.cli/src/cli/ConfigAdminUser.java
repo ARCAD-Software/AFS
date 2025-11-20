@@ -85,8 +85,14 @@ public class ConfigAdminUser extends DataSourceCommand {
 		String sql;
 		if (login.isEmpty()) {
 			sql = "update LOCALAUTH set LAU_PASSWORD = ? , LAU_LOCKED = 0 where LAU_USER = ?"; //$NON-NLS-1$
+			if (isArgument("-debug")) { //$NON-NLS-1$
+				println("Updated passowrd using User ID.");
+			}
 		} else {
 			sql = "update LOCALAUTH set LAU_PASSWORD = ? , LAU_LOCKED = 0 where LAU_LOGIN = ?"; //$NON-NLS-1$
+			if (isArgument("-debug")) { //$NON-NLS-1$
+				println("Updated passowrd using Login.");
+			}
 		}
 		try (PreparedStatement ps = connection.prepareStatement(sql)) {
 			ps.setString(1, Crypto.hash(pwd));
@@ -104,6 +110,9 @@ public class ConfigAdminUser extends DataSourceCommand {
 			return ERROR_WRONG_PARAMETER;
 		} catch (SQLException e) {
 			printError("SQL Error when updating the database: " + e.getLocalizedMessage());
+			if (isArgument("-debug")) { //$NON-NLS-1$
+				e.printStackTrace();
+			}
 			return ERROR_INTERNAL_ERROR;
 		}
 	}
