@@ -18,13 +18,13 @@ import org.eclipse.osgi.framework.console.CommandProvider;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
-import com.arcadsoftware.osgi.AbstractConfiguredActivator;
+import com.arcadsoftware.osgi.AbstractActivator;
 
 /**
  * This bundle activator provide some useful console commands.
  */
 @SuppressWarnings("restriction")
-public class Activator extends AbstractConfiguredActivator implements Runnable {
+public class Activator extends AbstractActivator implements Runnable {
 
 	protected static final String PROP_CONFIGPARAM = "param.test"; //$NON-NLS-1$
 	protected static final String PROP_CONFIGSYSTEMKEY = "system.key"; //$NON-NLS-1$
@@ -72,6 +72,7 @@ public class Activator extends AbstractConfiguredActivator implements Runnable {
 	@Override
 	public void run() {
 		if (!shutdown) {
+			error("Shutdown Hook call (Invalid platform shutdown method... but restored just-in-time.)");
 			System.out.println("Shutdown Hook call (Invalid platform shutdown method... but restored just-in-time.)");
 			if (EclipseStarter.isRunning()) {
 				try {

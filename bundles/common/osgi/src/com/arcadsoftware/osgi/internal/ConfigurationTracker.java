@@ -34,7 +34,8 @@ public class ConfigurationTracker extends ServiceTracker<ConfigurationAdmin, Con
 
 	private static final String OSGI_ERROR_UPDATING_PROPERTIES = "osgi.ErrorUpdatingProperties";
 	private static final String OSGI_ERROR_RETRIEVING_PROPERTIES = "osgi.ErrorRetrivingProperties";
-	private AbstractConfiguredActivator activator;
+	
+	private final AbstractConfiguredActivator activator;
 	
 	/**
 	 * @param abstractConfiguredActivator
