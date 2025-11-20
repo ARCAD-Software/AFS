@@ -22,11 +22,11 @@ import java.util.logging.Logger;
 import javax.sql.DataSource;
 
 /**
- * Return a warping datasource around a single (unique) Connection.
+ * Return a warping DataSource around a single (unique) Connection.
  */
 public class FakeDataSource implements DataSource {
 
-	private Connection connection;
+	private final Connection connection;
 	private int tt = 0;
 	private PrintWriter logWriter = null;
 	

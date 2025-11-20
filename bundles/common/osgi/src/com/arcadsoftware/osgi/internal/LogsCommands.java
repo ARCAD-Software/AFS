@@ -42,8 +42,8 @@ public class LogsCommands implements CommandProvider {
 	private static final String EQUINOXLOG_THRESHOLD = "log.threshold"; //$NON-NLS-1$;
 	private static final String EQUINOXLOG_DEFAULTLEVEL = "2"; //$NON-NLS-1$;
 
-	private Activator activator;
-	private BundleContext context;
+	private final Activator activator;
+	private final BundleContext context;
 	private ServiceReference<CommandProvider> serviceRef;
 
 	public LogsCommands(Activator activator,BundleContext context) {
