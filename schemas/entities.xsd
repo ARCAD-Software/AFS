@@ -1176,6 +1176,11 @@
 								<xsd:documentation>Indicates that the entity is associated with a binary file. The value of this tag indicates the category of the binary file for storage by the download service.</xsd:documentation>
 							</xsd:annotation>
 						</xsd:element>
+						<xsd:element name="attributeCode" type="xsd:string" maxOccurs="1" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Define the attribute that will be used as a "code" for this entity. Codes may be used as a functiona unique key to identify a data when selecting it through the web-services.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
 						<xsd:any namespace="##other" />
 					</xsd:choice>
 				</xsd:complexType>
