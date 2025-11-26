@@ -41,11 +41,13 @@ public class SSHKeyListener implements IMetaDataDeleteListener {
 	@Override
 	public void postDeletion(final MetaDataEntity entity, final BeanMap originalItem, final IConnectionUserBean user,
 			final Language language) {
-		try {
-			sshService.deleteKeyFiles(new SSHKey(originalItem));
-		} catch (final IOException e) {
-			activator.error("SSHKey postDeletion failed", e);
-			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
+		if ((originalItem != null) && SSHKey.TYPE.equals(originalItem.getType()) && (originalItem.getId() > 0)) {
+			try {
+				sshService.deleteKeyFiles(new SSHKey(originalItem));
+			} catch (final IOException e) {
+				activator.error("SSHKey postDeletion failed", e);
+				throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
+			}
 		}
 	}
 
