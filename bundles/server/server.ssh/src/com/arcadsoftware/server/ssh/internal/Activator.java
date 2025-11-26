@@ -14,6 +14,7 @@ import com.arcadsoftware.server.ssh.internal.resources.SSHGenerateKeyResource;
 import com.arcadsoftware.server.ssh.internal.resources.SSHGetPublicKeyResource;
 import com.arcadsoftware.server.ssh.internal.resources.SSHImportKeyResource;
 import com.arcadsoftware.server.ssh.services.SSHService;
+import com.arcadsoftware.ssh.model.SSHKey;
 import com.arcadsoftware.ssh.model.SSHRoutes;
 
 public class Activator extends AbstractActivator {
@@ -23,7 +24,8 @@ public class Activator extends AbstractActivator {
 		super.start(bundleContext);
 		final SSHService sshs = new SSHService(this);
 		registerService(SSHService.class, sshs);
-		registerService(IMetaDataDeleteListener.class, new SSHKeyListener(this, sshs));
+		registerService(IMetaDataDeleteListener.class, new SSHKeyListener(this, sshs),
+				IMetaDataDeleteListener.PROP_TYPE, SSHKey.ENTITY);
 		registerService(IBranch.class, new SimpleBranch() {
 			@Override
 			protected RouteList createAttachedResources(final Context context, final Router router) {
