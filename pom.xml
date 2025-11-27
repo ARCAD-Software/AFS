@@ -6,7 +6,7 @@
 
 	<groupId>com.arcadsoftware</groupId>
 	<artifactId>com.arcadsoftware.afs</artifactId>
-	<version>2025.7.0-SNAPSHOT</version>
+	<version>2025.10.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<properties>
@@ -472,7 +472,7 @@
 							<artifact>
 								<groupId>com.arcadsoftware</groupId>
 								<artifactId>com.arcadsoftware.afs.platform</artifactId>
-								<version>2025.7.0-SNAPSHOT</version>
+								<version>2025.10.0-SNAPSHOT</version>
 							</artifact>
 						</target>
 						<executionEnvironment>JavaSE-17</executionEnvironment>
