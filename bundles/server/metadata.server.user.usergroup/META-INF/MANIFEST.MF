@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: User management User's group
 Bundle-SymbolicName: com.arcadsoftware.metadata.server.user.usergroup
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.0.1
 Bundle-Vendor: ARCAD Software
 Automatic-Module-Name: com.arcadsoftware.metadata.server.user.usergroup
 Bundle-RequiredExecutionEnvironment: JavaSE-17
