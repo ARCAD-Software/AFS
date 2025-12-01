@@ -81,9 +81,7 @@ public class SysOutLogged implements ILoggedPlugin {
 	}
 
 	public final void debug(String message) {
-		if (message != null) {
-			System.out.println("[DEBUG] " + message); //$NON-NLS-1$
-		}
+		debug(message, null);
 	}
 
 	public void debug(String message, Throwable e) {
