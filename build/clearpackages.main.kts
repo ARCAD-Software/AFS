@@ -83,7 +83,7 @@ class GitHubRepository(
             }.build()
         )
         if (response.statusCode >= 300) {
-            println("GET $url ended with exception: status code: ${response.statusCode} \n${response.body}")
+            println("Deletion of ${packageName} ended with exception: status code: ${response.statusCode} \n${response.body}")
         }
     }
 
