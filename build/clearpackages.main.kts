@@ -86,7 +86,7 @@ class GitHubRepository(
             }.build()
         )
         if (response.statusCode >= 300) {
-            printlm("GET $url ended with exception: status code: ${response.statusCode} \n${response.body}")
+            println("GET $url ended with exception: status code: ${response.statusCode} \n${response.body}")
         }
     }
 
