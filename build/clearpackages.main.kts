@@ -25,7 +25,7 @@ runBlocking {
 
     // Step 2: fetch all packages for the repository
     val packages = gitHubRepository.getPackages("maven")
-    println("Packages found in $repositoryName repository:")
+    print("Packages found in $repositoryName repository: ")
     println(packages.joinToString(", ", "[", "]") { it.name })
 
     packages.map { githubPackage ->
@@ -36,7 +36,7 @@ runBlocking {
                 packageType = githubPackage.type
             )
 
-            println("Versions found for ${githubPackage.name}:")
+            print("Versions found for ${githubPackage.name}: ")
             println(allVersions.joinToString(", ", "[", "]") { it.name })
 
             // Step 4: delete those versions
@@ -59,20 +59,18 @@ runBlocking {
 class GitHubRepository(
     private val token: String,
     private val organisation: String,
-    private val repositoryName: String
-) {
+    private val repositoryName: String) {
 
     suspend fun getPackages(
         packageType: String
     ): List<Package> {
-        val url = "https://api.github.com/orgs/$organisation/packages?package_type=$packageType"
+        val url = "https://api.github.com/orgs/$organisation/packages?package_type=$packageType&per_page=99"
         val response = Fuel.loader().get(
             Request.Builder().apply {
                 headers(buildHeaders())
                 url(url)
             }.build()
         )
-
         if (response.statusCode == 200) {
             val packagesResponseJson = JsonParser.parseString(response.body)
             val packages = packagesResponseJson.asJsonArray.map {
@@ -86,9 +84,10 @@ class GitHubRepository(
             return packages.filter {
                 it.repository == repositoryName
             }
-        } else {
+        } else if (response.statusCode >= 300) {
             throw Exception("GET $url ended with exception:\nstatus code: ${response.statusCode} \n${response.body}")
         }
+        return null;
     }
 
     suspend fun getAllVersionsOfPackage(
@@ -115,7 +114,7 @@ class GitHubRepository(
                 )
             }
             return versions
-        } else {
+        } else if (response.statusCode >= 300) {
             throw Exception("GET $url ended with exception:\nstatus code: ${response.statusCode} \n${response.body}")
         }
     }
@@ -131,7 +130,7 @@ class GitHubRepository(
                 url(url)
             }.build()
         )
-        if (response.statusCode != 200) {
+        if (response.statusCode >= 300) {
             throw Exception("GET $url ended with exception:\nstatus code: ${response.statusCode} \n${response.body}")
         }
     }
