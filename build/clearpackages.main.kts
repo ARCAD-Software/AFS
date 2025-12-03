@@ -25,31 +25,14 @@ runBlocking {
 
     // Step 2: fetch all packages for the repository
     val packages = gitHubRepository.getPackages("maven")
-    println("Packages found in $repositoryName repository:")
+    println("Packages found in $repositoryName repository: ${packages.size} ")
     println(packages.joinToString(", ", "[", "]") { it.name })
-
     packages.map { githubPackage ->
         async {
-            // Step 3.1: get all versions for this github package
-            val allVersions = gitHubRepository.getAllVersionsOfPackage(
-                packageName = githubPackage.name,
-                packageType = githubPackage.type
-            )
-
-            println("Versions found for ${githubPackage.name}:")
-            println(allVersions.joinToString(", ", "[", "]") { it.name })
-
-            // Step 4: delete those versions
-                allVersions.map { version ->
-                    async {
-                        gitHubRepository.deletePackageVersion(
-                            packageType = githubPackage.type,
-                            packageName = githubPackage.name,
-                            packageVersionId = version.id
-                        )
-                        println("${githubPackage.name} ${version.name} DELETED")
-                    }
-                }.awaitAll()
+            gitHubRepository.deletePackage(
+                packageType = githubPackage.type,
+                packageName = githubPackage.name)
+            println("Package ${githubPackage.name} DELETED")
         }
     }.awaitAll()
 
@@ -59,20 +42,18 @@ runBlocking {
 class GitHubRepository(
     private val token: String,
     private val organisation: String,
-    private val repositoryName: String
-) {
+    private val repositoryName: String) {
 
     suspend fun getPackages(
         packageType: String
     ): List<Package> {
-        val url = "https://api.github.com/orgs/$organisation/packages?package_type=$packageType"
+        val url = "https://api.github.com/orgs/$organisation/packages?package_type=$packageType&per_page=99"
         val response = Fuel.loader().get(
             Request.Builder().apply {
                 headers(buildHeaders())
                 url(url)
             }.build()
         )
-
         if (response.statusCode == 200) {
             val packagesResponseJson = JsonParser.parseString(response.body)
             val packages = packagesResponseJson.asJsonArray.map {
@@ -86,53 +67,23 @@ class GitHubRepository(
             return packages.filter {
                 it.repository == repositoryName
             }
-        } else {
+        } else if (response.statusCode >= 300) {
             throw Exception("GET $url ended with exception:\nstatus code: ${response.statusCode} \n${response.body}")
         }
+        return listOf<Package>();
     }
 
-    suspend fun getAllVersionsOfPackage(
-        packageName: String,
-        packageType: String
-    ): List<Version> {
-        val url = "https://api.github.com/orgs/$organisation/packages/$packageType/$packageName/versions"
-        val response = Fuel.loader().get(
-            Request.Builder().apply {
-                headers(buildHeaders())
-                url(url)
-            }.build()
-        )
-        if (response.statusCode == 200) {
-            val responseJson = JsonParser.parseString(response.body)
-            val versions = responseJson.asJsonArray.map {
-                Version(
-                    id = it.asJsonObject.get("id").asString,
-                    name = it.asJsonObject.get("name").asString,
-                    createdAt = LocalDateTime.parse(
-                        it.asJsonObject.get("created_at").asString,
-                        DateTimeFormatter.ISO_OFFSET_DATE_TIME
-                    )
-                )
-            }
-            return versions
-        } else {
-            throw Exception("GET $url ended with exception:\nstatus code: ${response.statusCode} \n${response.body}")
-        }
-    }
-
-    suspend fun deletePackageVersion(
+    suspend fun deletePackage(
         packageType: String,
-        packageName: String,
-        packageVersionId: String) {
-        val url = "https://api.github.com/orgs/$organisation/packages/$packageType/$packageName/versions/$packageVersionId"
+        packageName: String) {
         val response = Fuel.loader().delete(
             Request.Builder().apply {
                 headers(buildHeaders())
-                url(url)
+                url("https://api.github.com/orgs/$organisation/packages/$packageType/$packageName")
             }.build()
         )
-        if (response.statusCode != 200) {
-            throw Exception("GET $url ended with exception:\nstatus code: ${response.statusCode} \n${response.body}")
+        if (response.statusCode >= 300) {
+            println("Deletion of ${packageName} ended with exception: status code: ${response.statusCode} \n${response.body}")
         }
     }
 
