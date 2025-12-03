@@ -15,5 +15,5 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run Kotlin script
-        run: kotlinc -script build/cleaner.packages.kts ${{ env.TOKEN }}
+        run: kotlinc -script build/clearpackages.main.kts ${{ env.TOKEN }}
 
