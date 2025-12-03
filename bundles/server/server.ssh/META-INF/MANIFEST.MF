@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: SSH Connection Management
 Bundle-SymbolicName: com.arcadsoftware.server.ssh
-Bundle-Version: 3.0.2.qualifier
+Bundle-Version: 3.0.3
 Bundle-Vendor: ARCAD Software
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Import-Package: com.arcadsoftware.beanmap;version="[3.0.0,4.0.0)",
