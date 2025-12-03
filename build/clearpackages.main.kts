@@ -29,13 +29,10 @@ runBlocking {
     println(packages.joinToString(", ", "[", "]") { it.name })
     packages.map { githubPackage ->
         async {
-                        gitHubRepository.deletePackage(
-                            packageType = githubPackage.type,
-                            packageName = githubPackage.name,
-                        )
-                        println("Package ${githubPackage.name} DELETED")
-                    }
-                }.awaitAll()
+            gitHubRepository.deletePackage(
+                packageType = githubPackage.type,
+                packageName = githubPackage.name)
+            println("Package ${githubPackage.name} DELETED")
         }
     }.awaitAll()
 
