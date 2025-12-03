@@ -87,7 +87,7 @@ class GitHubRepository(
         } else if (response.statusCode >= 300) {
             throw Exception("GET $url ended with exception:\nstatus code: ${response.statusCode} \n${response.body}")
         }
-        return null;
+        return listOf<Package>();
     }
 
     suspend fun getAllVersionsOfPackage(
@@ -117,6 +117,7 @@ class GitHubRepository(
         } else if (response.statusCode >= 300) {
             throw Exception("GET $url ended with exception:\nstatus code: ${response.statusCode} \n${response.body}")
         }
+        return listOf<Version>();
     }
 
     suspend fun deletePackageVersion(
