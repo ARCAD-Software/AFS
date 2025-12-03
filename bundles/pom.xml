@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.arcadsoftware</groupId>
 		<artifactId>com.arcadsoftware.afs</artifactId>
-		<version>2025.5.8</version>
+		<version>2025.5.9-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>com.arcadsoftware.afs.bundles</artifactId>

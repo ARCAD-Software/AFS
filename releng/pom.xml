@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.arcadsoftware</groupId>
 		<artifactId>com.arcadsoftware.afs</artifactId>
-		<version>2025.5.8</version>
+		<version>2025.5.9-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>com.arcadsoftware.afs.releng</artifactId>
@@ -13,7 +13,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-deploy-plugin</artifactId>
-				<version>${maven.deloy.version}</version>
+				<version>${maven.deloy.version}-SNAPSHOT</version>
 				<configuration>
 					<skip>true</skip>
 				</configuration>
