@@ -1,0 +1,19 @@
+# Allow to mannually remove all Maven package from this project.
+
+name: Clear All AFS packages
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    env:
+      TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run Kotlin script
+        run: kotlinc -script build/cleaner.packages.kts ${{ env.TOKEN }}
+
