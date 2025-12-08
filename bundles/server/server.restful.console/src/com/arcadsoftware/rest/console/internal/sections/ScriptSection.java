@@ -285,7 +285,7 @@ public class ScriptSection extends Section {
 		if (getLabel() != null) {
 			result.add(0, new ConsoleText(localize(getLabel(), language), getIcon(), null));
 		}
-		for(IConsoleActionService cas: getActivator().getConsoleActionServices(getId())) {
+		for (IConsoleActionService cas: getActivator().getConsoleActionServices(getId())) {
 			result.add(new ConsoleAction(cas.getCode(), null, cas.getLabel(language), cas.getIcon(), cas.isHidden(), cas.getHelp(language)));
 		}
 		return result;

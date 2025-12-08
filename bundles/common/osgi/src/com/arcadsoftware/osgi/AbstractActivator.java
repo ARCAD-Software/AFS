@@ -1332,8 +1332,18 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 	/**
 	 * Utility method to get a service instance.
 	 * 
-	 * @param clazz the OSGi service "class" name.
-	 * @param filter
+	 * <p>
+	 * The specified {@code filter} expression is used to select the registered
+	 * services whose service properties contain keys and values which satisfy
+	 * the filter expression. See {@link org.osgi.framework.Filter} for a description of the filter
+	 * syntax. If the specified {@code filter} is {@code null}, all registered
+	 * services are considered to match the filter. If the specified
+	 * {@code filter} expression cannot be parsed, an
+	 * {@link InvalidSyntaxException} will be thrown with a human readable
+	 * message where the filter became unparsable.
+	 * 
+	 * @param clazz The OSGi service "class" name.
+	 * @param filter The filter expression or null for all services.
 	 * @return null if no services are available.
 	 */
 	public Object getService(String clazz, String filter) {
@@ -1350,6 +1360,39 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 			return null;
 		}
 		return context.getService(sr[0]);
+	}
+	
+	/**
+	 * Utility method to get a service instance.
+	 * 
+	 * <p>
+	 * The specified {@code filter} expression is used to select the registered
+	 * services whose service properties contain keys and values which satisfy
+	 * the filter expression. See {@link org.osgi.framework.Filter} for a description of the filter
+	 * syntax. If the specified {@code filter} is {@code null}, all registered
+	 * services are considered to match the filter. If the specified
+	 * {@code filter} expression cannot be parsed, an
+	 * {@link InvalidSyntaxException} will be thrown with a human readable
+	 * message where the filter became unparsable.
+	 * 
+	 * @param clazz The OSGi service "class" name.
+	 * @param filter The filter expression or null for all services.
+	 * @return null if no services are available.
+	 */
+	public <T> T getService(Class<T> clazz, String filter) {
+		if (context == null) {
+			return null;
+		}
+		Collection<ServiceReference<T>> sr;
+		try {
+			sr = context.getServiceReferences(clazz, filter);
+		} catch (InvalidSyntaxException e) {
+			return null;
+		}
+		if ((sr == null) || (sr.size() == 0)) {
+			return null;
+		}
+		return context.getService(sr.iterator().next());
 	}
 	
 	/**
@@ -1372,7 +1415,7 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 		if (srs == null) {
 			return null;
 		}
-		for (ServiceReference<?> sr:srs) {
+		for (ServiceReference<?> sr: srs) {
 			Object o = context.getService(sr);
 			if (serviceClass.isInstance(o)) {
 				return serviceClass.cast(o);
