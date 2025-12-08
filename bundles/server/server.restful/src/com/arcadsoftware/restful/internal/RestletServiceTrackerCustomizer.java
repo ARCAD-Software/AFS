@@ -17,11 +17,10 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import org.restlet.Restlet;
 
+import com.arcadsoftware.rest.IBranch;
 import com.arcadsoftware.rest.OSGiApplication;
 
 public class RestletServiceTrackerCustomizer implements ServiceTrackerCustomizer<Restlet, Restlet> {
-
-	private static final String RESTFUL_URIPATTERN = "uri"; //$NON-NLS-1$;
 
 	private OSGiApplication application;
 	private Activator activator;
@@ -33,11 +32,14 @@ public class RestletServiceTrackerCustomizer implements ServiceTrackerCustomizer
 	}
 
 	public Restlet addingService(ServiceReference<Restlet> reference) {
-		Object path = reference.getProperty(RESTFUL_URIPATTERN);
+		Object path = reference.getProperty(IBranch.URI);
 		if (path instanceof String) {
-			Object service = activator.getContext().getService(reference);
-			if (service instanceof Restlet) {
-				application.getRouter().attach((String) path, (Restlet) service);
+			Restlet service = activator.getContext().getService(reference);
+			if (service != null) {
+				application.getRouter().attach((String) path, service);
+				if (service.getContext() == null) {
+					service.setContext(application.getContext());
+				}
 				return (Restlet) service;
 			}
 		}
