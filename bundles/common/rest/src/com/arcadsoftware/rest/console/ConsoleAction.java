@@ -48,9 +48,9 @@ public class ConsoleAction extends ConsoleField {
 	/**
 	 * Create an action with a specific code.
 	 * 
-	 * @param id
-	 * @param code
-	 * @param label
+	 * @param id The unique internal identifier of this action.
+	 * @param code A program code that should executed on the client side.
+	 * @param label The localized label of this action.
 	 */
 	public ConsoleAction(String id, String code, String label) {
 		this();
@@ -59,16 +59,27 @@ public class ConsoleAction extends ConsoleField {
 		setLabel(label);
 	}
 
+	/**
+	 * 
+	 * @param id The unique internal identifier of this action.
+	 * @param code A program code that should executed on the client side.
+	 * @param label The localized label of this action.
+	 * @param icon An Icon identifier.
+	 * @param hidden If true this action should not be presented to the user.
+	 * @param help A more detailed information about this action. 
+	 */
 	public ConsoleAction(String id, String code, String label, int icon, boolean hidden, String help) {
 		this(id, code, label);
 		this.id = id;
 		this.code = code;
-		setLabel(label);
+		setIcon(icon);
+		this.hidden = hidden;
+		setHelp(help);
 	}
 
 	/**
 	 * 
-	 * @param id
+	 * @param id The unique internal identifier of this action.
 	 * @param code
 	 * @param label The localized label of this action.
 	 * @param icon
@@ -81,10 +92,20 @@ public class ConsoleAction extends ConsoleField {
 		this.recall = recall;
 	}
 
+	/**
+	 * The unique internal identifier of this action.
+	 * 
+	 * @return
+	 */
 	public String getId() {
 		return id;
 	}
 
+	/**
+	 * Get a Code (javascript or groovy which should be executed on the client side).
+	 * 
+	 * @return
+	 */
 	public String getCode() {
 		return code;
 	}
