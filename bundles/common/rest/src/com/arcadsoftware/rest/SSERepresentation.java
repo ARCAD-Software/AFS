@@ -10,7 +10,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 import org.restlet.Response;
 import org.restlet.data.CacheDirective;
 import org.restlet.data.CharacterSet;
@@ -53,8 +52,8 @@ public class SSERepresentation extends OutputRepresentation {
 	 */
 	public final static MediaType TEXT_EVENTSTREAM = MediaType.register("text/event-stream", "Server Send Event stream"); //$NON-NLS-1$ //$NON-NLS-2$
 	
-	private static final record Event(String event, JSONObject data) {}
-	private static final JSONObject EMPTY_JSONOBJECT = new JSONObject();
+	private static final record Event(String event, Object data) {}
+	private static final String EMPTY_JSONOBJECT = "{}";
 	private static final byte[] ID = "id: ".getBytes(StandardCharsets.UTF_8); //$NON-NLS-1$
 	private static final byte[] EVENT = "\nevent: ".getBytes(StandardCharsets.UTF_8); //$NON-NLS-1$
 	private static final byte[] DATA = "\ndata: ".getBytes(StandardCharsets.UTF_8); //$NON-NLS-1$
@@ -171,7 +170,7 @@ public class SSERepresentation extends OutputRepresentation {
 	 * @param data may be null.
 	 * @throws IOException
 	 */
-	protected void sendEvent(final OutputStream outputStream, final String event, final JSONObject data) throws IOException {
+	protected void sendEvent(final OutputStream outputStream, final String event, final Object data) throws IOException {
 		try {
 			outputStream.write(ID);
 			outputStream.write(Long.toString(id.getAndIncrement()).getBytes(StandardCharsets.UTF_8));
@@ -195,7 +194,7 @@ public class SSERepresentation extends OutputRepresentation {
 	 * Return the JSON Object used in the "ping" keep alive message.
 	 * @return
 	 */
-	protected JSONObject getPingObject() {
+	protected Object getPingObject() {
 		return EMPTY_JSONOBJECT;
 	}
 
@@ -220,7 +219,7 @@ public class SSERepresentation extends OutputRepresentation {
 	 * 
 	 * @param data The event data, may be null.
 	 */
-	public void pushEvent(JSONObject data) {
+	public void pushEvent(Object data) {
 		queue.offer(new Event(null, data));
 		if ((queueMaxSize > 0) && (queue.size() > queueMaxSize)) {
 			queue.poll();
@@ -236,7 +235,7 @@ public class SSERepresentation extends OutputRepresentation {
 	 * @param event The event name, may be null.
 	 * @param data The event data, may be null.
 	 */
-	public void pushEvent(String event, JSONObject data) {
+	public void pushEvent(String event, Object data) {
 		queue.offer(new Event(event, data));
 		if ((queueMaxSize > 0) && (queue.size() > queueMaxSize)) {
 			queue.poll();
@@ -270,7 +269,7 @@ public class SSERepresentation extends OutputRepresentation {
 		if (datas != null) {
 			for (int i = 0; i < datas.length(); i++) {
 				try {
-					queue.offer(new Event(event, datas.getJSONObject(i)));
+					queue.offer(new Event(event, datas.get(i)));
 				} catch (JSONException e) {
 					throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Only JSON Object are allowed as Server Send Event Data.");
 				}
