@@ -42,8 +42,9 @@ public interface IRestConsoleSection {
 	public String getLabel(Language language);
 	
 	/**
+	 * Return an unique ID used in the URL of the web-service corresponding to this Section.
 	 * 
-	 * @return
+	 * @return must not return null.
 	 */
 	public String getId();
 	
