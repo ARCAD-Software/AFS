@@ -1,6 +1,6 @@
 # AFS-OS release version 2025.5.9.
 
-Release date Mon Dec 08 17:52:11 CET 2025.
+Release date Mon Dec 08 17:56:38 CET 2025.
 
 Link to the update site of [Version 2025.5.9](https://github.com/ARCAD-Software/AFS/releases/download/2025.5.9/).
 
