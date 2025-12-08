@@ -31,9 +31,11 @@ import com.arcadsoftware.rest.JSONRepresentation;
 import com.arcadsoftware.rest.JsonStreamCompact;
 import com.arcadsoftware.rest.UserLinkedResource;
 import com.arcadsoftware.rest.XMLRepresentation;
+import com.arcadsoftware.rest.connection.IConnectionUserBean;
 import com.arcadsoftware.rest.console.Category;
 import com.arcadsoftware.rest.console.IActivableConsoleNode;
 import com.arcadsoftware.rest.console.IRestConsoleSection;
+import com.arcadsoftware.rest.console.ISecuredConsoleSection;
 import com.arcadsoftware.rest.console.SectionId;
 import com.arcadsoftware.rest.console.XmlConsoleStream;
 
@@ -83,8 +85,10 @@ public class SectionsListResource extends UserLinkedResource {
 				return new FileRepresentation(activator.getBundleFile("schemas/sections.xsd"), MediaType.APPLICATION_W3C_SCHEMA); //$NON-NLS-1$
 			}
 			HashMap<String, Category> list = new HashMap<String, Category>();
+			IConnectionUserBean user = getUser();
 			for (IRestConsoleSection s: activator.getSections()) {
-				if ((s instanceof IActivableConsoleNode) && !((IActivableConsoleNode) s).isActivated()) {
+				if (((s instanceof IActivableConsoleNode) && !((IActivableConsoleNode) s).isActivated()) ||
+						((s instanceof ISecuredConsoleSection) && !((ISecuredConsoleSection) s).hasRight(user))) {
 					continue;
 				}
 				String cat = s.getCategory(language);

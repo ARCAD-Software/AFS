@@ -32,6 +32,7 @@ import com.arcadsoftware.rest.XMLRepresentation;
 import com.arcadsoftware.rest.console.ConsoleField;
 import com.arcadsoftware.rest.console.IActivableConsoleNode;
 import com.arcadsoftware.rest.console.IRestConsoleSection;
+import com.arcadsoftware.rest.console.ISecuredConsoleSection;
 
 public class SectionResource extends UserLinkedResource {
 
@@ -54,6 +55,10 @@ public class SectionResource extends UserLinkedResource {
 		}
 		String name = getAttribute("section"); //$NON-NLS-1$
 		section = activator.getSection(name); //$NON-NLS-1$
+		if ((section instanceof ISecuredConsoleSection) && !((ISecuredConsoleSection) section).hasRight(getUser())) {
+			setExisting(false);
+			return;
+		}
 		if ((section == null) || ((section instanceof IActivableConsoleNode) && !((IActivableConsoleNode)section).isActivated())) {
 			file = activator.getBundleFile("/files/" + name); //$NON-NLS-1$
 			if ((file == null) || !file.isFile()) {

@@ -16,7 +16,7 @@ package com.arcadsoftware.rest.console;
 /**
  * This Console Section can be activated (or deactivated) according to some conditions.
  *  
- * <p>Deactivated section are not displayer into the list of Sections.
+ * <p>Deactivated section are not displayed into the list of Sections.
  *  
  * @see IRestConsoleSection
  * @author ARCAD Software

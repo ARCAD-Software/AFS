@@ -102,6 +102,7 @@ public class Activator extends AbstractConfiguredActivator implements BundleList
 		xs.alias("configuration", ConfigSection.class); //$NON-NLS-1$
 		xs.useAttributeFor(ConfigSection.class, "pid"); //$NON-NLS-1$
 		xs.useAttributeFor(ConfigSection.class, "bid"); //$NON-NLS-1$
+		xs.useAttributeFor(ConfigSection.class, "right"); //$NON-NLS-1$
 		xs.alias("section", ScriptSection.class); //$NON-NLS-1$
 		xs.alias("multiconfiguration", MultiConfigSection.class); //$NON-NLS-1$
 		xs.addImplicitCollection(MultiConfigSection.class, "sections"); //$NON-NLS-1$

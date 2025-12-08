@@ -28,6 +28,7 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 
 import com.arcadsoftware.crypt.Crypto;
+import com.arcadsoftware.rest.connection.IConnectionUserBean;
 import com.arcadsoftware.rest.console.AbstractConfigSection;
 import com.arcadsoftware.rest.console.ConsoleAction;
 import com.arcadsoftware.rest.console.ConsoleField;
@@ -35,11 +36,13 @@ import com.arcadsoftware.rest.console.ConsoleProperty;
 import com.arcadsoftware.rest.console.ConsoleText;
 import com.arcadsoftware.rest.console.IActivableConsoleNode;
 import com.arcadsoftware.rest.console.IConsoleActionService;
+import com.arcadsoftware.rest.console.ISecuredConsoleSection;
 
-public class ConfigSection extends Section implements IActivableConsoleNode {
+public class ConfigSection extends Section implements IActivableConsoleNode, ISecuredConsoleSection {
 
 	private String pid;
 	private String bid;
+	private int right;
 	
 	@Override
 	public String getId() {
@@ -212,5 +215,18 @@ public class ConfigSection extends Section implements IActivableConsoleNode {
 
 	public String getBid() {
 		return pid;
+	}
+
+	@Override
+	public boolean hasRight(IConnectionUserBean currentUser) {
+		return (right <= 0) || currentUser.getProfile().hasRight(right);
+	}
+
+	public int getRight() {
+		return right;
+	}
+
+	public void setRight(int right) {
+		this.right = right;
 	}
 }
