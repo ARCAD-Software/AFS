@@ -121,7 +121,7 @@ public class Exec {
 		for (int i = 1; i < args.length; i++) {
 			arguments[i - 1] = args[i];
 			if ("-debug".equalsIgnoreCase(args[i])) {
-				
+				debug = true;
 			}
 		}
 		// Test the working directory...
@@ -129,11 +129,17 @@ public class Exec {
 		File pluginsDir = new File(homedir, "plugins"); //$NON-NLS-1$
 		if (!pluginsDir.isDirectory()) {
 			System.err.println("ERROR: Plugins folder not found in home directory.");
+			if (debug) {
+				System.out.println("Plugin Directory: " + pluginsDir.getAbsolutePath());
+			}
 			return 33;
 		}
 		File toolsDir = new File(homedir, "tools"); //$NON-NLS-1$
 		if (!toolsDir.isDirectory()) {
 			System.err.println("ERROR: Tools folder not found in home directory.");
+			if (debug) {
+				System.out.println("Tools Directory: " + toolsDir.getAbsolutePath());
+			}
 			return 33;
 		}
 		// Compute the classpath of the required sub command...
@@ -173,10 +179,17 @@ public class Exec {
 		// Add a copy of this classes Jar...
 		File tools = getJar(toolsDir.listFiles(), "com.arcadsoftware.tool.cli"); //$NON-NLS-1$
 		if (tools == null) {
-			System.err.println("ERROR: Tools program not found in home directory.");
+			System.err.println("ERROR: Tools program not found in the tools directory.");
 			return 36;
 		}
 		files.add(tools);
+		if (debug) {
+			System.out.println("Tool classpath:");
+			for (File f: files) {
+				System.out.println("  - " + f.getAbsolutePath());
+			}
+			System.out.println();
+		}
 		// Execute the command...
 		ClassLoader origin = Thread.currentThread().getContextClassLoader();
 		try (URLClassLoader ccl = getClassLoader(files)) {
