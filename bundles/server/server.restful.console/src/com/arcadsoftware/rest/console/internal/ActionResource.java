@@ -42,7 +42,6 @@ import com.arcadsoftware.rest.console.ConsoleSet;
 import com.arcadsoftware.rest.console.ConsoleText;
 import com.arcadsoftware.rest.console.IActivableConsoleNode;
 import com.arcadsoftware.rest.console.IRestConsoleSection;
-import com.arcadsoftware.rest.console.ISecuredConsoleSection;
 
 public class ActionResource extends UserLinkedResource {
 
@@ -78,8 +77,7 @@ public class ActionResource extends UserLinkedResource {
 		}
 		section = activator.getSection(getAttribute("section")); //$NON-NLS-1$
 		if ((section == null) || 
-				((section instanceof IActivableConsoleNode) && !((IActivableConsoleNode) section).isActivated()) ||
-				((section instanceof ISecuredConsoleSection) && !((ISecuredConsoleSection) section).hasRight(getUser()))) {
+				((section instanceof IActivableConsoleNode) && !((IActivableConsoleNode) section).isActivated())) {
 			setExisting(false);
 			return;
 		}
