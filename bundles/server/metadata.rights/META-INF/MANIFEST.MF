@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Metadata Entities Access Rights
 Bundle-SymbolicName: com.arcadsoftware.metadata.rights;singleton:=true
-Bundle-Version: 1.4.0.qualifier
+Bundle-Version: 1.5.0.qualifier
 Bundle-Activator: com.arcadsoftware.metadata.rights.Activator
 Bundle-Vendor: ARCAD Software
 Bundle-RequiredExecutionEnvironment: JavaSE-17
@@ -26,11 +26,11 @@ Import-Package: com.arcadsoftware.beanmap;version="[3.0.0,4.0.0)",
  org.osgi.service.cm;version="[1.5.0,2.0.0)",
  org.osgi.service.event;version="[1.2.0,2.0.0)",
  org.osgi.util.tracker;version="[1.4.0,2.0.0)",
- org.restlet;version="[2.4.3,3.0.0)",
- org.restlet.data;version="[2.4.3,3.0.0)",
- org.restlet.representation;version="[2.4.3,3.0.0)",
- org.restlet.resource;version="[2.4.3,3.0.0)",
- org.restlet.routing;version="[2.4.3,3.0.0)"
+ org.restlet;version="[2.6.0,3.0.0)",
+ org.restlet.data;version="[2.6.0,3.0.0)",
+ org.restlet.representation;version="[2.6.0,3.0.0)",
+ org.restlet.resource;version="[2.6.0,3.0.0)",
+ org.restlet.routing;version="[2.6.0,3.0.0)"
 Arcad-PropertiesDomain: entities
 Automatic-Module-Name: com.arcadsoftware.metadata.rights
 Bundle-License: https://www.eclipse.org/legal/epl-2.0
