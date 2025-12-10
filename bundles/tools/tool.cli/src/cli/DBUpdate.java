@@ -232,6 +232,12 @@ public final class DBUpdate extends DataSourceCommand {
 			} else if (isArgument("-debug")) { //$NON-NLS-1$
 				println("Starting H2 database upgrade...");
 			}
+			// Check for the required initialization, there is 3 cases:
+			// - The is already initialized. (Nothing to do here.)
+			// - The database looks like an empty base (or H2 has just created it !)
+			//   We need to run the V0 scripts to install it.
+			// - The database is not empty but the ARCADDBV table is missing.
+			//   We assume that this is an old database that require a dedicated initialization.
 			switch (isDatabaseInitialized(connection)) {
 			case 2: // Database not created.
 				if (isArgument("-debug")) { //$NON-NLS-1$
@@ -328,7 +334,9 @@ public final class DBUpdate extends DataSourceCommand {
 			}
 			try {
 				if (afs != null) {
-					upgradeDBComponent(connection, upgradeDir, afs, typ);
+					if (!upgradeDBComponent(connection, upgradeDir, afs, typ)) {
+						return ERROR_INTERNAL_ERROR;
+					}
 					if (isArgument("-debug")) { //$NON-NLS-1$
 						println("Database Component AFS updated.");
 					}
@@ -338,7 +346,9 @@ public final class DBUpdate extends DataSourceCommand {
 				// et les ajouter à dbs pour les mises à jour !
 				for (String db: dbs) {
 					if (!db.equals(afs)) {
-						upgradeDBComponent(connection, upgradeDir, db, typ);
+						if (!upgradeDBComponent(connection, upgradeDir, db, typ)) {
+							return ERROR_INTERNAL_ERROR;
+						}
 						if (isArgument("-debug")) { //$NON-NLS-1$
 							println("Database Component " + db + " updated.");
 						}
@@ -395,15 +405,22 @@ public final class DBUpdate extends DataSourceCommand {
 		}
 	}
 
-	private void upgradeDBComponent(Connection connection, File upgradeDir, String db, String dbtype) throws Exception {
+	private boolean upgradeDBComponent(Connection connection, File upgradeDir, String db, String dbtype) throws Exception {
 		int ver = -1;
 		boolean upd = false;
+		int oldnv = -1;
 		while (true) {
+			// The ARCADDBV version of the component should be incremented at each run...
 			ver = getDBVersion(connection, db);
 			if (ver < 0) {
 				break;
 			}
 			int nv = ver + 1;
+			if ((oldnv > 0) && (nv == oldnv)) {
+				printError(String.format("The Database SQL script for version %d of component \"%s\" is invalid it does not upgrade the database version (Contact ARCAD Software support).", nv, db)); 
+				return false;
+			}
+			oldnv = nv;
 			boolean u = false;
 			File sql = new File(upgradeDir, db.toUpperCase() + "_V" + nv + ".sql"); //$NON-NLS-1$ //$NON-NLS-2$
 			if (sql.isFile()) {
@@ -411,9 +428,9 @@ public final class DBUpdate extends DataSourceCommand {
 				u = true;
 			} else if (isArgument("-debug")) { //$NON-NLS-1$
 				try {
-					println("Component file does not exist (the component is up to date): " + sql.getCanonicalPath());
+					println("Component generic file does not exist (the component is up to date, or there is a problem with the SQL scripts): " + sql.getCanonicalPath());
 				} catch (IOException e) {
-					println("Component file does not exist (the component is up to date): " + sql.getAbsolutePath());
+					println("Component generic file does not exist (the component is up to date, or there is a problem with the SQL scripts): " + sql.getAbsolutePath());
 				}
 			}
 			sql = new File(upgradeDir, db.toUpperCase() + "_V" + nv + '_' + dbtype + ".sql"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -422,14 +439,16 @@ public final class DBUpdate extends DataSourceCommand {
 				u = true;
 			} else if (isArgument("-debug")) { //$NON-NLS-1$
 				try {
-					println("Component file does not exist (the component is up to date): " + sql.getCanonicalPath());
+					println("Component file does not exist (the component should be up to date): " + sql.getCanonicalPath());
 				} catch (IOException e) {
-					println("Component file does not exist (the component is up to date): " + sql.getAbsolutePath());
+					println("Component file does not exist (the component should be up to date): " + sql.getAbsolutePath());
 				}
 			}
 			if (u) {
 				upd = true;
 			} else {
+				// There is no update in this version assume that this is the end...
+				// TODO We should check is there is not higher version script in the folder and execute them !!!
 				break;
 			}
 		}
@@ -438,6 +457,7 @@ public final class DBUpdate extends DataSourceCommand {
 		} else {
 			println(String.format("The Database component \"%s\" is already up to date.", db));
 		}
+		return true;
 	}
 
 	private int upgradeH2DatabaseVersion() {
