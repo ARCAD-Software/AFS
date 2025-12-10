@@ -530,7 +530,7 @@ public final class DBUpdate extends DataSourceCommand {
 					if (i < 1) {
 						i = h2DBFile.getName().length();
 					}
-					File backup = new File(new File(h2DBFile.getParentFile(), "backup"), h2DBFile.getName().substring(0, i) + "_h2upgrade.sql");
+					File backup = new File(new File(h2DBFile.getParentFile(), "backup"), h2DBFile.getName().substring(0, i) + "_h2upgrade.zip");
 					backup.getParentFile().mkdirs();
 					if (backup.isFile()) {
 						if (isArgument("-debug")) {
@@ -601,6 +601,7 @@ public final class DBUpdate extends DataSourceCommand {
 						continue;
 					}
 					// Restore the DB with current version.
+					args.remove(0);
 					args.add("-fromx1");
 					if (isArgument("-debug")) { //$NON-NLS-1$
 						print("Executing command: cli.DBH2Restore");
