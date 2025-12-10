@@ -417,7 +417,7 @@ public final class DBUpdate extends DataSourceCommand {
 			}
 			int nv = ver + 1;
 			if ((oldnv > 0) && (nv == oldnv)) {
-				printError(String.format("The Database SQL script for version %d of component \"%s\" is invalid it does not upgrade the database version (Contact ARCAD Software support).", nv, db)); 
+				printError(String.format("The Database SQL script for version %d of component \"%s\" is invalid. It does not upgrade the database version (Contact ARCAD Software support).", nv, db)); 
 				return false;
 			}
 			oldnv = nv;
