@@ -28,26 +28,29 @@ public class ConsoleMessage extends ConsoleField {
 	}
 	
 	public ConsoleMessage(String title, String message, int icon, String help) {
-		super();
-		setLabel(message);
-		setIcon(icon);
+		this(title, message, icon);
 		setHelp(help);
-		this.title = title;
 	}
 
 	public ConsoleMessage(String title, String message, int icon) {
-		this(title,message);
+		this(title, message);
 		setIcon(icon);
 	}
 
 	public ConsoleMessage(String title, String message,  String help) {
-		this(title,message);
+		this(title, message);
 		setHelp(help);		
 	}
 
 	public ConsoleMessage(String title, String message) {
 		super();
+		setTitle(title);
 		setLabel(message);
+	}
+
+	public ConsoleMessage(int messageType, String title, String message) {
+		this(title, message);
+		setMessageType(messageType);
 	}
 
 	public int getMessageType() {
