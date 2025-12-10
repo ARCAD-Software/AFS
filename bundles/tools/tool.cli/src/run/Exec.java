@@ -38,9 +38,9 @@ public class Exec {
 	private static final String[] CP_BASE = new String[] {
 			"javax.servlet-api_", //$NON-NLS-1$
 			"org.eclipse.osgi_", //$NON-NLS-1$
-			"org.eclipse.osgi.service.cm_", //$NON-NLS-1$
-			"org.eclipse.osgi.util.function_", //$NON-NLS-1$
-			"org.eclipse.osgi.util.promise_", //$NON-NLS-1$
+			"org.osgi.service.cm_", //$NON-NLS-1$
+			"org.osgi.util.function_", //$NON-NLS-1$
+			"org.osgi.util.promise_", //$NON-NLS-1$
 			"org.eclipse.equinox.common_", //$NON-NLS-1$
 			"bcprov", //$NON-NLS-1$
 			"bcpkix", //$NON-NLS-1$
