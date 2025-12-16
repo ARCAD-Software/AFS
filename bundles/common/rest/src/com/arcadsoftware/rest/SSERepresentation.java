@@ -285,16 +285,35 @@ public class SSERepresentation extends OutputRepresentation {
 	/**
 	 * Resume the Stream. This method must be called before to use it in a new HHTP response. 
 	 * 
-	 * @param response The actual HTTP Response object, it require dedicated configuration to correctly process this representation.
-	 * @param id if higher than zero ensure that the first event sent will have an ID at least equal to this value. If require currently waiting message will be purged if their ID is to low.
-	 * @return
+	 * <p>
+	 * A positive number ensure that the first event back will have an ID higher or equals to 
+	 * the given number. a negative number indicate that only the latest event will be sent. 
+	 * For instance, if the header value is 135, then the first event sent will have at least 
+	 * and ID higher or equals to 135. Note that it is not possible to send back an event already 
+	 * sent. If the header value is -3 only the lasted three event waiting to be sent will be 
+	 * sent back. So to resume the stream to the latest event to be sent you can set the header 
+	 * value to -1.
+	 * 
+	 * @param response The actual HTTP Response object, it require dedicated configuration to 
+	 *        correctly process this representation.
+	 * @param id if higher than zero ensure that the first event sent will have an ID at least 
+	 *        equal to this value. If required currently waiting message will be purged if their ID is to low.
+	 * @return the number of event removed from the waiting queue.
 	 */
 	public int resume(final Response response, final long id) {
 		int i = 0;
-		while (this.id.get() < id) {
-			this.id.incrementAndGet();
-			queue.poll();
-			i++;
+		if (id > 0) {
+			while (this.id.get() < id) {
+				this.id.incrementAndGet();
+				queue.poll();
+				i++;
+			}
+		} else if (id < 0) {
+			long x = -id;
+			while (queue.size() > x) {
+				queue.poll();
+				i++;
+			}
 		}
 		working.set(true);
 		setAvailable(true);
