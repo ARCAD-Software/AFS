@@ -34,5 +34,6 @@
 
 	<modules>
 		<module>xstream</module>
+		<module>org.restlet</module>
 	</modules>
 </project>
