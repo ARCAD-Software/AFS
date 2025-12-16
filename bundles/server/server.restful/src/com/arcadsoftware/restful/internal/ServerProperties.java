@@ -13,6 +13,7 @@
  *******************************************************************************/
 package com.arcadsoftware.restful.internal;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
@@ -20,6 +21,8 @@ import java.util.Dictionary;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
+import org.restlet.data.Parameter;
+import org.restlet.util.Series;
 
 import com.arcadsoftware.crypt.ConfiguredSSLContext;
 import com.arcadsoftware.crypt.Crypto;
@@ -51,6 +54,33 @@ public class ServerProperties {
 	private static final String PROP_URL = "website"; //$NON-NLS-1$
 	private static final String PROP_INTERFACE = "interface"; //$NON-NLS-1$
 	private static final String PROP_SYSTEMINTERFACE = "com.arcadsoftware.rest.interface"; //$NON-NLS-1$
+	private static final String PROP_HTTPVERSION = "http.version"; //$NON-NLS-1$
+	private static final String PROP_HTTP3PEMWORKDIR = "http3.pem.directory"; //$NON-NLS-1$
+	private static final String PROP_HTTPREQUESTHEADERLIMIT = "http.requestheaderlimit"; //$NON-NLS-1$
+	private static final String PROP_HTTPRESPONSEHEADERLIMIT = "http.responseheaderlimit"; //$NON-NLS-1$
+	private static final String PROP_MINTHREADS = "threadPool.minThreads"; //$NON-NLS-1$
+	private static final String PROP_MAXTHREADS = "threadPool.maxThreads"; //$NON-NLS-1$
+	private static final String PROP_THREADSPRIORITY = "threadPool.priority"; //$NON-NLS-1$
+	private static final String PROP_THREADSIDLETIMEOUT = "threadPool.idleTimeout"; //$NON-NLS-1$
+	private static final String PROP_STOPTIMEOUT = "threadPool.stopTimeout"; //$NON-NLS-1$
+	private static final String PROP_ACCEPTORS = "connector.acceptors"; //$NON-NLS-1$
+	private static final String PROP_SELECTORS = "connector.selectors"; //$NON-NLS-1$
+	private static final String PROP_ACCEPTQUEUESIZE = "connector.acceptQueueSize"; //$NON-NLS-1$
+	private static final String PROP_CONNECTORIDLETIMEOUT = "connector.idleTimeout"; //$NON-NLS-1$
+	private static final String PROP_CONNECTORSTOPTIMEOUT = "connector.stopTimeout"; //$NON-NLS-1$
+	private static final String PROP_HTTPHEADERCACHESIZE = "http.headerCacheSize"; //$NON-NLS-1$
+	private static final String PROP_HTTPOUTPUTBUFFERSIZE = "http.outputBufferSize"; //$NON-NLS-1$
+	private static final String PROP_LOWRESPERIOD = "com.arcadsoftware.lowResource.period"; //$NON-NLS-1$
+	private static final String PROP_LOWRESTHREADS = "lowResource.threads"; //$NON-NLS-1$
+	private static final String PROP_LOWRESMAXMEMORY = "lowResource.maxMemory"; //$NON-NLS-1$
+	private static final String PROP_LOWRESMAXCONNECTIONS = "lowResource.maxConnections"; //$NON-NLS-1$
+	private static final String PROP_LOWRESIDLETIMEOUT = "lowResource.idleTimeout"; //$NON-NLS-1$
+	private static final String PROP_LOWRESSTOPTIMEOUT = "lowResource.stopTimeout"; //$NON-NLS-1$
+	private static final String PROP_MAXCTN = "maxConnections"; //$NON-NLS-1$
+	private static final String PROP_MAXCTNIDLETIMEOUT = "maxConnections.idleTimeout"; //$NON-NLS-1$
+	private static final String PROP_SHUTDOWNGRACEFULLY = "shutdown.gracefully"; //$NON-NLS-1$
+	private static final String PROP_SHUTDOWNTIMEOUT = "shutdown.timeout"; //$NON-NLS-1$
+	private static final String PROP_USEFORWARDEDFORHEADER = "useForwardedForHeader"; //$NON-NLS-1$
 
 	private final int port;
 	private final int portssl;
@@ -84,6 +114,33 @@ public class ServerProperties {
 	private final String termsOfService;
 	private final String webSite;
 	private final String ethernetInterface;
+	private final int httpVersion;
+	private final String http3PEMWorkdir;
+	private final int responseHeaderSize;
+	private final int requestHeaderSize;
+	private final int minThreads;
+	private final int maxThreads;
+	private final int threadsPriority;
+	private final int threadsIdleTimeout;
+	private final int threadsStopTimeout;
+	private final int selectors;
+	private final int acceptors;
+	private final int acceptQueueSize;
+	private final int connectorIdleTimeout;
+	private final int connectorStopTimeout;
+	private final int headerCacheSize;
+	private final int outputBufferSize;
+	private final int lrPeriod;
+	private final boolean lrThreads;
+	private final int lrMaxMemory;
+	private final int lrMaxConnections;
+	private final int lrIdleTimeout;
+	private final int lrStopTimeOut;
+	private final int maxCtn;
+	private final int maxCtnIdleTimeOut;
+	private final boolean sdGraceFully;
+	private final int sdTimeout;
+	private final boolean useForwardedForHeader;
 	
 	public ServerProperties(final Dictionary<String, ?> properties, final Bundle brandingBundle, final Bundle thisBundle) {
 		super();
@@ -186,6 +243,36 @@ public class ServerProperties {
 		secureRandomAlgorithm = getProperty(properties, ConfiguredSSLContext.PROP_SECURERANDOM, null);
 		trustManagerAlgorithm = getProperty(properties, ConfiguredSSLContext.PROP_TRUSTSTORE_ALGO, null);
 		restletLogDisabled = getProperty(properties, PROP_LOGDISABLED, false);
+		httpVersion = getProperty(properties, PROP_HTTPVERSION, 1);
+		http3PEMWorkdir = getProperty(properties, PROP_HTTP3PEMWORKDIR, "./configuration/pem3/");
+		if (httpVersion == 3) {
+			new File(http3PEMWorkdir).mkdirs();
+		}
+		requestHeaderSize = getProperty(properties, PROP_HTTPREQUESTHEADERLIMIT, Integer.getInteger("com.arcadsoftware.httprequestheaderlimit", 16384)); //$NON-NLS-1$
+		responseHeaderSize = getProperty(properties, PROP_HTTPRESPONSEHEADERLIMIT, Integer.getInteger("com.arcadsoftware.httpresponseheaderlimit", 16384)); //$NON-NLS-1$
+		minThreads = getProperty(properties, PROP_MINTHREADS, Integer.getInteger("com.arcadsoftware.threadPoolminThreads", 8)); //$NON-NLS-1$
+		maxThreads = getProperty(properties, PROP_MAXTHREADS, Integer.getInteger("com.arcadsoftware.threadPool.maxThreads", 200)); //$NON-NLS-1$
+		threadsPriority = getProperty(properties, PROP_THREADSPRIORITY, Integer.getInteger("com.arcadsoftware.threadPool.threadsPriority", Thread.NORM_PRIORITY)); //$NON-NLS-1$
+		threadsIdleTimeout = getProperty(properties, PROP_THREADSIDLETIMEOUT, Integer.getInteger("com.arcadsoftware.threadPool.idleTimeout", 60000)); //$NON-NLS-1$
+		threadsStopTimeout = getProperty(properties, PROP_STOPTIMEOUT, Integer.getInteger("com.arcadsoftware.threadPool.stopTimeout", 5000)); //$NON-NLS-1$
+		acceptors = getProperty(properties, PROP_ACCEPTORS, Integer.getInteger("com.arcadsoftware.connector.acceptors", -1)); //$NON-NLS-1$
+		selectors = getProperty(properties, PROP_SELECTORS, Integer.getInteger("com.arcadsoftware.connector.selectors", -1)); //$NON-NLS-1$
+		acceptQueueSize = getProperty(properties, PROP_ACCEPTQUEUESIZE, Integer.getInteger("com.arcadsoftware.connector.acceptQueueSize", 0)); //$NON-NLS-1$
+		connectorIdleTimeout = getProperty(properties, PROP_CONNECTORIDLETIMEOUT, Integer.getInteger("com.arcadsoftware.connector.idleTimeout", 30000)); //$NON-NLS-1$
+		connectorStopTimeout = getProperty(properties, PROP_CONNECTORSTOPTIMEOUT, Integer.getInteger("com.arcadsoftware.connector.stopTimeout", 30000)); //$NON-NLS-1$
+		headerCacheSize  = getProperty(properties, PROP_HTTPHEADERCACHESIZE, Integer.getInteger("com.arcadsoftware.http.headerCacheSize", 512)); //$NON-NLS-1$
+		outputBufferSize = getProperty(properties, PROP_HTTPOUTPUTBUFFERSIZE, Integer.getInteger("com.arcadsoftware.http.outputBufferSize", 32768)); //$NON-NLS-1$
+		lrPeriod = getProperty(properties, PROP_LOWRESPERIOD, Integer.getInteger("com.arcadsoftware.lowResource.period", 1000)); //$NON-NLS-1$
+		lrThreads = getProperty(properties, PROP_LOWRESTHREADS, Boolean.parseBoolean(System.getProperty("com.arcadsoftware.lowResource.threads", "true"))); //$NON-NLS-1$
+		lrMaxMemory = getProperty(properties, PROP_LOWRESMAXMEMORY, Integer.getInteger("com.arcadsoftware.lowResource.maxMemory", 0)); //$NON-NLS-1$
+		lrMaxConnections = getProperty(properties, PROP_LOWRESMAXCONNECTIONS, Integer.getInteger("com.arcadsoftware.lowResource.maxConnections",0)); //$NON-NLS-1$
+		lrIdleTimeout = getProperty(properties, PROP_LOWRESIDLETIMEOUT, Integer.getInteger("com.arcadsoftware.lowResource.idleTimeout", 1000)); //$NON-NLS-1$
+		lrStopTimeOut = getProperty(properties, PROP_LOWRESSTOPTIMEOUT, Integer.getInteger("com.arcadsoftware.lowResource.stopTimeout", 30000)); //$NON-NLS-1$
+		maxCtn = getProperty(properties, PROP_MAXCTN, 0);
+		maxCtnIdleTimeOut = getProperty(properties, PROP_MAXCTNIDLETIMEOUT, 0);
+		sdGraceFully = getProperty(properties, PROP_SHUTDOWNGRACEFULLY, true);
+		sdTimeout = getProperty(properties, PROP_SHUTDOWNTIMEOUT, 30000);
+		useForwardedForHeader = getProperty(properties, PROP_USEFORWARDEDFORHEADER, Boolean.getBoolean("com.arcadsoftware.useForwardedForHeader"));
 	}
 
 	public ServerProperties(final Bundle thisBundle) {
@@ -222,6 +309,33 @@ public class ServerProperties {
 		secureRandomAlgorithm = null;
 		trustManagerAlgorithm = null;
 		restletLogDisabled = false;
+		httpVersion = 1;
+		http3PEMWorkdir = null;
+		requestHeaderSize = Integer.getInteger("com.arcadsoftware.httprequestheaderlimit", 16384); //$NON-NLS-1$
+		responseHeaderSize = Integer.getInteger("com.arcadsoftware.httpresponseheaderlimit", 16384); //$NON-NLS-1$
+		minThreads = Integer.getInteger("com.arcadsoftware.threadPoolminThreads", 8); //$NON-NLS-1$
+		maxThreads = Integer.getInteger("com.arcadsoftware.threadPool.maxThreads", 200); //$NON-NLS-1$
+		threadsPriority = Integer.getInteger("com.arcadsoftware.threadPool.threadsPriority", Thread.NORM_PRIORITY); //$NON-NLS-1$
+		threadsIdleTimeout = Integer.getInteger("com.arcadsoftware.threadPool.idleTimeout", 60000); //$NON-NLS-1$
+		threadsStopTimeout = Integer.getInteger("com.arcadsoftware.threadPool.stopTimeout", 5000); //$NON-NLS-1$
+		acceptors = Integer.getInteger("com.arcadsoftware.connector.acceptors", -1); //$NON-NLS-1$
+		selectors = Integer.getInteger("com.arcadsoftware.connector.selectors", -1); //$NON-NLS-1$
+		acceptQueueSize = Integer.getInteger("com.arcadsoftware.connector.acceptQueueSize", 0); //$NON-NLS-1$
+		connectorIdleTimeout = Integer.getInteger("com.arcadsoftware.connector.idleTimeout", 30000); //$NON-NLS-1$
+		connectorStopTimeout = Integer.getInteger("com.arcadsoftware.connector.stopTimeout", 30000); //$NON-NLS-1$
+		headerCacheSize  = Integer.getInteger("com.arcadsoftware.http.headerCacheSize", 512); //$NON-NLS-1$
+		outputBufferSize = Integer.getInteger("com.arcadsoftware.http.outputBufferSize", 32768); //$NON-NLS-1$
+		lrPeriod = Integer.getInteger("com.arcadsoftware.lowResource.period", 1000); //$NON-NLS-1$
+		lrThreads = Boolean.parseBoolean(System.getProperty("com.arcadsoftware.lowResource.threads", "true")); //$NON-NLS-1$
+		lrMaxMemory = Integer.getInteger("com.arcadsoftware.lowResource.maxMemory", 0); //$NON-NLS-1$
+		lrMaxConnections = Integer.getInteger("com.arcadsoftware.lowResource.maxConnections",0); //$NON-NLS-1$
+		lrIdleTimeout = Integer.getInteger("com.arcadsoftware.lowResource.idleTimeout", 1000); //$NON-NLS-1$
+		lrStopTimeOut = Integer.getInteger("com.arcadsoftware.lowResource.stopTimeout", 30000); //$NON-NLS-1$
+		maxCtn = 0;
+		maxCtnIdleTimeOut = 0;
+		sdGraceFully = true;
+		sdTimeout = 30000;
+		useForwardedForHeader = Boolean.getBoolean("com.arcadsoftware.useForwardedForHeader");
 	}
 	
 	public void close() {
@@ -297,6 +411,21 @@ public class ServerProperties {
 			return defaultValue;
 		}
 		return sv.equalsIgnoreCase("true") || sv.equalsIgnoreCase("yes") || sv.equals("1"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
+	private int getProperty(final Dictionary<String, ?> properties, final String key, final int defaultValue) {
+		final Object value = properties.get(key);
+		if (value == null) {
+			return defaultValue;
+		}
+		if (value instanceof Integer iv) {
+			return iv;
+		}
+		try {
+			return Integer.parseInt(value.toString());
+		} catch (NumberFormatException e) {
+			return defaultValue;
+		}
 	}
 	
 	private Integer getPortNumber(final Dictionary<String, ?> properties, final String key) {
@@ -511,4 +640,99 @@ public class ServerProperties {
 		return ethernetInterface;
 	}
 
+	public void setHTTPSParameters(Series<Parameter> parameters) {
+		parameters.add("sslContextFactory", org.restlet.engine.ssl.DefaultSslContextFactory.class.getName()); //$NON-NLS-1$
+		parameters.add("keyStorePath", kStore); //$NON-NLS-1$
+		parameters.add("keyStorePassword", new String(kSPwd)); //$NON-NLS-1$
+		parameters.add("keyPassword", new String(keyPwd)); //$NON-NLS-1$
+		if ((kSType != null) && !kSType.isBlank()) {
+			parameters.add("keyStoreType", kSType); //$NON-NLS-1$
+		}
+		if ((disabledCipherSuites != null) && !disabledCipherSuites.isBlank()) {
+			parameters.add("disabledCipherSuites", disabledCipherSuites); //$NON-NLS-1$
+		}
+		if ((disabledProtocols != null) && disabledProtocols.isBlank()) {
+			parameters.add("disabledProtocols", disabledProtocols); //$NON-NLS-1$
+		}
+		if ((enabledCipherSuites != null) && enabledCipherSuites.isBlank()) {
+			parameters.add("enabledCipherSuites", enabledCipherSuites); //$NON-NLS-1$
+		}
+		if ((enabledProtocols != null) && !enabledProtocols.isBlank()) {
+			parameters.add("enabledProtocols", enabledProtocols); //$NON-NLS-1$
+		}
+		if ((keyManagerAlgorithm != null) && !keyManagerAlgorithm.isBlank()) {
+			parameters.add("keyManagerAlgorithm", keyManagerAlgorithm); //$NON-NLS-1$
+		}
+		if ((protocol != null) && !protocol.isBlank()) {
+			parameters.add("protocol", protocol); //$NON-NLS-1$
+		}
+		if ((secureRandomAlgorithm != null) && secureRandomAlgorithm.isBlank()) {
+			parameters.add("secureRandomAlgorithm", secureRandomAlgorithm); //$NON-NLS-1$
+		}
+		if (keyClient && (tStore != null) && !tStore.isBlank()) {
+			parameters.add("trustStorePath", tStore); //$NON-NLS-1$
+			if (tSPwd != null) {
+				parameters.add("trustStorePassword", new String(tSPwd)); //$NON-NLS-1$
+			}
+			if (tSType != null) {
+				parameters.add("trustStoreType", tSType); //$NON-NLS-1$
+			}
+			if (trustManagerAlgorithm != null) {
+				parameters.add("trustManagerAlgorithm", trustManagerAlgorithm); //$NON-NLS-1$
+			}
+			parameters.add("needClientAuthentication", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		if (httpVersion > 1) {
+			if (httpVersion == 3) {
+				parameters.add("http.transport.protocols", "HTTP1_1, HTTP2, HTTP3"); //$NON-NLS-1$ //$NON-NLS-2$
+				parameters.add("http3.pem.workdir", http3PEMWorkdir); //$NON-NLS-1$
+			} else {
+				parameters.add("http.transport.protocols", "HTTP1_1, HTTP2"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		}
+		jettyServerFineTuning(parameters);
+	}
+
+	public void setHTTPParameters(Series<Parameter> parameters) {
+		if (httpVersion > 1) {
+			parameters.add("http.transport.protocol", "HTTP2"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		jettyServerFineTuning(parameters);
+	}
+
+	private void jettyServerFineTuning(Series<Parameter> parameters) {
+		// Jetty HTTP Server fine tuning:
+		// parameters specification from https://javadocs.restlet.talend.com/2.4/jse/ext/org/restlet/ext/jetty/JettyServerHelper.html
+		parameters.add("http.requestHeaderSize", Integer.toString(requestHeaderSize)); //$NON-NLS-1$ //$NON-NLS-2$
+		parameters.add("http.responseHeaderSize", Integer.toString(responseHeaderSize)); //$NON-NLS-1$ //$NON-NLS-2$
+		parameters.add("threadPool.minThreads", Integer.toString(minThreads)); //$NON-NLS-1$			
+		parameters.add("threadPool.maxThreads", Integer.toString(maxThreads)); //$NON-NLS-1$			
+		parameters.add("threadPool.threadsPriority", Integer.toString(threadsPriority)); //$NON-NLS-1$			
+		parameters.add("threadPool.idleTimeout", Integer.toString(threadsIdleTimeout)); //$NON-NLS-1$			
+		parameters.add("threadPool.stopTimeout", Integer.toString(threadsStopTimeout)); //$NON-NLS-1$			
+		parameters.add("connector.acceptors", Integer.toString(acceptors)); //$NON-NLS-1$			
+		parameters.add("connector.selectors", Integer.toString(selectors)); //$NON-NLS-1$			
+		parameters.add("connector.acceptQueueSize", Integer.toString(acceptQueueSize)); //$NON-NLS-1$			
+		parameters.add("connector.idleTimeout", Integer.toString(connectorIdleTimeout)); //$NON-NLS-1$			
+		parameters.add("connector.stopTimeout", Integer.toString(connectorStopTimeout)); //$NON-NLS-1$			
+		parameters.add("http.headerCacheSize", Integer.toString(headerCacheSize)); //$NON-NLS-1$			
+		parameters.add("http.outputBufferSize", Integer.toString(outputBufferSize)); //$NON-NLS-1$			
+		parameters.add("lowResource.period", Integer.toString(lrPeriod)); //$NON-NLS-1$
+		if (!lrThreads) {
+			parameters.add("lowResource.threads", "false"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		parameters.add("lowResource.maxMemory", Integer.toString(lrMaxMemory)); //$NON-NLS-1$			
+		parameters.add("lowResource.maxConnections", Integer.toString(lrMaxConnections)); //$NON-NLS-1$			
+		parameters.add("lowResource.idleTimeout", Integer.toString(lrIdleTimeout)); //$NON-NLS-1$			
+		parameters.add("lowResource.stopTimeout", Integer.toString(lrStopTimeOut)); //$NON-NLS-1$			
+		if (useForwardedForHeader) {
+			parameters.add("useForwardedForHeader", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		parameters.add("server.maxConnections", Integer.toString(maxCtn)); //$NON-NLS-1$			
+		parameters.add("server.maxConnections.idleTimeout", Integer.toString(maxCtnIdleTimeOut)); //$NON-NLS-1$
+		if (!sdGraceFully) {
+			parameters.add("shutdown.gracefully", "false"); //$NON-NLS-1$ //$NON-NLS-1$
+		}
+		parameters.add("shutdown.timeout", Integer.toString(sdTimeout)); //$NON-NLS-1$			
+	}
 }
