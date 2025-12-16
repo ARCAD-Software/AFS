@@ -34,27 +34,27 @@
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcjmail-jdk18on</artifactId>
-			<version>1.82</version>
+			<version>1.83</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcpkix-jdk18on</artifactId>
-			<version>1.82</version>
+			<version>1.83</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcprov-jdk18on</artifactId>
-			<version>1.82</version>
+			<version>1.83</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcutil-jdk18on</artifactId>
-			<version>1.82</version>
+			<version>1.83</version>
 		</dependency>
 		<dependency> <!-- Not distributed: only here because required by Eclipse P2 (for RCP) -->
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcpg-jdk18on</artifactId>
-			<version>1.82</version>
+			<version>1.83</version>
 		</dependency>
 		
 		<!-- XML SEC -->
@@ -80,16 +80,6 @@
 		    <artifactId>javax.servlet-api</artifactId>
 		    <version>4.0.1</version>
 		    <scope>provided</scope>
-		</dependency>
-		<dependency>
-		    <groupId>org.restlet</groupId>
-		    <artifactId>org.restlet</artifactId>
-		    <version>2.6.0</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.restlet</groupId>
-		    <artifactId>org.restlet.ext.jetty</artifactId>
-		    <version>2.6.0</version>
 		</dependency>
 
 		<!-- HTTP1.1 Jetty base Server and Client -->
@@ -126,7 +116,7 @@
 		    <version>${jetty.version}</version>
 		</dependency>
 		
-		<!-- JETTY ALPN nogetiation between HTTP1.1 HTTP/2 and HTTP/3 -->
+		<!-- JETTY ALPN negotiation between HTTP1.1 HTTP/2 and HTTP/3 -->
 		<dependency>
 		    <groupId>org.eclipse.jetty</groupId>
 		    <artifactId>jetty-alpn-client</artifactId>
@@ -269,7 +259,7 @@
 		<dependency> <!-- https://mvnrepository.com/artifact/com.unboundid/unboundid-ldapsdk -->
 			<groupId>com.unboundid</groupId>
 			<artifactId>unboundid-ldapsdk</artifactId>
-			<version>7.0.3</version>
+			<version>7.0.4</version>
 		</dependency>
 
 		<!-- Java Mail -->
@@ -324,7 +314,7 @@
 		<dependency>
 			<groupId>org.apache.groovy</groupId>
 			<artifactId>groovy</artifactId>
-			<version>4.0.27</version>
+			<version>4.0.29</version>
 		</dependency>
 		
 		<!-- Logger -->
