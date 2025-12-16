@@ -228,6 +228,29 @@ public abstract class AbstractConfiguredActivator extends AbstractActivator {
 	}
 	
 	/**
+	 * Try to parse an long configuration parameter. Support Long and Strings
+	 * representations of this value.
+	 *  
+	 * @param param
+	 * @param defaultValue
+	 * @return
+	 */
+	public long parseLongParameter(Object param, long defaultValue) {
+		if (param == null) {
+			return defaultValue; 
+		}
+		if (param instanceof Long) {
+			return (Long) param;
+		}
+		try {
+			return Long.parseLong(param.toString());
+		} catch (NumberFormatException e) {
+			debug(Messages.getString("osgi.NotAnInteger") + param); //$NON-NLS-1$
+			return defaultValue;
+		}
+	}
+	
+	/**
 	 * Try to parse an float number (double) configuration parameter. Support Float, Integer and Strings
 	 * representations of this value.
 	 *  
