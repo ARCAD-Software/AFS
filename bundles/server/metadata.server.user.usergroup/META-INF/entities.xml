@@ -9,7 +9,7 @@
 		<link type="usergroup" code="groups">
 			<rights>
 				<create>
-					<hasright attribute="." right="38" />
+					<hasright attribute="." right="33" />
 				</create>
 			</rights>
 			<metadata>
@@ -74,7 +74,7 @@
 		<link type="user" code="users">
 			<rights>
 				<create>
-					<hasright attribute="." right="38" />
+					<hasright attribute="." right="33" />
 				</create>
 			</rights>
 			<metadata>

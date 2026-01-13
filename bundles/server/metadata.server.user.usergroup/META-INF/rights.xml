@@ -3,7 +3,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://xml.arcadsoftware.com/1.0.0/rights.xsd https://raw.githubusercontent.com/ARCAD-Software/AFS/refs/heads/main/schemas/rights.xsd ">
 
-	<right id="38" category="3" code="user.groups"/>
+	<right id="33" category="3" code="user.groups"/>
 	<right id="39" category="3" code="group.add"/>
 	<right id="40" category="3" code="group.edit"/>
 
