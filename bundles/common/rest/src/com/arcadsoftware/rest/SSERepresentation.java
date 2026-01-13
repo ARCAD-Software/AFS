@@ -52,11 +52,12 @@ public class SSERepresentation extends OutputRepresentation {
 	 */
 	public final static MediaType TEXT_EVENTSTREAM = MediaType.register("text/event-stream", "Server Send Event stream"); //$NON-NLS-1$ //$NON-NLS-2$
 	
-	private static final record Event(String event, Object data) {}
+	private static final record Event(String event, Object data, int terminate) {}
 	private static final String EMPTY_JSONOBJECT = "{}";
 	private static final byte[] ID = "id: ".getBytes(StandardCharsets.UTF_8); //$NON-NLS-1$
 	private static final byte[] EVENT = "\nevent: ".getBytes(StandardCharsets.UTF_8); //$NON-NLS-1$
 	private static final byte[] DATA = "\ndata: ".getBytes(StandardCharsets.UTF_8); //$NON-NLS-1$
+	private static final byte[] RETRY = "\nretry: ".getBytes(StandardCharsets.UTF_8); //$NON-NLS-1$
 	private static final byte[] ENDEVENT = "\n\n".getBytes(StandardCharsets.UTF_8); //$NON-NLS-1$
 	
 	private final AtomicBoolean working;
@@ -146,14 +147,17 @@ public class SSERepresentation extends OutputRepresentation {
 						delay -= 50;
 						if (delay <= 0) {
 							delay = pingDelay;
-							sendEvent(outputStream, "ping", getPingObject()); //$NON-NLS-1$
+							sendEvent(outputStream, "ping", getPingObject(), 0); //$NON-NLS-1$
 						}
 					}
 				} else {
 					if (pingDelay > 0) {
 						delay = pingDelay;
 					}
-					sendEvent(outputStream, event.event, event.data);
+					sendEvent(outputStream, event.event, event.data, event.terminate);
+					if (event.terminate != 0) {
+						break;
+					}
 				}
 				event = queue.poll();
 			}
@@ -170,7 +174,7 @@ public class SSERepresentation extends OutputRepresentation {
 	 * @param data may be null.
 	 * @throws IOException
 	 */
-	protected void sendEvent(final OutputStream outputStream, final String event, final Object data) throws IOException {
+	protected void sendEvent(final OutputStream outputStream, final String event, final Object data, final int retry) throws IOException {
 		try {
 			outputStream.write(ID);
 			outputStream.write(Long.toString(id.getAndIncrement()).getBytes(StandardCharsets.UTF_8));
@@ -181,6 +185,10 @@ public class SSERepresentation extends OutputRepresentation {
 			outputStream.write(DATA);
 			if (data != null) {
 				outputStream.write(data.toString().getBytes(StandardCharsets.UTF_8));
+			}
+			if (retry > 0) {
+				outputStream.write(RETRY);
+				outputStream.write(Integer.toString(retry).getBytes(StandardCharsets.UTF_8));
 			}
 			outputStream.write(ENDEVENT);
 			outputStream.flush();
@@ -212,6 +220,20 @@ public class SSERepresentation extends OutputRepresentation {
 	}
 	
 	/**
+	 * Send a Ping event asynchronously.
+	 * 
+	 * <p>
+	 * Sending this event reset the Ping delay.
+	 * 
+	 */
+	public void pushPingEvent() {
+		queue.offer(new Event("ping", getPingObject(), 0)); //$NON-NLS-1$
+		if ((queueMaxSize > 0) && (queue.size() > queueMaxSize)) {
+			queue.poll();
+		}
+	}
+	
+	/**
 	 * Send an anonymous event with the given data.
 	 * 
 	 * <p>
@@ -220,7 +242,71 @@ public class SSERepresentation extends OutputRepresentation {
 	 * @param data The event data, may be null.
 	 */
 	public void pushEvent(Object data) {
-		queue.offer(new Event(null, data));
+		queue.offer(new Event(null, data, 0));
+		if ((queueMaxSize > 0) && (queue.size() > queueMaxSize)) {
+			queue.poll();
+		}
+	}
+	
+	/**
+	 * Send a last anonymous event with the given data and close the connection.
+	 * 
+	 * <p>
+	 * The events are always sent asynchronously. 
+	 * 
+	 * @param data The event data, may be null.
+	 */
+	public void pushTerminateEvent(Object data) {
+		queue.offer(new Event(null, data, -1));
+		if ((queueMaxSize > 0) && (queue.size() > queueMaxSize)) {
+			queue.poll();
+		}
+	}
+	
+	/**
+	 * Send a last anonymous event with the given data and close the connection.
+	 * 
+	 * <p>
+	 * The events are always sent asynchronously. 
+	 * 
+	 * @param data The event data, may be null.
+	 * @param retry a positive delay in milli-second sent to the client to wait before to resume this stream connection.
+	 */
+	public void pushTerminateEvent(Object data, int retry) {
+		queue.offer(new Event(null, data, retry));
+		if ((queueMaxSize > 0) && (queue.size() > queueMaxSize)) {
+			queue.poll();
+		}
+	}
+	
+	/**
+	 * Send a last event and close the connection.
+	 * 
+	 * <p>
+	 * The events are always sent asynchronously. 
+	 * 
+	 * @param event The event name, may be null.
+	 * @param data The event data, may be null.
+	 * @param retry a positive delay in milli-second sent to the client to wait before to resume this stream connection.
+	 */
+	public void pushTerminateEvent(String event, Object data, int retry) {
+		queue.offer(new Event(event, data, retry));
+		if ((queueMaxSize > 0) && (queue.size() > queueMaxSize)) {
+			queue.poll();
+		}
+	}
+	
+	/**
+	 * Send a last event and close the connection.
+	 * 
+	 * <p>
+	 * The events are always sent asynchronously. 
+	 * 
+	 * @param event The event name, may be null.
+	 * @param data The event data, may be null.
+	 */
+	public void pushTerminateEvent(String event, Object data) {
+		queue.offer(new Event(event, data, -1));
 		if ((queueMaxSize > 0) && (queue.size() > queueMaxSize)) {
 			queue.poll();
 		}
@@ -236,7 +322,7 @@ public class SSERepresentation extends OutputRepresentation {
 	 * @param data The event data, may be null.
 	 */
 	public void pushEvent(String event, Object data) {
-		queue.offer(new Event(event, data));
+		queue.offer(new Event(event, data, 0));
 		if ((queueMaxSize > 0) && (queue.size() > queueMaxSize)) {
 			queue.poll();
 		}
@@ -269,7 +355,7 @@ public class SSERepresentation extends OutputRepresentation {
 		if (datas != null) {
 			for (int i = 0; i < datas.length(); i++) {
 				try {
-					queue.offer(new Event(event, datas.get(i)));
+					queue.offer(new Event(event, datas.get(i), 0));
 				} catch (JSONException e) {
 					throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Only JSON Object are allowed as Server Send Event Data.");
 				}
