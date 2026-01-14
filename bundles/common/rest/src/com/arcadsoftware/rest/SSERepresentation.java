@@ -559,7 +559,7 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 	 * @return a non null SSERepresentation object.
 	 */
 	@Override
-	protected SSERepresentation clone() {
+	public SSERepresentation clone() {
 		SSERepresentation result = new SSERepresentation(null, getLanguages().get(0), pingDelay);
 		result.working.set(false);
 		synchronized (this) {
