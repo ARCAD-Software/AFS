@@ -3,6 +3,7 @@ package com.arcadsoftware.rest;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -29,13 +30,13 @@ import org.restlet.resource.ResourceException;
  * 
  * <p>
  * If required, the SSERepresentation can be reused to resume a broken connection, just call the {@link #resume(Response)} method, or {@link #resume(Response, long)}
- * before to use this Representation again. This can be used if the client initiate a HTTP call with the {@link #LAST_EVENT_HEADER}. Note that this
- * implementation does not allow to resume the communication to an event already sent.
+ * before to use this Representation again. This can be used if the client initiate a HTTP call with the {@link #LAST_EVENT_HEADER}. To
+ * allow the client to resume to an already sent message you have to activate the replay function by setting the {@link #setReplayActive(int)} with a positive number.
  * 
  * @author ARCAD Software
  * @see <a href="https://html.spec.whatwg.org/multipage/server-sent-events.html#server-sent-events">https://html.spec.whatwg.org/multipage/server-sent-events.html</a>
  */
-public class SSERepresentation extends OutputRepresentation {
+public class SSERepresentation extends OutputRepresentation implements Cloneable {
 
 	/**
 	 * This HTTP Header may be used by a client to resume a connection with the server.
@@ -52,20 +53,22 @@ public class SSERepresentation extends OutputRepresentation {
 	 */
 	public final static MediaType TEXT_EVENTSTREAM = MediaType.register("text/event-stream", "Server Send Event stream"); //$NON-NLS-1$ //$NON-NLS-2$
 	
-	private static final record Event(String event, Object data, int terminate) {}
+	private static final record Event(long id, String event, Object data, int terminate) {}
 	private static final String EMPTY_JSONOBJECT = "{}";
 	private static final byte[] ID = "id: ".getBytes(StandardCharsets.UTF_8); //$NON-NLS-1$
 	private static final byte[] EVENT = "\nevent: ".getBytes(StandardCharsets.UTF_8); //$NON-NLS-1$
 	private static final byte[] DATA = "\ndata: ".getBytes(StandardCharsets.UTF_8); //$NON-NLS-1$
 	private static final byte[] RETRY = "\nretry: ".getBytes(StandardCharsets.UTF_8); //$NON-NLS-1$
 	private static final byte[] ENDEVENT = "\n\n".getBytes(StandardCharsets.UTF_8); //$NON-NLS-1$
-	
+
 	private final AtomicBoolean working;
 	private final AtomicBoolean connected;
 	private final long pingDelay;
 	private final ConcurrentLinkedQueue<Event> queue;
-	private final AtomicLong id;
-	private volatile long queueMaxSize;
+	private volatile ConcurrentLinkedQueue<Event> replay;
+	private final AtomicLong currentId;
+	private volatile int queueMaxSize;
+	private volatile int replayMasSize;
 	
 	/**
 	 * Pre-create a new Server Send Event stream.
@@ -110,7 +113,7 @@ public class SSERepresentation extends OutputRepresentation {
 			this.pingDelay = pingDelay;
 		}
 		queue = new ConcurrentLinkedQueue<>();
-		id = new AtomicLong(1);
+		currentId = new AtomicLong(1);
 		connected = new AtomicBoolean(false);
 		setResponse(response);
 	}
@@ -143,18 +146,32 @@ public class SSERepresentation extends OutputRepresentation {
 						working.set(false);
 						return;
 					}
-					if (pingDelay > 0) {
+					event = queue.poll();
+					if ((event == null) && (pingDelay > 0)) {
 						delay -= 50;
 						if (delay <= 0) {
+							// Do not store the ping event in the replay...
+							sendEvent(outputStream, new Event(currentId.getAndIncrement(), "ping", getPingObject(), 0)); //$NON-NLS-1$
 							delay = pingDelay;
-							sendEvent(outputStream, "ping", getPingObject(), 0); //$NON-NLS-1$
+							continue;
 						}
 					}
-				} else {
+				}
+				if (event != null) {
 					if (pingDelay > 0) {
 						delay = pingDelay;
 					}
-					sendEvent(outputStream, event.event, event.data, event.terminate);
+					sendEvent(outputStream, event);
+					if (replay != null) {
+						synchronized (this) {
+							if (replay != null) {
+								replay.add(event);
+								if (replay.size() > replayMasSize) {
+									replay.poll();
+								}
+							}
+						}
+					}
 					if (event.terminate != 0) {
 						break;
 					}
@@ -170,25 +187,24 @@ public class SSERepresentation extends OutputRepresentation {
 	 * Write the given event message to the OutPutStream.
 	 * 
 	 * @param outputStream the OutPutStream to write the event message. 
-	 * @param event may be null.
-	 * @param data may be null.
+	 * @param event The event to send...
 	 * @throws IOException
 	 */
-	protected void sendEvent(final OutputStream outputStream, final String event, final Object data, final int retry) throws IOException {
+	protected void sendEvent(final OutputStream outputStream, final Event event) throws IOException {
 		try {
 			outputStream.write(ID);
-			outputStream.write(Long.toString(id.getAndIncrement()).getBytes(StandardCharsets.UTF_8));
+			outputStream.write(Long.toString(event.id).getBytes(StandardCharsets.UTF_8));
 			if (event != null) {
 				outputStream.write(EVENT);
-				outputStream.write(event.getBytes(StandardCharsets.UTF_8));
+				outputStream.write(event.event.getBytes(StandardCharsets.UTF_8));
 			}
 			outputStream.write(DATA);
-			if (data != null) {
-				outputStream.write(data.toString().getBytes(StandardCharsets.UTF_8));
+			if (event.data != null) {
+				outputStream.write(event.data.toString().getBytes(StandardCharsets.UTF_8));
 			}
-			if (retry > 0) {
+			if (event.terminate > 0) {
 				outputStream.write(RETRY);
-				outputStream.write(Integer.toString(retry).getBytes(StandardCharsets.UTF_8));
+				outputStream.write(Integer.toString(event.terminate).getBytes(StandardCharsets.UTF_8));
 			}
 			outputStream.write(ENDEVENT);
 			outputStream.flush();
@@ -227,10 +243,7 @@ public class SSERepresentation extends OutputRepresentation {
 	 * 
 	 */
 	public void pushPingEvent() {
-		queue.offer(new Event("ping", getPingObject(), 0)); //$NON-NLS-1$
-		if ((queueMaxSize > 0) && (queue.size() > queueMaxSize)) {
-			queue.poll();
-		}
+		pushTerminateEvent("ping", getPingObject(), 0); //$NON-NLS-1$
 	}
 	
 	/**
@@ -242,12 +255,22 @@ public class SSERepresentation extends OutputRepresentation {
 	 * @param data The event data, may be null.
 	 */
 	public void pushEvent(Object data) {
-		queue.offer(new Event(null, data, 0));
-		if ((queueMaxSize > 0) && (queue.size() > queueMaxSize)) {
-			queue.poll();
-		}
+		pushTerminateEvent(null, data, 0);
 	}
 	
+	/**
+	 * Send an event.
+	 * 
+	 * <p>
+	 * The events are always sent asynchronously. 
+	 * 
+	 * @param event The event name, may be null.
+	 * @param data The event data, may be null.
+	 */
+	public void pushEvent(String event, Object data) {
+		pushTerminateEvent(event, data, 0);
+	}
+
 	/**
 	 * Send a last anonymous event with the given data and close the connection.
 	 * 
@@ -257,7 +280,7 @@ public class SSERepresentation extends OutputRepresentation {
 	 * @param data The event data, may be null.
 	 */
 	public void pushTerminateEvent(Object data) {
-		queue.offer(new Event(null, data, -1));
+		queue.offer(new Event(currentId.getAndIncrement(), null, data, -1));
 		if ((queueMaxSize > 0) && (queue.size() > queueMaxSize)) {
 			queue.poll();
 		}
@@ -273,10 +296,21 @@ public class SSERepresentation extends OutputRepresentation {
 	 * @param retry a positive delay in milli-second sent to the client to wait before to resume this stream connection.
 	 */
 	public void pushTerminateEvent(Object data, int retry) {
-		queue.offer(new Event(null, data, retry));
-		if ((queueMaxSize > 0) && (queue.size() > queueMaxSize)) {
-			queue.poll();
-		}
+		pushTerminateEvent(null, data, retry);
+	}
+	
+	/**
+	 * Send a last event and close the connection.
+	 * 
+	 * <p>
+	 * The events are always sent asynchronously. 
+	 * 
+	 * @param event The event name, may be null.
+	 * @param data The event data, may be null.
+	 */
+	public void pushTerminateEvent(String event, Object data) {
+		pushTerminateEvent(event, data, -1);
+
 	}
 	
 	/**
@@ -290,39 +324,7 @@ public class SSERepresentation extends OutputRepresentation {
 	 * @param retry a positive delay in milli-second sent to the client to wait before to resume this stream connection.
 	 */
 	public void pushTerminateEvent(String event, Object data, int retry) {
-		queue.offer(new Event(event, data, retry));
-		if ((queueMaxSize > 0) && (queue.size() > queueMaxSize)) {
-			queue.poll();
-		}
-	}
-	
-	/**
-	 * Send a last event and close the connection.
-	 * 
-	 * <p>
-	 * The events are always sent asynchronously. 
-	 * 
-	 * @param event The event name, may be null.
-	 * @param data The event data, may be null.
-	 */
-	public void pushTerminateEvent(String event, Object data) {
-		queue.offer(new Event(event, data, -1));
-		if ((queueMaxSize > 0) && (queue.size() > queueMaxSize)) {
-			queue.poll();
-		}
-	}
-	
-	/**
-	 * Send an event.
-	 * 
-	 * <p>
-	 * The events are always sent asynchronously. 
-	 * 
-	 * @param event The event name, may be null.
-	 * @param data The event data, may be null.
-	 */
-	public void pushEvent(String event, Object data) {
-		queue.offer(new Event(event, data, 0));
+		queue.offer(new Event(currentId.getAndIncrement(), event, data, retry));
 		if ((queueMaxSize > 0) && (queue.size() > queueMaxSize)) {
 			queue.poll();
 		}
@@ -355,15 +357,13 @@ public class SSERepresentation extends OutputRepresentation {
 		if (datas != null) {
 			for (int i = 0; i < datas.length(); i++) {
 				try {
-					queue.offer(new Event(event, datas.get(i), 0));
+					queue.offer(new Event(currentId.getAndIncrement(), event, datas.get(i), 0));
 				} catch (JSONException e) {
 					throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Only JSON Object are allowed as Server Send Event Data.");
 				}
 			}
-			if (queueMaxSize > 0) {
-				while (queue.size() > queueMaxSize) {
-					queue.poll();
-				}
+			while (queue.size() > queueMaxSize) {
+				queue.poll();
 			}
 		}
 	}
@@ -384,27 +384,70 @@ public class SSERepresentation extends OutputRepresentation {
 	 *        correctly process this representation.
 	 * @param id if higher than zero ensure that the first event sent will have an ID at least 
 	 *        equal to this value. If required currently waiting message will be purged if their ID is to low.
-	 * @return the number of event removed from the waiting queue.
 	 */
-	public int resume(final Response response, final long id) {
-		int i = 0;
+	public void resume(final Response response, final long id) {
 		if (id > 0) {
-			while (this.id.get() < id) {
-				this.id.incrementAndGet();
-				queue.poll();
-				i++;
+			if (id < currentId.get()) {
+				if (replay != null) {
+					synchronized (this) {
+						if (replay != null) {
+							// Restore the queue and the historic to the actual current state...
+							ArrayList<Event> temp = new ArrayList<>();
+							ArrayList<Event> rtemp = new ArrayList<>();
+							Event e = replay.poll();
+							while (e != null) {
+								if (e.id >= id) {
+									temp.add(e);
+								} else {
+									rtemp.add(e);
+								}
+							}
+							replay.addAll(rtemp);
+							e = queue.poll();
+							while (e != null) {
+								temp.add(e);
+								e = queue.poll();
+							}
+							queue.addAll(temp);
+						}
+					}
+				}
+			} else {
+				// Clear the not sent messages
+				if (replay != null) {
+					synchronized (this) {
+						if (replay != null) {
+							Event e = queue.poll();
+							while (e != null) {
+								replay.add(e);
+								e = queue.poll();
+								while (replay.size() > replayMasSize) {
+									replay.poll();
+								}
+							}
+						} else {
+							queue.clear();
+						}
+					}
+				} else {
+					queue.clear();
+				}
+				currentId.set(id);
 			}
 		} else if (id < 0) {
-			long x = -id;
-			while (queue.size() > x) {
-				queue.poll();
-				i++;
+			queue.clear();
+			if (replay != null) {
+				synchronized (this) {
+					if (replay != null) {
+						replay.clear();
+					}
+				}
 			}
 		}
+		// Restart the streaming...
 		working.set(true);
 		setAvailable(true);
 		setResponse(response);
-		return i;
 	}
 
 	/**
@@ -456,7 +499,7 @@ public class SSERepresentation extends OutputRepresentation {
 	 * 
 	 * @return
 	 */
-	public long getQueueMaxSize() {
+	public int getQueueMaxSize() {
 		return queueMaxSize;
 	}
 
@@ -466,11 +509,71 @@ public class SSERepresentation extends OutputRepresentation {
 	 * 
 	 * @param queueMaxSize any value lower than 10 disable this limitation.
 	 */
-	public void setQueueMaxSize(long queueMaxSize) {
+	public void setQueueMaxSize(int queueMaxSize) {
 		if (queueMaxSize < 10) {
 			this.queueMaxSize = 0;
 		} else {
 			this.queueMaxSize = queueMaxSize;
 		}
 	}
+	
+	/**
+	 * If true the the SSE stream will record event sent allowing to the client to resume the stream.
+	 *   
+	 * @return
+	 */
+	public boolean isReplayActive() {
+		return replay != null;
+	}
+	
+	/**
+	 * Define the number of events to keep in the historic log.
+	 * 
+	 * <p>
+	 * Depending on the number of message generally send through this channel choose the most lower number as it will consume the server memory.
+	 * 
+	 * @param size a null or negative size disable the replay option.
+	 */
+	public void setReplayActive(int size) {
+		if (size > 0) {
+			replayMasSize = size;
+			if (replay == null) {
+				synchronized (this) {
+					if (replay == null) {
+						replay = new ConcurrentLinkedQueue<>();
+					}
+				}
+			}
+		} else if (replay != null) {
+			synchronized (this) {
+				if (replay != null) {
+					replay = null;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Get a new SSE Stream corresponding to the current state of this one.
+	 * 
+	 * @return a non null SSERepresentation object.
+	 */
+	@Override
+	protected SSERepresentation clone() {
+		SSERepresentation result = new SSERepresentation(null, getLanguages().get(0), pingDelay);
+		result.working.set(false);
+		synchronized (this) {
+			result.currentId.set(currentId.get());
+			if (replay != null) {
+				result.replay = new ConcurrentLinkedQueue<>();
+				result.replay.addAll(replay);
+				result.replayMasSize = replayMasSize;
+			}
+			result.queueMaxSize = queueMaxSize;
+			result.queue.addAll(queue);
+		}
+		return result;
+	}
+	
+	
 }
