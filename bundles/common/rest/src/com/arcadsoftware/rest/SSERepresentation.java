@@ -191,26 +191,28 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 	 * @throws IOException
 	 */
 	protected void sendEvent(final OutputStream outputStream, final Event event) throws IOException {
-		try {
-			outputStream.write(ID);
-			outputStream.write(Long.toString(event.id).getBytes(StandardCharsets.UTF_8));
-			if (event != null) {
-				outputStream.write(EVENT);
-				outputStream.write(event.event.getBytes(StandardCharsets.UTF_8));
+		if (event != null) { 
+			try {
+				outputStream.write(ID);
+				outputStream.write(Long.toString(event.id).getBytes(StandardCharsets.UTF_8));
+				if (event.event != null) {
+					outputStream.write(EVENT);
+					outputStream.write(event.event.getBytes(StandardCharsets.UTF_8));
+				}
+				outputStream.write(DATA);
+				if (event.data != null) {
+					outputStream.write(event.data.toString().getBytes(StandardCharsets.UTF_8));
+				}
+				if (event.terminate > 0) {
+					outputStream.write(RETRY);
+					outputStream.write(Integer.toString(event.terminate).getBytes(StandardCharsets.UTF_8));
+				}
+				outputStream.write(ENDEVENT);
+				outputStream.flush();
+			} catch (IOException e) {
+				working.set(false);
+				throw e;
 			}
-			outputStream.write(DATA);
-			if (event.data != null) {
-				outputStream.write(event.data.toString().getBytes(StandardCharsets.UTF_8));
-			}
-			if (event.terminate > 0) {
-				outputStream.write(RETRY);
-				outputStream.write(Integer.toString(event.terminate).getBytes(StandardCharsets.UTF_8));
-			}
-			outputStream.write(ENDEVENT);
-			outputStream.flush();
-		} catch (IOException e) {
-			working.set(false);
-			throw e;
 		}
 	}
 
