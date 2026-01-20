@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Metadata REST Services
 Bundle-SymbolicName: com.arcadsoftware.metadata.rest;singleton:=true
-Bundle-Version: 2.0.2
+Bundle-Version: 2.0.2.qualifier
 Bundle-Activator: com.arcadsoftware.metadata.rest.internal.Activator
 Bundle-Vendor: ARCAD Software
 Bundle-RequiredExecutionEnvironment: JavaSE-17
