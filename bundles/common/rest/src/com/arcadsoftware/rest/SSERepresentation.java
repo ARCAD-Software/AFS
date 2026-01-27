@@ -69,6 +69,7 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 	private final AtomicLong currentId;
 	private volatile int queueMaxSize;
 	private volatile int replayMasSize;
+	private final boolean shared;
 	
 	/**
 	 * Pre-create a new Server Send Event stream.
@@ -113,7 +114,25 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 			this.pingDelay = pingDelay;
 		}
 		queue = new ConcurrentLinkedQueue<>();
+		shared = false;
 		currentId = new AtomicLong(1);
+		connected = new AtomicBoolean(false);
+		setResponse(response);
+	}
+
+	public SSERepresentation(AtomicLong idCounter, Response response, Language language, long pingDelay) {
+		super(TEXT_EVENTSTREAM);
+		setCharacterSet(CharacterSet.UTF_8);
+		setLanguages(Arrays.asList(language));
+		working = new AtomicBoolean(true);
+		if (pingDelay < 10) {
+			this.pingDelay = 0;
+		} else {
+			this.pingDelay = pingDelay;
+		}
+		queue = new ConcurrentLinkedQueue<>();
+		shared = true;
+		currentId = idCounter;
 		connected = new AtomicBoolean(false);
 		setResponse(response);
 	}
@@ -560,10 +579,17 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 	 */
 	@Override
 	public SSERepresentation clone() {
-		SSERepresentation result = new SSERepresentation(null, getLanguages().get(0), pingDelay);
+		final SSERepresentation result;
+		if (shared) {
+			result = new SSERepresentation(currentId, null, getLanguages().get(0), pingDelay);
+		} else {
+			result = new SSERepresentation(null, getLanguages().get(0), pingDelay);
+		}
 		result.working.set(false);
 		synchronized (this) {
-			result.currentId.set(currentId.get());
+			if (!shared) {
+				result.currentId.set(currentId.get());
+			}
 			if (replay != null) {
 				result.replay = new ConcurrentLinkedQueue<>();
 				result.replay.addAll(replay);
@@ -574,6 +600,30 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 		}
 		return result;
 	}
-	
+
+	/**
+	 * Return true if the given event identifier can be associated to a message sent by this Event stream.
+	 *  
+	 * @param id
+	 * @return
+	 */
+	public boolean isAnID(long id) {
+		if (shared) {
+			if (replay != null) {
+				for (Event e: replay.toArray(new Event[replay.size()])) {
+					if (e.id == id) {
+						return true;
+					}
+				}
+			}
+			for (Event e: queue.toArray(new Event[replay.size()])) {
+				if (e.id == id) {
+					return true;
+				}
+			}
+			return false;
+		}
+		return (id > 0) && (id <= currentId.get());
+	}
 	
 }
