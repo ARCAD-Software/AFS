@@ -73,7 +73,7 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 		final Thread[] lstThread = new Thread[Thread.activeCount()];
 		Thread.enumerate(lstThread);
 		for (final Thread thd : lstThread) {
-			if (thd.getName().equals(CleanupManager.SERVICE_NAME)) {
+			if ((thd != null) && thd.getName().equals(CleanupManager.SERVICE_NAME)) {
 				return thd;
 			}
 		}
