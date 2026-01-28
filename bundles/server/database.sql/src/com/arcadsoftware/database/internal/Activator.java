@@ -14,6 +14,7 @@
 package com.arcadsoftware.database.internal;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -42,6 +43,7 @@ import com.arcadsoftware.crypt.Crypto;
 import com.arcadsoftware.database.DatabaseTracker;
 import com.arcadsoftware.database.IDataSourceEvent;
 import com.arcadsoftware.database.IDataSourceInformations;
+import com.arcadsoftware.database.IDataSourcePrecheckService;
 import com.arcadsoftware.database.sql.DataSourceFactory;
 import com.arcadsoftware.database.sql.DataSourceParameters;
 import com.arcadsoftware.database.sql.IDataSourceProvider;
@@ -56,6 +58,11 @@ import com.arcadsoftware.osgi.AbstractConfiguredActivator;
  */
 public class Activator extends AbstractConfiguredActivator {
 
+	/**
+	 * This is the current database version of the "AFS" Database Module !
+	 */
+	private static final int AFS_DB_VERSION = 7;
+	
 	protected static final String KEY_DATABASEID = ".dbid"; //$NON-NLS-1$
 	protected static final String KEY_DATABASETYPE = ".type"; //$NON-NLS-1$
 	protected static final String KEY_DATABASEURL = ".url"; //$NON-NLS-1$
@@ -83,20 +90,38 @@ public class Activator extends AbstractConfiguredActivator {
 	
 	private final ArrayList<ServiceRegistration<DataSource>> currentDataSources = new ArrayList<ServiceRegistration<DataSource>>();
 	private final ArrayList<DataSourceParameters> postponeDataSources = new ArrayList<DataSourceParameters>();
-	private volatile ServiceTracker<DataSource, DataSource> eventtracker;
+	private volatile ServiceTracker<EventAdmin, EventAdmin> eventtracker;
 	private DataSourceInformations infos;
 	private ServiceTracker<IDataSourceProvider, IDataSourceProvider> dstracker;
+	private ServiceTracker<IDataSourcePrecheckService, IDataSourcePrecheckService> preCheckTracker;
 
 	@Override
 	public void start(BundleContext context) throws Exception {
 		instance = this;
 		super.start(context);
-		eventtracker = new ServiceTracker<>(context, EventAdmin.class.getName(), null);
+		eventtracker = new ServiceTracker<>(context, EventAdmin.class, null);
 		eventtracker.open();
+		preCheckTracker = new ServiceTracker<>(context, IDataSourcePrecheckService.class, null);
+		preCheckTracker.open();
+		registerService(IDataSourcePrecheckService.class, new IDataSourcePrecheckService() {
+
+			@Override
+			public void check(DataSource ds, Dictionary<String, Object> properties) throws SQLException {
+				int v = IDataSourcePrecheckService.getDatabaseVersion(ds, "AFS");
+				if (v == -2) {
+					debug("The DataSource \"{}\" does not rely to AFS Data management.", properties.get(DatabaseTracker.DatabaseID));
+				} if (v == -1) {
+					warn("The DataSource \"{}\" does containt the AFS Database component.", properties.get(DatabaseTracker.DatabaseID));
+				} else if (v == AFS_DB_VERSION) {
+					debug("The DataSource \"{}\" is ready to work with AFS DB version {}.", properties.get(DatabaseTracker.DatabaseID), AFS_DB_VERSION);
+				} else {
+					debug("The DataSource \"{}\" does not match the required AFS DB version {}.", properties.get(DatabaseTracker.DatabaseID), AFS_DB_VERSION);
+				}
+			}});
 		registerService(CommandProvider.class.getName(), new DatabaseCommandProvider(this));
 		infos = new DataSourceInformations(this);
 		registerService(IDataSourceInformations.clazz, infos);
-		dstracker = new ServiceTracker<IDataSourceProvider, IDataSourceProvider>(context, IDataSourceProvider.class, new ServiceTrackerCustomizer<IDataSourceProvider, IDataSourceProvider>() {
+		dstracker = new ServiceTracker<>(context, IDataSourceProvider.class, new ServiceTrackerCustomizer<IDataSourceProvider, IDataSourceProvider>() {
 			@Override
 			public IDataSourceProvider addingService(ServiceReference<IDataSourceProvider> reference) {
 				IDataSourceProvider dsp = getContext().getService(reference);
@@ -127,6 +152,7 @@ public class Activator extends AbstractConfiguredActivator {
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		dstracker.close();
+		preCheckTracker.close();
 		ArrayList<DataSource> dslist = new ArrayList<DataSource>();
 		for (ServiceRegistration<DataSource> serviceRegistration: currentDataSources) {
 			ServiceReference<DataSource> r = serviceRegistration.getReference();
@@ -320,6 +346,18 @@ public class Activator extends AbstractConfiguredActivator {
 			if (parameters.getDialect() != null) {
 				props.put(DatabaseTracker.DatabaseDialect, parameters.getDialect());
 			}
+			for (IDataSourcePrecheckService pcs: preCheckTracker.getServices(new IDataSourcePrecheckService[4])) {
+				if (pcs != null) {
+					try {
+						pcs.check(ds, props);
+					} catch (SQLException e) {
+						if (!"[ignore]".equalsIgnoreCase(e.getMessage())) {
+							error("Unable to register the DataSource \"{}\": {}", parameters.getId(), e.getMessage(), e);
+						}
+						return;
+					}
+				}
+			}
 			currentDataSources.add(registerService(DataSource.class, ds, props));
 			info(parameters.getType() + Messages.Activator_DataSource_Declared + parameters.getId());
 			fireDSChangeEvent(IDataSourceEvent.TOPIC_ADD, parameters.getId(), parameters.getType(), parameters.getUrl(), parameters.getDialect(), ds);
@@ -331,7 +369,7 @@ public class Activator extends AbstractConfiguredActivator {
 
 	private void fireDSChangeEvent(String topic, String databaseID, String databaseType, String databaseURL, String dialect, DataSource ds) {
 		if (eventtracker != null) {
-			EventAdmin ea = (EventAdmin) eventtracker.getService();
+			EventAdmin ea = eventtracker.getService();
 			if (ea != null) {
 				Dictionary<String, Object> properties = new Hashtable<String, Object>();
 				if (ds != null) {
@@ -360,7 +398,7 @@ public class Activator extends AbstractConfiguredActivator {
 
 	private void fireSyncDSChangeEvent(String topic, String databaseID, String databaseType, String databaseURL, String dialect, DataSource ds) {
 		if (eventtracker != null) {
-			EventAdmin ea = (EventAdmin) eventtracker.getService();
+			EventAdmin ea = eventtracker.getService();
 			if (ea != null) {
 				Dictionary<String, Object> properties = new Hashtable<String, Object>();
 				if (ds != null) {
