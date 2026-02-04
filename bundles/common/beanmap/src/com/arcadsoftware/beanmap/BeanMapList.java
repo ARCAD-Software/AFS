@@ -284,7 +284,7 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	 * @param bean
 	 */
 	public void addUnique(BeanMap bean) {
-		if (find(bean.getId()) == null) {
+		if ((bean != null) && (find(bean.getId()) == null)) {
 			add(bean);
 		}
 	}

@@ -75,10 +75,10 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
  */
 public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> {
 	
-	private static final boolean RETURNEMPTYBEAMMAP = Boolean.getBoolean("com.arcadsoftware.mapper.sql.empty.beanmap"); //$NON-NLS-1$
 	protected static final char COLUMNPREFIX_PLACEHOLDER = '~';
 	protected static final String COLUMNPREFIX_PLACEHOLDERS = "~"; //$NON-NLS-1$
 	protected static final String DEFAULT_TABLEALIAS = "x"; //$NON-NLS-1$
+	private static final boolean RETURNEMPTYBEAMMAP = Boolean.getBoolean("com.arcadsoftware.mapper.sql.empty.beanmap"); //$NON-NLS-1$
 	private static final int FORCECOLCASSE;
 
 	static {
@@ -1355,7 +1355,11 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		}
 		StringBuilder cols = context.generateColumns(attributes, deleted);
 		StringBuilder where = context.generateCriteria(new IdEqualCriteria(itemId), deleted);
-		return completeForeignAttributes(attributes, query(String.format(fg.select, cols.toString(), context.generateJoins(deleted), where.toString()), entity.getType(), null));
+		BeanMap result = query(String.format(fg.select, cols.toString(), context.generateJoins(deleted), where.toString()), entity.getType(), null);
+		if ((result == null) || (result.getId() != itemId)) {
+			return null;
+		}
+		return completeForeignAttributes(attributes, result);
 	}
 	
 	@Override
@@ -1442,6 +1446,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 		} else {
 			query = ((SQLCriteriaContext) context).formatQuery(fg.select, cols.toString(), context.generateJoins(deleted), where.toString());
 		}
+		// Attention: the query method may return an empty (non null) BeanMap result...
 		return completeForeignAttributes(attributes, query(query, context.getEntity().getType(), null));
 	}
 
