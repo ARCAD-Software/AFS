@@ -25,16 +25,11 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
  * Creation Date: 2024/10/21
  */
 public interface IMetaDataUndeleteListener {
-
-	/**
-	 * The OSGi Service ID.
-	 */
-	public static final String clazz = IMetaDataUndeleteListener.class.getName();
 	
 	/**
 	 * This property define the listened entity type.
 	 */
-	public static final String PROP_TYPE = "type"; //$NON-NLS-1$
+	public static final String PROP_TYPE = IMetaDataSelectionListener.PROP_TYPE;
 	
 	/**
 	 * Called before deletion.
@@ -42,7 +37,7 @@ public interface IMetaDataUndeleteListener {
 	 * <p>
 	 * Use this method to test, change or complete the undeletion of the given item.
 	 * 
-	 * <p>Default implementation must return true.
+	 * <p>Default implementation return true.
 	 * 
 	 * @param entity The corresponding entity.
 	 * @param item the currently values of the object into database (The Deleted flag of this BeanMap is true).
@@ -51,7 +46,9 @@ public interface IMetaDataUndeleteListener {
 	 * @return false if the process should be stopped.
 	 * @throws ResourceException throw this exception to return a specific error message to the client.
 	 */
-	public boolean testUndeletion(MetaDataEntity entity, BeanMap item, IConnectionUserBean user, Language language) throws ResourceException;
+	public default boolean testUndeletion(MetaDataEntity entity, BeanMap item, IConnectionUserBean user, Language language) throws ResourceException {
+		return true;
+	}
 
 	/**
 	 * Called just after the item undeletion.

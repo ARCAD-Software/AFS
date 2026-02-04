@@ -20,16 +20,11 @@ import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.rest.connection.IConnectionUserBean;
 
 public interface IMetaDataLinkingListener {
-
-	/**
-	 * The OSGi Service ID.
-	 */
-	public static final String clazz = IMetaDataLinkingListener.class.getName();
 	
 	/**
 	 * This property define the listened entity type.
 	 */
-	public static final String PROP_TYPE = "type"; //$NON-NLS-1$
+	public static final String PROP_TYPE = IMetaDataSelectionListener.PROP_TYPE;
 	
 	/**
 	 * This property define the listened entity link.
@@ -42,7 +37,7 @@ public interface IMetaDataLinkingListener {
 	 * <p>
 	 * Use this method to test, change the link operation.
 	 * 
-	 * <p>Default implementation must return true.
+	 * <p>Default implementation return true.
 	 * 
 	 * @param link The corresponding entity link.
 	 * @param sourceItem the source item to be linked.
@@ -52,7 +47,9 @@ public interface IMetaDataLinkingListener {
 	 * @return false if the process should be stopped.
 	 * @throws ResourceException throw this exception to return a specific error message to the client.
 	 */
-	public boolean testLink(MetaDataLink link, BeanMap sourceItem, BeanMap destItem, IConnectionUserBean user, Language language) throws ResourceException;
+	public default boolean testLink(MetaDataLink link, BeanMap sourceItem, BeanMap destItem, IConnectionUserBean user, Language language) throws ResourceException {
+		return true;
+	}
 
 	/**
 	 * Called before two element are unlinked with each other.
@@ -60,7 +57,7 @@ public interface IMetaDataLinkingListener {
 	 * <p>
 	 * Use this method to test, change the unlink operation.
 	 * 
-	 * <p>Default implementation must return true.
+	 * <p>Default implementation return true.
 	 * 
 	 * @param link The corresponding entity link.
 	 * @param sourceItem the source item to be linked.
@@ -70,6 +67,8 @@ public interface IMetaDataLinkingListener {
 	 * @param language The current user language (or default language).
 	 * @throws ResourceException throw this exception to return a specific error message to the client.
 	 */
-	public boolean testUnlink(MetaDataLink link, BeanMap sourceItem, BeanMap destItem, IConnectionUserBean user, Language language) throws ResourceException;
+	public default boolean testUnlink(MetaDataLink link, BeanMap sourceItem, BeanMap destItem, IConnectionUserBean user, Language language) throws ResourceException {
+		return true;
+	}
 
 }

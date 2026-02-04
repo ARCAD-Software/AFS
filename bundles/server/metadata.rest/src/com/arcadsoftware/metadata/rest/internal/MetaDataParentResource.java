@@ -32,6 +32,7 @@ import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
 import com.arcadsoftware.beanmap.BeanMapPartialList;
 import com.arcadsoftware.metadata.IByPassListener;
+import com.arcadsoftware.metadata.IMetaDataCreationListener;
 import com.arcadsoftware.metadata.IMetaDataDeleteListener;
 import com.arcadsoftware.metadata.IMetaDataModifyListener;
 import com.arcadsoftware.metadata.IMetaDataSelectionListener;
@@ -464,7 +465,7 @@ public class MetaDataParentResource extends DataParentResource {
 		// Obtention de l'élément tel qu'il doit devrait créé (tel qu'il est passé à la resource).
 		Form form = getRequestForm();
 		ArrayList<MetaDataAttribute> list = new ArrayList<MetaDataAttribute>();
-		BeanMap result = getEntity().formToBean(form, list);
+		BeanMap item = getEntity().formToBean(form, list);
 		// Test des droits sur attributs.
 		Iterator<MetaDataAttribute> itt = list.iterator();
 		while (itt.hasNext()) {
@@ -473,19 +474,21 @@ public class MetaDataParentResource extends DataParentResource {
 					!getMapper().test(getEntity(), att.getRightUpdate(false), getUser())) {
 				// Si un attribut n'est pas modifiable on le supprime de la liste.
 				itt.remove();
-				result.remove(att.getCode());
+				item.remove(att.getCode());
 			}
 		}
 		// Phase de test des attributs et des valeurs qui leur sont affectées.
 		// A. Application des listeners et des contraintes de type Mandatory.
 		List<IMetaDataModifyListener> listeners = Activator.getInstance().getModifyListener(getType());
-		switch (doCreateTest(listeners, result, list, language)) {
+		List<IMetaDataCreationListener> creationListeners = Activator.getInstance().getCreationListener(getType());
+		BeanMap result = null;
+		switch (doCreateTest(listeners, creationListeners, item, list, language)) {
 		case 0:
 			// Contraintes de type "Mandatory" non respectées, ou echec des listener ou du Script de test.
 			// if this item already exist, just return it to sender...
-			if (result.getId() > 0) {
-				removeHiddenAttributes(result);
-				return getRepresentation(variant, form, result, language);
+			if (item.getId() > 0) {
+				removeHiddenAttributes(item);
+				return getRepresentation(variant, form, item, language);
 			}
 			getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST, Activator.getMessage("error.missingattributes", language)); //$NON-NLS-1$
 			return null;
@@ -493,7 +496,7 @@ public class MetaDataParentResource extends DataParentResource {
 			// B. Validation of uniqueness of values.
 			for (MetaDataAttribute attribute: list) {
 				if (attribute.getMetadata().getBoolean(MetaDataEntity.METADATA_UNIQUE)) {
-					Object value = result.get(attribute.getCode());
+					Object value = item.get(attribute.getCode());
 					if ((value != null) && (value.toString().length() > 0) && // On ignore les affectation à null.
 							(getEntity().dataCount(false, attribute.getCode(), value) > 0)) {
 						throw new ResourceException(Status.CLIENT_ERROR_PRECONDITION_FAILED, //
@@ -506,10 +509,10 @@ public class MetaDataParentResource extends DataParentResource {
 			// TODO (for instance user.firstname = "x" create a user with firstname = "x" and link it through with user = id)
 			// TODO Use getEntity().formToBean(form, list, true, false false);
 			// TODO And then look for sub BeanMap in the result BeanMap...
-			// TODO Process each of then (recursively, as it may include property like "subcode.subsubcode")  
+			// TODO Process each of then (recursively, as it may include property like "subcode.sub.subcode")  
 			
 			// Item creation.
-			result = getMapper().create(getEntity(), list, getEntity().getValues(list,result), getUser());
+			result = getMapper().create(getEntity(), list, getEntity().getValues(list, item), getUser());
 		}
 		if ((result == null) || (result.getId() == 0)) {
 			// Creation fail.
@@ -517,7 +520,7 @@ public class MetaDataParentResource extends DataParentResource {
 			return null;
 		}
 		try {
-			doPostCreateTreatment(listeners, result, list, language);
+			doPostCreateTreatment(listeners, creationListeners, item, result, list, language);
 		} catch (Exception e) {
 			getMapper().delete(result, true);
 			Activator.getInstance().debug(e);
@@ -545,10 +548,18 @@ public class MetaDataParentResource extends DataParentResource {
 	 * @param language
 	 * @return
 	 */
-	private int doCreateTest(List<IMetaDataModifyListener> listeners, BeanMap result, ArrayList<MetaDataAttribute> list, Language language) {
+	private int doCreateTest(List<IMetaDataModifyListener> listeners, List<IMetaDataCreationListener> creationListeners, BeanMap result, ArrayList<MetaDataAttribute> list, Language language) {
 		MetaDataEntity entity = getEntity();
 		// Avant tout, appel des Listeners qui peuvent rétablir une situation non conforme.
 		boolean byPass = false;
+		for (IMetaDataCreationListener listener: creationListeners) {
+			if (!listener.testCreation(entity, result, list, getUser(), language)) {
+				return 0;
+			}
+			if (listener instanceof IByPassListener) {
+				byPass = true;
+			}
+		}
 		for (IMetaDataModifyListener listener: listeners) {
 			if (!listener.testModification(entity, null, result, list, getUser(), language)) {
 				return 0;
@@ -584,9 +595,12 @@ public class MetaDataParentResource extends DataParentResource {
 		return 1;
 	}
 
-	private void doPostCreateTreatment(List<IMetaDataModifyListener> listeners, BeanMap result, ArrayList<MetaDataAttribute> list, Language language) throws Exception {
+	private void doPostCreateTreatment(List<IMetaDataModifyListener> listeners, List<IMetaDataCreationListener> creationListeners, BeanMap original, BeanMap result, ArrayList<MetaDataAttribute> list, Language language) throws Exception {
 		// Translate ? (en théorie les attributs translate ne sont pas modifiés ici !)
 		MetaDataEntity entity = getEntity();
+		for (IMetaDataCreationListener listener: creationListeners) {
+			listener.postCreation(entity, original, result, list, getUser(), language);
+		}
 		for (IMetaDataModifyListener listener: listeners) {
 			listener.postModification(entity, null, result, list, getUser(), language);
 		}

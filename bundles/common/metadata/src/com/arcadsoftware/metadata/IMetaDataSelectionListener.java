@@ -28,11 +28,6 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
  * @author ARCAD Software
  */
 public interface IMetaDataSelectionListener {
-
-	/**
-	 * The OSGi Service ID.
-	 */
-	public static final String clazz = IMetaDataSelectionListener.class.getName();
 	
 	/**
 	 * This property define the listened entity type.
