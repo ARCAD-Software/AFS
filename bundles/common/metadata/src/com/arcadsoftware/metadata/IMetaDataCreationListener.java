@@ -1,16 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2025 ARCAD Software.
- *
- * This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License 2.0
- * which accompanies this distribution, and is available at
- * https://www.eclipse.org/legal/epl-2.0/
- *
- * SPDX-License-Identifier: EPL-2.0
- *
- * Contributors:
- *     ARCAD Software - initial API and implementation
- *******************************************************************************/
 package com.arcadsoftware.metadata;
 
 import java.util.List;
@@ -23,10 +10,15 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
 
 /**
  * Listener (synchronized) of items modifications. 
+ *
+ * <p>
+ * This listener is a specialization of the {@link IMetaDataModifyListener}, only called for the creation of a new data.
+ * When a new data in created both IMetaDataCreationListener and IMetaDataModifyListener are called. The IMetaDataCreationListener are
+ * called first. 
  * 
- * Creation Date: 11 avr. 2011
+ * @author ARCAD Software
  */
-public interface IMetaDataModifyListener {
+public interface IMetaDataCreationListener {
 	
 	/**
 	 * This property define the listened entity type.
@@ -43,15 +35,14 @@ public interface IMetaDataModifyListener {
 	 * Default implementation return true. Returning false will cancel the operation.
 	 * 
 	 * @param entity The corresponding entity.
-	 * @param originalItem the currently values of the object into the storage. This parameter may be null if the "modification" is a creation.
-	 * @param modifiedItem the modified attributes values.
-	 * @param attributes the modified attributes list.
+	 * @param requestedItem the values of the object to requested to store.
+	 * @param attributes the attributes list used in the requestedItem.
 	 * @param user the current user (may be null).
 	 * @param language The current user language (or default language).
 	 * @return false if the process should be stopped.
 	 * @throws ResourceException throw this exception to return a specific error message to the client.
 	 */
-	public default boolean testModification(MetaDataEntity entity, BeanMap originalItem, BeanMap modifiedItem, List<MetaDataAttribute> attributes, IConnectionUserBean user, Language language) throws ResourceException {
+	public default boolean testCreation(MetaDataEntity entity, BeanMap requestedItem, List<MetaDataAttribute> attributes, IConnectionUserBean user, Language language) throws ResourceException {
 		return true;
 	}
 
@@ -59,12 +50,13 @@ public interface IMetaDataModifyListener {
 	 * Called just after the item modification or creation (originalItem is null).
 	 * 
 	 * @param entity The corresponding entity.
-	 * @param originalItem the old values of the object into the storage. This parameter may be null if the "modification" is a creation.
-	 * @param modifiedItem the recently modified attributes values.
+	 * @param requestedItem the values of the object to requested to store.
+	 * @param createdItem the attributes values as stored in the database and to return to the client.
 	 * @param attributes the modified attributes list.
 	 * @param user the current user (may be null).
 	 * @param language The current user language (or default language).
 	 * @throws ResourceException throw this exception to return a specific error message to the client.
 	 */
-	public void postModification(MetaDataEntity entity, BeanMap originalItem, BeanMap modifiedItem, List<MetaDataAttribute> attributes, IConnectionUserBean user, Language language) throws ResourceException;
+	public void postCreation(MetaDataEntity entity, BeanMap requestedItem, BeanMap createdItem, List<MetaDataAttribute> attributes, IConnectionUserBean user, Language language) throws ResourceException;
+
 }

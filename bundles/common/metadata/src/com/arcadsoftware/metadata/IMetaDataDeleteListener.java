@@ -25,16 +25,11 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
  * Creation Date: 11 avr. 2011
  */
 public interface IMetaDataDeleteListener {
-
-	/**
-	 * The OSGi Service ID.
-	 */
-	public static final String clazz = IMetaDataDeleteListener.class.getName();
 	
 	/**
 	 * This property define the listened entity type.
 	 */
-	public static final String PROP_TYPE = "type"; //$NON-NLS-1$
+	public static final String PROP_TYPE = IMetaDataSelectionListener.PROP_TYPE;
 	
 	/**
 	 * Called before deletion.
@@ -42,7 +37,7 @@ public interface IMetaDataDeleteListener {
 	 * <p>
 	 * Use this method to test, change or complete the modified attributes of the entity.
 	 * 
-	 * <p>Default implementation must return true.
+	 * <p>Default implementation return true.
 	 * 
 	 * @param entity The corresponding entity.
 	 * @param originalItem the currently values of the object into stockage.
@@ -51,7 +46,9 @@ public interface IMetaDataDeleteListener {
 	 * @return false if the process should be stopped.
 	 * @throws ResourceException throw this exception to return a specific error message to the client.
 	 */
-	public boolean testDeletion(MetaDataEntity entity, BeanMap originalItem, IConnectionUserBean user, Language language) throws ResourceException;
+	public default boolean testDeletion(MetaDataEntity entity, BeanMap originalItem, IConnectionUserBean user, Language language) throws ResourceException {
+		return true;
+	}
 
 	/**
 	 * Called just after the item deletion.

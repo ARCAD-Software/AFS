@@ -48,7 +48,7 @@ import com.thoughtworks.xstream.converters.ConversionException;
  * 
  * <p>
  * Using this class is <b>not</b> an efficient way to access Datas with MetaData API. Any way, if a connected
- * bean is require to process data into a BeanMap compatible API, this class may be useful.
+ * bean is required to process data into a BeanMap compatible API, this class may be useful.
  * 
  * <p>
  * This class test Access Right if "currentUser" property is defined.
@@ -175,7 +175,7 @@ Cloneable, Comparable<IBeanMap> {
 		}
 		load = 0;
 		try {
-			for(IMetaDataModifyListener listener:listeners) {
+			for(IMetaDataModifyListener listener: listeners) {
 				listener.postModification(entity, original, modified, atts, currentUser, language);
 			}
 		} catch (ResourceException e) {

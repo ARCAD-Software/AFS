@@ -27,6 +27,7 @@ import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
 import com.arcadsoftware.metadata.BeanMapEventTracker;
 import com.arcadsoftware.metadata.IEntityTesterService;
+import com.arcadsoftware.metadata.IMetaDataCreationListener;
 import com.arcadsoftware.metadata.IMetaDataDeleteListener;
 import com.arcadsoftware.metadata.IMetaDataLinkingListener;
 import com.arcadsoftware.metadata.IMetaDataModifyListener;
@@ -61,11 +62,12 @@ public class Activator extends AbstractActivator implements IEntityTesterService
 	}
 
 	private BeanMapEventTracker eventTracker;
-	private ServiceTracker<IMetaDataModifyListener, Object> modifyTracker;
-	private ServiceTracker<IMetaDataDeleteListener, Object> deleteTracker;
-	private ServiceTracker<IMetaDataUndeleteListener, Object> undeleteTracker;
-	private ServiceTracker<IMetaDataLinkingListener, Object> linkingTracker;
-	private ServiceTracker<IMetaDataSelectionListener, Object> selectionTracker;
+	private ServiceTracker<IMetaDataCreationListener, IMetaDataCreationListener> creationTracker;
+	private ServiceTracker<IMetaDataModifyListener, IMetaDataModifyListener> modifyTracker;
+	private ServiceTracker<IMetaDataDeleteListener, IMetaDataDeleteListener> deleteTracker;
+	private ServiceTracker<IMetaDataUndeleteListener, IMetaDataUndeleteListener> undeleteTracker;
+	private ServiceTracker<IMetaDataLinkingListener, IMetaDataLinkingListener> linkingTracker;
+	private ServiceTracker<IMetaDataSelectionListener, IMetaDataSelectionListener> selectionTracker;
 
 	@Override
 	public void start(BundleContext bundleContext) throws Exception {
@@ -73,15 +75,17 @@ public class Activator extends AbstractActivator implements IEntityTesterService
 		super.start(bundleContext);
 		registerService(Branch.clazz, new Branch(), Branch.URI, Branch.SECUREDBRANCH);
 		eventTracker = new BeanMapEventTracker(bundleContext);
-		modifyTracker = new ServiceTracker<IMetaDataModifyListener, Object>(bundleContext, IMetaDataModifyListener.clazz, null);
+		creationTracker = new ServiceTracker<>(bundleContext, IMetaDataCreationListener.class, null);
+		creationTracker.open();
+		modifyTracker = new ServiceTracker<>(bundleContext, IMetaDataModifyListener.class, null);
 		modifyTracker.open();
-		deleteTracker = new ServiceTracker<IMetaDataDeleteListener, Object>(bundleContext, IMetaDataDeleteListener.clazz, null);
+		deleteTracker = new ServiceTracker<>(bundleContext, IMetaDataDeleteListener.class, null);
 		deleteTracker.open();
-		linkingTracker = new ServiceTracker<IMetaDataLinkingListener, Object>(bundleContext, IMetaDataLinkingListener.clazz, null);
+		linkingTracker = new ServiceTracker<>(bundleContext, IMetaDataLinkingListener.class, null);
 		linkingTracker.open();
-		selectionTracker = new ServiceTracker<IMetaDataSelectionListener, Object>(bundleContext, IMetaDataSelectionListener.clazz, null);
+		selectionTracker = new ServiceTracker<>(bundleContext, IMetaDataSelectionListener.class, null);
 		selectionTracker.open();
-		undeleteTracker = new ServiceTracker<IMetaDataUndeleteListener, Object>(bundleContext, IMetaDataUndeleteListener.clazz, null);
+		undeleteTracker = new ServiceTracker<>(bundleContext, IMetaDataUndeleteListener.class, null);
 		undeleteTracker.open();
 	}
 
@@ -90,6 +94,8 @@ public class Activator extends AbstractActivator implements IEntityTesterService
 		super.stop(bundleContext);
 		eventTracker.close();
 		eventTracker = null;
+		creationTracker.close();
+		creationTracker = null;
 		modifyTracker.close();
 		modifyTracker = null;
 		deleteTracker.close();
@@ -104,13 +110,13 @@ public class Activator extends AbstractActivator implements IEntityTesterService
 	}
 
 	public List<IMetaDataSelectionListener> getSelectionListener(String type) {
-		ArrayList<IMetaDataSelectionListener> result = new ArrayList<IMetaDataSelectionListener>();
+		ArrayList<IMetaDataSelectionListener> result = new ArrayList<>();
 		ServiceReference<IMetaDataSelectionListener>[] refs = selectionTracker.getServiceReferences();
 		if (refs != null) {
 			for(ServiceReference<IMetaDataSelectionListener> ref: refs) {
 				Object o = ref.getProperty(IMetaDataSelectionListener.PROP_TYPE);
 				if ((o == null) || (type == null) || type.equals(o)) {
-					result.add((IMetaDataSelectionListener) selectionTracker.getService(ref));
+					result.add(selectionTracker.getService(ref));
 				}
 			}
 		}
@@ -118,13 +124,27 @@ public class Activator extends AbstractActivator implements IEntityTesterService
 	}
 
 	public List<IMetaDataModifyListener> getModifyListener(String type) {
-		ArrayList<IMetaDataModifyListener> result = new ArrayList<IMetaDataModifyListener>();
+		ArrayList<IMetaDataModifyListener> result = new ArrayList<>();
 		ServiceReference<IMetaDataModifyListener>[] refs = modifyTracker.getServiceReferences();
 		if (refs != null) {
 			for(ServiceReference<IMetaDataModifyListener> ref: refs) {
 				Object o = ref.getProperty(IMetaDataModifyListener.PROP_TYPE);
 				if ((o == null) || (type == null) || type.equals(o)) {
-					result.add((IMetaDataModifyListener) modifyTracker.getService(ref));
+					result.add(modifyTracker.getService(ref));
+				}
+			}
+		}
+		return result;
+	}
+
+	public List<IMetaDataCreationListener> getCreationListener(String type) {
+		ArrayList<IMetaDataCreationListener> result = new ArrayList<>();
+		ServiceReference<IMetaDataCreationListener>[] refs = creationTracker.getServiceReferences();
+		if (refs != null) {
+			for(ServiceReference<IMetaDataCreationListener> ref: refs) {
+				Object o = ref.getProperty(IMetaDataCreationListener.PROP_TYPE);
+				if ((o == null) || (type == null) || type.equals(o)) {
+					result.add(creationTracker.getService(ref));
 				}
 			}
 		}
@@ -132,13 +152,13 @@ public class Activator extends AbstractActivator implements IEntityTesterService
 	}
 
 	public List<IMetaDataDeleteListener> getDeleteListener(String type) {
-		ArrayList<IMetaDataDeleteListener> result = new ArrayList<IMetaDataDeleteListener>();
+		ArrayList<IMetaDataDeleteListener> result = new ArrayList<>();
 		ServiceReference<IMetaDataDeleteListener>[] refs = deleteTracker.getServiceReferences();
 		if (refs != null) {
 			for (ServiceReference<IMetaDataDeleteListener> ref: refs) {
 				Object o = ref.getProperty(IMetaDataDeleteListener.PROP_TYPE);
 				if ((o == null) || (type == null) || type.equals(o)) {
-					result.add((IMetaDataDeleteListener) deleteTracker.getService(ref));
+					result.add(deleteTracker.getService(ref));
 				}
 			}
 		}
@@ -146,13 +166,13 @@ public class Activator extends AbstractActivator implements IEntityTesterService
 	}
 
 	public List<IMetaDataUndeleteListener> getUndeleteListener(String type) {
-		ArrayList<IMetaDataUndeleteListener> result = new ArrayList<IMetaDataUndeleteListener>();
+		ArrayList<IMetaDataUndeleteListener> result = new ArrayList<>();
 		ServiceReference<IMetaDataUndeleteListener>[] refs = undeleteTracker.getServiceReferences();
 		if (refs != null) {
 			for (ServiceReference<IMetaDataUndeleteListener> ref: refs) {
 				Object o = ref.getProperty(IMetaDataUndeleteListener.PROP_TYPE);
 				if ((o == null) || (type == null) || type.equals(o)) {
-					result.add((IMetaDataUndeleteListener) undeleteTracker.getService(ref));
+					result.add(undeleteTracker.getService(ref));
 				}
 			}
 		}
@@ -160,15 +180,15 @@ public class Activator extends AbstractActivator implements IEntityTesterService
 	}
 
 	public List<IMetaDataLinkingListener> getLinkingListener(MetaDataLink link) {
-		ArrayList<IMetaDataLinkingListener> result = new ArrayList<IMetaDataLinkingListener>();
+		ArrayList<IMetaDataLinkingListener> result = new ArrayList<>();
 		ServiceReference<IMetaDataLinkingListener>[] refs = linkingTracker.getServiceReferences();
 		if (refs != null) {
-			for(ServiceReference<IMetaDataLinkingListener> ref:refs) {
+			for(ServiceReference<IMetaDataLinkingListener> ref: refs) {
 				Object o = ref.getProperty(IMetaDataLinkingListener.PROP_TYPE);
 				if ((o == null) || link.getParent().getType().equals(o)) {
 					o = ref.getProperty(IMetaDataLinkingListener.PROP_LINK);
 					if ((o == null) || link.getCode().equals(o)) {
-						result.add((IMetaDataLinkingListener) linkingTracker.getService(ref));
+						result.add(linkingTracker.getService(ref));
 					}
 				}
 			}

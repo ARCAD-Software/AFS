@@ -96,7 +96,7 @@ public class Activator extends AbstractConfiguredActivator {
 				}
 			}, SimpleBranch.properties(SimpleBranch.SECUREDBRANCH));
 		}
-		registerService(IMetaDataModifyListener.clazz, new LdapAuthModifyListener(this), IMetaDataModifyListener.PROP_TYPE, LDAPAUTH);
+		registerService(IMetaDataModifyListener.class, new LdapAuthModifyListener(this), IMetaDataModifyListener.PROP_TYPE, LDAPAUTH);
 		registerService(IApplicationStateBroadcaster.class, new ApplicationStateBroadcaster(this));
 	}
 

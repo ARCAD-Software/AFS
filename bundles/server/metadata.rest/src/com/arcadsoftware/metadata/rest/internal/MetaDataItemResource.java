@@ -333,9 +333,7 @@ public class MetaDataItemResource extends DataItemResource {
 					attLine = null;
 					return null;
 				}
-				final ArrayList<ReferenceLine> list = new ArrayList<>(1);
-				list.add(attLine);
-				return list;
+				return List.of(attLine);
 			}
 		}
 		return null;
