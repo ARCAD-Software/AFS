@@ -27,6 +27,11 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
  * Creation Date: 11 avr. 2011
  */
 public interface IMetaDataModifyListener {
+
+	/**
+	 * The OSGi Service ID.
+	 */
+	public static final String clazz = IMetaDataModifyListener.class.getName();
 	
 	/**
 	 * This property define the listened entity type.

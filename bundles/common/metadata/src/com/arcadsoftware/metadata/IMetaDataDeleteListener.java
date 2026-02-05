@@ -25,6 +25,11 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
  * Creation Date: 11 avr. 2011
  */
 public interface IMetaDataDeleteListener {
+
+	/**
+	 * The OSGi Service ID.
+	 */
+	public static final String clazz = IMetaDataDeleteListener.class.getName();
 	
 	/**
 	 * This property define the listened entity type.

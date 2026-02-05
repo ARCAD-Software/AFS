@@ -20,6 +20,11 @@ import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.rest.connection.IConnectionUserBean;
 
 public interface IMetaDataLinkingListener {
+
+	/**
+	 * The OSGi Service ID.
+	 */
+	public static final String clazz = IMetaDataLinkingListener.class.getName();
 	
 	/**
 	 * This property define the listened entity type.
