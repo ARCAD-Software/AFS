@@ -18,10 +18,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
     steps:
     - uses: actions/checkout@v3
-       
 	- name: Delete all maven packages
 	  run: kotlinc -script build/clearpackages.main.kts ${{ secrets.GITHUB_TOKEN }}
       
