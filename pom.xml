@@ -18,7 +18,7 @@
 		<tycho.extra.version>4.0.13</tycho.extra.version>
 		<keystore></keystore>
 		<tycho.scmUrl>scm:git:https://github.com/ARCAD-Software/AFS.git</tycho.scmUrl>
-		<jetty.version>12.0.31</jetty.version>
+		<jetty.version>12.0.32</jetty.version>
 	</properties>
 
 	<!-- Add explicit dependencies not available on P2 repository -->
@@ -79,7 +79,6 @@
 		    <groupId>javax.servlet</groupId>
 		    <artifactId>javax.servlet-api</artifactId>
 		    <version>4.0.1</version>
-		    <scope>provided</scope>
 		</dependency>
 
 		<!-- HTTP1.1 Jetty base Server and Client -->
@@ -143,7 +142,6 @@
 		    <groupId>org.eclipse.jetty.http2</groupId>
 		    <artifactId>jetty-http2-server</artifactId>
 		    <version>${jetty.version}</version>
-		    <scope>test</scope>
 		</dependency>
 		<dependency>
 		    <groupId>org.eclipse.jetty.http2</groupId>
@@ -159,13 +157,11 @@
 		    <groupId>org.eclipse.jetty.http2</groupId>
 		    <artifactId>jetty-http2-client-transport</artifactId>
 		    <version>${jetty.version}</version>
-		    <scope>test</scope>
 		</dependency>
 		<dependency>
 		    <groupId>org.eclipse.jetty.http2</groupId>
 		    <artifactId>jetty-http2-client</artifactId>
 		    <version>${jetty.version}</version>
-		    <scope>test</scope>
 		</dependency>
 		
 		<!-- Jetty HTTP/3 Server and Client (HTTPS only) -->
@@ -266,7 +262,6 @@
 		    <groupId>org.osgi</groupId>
 		    <artifactId>org.osgi.service.jdbc</artifactId>
 		    <version>1.1.0</version>
-		    <scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.zaxxer</groupId>
