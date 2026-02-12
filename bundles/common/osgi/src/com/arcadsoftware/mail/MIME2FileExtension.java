@@ -13,6 +13,7 @@
  *******************************************************************************/
 package com.arcadsoftware.mail;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -486,15 +487,15 @@ public class MIME2FileExtension {
 			}
 			i = result.lastIndexOf('+');
 			if (i > -1) {
-				result = result.substring(i+1);
+				result = result.substring(i + 1);
 			}
 			i = result.lastIndexOf('-');
 			if (i > -1) {
-				result = result.substring(i+1);
+				result = result.substring(i + 1);
 			}
 			i = result.lastIndexOf('.');
 			if (i > -1) {
-				result = result.substring(i+1);
+				result = result.substring(i + 1);
 			}
 		}
 		return "." + result; //$NON-NLS-1$
@@ -517,9 +518,26 @@ public class MIME2FileExtension {
 			}
 		}
 		ext = ext.toLowerCase();
-		for(Entry<String, String> e:FILEEXTENTIONMAP.entrySet()) {
+		for (Entry<String, String> e: FILEEXTENTIONMAP.entrySet()) {
 			if (e.getValue().equals(ext)) {
 				return e.getKey();
+			}
+		}
+		return "application/octect-stream"; //$NON-NLS-1$
+	}
+
+	/**
+	 * Get a MIME type the correspond to the given file.
+	 * 
+	 * @param file a file, can be null.
+	 * @return always return a MIME type even if nothing is found.
+	 */
+	public static String getFileMimeType(File file) {
+		if (file != null) {
+			String name = file.getName();
+			int i = name.lastIndexOf('.');
+			if (i > 0) {
+				return getFileMimeTypeFromExtension(name.substring(i + 1));
 			}
 		}
 		return "application/octect-stream"; //$NON-NLS-1$
