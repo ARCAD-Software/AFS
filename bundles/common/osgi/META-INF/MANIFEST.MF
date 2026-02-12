@@ -19,7 +19,7 @@ Import-Package: javax.crypto,
  org.osgi.util.tracker;version="[1.5.3,2.0.0)"
 Export-Package: com.arcadsoftware.cli;version="1.0.0";uses:="com.arcadsoftware.osgi",
  com.arcadsoftware.database;version="1.0.2";uses:="org.osgi.framework,javax.sql,org.osgi.util.tracker",
- com.arcadsoftware.mail;version="2.0.0",
+ com.arcadsoftware.mail;version="2.1.0",
  com.arcadsoftware.osgi;version="2.0.0";
   uses:="org.osgi.framework,
    org.eclipse.core.runtime,
