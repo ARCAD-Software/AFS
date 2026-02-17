@@ -684,10 +684,10 @@ public class ServerProperties {
 		}
 		if (httpVersion > 1) {
 			if (httpVersion == 3) {
-				parameters.add("http.transport.protocols", "HTTP1_1, HTTP2, HTTP3"); //$NON-NLS-1$ //$NON-NLS-2$
+				parameters.add("http.transport.protocols", "HTTP1_1,HTTP2,HTTP3"); //$NON-NLS-1$ //$NON-NLS-2$
 				parameters.add("http3.pem.workdir", http3PEMWorkdir); //$NON-NLS-1$
 			} else {
-				parameters.add("http.transport.protocols", "HTTP1_1, HTTP2"); //$NON-NLS-1$ //$NON-NLS-2$
+				parameters.add("http.transport.protocols", "HTTP1_1,HTTP2"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 		jettyServerFineTuning(parameters);
@@ -700,6 +700,14 @@ public class ServerProperties {
 		jettyServerFineTuning(parameters);
 	}
 
+	public boolean isHTTP3() {
+		return httpVersion == 3;
+	}
+
+	public boolean isHTTP2() {
+		return httpVersion > 1;
+	}
+	
 	private void jettyServerFineTuning(Series<Parameter> parameters) {
 		// Jetty HTTP Server fine tuning:
 		// parameters specification from https://javadocs.restlet.talend.com/2.4/jse/ext/org/restlet/ext/jetty/JettyServerHelper.html
