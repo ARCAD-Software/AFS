@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -29,7 +28,7 @@ import org.restlet.resource.ResourceException;
  * to store the event from another Thread.
  * 
  * <p>
- * If required, the SSERepresentation can be reused to resume a broken connection, just call the {@link #resume(Response)} method, or {@link #resume(Response, long)}
+ * If required, the SSERepresentation can be reused to resume a broken connection, just call the {@link #resume(Response)} method, or {@link #resume(Response, String)}
  * before to use this Representation again. This can be used if the client initiate a HTTP call with the {@link #LAST_EVENT_HEADER}. To
  * allow the client to resume to an already sent message you have to activate the replay function by setting the {@link #setReplayActive(int)} with a positive number.
  * 
@@ -53,7 +52,7 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 	 */
 	public final static MediaType TEXT_EVENTSTREAM = MediaType.register("text/event-stream", "Server Send Event stream"); //$NON-NLS-1$ //$NON-NLS-2$
 	
-	private static final record Event(long id, String event, Object data, int terminate) {}
+	private static final record Event(String id, String event, Object data, int terminate) {}
 	private static final String EMPTY_JSONOBJECT = "{}";
 	private static final byte[] ID = "id: ".getBytes(StandardCharsets.UTF_8); //$NON-NLS-1$
 	private static final byte[] EVENT = "\nevent: ".getBytes(StandardCharsets.UTF_8); //$NON-NLS-1$
@@ -66,7 +65,7 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 	private final long pingDelay;
 	private final ConcurrentLinkedQueue<Event> queue;
 	private volatile ConcurrentLinkedQueue<Event> replay;
-	private final AtomicLong currentId;
+	private final ISSEIdGenerator currentId;
 	private volatile int queueMaxSize;
 	private volatile int replayMasSize;
 	private final boolean shared;
@@ -115,12 +114,12 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 		}
 		queue = new ConcurrentLinkedQueue<>();
 		shared = false;
-		currentId = new AtomicLong(1);
+		currentId = new SSELongIdGenerator();
 		connected = new AtomicBoolean(false);
 		setResponse(response);
 	}
 
-	public SSERepresentation(AtomicLong idCounter, Response response, Language language, long pingDelay) {
+	public SSERepresentation(ISSEIdGenerator idCounter, Response response, Language language, long pingDelay) {
 		super(TEXT_EVENTSTREAM);
 		setCharacterSet(CharacterSet.UTF_8);
 		setLanguages(Arrays.asList(language));
@@ -210,26 +209,28 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 	 * @throws IOException
 	 */
 	protected void sendEvent(final OutputStream outputStream, final Event event) throws IOException {
-		try {
-			outputStream.write(ID);
-			outputStream.write(Long.toString(event.id).getBytes(StandardCharsets.UTF_8));
-			if (event != null) {
-				outputStream.write(EVENT);
-				outputStream.write(event.event.getBytes(StandardCharsets.UTF_8));
+		if (event != null) { 
+			try {
+				outputStream.write(ID);
+				outputStream.write(event.id.getBytes(StandardCharsets.UTF_8));
+				if (event.event != null) {
+					outputStream.write(EVENT);
+					outputStream.write(event.event.getBytes(StandardCharsets.UTF_8));
+				}
+				outputStream.write(DATA);
+				if (event.data != null) {
+					outputStream.write(event.data.toString().getBytes(StandardCharsets.UTF_8));
+				}
+				if (event.terminate > 0) {
+					outputStream.write(RETRY);
+					outputStream.write(Integer.toString(event.terminate).getBytes(StandardCharsets.UTF_8));
+				}
+				outputStream.write(ENDEVENT);
+				outputStream.flush();
+			} catch (IOException e) {
+				working.set(false);
+				throw e;
 			}
-			outputStream.write(DATA);
-			if (event.data != null) {
-				outputStream.write(event.data.toString().getBytes(StandardCharsets.UTF_8));
-			}
-			if (event.terminate > 0) {
-				outputStream.write(RETRY);
-				outputStream.write(Integer.toString(event.terminate).getBytes(StandardCharsets.UTF_8));
-			}
-			outputStream.write(ENDEVENT);
-			outputStream.flush();
-		} catch (IOException e) {
-			working.set(false);
-			throw e;
 		}
 	}
 
@@ -401,12 +402,12 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 	 * 
 	 * @param response The actual HTTP Response object, it require dedicated configuration to 
 	 *        correctly process this representation.
-	 * @param id if higher than zero ensure that the first event sent will have an ID at least 
+	 * @param id if not null ensure that the first event sent will have an ID at least 
 	 *        equal to this value. If required currently waiting message will be purged if their ID is to low.
 	 */
-	public void resume(final Response response, final long id) {
-		if (id > 0) {
-			if (id < currentId.get()) {
+	public void resume(final Response response, final String id) {
+		if (id != null) {
+			if (currentId.possess(id)) {
 				if (replay != null) {
 					synchronized (this) {
 						if (replay != null) {
@@ -414,20 +415,26 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 							ArrayList<Event> temp = new ArrayList<>();
 							ArrayList<Event> rtemp = new ArrayList<>();
 							Event e = replay.poll();
+							boolean found = false;
 							while (e != null) {
-								if (e.id >= id) {
+								if (found) {
+									temp.add(e);
+								} else if (e.id.equals(id)) {
+									found = true;
 									temp.add(e);
 								} else {
 									rtemp.add(e);
 								}
 							}
-							replay.addAll(rtemp);
-							e = queue.poll();
-							while (e != null) {
-								temp.add(e);
+							if (found) {
+								replay.addAll(rtemp);
 								e = queue.poll();
+								while (e != null) {
+									temp.add(e);
+									e = queue.poll();
+								}
+								queue.addAll(temp);
 							}
-							queue.addAll(temp);
 						}
 					}
 				}
@@ -451,9 +458,9 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 				} else {
 					queue.clear();
 				}
-				currentId.set(id);
+				currentId.reset(id);
 			}
-		} else if (id < 0) {
+		} else {
 			queue.clear();
 			if (replay != null) {
 				synchronized (this) {
@@ -583,13 +590,10 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 		if (shared) {
 			result = new SSERepresentation(currentId, null, getLanguages().get(0), pingDelay);
 		} else {
-			result = new SSERepresentation(null, getLanguages().get(0), pingDelay);
+			result = new SSERepresentation(currentId.clone(), null, getLanguages().get(0), pingDelay);
 		}
 		result.working.set(false);
 		synchronized (this) {
-			if (!shared) {
-				result.currentId.set(currentId.get());
-			}
 			if (replay != null) {
 				result.replay = new ConcurrentLinkedQueue<>();
 				result.replay.addAll(replay);
@@ -607,23 +611,23 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 	 * @param id
 	 * @return
 	 */
-	public boolean isAnID(long id) {
+	public boolean isAnID(String id) {
 		if (shared) {
 			if (replay != null) {
 				for (Event e: replay.toArray(new Event[replay.size()])) {
-					if (e.id == id) {
+					if (e.id.equals(id)) {
 						return true;
 					}
 				}
 			}
 			for (Event e: queue.toArray(new Event[replay.size()])) {
-				if (e.id == id) {
+				if (e.id.equals(id)) {
 					return true;
 				}
 			}
 			return false;
 		}
-		return (id > 0) && (id <= currentId.get());
+		return currentId.possess(id);
 	}
 	
 }
