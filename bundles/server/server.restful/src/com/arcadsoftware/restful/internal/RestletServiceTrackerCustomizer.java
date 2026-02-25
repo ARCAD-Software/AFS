@@ -16,6 +16,7 @@ package com.arcadsoftware.restful.internal;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import org.restlet.Restlet;
+import org.restlet.routing.Template;
 
 import com.arcadsoftware.rest.IBranch;
 import com.arcadsoftware.rest.OSGiApplication;
@@ -36,7 +37,7 @@ public class RestletServiceTrackerCustomizer implements ServiceTrackerCustomizer
 		if (path instanceof String) {
 			Restlet service = activator.getContext().getService(reference);
 			if (service != null) {
-				application.getRouter().attach((String) path, service);
+				application.getRouter().attach((String) path, service, Template.MODE_EQUALS);
 				if (service.getContext() == null) {
 					service.setContext(application.getContext());
 				}
