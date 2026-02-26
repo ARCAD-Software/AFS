@@ -12,6 +12,7 @@
  *     ARCAD Software - initial API and implementation
  *******************************************************************************/
 package com.arcadsoftware.server.messages;
+
 /**
  * Interface for logging messages identified by a code and optional parameters.
  * <p>
