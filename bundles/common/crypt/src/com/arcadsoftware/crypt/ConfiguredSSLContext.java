@@ -421,6 +421,7 @@ public class ConfiguredSSLContext {
 			KeyManagerFactory kmf = KeyManagerFactory
 					.getInstance(getProp(props, PROP_KEYSTORE_ALGO, KeyManagerFactory.getDefaultAlgorithm()));
 			kmf.init(ks, getProp(props, PROP_KEYSTORE_KEYPWD, ksPwd));
+			// TODO Wrap the X509ExtendedKeyManager to allow to select the key "alias" !
 			// TODO Add a proprty to merge the Curent keystore to the default one...
 			return kmf.getKeyManagers();
 		} catch (KeyStoreException | NoSuchProviderException | NoSuchAlgorithmException e) {
