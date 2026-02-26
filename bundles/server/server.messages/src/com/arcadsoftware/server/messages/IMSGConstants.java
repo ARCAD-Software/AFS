@@ -12,6 +12,7 @@
  *     ARCAD Software - initial API and implementation
  *******************************************************************************/
 package com.arcadsoftware.server.messages;
+
 /**
  * Defines constants used for message representation and handling.
  * <p>
