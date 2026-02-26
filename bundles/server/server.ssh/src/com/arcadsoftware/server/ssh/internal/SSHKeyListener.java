@@ -11,7 +11,7 @@
  * Contributors:
  *     ARCAD Software - initial API and implementation
  *******************************************************************************/
-package com.arcadsoftware.server.ssh.internal.listeners;
+package com.arcadsoftware.server.ssh.internal;
 
 import java.io.IOException;
 
@@ -23,8 +23,6 @@ import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.metadata.IMetaDataDeleteListener;
 import com.arcadsoftware.metadata.MetaDataEntity;
 import com.arcadsoftware.rest.connection.IConnectionUserBean;
-import com.arcadsoftware.server.ssh.internal.Activator;
-import com.arcadsoftware.server.ssh.services.SSHService;
 import com.arcadsoftware.ssh.model.SSHKey;
 
 public class SSHKeyListener implements IMetaDataDeleteListener {

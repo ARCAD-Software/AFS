@@ -11,11 +11,12 @@
  * Contributors:
  *     ARCAD Software - initial API and implementation
  *******************************************************************************/
-package com.arcadsoftware.server.ssh.internal.resources;
+package com.arcadsoftware.server.ssh.internal;
 
 import java.nio.charset.StandardCharsets;
 
 import org.restlet.data.MediaType;
+import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
@@ -23,27 +24,27 @@ import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
 
 import com.arcadsoftware.rest.UserLinkedResource;
-import com.arcadsoftware.server.ssh.services.SSHService;
+import com.arcadsoftware.ssh.model.ISSHService;
 import com.arcadsoftware.ssh.model.SSHKey;
 
 public class SSHGetPublicKeyResource extends UserLinkedResource {
-	@Override
-	protected Representation delete(final Variant variant) {
-		throw new ResourceException(Status.CLIENT_ERROR_METHOD_NOT_ALLOWED);
-	}
 
 	@Override
 	protected void doInit() {
 		super.doInit();
 		setVariants(MediaType.TEXT_PLAIN);
+		getAllowedMethods().add(Method.GET);
 	}
 
 	@Override
 	protected Representation get(final Variant variant) {
+		if (!(hasRight(10) || hasRight(11))) {
+			throw new ResourceException(Status.CLIENT_ERROR_FORBIDDEN, "This service is not accessible to the current user (not enough privilege).");
+		}
 		final int sshKeyId = getAttribute("id", 0); //$NON-NLS-1$
 		if (sshKeyId > 0) {
 			try {
-				final SSHService sshService = getOSGiService(SSHService.class);
+				final ISSHService sshService = getOSGiService(ISSHService.class);
 				if (sshService == null) {
 					throw new ResourceException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE, "The SSH Service is not running on the Server. This service is disable for the moment.");
 				}
@@ -57,15 +58,5 @@ public class SSHGetPublicKeyResource extends UserLinkedResource {
 		} else {
 			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "id attribute must be greater than 0");
 		}
-	}
-
-	@Override
-	protected Representation post(final Representation entity, final Variant variant) {
-		throw new ResourceException(Status.CLIENT_ERROR_METHOD_NOT_ALLOWED);
-	}
-
-	@Override
-	protected Representation put(final Representation representation, final Variant variant) {
-		throw new ResourceException(Status.CLIENT_ERROR_METHOD_NOT_ALLOWED);
 	}
 }

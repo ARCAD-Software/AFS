@@ -11,7 +11,7 @@
  * Contributors:
  *     ARCAD Software - initial API and implementation
  *******************************************************************************/
-package com.arcadsoftware.server.ssh.services;
+package com.arcadsoftware.server.ssh.internal;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -32,6 +32,7 @@ import java.security.PrivateKey;
 import java.security.Security;
 import java.security.interfaces.RSAKey;
 import java.util.Base64;
+import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -45,44 +46,65 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.crypt.Crypto;
 import com.arcadsoftware.metadata.MetaDataEntity;
-import com.arcadsoftware.osgi.ILoggedPlugin;
+import com.arcadsoftware.ssh.model.ISSHService;
 import com.arcadsoftware.ssh.model.SSHException;
 import com.arcadsoftware.ssh.model.SSHKey;
 import com.arcadsoftware.ssh.model.SSHKeyType;
 import com.arcadsoftware.ssh.model.SSHKeyUpload;
 
-public class SSHService {
+public class SSHService implements ISSHService {
 
 	private static final String PRIVATE_KEY_FILE = "private_key"; //$NON-NLS-1$
-	private static final String KEYSTORE_DIRECTORY = System.getProperty("com.arcadsoftware.ssh.keypath", "./files/ssh/keystore"); //$NON-NLS-1$ //$NON-NLS-2$
+	private static final String PROP_KEYSTOREPATH = "ssh.keystore.path"; //$NON-NLS-1$
 	private static final HashSet<PosixFilePermission> CHMOD_600 = new HashSet<>(2);
 
 	static {
 		CHMOD_600.add(PosixFilePermission.OWNER_READ);
 		CHMOD_600.add(PosixFilePermission.OWNER_WRITE);
-	}
-
-	private final ILoggedPlugin activator;
-	private final File keystoreDirectory;
-
-	public SSHService(ILoggedPlugin activator) {
-		super();
-		this.activator = activator;
+		// Blindage: this should have been ndone in the initialization of the Crypt bundle.
 		if (Security.getProperty(BouncyCastleProvider.PROVIDER_NAME) == null) {
 			try {
 				Security.addProvider(new BouncyCastleProvider());
-			} catch (Exception e) {
-				activator.error("There is a problem with Bouncy Castle (AFS will fall back to JCE implementation): " + e.getLocalizedMessage());
+			} catch (Exception e) {}
+		}
+	}
+
+	private final Activator activator;
+	private final File keystoreDirectory;
+
+	public SSHService(Activator activator) {
+		super();
+		this.activator = activator;
+		// The Keystore folder path may be declared in the OSGi configuration, with a lot of fallback...
+		File folderPath = null;
+		// 1. use the OSGi Configuration...
+		Dictionary<String, Object> conf = activator.getConfiguration(activator.getContext().getBundle().getSymbolicName());
+		if (conf != null) {
+			Object o = conf.get(PROP_KEYSTOREPATH);
+			if ((o instanceof String s) && !s.isBlank()) {
+				folderPath = new File(s);
 			}
 		}
-		File f = null;
-		try {
-			f = new File(KEYSTORE_DIRECTORY).getCanonicalFile();
-		} catch (final IOException e) {
-			activator.error("Error while revolving SSH keystore", e);
-			f = new File(KEYSTORE_DIRECTORY).getAbsoluteFile();
+		// 2. use the system property...
+		if (folderPath == null) {
+			String s = System.getProperty("com.arcadsoftware.ssh.keypath"); //$NON-NLS-1$
+			if (s != null) {
+				folderPath = new File(s);
+			}
 		}
-		keystoreDirectory = f;
+		// 3. use the legacy ./ssh folder but only if is exists !
+		if (folderPath == null) {
+			File dkd = new File("./ssh/keystore"); //$NON-NLS-1$
+			if (dkd.isDirectory()) {
+				folderPath = dkd;
+			}
+		}
+		// 4. Use the "new" default folder !
+		if (folderPath == null) {
+			folderPath = new File("./files/ssh/keystore"); //$NON-NLS-1$
+		}
+		keystoreDirectory = folderPath;
+		keystoreDirectory.mkdirs();
 	}
 
 	private String computeKeyFingerprint(final KeyPair keyPair) throws IOException, GeneralSecurityException {
@@ -106,30 +128,24 @@ public class SSHService {
 		return toRet.toString();
 	}
 
-	/**
-	 * TODO Document interface.
-	 * 
-	 * @param sshKeyBeanMap
-	 * @return
-	 * @throws SSHException
-	 */
+	@Override
 	public SSHKey create(final BeanMap sshKeyBeanMap) throws SSHException {
-		final SSHKey newSSHKey = insert(sshKeyBeanMap);
+		// Pretest of the key type...
+		if (new SSHKey(sshKeyBeanMap).getType() == SSHKeyType.UNKNOWN) {
+			throw new SSHException("SSH key type \"%s\" is unknown".formatted(sshKeyBeanMap.get(SSHKey.TYPE)));
+		}
+		final SSHKey newSSHKey = new SSHKey(createKey(sshKeyBeanMap));
 		try {
 			generateKeyPair(newSSHKey);
 		} catch (IOException | GeneralSecurityException e) {
+			// "manual" rollback...
 			delete(newSSHKey);
 			throw new SSHException("Error occurred while creating new SSH key: " + e, e);
 		}
 		return newSSHKey;
 	}
 
-	/**
-	 * TODO Document interface.
-	 * 
-	 * @param sshKey
-	 * @return
-	 */
+	@Override
 	public boolean delete(final SSHKey sshKey) {
 		if (sshKey.getId() > 0) {
 			return getEntity().dataDelete(sshKey.getId(), true);
@@ -137,12 +153,7 @@ public class SSHService {
 		return false;
 	}
 
-	/**
-	 * Deletes all the files related to an {@link SSHKey}.
-	 *
-	 * @param key
-	 * @throws IOException
-	 */
+	@Override
 	public void deleteKeyFiles(final SSHKey key) throws IOException {
 		final File keyDirectory = getSSHKeyDirectory(key);
 		if (keyDirectory.isDirectory()) {
@@ -199,13 +210,7 @@ public class SSHService {
 		getEntity().dataUpdate(b);
 	}
 
-	/**
-	 * Load the {@link SSHKey} (ie. general information about a {@link KeyPair}
-	 * stored in database)
-	 *
-	 * @param id
-	 * @return the {@link SSHKey} for the given id, or null if not found
-	 */
+	@Override
 	public SSHKey get(final int id) {
 		final MetaDataEntity e = getEntity();
 		if (e != null) {
@@ -217,12 +222,7 @@ public class SSHService {
 		return null;
 	}
 
-	/**
-	 * Only useful for RSA keys.
-	 *
-	 * @param keyPair
-	 * @return the length of an RSA key or 256 for an ed25519 key.
-	 */
+	@Override
 	public int getKeyLength(final KeyPair keyPair) {
 		PrivateKey pk = keyPair.getPrivate();
 		if (pk instanceof RSAKey) {
@@ -250,32 +250,19 @@ public class SSHService {
 		throw new IOException(String.format("Private key file for SSH key %d not found", sshKey.getId()));
 	}
 
-	/**
-	 * TODO Document interface.
-	 * 
-	 * @param sshKey
-	 * @return
-	 * @throws IOException
-	 * @throws GeneralSecurityException
-	 */
+	@Override
 	public byte[] getPublicKey(final SSHKey sshKey) throws IOException, GeneralSecurityException {
-		final ByteArrayOutputStream output = new ByteArrayOutputStream();
-		OpenSSHKeyPairResourceWriter.INSTANCE.writePublicKey(loadKeyPair(sshKey), sshKey.getComment(), output);
-		output.close();
-		return output.toByteArray();
+		try (final ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+			OpenSSHKeyPairResourceWriter.INSTANCE.writePublicKey(loadKeyPair(sshKey), sshKey.getComment(), output);
+			return output.toByteArray();
+		}
 	}
 
 	private File getSSHKeyDirectory(final SSHKey key) {
 		return new File(keystoreDirectory, "ks" + key.getId()); //$NON-NLS-1$
 	}
 
-	/**
-	 * TODO Document interface.
-	 * 
-	 * @param sshKeyUpload
-	 * @return
-	 * @throws SSHException
-	 */
+	@Override
 	public SSHKey importKey(final SSHKeyUpload sshKeyUpload) throws SSHException {
 		final KeyPair keyPair;
 		final byte[] privateKeyBytes = sshKeyUpload.getPrivateKey().getBytes(StandardCharsets.UTF_8);
@@ -291,7 +278,7 @@ public class SSHService {
 		if (tempSSHKey.getType() == SSHKeyType.UNKNOWN) {
 			throw new SSHException(keyPair.getPrivate().getAlgorithm() + " key type is not supported");
 		} 
-		if (tempSSHKey.getType() == SSHKeyType.RSA && tempSSHKey.getLength() < 4096) {
+		if ((tempSSHKey.getType() == SSHKeyType.RSA) && (tempSSHKey.getLength() < 4096)) {
 			throw new SSHException(String.format("RSA key length is too short (%d); it must be 4096", tempSSHKey.getLength()));
 		}
 		try {
@@ -314,12 +301,16 @@ public class SSHService {
 		}
 	}
 
-	private SSHKey insert(final BeanMap sshKeyBeanMap) throws SSHException {
-		// Pretest of the key type...
-		if (new SSHKey(sshKeyBeanMap).getType() == SSHKeyType.UNKNOWN) {
-			throw new SSHException("SSH key type \"%s\" is unknown".formatted(sshKeyBeanMap.getString(SSHKey.TYPE, "null")));
+	private void writePrivateKey(final SSHKey sshKey, final byte[] privateKeyBytes) throws IOException {
+		final File keyDirectory = getSSHKeyDirectory(sshKey);
+		keyDirectory.mkdirs();
+		final File keyFile = new File(keyDirectory, PRIVATE_KEY_FILE);
+		Files.write(keyFile.toPath(), privateKeyBytes);
+		try {
+			Files.setPosixFilePermissions(keyFile.toPath(), CHMOD_600);
+		} catch (final Exception e) {
+			activator.debug("Unable to change file \"{}\" access mode: ", keyFile, e.getLocalizedMessage(), e);
 		}
-		return new SSHKey(createKey(sshKeyBeanMap));
 	}
 
 	private synchronized BeanMap createKey(BeanMap key) throws SSHException {
@@ -340,17 +331,8 @@ public class SSHService {
 		}
 		throw new SSHException("Could not add new SSH key, the database is not accessible.");
 	}
-	
-	/**
-	 * Load the {@link KeyPair} linked to an {@link SSHKey} stored in
-	 * database.<br />
-	 * Can be an <b>RSA</b> or <b>ed25519</b> key pair.
-	 *
-	 * @param sshKey
-	 * @return a {@link KeyPair}
-	 * @throws IOException
-	 * @throws GeneralSecurityException
-	 */
+
+	@Override
 	public KeyPair loadKeyPair(final SSHKey sshKey) throws IOException, GeneralSecurityException {
 		final File keyFile = getPrivateKeyFile(sshKey);
 		try (InputStream input = new BufferedInputStream(new FileInputStream(keyFile))) {
@@ -358,61 +340,26 @@ public class SSHService {
 		}
 	}
 
-	private KeyPair loadKeyPair(final SSHKey sshKey, final InputStream input)
-			throws IOException, GeneralSecurityException {
-		final String passphrase;
+	private KeyPair loadKeyPair(final SSHKey sshKey, final InputStream input) throws IOException, GeneralSecurityException {
 		if (sshKey.isEncrypted()) {
-			passphrase = new String(Crypto.decrypt(sshKey.getPassphrase()));
-		} else {
-			passphrase = null;
+			return loadKeyPair(input, new String(Crypto.decrypt(sshKey.getPassphrase())));
 		}
-		return loadKeyPair(input, passphrase);
+		return loadKeyPair(input, null);
 	}
 
-	/**
-	 * TODO Document interface.
-	 * 
-	 * @param input
-	 * @param passphrase
-	 * @return
-	 * @throws IOException
-	 * @throws GeneralSecurityException
-	 */
+	@Override
 	public KeyPair loadKeyPair(final InputStream input, final String passphrase)
 			throws IOException, GeneralSecurityException {
 		final FilePasswordProvider password;
-		if (passphrase != null && !passphrase.isEmpty()) {
+		if ((passphrase != null) && !passphrase.isEmpty()) {
 			password = FilePasswordProvider.of(passphrase);
 		} else {
 			password = null;
 		}
-
-		final Iterator<KeyPair> identities = SecurityUtils
-				.loadKeyPairIdentities(null, NamedResource.ofName(PRIVATE_KEY_FILE), input, password).iterator();
+		final Iterator<KeyPair> identities = SecurityUtils.loadKeyPairIdentities(null, NamedResource.ofName(PRIVATE_KEY_FILE), input, password).iterator();
 		if (identities.hasNext()) {
 			return identities.next();
 		}
-
 		throw new IOException("Cannot load invalid private key");
-	}
-
-	private void writePrivateKey(final SSHKey sshKey, final byte[] privateKeyBytes) throws IOException {
-		final File keyDirectory = getSSHKeyDirectory(sshKey);
-		keyDirectory.mkdirs();
-		final File keyFile = new File(keyDirectory, PRIVATE_KEY_FILE);
-		Files.write(keyFile.toPath(), privateKeyBytes);
-		try {
-			Files.setPosixFilePermissions(keyFile.toPath(), CHMOD_600);
-		} catch (final UnsupportedOperationException e) {
-			if (!keyFile.setReadable(true, true)) {
-				activator.debug("Unable to change file mode read: " + keyFile);
-			}
-			if (!keyFile.setWritable(false, false)) {
-				activator.debug("Unable to change file mode write: " + keyFile);
-			}
-			if (!keyFile.setExecutable(false, false)) {
-				activator.debug("Unable to change file mode execute: " + keyFile);
-			}
-		}
 	}
 }

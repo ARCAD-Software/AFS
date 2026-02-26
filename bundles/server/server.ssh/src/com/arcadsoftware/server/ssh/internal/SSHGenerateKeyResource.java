@@ -11,7 +11,7 @@
  * Contributors:
  *     ARCAD Software - initial API and implementation
  *******************************************************************************/
-package com.arcadsoftware.server.ssh.internal.resources;
+package com.arcadsoftware.server.ssh.internal;
 
 import org.restlet.data.Method;
 import org.restlet.data.Status;
@@ -20,21 +20,11 @@ import org.restlet.resource.ResourceException;
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.rest.BeanMapItemResource;
 import com.arcadsoftware.crypt.Crypto;
-import com.arcadsoftware.server.ssh.services.SSHService;
+import com.arcadsoftware.ssh.model.ISSHService;
 import com.arcadsoftware.ssh.model.SSHException;
 import com.arcadsoftware.ssh.model.SSHKey;
 
 public class SSHGenerateKeyResource extends BeanMapItemResource {
-	
-	@Override
-	protected void delete(final BeanMap bean) {
-		throw new ResourceException(Status.CLIENT_ERROR_METHOD_NOT_ALLOWED);
-	}
-
-	@Override
-	protected BeanMap get(final BeanMap beanMap) {
-		throw new ResourceException(Status.CLIENT_ERROR_METHOD_NOT_ALLOWED);
-	}
 
 	@Override
 	public String getType() {
@@ -43,7 +33,7 @@ public class SSHGenerateKeyResource extends BeanMapItemResource {
 
 	@Override
 	public boolean hasRight(final Method method) {
-		return method.equals(Method.GET);
+		return method.equals(Method.PUT) && hasRight(10);
 	}
 
 	@Override
@@ -54,7 +44,7 @@ public class SSHGenerateKeyResource extends BeanMapItemResource {
 			tempSSHKey.setPassphrase(new String(Crypto.unFog(tempSSHKey.getPassphrase())));
 		}
 		try {
-			final SSHKey sshKey = getOSGiService(SSHService.class).create(tempSSHKey.getBeanMap());
+			final SSHKey sshKey = getOSGiService(ISSHService.class).create(tempSSHKey.getBeanMap());
 			bean.clear();
 			bean.addAll(sshKey.getBeanMap());
 			bean.forceId(sshKey.getId());

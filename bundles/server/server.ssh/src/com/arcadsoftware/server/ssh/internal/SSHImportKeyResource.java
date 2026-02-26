@@ -11,11 +11,13 @@
  * Contributors:
  *     ARCAD Software - initial API and implementation
  *******************************************************************************/
-package com.arcadsoftware.server.ssh.internal.resources;
+package com.arcadsoftware.server.ssh.internal;
 
 import org.restlet.data.Method;
+import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.representation.Variant;
+import org.restlet.resource.ResourceException;
 
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.xml.JSonBeanMapStream;
@@ -24,7 +26,7 @@ import com.arcadsoftware.crypt.Crypto;
 import com.arcadsoftware.rest.JSONRepresentation;
 import com.arcadsoftware.rest.UserLinkedResource;
 import com.arcadsoftware.rest.XMLRepresentation;
-import com.arcadsoftware.server.ssh.services.SSHService;
+import com.arcadsoftware.ssh.model.ISSHService;
 import com.arcadsoftware.ssh.model.SSHException;
 import com.arcadsoftware.ssh.model.SSHKey;
 import com.arcadsoftware.ssh.model.SSHKeyUpload;
@@ -45,6 +47,9 @@ public class SSHImportKeyResource extends UserLinkedResource {
 
 	@Override
 	protected Representation post(final Representation entity, final Variant variant) {
+		if (!hasRight(10)) {
+			throw new ResourceException(Status.CLIENT_ERROR_FORBIDDEN, "This service is not accessible to the current user (not enough privilege).");
+		}
 		final SSHKeyUpload sshKeyUpload = new SSHKeyUpload(new BeanMap(SSHKey.ENTITY, getRequestForm()));
 		// Passphrase may have been fogged
 		String pf = sshKeyUpload.getPassphrase();
@@ -53,7 +58,7 @@ public class SSHImportKeyResource extends UserLinkedResource {
 		}
 		final SSHKeyUpload upload = new SSHKeyUpload(SSHKey.ENTITY);
 		try {
-			SSHService ssh = getOSGiService(SSHService.class);
+			ISSHService ssh = getOSGiService(ISSHService.class);
 			if (ssh != null) {
 				ssh.importKey(sshKeyUpload);
 				upload.setSuccessful(true);

@@ -1,52 +1,82 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<entities xmlns="http://xml.arcadsoftware.com/1.0.0/entities.xsd"
+<entities
+	xmlns="http://xml.arcadsoftware.com/1.0.0/entities.xsd"
 	xmlns:criteria="http://xml.arcadsoftware.com/1.0.0/searchcriteria.xsd"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://xml.arcadsoftware.com/1.0.0/entities.xsd https://raw.githubusercontent.com/ARCAD-Software/AFS/refs/heads/main/schemas/entities.xsd">
-<entity domain="generic" version="3" date="2025-02-26T10:02:00Z" type="sshKey">
-  <metadata>
-    <idCol>SHK_ID</idCol>
-    <updateCol>SHK_UPDATE</updateCol>
-    <colPrefix>SHK_</colPrefix>
-    <table>SSH_KEYS</table>
-    <attributeCode>name</attributeCode>
-  </metadata>
-  <attribute type="integer" code="keylength" listable="true">
-    <metadata colrank="1" colsize="75">
-      <col>SHK_LENGTH</col>
-      <visible>true</visible>
-    </metadata>
-  </attribute>
-  <attribute type="string" code="keycomment" listable="true" length="500">
-    <metadata colrank="1" colsize="200">
-      <col>SHK_COMMENT</col>
-      <visible>true</visible>
-    </metadata>
-  </attribute>
-  <attribute type="string" code="fingerprint" listable="true" length="70">
-    <metadata colrank="1" colsize="260">
-      <col>SHK_FINGERPRINT</col>
-      <visible>true</visible>
-    </metadata>
-  </attribute>
-  <attribute type="string" code="name" listable="true" mandatory="true" length="1000">
-    <metadata colrank="1" colsize="150">
-      <col>SHK_NAME</col>
-      <visible>true</visible>
-      <unique>true</unique>
-    </metadata>
-  </attribute>
-  <attribute type="string" code="keytype" listable="true" length="10">
-    <metadata colrank="1" colsize="100">
-      <col>SHK_TYPE</col>
-      <visible>true</visible>
-    </metadata>
-  </attribute>
-  <attribute type="string" code="passphrase" listable="true" length="5000">
-    <metadata colrank="1" colsize="1">
-      <col>SHK_PASSPHRASE</col>
-      <visible>false</visible>
-    </metadata>
-  </attribute>
-</entity>
+	<entity domain="generic" version="3" date="2025-02-26T10:02:00Z"
+		type="sshKey">
+		<rights>
+			<create>
+				<hasright attribute="." right="10" />
+			</create>
+			<delete>
+				<hasright attribute="." right="10" />
+			</delete>
+			<update>
+				<hasright attribute="." right="10" />
+			</update>
+			<read>
+				<or>
+					<hasright attribute="." right="10" />
+					<hasright attribute="." right="11" />
+				</or>
+			</read>
+			<list>
+				<or>
+					<hasright attribute="." right="10" />
+					<hasright attribute="." right="11" />
+				</or>
+			</list>
+		</rights>
+		<metadata>
+			<idCol>SHK_ID</idCol>
+			<updateCol>SHK_UPDATE</updateCol>
+			<colPrefix>SHK_</colPrefix>
+			<table>SSH_KEYS</table>
+			<attributeCode>name</attributeCode>
+		</metadata>
+		<attribute type="integer" code="keylength" listable="true">
+			<metadata colrank="1" colsize="75">
+				<col>SHK_LENGTH</col>
+				<visible>true</visible>
+			</metadata>
+		</attribute>
+		<attribute type="string" code="keycomment" listable="true"
+			length="500">
+			<metadata colrank="1" colsize="200">
+				<col>SHK_COMMENT</col>
+				<visible>true</visible>
+			</metadata>
+		</attribute>
+		<attribute type="string" code="fingerprint" listable="true"
+			length="70">
+			<metadata colrank="1" colsize="260">
+				<col>SHK_FINGERPRINT</col>
+				<visible>true</visible>
+			</metadata>
+		</attribute>
+		<attribute type="string" code="name" listable="true"
+			mandatory="true" length="1000">
+			<metadata colrank="1" colsize="150">
+				<col>SHK_NAME</col>
+				<visible>true</visible>
+				<unique>true</unique>
+			</metadata>
+		</attribute>
+		<attribute type="string" code="keytype" listable="true"
+			length="10">
+			<metadata colrank="1" colsize="100">
+				<col>SHK_TYPE</col>
+				<visible>true</visible>
+			</metadata>
+		</attribute>
+		<attribute type="string" code="passphrase" listable="true"
+			length="5000">
+			<metadata colrank="1" colsize="1">
+				<col>SHK_PASSPHRASE</col>
+				<visible>false</visible>
+			</metadata>
+		</attribute>
+	</entity>
 </entities>

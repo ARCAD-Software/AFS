@@ -9,11 +9,6 @@ import com.arcadsoftware.osgi.AbstractActivator;
 import com.arcadsoftware.rest.IBranch;
 import com.arcadsoftware.rest.RouteList;
 import com.arcadsoftware.rest.SimpleBranch;
-import com.arcadsoftware.server.ssh.internal.listeners.SSHKeyListener;
-import com.arcadsoftware.server.ssh.internal.resources.SSHGenerateKeyResource;
-import com.arcadsoftware.server.ssh.internal.resources.SSHGetPublicKeyResource;
-import com.arcadsoftware.server.ssh.internal.resources.SSHImportKeyResource;
-import com.arcadsoftware.server.ssh.services.SSHService;
 import com.arcadsoftware.ssh.model.SSHKey;
 import com.arcadsoftware.ssh.model.SSHRoutes;
 
