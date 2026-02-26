@@ -29,8 +29,8 @@
 					</xsd:documentation>
 				</xsd:annotation>
 				<xsd:complexType>
-					<xsd:choice>
-						<xsd:group ref="criteria"></xsd:group>
+					<xsd:choice maxOccurs="unbounded" minOccurs="0">
+						<xsd:group ref="criterion"></xsd:group>
 					</xsd:choice>
 				</xsd:complexType>
 			</xsd:element>
@@ -41,8 +41,8 @@
 					</xsd:documentation>
 				</xsd:annotation>
 				<xsd:complexType>
-					<xsd:choice>
-						<xsd:group ref="criteria"></xsd:group>
+					<xsd:choice maxOccurs="unbounded" minOccurs="0">
+						<xsd:group ref="criterion"></xsd:group>
 					</xsd:choice>
 				</xsd:complexType>
 			</xsd:element>
@@ -53,7 +53,7 @@
 					</xsd:documentation>
 				</xsd:annotation>
 				<xsd:complexType>
-					<xsd:choice>
+					<xsd:choice maxOccurs="1" minOccurs="0">
 						<xsd:group ref="criterion"></xsd:group>
 					</xsd:choice>
 				</xsd:complexType>
@@ -355,7 +355,7 @@
 							</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
-					<xsd:attribute name="value" type="xsd:date" use="optional">
+					<xsd:attribute name="value" type="xsd:dateTime" use="optional">
 						<xsd:annotation>
 							<xsd:documentation>Define an absolute date constant. If the other parameter are used this date will be altered.</xsd:documentation>
 						</xsd:annotation>
@@ -412,7 +412,7 @@
 							</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
-					<xsd:attribute name="value" type="xsd:date" use="optional">
+					<xsd:attribute name="value" type="xsd:dateTime" use="optional">
 						<xsd:annotation>
 							<xsd:documentation>Define an absolute date constant. If the other parameter are used this date will be altered.</xsd:documentation>
 						</xsd:annotation>
@@ -469,12 +469,12 @@
 							</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
-					<xsd:attribute name="before" type="xsd:date" use="optional">
+					<xsd:attribute name="before" type="xsd:dateTime" use="optional">
 						<xsd:annotation>
 							<xsd:documentation>Define an absolute date constant used as the higher limit of the instant interval. If the other parameter are used this date will be altered.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
-					<xsd:attribute name="after" type="xsd:date" use="optional">
+					<xsd:attribute name="after" type="xsd:dateTime" use="optional">
 						<xsd:annotation>
 							<xsd:documentation>Define an absolute date constant used as the lower limit of the instant interval. If the other parameter are used this date will be altered.</xsd:documentation>
 						</xsd:annotation>
@@ -829,12 +829,12 @@
 					<xsd:documentation>Test if the referenced element has been changed during the given interval of time. The "before" and "after" parameters are optionals, if ommited the current time will be used.</xsd:documentation>
 				</xsd:annotation>
 				<xsd:complexType>
-					<xsd:attribute name="before" type="xsd:date" use="optional">
+					<xsd:attribute name="before" type="xsd:dateTime" use="optional">
 						<xsd:annotation>
 							<xsd:documentation>Define an absolute date constant used as the higher limit of the instant interval. If the other parameter are used this date will be altered.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
-					<xsd:attribute name="after" type="xsd:date" use="optional">
+					<xsd:attribute name="after" type="xsd:dateTime" use="optional">
 						<xsd:annotation>
 							<xsd:documentation>Define an absolute date constant used as the lower limit of the instant interval. If the other parameter are used this date will be altered.</xsd:documentation>
 						</xsd:annotation>
@@ -972,12 +972,6 @@
 		</xsd:choice>
 	</xsd:group>
 
-	<xsd:group name="criteria">
-		<xsd:sequence>
-			<xsd:group ref="criterion" />
-		</xsd:sequence>
-	</xsd:group>
-
 	<xsd:element name="list">
 		<xsd:complexType>
 			<xsd:choice minOccurs="0" maxOccurs="unbounded">
@@ -1038,8 +1032,8 @@
 								</xsd:documentation>
 							</xsd:annotation>
 							<xsd:complexType>
-								<xsd:choice>
-									<xsd:group ref="criteria" />
+								<xsd:choice maxOccurs="unbounded" minOccurs="0">
+									<xsd:group ref="criterion" />
 								</xsd:choice>
 							</xsd:complexType>
 						</xsd:element>
@@ -1052,8 +1046,8 @@
 								</xsd:documentation>
 							</xsd:annotation>
 							<xsd:complexType>
-								<xsd:choice>
-									<xsd:group ref="criteria" />
+								<xsd:choice maxOccurs="unbounded" minOccurs="0">
+									<xsd:group ref="criterion" />
 								</xsd:choice>
 							</xsd:complexType>
 						</xsd:element>
@@ -1066,8 +1060,8 @@
 								</xsd:documentation>
 							</xsd:annotation>
 							<xsd:complexType>
-								<xsd:choice>
-									<xsd:group ref="criteria" />
+								<xsd:choice maxOccurs="unbounded" minOccurs="0">
+									<xsd:group ref="criterion" />
 								</xsd:choice>
 							</xsd:complexType>
 						</xsd:element>
@@ -1079,8 +1073,8 @@
 								</xsd:documentation>
 							</xsd:annotation>
 							<xsd:complexType>
-								<xsd:choice>
-									<xsd:group ref="criteria" />
+								<xsd:choice maxOccurs="unbounded" minOccurs="0">
+									<xsd:group ref="criterion" />
 								</xsd:choice>
 							</xsd:complexType>
 						</xsd:element>
@@ -1093,8 +1087,8 @@
 								</xsd:documentation>
 							</xsd:annotation>
 							<xsd:complexType>
-								<xsd:choice>
-									<xsd:group ref="criteria" />
+								<xsd:choice maxOccurs="unbounded" minOccurs="0">
+									<xsd:group ref="criterion" />
 								</xsd:choice>
 							</xsd:complexType>
 						</xsd:element>
@@ -1231,7 +1225,7 @@
 				<xsd:documentation>Indicates whether the entity supports locks against concurent modifications (Depending on the mapper implementation).</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="date" type="xsd:date" use="optional">
+		<xsd:attribute name="date" type="xsd:dateTime" use="optional">
 			<xsd:annotation>
 				<xsd:documentation>Sets the date the entity was last modified. Otherwise this date will be deducted from the date of last modification of the file, or of the bundle containing this file.</xsd:documentation>
 			</xsd:annotation>
@@ -1245,15 +1239,15 @@
 					<xsd:sequence minOccurs="1" maxOccurs="1">
 						<xsd:element name="update" minOccurs="0" maxOccurs="1">
 							<xsd:complexType>
-								<xsd:choice>
-									<xsd:group ref="criteria" />
+								<xsd:choice maxOccurs="unbounded" minOccurs="0">
+									<xsd:group ref="criterion" />
 								</xsd:choice>
 							</xsd:complexType>
 						</xsd:element>
 						<xsd:element name="read" minOccurs="0" maxOccurs="1">
 							<xsd:complexType>
-								<xsd:choice>
-									<xsd:group ref="criteria" />
+								<xsd:choice maxOccurs="unbounded" minOccurs="0">
+									<xsd:group ref="criterion" />
 								</xsd:choice>
 							</xsd:complexType>
 						</xsd:element>
@@ -1417,15 +1411,15 @@
 					<xsd:sequence minOccurs="1" maxOccurs="1">
 						<xsd:element name="create" minOccurs="0" maxOccurs="1">
 							<xsd:complexType>
-								<xsd:choice>
-									<xsd:group ref="criteria" />
+								<xsd:choice maxOccurs="unbounded" minOccurs="0">
+									<xsd:group ref="criterion" />
 								</xsd:choice>
 							</xsd:complexType>
 						</xsd:element>
 						<xsd:element name="list" minOccurs="0" maxOccurs="1">
 							<xsd:complexType>
-								<xsd:choice>
-									<xsd:group ref="criteria" />
+								<xsd:choice maxOccurs="unbounded" minOccurs="0">
+									<xsd:group ref="criterion" />
 								</xsd:choice>
 							</xsd:complexType>
 						</xsd:element>
