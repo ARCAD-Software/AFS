@@ -3,7 +3,7 @@
 	xmlns:criteria="http://xml.arcadsoftware.com/1.0.0/searchcriteria.xsd"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://xml.arcadsoftware.com/1.0.0/entities.xsd https://raw.githubusercontent.com/ARCAD-Software/AFS/refs/heads/main/schemas/entities.xsd">
-<entity domain="generic" version="2" date="2019-01-03T15:14:36Z" type="sshKey">
+<entity domain="generic" version="3" date="2025-02-26T10:02:00Z" type="sshKey">
   <metadata>
     <idCol>SHK_ID</idCol>
     <updateCol>SHK_UPDATE</updateCol>
@@ -11,38 +11,38 @@
     <table>SSH_KEYS</table>
     <attributeCode>name</attributeCode>
   </metadata>
-  <attribute type="integer" code="keylength" readonly="false" listable="true" mandatory="false">
+  <attribute type="integer" code="keylength" listable="true">
     <metadata colrank="1" colsize="75">
       <col>SHK_LENGTH</col>
       <visible>true</visible>
     </metadata>
   </attribute>
-  <attribute type="string" code="keycomment" readonly="false" listable="true" mandatory="false" length="500">
+  <attribute type="string" code="keycomment" listable="true" length="500">
     <metadata colrank="1" colsize="200">
       <col>SHK_COMMENT</col>
       <visible>true</visible>
     </metadata>
   </attribute>
-  <attribute type="string" code="fingerprint" readonly="false" listable="true" mandatory="false" length="70">
+  <attribute type="string" code="fingerprint" listable="true" length="70">
     <metadata colrank="1" colsize="260">
       <col>SHK_FINGERPRINT</col>
       <visible>true</visible>
     </metadata>
   </attribute>
-  <attribute type="string" code="name" readonly="false" listable="true" mandatory="false" length="1000">
+  <attribute type="string" code="name" listable="true" mandatory="true" length="1000">
     <metadata colrank="1" colsize="150">
       <col>SHK_NAME</col>
       <visible>true</visible>
       <unique>true</unique>
     </metadata>
   </attribute>
-  <attribute type="string" code="keytype" readonly="false" listable="true" mandatory="false" length="10">
+  <attribute type="string" code="keytype" listable="true" length="10">
     <metadata colrank="1" colsize="100">
       <col>SHK_TYPE</col>
       <visible>true</visible>
     </metadata>
   </attribute>
-  <attribute type="string" code="passphrase" readonly="false" listable="true" mandatory="false" length="5000">
+  <attribute type="string" code="passphrase" listable="true" length="5000">
     <metadata colrank="1" colsize="1">
       <col>SHK_PASSPHRASE</col>
       <visible>false</visible>

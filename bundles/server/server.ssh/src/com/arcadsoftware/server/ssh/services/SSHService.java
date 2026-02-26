@@ -193,7 +193,10 @@ public class SSHService {
 			sshKey.setPassphrase(Crypto.encrypt(sshKey.getPassphrase().toCharArray()));
 		}
 		sshKey.setLength(getKeyLength(keyPair));
-		getEntity().dataUpdate(sshKey.getBeanMap());
+		BeanMap b = sshKey.getBeanMap().clone();
+		// The name of the SSH key can not be changed trhough this process...
+		b.remove("name"); //$NON-NLS-1$
+		getEntity().dataUpdate(b);
 	}
 
 	/**
@@ -299,7 +302,7 @@ public class SSHService {
 		if (sshKeyUpload.getPassphrase() != null) {
 			tempSSHKey.setPassphrase(Crypto.encrypt(sshKeyUpload.getPassphrase().toCharArray()));
 		}
-		final SSHKey importedSSHKey = new SSHKey(getEntity().dataCreate(tempSSHKey.getBeanMap()));
+		final SSHKey importedSSHKey = new SSHKey(createKey(tempSSHKey.getBeanMap()));
 		try {
 			writePrivateKey(importedSSHKey, privateKeyBytes);
 			return importedSSHKey;
@@ -312,21 +315,32 @@ public class SSHService {
 	}
 
 	private SSHKey insert(final BeanMap sshKeyBeanMap) throws SSHException {
-		final SSHKey tempSSHKey = new SSHKey(sshKeyBeanMap);
-		if (tempSSHKey.getType() == SSHKeyType.UNKNOWN) {
-			throw new SSHException(String.format("SSH key type %s is unknown", tempSSHKey.getBeanMap().get(SSHKey.TYPE)));
+		// Pretest of the key type...
+		if (new SSHKey(sshKeyBeanMap).getType() == SSHKeyType.UNKNOWN) {
+			throw new SSHException("SSH key type \"%s\" is unknown".formatted(sshKeyBeanMap.getString(SSHKey.TYPE, "null")));
 		}
-		tempSSHKey.setLength(tempSSHKey.getType().getLength());
-		MetaDataEntity e = getEntity();
-		if (e != null) {
-			BeanMap b = e.dataCreate(sshKeyBeanMap);
-			if ((b != null) && (b.getId() > 0)) {
-				return new SSHKey(b);
-			}
-		}
-		throw new SSHException("Could not insert new SSH key in database");
+		return new SSHKey(createKey(sshKeyBeanMap));
 	}
 
+	private synchronized BeanMap createKey(BeanMap key) throws SSHException {
+		MetaDataEntity e = getEntity();
+		if (e != null) {
+			String name = key.getString("name", ""); //$NON-NLS-1$ //$NON-NLS-2$
+			if (name.isBlank()) {
+				throw new SSHException("Could not add new SSH key in database, the name must not be empty.");
+			}
+			if (e.dataCount(false, "name", name) > 0) { //$NON-NLS-1$
+				throw new SSHException("Could not add new SSH key in database, the name \"%s\" is already used by another key.".formatted(name));
+			}
+			BeanMap b = e.dataCreate(key);
+			if ((b != null) && (b.getId() > 0)) {
+				return b;
+			}
+			throw new SSHException("Could not add new SSH key in database, due to an violation of a constraint on the key data.");
+		}
+		throw new SSHException("Could not add new SSH key, the database is not accessible.");
+	}
+	
 	/**
 	 * Load the {@link KeyPair} linked to an {@link SSHKey} stored in
 	 * database.<br />
