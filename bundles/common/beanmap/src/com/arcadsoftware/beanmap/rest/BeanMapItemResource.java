@@ -50,6 +50,7 @@ public abstract class BeanMapItemResource extends UserLinkedIdentifiedResource {
 		}
 		if (hasRight(Method.PUT)) {
 			getAllowedMethods().add(Method.PUT);
+			getAllowedMethods().add(Method.POST);
 		}
 		if (hasRight(Method.DELETE)) {
 			getAllowedMethods().add(Method.DELETE);
@@ -163,7 +164,9 @@ public abstract class BeanMapItemResource extends UserLinkedIdentifiedResource {
 	 * @return A new BeanMap or the given one completed with full attributes.
 	 * @throws ResourceException
 	 */
-	protected abstract BeanMap get(BeanMap bean) throws ResourceException;
+	protected BeanMap get(BeanMap bean) throws ResourceException {
+		return bean;
+	}
 	
 	/**
 	 * Update a BeanMap
@@ -171,7 +174,7 @@ public abstract class BeanMapItemResource extends UserLinkedIdentifiedResource {
 	 * @param bean The beanMap to update with modified attributes.
 	 * @throws ResourceException
 	 */
-	protected abstract void put(BeanMap bean) throws ResourceException;
+	protected void put(BeanMap bean) throws ResourceException {}
 
 	/**
 	 * Delete a BeanMap
@@ -179,5 +182,5 @@ public abstract class BeanMapItemResource extends UserLinkedIdentifiedResource {
 	 * @param bean
 	 * @throws ResourceException
 	 */
-	protected abstract void delete(BeanMap bean) throws ResourceException;
+	protected void delete(BeanMap bean) throws ResourceException {}
 }
