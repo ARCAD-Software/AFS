@@ -41,6 +41,9 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Random;
+import java.util.zip.DataFormatException;
+import java.util.zip.Deflater;
+import java.util.zip.Inflater;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -1958,8 +1961,7 @@ public final class Crypto {
 	 * @return
 	 */
 	public static byte[] charToBytes(char... chars) {
-		Charset charset = Charset.forName("UTF-8"); //$NON-NLS-1$
-		ByteBuffer buffer = charset.encode(CharBuffer.wrap(chars));
+		ByteBuffer buffer = StandardCharsets.UTF_8.encode(CharBuffer.wrap(chars));
 		return Arrays.copyOf(buffer.array(), buffer.limit());
 	}
 	
@@ -2517,6 +2519,51 @@ public final class Crypto {
 		return true;
 	}
 
+	/**
+	 * Compress the given byte[].
+	 * 
+	 * @param value
+	 * @return
+	 * @see #unzip(byte[])
+	 */
+	public static byte[] zip(byte[] value) {
+		Deflater deflater = new Deflater();
+	    deflater.setInput(value);
+	    deflater.setLevel(9);
+	    deflater.finish();
+	    try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+		    byte[] buffer = new byte[1024];
+		    while (!deflater.finished()) {
+		        int compressedSize = deflater.deflate(buffer);
+		        outputStream.write(buffer, 0, compressedSize);
+		    }
+		    return outputStream.toByteArray();
+	    } catch (IOException e) {
+	    	return value;
+		}
+	}
+	
+	/**
+	 * Unzip the given compressed data.
+	 * 
+	 * @param zip
+	 * @return
+	 * @see #zip(byte[])
+	 */
+	public static byte[] unzip(byte[] zip) {
+		Inflater inflater = new Inflater();
+	    inflater.setInput(zip);
+	    try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+		    byte[] buffer = new byte[1024];
+		    while (!inflater.finished()) {
+		        int decompressedSize = inflater.inflate(buffer);
+		        outputStream.write(buffer, 0, decompressedSize);
+		    }
+		    return outputStream.toByteArray();
+	    } catch (IOException | DataFormatException e) {
+	    	return zip;
+		}
+	}
 	/**
 	 * Hash with the Whirlpool algorithm.
 	 * 

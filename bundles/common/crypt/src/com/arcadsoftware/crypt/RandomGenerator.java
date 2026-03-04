@@ -150,6 +150,32 @@ public class RandomGenerator {
 	}
 
 	/**
+	 * Generate a random array of char using Alphnumeric and non alphanumeric, printable characters.
+	 * 
+	 * @param buffer the Char buffer to fill.
+	 * @return
+	 */
+	public static void randomCharSecure(char[] buffer) {
+		if (buffer != null) {
+			SecureRandom sr = null;
+			try {
+				sr = SecureRandom.getInstance("SHA1PRNG"); //$NON-NLS-1$
+			} catch (NoSuchAlgorithmException e) {
+				try {
+					sr = SecureRandom.getInstanceStrong();
+				} catch (NoSuchAlgorithmException e1) {}
+			}
+			if (sr == null) {
+				randomChars(buffer, 0, buffer.length);
+			} else {
+				for (int i = buffer.length - 1; i >= 0; i--) {
+					buffer[i] = ALLCHARS.charAt(sr.nextInt(ALLCHARS.length()));
+				}
+			}
+		}
+	}
+
+	/**
 	 * Generate a random string of letter.
 	 * @param length
 	 * @return

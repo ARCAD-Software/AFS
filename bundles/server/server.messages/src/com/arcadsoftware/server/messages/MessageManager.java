@@ -137,7 +137,7 @@ public class MessageManager {
 	 * @param e the throwable to convert
 	 * @return the stack trace as a string
 	 */
-	private static String stackTraceToString(Throwable e) {
+	private static String stackTraceToString(final Throwable e) {
 		StringWriter w = new StringWriter();
 		e.printStackTrace(new PrintWriter(w));
 		return w.toString();

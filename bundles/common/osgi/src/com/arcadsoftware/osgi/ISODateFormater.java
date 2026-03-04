@@ -15,6 +15,7 @@ package com.arcadsoftware.osgi;
 
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
@@ -243,6 +244,26 @@ public final class ISODateFormater {
 		}
 		try {
 			return Instant.parse(String.format("%s-%s-%sT00:00:00.00Z", //$NON-NLS-1$
+					date.substring(0, 4),
+					date.substring(4, 6),
+					date.substring(6)));
+		} catch (DateTimeParseException e) {
+			return null;
+		}
+	}
+	
+	/**
+	 * Convert a short date format "YYYYMMDD" into an Instant.
+	 *  
+	 * @param date a "YYYYMMDD" formated string.
+	 * @return an Instant, null if the date is not correctly formated.
+	 */
+	static public LocalDate shortDatetoLocalDate(String date) {
+		if ((date == null) || (date.length() != 8)) {
+			return null;
+		}
+		try {
+			return LocalDate.parse(String.format("%s-%s-%s", //$NON-NLS-1$
 					date.substring(0, 4),
 					date.substring(4, 6),
 					date.substring(6)));
