@@ -31,28 +31,28 @@
 		<!-- Cryptography libraries -->
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcmail-jdk18on</artifactId>
-			<version>1.82</version>
+			<artifactId>bcjmail-jdk18on</artifactId>
+			<version>1.83</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcpg-jdk18on</artifactId>
-			<version>1.82</version>
+			<version>1.83</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcpkix-jdk18on</artifactId>
-			<version>1.82</version>
+			<version>1.83</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcprov-jdk18on</artifactId>
-			<version>1.82</version>
+			<version>1.83</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcutil-jdk18on</artifactId>
-			<version>1.82</version>
+			<version>1.83</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.santuario</groupId>
