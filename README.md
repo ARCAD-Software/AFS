@@ -1,50 +1,124 @@
-# ARCAD Foundation Services
+# AFS-OS release version 2026.3.0.
 
-The ARCAD Foundation services propose a technical base build as an OSGi framework. Each service, function or API are embedded into a Bundle, even if some can be used into "plain java applications".
+Release date Thu Mar 05 16:03:51 CET 2026.
 
-## Risks and Returns
+Link to the update site of [Version 2026.3.0](https://github.com/ARCAD-Software/AFS/releases/download/2026.3.0/).
 
-This framework is based on the OSGi platform and the Restlet framework, it will confere the following main features *out of the box* :
-
-* **Component oriented development**: highly modular, dynamic and extendable framework.
-* **SOA**: The AFS framework is Service oriented, this mean that it include web-services (REST), and internal Service architecture (OSGi) and is compatible with a micro-service architecture (or into and Agent oriented architecture).
-* **Compatible**: your project is compatible, even ''embedded'', with other projects developed with AFS. As far as possible, every feature and external tool included into the AFS deliveries are compatible with each other.
-* **Secured**: Your technical base is stable and security questions are taken into account (with dedicated features), as long as licensing questions.
-Up to date: AFS is maintained to the latest version of technology that do not compromise previous arguments.
+51 Bundles modified in this release.
+1 new bundles.
+3 deleted bundles.
 
 
-## Download
 
-Each release include a P2 repository which may be used a a target within Eclipse IDE.
+### List of bundles from group **client**
+
+Bundle Symbolic Name | Modification | Version
+-------------------- | ------------ | -------
+[com.arcadsoftware.afs.client.brands](bundles/client/afs.client.brands) | Not changed | 1.2.0
+[com.arcadsoftware.afs.client.cli](bundles/client/afs.client.cli) | Not changed | 1.4.0
+[com.arcadsoftware.afs.client.core](bundles/client/afs.client.core) | **Upgraded** from version 1.5.0 | **1.6.0**
+[com.arcadsoftware.afs.client.core.base](bundles/client/afs.client.core.base) | **Upgraded** from version 1.7.0 | **1.8.0**
+[com.arcadsoftware.afs.client.core.rcp](bundles/client/afs.client.core.rcp) | **Upgraded** from version 1.4.0 | **1.5.0**
+[com.arcadsoftware.afs.client.editors](bundles/client/afs.client.editors) | **Upgraded** from version 1.3.0 | **1.4.0**
+[com.arcadsoftware.afs.client.list](bundles/client/afs.client.list) | **Upgraded** from version 1.4.0 | **1.5.0**
+[com.arcadsoftware.afs.client.macro](bundles/client/afs.client.macro) | **Upgraded** from version 1.3.0 | **1.4.0**
+[com.arcadsoftware.afs.client.reporting](bundles/client/afs.client.reporting) | **Upgraded** from version 1.6.0 | **1.7.0**
+[com.arcadsoftware.afs.client.server](bundles/client/afs.client.server) | **Upgraded** from version 1.6.0 | **1.7.0**
+[com.arcadsoftware.afs.client.server.admin.common](bundles/client/afs.client.server.admin.common) | **Upgraded** from version 1.4.0 | **1.5.0**
+[com.arcadsoftware.afs.client.server.admin.common.actions](bundles/client/afs.client.server.admin.common.actions) | Not changed | 1.4.0
+[com.arcadsoftware.afs.client.ssh](bundles/client/afs.client.ssh) | **Upgraded** from version 2.3.0 | **2.4.0**
+[com.arcadsoftware.afs.client.users](bundles/client/afs.client.users) | **Upgraded** from version 1.5.0 | **1.6.0**
+[com.arcadsoftware.afs.client.widgets](bundles/client/afs.client.widgets) | **Upgraded** from version 1.4.0 | **1.5.0**
+[com.arcadsoftware.afs.client.widgets.rcp](bundles/client/afs.client.widgets.rcp) | **Upgraded** from version 1.4.0 | **1.5.0**
+[com.arcadsoftware.afs.framework](bundles/client/afs.framework) | Not changed | 1.3.0
+[com.arcadsoftware.afs.framework.application](bundles/client/afs.framework.application) | Not changed | 1.4.0
+[com.arcadsoftware.afs.framework.application.rcp](bundles/client/afs.framework.application.rcp) | Not changed | 1.4.0
+[com.arcadsoftware.afs.framework.help](bundles/client/afs.framework.help) | **Upgraded** from version 1.3.0 | **1.4.0**
+[com.arcadsoftware.afs.framework.ui](bundles/client/afs.framework.ui) | **Upgraded** from version 1.5.0 | **1.6.0**
 
 
-## External dependencies
 
-Two features of bundles are provided into the releases of AFS, one for the "server" part built on OSGi framework, and the other one for RCP development.
-You can retrieve these dependencies from the **pom.xml** file from the root of this project and in the **target platform** defined in the /releng/platform folder.
+### List of bundles from group **common**
 
-### OSGi server
+Bundle Symbolic Name | Modification | Version
+-------------------- | ------------ | -------
+[com.arcadsoftware.beanmap](bundles/common/beanmap) | **Upgraded** from version 2.0.2 | **2.2.0**
+[com.arcadsoftware.cleanup](bundles/common/cleanup) | Not changed | 1.5.0
+[com.arcadsoftware.cm.simple](bundles/common/cm.simple) | Not changed | 1.8.0
+[com.arcadsoftware.crypt](bundles/common/crypt) | **Upgraded** from version 1.9.2 | **1.10.0**
+[com.arcadsoftware.crypt.xml](bundles/common/crypt.xml) | Not changed | 1.2.0
+[com.arcadsoftware.email](bundles/common/email) | Not changed | 1.5.0
+[com.arcadsoftware.groovy.security](bundles/common/groovy.security) | Not changed | 1.3.0
+[com.arcadsoftware.metadata](bundles/common/metadata) | **Upgraded** from version 2.0.4 | **2.2.0**
+[com.arcadsoftware.osgi](bundles/common/osgi) | **Upgraded** from version 1.10.7 | **1.11.0**
+[com.arcadsoftware.rest](bundles/common/rest) | **Upgraded** from version 3.2.5 | **3.4.0**
+[com.arcadsoftware.ssh](bundles/common/ssh) | **Upgraded** from version 1.3.1 | **2.0.0**
 
-To be able to run the server part you will have to include the following dependencies:
 
-* Bouncy Castle version 1.80.
-* Apache Santuario XMLSec version 4.0.3
-* Apache Commons bundles:
-  * Commons FileUpload version 1.5.0
-  * Commons Codec version 1.18.0
-  * Commons DBUtils version 1.8.1
-  * and Commons io version 2.18.0
-* Apache Jakarta Mail version 2.0.1
-* UnboundID LDAP SDK version 7.0.2
-* HikariCP version 6.2.1 and the JDBC driver:
-  * H2Database (light fork) version 2.3.232
-  * PostgreSQL version 42.7.5
-* Groovy version 4.0.25
-* and the Equinox OSGi framework, a version compatible with Java 17 and at least equal to version 4.19 is required. The required bundles are only the ones related to:
-  * The Declarative Service.
-  * The Event Admin Service.
-  * The Felix Gogo console.
- 
-### RCP Client
 
-All the above dependencies are required, except the JDBC related ones and Groovy. You have to import Eclipse RCP version Neon or an above version compatible with Java 17.
+### List of bundles from group **repack**
+
+Bundle Symbolic Name | Modification | Version
+-------------------- | ------------ | -------
+[org.restlet](bundles/repack/org.restlet) | **New Bundle** | **2.6.0**
+[org.restlet.base](bundles/repack/org.restlet.base) | **Bundle deleted** | ~~2.4.311~~
+[org.restlet.server](bundles/repack/org.restlet.server) | **Bundle deleted** | ~~2.4.310~~
+[org.restlet.server.jmx](bundles/repack/org.restlet.server.jmx) | **Bundle deleted** | ~~2.4.310~~
+[xstream](bundles/repack/xstream) | Not changed | 1.4.210
+
+
+
+### List of bundles from group **server**
+
+Bundle Symbolic Name | Modification | Version
+-------------------- | ------------ | -------
+[com.arcadsoftware.database.sql](bundles/server/database.sql) | **Upgraded** from version 2.4.1 | **2.5.0**
+[com.arcadsoftware.database.sql.h2](bundles/server/database.sql.h2) | Not changed | 3.3.0
+[com.arcadsoftware.database.sql.postgresql](bundles/server/database.sql.postgresql) | Not changed | 1.4.0
+[com.arcadsoftware.metadata.binary](bundles/server/metadata.binary) | **Upgraded** from version 1.3.0 | **1.4.0**
+[com.arcadsoftware.metadata.mapper.sql](bundles/server/metadata.mapper.sql) | **Upgraded** from version 2.0.4 | **2.1.0**
+[com.arcadsoftware.metadata.mapper.sql.postgresql](bundles/server/metadata.mapper.sql.postgresql) | **Upgraded** from version 2.0.1 | **2.1.0**
+[com.arcadsoftware.metadata.registry.xml](bundles/server/metadata.registry.xml) | **Upgraded** from version 1.3.1 | **1.4.0**
+[com.arcadsoftware.metadata.rest](bundles/server/metadata.rest) | **Upgraded** from version 2.0.3 | **2.1.0**
+[com.arcadsoftware.metadata.rights](bundles/server/metadata.rights) | **Upgraded** from version 1.4.3 | **1.6.0**
+[com.arcadsoftware.metadata.server.user](bundles/server/metadata.server.user) | **Upgraded** from version 1.3.5 | **1.5.0**
+[com.arcadsoftware.metadata.server.user.usergroup](bundles/server/metadata.server.user.usergroup) | **Upgraded** from version 1.0.1 | **1.1.0**
+[com.arcadsoftware.server.binaries](bundles/server/server.binaries) | **Upgraded** from version 1.3.1 | **1.5.0**
+[com.arcadsoftware.server.messages](bundles/server/server.messages) | **Upgraded** from version 1.3.2 | **1.4.0**
+[com.arcadsoftware.server.properties](bundles/server/server.properties) | **Upgraded** from version 1.3.0 | **1.4.0**
+[com.arcadsoftware.server.restful](bundles/server/server.restful) | **Upgraded** from version 3.2.4 | **4.0.0**
+[com.arcadsoftware.server.restful.connection](bundles/server/server.restful.connection) | **Upgraded** from version 2.2.2 | **2.4.0**
+[com.arcadsoftware.server.restful.connection.config](bundles/server/server.restful.connection.config) | **Upgraded** from version 1.4.0 | **1.5.0**
+[com.arcadsoftware.server.restful.connection.ldap](bundles/server/server.restful.connection.ldap) | **Upgraded** from version 2.5.1 | **2.6.0**
+[com.arcadsoftware.server.restful.connection.local](bundles/server/server.restful.connection.local) | **Upgraded** from version 2.0.3 | **2.2.0**
+[com.arcadsoftware.server.restful.console](bundles/server/server.restful.console) | **Upgraded** from version 1.5.1 | **1.6.0**
+[com.arcadsoftware.server.restful.layouts](bundles/server/server.restful.layouts) | **Upgraded** from version 9.7.1 | **9.8.0**
+[com.arcadsoftware.server.restful.log](bundles/server/server.restful.log) | **Upgraded** from version 1.3.0 | **1.4.0**
+[com.arcadsoftware.server.scheduler](bundles/server/server.scheduler) | **Upgraded** from version 1.4.0 | **1.5.0**
+[com.arcadsoftware.server.scheduler.impl](bundles/server/server.scheduler.impl) | **Upgraded** from version 1.4.0 | **1.5.0**
+[com.arcadsoftware.server.ssh](bundles/server/server.ssh) | **Upgraded** from version 3.0.4 | **4.0.0**
+[com.arcadsoftware.server.web](bundles/server/server.web) | **Upgraded** from version 1.3.0 | **1.5.0**
+
+
+
+### List of bundles from group **tests**
+
+Bundle Symbolic Name | Modification | Version
+-------------------- | ------------ | -------
+[byPassTests](bundles/tests/byPassTests) | Not changed | 1.1.0
+[test.rcp](bundles/tests/test_RCP) | **Upgraded** from version 2.0.0 | **2.1.0**
+
+
+
+### List of bundles from group **tools**
+
+Bundle Symbolic Name | Modification | Version
+-------------------- | ------------ | -------
+[com.arcadsoftware.tool.cli](bundles/tools/tool.cli) | **Upgraded** from version 2025.5.11 | **2026.3.0**
+
+
+
+
+
+
+*Readme auto generated during release*.
