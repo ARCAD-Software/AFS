@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AFS - Framework Application
 Bundle-SymbolicName: com.arcadsoftware.afs.framework.application;singleton:=true
-Bundle-Version: 1.3.5.qualifier
+Bundle-Version: 1.3.5
 Bundle-Activator: com.arcadsoftware.afs.framework.application.internal.Activator
 Bundle-Vendor: ARCAD Software
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
