@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AFS Configuration Admin Simple File Manager
 Bundle-SymbolicName: com.arcadsoftware.cm.simple;singleton:=true
-Bundle-Version: 1.5.4
+Bundle-Version: 1.5.4.qualifier
 Bundle-Activator: com.arcadsoftware.cm.simple.internal.Activator
 Bundle-Vendor: ARCAD Software
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
