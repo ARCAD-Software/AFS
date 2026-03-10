@@ -799,6 +799,35 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 		return result;
 	}
 
+	/**
+	 * Construct a List of values extracted from the BeanMap list.
+	 * 
+	 * @param <T>
+	 *            any type (converted types are String, Integer, Date, Boolean, Float).
+	 * @param attribute
+	 *            the attribute code.
+	 * @param clazz
+	 *            The desired class
+	 * @param limit
+	 *            The maximal number of values to add in the result list.
+	 * @return a List of <code>T</code> Objects.
+	 */
+	public <T> ArrayList<T> getValues(String attribute, Class<T> clazz, int limit) {
+		ArrayList<T> result = new ArrayList<T>();
+		for (BeanMap bm : this) {
+			if (bm != null) {
+				T o = bm.get(attribute, clazz);
+				if (o != null) {
+					result.add(o);
+					if (result.size() >= limit) {
+						return result;
+					}
+				}
+			}
+		}
+		return result;
+	}
+
 	@Override
 	public boolean moreRecent(IDatedBean bm) {
 		return (date != null) && date.after(bm.getDate());
