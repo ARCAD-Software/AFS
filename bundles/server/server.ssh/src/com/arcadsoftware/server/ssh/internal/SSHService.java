@@ -131,9 +131,12 @@ public class SSHService implements ISSHService {
 	@Override
 	public SSHKey create(final BeanMap sshKeyBeanMap) throws SSHException {
 		// Pretest of the key type...
-		if (new SSHKey(sshKeyBeanMap).getType() == SSHKeyType.UNKNOWN) {
+		SSHKeyType type = SSHKeyType.fromName(sshKeyBeanMap.getString(SSHKey.TYPE));
+		if (type == SSHKeyType.UNKNOWN) {
 			throw new SSHException("SSH key type \"%s\" is unknown".formatted(sshKeyBeanMap.get(SSHKey.TYPE)));
 		}
+		// Force a the key length... So why store it in the database ?
+		sshKeyBeanMap.put(SSHKey.LENGTH, type.getLength());
 		final SSHKey newSSHKey = new SSHKey(createKey(sshKeyBeanMap));
 		try {
 			generateKeyPair(newSSHKey);
@@ -331,7 +334,7 @@ public class SSHService implements ISSHService {
 		}
 		throw new SSHException("Could not add new SSH key, the database is not accessible.");
 	}
-
+	
 	@Override
 	public KeyPair loadKeyPair(final SSHKey sshKey) throws IOException, GeneralSecurityException {
 		final File keyFile = getPrivateKeyFile(sshKey);
