@@ -1035,7 +1035,7 @@ public final class Crypto {
 				iterations += minIterations;
 			}
 			if ((algorithm > ENCRYPT_ALGORITHM) || (saltsize < 4) || (ivsize < 4) || (iterations < 1)) {
-				throw new NoSuchAlgorithmException();
+				throw new NoSuchAlgorithmException("Invalid boundaries.");
 			}
 			iv = new byte[ivsize];
 			salt = new byte[saltsize];
@@ -1043,8 +1043,10 @@ public final class Crypto {
 			System.arraycopy(buffer, 16, iv, 0, ivsize);
 			System.arraycopy(buffer, 16 + ivsize, ct, 0, ct.length);
 			System.arraycopy(buffer, buffer.length - saltsize, salt, 0, saltsize);
+		} catch (NoSuchAlgorithmException e) {
+			throw e;
 		} catch (Exception e) {
-			throw new NoSuchAlgorithmException();
+			throw new NoSuchAlgorithmException(e);
 		}
 		SecretKey secret;
 		Cipher cipher;
