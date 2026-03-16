@@ -315,10 +315,12 @@ public class SSHService {
 	}
 
 	private SSHKey insert(final BeanMap sshKeyBeanMap) throws SSHException {
-		// Pretest of the key type...
-		if (new SSHKey(sshKeyBeanMap).getType() == SSHKeyType.UNKNOWN) {
-			throw new SSHException("SSH key type \"%s\" is unknown".formatted(sshKeyBeanMap.getString(SSHKey.TYPE, "null")));
+		SSHKeyType type = SSHKeyType.fromName(sshKeyBeanMap.getString(SSHKey.TYPE));
+		if (type == SSHKeyType.UNKNOWN) {
+			throw new SSHException("SSH key type \"%s\" is unknown".formatted(sshKeyBeanMap.get(SSHKey.TYPE)));
 		}
+		// Force a the key length... So why store it in the database ?
+		sshKeyBeanMap.put(SSHKey.LENGTH, type.getLength());
 		return new SSHKey(createKey(sshKeyBeanMap));
 	}
 
