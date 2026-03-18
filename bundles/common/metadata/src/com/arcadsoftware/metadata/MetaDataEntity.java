@@ -2799,7 +2799,7 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 		if (mapper == null) {
 			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataTest,getType()));
 		}
-		return mapper.test(this, itemId, getRightRead(), currentUser);
+		return mapper.test(this, itemId, getRightRead(), true, currentUser);
 	}
 
 	/**
@@ -2823,7 +2823,7 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 		if (mapper == null) {
 			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataTest,getType()));
 		}
-		return mapper.test(this, itemId, getRightUpdate(), currentUser);
+		return mapper.test(this, itemId, getRightUpdate(), true, currentUser);
 	}
 
 	/**
@@ -2847,7 +2847,7 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 		if (mapper == null) {
 			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataTest,getType()));
 		}
-		return mapper.test(this, itemId, getRightDelete(), currentUser);
+		return mapper.test(this, itemId, getRightDelete(), true, currentUser);
 	}
 
 	/**
@@ -2870,7 +2870,7 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 		if (mapper == null) {
 			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, String.format(Messages.MetaDataEntity_Error_DataTest,getType()));
 		}
-		return mapper.test(this, getRightList(), currentUser);
+		return mapper.test(this, getRightList(), currentUser) || (mapper.count(this) == 0);
 	}
 
 	/**
