@@ -149,7 +149,7 @@ public class EncryptPassword extends Command {
 				}
 			} else {
 				boolean changed = false;
-				for(Configuration c: listOSgiConfigurations()) {
+				for (Configuration c: listOSgiConfigurations()) {
 					if (c.contains(key)) {
 						changed = true;
 						c.put(key, npwd);
