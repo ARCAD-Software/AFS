@@ -696,6 +696,13 @@ public class MetaDataItemResource extends DataItemResource {
 			// Undelete is not an attribute...
 			values.remove("undelete"); //$NON-NLS-1$
 		}
+		// Mandatory attributes... with null value.
+		for (MetaDataAttribute a: attlist) {
+			if (a.isMandatory() && (values.get(a.getCode()) == null)) {
+				setStatus(Status.CLIENT_ERROR_FORBIDDEN, Activator.getMessage("error.mandatorynull", language).formatted(a.getName(language))); //$NON-NLS-1$
+				return null;
+			}
+		}
 		for (final BeanMap item : getItems()) {
 			final BeanMap result = put(variant, form, entity, item, values, attlist, language, listeners, udlisteners);
 			if (result != null) {

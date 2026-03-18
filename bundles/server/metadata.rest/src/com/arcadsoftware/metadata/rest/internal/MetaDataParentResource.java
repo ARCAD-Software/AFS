@@ -208,7 +208,7 @@ public class MetaDataParentResource extends DataParentResource {
 	protected Representation put(Representation representation, Variant variant) throws ResourceException {
 		// The default implementation is to switch to a "GET" request.
 		// If a true "multi update" method is required we can add a required field to identify and "update".
-		// For instance "order" may identify a selection (but this is optional parameter).
+		// For instance "order" may identify a selection (but this is an optional parameter).
 		return list(variant);
 	}
 
@@ -582,10 +582,9 @@ public class MetaDataParentResource extends DataParentResource {
 				throw e;
 			}
 		}
-		// Mandatory and Unique attributes...
+		// Mandatory attributes... missing or with null value.
 		for (MetaDataAttribute a: entity.getAttributes().values()) {
-			// Un Mandatory absent termine le test.
-			if (a.isMandatory() && (list.indexOf(a) < 0)) {
+			if (a.isMandatory() && (list.indexOf(a) < 0) || (result.get(a.getCode()) == null)) {
 				return 0;
 			}
 		}
