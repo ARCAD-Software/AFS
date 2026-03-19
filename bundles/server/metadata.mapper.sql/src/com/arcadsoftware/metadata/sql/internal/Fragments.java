@@ -115,6 +115,7 @@ public class Fragments {
 	public String dest;
 	public String select_max;
 	public String select_maxwhere;
+	public String notequal;
 	
 	public Fragments(String name) {
 		// Reset this class...

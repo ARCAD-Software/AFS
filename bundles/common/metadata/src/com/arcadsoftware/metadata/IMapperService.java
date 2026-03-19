@@ -973,9 +973,6 @@ public interface IMapperService {
 	 * <p>
 	 * Update operation can be applied to (soft) deleted items.
 	 * 
-	 * <p>
-	 * The entity to update is deducted from the parent entity of the given attributes.
-	 * 
 	 * @param entity The entity to modify.
 	 * @param attributes
 	 *            The list of attributes to be updated.

@@ -137,8 +137,7 @@ public class MultiLinkQuery {
 	 * @param ignoreSubdivision true if subdivision (recursive query) must be ignored.
 	 * @return null if this link chains can not be proceeded or is invalid.
 	 */
-	public static MultiLinkQuery generate(int initial, MapperSQLService mapper, List<MetaDataLink> links, boolean deleted,
-			boolean ignoreSubdivision) {
+	public static MultiLinkQuery generate(int initial, MapperSQLService mapper, List<MetaDataLink> links, boolean deleted, boolean ignoreSubdivision) {
 		if ((links == null) || links.isEmpty()) {
 			return null;
 		}
@@ -163,7 +162,7 @@ public class MultiLinkQuery {
 			}
 			final LinkInfo cli = csei.links.get(l.getCode());
 			if ((cli == null) || !cli.isComplete()) {
-				// Unknown of virtual link...
+				// Unknown or virtual link...
 				alias = 1;
 				break;
 			}
@@ -177,11 +176,12 @@ public class MultiLinkQuery {
 					// If the recursive link is unknown or incomplete, process like a normal link.
 					if ((rli != null) && rli.isComplete()) {
 						rec_alias = RECURCIVE_PREFIX + alias;
+						// Initialization part of the recursive selection:
 						final String firstSelect;
 						if (joins == null) {
 							// As first selection we select the direct sub links (first level).
 							// This avoid to select the original source in the result.
-							if ((i+1 < links.size()) && !recLink.equals(links.get(i + 1))) {
+							if (((i + 1) < links.size()) && !recLink.equals(links.get(i + 1))) {
 								firstSelect = String.format(mapper.fg.select, "fl." + rli.destCol + mapper.fg.asid, //$NON-NLS-1$
 										rli.table + " fl", //$NON-NLS-1$
 										"fl." + rli.sourceCol + mapper.fg.paramequal); //$NON-NLS-1$
@@ -217,10 +217,10 @@ public class MultiLinkQuery {
 								del.append(mapper.fg.equaldelfalse);
 							}
 							// Test if the sub-elements are not deleted too.
-							if ((joins != null) && (csei.deleteCol != null)) {
+							if (csei.deleteCol != null) {
 								final String talias = LNKALS_INRECQUERY + DEFAULT_LINKALIASPREFIX + alias++;
 								del.append(String.format(mapper.fg.join_inner, csei.table, talias, csei.idCol,
-										LNKALS_INRECQUERY + '.' + rli.sourceCol));
+										LNKALS_INRECQUERY + '.' + rli.destCol));
 								del.append(' ');
 								del.append(mapper.fg.and);
 								del.append(talias);
@@ -254,6 +254,7 @@ public class MultiLinkQuery {
 								joins.append(cli.deleteCol);
 								joins.append(mapper.fg.equaldelfalse);
 							}
+							
 						}
 						continue;
 					}
