@@ -1191,7 +1191,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 					l.sql_rec = fg.rec_first + String.format(fg.rec_alt, rec_alias, fg.rec_init, l.table, l.destCol, l.sourceCol, ""); //$NON-NLS-1$
 				}
 				l.sql_rectest = l.sql_rec +
-						String.format(fg.select, "*", rec_alias, rec_alias + ".r = ?"); //$NON-NLS-1$ //$NON-NLS-2$
+						String.format(fg.select, fg.count, rec_alias, rec_alias + '.' + fg.id + fg.paramequal);
 			}
 			if (count(l.sql_rectest, new Object[] {destId, sourceId}) > 0) {
 				return false;
@@ -1476,10 +1476,13 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 	protected BeanMapList doLinkSelection(List<MetaDataLink> links, int sourceId, List<ReferenceLine> attributes,
 			boolean deleted, ISearchCriteria criteria, boolean distinct, boolean ignoreSubdivision, 
 			List<ReferenceLine> orders, int page, int limit, SQLCriteriaContext context) {
+		if ((links == null) || links.isEmpty()) {
+			return new BeanMapPartialList();
+		}
 		final MetaDataEntity sourceEntity = links.get(0).getParent();
 		EntityInfo ei = getEntityInfo(sourceEntity);
 		if (ei == null) {
-			return null;
+			return new BeanMapPartialList();
 		}
 		final MetaDataEntity targetEntity = context.getEntity();
 		if (targetEntity == null) {
@@ -1498,7 +1501,7 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 			context.addQueryContext(mlq.rec_alias, mlq.rec_query);
 		}
 		final StringBuilder cols;
-		final StringBuilder where;
+		StringBuilder where;
 		final String orderCols;
 		final EntityInfo tei = context.getEntityInfo();
 		// FIXME If the last link is a "reversed link" then the final entity alias is already the targeted one...
@@ -1525,9 +1528,28 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 			where = context.generateCriteria(join, criteria, deleted); // The deletion test is already done in the last join... 
 			if (!mlq.where.isEmpty()) {
 				if (!where.isEmpty()) {
-					where.append(fg.and);
+					if (fg.true_cond.equals(where.toString())) {
+						where = new StringBuilder(mlq.where);
+					} else {
+						where.append(fg.and);
+						where.append(mlq.where);
+					}
+				} else {
+					where.append(mlq.where);
 				}
-				where.append(mlq.where);
+			}
+		}
+		// If the link is a single recursive link we must exclude the initial items from the results.
+		if ((links.size() == 1) && links.get(0).isRecursive()) {
+			if (!where.isEmpty()) {
+				if (fg.true_cond.equals(where.toString())) {
+					where = new StringBuilder(fg.notequal.formatted(fg.id, Integer.toString(sourceId)));
+				} else {
+					where.append(fg.and);
+					where.append(fg.notequal.formatted(fg.id, Integer.toString(sourceId)));
+				}
+			} else {
+				where.append(fg.notequal.formatted(fg.id, Integer.toString(sourceId)));
 			}
 		}
 		String query;
@@ -1702,7 +1724,12 @@ public class MapperSQLService extends AbstractMapperService<SQLCriteriaContext> 
 				where.append(mlq.where);
 			}
 		}
-		return count(((SQLCriteriaContext) context).formatQuery(fg.select, col, context.generateJoins(deleted), where.toString()), new Object[] {sourceId});
+		int result = count(((SQLCriteriaContext) context).formatQuery(fg.select, col, context.generateJoins(deleted), where.toString()), new Object[] {sourceId});
+		// Single selection of an unique subdivision link must remove the original item from the result...
+		if ((links.size() == 1) && links.get(0).isRecursive()) {
+			return result - 1;
+		}
+		return result;
 	}
 
 	@Override
