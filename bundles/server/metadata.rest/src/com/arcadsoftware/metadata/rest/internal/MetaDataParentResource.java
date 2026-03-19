@@ -43,7 +43,10 @@ import com.arcadsoftware.metadata.MetaDataTest;
 import com.arcadsoftware.metadata.ReferenceLine;
 import com.arcadsoftware.metadata.criteria.AndCriteria;
 import com.arcadsoftware.metadata.criteria.ConstantCriteria;
+import com.arcadsoftware.metadata.criteria.EqualCriteria;
 import com.arcadsoftware.metadata.criteria.ISearchCriteria;
+import com.arcadsoftware.metadata.criteria.IdEqualCriteria;
+import com.arcadsoftware.metadata.criteria.NotCriteria;
 import com.arcadsoftware.metadata.rest.DataParentResource;
 
 /*
@@ -202,14 +205,6 @@ public class MetaDataParentResource extends DataParentResource {
 		// Do not use the actual select item modification but a global modification date for the select entity.
 		// this is not perfect but more accurate with side effect like soft-deletion and other kind of side effects. 
 		setLastModification(getEntity().getMapper().lastModification(getEntity(), true));
-	}
-
-	@Override
-	protected Representation put(Representation representation, Variant variant) throws ResourceException {
-		// The default implementation is to switch to a "GET" request.
-		// If a true "multi update" method is required we can add a required field to identify and "update".
-		// For instance "order" may identify a selection (but this is an optional parameter).
-		return list(variant);
 	}
 
 	@Override
@@ -451,9 +446,129 @@ public class MetaDataParentResource extends DataParentResource {
 	}
 
 	@Override
+	protected Representation put(Representation representation, Variant variant) throws ResourceException {
+		final Language language = getClientPreferedLanguage();
+		final MetaDataEntity entity = getEntity();
+		// Access rights tests:
+		if (entity.isReadOnly()) {
+			setStatus(Status.CLIENT_ERROR_FORBIDDEN, Activator.getMessage("error.readonly", language)); //$NON-NLS-1$
+			return null;
+		}
+		final Form form = getRequestForm();
+		// TODO Allow to undelete updated items...
+		// Build the search criteria
+		ISearchCriteria criteria = getCriteria(this, form);
+		if (ConstantCriteria.TRUE.equals(criteria) || (criteria == null)) {
+			criteria = entity.getRightUpdate();
+		} else {
+			ISearchCriteria rc = entity.getRightUpdate();
+			if ((rc != null) && !ConstantCriteria.TRUE.equals(rc)) {
+				criteria = new AndCriteria(criteria, rc);
+			}
+		}
+		form.removeAll("criteria");
+		// Get the attributes and the modifications...
+		final ArrayList<MetaDataAttribute> attlist = new ArrayList<MetaDataAttribute>();
+		final BeanMap values = entity.formToBean(form, attlist);
+		if (attlist.isEmpty()) {
+			getResponse().setStatus(Status.SUCCESS_NO_CONTENT);
+			return null;
+		}
+		// Mandatory attributes... with null value.
+		for (MetaDataAttribute a: attlist) {
+			if (a.isMandatory() && (values.get(a.getCode()) == null)) {
+				setStatus(Status.CLIENT_ERROR_FORBIDDEN, Activator.getMessage("error.mandatorynull", language).formatted(a.getName(language))); //$NON-NLS-1$
+				return null;
+			}
+		}
+		// Select items...
+		// TODO Allow to update deleted items...
+		BeanMapList items = entity.dataSelection(entity.getAllAttributes(), false, criteria, false, null, getUser(), 0, -1);
+		if (items.isEmpty()) {
+			getResponse().setStatus(Status.SUCCESS_NO_CONTENT);
+			return null;
+		}
+		// Manage unique contraints...
+		final ISearchCriteria invariantCriteria = new NotCriteria(new IdEqualCriteria(items.get(0).getId()));
+		for (MetaDataAttribute a: attlist) {
+			if (a.getMetadata().getBoolean(MetaDataEntity.METADATA_UNIQUE)) {
+				final Object value = values.get(a.getCode());
+				if ((value != null) && (value.toString().length() > 0)) { // ignore null values...
+					if (items.size() > 1) {
+						getResponse().setStatus(Status.CLIENT_ERROR_PRECONDITION_FAILED, //
+								Activator.getMessage("error.uniqueattribute.update", language) //$NON-NLS-1$
+										.formatted(a.getName(language), value, a.getCode()));
+						return null;
+					}
+					// Removes the current element from the selection (avoids updates on the same value)
+					final EqualCriteria codeEqual = new EqualCriteria();
+					codeEqual.setAttribute(a.getCode());
+					if (MetaDataAttribute.TYPE_INTEGER.equals(a.getType()) || //
+							MetaDataAttribute.TYPE_INT.equals(a.getType())) {
+						codeEqual.setIntval((Integer) value);
+					} else {
+						codeEqual.setValue(value.toString());
+					}
+					if (getEntity().dataCount(false, new AndCriteria(invariantCriteria, codeEqual), false, getUser()) > 0) {
+						throw new ResourceException(Status.CLIENT_ERROR_PRECONDITION_FAILED, //
+								String.format(Activator.getMessage("error.uniqueattribute.update", language), //$NON-NLS-1$
+										a.getName(language), value, a.getCode()));
+					}
+				}
+			}
+		}
+		// Perform the modifications one by one...
+		final List<IMetaDataModifyListener> listeners = Activator.getInstance().getModifyListener(getType());
+		boolean error = false;
+		for (BeanMap item: items) {
+			final ArrayList<MetaDataAttribute> list = new ArrayList<>(attlist);
+			final BeanMap updated = values.clone();
+			updated.forceId(item.getId());
+			updated.setDeleted(item.isDeleted());
+			// pre-treatment... 
+			boolean bypass = false;
+			boolean e = false;
+			for (final IMetaDataModifyListener listener : listeners) {
+				if (!listener.testModification(entity, item, updated, list, getUser(), language)) {
+					e = true;
+					break;
+				}
+				if (listener instanceof IByPassListener) {
+					bypass = true;
+				}
+			}
+			if (e) {
+				// If there is an "error" on one modification continue with the other ones...
+				error = true;
+				continue;
+			}
+			if (!Activator.getInstance().test(MetaDataTest.EVENTCODE_BEFOREUPDATE, entity, item, updated, list, getUser(), language)) {
+				error = true;
+				continue;
+			}
+			if (!bypass) {
+				entity.dataUpdate(updated, getUser());
+			}
+			// Post Treatment...
+			for (final IMetaDataModifyListener listener : listeners) {
+				listener.postModification(entity, item, updated, list, getUser(), language);
+			}
+			Activator.getInstance().test(MetaDataTest.EVENTCODE_AFTERUPDATE, entity, item, updated, list, getUser(), language);
+			Activator.getInstance().fireUpdateEvent(entity, item, updated, getUser());
+			broadcastUserAction("logUpdate", updated); //$NON-NLS-1$
+		}
+		if (error) {
+			getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST, Activator.getMessage("error.badattributes", language)); //$NON-NLS-1$
+		} else {
+			getResponse().setStatus(Status.SUCCESS_NO_CONTENT);
+		}
+		return null;
+	}
+
+	@Override
 	protected Representation post(Representation representation, Variant variant) throws ResourceException {
 		Language language = getClientPreferedLanguage();
-		// Test des droits:
+		// Access rights tests:
 		if (getEntity().isReadOnly()) {
 			setStatus(Status.CLIENT_ERROR_FORBIDDEN, Activator.getMessage("error.readonly", language)); //$NON-NLS-1$
 			return null;
@@ -462,11 +577,11 @@ public class MetaDataParentResource extends DataParentResource {
 			setStatus(Status.CLIENT_ERROR_FORBIDDEN, Activator.getMessage("right.nocreate", language)); //$NON-NLS-1$
 			return null;
 		}
-		// Obtention de l'élément tel qu'il doit devrait créé (tel qu'il est passé à la resource).
+		// Obtaining the element as it should be created (as it is passed to the resource).
 		Form form = getRequestForm();
 		ArrayList<MetaDataAttribute> list = new ArrayList<MetaDataAttribute>();
 		BeanMap item = getEntity().formToBean(form, list);
-		// Test des droits sur attributs.
+		// Testing of rights on attributes.
 		Iterator<MetaDataAttribute> itt = list.iterator();
 		while (itt.hasNext()) {
 			MetaDataAttribute att = itt.next();
