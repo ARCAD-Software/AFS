@@ -519,15 +519,15 @@ public final class DBUpdate extends DataSourceCommand {
 						}
 					}
 					if ((h2DBFile != null) && (mvDBFile != null)) {
-						println("Two different database storage files (.h2.db and .mv.db) are located in the same folder. Assuming that the largest one is the correct one...");
+						printWarn("Two different database storage files (.h2.db and .mv.db) are located in the same folder. Assuming that the largest one is the correct one...");
 						if (mvDBFile.length() > h2DBFile.length()) {
 							File hardBackup = new File(h2DBFile.getParentFile(), h2DBFile.getName().substring(0, h2DBFile.getName().indexOf('.')) + ".h2.backup"); //$NON-NLS-1$
 							if (h2DBFile.renameTo(hardBackup)) {
-								println("The legacy H2 database file of \"" + id + "\" has been renamed: " + hardBackup.getAbsolutePath());
+								println("The smaller H2 database file of \"" + id + "\" has been renamed: " + hardBackup.getAbsolutePath());
 								println("(You will be able to remove this file when the installation process will be terninated.)");
 								println();
 							} else {
-								printError("WARNING: The legacy H2 database file \"" + h2DBFile.getAbsolutePath() +"\" can not be moved. It should not interfere with the update and you should remove it after installation.");
+								printError("WARNING: The smaller H2 database file \"" + h2DBFile.getAbsolutePath() +"\" can not be moved. It should not interfere with the update, but you should remove it after installation.");
 							}
 							h2DBFile = mvDBFile;
 						}
@@ -546,7 +546,7 @@ public final class DBUpdate extends DataSourceCommand {
 							println("A previous H2 upgrade backup file is present, removing this file...");
 						}
 						if (!backup.delete()) {
-							println("WARNING: Unable to delete the previous backup file: " + backup.getAbsolutePath());
+							printWarn("Unable to delete the previous backup file: " + backup.getAbsolutePath());
 						}
 					} else if (isArgument("-debug")) { //$NON-NLS-1$
 						println("The Old H2 database is moved in the backup file: " + backup.getAbsolutePath());
