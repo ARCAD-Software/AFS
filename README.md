@@ -1,10 +1,10 @@
 # AFS-OS release version 2025.5.12.
 
-Release date Thu Mar 19 15:33:53 CET 2026.
+Release date Mon Mar 23 10:49:19 CET 2026.
 
 Link to the update site of [Version 2025.5.12](https://github.com/ARCAD-Software/AFS/releases/download/2025.5.12/).
 
-6 Bundles modified in this release.
+7 Bundles modified in this release.
 
 
 
@@ -44,7 +44,7 @@ Bundle Symbolic Name | Modification | Version
 [com.arcadsoftware.cleanup](bundles/common/cleanup) | Not changed | 1.5.1
 [com.arcadsoftware.cm.simple](bundles/common/cm.simple) | Not changed | 1.8.0
 [com.arcadsoftware.crypt](bundles/common/crypt) | **Upgraded** from version 1.9.2 | **1.9.3**
-[com.arcadsoftware.crypt.xml](bundles/common/crypt.xml) | Not changed | 1.2.0
+[com.arcadsoftware.crypt.xml](bundles/common/crypt.xml) | Not changed | 1.2.1
 [com.arcadsoftware.email](bundles/common/email) | Not changed | 1.5.1
 [com.arcadsoftware.groovy.security](bundles/common/groovy.security) | Not changed | 1.2.1
 [com.arcadsoftware.metadata](bundles/common/metadata) | **Upgraded** from version 2.0.4 | **2.0.5**
@@ -76,7 +76,7 @@ Bundle Symbolic Name | Modification | Version
 [com.arcadsoftware.metadata.mapper.sql](bundles/server/metadata.mapper.sql) | **Upgraded** from version 2.0.4 | **2.0.5**
 [com.arcadsoftware.metadata.mapper.sql.postgresql](bundles/server/metadata.mapper.sql.postgresql) | Not changed | 2.0.1
 [com.arcadsoftware.metadata.registry.xml](bundles/server/metadata.registry.xml) | Not changed | 1.3.1
-[com.arcadsoftware.metadata.rest](bundles/server/metadata.rest) | **Upgraded** from version 2.0.3 | **2.0.4**
+[com.arcadsoftware.metadata.rest](bundles/server/metadata.rest) | **Upgraded** from version 2.0.3 | **2.0.5**
 [com.arcadsoftware.metadata.rights](bundles/server/metadata.rights) | Not changed | 1.4.3
 [com.arcadsoftware.metadata.server.user](bundles/server/metadata.server.user) | Not changed | 1.3.5
 [com.arcadsoftware.metadata.server.user.usergroup](bundles/server/metadata.server.user.usergroup) | Not changed | 1.0.1
@@ -87,7 +87,7 @@ Bundle Symbolic Name | Modification | Version
 [com.arcadsoftware.server.restful.connection](bundles/server/server.restful.connection) | Not changed | 2.2.2
 [com.arcadsoftware.server.restful.connection.config](bundles/server/server.restful.connection.config) | Not changed | 1.4.0
 [com.arcadsoftware.server.restful.connection.ldap](bundles/server/server.restful.connection.ldap) | Not changed | 2.5.1
-[com.arcadsoftware.server.restful.connection.local](bundles/server/server.restful.connection.local) | Not changed | 2.0.3
+[com.arcadsoftware.server.restful.connection.local](bundles/server/server.restful.connection.local) | **Upgraded** from version 2.0.3 | **2.0.4**
 [com.arcadsoftware.server.restful.console](bundles/server/server.restful.console) | Not changed | 1.5.1
 [com.arcadsoftware.server.restful.layouts](bundles/server/server.restful.layouts) | Not changed | 9.7.1
 [com.arcadsoftware.server.restful.log](bundles/server/server.restful.log) | Not changed | 1.3.0
