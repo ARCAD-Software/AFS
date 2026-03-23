@@ -699,7 +699,7 @@ public class MetaDataParentResource extends DataParentResource {
 		}
 		// Mandatory attributes... missing or with null value.
 		for (MetaDataAttribute a: entity.getAttributes().values()) {
-			if (a.isMandatory() {
+			if (a.isMandatory()) {
 				if (list.indexOf(a) < 0) {
 					return 0;
 				}
