@@ -34,8 +34,7 @@
 				<col>LAU_LOGIN</col>
 			</metadata>
 		</attribute>
-		<attribute type="string" code="password"
-			listable="false">
+		<attribute type="string" code="password" istable="false">
 			<metadata>
 				<col>LAU_PASSWORD</col>
 				<generator>localauth/</generator>
