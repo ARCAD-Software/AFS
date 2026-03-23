@@ -699,8 +699,15 @@ public class MetaDataParentResource extends DataParentResource {
 		}
 		// Mandatory attributes... missing or with null value.
 		for (MetaDataAttribute a: entity.getAttributes().values()) {
-			if (a.isMandatory() && (list.indexOf(a) < 0) || (result.get(a.getCode()) == null)) {
-				return 0;
+			if (a.isMandatory() {
+				if (list.indexOf(a) < 0) {
+					return 0;
+				}
+				// As result values have been already converted we just have to test that String values are not empty, other types are set to null.
+				Object v = result.get(a.getCode());
+				if ((v == null) || (v instanceof String s) && s.isBlank()) {
+					return 0;
+				}
 			}
 		}
 		if (byPass) {

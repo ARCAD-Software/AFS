@@ -845,9 +845,18 @@ public class MetaDataItemResource extends DataItemResource {
 				bypass = true;
 			}
 		}
-		if (!Activator.getInstance().test(MetaDataTest.EVENTCODE_BEFOREUPDATE, entity, oldValue, result, list,
-				getUser(), language)) {
+		if (!Activator.getInstance().test(MetaDataTest.EVENTCODE_BEFOREUPDATE, entity, oldValue, result, list, getUser(), language)) {
 			return 0;
+		}
+		// Check if some mandatory attribute is not set to null or an empty value...
+		for (MetaDataAttribute a: list) {
+			if (a.isMandatory()) {
+				// As result values have been already converted we just have to test that String values are not empty, other types are set to null.
+				Object v = result.get(a.getCode());
+				if ((v == null) || (v instanceof String s) && s.isBlank()) {
+					return 0;
+				}
+			}
 		}
 		if (bypass) {
 			return -1;
