@@ -1,10 +1,10 @@
 # AFS-OS release version 2026.3.1.
 
-Release date Thu Mar 19 15:55:26 CET 2026.
+Release date Mon Mar 23 10:35:56 CET 2026.
 
 Link to the update site of [Version 2026.3.1](https://github.com/ARCAD-Software/AFS/releases/download/2026.3.1/).
 
-7 Bundles modified in this release.
+8 Bundles modified in this release.
 
 
 
@@ -74,7 +74,7 @@ Bundle Symbolic Name | Modification | Version
 [com.arcadsoftware.metadata.mapper.sql](bundles/server/metadata.mapper.sql) | **Upgraded** from version 2.1.0 | **2.1.1**
 [com.arcadsoftware.metadata.mapper.sql.postgresql](bundles/server/metadata.mapper.sql.postgresql) | Not changed | 2.1.0
 [com.arcadsoftware.metadata.registry.xml](bundles/server/metadata.registry.xml) | Not changed | 1.4.0
-[com.arcadsoftware.metadata.rest](bundles/server/metadata.rest) | **Upgraded** from version 2.1.0 | **2.1.1**
+[com.arcadsoftware.metadata.rest](bundles/server/metadata.rest) | **Upgraded** from version 2.1.0 | **2.1.2**
 [com.arcadsoftware.metadata.rights](bundles/server/metadata.rights) | Not changed | 1.6.0
 [com.arcadsoftware.metadata.server.user](bundles/server/metadata.server.user) | Not changed | 1.5.0
 [com.arcadsoftware.metadata.server.user.usergroup](bundles/server/metadata.server.user.usergroup) | Not changed | 1.1.0
@@ -85,7 +85,7 @@ Bundle Symbolic Name | Modification | Version
 [com.arcadsoftware.server.restful.connection](bundles/server/server.restful.connection) | Not changed | 2.4.0
 [com.arcadsoftware.server.restful.connection.config](bundles/server/server.restful.connection.config) | Not changed | 1.5.0
 [com.arcadsoftware.server.restful.connection.ldap](bundles/server/server.restful.connection.ldap) | Not changed | 2.6.0
-[com.arcadsoftware.server.restful.connection.local](bundles/server/server.restful.connection.local) | Not changed | 2.2.0
+[com.arcadsoftware.server.restful.connection.local](bundles/server/server.restful.connection.local) | **Upgraded** from version 2.2.0 | **2.2.1**
 [com.arcadsoftware.server.restful.console](bundles/server/server.restful.console) | Not changed | 1.6.0
 [com.arcadsoftware.server.restful.layouts](bundles/server/server.restful.layouts) | Not changed | 9.8.0
 [com.arcadsoftware.server.restful.log](bundles/server/server.restful.log) | Not changed | 1.4.0
