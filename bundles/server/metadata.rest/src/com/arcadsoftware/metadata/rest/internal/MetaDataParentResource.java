@@ -705,7 +705,7 @@ public class MetaDataParentResource extends DataParentResource {
 				}
 				// As result values have been already converted we just have to test that String values are not empty, other types are set to null.
 				Object v = result.get(a.getCode());
-				if ((v == null) || (v instanceof String s) && s.isBlank()) {
+				if ((v == null) || ((v instanceof String s) && s.isBlank())) {
 					return 0;
 				}
 			}
