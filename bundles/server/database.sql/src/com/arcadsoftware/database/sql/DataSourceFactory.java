@@ -40,6 +40,8 @@ import com.arcadsoftware.osgi.ILoggedPlugin;
  */
 public class DataSourceFactory {
 
+	private static ServiceLoader<IDataSourceProvider> loader = ServiceLoader.load(IDataSourceProvider.class);
+	
 	/**
 	 * 
 	 * @param databaseID
@@ -106,7 +108,6 @@ public class DataSourceFactory {
 				}
 			}
 		}
-		ServiceLoader<IDataSourceProvider> loader = ServiceLoader.load(IDataSourceProvider.class);
 		if (loader != null) {
 			Iterator<IDataSourceProvider> itt = loader.iterator();
 			while (itt.hasNext()) {
