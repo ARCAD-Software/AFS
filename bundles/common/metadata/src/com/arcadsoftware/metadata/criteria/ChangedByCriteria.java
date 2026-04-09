@@ -5,6 +5,24 @@ import com.arcadsoftware.metadata.MetaDataEntity;
 import com.arcadsoftware.metadata.ReferenceLine;
 import com.arcadsoftware.rest.connection.IConnectionUserBean;
 
+/**
+ * Check if the given user (or the current user) is the last user to 
+ * have modified the selected data, or the referenced one through "attribute".
+ * 
+ * <p>
+ * The formal test use the "muidCol" data of the entity. 
+ * 
+ * <p>
+ * If "attribute" is null or empty, the current selected entity is tested.
+ * 
+ * <p>
+ * If "uid" is set to zero the current user is used for the test. If no current user is avaible the test fail.
+ * 
+ * <p>
+ * If the entity is read-only, not "updatable" or do not define a "muidCol" metadata, then the test fail.
+ * 
+ * @author ARCAD Software
+ */
 public class ChangedByCriteria extends AbstractSearchCriteria implements IAttributeCriteria {
 
 	private String attribute;
@@ -44,9 +62,10 @@ public class ChangedByCriteria extends AbstractSearchCriteria implements IAttrib
 			}
 			e = rl.getLastEntity();
 		}
+		// Read only data can not be changed, non updatables or without updateCol neither.
 		if (e.isReadOnly() || //
-				!e.getMetadata().getBoolean(MetaDataEntity.METADATA_UPDATABLE) || // 
-				(e.getMetadata().get("muidCol") == null)) { //$NON-NLS-1$
+				(!e.getMetadata().getBoolean(MetaDataEntity.METADATA_UPDATABLE) && // 
+				(e.getMetadata().get("muidCol") == null))) { //$NON-NLS-1$
 			return ConstantCriteria.FALSE;
 		}
 		if (rl != null) {
