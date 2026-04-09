@@ -88,19 +88,19 @@ public class BinaryRedirectionResource extends DataItemResource {
 
 	private void redirect() {
 		Reference ori = getRequest().getOriginalRef();
+		getRequest().getProtocol();
 		Reference ref = new Reference(ori, uri);
 		if (uri.startsWith("http://localhost")) { //$NON-NLS-1$
-			// Local resource use protocol, host and port of original request
-			ref.setProtocol(getRequest().getProtocol());
+			// Force the resource to use the protocol, host and port of original request...
+			ref.setProtocol(ori.getSchemeProtocol());
 			ref.setHostDomain(ori.getHostDomain(true));
 			int port = ori.getHostPort();
 			if (port != -1) {
 				ref.setHostPort(port);
-			} else if (ori.getHostIdentifier(true).startsWith("https://")) {
-				ref.setHostPort(443);
 			} else {
-				ref.setHostPort(80);
+				ref.setHostPort(null);
 			}
+			getOSGiApplication().getActivator().debug("Binary redirection converted to {}", ref.toString());
 		}
 		setLocationRef(ref);
 		setStatus(Status.REDIRECTION_TEMPORARY);
