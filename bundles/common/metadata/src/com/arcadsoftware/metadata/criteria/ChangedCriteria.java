@@ -25,9 +25,10 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
 
 /**
  * Compare the last update of the data to two given dates.
+ *  
+ * <p>
+ * Default values of After and Before dates are the current time.
  *   
- * TODO Add support for referenced entity (attribut parameter).
- *
  */
 public class ChangedCriteria extends AbstractSearchCriteria implements IAttributeCriteria {
 
@@ -94,9 +95,10 @@ public class ChangedCriteria extends AbstractSearchCriteria implements IAttribut
 			}
 			e = rl.getLastEntity();
 		}
+		// Read only data can not be changed, non updatables or without updateCol neither.
 		if (e.isReadOnly() || //
-				!e.getMetadata().getBoolean(MetaDataEntity.METADATA_UPDATABLE) || // 
-				(e.getMetadata().get("updateCol") == null)) { //$NON-NLS-1$
+				(!e.getMetadata().getBoolean(MetaDataEntity.METADATA_UPDATABLE) && // 
+				(e.getMetadata().get("updateCol") == null))) { //$NON-NLS-1$
 			return ConstantCriteria.FALSE;
 		}
 		if (rl != null) {

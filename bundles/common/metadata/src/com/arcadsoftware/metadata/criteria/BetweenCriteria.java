@@ -30,6 +30,9 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
  *  
  *  <p>
  *  If field <code>includeLimits</code> is true then the interval is [after .. before]
+ *  
+ *  <p>
+ *  Default values of After and Before dates are the current time.
  */
 public class BetweenCriteria extends AbstractSearchCriteria implements Cloneable, IAttributeCriteria {
 
