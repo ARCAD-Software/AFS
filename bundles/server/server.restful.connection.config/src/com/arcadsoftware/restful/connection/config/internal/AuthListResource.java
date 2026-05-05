@@ -29,7 +29,6 @@ public class AuthListResource extends BaseResource {
 	@Override
 	protected void doInit() throws ResourceException {
 		super.doInit();
-		getAllowedMethods().add(Method.OPTIONS);
 		getAllowedMethods().add(Method.HEAD);
 		getAllowedMethods().add(Method.GET);
 		setVariants(MEDIATYPES_BASE_XMLJSON);

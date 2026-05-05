@@ -36,7 +36,6 @@ public class FileRestlet extends Restlet {
 	public void handle(Request request, Response response) {
 		super.handle(request, response);
 		response.getAllowedMethods().add(Method.GET);
-		response.getAllowedMethods().add(Method.OPTIONS);
 		response.getAllowedMethods().add(Method.HEAD);
 		if (!file.isFile()) {
             response.setStatus(Status.CLIENT_ERROR_NOT_FOUND);
