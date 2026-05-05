@@ -261,7 +261,6 @@ public abstract class OSGiResource extends BaseResource {
 	@Override
 	protected void doInit() throws ResourceException {
 		super.doInit();
-		getAllowedMethods().add(Method.OPTIONS);
 		getAllowedMethods().add(Method.HEAD);
 		setVariants(MEDIATYPES_BASE_XMLJSON);
 	}

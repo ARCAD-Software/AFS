@@ -56,7 +56,6 @@ public class BinResource extends OSGiResource {
 					category = key.getCategory();
 					setExisting(true);
 					getAllowedMethods().clear();
-					getAllowedMethods().add(Method.OPTIONS);
 					getAllowedMethods().add(Method.HEAD);
 					getAllowedMethods().add(Method.GET);
 					setVariants(MediaType.APPLICATION_OCTET_STREAM, MediaType.MULTIPART_FORM_DATA, MediaType.ALL);
