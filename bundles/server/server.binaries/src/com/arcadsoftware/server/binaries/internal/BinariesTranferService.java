@@ -209,7 +209,7 @@ public class BinariesTranferService implements IBinariesTranferService {
 	@Override
 	public File generateTempFile(String category, int id) {
 		// We should copy the file into a temporary directory.
-		// Distant repository need to access to the web-service.
+		// TODO Distant repository need to access to download the file in a temp dir...
 		File result = activator.getFile(category, id);
 		if ((result != null) && result.isFile()) {
 			return result;

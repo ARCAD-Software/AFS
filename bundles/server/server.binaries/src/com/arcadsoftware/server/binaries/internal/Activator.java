@@ -32,13 +32,9 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.util.tracker.ServiceTracker;
-import org.restlet.Context;
-import org.restlet.routing.Router;
 
 import com.arcadsoftware.osgi.AbstractConfiguredActivator;
 import com.arcadsoftware.osgi.IBinariesTranferService;
-import com.arcadsoftware.rest.RouteList;
-import com.arcadsoftware.rest.SimpleBranch;
 
 public class Activator extends AbstractConfiguredActivator {
 
@@ -83,12 +79,6 @@ public class Activator extends AbstractConfiguredActivator {
 		binTransfer = new BinariesTranferService(this);
 		registerService(IBinariesTranferService.clazz, binTransfer);
 		registerService(Branch.clazz, new Branch(), Branch.properties(Branch.ROOTBRANCH));
-		registerService(SimpleBranch.clazz, new SimpleBranch() {
-			@Override
-			protected RouteList createAttachedResources(Context context, Router router) {
-				return new RouteList(router.attach("/binredirect/{type}/{id}", new RedirectRestlet(context, Activator.this))); //$NON-NLS-1$
-			}
-		}, SimpleBranch.properties(SimpleBranch.SECUREDBRANCH));
 		updateTimer();
 	}
 
