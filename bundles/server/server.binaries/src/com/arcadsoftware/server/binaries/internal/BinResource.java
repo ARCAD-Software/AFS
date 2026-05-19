@@ -87,6 +87,7 @@ public class BinResource extends OSGiResource {
 			setStatus(Status.CLIENT_ERROR_BAD_REQUEST, "The server has retreived an empty body. Creating null binaries files is not allowed.");
 			return null;
 		}
+		// TODO Apply this method to all Mediatypes not only the binary one !!!
 		if (MediaType.APPLICATION_OCTET_STREAM.equals(entity.getMediaType(), true)) {
 			// Delete any existing file.
 			Activator.getInstance().removeFiles(category, id);

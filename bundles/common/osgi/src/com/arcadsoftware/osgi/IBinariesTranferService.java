@@ -33,6 +33,7 @@ public interface IBinariesTranferService {
 	 * 
 	 * @param category
 	 * @param id
+	 * @parm readOnly
 	 * @return the http uri usable to access to this resource.
 	 */
 	public String generateKey(String category, int id, boolean readOnly);
