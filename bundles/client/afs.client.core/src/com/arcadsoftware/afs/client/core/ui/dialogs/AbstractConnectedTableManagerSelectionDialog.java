@@ -146,19 +146,17 @@ public abstract class AbstractConnectedTableManagerSelectionDialog extends Abstr
 	}
 
 	protected boolean manageUpdate(BeanMap edited) {
-		boolean result = edit(edited);
-		if (result) {
-			result = helper.update(edited);
+		if (edit(edited)) {
+			return helper.update(edited);
 		}
-		return result;
+		return false;
 	}
 
 	protected boolean manageDeletion(BeanMap deleted) {
-		boolean result = delete(deleted);
-		if (result) {
-			result = helper.delete(deleted);
+		if (delete(deleted)) {
+			return helper.delete(deleted);
 		}
-		return result;
+		return false;
 	}
 
 	protected boolean isEditable() {
