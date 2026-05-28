@@ -306,6 +306,9 @@ public class ConfiguredSSLContext {
 	private final ArrayList<String> cipherSuitesDisabled;
 	private final ArrayList<String> protocolsEnabled;
 	private final ArrayList<String> protocolsDisabled;
+	private final KeyManager[] keyManagers;
+	private final TrustManager[] trustManagers;
+	private final SecureRandom secureRandom;
 
 	/**
 	 * Create a new TLS configuration.
@@ -346,17 +349,23 @@ public class ConfiguredSSLContext {
 		if (isActive(properties)) {
 			String provider = getProp(properties, PROP_SSL_PROVIDER);
 			String protocol = getProp(properties, PROP_SSL_PREFEREDPROTOCOL, "TLSv1.3"); //$NON-NLS-1$
+			keyManagers = getKeyManagers(properties, provider);
+			trustManagers = getTrustManagers(properties, provider);
+			secureRandom = getSecureRandom(properties, provider);
 			try {
 				if (provider == null) {
 					ctx = SSLContext.getInstance(protocol);
 				} else {
 					ctx = SSLContext.getInstance(protocol, provider);
 				}
-				ctx.init(getKeyManagers(properties, provider), getTrustManagers(properties, provider),
-						getSecureRandom(properties, provider));
+				ctx.init(keyManagers, trustManagers, secureRandom);
 			} catch (KeyManagementException | NoSuchAlgorithmException | NoSuchProviderException e) {
 				throw new ConfiguredSSLContextException(e);
 			}
+		} else {
+			keyManagers = null;
+			trustManagers = null;
+			secureRandom = null;
 		}
 		if (ctx == null) {
 			verifyHostname = false;
@@ -809,5 +818,32 @@ public class ConfiguredSSLContext {
 			parameters.put("sslContextFactory", "org.restlet.engine.ssl.DefaultSslContextFactory"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return parameters.entrySet();
+	}
+	
+	/**
+	 * Get the Trusted Certificate managers included in the Trust Store.
+	 * 
+	 * @return null if the default JVM trust managers must be used.
+	 */
+	public TrustManager[] getTrustManagers() {
+		return trustManagers;
+	}
+	
+	/**
+	 * Get the Keys pair managers included in the Keys Store.
+	 * 
+	 * @return null if the default JVM key managers must be used.
+	 */
+	public KeyManager[] getKeyManagers() {
+		return keyManagers;
+	}
+
+	/**
+	 * Get the Secure Random generator specified in the configuration.
+	 * 
+	 * @return null if no Secure random is specified.
+	 */
+	public SecureRandom getSecureRandom() {
+		return secureRandom;
 	}
 }
