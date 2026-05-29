@@ -181,7 +181,7 @@ public class ConfigurationAdminFactory implements ServiceFactory<ConfigurationAd
 				}
 			}
 		}
-	if (confs.isEmpty()) {
+	if (!confs.isEmpty()) {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
