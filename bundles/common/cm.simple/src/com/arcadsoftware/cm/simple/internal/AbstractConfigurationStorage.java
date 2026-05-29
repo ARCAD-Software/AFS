@@ -710,7 +710,7 @@ public abstract class AbstractConfigurationStorage {
 		if (i > 0) {
 			try {
 				if (Integer.parseInt(name.substring(i + 1)) > 0) {
-					return name.substring(0, i - 1);
+					return name.substring(0, i);
 				}
 			} catch (NumberFormatException e) {}
 		}
