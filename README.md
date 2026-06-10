@@ -1,10 +1,10 @@
-# AFS-OS release version 2025.5.13.
+# AFS-OS release version 2025.5.14.
 
-Release date Thu Apr 23 15:17:23 CEST 2026.
+Release date Wed Jun 10 18:02:38 CEST 2026.
 
-Link to the update site of [Version 2025.5.13](https://github.com/ARCAD-Software/AFS/releases/download/2025.5.13/).
+Link to the update site of [Version 2025.5.14](https://github.com/ARCAD-Software/AFS/releases/download/2025.5.14/).
 
-5 Bundles modified in this release.
+3 Bundles modified in this release.
 
 
 
@@ -43,13 +43,13 @@ Bundle Symbolic Name | Modification | Version
 [com.arcadsoftware.beanmap](bundles/common/beanmap) | Not changed | 2.0.2
 [com.arcadsoftware.cleanup](bundles/common/cleanup) | Not changed | 1.5.1
 [com.arcadsoftware.cm.simple](bundles/common/cm.simple) | Not changed | 1.8.0
-[com.arcadsoftware.crypt](bundles/common/crypt) | **Upgraded** from version 1.9.3 | **1.9.4**
+[com.arcadsoftware.crypt](bundles/common/crypt) | Not changed | 1.9.4
 [com.arcadsoftware.crypt.xml](bundles/common/crypt.xml) | Not changed | 1.2.1
 [com.arcadsoftware.email](bundles/common/email) | Not changed | 1.5.1
 [com.arcadsoftware.groovy.security](bundles/common/groovy.security) | Not changed | 1.2.1
-[com.arcadsoftware.metadata](bundles/common/metadata) | **Upgraded** from version 2.0.5 | **2.0.6**
-[com.arcadsoftware.osgi](bundles/common/osgi) | Not changed | 1.10.7
-[com.arcadsoftware.rest](bundles/common/rest) | Not changed | 3.2.5
+[com.arcadsoftware.metadata](bundles/common/metadata) | Not changed | 2.0.6
+[com.arcadsoftware.osgi](bundles/common/osgi) | **Upgraded** from version 1.10.7 | **1.10.8**
+[com.arcadsoftware.rest](bundles/common/rest) | **Upgraded** from version 3.2.5 | **3.2.6**
 [com.arcadsoftware.ssh](bundles/common/ssh) | Not changed | 1.3.1
 
 
@@ -69,17 +69,17 @@ Bundle Symbolic Name | Modification | Version
 
 Bundle Symbolic Name | Modification | Version
 -------------------- | ------------ | -------
-[com.arcadsoftware.database.sql](bundles/server/database.sql) | **Upgraded** from version 2.4.1 | **2.4.2**
+[com.arcadsoftware.database.sql](bundles/server/database.sql) | Not changed | 2.4.2
 [com.arcadsoftware.database.sql.h2](bundles/server/database.sql.h2) | Not changed | 3.2.2
 [com.arcadsoftware.database.sql.postgresql](bundles/server/database.sql.postgresql) | Not changed | 1.3.1
-[com.arcadsoftware.metadata.binary](bundles/server/metadata.binary) | **Upgraded** from version 1.3.0 | **1.3.1**
+[com.arcadsoftware.metadata.binary](bundles/server/metadata.binary) | Not changed | 1.3.1
 [com.arcadsoftware.metadata.mapper.sql](bundles/server/metadata.mapper.sql) | Not changed | 2.0.5
 [com.arcadsoftware.metadata.mapper.sql.postgresql](bundles/server/metadata.mapper.sql.postgresql) | Not changed | 2.0.1
 [com.arcadsoftware.metadata.registry.xml](bundles/server/metadata.registry.xml) | Not changed | 1.3.1
-[com.arcadsoftware.metadata.rest](bundles/server/metadata.rest) | **Upgraded** from version 2.0.5 | **2.0.6**
+[com.arcadsoftware.metadata.rest](bundles/server/metadata.rest) | Not changed | 2.0.6
 [com.arcadsoftware.metadata.rights](bundles/server/metadata.rights) | Not changed | 1.4.3
 [com.arcadsoftware.metadata.server.user](bundles/server/metadata.server.user) | Not changed | 1.3.5
-[com.arcadsoftware.metadata.server.user.usergroup](bundles/server/metadata.server.user.usergroup) | Not changed | 1.0.1
+[com.arcadsoftware.metadata.server.user.usergroup](bundles/server/metadata.server.user.usergroup) | **Upgraded** from version 1.0.1 | **1.0.2**
 [com.arcadsoftware.server.binaries](bundles/server/server.binaries) | Not changed | 1.3.1
 [com.arcadsoftware.server.messages](bundles/server/server.messages) | Not changed | 1.3.2
 [com.arcadsoftware.server.properties](bundles/server/server.properties) | Not changed | 1.3.0
@@ -111,7 +111,7 @@ Bundle Symbolic Name | Modification | Version
 
 Bundle Symbolic Name | Modification | Version
 -------------------- | ------------ | -------
-[com.arcadsoftware.tool.cli](bundles/tools/tool.cli) | Not changed | 2025.5.12
+[com.arcadsoftware.tool.cli](bundles/tools/tool.cli) | Not changed | 2025.5.13
 
 
 
