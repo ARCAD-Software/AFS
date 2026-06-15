@@ -9,6 +9,7 @@ import com.arcadsoftware.osgi.AbstractActivator;
 import com.arcadsoftware.rest.IBranch;
 import com.arcadsoftware.rest.RouteList;
 import com.arcadsoftware.rest.SimpleBranch;
+import com.arcadsoftware.ssh.model.ISSHService;
 import com.arcadsoftware.ssh.model.SSHKey;
 import com.arcadsoftware.ssh.model.SSHRoutes;
 
@@ -18,7 +19,7 @@ public class Activator extends AbstractActivator {
 	public void start(BundleContext bundleContext) throws Exception {
 		super.start(bundleContext);
 		final SSHService sshs = new SSHService(this);
-		registerService(SSHService.class, sshs);
+		registerService(ISSHService.class, sshs);
 		registerService(IMetaDataDeleteListener.class, new SSHKeyListener(this, sshs),
 				IMetaDataDeleteListener.PROP_TYPE, SSHKey.ENTITY);
 		registerService(IBranch.class, new SimpleBranch() {
