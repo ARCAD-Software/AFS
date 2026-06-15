@@ -70,7 +70,7 @@ public class ConnectionUserBean implements Cloneable, IConnectionUserBean, Seria
 		}
 	}
 
-	private transient Hashtable<Object, IConnectionCredential> credentials = new Hashtable<Object, IConnectionCredential>(1);
+	private transient final Hashtable<Object, IConnectionCredential> credentials = new Hashtable<Object, IConnectionCredential>(1);
 	private transient Date storeDate = new Date();
 	private Profile profile;
 	// Persistant properties
@@ -175,7 +175,7 @@ public class ConnectionUserBean implements Cloneable, IConnectionUserBean, Seria
 	 */
 	@Override
 	public ConnectionUserBean clone() {
-		ConnectionUserBean result = new ConnectionUserBean(userType,id);
+		ConnectionUserBean result = new ConnectionUserBean(userType, id);
 		result.storeDate = storeDate;
 		// Identification: Données non volatiles.
 		result.setFullname(fullname);

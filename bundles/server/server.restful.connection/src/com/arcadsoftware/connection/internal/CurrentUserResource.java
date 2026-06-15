@@ -73,12 +73,17 @@ public class CurrentUserResource extends OSGiResource {
 		// Retrieve the connected user information.
 		try {
 			user = (ConnectionUserBean) getRequest().getAttributes().get(ConnectionUserBean.CONNECTED_USER);
+			if (user == null) {
+				// If there is no user information then the resource is not available.
+				setExisting(false);
+				return;
+			}
 			cc = (IConnectionCredential) getRequest().getAttributes().get(IConnectionCredential.CONNECTED_CREDENTIAL);
 			oldp = user.getPassword();
-			user = (ConnectionUserBean) user.clone();
+			user = user.clone();
 			if (cc != null) {
-				if (cc instanceof IPatchUserCredential) {
-					((IPatchUserCredential) cc).patchUser(user);
+				if (cc instanceof IPatchUserCredential pcc) {
+					pcc.patchUser(user);
 					if (user.getPassword() != null) {
 						oldp = user.getPassword();
 					}
@@ -88,11 +93,9 @@ public class CurrentUserResource extends OSGiResource {
 				}
 			}
 		} catch (Exception e) {
-			getOSGiApplication().getActivator().debug(e.getLocalizedMessage());
+			getOSGiApplication().getActivator().error(e.getLocalizedMessage(), e);
 			getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
 		}
-		// If there is no user information then the resource is not available.
-		setExisting(user != null);
 		// Add accepted representations.
 		addVariants(MediaType.APPLICATION_XHTML, MediaType.TEXT_HTML, MediaType.TEXT_PLAIN, MediaType.TEXT_XML, MediaType.APPLICATION_W3C_SCHEMA);
 	}
@@ -437,7 +440,7 @@ public class CurrentUserResource extends OSGiResource {
 		props.put("code", "chg_pwd"); //$NON-NLS-1$ //$NON-NLS-2$
 		String text = user.getFullname();
 		if ((text == null) || text.isEmpty()) {
-			text = ((IConnectionCredential) cc).getText();
+			text = cc.getText();
 			if ((text == null) || text.isEmpty()) {
 				text = login;
 			} else if (login.isEmpty()) {
