@@ -1,10 +1,10 @@
-# AFS-OS release version 2026.3.3.
+# AFS-OS release version 2026.3.4.
 
-Release date Wed Jun 10 18:20:22 CEST 2026.
+Release date Thu Jun 18 10:52:02 CEST 2026.
 
-Link to the update site of [Version 2026.3.3](https://github.com/ARCAD-Software/AFS/releases/download/2026.3.3/).
+Link to the update site of [Version 2026.3.4](https://github.com/ARCAD-Software/AFS/releases/download/2026.3.4/).
 
-5 Bundles modified in this release.
+3 Bundles modified in this release.
 
 
 
@@ -48,8 +48,8 @@ Bundle Symbolic Name | Modification | Version
 [com.arcadsoftware.email](bundles/common/email) | Not changed | 1.5.0
 [com.arcadsoftware.groovy.security](bundles/common/groovy.security) | Not changed | 1.3.0
 [com.arcadsoftware.metadata](bundles/common/metadata) | Not changed | 2.2.2
-[com.arcadsoftware.osgi](bundles/common/osgi) | **Upgraded** from version 1.11.0 | **1.11.1**
-[com.arcadsoftware.rest](bundles/common/rest) | **Upgraded** from version 3.4.0 | **3.4.1**
+[com.arcadsoftware.osgi](bundles/common/osgi) | Not changed | 1.11.1
+[com.arcadsoftware.rest](bundles/common/rest) | **Upgraded** from version 3.4.1 | **3.4.2**
 [com.arcadsoftware.ssh](bundles/common/ssh) | Not changed | 2.0.0
 
 
@@ -77,13 +77,13 @@ Bundle Symbolic Name | Modification | Version
 [com.arcadsoftware.metadata.rest](bundles/server/metadata.rest) | Not changed | 2.1.3
 [com.arcadsoftware.metadata.rights](bundles/server/metadata.rights) | Not changed | 1.6.0
 [com.arcadsoftware.metadata.server.user](bundles/server/metadata.server.user) | Not changed | 1.5.0
-[com.arcadsoftware.metadata.server.user.usergroup](bundles/server/metadata.server.user.usergroup) | **Upgraded** from version 1.1.0 | **1.1.1**
-[com.arcadsoftware.server.binaries](bundles/server/server.binaries) | **Upgraded** from version 1.5.0 | **1.5.1**
+[com.arcadsoftware.metadata.server.user.usergroup](bundles/server/metadata.server.user.usergroup) | Not changed | 1.1.1
+[com.arcadsoftware.server.binaries](bundles/server/server.binaries) | Not changed | 1.5.1
 [com.arcadsoftware.server.messages](bundles/server/server.messages) | Not changed | 1.4.0
 [com.arcadsoftware.server.properties](bundles/server/server.properties) | Not changed | 1.4.0
 [com.arcadsoftware.server.restful](bundles/server/server.restful) | Not changed | 4.0.0
-[com.arcadsoftware.server.restful.connection](bundles/server/server.restful.connection) | Not changed | 2.4.0
-[com.arcadsoftware.server.restful.connection.config](bundles/server/server.restful.connection.config) | **Upgraded** from version 1.5.0 | **1.5.1**
+[com.arcadsoftware.server.restful.connection](bundles/server/server.restful.connection) | **Upgraded** from version 2.4.0 | **2.4.1**
+[com.arcadsoftware.server.restful.connection.config](bundles/server/server.restful.connection.config) | Not changed | 1.5.1
 [com.arcadsoftware.server.restful.connection.ldap](bundles/server/server.restful.connection.ldap) | Not changed | 2.6.0
 [com.arcadsoftware.server.restful.connection.local](bundles/server/server.restful.connection.local) | Not changed | 2.2.1
 [com.arcadsoftware.server.restful.console](bundles/server/server.restful.console) | Not changed | 1.6.0
@@ -91,7 +91,7 @@ Bundle Symbolic Name | Modification | Version
 [com.arcadsoftware.server.restful.log](bundles/server/server.restful.log) | Not changed | 1.4.0
 [com.arcadsoftware.server.scheduler](bundles/server/server.scheduler) | Not changed | 1.5.0
 [com.arcadsoftware.server.scheduler.impl](bundles/server/server.scheduler.impl) | Not changed | 1.5.0
-[com.arcadsoftware.server.ssh](bundles/server/server.ssh) | Not changed | 4.0.1
+[com.arcadsoftware.server.ssh](bundles/server/server.ssh) | **Upgraded** from version 4.0.1 | **4.0.2**
 [com.arcadsoftware.server.web](bundles/server/server.web) | Not changed | 1.5.0
 
 
@@ -109,7 +109,7 @@ Bundle Symbolic Name | Modification | Version
 
 Bundle Symbolic Name | Modification | Version
 -------------------- | ------------ | -------
-[com.arcadsoftware.tool.cli](bundles/tools/tool.cli) | Not changed | 2026.3.2
+[com.arcadsoftware.tool.cli](bundles/tools/tool.cli) | Not changed | 2026.3.3
 
 
 
