@@ -18,6 +18,8 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.OutputRepresentation;
 import org.restlet.resource.ResourceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This Representation is used to send a Stream of Server Send Events. It use a multi-threaded queue of events to
@@ -59,6 +61,7 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 	private static final byte[] DATA = "\ndata: ".getBytes(StandardCharsets.UTF_8); //$NON-NLS-1$
 	private static final byte[] RETRY = "\nretry: ".getBytes(StandardCharsets.UTF_8); //$NON-NLS-1$
 	private static final byte[] ENDEVENT = "\n\n".getBytes(StandardCharsets.UTF_8); //$NON-NLS-1$
+	private static final Logger logger = LoggerFactory.getLogger(SSERepresentation.class); 
 
 	private final AtomicBoolean working;
 	private final AtomicBoolean connected;
@@ -146,6 +149,7 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 			response.setCacheDirectives(Arrays.asList(CacheDirective.noCache()));
 			response.setEntity(this);
 			response.setStatus(Status.SUCCESS_OK);
+			logger.debug("SSERepresentation attached to an HTTP Response."); //$NON-NLS-1$
 		}
 	}
 
@@ -160,6 +164,9 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 					// Wait a little...
 					try {
 						Thread.sleep(50);
+						if (!working.get()) {
+							return;
+						}
 					} catch (InterruptedException e) {
 						working.set(false);
 						return;
@@ -196,6 +203,9 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 				}
 				event = queue.poll();
 			}
+		} catch (Exception e) {
+			logger.debug("SSERepresentation catch exception: " + e.getLocalizedMessage()); //$NON-NLS-1$
+			throw e;
 		} finally {
 			connected.set(false);
 		}
@@ -227,7 +237,9 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 				}
 				outputStream.write(ENDEVENT);
 				outputStream.flush();
+				logger.debug("Event {} pushed.", event.id);
 			} catch (IOException e) {
+				logger.debug("SSERepresentation Error during event push: " + e.getLocalizedMessage(), e);
 				working.set(false);
 				throw e;
 			}
@@ -253,6 +265,7 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 			queue.clear();
 		}
 		working.set(false);
+		logger.debug("Graceful terminate SSERepresentation");
 	}
 	
 	/**
@@ -406,6 +419,7 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 	 *        equal to this value. If required currently waiting message will be purged if their ID is to low.
 	 */
 	public void resume(final Response response, final String id) {
+		disconnect();
 		if (id != null) {
 			if (currentId.possess(id)) {
 				if (replay != null) {
@@ -472,8 +486,8 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 		}
 		// Restart the streaming...
 		working.set(true);
-		setAvailable(true);
 		setResponse(response);
+		setAvailable(true);
 	}
 
 	/**
@@ -483,8 +497,42 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 	 * @see #resume(Response, long)
 	 */
 	public void resume(final Response response) {
+		disconnect();
 		working.set(true);
 		setResponse(response);
+		setAvailable(true);
+	}
+
+	/**
+	 * Force the representation to stop the current working thread...
+	 */
+	protected void disconnect() {
+		if (connected.get()) {
+			logger.debug("SSERepresentation force to stop other pending connection.");
+			synchronized (this) {
+				if (connected.get()) {
+					working.set(false);
+				}
+			}
+			if (connected.get()) {
+				try {
+					Thread.sleep(60);
+				} catch (InterruptedException e) {
+					return;
+				}
+				// force to end any other run...
+				if (working.get()) {
+					logger.debug("SSERepresentation pending connection still working...");
+					working.set(false);
+					try {
+						Thread.sleep(50);
+					} catch (InterruptedException e) {
+						return;
+					}
+					// should be ok here (or the other thread may be stuck !)
+				}
+			}				
+		}
 	}
 
 	/**
