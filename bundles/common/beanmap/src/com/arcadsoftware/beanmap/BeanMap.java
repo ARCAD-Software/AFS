@@ -1263,13 +1263,12 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 		}
 		if (o instanceof Float) {
 			return ((Float) o).floatValue() != 0;
-		}
-		else {
+		} else {
 			//Handles any other type (like Short)
 			final String value = String.valueOf(o);		
 			return "true".equalsIgnoreCase(value) || //$NON-NLS-1$
 					"yes".equalsIgnoreCase(value) || //$NON-NLS-1$
-					"1".equalsIgnoreCase(value); //$NON-NLS-1$
+					"1".equals(value); //$NON-NLS-1$
 		
 		}
 	}
