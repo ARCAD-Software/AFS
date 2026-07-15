@@ -392,6 +392,7 @@ public class ConfiguredSSLContext {
 
 	private void addAllProps(Map<String, Object> props, String propName,	ArrayList<String> list) {
 		for(String s: getProp(props, propName, "").split(" ")) { //$NON-NLS-1$ //$NON-NLS-2$
+			s = s.strip(); // remove tabulation, carriage return, etc.
 			if (!s.isEmpty()) {
 				list.add(s.toLowerCase());
 			}
