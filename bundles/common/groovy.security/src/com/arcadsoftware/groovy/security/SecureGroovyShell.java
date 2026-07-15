@@ -13,15 +13,30 @@
  *******************************************************************************/
 package com.arcadsoftware.groovy.security;
 
+import java.io.StringWriter;
+
 import org.codehaus.groovy.control.CompilationFailedException;
 
 import groovy.lang.Binding;
+import groovy.lang.GroovyCodeSource;
 import groovy.lang.GroovyShell;
+import groovy.lang.Script;
 
 /**
  * Simple secured GroovyShell implementation.
  * 
+ * <p>
+ * Along with more secured execution context this class provide the following behavior:
+ * 
+ * <ul>
+ * <li> given "IScriptAPI" methods and fields (getter and setter) are directly accessible 
+ * in the script without the need to name any variable name. 
+ * <li> The "print" and "println" command of Groovy are redirected to a string accessible, 
+ * after execution through the <code>getConsoleMessage()</code> method. 
+ * </ul>
+ * 
  * @author ARCAD Software
+ * @see IScriptAPI
  */
 public class SecureGroovyShell extends GroovyShell {
 
@@ -31,8 +46,11 @@ public class SecureGroovyShell extends GroovyShell {
 		return binding;
 	}
 
+	private final StringWriter out;
+	
 	public SecureGroovyShell(IScriptAPI api) {
 		super(api.getClass().getClassLoader(), createBinding(api), new SecuredCompilerConfiguration());
+		out = new StringWriter();
 	}
 
 	@Override
@@ -40,5 +58,18 @@ public class SecureGroovyShell extends GroovyShell {
 		return super.evaluate("api.with {" + scriptText + '}', fileName, codeBase); //$NON-NLS-1$
 	}
 
-	
+	@Override
+    public Object evaluate(GroovyCodeSource codeSource) throws CompilationFailedException {
+		getContext().setVariable("out", out); //$NON-NLS-1$
+		return super.evaluate(codeSource);
+    }
+
+	@Override
+    public Script parse(String scriptText) throws CompilationFailedException {
+        return super.parse("api.with {" + scriptText + '}'); //$NON-NLS-1$
+    }
+
+	public String getConsoleMessages() {
+		return out.toString();
+	}
 }
