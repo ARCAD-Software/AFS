@@ -125,7 +125,7 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 	}
 
 	@SuppressWarnings("incomplete-switch")
-	private void createAuthButton(final Group sourceGroup, final AuthType auth) {
+	private Button createAuthButton(final Group sourceGroup, final AuthType auth) {
 		final Button result = new Button(sourceGroup, SWT.RADIO);
 		switch (auth) {
 		case IBMI:
@@ -146,6 +146,7 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 			selectedAuth = auth;
 		}
 		defaultSelected = false;
+		return result;
 	}
 
 	protected void createButtonBar(final Composite parent) {
@@ -274,6 +275,9 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 	}
 
 	private String getUserDefinition(final BeanMap user) {
+		if (selectedAuth == null) {
+			return "";
+		}
 		switch (selectedAuth) {
 		case IBMI:
 			return String.format("%s [%s]",
@@ -284,7 +288,7 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 				userDef.append(user.getString(IUsersConsts.LDAPIMPORT_LOGIN) + " ");
 			}
 			if (user.contains(IUsersConsts.PROP_USER_FIRSTNAME)) {
-				userDef.append("[" + user.getString(IUsersConsts.PROP_USER_FIRSTNAME) + "] ");
+				userDef.append("[" + user.getString(IUsersConsts.PROP_USER_FIRSTNAME) + "] "); //$NON-NLS-1$
 			}
 
 			if (user.contains(IUsersConsts.PROP_USER_LASTNAME)) {
