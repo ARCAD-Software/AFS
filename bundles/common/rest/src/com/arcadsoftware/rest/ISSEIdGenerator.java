@@ -35,5 +35,5 @@ public interface ISSEIdGenerator extends Cloneable {
 	 */
 	public boolean possess(String id);
 	
-	public SSELongIdGenerator clone();
+	public ISSEIdGenerator clone();
 }
