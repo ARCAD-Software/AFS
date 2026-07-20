@@ -134,7 +134,7 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 	}
 
 	@SuppressWarnings("incomplete-switch")
-	private void createAuthButton(final Group sourceGroup, final AuthType auth) {
+	private Button createAuthButton(final Group sourceGroup, final AuthType auth) {
 		final Button result = new Button(sourceGroup, SWT.RADIO);
 		if (auth == null) {
 			result.setText(Activator.resString("user.action.import.type.ldap"));
@@ -154,6 +154,7 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 				selectedAuth = auth;
 			}
 		});
+		return result;
 	}
 
 	protected void createButtonBar(final Composite parent) {
@@ -282,30 +283,30 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 	}
 
 	private String getUserDefinition(final BeanMap user) {
-		if (selectedAuth != null) {
-			switch (selectedAuth) {
-			case IBMI:
-				return String.format("%s [%s]",
-						user.getString(IUsersConsts.IBMI_IMPORT_LOGIN), user.getString("description"));
-			case LDAP:
-				final StringBuilder userDef = new StringBuilder();
-				if (user.contains(IUsersConsts.LDAPIMPORT_LOGIN)) {
-					userDef.append(user.getString(IUsersConsts.LDAPIMPORT_LOGIN) + " ");
-				}
-				if (user.contains(IUsersConsts.PROP_USER_FIRSTNAME)) {
-					userDef.append("[" + user.getString(IUsersConsts.PROP_USER_FIRSTNAME) + "] ");
-				}
-	
-				if (user.contains(IUsersConsts.PROP_USER_LASTNAME)) {
-					userDef.append(user.getString(IUsersConsts.PROP_USER_LASTNAME) + " ");
-				}
-				if (user.contains(IUsersConsts.PROP_USER_EMAIL)) {
-					userDef.append("[" + user.getString(IUsersConsts.PROP_USER_EMAIL) + "]");
-				}
-				return userDef.toString();
-			default:
-				return "";
+		if (selectedAuth == null) {
+			return "";
+		}
+		switch (selectedAuth) {
+		case IBMI:
+			return String.format("%s [%s]", user.getString(IUsersConsts.IBMI_IMPORT_LOGIN), user.getString("description")); //$NON-NLS-1$ //$NON-NLS-2$
+		case LDAP:
+			final StringBuilder userDef = new StringBuilder();
+			if (user.contains(IUsersConsts.LDAPIMPORT_LOGIN)) {
+				userDef.append(user.getString(IUsersConsts.LDAPIMPORT_LOGIN) + ' ');
 			}
+			if (user.contains(IUsersConsts.PROP_USER_FIRSTNAME)) {
+				userDef.append('[' + user.getString(IUsersConsts.PROP_USER_FIRSTNAME) + "] "); //$NON-NLS-1$
+			}
+
+			if (user.contains(IUsersConsts.PROP_USER_LASTNAME)) {
+				userDef.append(user.getString(IUsersConsts.PROP_USER_LASTNAME) + ' ');
+			}
+			if (user.contains(IUsersConsts.PROP_USER_EMAIL)) {
+				userDef.append('[' + user.getString(IUsersConsts.PROP_USER_EMAIL) + ']');
+			}
+			return userDef.toString();
+		default:
+			return "";
 		}
 	}
 
