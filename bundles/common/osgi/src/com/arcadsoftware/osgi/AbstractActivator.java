@@ -670,6 +670,21 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 	}
 
 	/**
+	 * Returns the {@code Bundle} object associated with this
+	 * {@code BundleContext}. This bundle is called the context bundle.
+	 * 
+	 * @return The {@code Bundle} object associated with this
+	 *         {@code BundleContext}.
+	 * @throws IllegalStateException If this BundleContext is no longer valid.
+	 */
+	public Bundle getBundle() {
+		if (context != null) {
+			return context.getBundle();
+		}
+		return null;
+	}
+	
+	/**
 	 * Logs a message with an exception associated and a
 	 * <code>ServiceReference</code> object.
 	 * 
