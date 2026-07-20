@@ -66,14 +66,14 @@ public final class ISODateFormater {
 	 */
 	static public boolean mayIsoDate(String string) {
 		return (string != null) && //
-				((string.length() == 10) && //
-				 (string.charAt(4) == '-') && //
-				 (string.charAt(7) == '-')) || //
-				((string.length() >= 19) && //
-				 (string.length() < 31) && //
-				 (string.charAt(4) == '-') && //
-				 (string.charAt(10) == 'T') && //
-				 (string.charAt(16) == ':'));
+				(((string.length() == 10) && //
+				  (string.charAt(4) == '-') && //
+				  (string.charAt(7) == '-')) || //
+				 ((string.length() >= 19) && //
+				  (string.length() < 31) && //
+				  (string.charAt(4) == '-') && //
+				  (string.charAt(10) == 'T') && //
+				  (string.charAt(16) == ':')));
 	}
 
 	/**
