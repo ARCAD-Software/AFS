@@ -1551,4 +1551,19 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 		}
 		return null;
 	}
+	
+	/**
+	 * Generate an Error Report and store it on the file system.
+	 * 
+	 * @param data
+	 * @return -1 if the Error generator service is not installed.
+	 * @see IErrorReportGenerator
+	 */
+	public long generateErrorReport(String data) {
+		IErrorReportGenerator generator = getService(IErrorReportGenerator.class);
+		if (generator == null) {
+			return -1l;
+		}
+		return generator.generateReport(data);
+	}
 }
