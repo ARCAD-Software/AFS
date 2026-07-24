@@ -23,8 +23,12 @@ public interface IErrorReportGenerator {
 	/**
 	 * Generate a report file stored on the local file system.
 	 * 
+	 * <p>
+	 * If the HTTP/REST server is runing this report is accessible through the resource 
+	 * /bugreport/{rid} where <i>rid</i> is the report identifier returned by this method.
+	 * 
 	 * @param data Any personnal data that will be added to the report.
-	 * @return
+	 * @return -1 if not report could be generated.
 	 */
 	public long generateReport(String data);
 	
