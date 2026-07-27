@@ -18,7 +18,7 @@
 		<tycho.extra.version>4.0.13</tycho.extra.version>
 		<keystore></keystore>
 		<tycho.scmUrl>scm:git:https://github.com/ARCAD-Software/AFS.git</tycho.scmUrl>
-		<jetty.version>12.0.32</jetty.version>
+		<jetty.version>12.0.37</jetty.version>
 	</properties>
 
 	<!-- Add explicit dependencies not available on P2 repository -->
