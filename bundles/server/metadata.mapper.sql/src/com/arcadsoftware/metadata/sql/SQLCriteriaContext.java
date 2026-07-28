@@ -956,7 +956,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 				}
 			}
 			result.append(String.format(mapper.fg.inset, attcn, 
-					String.format(mapper.fg.select, j.getAlias() + j.getId(), j.toString(mapper), subWhere.toString())));
+					String.format(mapper.fg.select, j.getAlias() + '.' + j.getId(), j.toString(mapper), subWhere.toString())));
 		} else if (criteria instanceof LowerStrictCriteria) {
 			if (getReference(((LowerStrictCriteria) criteria).getAttribute()).isNumericType()) {
 				try {
