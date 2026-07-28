@@ -32,6 +32,7 @@ public class XmlCurrentUserStream extends XStreamCompact {
 		useAttributeFor(ConnectionUserBean.class, "canChangePWD"); //$NON-NLS-1$
 		useAttributeFor(ConnectionUserBean.class, "login"); //$NON-NLS-1$ //$NON-NLS-2$
 		aliasAttribute(ConnectionUserBean.class, "fullname", "name"); //$NON-NLS-1$ //$NON-NLS-2$
+		ignoreUnknownElements();
 		alias("profile", Profile.class); //$NON-NLS-1$
 		addImplicitCollection(Profile.class, "rights"); //$NON-NLS-1$
 		alias("right", Right.class); //$NON-NLS-1$
