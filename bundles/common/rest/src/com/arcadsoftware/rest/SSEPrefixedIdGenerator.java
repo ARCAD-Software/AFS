@@ -2,12 +2,12 @@ package com.arcadsoftware.rest;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-public class SSEPerfixedIdGenerator implements ISSEIdGenerator {
+public class SSEPrefixedIdGenerator implements ISSEIdGenerator {
 
 	private final AtomicLong counter;
 	private final String prefix;
 
-	public SSEPerfixedIdGenerator(String prefix) {
+	public SSEPrefixedIdGenerator(String prefix) {
 		super();
 		counter = new AtomicLong(1);
 		this.prefix = prefix;
@@ -40,7 +40,7 @@ public class SSEPerfixedIdGenerator implements ISSEIdGenerator {
 
 	@Override
 	public ISSEIdGenerator clone() {
-		SSEPerfixedIdGenerator result = new SSEPerfixedIdGenerator(prefix);
+		SSEPrefixedIdGenerator result = new SSEPrefixedIdGenerator(prefix);
 		result.counter.set(counter.get());
 		return result;
 	}
