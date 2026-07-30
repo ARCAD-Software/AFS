@@ -125,6 +125,13 @@ public class BinariesTranferService implements IBinariesTranferService {
 		return result;
 	}
 
+	/**
+	 * This store is filesystem only: the key carries the access right and stays
+	 * valid for every verb, so the default implementation of
+	 * {@link IBinariesTranferService#generateKey(String, int, BinaryAccess)} is
+	 * enough and does not need to be overridden here.
+	 */
+	@Deprecated
 	@Override
 	public String generateKey(String category, int id, boolean readOnly) {
 		return activator.store(category, id, readOnly);

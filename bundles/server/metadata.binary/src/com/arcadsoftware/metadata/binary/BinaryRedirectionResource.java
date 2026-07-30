@@ -22,13 +22,16 @@ import org.restlet.resource.ResourceException;
 
 import com.arcadsoftware.metadata.rest.DataItemResource;
 import com.arcadsoftware.osgi.IBinariesTranferService;
+import com.arcadsoftware.osgi.IBinariesTranferService.BinaryAccess;
 
 public class BinaryRedirectionResource extends DataItemResource {
 
 	private String uri;
 	private String category;
 	private boolean isReadOnly;
-	
+
+	private IBinariesTranferService service;
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	protected void doInit() throws ResourceException {
@@ -75,14 +78,10 @@ public class BinaryRedirectionResource extends DataItemResource {
 			setExisting(false);
 			return;
 		}
-		IBinariesTranferService service = (IBinariesTranferService) Activator.getBundleContext().getService(ref);
+		service = (IBinariesTranferService) Activator.getBundleContext().getService(ref);
 		if (service != null) {
 			// Test the user Access right to set the read-only flag.
 			isReadOnly = !hasRightUpdate(getEntity(), getItems().get(0), getClientPreferedLanguage());
-			uri = service.generateKey(category, getItems().get(0).getId(), isReadOnly);
-			if (uri == null) {
-				setExisting(false);
-			}
 		}
 	}
 
@@ -117,6 +116,12 @@ public class BinaryRedirectionResource extends DataItemResource {
 		if (isReadOnly) {
 			throw new ResourceException(Status.CLIENT_ERROR_FORBIDDEN);
 		}
+		if (service != null) {
+			uri = service.generateKey(category, getItems().get(0).getId(), BinaryAccess.DELETE);
+			if (uri == null) {
+				setExisting(false);
+			}
+		}
 		redirect();
 		return null;
 	}
@@ -125,6 +130,15 @@ public class BinaryRedirectionResource extends DataItemResource {
 	protected Representation get(Variant variant) throws ResourceException {
 		if (!hasRightRead(getEntity(), getItems().get(0), getClientPreferedLanguage())) {
 			throw new ResourceException(Status.CLIENT_ERROR_FORBIDDEN);
+		}
+		if (service != null) {
+			// Back compatibility: a user allowed to update used to get, on a GET, a key
+			// that stayed usable to upload. Only a filesystem store honors READ_WRITE.
+			uri = service.generateKey(category, getItems().get(0).getId(),
+					isReadOnly ? BinaryAccess.READ : BinaryAccess.READ_WRITE);
+			if (uri == null) {
+				setExisting(false);
+			}
 		}
 		redirect();
 		return null;
@@ -140,8 +154,13 @@ public class BinaryRedirectionResource extends DataItemResource {
 		if (isReadOnly) {
 			throw new ResourceException(Status.CLIENT_ERROR_FORBIDDEN);
 		}
+		if (service != null) {
+			uri = service.generateKey(category, getItems().get(0).getId(), BinaryAccess.WRITE);
+			if (uri == null) {
+				setExisting(false);
+			}
+		}
 		redirect();
 		return null;
 	}
-
 }
