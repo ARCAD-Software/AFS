@@ -64,11 +64,9 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 	protected RefreshListAction refreshAction;
 	private ImportCandidatesCheckViewer candidates;
 	private AuthType selectedAuth;
-	private boolean defaultSelected;
 
 	public AbstractUsersImportView() {
 		super();
-		defaultSelected = true;
 	}
 
 	/**
@@ -115,8 +113,19 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 		final Group sourceGroup = GuiFormatTools.createGroup(optionsComposite,
 				Activator.resString("user.action.import.source.group.label"), possibleImports.size());
 		sourceGroup.setLayoutData(GridDataFactory.fillDefaults().grab(false, false).create());
+		boolean first = true;
 		for (final AuthType auth : possibleImports) {
-			createAuthButton(sourceGroup, auth);
+			Button b = createAuthButton(sourceGroup, auth);
+			if (first) {
+				b.setSelection(true);
+				selectedAuth = auth;
+				first = false;
+			}
+		}
+		if (first) {
+			Button b = new Button(sourceGroup, SWT.RADIO);
+			b.setText("NO IMPORT AVAILABLE");
+			b.setEnabled(false);
 		}
 		extendOptionsComposite(optionsComposite);
 	}
@@ -125,15 +134,19 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 	}
 
 	@SuppressWarnings("incomplete-switch")
-	private void createAuthButton(final Group sourceGroup, final AuthType auth) {
+	private Button createAuthButton(final Group sourceGroup, final AuthType auth) {
 		final Button result = new Button(sourceGroup, SWT.RADIO);
-		switch (auth) {
-		case IBMI:
-			result.setText(Activator.resString("user.action.import.type.ibmi"));
-			break;
-		case LDAP:
+		if (auth == null) {
 			result.setText(Activator.resString("user.action.import.type.ldap"));
-			break;
+		} else {
+			switch (auth) {
+			case IBMI:
+				result.setText(Activator.resString("user.action.import.type.ibmi"));
+				break;
+			case LDAP:
+				result.setText(Activator.resString("user.action.import.type.ldap"));
+				break;
+			}
 		}
 		result.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -141,11 +154,7 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 				selectedAuth = auth;
 			}
 		});
-		if (defaultSelected) {
-			result.setSelection(true);
-			selectedAuth = auth;
-		}
-		defaultSelected = false;
+		return result;
 	}
 
 	protected void createButtonBar(final Composite parent) {
@@ -274,24 +283,26 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 	}
 
 	private String getUserDefinition(final BeanMap user) {
+		if (selectedAuth == null) {
+			return "";
+		}
 		switch (selectedAuth) {
 		case IBMI:
-			return String.format("%s [%s]",
-					user.getString(IUsersConsts.IBMI_IMPORT_LOGIN), user.getString("description"));
+			return String.format("%s [%s]", user.getString(IUsersConsts.IBMI_IMPORT_LOGIN), user.getString("description")); //$NON-NLS-1$ //$NON-NLS-2$
 		case LDAP:
 			final StringBuilder userDef = new StringBuilder();
 			if (user.contains(IUsersConsts.LDAPIMPORT_LOGIN)) {
-				userDef.append(user.getString(IUsersConsts.LDAPIMPORT_LOGIN) + " ");
+				userDef.append(user.getString(IUsersConsts.LDAPIMPORT_LOGIN) + ' ');
 			}
 			if (user.contains(IUsersConsts.PROP_USER_FIRSTNAME)) {
-				userDef.append("[" + user.getString(IUsersConsts.PROP_USER_FIRSTNAME) + "] ");
+				userDef.append('[' + user.getString(IUsersConsts.PROP_USER_FIRSTNAME) + "] "); //$NON-NLS-1$
 			}
 
 			if (user.contains(IUsersConsts.PROP_USER_LASTNAME)) {
-				userDef.append(user.getString(IUsersConsts.PROP_USER_LASTNAME) + " ");
+				userDef.append(user.getString(IUsersConsts.PROP_USER_LASTNAME) + ' ');
 			}
 			if (user.contains(IUsersConsts.PROP_USER_EMAIL)) {
-				userDef.append("[" + user.getString(IUsersConsts.PROP_USER_EMAIL) + "]");
+				userDef.append('[' + user.getString(IUsersConsts.PROP_USER_EMAIL) + ']');
 			}
 			return userDef.toString();
 		default:
@@ -398,38 +409,42 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 	protected abstract void initializeSelection();
 
 	private void importUsers() {
-		switch (selectedAuth) {
-		case IBMI:
-			loadIBMiProfiles();
-			break;
-		case LDAP:
-			loadLDAPUsers();
-			break;
-		default:
+		if (selectedAuth != null) {
+			switch (selectedAuth) {
+			case IBMI:
+				loadIBMiProfiles();
+				break;
+			case LDAP:
+				loadLDAPUsers();
+				break;
+			default:
+			}
 		}
 	}
 
 	private void loadIBMiProfiles() {
-		try {
-			final String filter = filterNameText.getText().toUpperCase();
-			final Set<String> existingProfiles = new HashSet<>();
-			for (final BeanMap b : getConnection().getDataAccess().getList(AuthType.IBMI.code())) {
-				existingProfiles.add(b.getString("login"));
-			}
-			final BeanMapList totalList = getConnection().getDataAccess().getList(
-					String.format("/admin/%s/import", AuthType.IBMI.resourceSuffix()), IUsersConsts.ENTITY_USER);
-			if (totalList != null) {
-				final BeanMapList list = new BeanMapList(totalList.size());
-				for (final BeanMap b : totalList) {
-					final String login = b.getString(IUsersConsts.IBMI_IMPORT_LOGIN);
-					if ((login != null) && (login.toUpperCase().contains(filter)) && existingProfiles.contains(login)) {
-						list.add(b);
-					}
+		if (filterNameText != null) {
+			try {
+				final String filter = filterNameText.getText().toUpperCase();
+				final Set<String> existingProfiles = new HashSet<>();
+				for (final BeanMap b : getConnection().getDataAccess().getList(AuthType.IBMI.code())) {
+					existingProfiles.add(b.getString("login"));
 				}
-				getViewer().setInput(list);
+				final BeanMapList totalList = getConnection().getDataAccess().getList(
+						String.format("/admin/%s/import", AuthType.IBMI.resourceSuffix()), IUsersConsts.ENTITY_USER);
+				if (totalList != null) {
+					final BeanMapList list = new BeanMapList(totalList.size());
+					for (final BeanMap b : totalList) {
+						final String login = b.getString(IUsersConsts.IBMI_IMPORT_LOGIN);
+						if ((login != null) && (login.toUpperCase().contains(filter)) && existingProfiles.contains(login)) {
+							list.add(b);
+						}
+					}
+					getViewer().setInput(list);
+				}
+			} catch (final Exception e) {
+				Activator.getDefault().error("AbstractUsersImportView::loadIBMiProfiles", e);
 			}
-		} catch (final Exception e) {
-			Activator.getDefault().error("AbstractUsersImportView::loadIBMiProfiles", e);
 		}
 	}
 
@@ -437,14 +452,15 @@ public abstract class AbstractUsersImportView extends AbstractSecuredView {
 		// call server
 		final LDAPAccessHelper ldapHelper = new LDAPAccessHelper(getConnection());
 		String filter = null;
-		if (filterNameText.getText().length() > 0) {
+		if ((filterNameText != null) && (filterNameText.getText().length() > 0)) {
 			filter = filterNameText.getText();
 		}
-		candidates.setInput(ldapHelper.getImportCandidates(filter));
+		if (candidates != null) {
+			candidates.setInput(ldapHelper.getImportCandidates(filter));
+		}
 	}
 
 	@Override
-	public void setFocus() {
-	}
+	public void setFocus() {}
 
 }

@@ -36,19 +36,35 @@ public class AbstractLoggerFacade implements ILoggedPlugin {
 		if (message == null) {
 			return ""; //$NON-NLS-1$
 		}
+		if (objects == null) {
+			return message;
+		}
 		StringBuilder sb = new StringBuilder();
 		int i = message.indexOf('{');
 		int p = 0;
 		int x = 0;
 		while (i >= 0) {
 			if ((i < message.length() - 1) && (message.charAt(i + 1) == '}')) {
+				// a "\" disable the "{}" tag except if there is two "\" !
 				if ((i > 0) && (message.charAt(i - 1) == '\\')) {
 					if ((i > 1) && (message.charAt(i - 2) == '\\')) {
-						// Just remove le second '\' character and process to the placeholder replacement.
+						// remove the second '\' character and process to the placeholder replacement.
 						sb.append(message.substring(p, i - 1));
-						sb.append(format(x++, objects));
+						if (x < objects.length) {
+							sb.append(format(x++, objects));
+						}
 						p = i + 2;
+					} else {
+						// else ignore the tag...
+						sb.append(message.substring(p, i - 1));
+						p = i;
 					}
+				} else {
+					sb.append(message.substring(p, i));
+					if (x < objects.length) {
+						sb.append(format(x++, objects));
+					}
+					p = i + 2;
 				}
 			}
 			i = message.indexOf('{', i + 1);

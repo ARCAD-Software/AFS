@@ -90,6 +90,7 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 	private MultiLanguageMessages messages;
 	private volatile ServerProperties serverProps;
 	private volatile Date startDate;
+	private boolean httpsActive;
 
 	public Activator() {
 		super();
@@ -330,13 +331,14 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 				component = null;
 			}
 		}
+		httpsActive = false;
 	}
 
 	private synchronized void startServer() {
 		if ((serverProps != null) && !serverProps.isServerInactive()) {
 			// Create a new Restlet component and add a HTTP server connector to it
 			final StringBuilder httplogger = new StringBuilder();
-			boolean https = false;
+			httpsActive = false;
 			try {
 				if (component != null) {
 					stopServer();
@@ -348,7 +350,7 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 					component.getLogger().setUseParentHandlers(false);
 				}
 				if (useHTTPS()) {
-					https = true;
+					httpsActive = true;
 					Server server = new Server(component.getServers().getContext().createChildContext(), //
 							Arrays.asList(Protocol.HTTPS), serverProps.getEthernetInterface(), serverProps.getPortssl(), component.getServers().getNext(), HttpsServerHelper.class.getName()); 
 					if (!server.isAvailable()) {
@@ -377,9 +379,9 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 				component.setOwner(serverProps.getOwner());
 				component.setDescription(serverProps.getDescription());
 				// Attach the application.
-				OSGiApplication application = createApplication(serverProps.getPort() > 0, https);
+				OSGiApplication application = createApplication(serverProps.getPort() > 0, httpsActive);
 				// Activate the HTTP Strict-Transport-Security header.
-				application.setHttps(https);
+				application.setHttps(httpsActive);
 				String serverAddress = "localhost";
 				for (String dn: serverProps.getDomainNames()) {
 					if (!dn.equals("*")) {
@@ -387,7 +389,7 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 						break;
 					}
 				}
-				if (https) {
+				if (httpsActive) {
 					if (serverProps.getPortssl() != 443) {
 						serverAddress += ":" + serverProps.getPortssl(); //$NON-NLS-1$ 
 					}
@@ -420,7 +422,7 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 					httplogger.append(portInfo);
 					httplogger.append("\n## WARNING: Running an HTTP Server on production is a security breach.\n\n");
 				}
-				if (https) {
+				if (httpsActive) {
 					final String sslPortInfo = Messages.getString("Activator.Started") + serverProps.getPortssl() + " [HTTPS]"; //$NON-NLS-1$ //$NON-NLS-2$
 					info(sslPortInfo);
 					httplogger.append(sslPortInfo);
@@ -431,11 +433,11 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 				StringBuilder text = new StringBuilder(Messages.getString("Activator.StartingError")); //$NON-NLS-1$
 				if (serverProps.getPort() > 0) {
 					text.append(serverProps.getPort());
-					if (https) {
+					if (httpsActive) {
 						text.append(" and "); //$NON-NLS-1$
 					}
 				}
-				if (https) {
+				if (httpsActive) {
 					text.append(serverProps.getPortssl());
 					text.append(" [HTTPS]"); //$NON-NLS-1$
 				}
@@ -482,10 +484,14 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 	}
 
 	protected boolean isRestletLogDisabled() {
-		// TODO Auto-generated method stub
 		return (serverProps != null) && (serverProps.isServerInactive() || serverProps.isRestletLogDisabled());
 	}
 
+	@Override
+	public boolean isHTTPSActive() {
+		return httpsActive;
+	}
+	
 	private boolean useHTTPS() {
 		if ((serverProps != null) && serverProps.useHTTPS()) {
 			// Check that the SSL configuration is correct before to try to start it.
@@ -533,7 +539,7 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 						serverProps.close();
 					}
 					serverProps = sp;
-					if (useHTTPS()) {
+					if (httpsActive) {
 						Server server = component.getServers().get(0);
 						Series<Parameter> parameters = server.getContext().getParameters();
 						parameters.add("keystorePath", serverProps.getkStore()); //$NON-NLS-1$
@@ -594,22 +600,27 @@ public class Activator extends AbstractActivator implements BundleListener, IRes
 		return messages;
 	}
 	
+	@Override
 	public Date getStartDate() {
 		return startDate;
 	}
 
+	@Override
 	public Component getComponent() {
 		return component;
 	}
 
+	@Override
 	public int getPort() {
 		return serverProps.getPort();
 	}
 
+	@Override
 	public int getSSLPort() {
 		return serverProps.getPortssl();
 	}
 
+	@Override
 	public String getDomainName() {
 		return serverProps.getDomainname();
 	}

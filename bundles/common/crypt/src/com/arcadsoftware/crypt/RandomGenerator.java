@@ -34,7 +34,7 @@ public class RandomGenerator {
 	private static final int PWD_LEN = 12;
 	private static final String NONALPHA = " !\"#$%£%&'()*+,-./:;<=>?@[\\]^_{|}~"; //$NON-NLS-1$
 	private static final String ALLCHARS = ALPHA + NONALPHA + "0123456789";
-	private static final SecureRandom rn;
+	protected static final SecureRandom rn;
 	
 	static {
 		SecureRandom r;
@@ -124,6 +124,40 @@ public class RandomGenerator {
 		return i;
 	}
 
+	/**
+	 * Generate a random number ranging from zero to n - 1.
+	 * 
+	 * @param n
+	 * @return
+	 */
+	public static long randLong(long n) {
+		final long i = rn.nextLong() % n;
+		if (i < 0) {
+			return -i;
+		}
+		return i;
+	}
+
+	/**
+	 * Generate a random number.
+	 * 
+	 * @param n
+	 * @return
+	 */
+	public static long randLong() {
+		return rn.nextLong();
+	}
+
+	public static byte[] randBytes(int length) {
+		if (length <= 0) {
+			return new byte[0];
+		}
+		byte[] bytes = new byte[length];
+		new Random(rn.nextInt()).nextBytes(bytes);
+		return bytes;
+	}
+
+	
 	/**
 	 * Generate a random string using Alphnumeric and non alphanumeric, printable characters.
 	 * 

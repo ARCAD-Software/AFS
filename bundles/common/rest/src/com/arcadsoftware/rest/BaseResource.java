@@ -591,11 +591,23 @@ public abstract class BaseResource extends ServerResource {
 								if (en.getValue() instanceof JSONArray) {
 									JSONArray a = (JSONArray) en.getValue();
 									for (int i = 0; i < a.length(); i++) {
-										requestForm.add(requestForm.createEntry(en.getKey().toString(), a.get(i).toString()));
+										Object v = a.get(i);
+										// Manage JSON null values
+										if (v == null) {
+											requestForm.add(requestForm.createEntry(en.getKey().toString(), null));
+										} else {
+											requestForm.add(requestForm.createEntry(en.getKey().toString(), v.toString()));
+										}
 									}
 								} else {
 									// Every other type of value we 
-									requestForm.add(requestForm.createEntry(en.getKey().toString(), en.getValue().toString()));
+									Object v = en.getValue();
+									// Manage JSON null values
+									if (v == null) {
+										requestForm.add(requestForm.createEntry(en.getKey().toString(), null));
+									} else {
+										requestForm.add(requestForm.createEntry(en.getKey().toString(), v.toString()));
+									}
 								}
 							}
 						}

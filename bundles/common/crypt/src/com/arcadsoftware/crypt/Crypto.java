@@ -2607,6 +2607,10 @@ public final class Crypto {
 		return ((0xFF & array[pos]) << 24) | ((0xFF & array[pos + 1]) << 16) | ((0xFF & array[pos + 2]) << 8) | (0xFF & array[pos + 3]);    
 	}
 
+	protected static char[] getMK() {
+		return Arrays.copyOf(DEFAULTMASTERK, DEFAULTMASTERK.length - 3); 
+	}
+	
 	private Crypto() {
 		super();
 	}

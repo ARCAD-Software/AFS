@@ -14,6 +14,5 @@
 	<classpathentry kind="var" path="PATH_BCPROV"/>
 	<classpathentry kind="var" path="PATH_BCUTIL"/>
 	<classpathentry kind="var" path="ECLIPSE_OSGI"/>
-	<classpathentry kind="var" path="PATH_GNUCRYPTO"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

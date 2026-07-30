@@ -48,8 +48,17 @@ public interface IRestServerMonitor {
 	public Component getComponent();
 
 	/**
-	 * Get the HTTP/HTTPS Port number.
+	 * Get the HTTP Port number.
 	 * @return
 	 */
 	public int getPort();
+
+	/**
+	 * Get the HTTPS Port number.
+	 * @return
+	 */
+	public int getSSLPort();
+	
+	public String getDomainName();
+	public boolean isHTTPSActive();
 }

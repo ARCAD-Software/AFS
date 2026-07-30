@@ -488,6 +488,16 @@ public class MetaDataParentResource extends DataParentResource {
 			getResponse().setStatus(Status.SUCCESS_NO_CONTENT);
 			return null;
 		}
+		if ((items.size() > 1) && !entity.getMetadata().getBoolean("multiupdate")) { //$NON-NLS-1$
+			setStatus(Status.CLIENT_ERROR_FORBIDDEN, Activator.getMessage("error.nomultiupdate", language)); //$NON-NLS-1$
+			return null;
+		}
+		if (!entity.getMetadata().getBoolean("massupdate")) { //$NON-NLS-1$
+			if (items.size() == entity.dataCount()) {
+				setStatus(Status.CLIENT_ERROR_FORBIDDEN, Activator.getMessage("error.nomassupdate", language)); //$NON-NLS-1$
+				return null;
+			}
+		}
 		// Manage unique contraints...
 		final ISearchCriteria invariantCriteria = new NotCriteria(new IdEqualCriteria(items.get(0).getId()));
 		for (MetaDataAttribute a: attlist) {
@@ -744,6 +754,16 @@ public class MetaDataParentResource extends DataParentResource {
 		ISearchCriteria criteria = new AndCriteria(entity.getRightDelete(), getCriteria(this, form));
 		// Faire une primosélection (criteria + right delete)
 		BeanMapList items = getEntity().getMapper().selection(entity, (List<ReferenceLine>) null, hardelete, criteria, false, null, getUser(), 0, -1);
+		if ((items.size() > 1) && !entity.getMetadata().getBoolean("multiupdate")) { //$NON-NLS-1$
+			setStatus(Status.CLIENT_ERROR_FORBIDDEN, Activator.getMessage("error.nomultiupdate", language)); //$NON-NLS-1$
+			return null;
+		}
+		if (!entity.getMetadata().getBoolean("massupdate")) { //$NON-NLS-1$
+			if (items.size() == entity.dataCount()) {
+				setStatus(Status.CLIENT_ERROR_FORBIDDEN, Activator.getMessage("error.nomassupdate", language)); //$NON-NLS-1$
+				return null;
+			}
+		}
 		boolean noerrors = true;
 		List<IMetaDataDeleteListener> listeners = Activator.getInstance().getDeleteListener(entity.getType());
 		for (BeanMap item: items) {

@@ -48,6 +48,7 @@ public abstract class MetaDataEntityWaiter {
 				run(entity);
 			}
 		}
+		// FIXME there is a multi-thred if the entities are declared between the previous loop and the event is registered...
 		if (c < types.length) {
 			ers = activator.registerService(MetaDataEventHandler.clazz, new MetaDataEventHandler(activator) {
 				public void handleEvent(Event event) {

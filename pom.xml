@@ -18,7 +18,7 @@
 		<tycho.extra.version>4.0.13</tycho.extra.version>
 		<keystore></keystore>
 		<tycho.scmUrl>scm:git:https://github.com/ARCAD-Software/AFS.git</tycho.scmUrl>
-		<jetty.version>12.0.32</jetty.version>
+		<jetty.version>12.0.37</jetty.version>
 	</properties>
 
 	<!-- Add explicit dependencies not available on P2 repository -->
@@ -27,7 +27,7 @@
 		<dependency>
 			<groupId>org.apache.sshd</groupId>
 			<artifactId>sshd-osgi</artifactId>
-			<version>2.15.0</version>
+			<version>2.18.0</version>
 		</dependency>
 
 		<!-- Cryptography libraries -->
@@ -225,12 +225,12 @@
 		<dependency>
 		    <groupId>net.java.dev.jna</groupId>
 		    <artifactId>jna-jpms</artifactId>
-		    <version>5.18.1</version>
+		    <version>5.19.1</version>
 		</dependency>
 		<dependency>
 		    <groupId>net.java.dev.jna</groupId>
 		    <artifactId>jna-platform-jpms</artifactId>
-		    <version>5.18.1</version>
+		    <version>5.19.1</version>
 		</dependency>
 
 		<!-- LDAP Connection -->
@@ -266,7 +266,7 @@
 		<dependency>
 			<groupId>com.zaxxer</groupId>
 			<artifactId>HikariCP</artifactId>
-			<version>7.0.2</version>
+			<version>7.1.0</version>
 		</dependency>
 
 		<dependency>
@@ -278,7 +278,7 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>42.7.8</version>
+			<version>42.7.13</version>
 		</dependency>
 
 		<dependency>
@@ -291,26 +291,26 @@
 		<dependency>
 			<groupId>org.apache.groovy</groupId>
 			<artifactId>groovy</artifactId>
-			<version>4.0.29</version>
+			<version>4.0.32</version>
 		</dependency>
 		
 		<!-- Logger -->
 		<dependency>
 			<groupId>org.ops4j.pax.logging</groupId>
 			<artifactId>pax-logging-api</artifactId>
-			<version>2.3.3</version>
+			<version>2.3.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.ops4j.pax.logging</groupId>
 			<artifactId>pax-logging-log4j2</artifactId>
-			<version>2.3.3</version>
+			<version>2.3.4</version>
 		</dependency>
 		
 		<!-- Required by AEV... -->
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>2.20.0</version>
+			<version>2.22.0</version>
 		</dependency>
 		
 		

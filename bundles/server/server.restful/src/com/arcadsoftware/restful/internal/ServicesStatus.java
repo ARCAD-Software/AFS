@@ -138,7 +138,7 @@ public class ServicesStatus extends StatusService {
 	@Override
 	public Status toStatus(Throwable throwable, Request request, Response response) {
 		if (activator.isRestletLogDisabled() && !(throwable instanceof ResourceException)) {
-			activator.info("Unexpected Exception during Web-Service call.", throwable);
+			activator.info("Unexpected Exception during REST call.", throwable);
 		}
 		return super.toStatus(throwable, request, response);
 	}

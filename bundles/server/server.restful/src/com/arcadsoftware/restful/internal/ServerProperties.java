@@ -244,7 +244,7 @@ public class ServerProperties {
 		trustManagerAlgorithm = getProperty(properties, ConfiguredSSLContext.PROP_TRUSTSTORE_ALGO, null);
 		restletLogDisabled = getProperty(properties, PROP_LOGDISABLED, false);
 		httpVersion = getProperty(properties, PROP_HTTPVERSION, 1);
-		http3PEMWorkdir = getProperty(properties, PROP_HTTP3PEMWORKDIR, "./configuration/pem3/");
+		http3PEMWorkdir = getProperty(properties, PROP_HTTP3PEMWORKDIR, "./configuration/pem3/"); //$NON-NLS-1$
 		if (httpVersion == 3) {
 			new File(http3PEMWorkdir).mkdirs();
 		}
@@ -272,7 +272,7 @@ public class ServerProperties {
 		maxCtnIdleTimeOut = getProperty(properties, PROP_MAXCTNIDLETIMEOUT, 0);
 		sdGraceFully = getProperty(properties, PROP_SHUTDOWNGRACEFULLY, true);
 		sdTimeout = getProperty(properties, PROP_SHUTDOWNTIMEOUT, 30000);
-		useForwardedForHeader = getProperty(properties, PROP_USEFORWARDEDFORHEADER, Boolean.getBoolean("com.arcadsoftware.useForwardedForHeader"));
+		useForwardedForHeader = getProperty(properties, PROP_USEFORWARDEDFORHEADER, Boolean.getBoolean("com.arcadsoftware.useForwardedForHeader")); //$NON-NLS-1$
 	}
 
 	public ServerProperties(final Bundle thisBundle) {

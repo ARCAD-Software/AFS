@@ -182,12 +182,14 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 				result = joinTree.add(entity, alias + '.' + parentCol, deleted);
 			}
 			for (ReferenceLine rf: getReferences()) {
-				String code = rf.getCode();
-				if (!colNames.containsKey(code)) {
-					// We use left outer join for columns used in where clause.
-					String col = buildAttributeColName(rf, entity, result, false, deleted);
-					if (col != null) {
-						colNames.put(code, col);
+				if (rf != null) {
+					String code = rf.getCode();
+					if (!colNames.containsKey(code)) {
+						// We use left outer join for columns used in where clause.
+						String col = buildAttributeColName(rf, entity, result, false, deleted);
+						if (col != null) {
+							colNames.put(code, col);
+						}
 					}
 				}
 			}
@@ -228,18 +230,20 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 		result.append(e.idCol);
 		result.append(mapper.fg.asid);
 		for (ReferenceLine att: attributes) {
-			String cn = buildAttributeColName(att, e, join, false, deleted);
-			if (cn != null) {
-				colNames.put(att.getCode(), cn);
-				result.append(mapper.fg.columnsep);
-				result.append(cn);
-				result.append(mapper.fg.as);
-				if (mapper.isEncrypted(att.getLast())) {
-					result.append(SQL_JAVA_CRYPT_PREFIX);
-				} else {
-					result.append(SQL_JAVA_PREFIX);
+			if (att != null) {
+				String cn = buildAttributeColName(att, e, join, false, deleted);
+				if (cn != null) {
+					colNames.put(att.getCode(), cn);
+					result.append(mapper.fg.columnsep);
+					result.append(cn);
+					result.append(mapper.fg.as);
+					if (mapper.isEncrypted(att.getLast())) {
+						result.append(SQL_JAVA_CRYPT_PREFIX);
+					} else {
+						result.append(SQL_JAVA_PREFIX);
+					}
+					result.append(att.getCode().replace('.', '_'));
 				}
-				result.append(att.getCode().replace('.', '_'));
 			}
 		}
 		if (e.updateCol != null) {
@@ -356,6 +360,9 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 	}
 	
 	private String buildAttributeColName(ReferenceLine reference, EntityInfo lastInfo, JoinElement join, boolean innerJoin, boolean deleted) {
+		if (reference == null) {
+			return null;
+		}
 		String currentCol = null;
 		for (int i = 0; i < reference.size(); i++) {
 			Element e = reference.get(i);
@@ -871,7 +878,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 				attcn = join.getAlias() + '.' + entityInfo.idCol;
 				code = ((AbstractLinkTestCriteria) criteria).getLinkCode();
 			} else {
-				code = ((AbstractLinkTestCriteria) criteria).getAttribute() + '/' + ((AbstractLinkTestCriteria) criteria).getLinkCode();
+				code = ((AbstractLinkTestCriteria) criteria).getReference() + '/' + ((AbstractLinkTestCriteria) criteria).getLinkCode();
 			}
 			StringBuilder subWhere = new StringBuilder();
 			JoinElement j = generateLinkJoins(getLinks(code), subWhere, null, true, deleted);
@@ -949,7 +956,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 				}
 			}
 			result.append(String.format(mapper.fg.inset, attcn, 
-					String.format(mapper.fg.select, j.getAlias() + j.getId(), j.toString(mapper), subWhere.toString())));
+					String.format(mapper.fg.select, j.getAlias() + '.' + j.getId(), j.toString(mapper), subWhere.toString())));
 		} else if (criteria instanceof LowerStrictCriteria) {
 			if (getReference(((LowerStrictCriteria) criteria).getAttribute()).isNumericType()) {
 				try {

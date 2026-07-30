@@ -670,6 +670,21 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 	}
 
 	/**
+	 * Returns the {@code Bundle} object associated with this
+	 * {@code BundleContext}. This bundle is called the context bundle.
+	 * 
+	 * @return The {@code Bundle} object associated with this
+	 *         {@code BundleContext}.
+	 * @throws IllegalStateException If this BundleContext is no longer valid.
+	 */
+	public Bundle getBundle() {
+		if (context != null) {
+			return context.getBundle();
+		}
+		return null;
+	}
+	
+	/**
 	 * Logs a message with an exception associated and a
 	 * <code>ServiceReference</code> object.
 	 * 
@@ -1535,5 +1550,20 @@ public abstract class AbstractActivator implements BundleActivator, ILoggedPlugi
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * Generate an Error Report and store it on the file system.
+	 * 
+	 * @param data
+	 * @return -1 if the Error generator service is not installed.
+	 * @see IErrorReportGenerator
+	 */
+	public long generateErrorReport(String data) {
+		IErrorReportGenerator generator = getService(IErrorReportGenerator.class);
+		if (generator == null) {
+			return -1l;
+		}
+		return generator.generateReport(data);
 	}
 }

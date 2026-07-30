@@ -66,11 +66,14 @@ public final class ISODateFormater {
 	 */
 	static public boolean mayIsoDate(String string) {
 		return (string != null) && //
-				(string.length() >= 19) && //
-				(string.length() < 31) && //
-				(string.charAt(4) == '-') && //
-				(string.charAt(10) == 'T') && //
-				(string.charAt(16) == ':');
+				(((string.length() == 10) && //
+				  (string.charAt(4) == '-') && //
+				  (string.charAt(7) == '-')) || //
+				 ((string.length() >= 19) && //
+				  (string.length() < 31) && //
+				  (string.charAt(4) == '-') && //
+				  (string.charAt(10) == 'T') && //
+				  (string.charAt(16) == ':')));
 	}
 
 	/**
@@ -83,6 +86,23 @@ public final class ISODateFormater {
 	static public Calendar toCalendar(String string) throws ParseException {
 		if (string == null) {
 			return null;
+		}
+		if ((string.length() == 10) && (string.charAt(4) == '-') && (string.charAt(7) == '-')) {
+			Calendar result = new GregorianCalendar(TimeZone.getTimeZone("GMT")); //$NON-NLS-1$
+			result.set(Calendar.MILLISECOND, 0);
+			result.set(Calendar.HOUR_OF_DAY, 0);
+			result.set(Calendar.MINUTE, 0);
+			result.set(Calendar.SECOND, 0);
+			try {
+				result.set(Calendar.YEAR, Integer.parseInt(string.substring(0,4)));
+				result.set(Calendar.MONTH, Integer.parseInt(string.substring(5,7)) - 1);
+				result.set(Calendar.DAY_OF_MONTH, Integer.parseInt(string.substring(8,10)));
+			} catch (NumberFormatException e) {
+				throw new ParseException(e.getMessage(), 0);
+			} catch (IndexOutOfBoundsException e) {
+				throw new ParseException(e.getMessage(), 0);
+			}
+			return result;
 		}
 		if (string.length() < 19) {
 			throw new ParseException(Messages.getString("ISODateFormater.InvalidLength"),string.length()); //$NON-NLS-1$
@@ -291,5 +311,5 @@ public final class ISODateFormater {
 				calendar.get(Calendar.MINUTE),
 				calendar.get(Calendar.SECOND));
 	}
-	
+		
 }
