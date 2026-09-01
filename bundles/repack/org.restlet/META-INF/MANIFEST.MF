@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Restlet Framework
 Bundle-SymbolicName: org.restlet
-Bundle-Version: 2.6.0
+Bundle-Version: 2.6.0.qualifier
 Export-Package: org.restlet;version="2.6.0",
  org.restlet.data;version="2.6.0",
  org.restlet.engine;version="2.6.0",
