@@ -162,7 +162,7 @@ public class CurrentUserResource extends OSGiResource {
 			writer.startNode("user"); //$NON-NLS-1$
 			if (user.getId() > 0) {
 				writer.addAttribute("id", Integer.toString(user.getId())); //$NON-NLS-1$
-			}			
+			} 
 			if (user.getPrincipal() > 0) {
 				writer.addAttribute("principal", Integer.toString(user.getPrincipal())); //$NON-NLS-1$
 			}			
@@ -227,7 +227,9 @@ public class CurrentUserResource extends OSGiResource {
 			try {
 				if (user.getId() > 0) {
 					result.put("id", user.getId()); //$NON-NLS-1$
-				}			
+				} else if (user.getId() < 0) {
+					result.put("id", -1); //$NON-NLS-1$
+				}
 				if (user.getPrincipal() > 0) {
 					result.put("principal", user.getPrincipal()); //$NON-NLS-1$
 				}			

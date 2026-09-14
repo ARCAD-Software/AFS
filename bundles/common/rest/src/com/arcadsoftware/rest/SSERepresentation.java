@@ -581,10 +581,10 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 	 * Set the limit of event stored in the waiting list. When this limit is reach
 	 * older message are removed even if they are not sent to the client.
 	 * 
-	 * @param queueMaxSize any value lower than 10 disable this limitation.
+	 * @param queueMaxSize any negative value disable this limitation.
 	 */
 	public void setQueueMaxSize(int queueMaxSize) {
-		if (queueMaxSize < 10) {
+		if (queueMaxSize < 0) {
 			this.queueMaxSize = 0;
 		} else {
 			this.queueMaxSize = queueMaxSize;
