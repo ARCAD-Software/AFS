@@ -22,6 +22,10 @@ import org.restlet.data.Language;
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.crypt.Crypto;
 import com.arcadsoftware.metadata.MetaDataEntity;
+import com.arcadsoftware.metadata.criteria.AndCriteria;
+import com.arcadsoftware.metadata.criteria.EqualCriteria;
+import com.arcadsoftware.metadata.criteria.GreaterStrictCriteria;
+import com.arcadsoftware.metadata.criteria.LowerStrictCriteria;
 import com.arcadsoftware.rest.connection.ConnectionUserBean;
 import com.arcadsoftware.rest.connection.IConnectionCredential;
 import com.arcadsoftware.rest.connection.IConnectionUserBean;
@@ -98,23 +102,34 @@ public class LocalConnectionCredential implements IConnectionCredential, IUpdata
 	private void updateLockCount(final int lock) {
 		locked = lock;
 		BeanMap auth = activator.getAuth(uid);
-		if (auth != null) {
+		if ((auth != null) && (lock != auth.getInt(Activator.LOCALAUTH_LOCKED))) {
 			// Cache update.
 			auth.put(Activator.LOCALAUTH_LOCKED, lock);
-			// Database update.
 			MetaDataEntity entity = MetaDataEntity.loadEntity(Activator.LOCALAUTH);
-			if ((entity != null) && (entity.getMapper() != null)) {
-				entity.getMapper().update(id, entity.getAttribute(Activator.LOCALAUTH_LOCKED), lock);
-				// TODO we should fire an Entity change event....
+			// Avoid useless or concurent modifications...
+			// Do not relly on local cache for it.
+			if (((lock > 0) && (entity.dataCount(false, 
+					new AndCriteria(
+							new EqualCriteria(Activator.LOCALAUTH_USERID, uid), 
+							new LowerStrictCriteria(Activator.LOCALAUTH_LOCKED, Integer.toString(lock))), false, null) != 0)) ||
+					((lock == 0) && (entity.dataCount(false, 
+							new AndCriteria(
+									new EqualCriteria(Activator.LOCALAUTH_USERID, uid), 
+									new GreaterStrictCriteria(Activator.LOCALAUTH_LOCKED, "0")), false, null) != 0))) {
+				// Database update.
+				if ((entity != null) && (entity.getMapper() != null)) {
+					entity.getMapper().update(id, entity.getAttribute(Activator.LOCALAUTH_LOCKED), lock);
+					// TODO we should fire an Entity change event....
+				}
 			}
 		}
-		if (lock == activator.getMaxLockCount()) {
+		if (lock > activator.getMaxLockCount()) {
 			activator.recordUserLock(uid);
 		}
 	}
 		
 	private boolean isLocked() {
-		return locked >= activator.getMaxLockCount();
+		return locked > activator.getMaxLockCount();
 	}
 
 	@Override
