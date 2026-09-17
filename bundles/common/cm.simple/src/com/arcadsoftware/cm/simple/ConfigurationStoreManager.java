@@ -265,5 +265,15 @@ public class ConfigurationStoreManager extends AbstractConfigurationStorage {
 	public File getRoot() {
 		return root;
 	}
+
+	@Override
+	protected Object variableToValue(String pid, String key, Object value) {
+		return value;
+	}
+
+	@Override
+	protected Object valueToVariable(String pid, String key, Object value) {
+		return value;
+	}
 	
 }

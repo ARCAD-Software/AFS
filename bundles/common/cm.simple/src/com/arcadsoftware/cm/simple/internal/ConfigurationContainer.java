@@ -37,7 +37,7 @@ public class ConfigurationContainer {
 		this.factory = factory;
 		this.pid = pid;
 		this.factoryPid = factoryPid;
-		this.properties = new Hashtable<String, Object>();
+		properties = new Hashtable<>();
 		properties.put(Constants.SERVICE_PID, pid);
 		if (factoryPid != null) {
 			properties.put(ConfigurationAdmin.SERVICE_FACTORYPID, factoryPid);
