@@ -35,6 +35,7 @@ public class ConfigurationStorage extends AbstractConfigurationStorage {
 	private final File store;
 	private final HashMap<String, ConfigurationContainer> configurations;
 	private final HashMap<String, Integer> factoryCount;
+	private final HashMap<String, String> variables;
 	private final boolean readonly;
 	private final boolean delayed;
 	
@@ -42,11 +43,12 @@ public class ConfigurationStorage extends AbstractConfigurationStorage {
 		super(factory.getActivator());
 		this.factory = factory;
 		this.store = store;
-		configurations = new HashMap<String, ConfigurationContainer>();
+		configurations = new HashMap<>();
 		String ro = factory.getActivator().getContext().getProperty("cm.state"); //$NON-NLS-1$
 		readonly = (ro != null) && ("readonly".equalsIgnoreCase(ro) || "ro".equalsIgnoreCase(ro)); //$NON-NLS-1$ //$NON-NLS-2$
 		delayed = (ro != null) && ("delayed".equalsIgnoreCase(ro) || "delay".equals(ro)); //$NON-NLS-1$ //$NON-NLS-2$
-		factoryCount  =new HashMap<String, Integer>();
+		factoryCount  =new HashMap<>();
+		variables = new HashMap<>();
 	}
 	
 	public synchronized String newPid(String factoryPid) {
@@ -205,5 +207,39 @@ public class ConfigurationStorage extends AbstractConfigurationStorage {
 
 	public int count() {
 		return configurations.size();
+	}
+
+	@Override
+	protected Object variableToValue(String pid, String key, Object value) {
+		if (value instanceof String variable) {
+			if (variable.startsWith("!ENV# ")) { //$NON-NLS-1$
+				String v = System.getenv(variable.substring(6).trim());
+				if (v != null) {
+					variables.put(pid + ' ' + key, variable);
+					return v;
+				}
+			} else if (variable.startsWith("!SYS# ")) { //$NON-NLS-1$
+				String v = System.getProperty(variable.substring(6).trim());
+				if (v != null) {
+					variables.put(pid + ' ' + key, variable);
+					return v;
+				}
+			}
+		}
+		return value;
+	}
+
+	@Override
+	protected Object valueToVariable(String pid, String key, Object value) {
+		String variable = variables.get(pid + ' ' + key);
+		if (variable != null) {
+			return variable;
+		}
+		if (value instanceof String s) {
+			if (s.startsWith("!ENV# ") ||s.startsWith("!SYS# ")) { //$NON-NLS-1$ //$NON-NLS-2$
+				return s.substring(6);
+			}
+		}
+		return value;
 	}
 }

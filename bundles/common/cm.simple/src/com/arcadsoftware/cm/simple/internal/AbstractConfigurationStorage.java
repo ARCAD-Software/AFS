@@ -315,13 +315,14 @@ public abstract class AbstractConfigurationStorage {
 					for (Entry<String, Entry<String, T>> e: sortedConf.entrySet()) {
 						TreeMap<String, String> values = new TreeMap<String, String>();
 						int mtl = 0;
+						String pid = e.getValue().getKey();
 						for (Entry<String, Object> p: e.getValue().getValue().entrySet()) {
 							String token = getToken(p.getKey());
 							if (token != null) {
 								if (mtl < token.length()) {
 									mtl = token.length();
 								}
-								String val = getFileValue(p.getValue());
+								String val = getFileValue(valueToVariable(pid, p.getKey(), p.getValue()));
 								if (val != null) {
 									values.put(token, val);
 								}
@@ -525,14 +526,14 @@ public abstract class AbstractConfigurationStorage {
 				try (BufferedReader r = new BufferedReader(in)) {
 					String line = r.readLine();
 					Hashtable<String, Object> curconf = null; 
+					String pid = null;
+					String fpid = null;
 					while (line != null) {
 						line = line.trim();
 						if (!line.isEmpty() && (line.charAt(0) != '#') && (line.charAt(0) != ';')) {
 							if ((line.charAt(0) == '[') && (line.charAt(line.length() - 1) == ']')) {
 								line = line.substring(1, line.length() - 1).trim();
 								int i = line.indexOf('/');
-								String pid;
-								String fpid = null;
 								if (i > 0) {
 									fpid = getPid(line.substring(0, i - 1).trim());
 									try {
@@ -557,7 +558,7 @@ public abstract class AbstractConfigurationStorage {
 									if (key != null) {
 										Object value = getConfValue(line.substring(i + 1), r);
 										if (value != null) {
-											curconf.put(key, value);
+											curconf.put(key, variableToValue(pid, key, value));
 										}
 									}
 								}
@@ -569,6 +570,10 @@ public abstract class AbstractConfigurationStorage {
 			}
 		}
 	}
+
+	protected abstract Object variableToValue(String pid, String key, Object value);
+
+	protected abstract Object valueToVariable(String pid, String key, Object value);
 
 	private void loadFromCFGFile(File file) throws IOException {
 		String pid = file.getName().substring(0, file.getName().length() - 4);
@@ -582,8 +587,8 @@ public abstract class AbstractConfigurationStorage {
 			if (curconf != null) {
 				Enumeration<Object> e = p.keys();
 				while (e.hasMoreElements()) {
-					Object k = e.nextElement();
-					curconf.put(k.toString(), p.get(k));
+					String key = (String) e.nextElement();
+					curconf.put(key, variableToValue(pid, key, p.get(key)));
 				}
 			}
 		}
@@ -604,7 +609,7 @@ public abstract class AbstractConfigurationStorage {
 						if ("_comment".equalsIgnoreCase(key)) { //$NON-NLS-1$
 							readString(r);
 						} else {
-							curconf.put(key, getConfValue(readString(r)));
+							curconf.put(key, variableToValue(pid, key, getConfValue(readString(r))));
 						}
 						if (!readChar(r, ',')) {
 							break;
