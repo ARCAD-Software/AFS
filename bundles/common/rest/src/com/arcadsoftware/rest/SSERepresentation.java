@@ -72,6 +72,7 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 	private volatile int queueMaxSize;
 	private volatile int replayMasSize;
 	private final boolean shared;
+	private volatile ISSERepresentationClosedCallback closedCallback;
 	
 	/**
 	 * Pre-create a new Server Send Event stream.
@@ -208,6 +209,17 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 			throw e;
 		} finally {
 			connected.set(false);
+			disconnected();
+		}
+	}
+	
+	protected synchronized void disconnected() {
+		if (closedCallback != null) {
+			try {
+				closedCallback.connectionClosed(this);
+			} catch (Exception e) {
+				logger.error("Error while closing the Upstream SSE representation.", e);
+			}
 		}
 	}
 
@@ -676,6 +688,14 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 			return false;
 		}
 		return currentId.possess(id);
+	}
+
+	public ISSERepresentationClosedCallback getClosedCallbak() {
+		return closedCallback;
+	}
+
+	public void setClosedCallbak(ISSERepresentationClosedCallback closedCallbak) {
+		this.closedCallback = closedCallbak;
 	}
 	
 }
