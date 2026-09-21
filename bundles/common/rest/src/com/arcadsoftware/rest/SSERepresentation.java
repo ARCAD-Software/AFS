@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -53,6 +54,11 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 	 * The "text/event-stream" is the Media type associated to Server Sent events.
 	 */
 	public final static MediaType TEXT_EVENTSTREAM = MediaType.register("text/event-stream", "Server Send Event stream"); //$NON-NLS-1$ //$NON-NLS-2$
+
+	private final static int WORKING_STOP = 0;
+	private final static int WORKING_STOPPING = 1;
+	private final static int WORKING_RUNNING = 2;
+	
 	
 	private static final record Event(String id, String event, Object data, int terminate) {}
 	private static final String EMPTY_JSONOBJECT = "{}";
@@ -61,9 +67,10 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 	private static final byte[] DATA = "\ndata: ".getBytes(StandardCharsets.UTF_8); //$NON-NLS-1$
 	private static final byte[] RETRY = "\nretry: ".getBytes(StandardCharsets.UTF_8); //$NON-NLS-1$
 	private static final byte[] ENDEVENT = "\n\n".getBytes(StandardCharsets.UTF_8); //$NON-NLS-1$
-	private static final Logger logger = LoggerFactory.getLogger(SSERepresentation.class); 
+	private static final Logger logger = LoggerFactory.getLogger(SSERepresentation.class);
+	private static final long LOOP_DELAY = 75; 
 
-	private final AtomicBoolean working;
+	private final AtomicInteger working;
 	private final AtomicBoolean connected;
 	private final long pingDelay;
 	private final ConcurrentLinkedQueue<Event> queue;
@@ -110,7 +117,7 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 		super(TEXT_EVENTSTREAM);
 		setCharacterSet(CharacterSet.UTF_8);
 		setLanguages(Arrays.asList(language));
-		working = new AtomicBoolean(true);
+		working = new AtomicInteger(WORKING_RUNNING);
 		if (pingDelay < 10) {
 			this.pingDelay = 0;
 		} else {
@@ -127,7 +134,7 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 		super(TEXT_EVENTSTREAM);
 		setCharacterSet(CharacterSet.UTF_8);
 		setLanguages(Arrays.asList(language));
-		working = new AtomicBoolean(true);
+		working = new AtomicInteger(WORKING_RUNNING);
 		if (pingDelay < 10) {
 			this.pingDelay = 0;
 		} else {
@@ -159,22 +166,31 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 		connected.set(true);
 		try {
 			long delay = pingDelay;
-			Event event = queue.poll();
-			while (working.get() || (event != null)) {
+			while (working.get() > WORKING_STOP) {
+				Event event = queue.poll();
 				if (event == null) {
 					// Wait a little...
 					try {
-						Thread.sleep(50);
-						if (!working.get()) {
+						Thread.sleep(LOOP_DELAY);
+						// Only terminate here is the stream must stop now.
+						if (working.get() == WORKING_STOP) {
 							return;
 						}
 					} catch (InterruptedException e) {
-						working.set(false);
+						working.set(WORKING_STOP);
 						return;
 					}
 					event = queue.poll();
+					// There is still no event to send...
 					if ((event == null) && (pingDelay > 0)) {
-						delay -= 50;
+						// test if we are still working...
+						if (working.get() == WORKING_STOPPING) {
+							working.set(WORKING_STOP);
+							logger.debug("SSERepresentation ending skip ping..."); //$NON-NLS-1$
+							break;
+						}
+						// check if it is time to send a ping event...
+						delay -= LOOP_DELAY;
 						if (delay <= 0) {
 							// Do not store the ping event in the replay...
 							sendEvent(outputStream, new Event(currentId.getAndIncrement(), "ping", getPingObject(), 0)); //$NON-NLS-1$
@@ -199,10 +215,17 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 						}
 					}
 					if (event.terminate != 0) {
+						logger.debug("SSERepresentation ending final event."); //$NON-NLS-1$
+						working.set(WORKING_STOP);
 						break;
 					}
 				}
 				event = queue.poll();
+				if ((event == null) && (working.get() == WORKING_STOPPING)) {
+					working.set(WORKING_STOP);
+					logger.debug("SSERepresentation ending pending..."); //$NON-NLS-1$
+					break;
+				}
 			}
 		} catch (Exception e) {
 			logger.debug("SSERepresentation catch exception: " + e.getLocalizedMessage()); //$NON-NLS-1$
@@ -211,6 +234,7 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 			connected.set(false);
 			disconnected();
 		}
+		logger.debug("SSERepresentation Disconnected."); //$NON-NLS-1$
 	}
 	
 	protected synchronized void disconnected() {
@@ -252,7 +276,7 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 				logger.debug("Event {} pushed.", event.id);
 			} catch (IOException e) {
 				logger.debug("SSERepresentation Error during event push: " + e.getLocalizedMessage(), e);
-				working.set(false);
+				working.set(WORKING_STOP);
 				throw e;
 			}
 		}
@@ -275,9 +299,12 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 	public void terminateEventStream(boolean keepWaitingEvents) {
 		if (!keepWaitingEvents) {
 			queue.clear();
+			logger.debug("Terminate SSERepresentation");
+			working.set(WORKING_STOP);
+		} else {
+			logger.debug("Graceful terminate SSERepresentation");
+			working.set(WORKING_STOPPING);
 		}
-		working.set(false);
-		logger.debug("Graceful terminate SSERepresentation");
 	}
 	
 	/**
@@ -325,10 +352,7 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 	 * @param data The event data, may be null.
 	 */
 	public void pushTerminateEvent(Object data) {
-		queue.offer(new Event(currentId.getAndIncrement(), null, data, -1));
-		if ((queueMaxSize > 0) && (queue.size() > queueMaxSize)) {
-			queue.poll();
-		}
+		pushTerminateEvent(null, data, 0);
 	}
 	
 	/**
@@ -355,7 +379,6 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 	 */
 	public void pushTerminateEvent(String event, Object data) {
 		pushTerminateEvent(event, data, -1);
-
 	}
 	
 	/**
@@ -369,9 +392,11 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 	 * @param retry a positive delay in milli-second sent to the client to wait before to resume this stream connection.
 	 */
 	public void pushTerminateEvent(String event, Object data, int retry) {
-		queue.offer(new Event(currentId.getAndIncrement(), event, data, retry));
-		if ((queueMaxSize > 0) && (queue.size() > queueMaxSize)) {
-			queue.poll();
+		if (working.get() > WORKING_STOPPING) {
+			queue.offer(new Event(currentId.getAndIncrement(), event, data, retry));
+			if ((queueMaxSize > 0) && (queue.size() > queueMaxSize)) {
+				queue.poll();
+			}
 		}
 	}
 
@@ -399,7 +424,7 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 	 * @throws ResourceException If the Array content other object than JSONObjects.
 	 */
 	public void pushEvents(String event, JSONArray datas) throws ResourceException {
-		if (datas != null) {
+		if ((datas != null) && (working.get() > WORKING_STOPPING)) {
 			for (int i = 0; i < datas.length(); i++) {
 				try {
 					queue.offer(new Event(currentId.getAndIncrement(), event, datas.get(i), 0));
@@ -497,7 +522,7 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 			}
 		}
 		// Restart the streaming...
-		working.set(true);
+		working.set(WORKING_RUNNING);
 		setResponse(response);
 		setAvailable(true);
 	}
@@ -510,7 +535,7 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 	 */
 	public void resume(final Response response) {
 		disconnect();
-		working.set(true);
+		working.set(WORKING_RUNNING);
 		setResponse(response);
 		setAvailable(true);
 	}
@@ -523,7 +548,7 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 			logger.debug("SSERepresentation force to stop other pending connection.");
 			synchronized (this) {
 				if (connected.get()) {
-					working.set(false);
+					working.set(WORKING_STOP);
 				}
 			}
 			if (connected.get()) {
@@ -533,9 +558,9 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 					return;
 				}
 				// force to end any other run...
-				if (working.get()) {
-					logger.debug("SSERepresentation pending connection still working...");
-					working.set(false);
+				if (working.get() > WORKING_STOP) {
+					logger.debug("SSERepresentation pending connection still working... killing it.");
+					working.set(WORKING_STOP);
 					try {
 						Thread.sleep(50);
 					} catch (InterruptedException e) {
@@ -557,7 +582,8 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 	 * @see #isConnected()
 	 */
 	public boolean isWorking() {
-		return working.get() || !queue.isEmpty();
+		int i = working.get();
+		return (i == WORKING_RUNNING) || ((i == WORKING_STOPPING) && !queue.isEmpty());
 	}
 	
 	/**
@@ -642,6 +668,10 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 	/**
 	 * Get a new SSE Stream corresponding to the current state of this one.
 	 * 
+	 * <p>
+	 * The returned stream is not associated to any Response and is stoped. 
+	 * It need to be resumed by the caller.
+	 * 
 	 * @return a non null SSERepresentation object.
 	 */
 	@Override
@@ -652,7 +682,7 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 		} else {
 			result = new SSERepresentation(currentId.clone(), null, getLanguages().get(0), pingDelay);
 		}
-		result.working.set(false);
+		result.working.set(WORKING_STOP);
 		synchronized (this) {
 			if (replay != null) {
 				result.replay = new ConcurrentLinkedQueue<>();
