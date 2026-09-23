@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AFS - Client CLI
 Bundle-SymbolicName: com.arcadsoftware.afs.client.cli;singleton:=true
-Bundle-Version: 1.4.0.qualifier
+Bundle-Version: 1.4.0
 Bundle-Vendor: ARCAD Software
 Require-Bundle: xstream;bundle-version="1.4.201",
  com.arcadsoftware.aev.core.services;bundle-version="11.0.4",
