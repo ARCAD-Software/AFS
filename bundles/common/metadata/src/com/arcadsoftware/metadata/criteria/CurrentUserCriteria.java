@@ -23,6 +23,16 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
 /**
  * Test attribute value according to current user properties.
  * 
+ * <ul>
+ * <li> The "attribute" property accept a spcecial value "." which designate the ID of the tested entity.
+ *      Otherwise it is an attribute chain starting from the tested Entity.
+ * <li> The "userAttribute" property is an attribute chain from the User entity, it will be replaced by the actual 
+ *      value of the current user. If this property is not used this is the current User ID which is tested.
+ * <li> The "linkCode" is a link from the tested entity if he "attribute" property is not set, or a link from the entity
+ *      designated by the attribute chain. The targeted entity must be the User entity, or the entity designated by the
+ *      "userAttribute" attribute chain.
+ * </ul>
+ * 
  * <p>
  * Note for Mapper developers : This criteria is a metadata criteria, it always reduce to a simpler criteria. In some
  * case it can perform direct database request to select data (during reduction process).

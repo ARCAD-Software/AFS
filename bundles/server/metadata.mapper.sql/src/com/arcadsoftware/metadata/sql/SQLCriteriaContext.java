@@ -500,7 +500,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 		String parentCol = null;
 		if (a != null) {
 			result = new JoinElement(a, a, mapper.fg.dest);
-			parentCol = a + '.' + mapper.fg.source;
+			parentCol = a + '.' + mapper.fg.dest;
 		} else if (!deleted && (ei.deleteCol != null)) {
 			result = new JoinElement("xa", ei.table + " xa", ei.idCol); //$NON-NLS-1$ //$NON-NLS-2$
 			parentCol = "xa." + ei.idCol; //$NON-NLS-1$
@@ -515,7 +515,7 @@ public class SQLCriteriaContext extends CriteriaContextBasic {
 		for (MetaDataLink link: links) {
 			// If the current link is the subdivision link of the current entity,
 			// then we have managed is with a recurvise conversion at the previous step, we must ignore it.
-			if (!link.isRecursive()) { 
+			if (!link.isRecursive()) {
 				LinkInfo li = ei.links.get(link.getCode());
 				if (result == null) {
 					result = new JoinElement("la", li.table + " la", li.sourceCol);
