@@ -1,10 +1,10 @@
-# AFS-OS release version 2026.3.6.
+# AFS-OS release version 2026.3.7.
 
-Release date Tue Sep 01 11:26:29 CEST 2026.
+Release date Wed Sep 23 15:41:02 CEST 2026.
 
-Link to the update site of [Version 2026.3.6](https://github.com/ARCAD-Software/AFS/releases/download/2026.3.6/).
+Link to the update site of [Version 2026.3.7](https://github.com/ARCAD-Software/AFS/releases/download/2026.3.7/).
 
-2 Bundles modified in this release.
+5 Bundles modified in this release.
 
 
 
@@ -47,9 +47,9 @@ Bundle Symbolic Name | Modification | Version
 [com.arcadsoftware.crypt.xml](bundles/common/crypt.xml) | Not changed | 1.3.0
 [com.arcadsoftware.email](bundles/common/email) | Not changed | 1.5.0
 [com.arcadsoftware.groovy.security](bundles/common/groovy.security) | Not changed | 1.3.0
-[com.arcadsoftware.metadata](bundles/common/metadata) | Not changed | 2.2.3
+[com.arcadsoftware.metadata](bundles/common/metadata) | **Upgraded** from version 2.2.3 | **2.2.4**
 [com.arcadsoftware.osgi](bundles/common/osgi) | Not changed | 1.11.2
-[com.arcadsoftware.rest](bundles/common/rest) | Not changed | 3.4.3
+[com.arcadsoftware.rest](bundles/common/rest) | **Upgraded** from version 3.4.3 | **3.4.5**
 [com.arcadsoftware.ssh](bundles/common/ssh) | Not changed | 2.0.0
 
 
@@ -71,10 +71,10 @@ Bundle Symbolic Name | Modification | Version
 [com.arcadsoftware.database.sql.h2](bundles/server/database.sql.h2) | Not changed | 3.3.0
 [com.arcadsoftware.database.sql.postgresql](bundles/server/database.sql.postgresql) | Not changed | 1.4.0
 [com.arcadsoftware.metadata.binary](bundles/server/metadata.binary) | Not changed | 1.4.1
-[com.arcadsoftware.metadata.mapper.sql](bundles/server/metadata.mapper.sql) | **Upgraded** from version 2.1.2 | **2.1.3**
+[com.arcadsoftware.metadata.mapper.sql](bundles/server/metadata.mapper.sql) | **Upgraded** from version 2.1.3 | **2.1.4**
 [com.arcadsoftware.metadata.mapper.sql.postgresql](bundles/server/metadata.mapper.sql.postgresql) | Not changed | 2.1.0
 [com.arcadsoftware.metadata.registry.xml](bundles/server/metadata.registry.xml) | Not changed | 1.4.0
-[com.arcadsoftware.metadata.rest](bundles/server/metadata.rest) | **Upgraded** from version 2.1.3 | **2.1.4**
+[com.arcadsoftware.metadata.rest](bundles/server/metadata.rest) | **Upgraded** from version 2.1.4 | **2.1.5**
 [com.arcadsoftware.metadata.rights](bundles/server/metadata.rights) | Not changed | 1.6.0
 [com.arcadsoftware.metadata.server.user](bundles/server/metadata.server.user) | Not changed | 1.5.0
 [com.arcadsoftware.metadata.server.user.usergroup](bundles/server/metadata.server.user.usergroup) | Not changed | 1.1.1
@@ -85,7 +85,7 @@ Bundle Symbolic Name | Modification | Version
 [com.arcadsoftware.server.restful.connection](bundles/server/server.restful.connection) | Not changed | 2.4.1
 [com.arcadsoftware.server.restful.connection.config](bundles/server/server.restful.connection.config) | Not changed | 1.5.1
 [com.arcadsoftware.server.restful.connection.ldap](bundles/server/server.restful.connection.ldap) | Not changed | 2.6.0
-[com.arcadsoftware.server.restful.connection.local](bundles/server/server.restful.connection.local) | Not changed | 2.2.1
+[com.arcadsoftware.server.restful.connection.local](bundles/server/server.restful.connection.local) | **Upgraded** from version 2.2.1 | **2.2.2**
 [com.arcadsoftware.server.restful.console](bundles/server/server.restful.console) | Not changed | 1.6.0
 [com.arcadsoftware.server.restful.layouts](bundles/server/server.restful.layouts) | Not changed | 9.8.0
 [com.arcadsoftware.server.restful.log](bundles/server/server.restful.log) | Not changed | 1.4.0
@@ -109,7 +109,7 @@ Bundle Symbolic Name | Modification | Version
 
 Bundle Symbolic Name | Modification | Version
 -------------------- | ------------ | -------
-[com.arcadsoftware.tool.cli](bundles/tools/tool.cli) | Not changed | 2026.3.5
+[com.arcadsoftware.tool.cli](bundles/tools/tool.cli) | Not changed | 2026.3.6
 
 
 
