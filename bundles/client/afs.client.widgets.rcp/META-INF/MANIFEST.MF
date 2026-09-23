@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AFS - Dynamic Editors Widgets RCP Extension
 Bundle-SymbolicName: com.arcadsoftware.afs.client.widgets.rcp;singleton:=true
-Bundle-Version: 1.4.0
+Bundle-Version: 1.4.0.qualifier
 Bundle-Vendor: ARCAD Software
 Fragment-Host: com.arcadsoftware.afs.client.widgets;bundle-version="1.4.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-17
