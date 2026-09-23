@@ -145,6 +145,11 @@ public class JoinElement {
 		return result;
 	}
 
+	/**
+	 * Generate the from close
+	 * @param mapper
+	 * @return
+	 */
 	public String toString(MapperSQLService mapper) {
 		StringBuilder sb = new StringBuilder(table);
 		for (JoinElement c: children) {

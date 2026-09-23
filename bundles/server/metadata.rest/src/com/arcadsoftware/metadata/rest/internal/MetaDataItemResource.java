@@ -183,11 +183,7 @@ public class MetaDataItemResource extends DataItemResource {
 			for (final BeanMap item : getItems()) {
 				or.add(new IdEqualCriteria(item.getId()));
 			}
-			if (criteria instanceof AndCriteria) {
-				((AndCriteria) criteria).add(or);
-			} else {
-				criteria = new AndCriteria(criteria, or);
-			}
+			criteria = new AndCriteria(criteria, or);
 			// Get the result offset.
 			final int first = getFirst(form);
 			final int number = getPageCount(form, first);
@@ -542,11 +538,7 @@ public class MetaDataItemResource extends DataItemResource {
 		for (final BeanMap item : getItems()) {
 			or.add(new IdEqualCriteria(item.getId()));
 		}
-		if (criteria instanceof AndCriteria) {
-			((AndCriteria) criteria).add(or);
-		} else {
-			criteria = new AndCriteria(criteria, or);
-		}
+		criteria = new AndCriteria(criteria, or);
 		// Get the result offset.
 		final int first = getFirst(form);
 		final int number = getPageCount(form, first);
