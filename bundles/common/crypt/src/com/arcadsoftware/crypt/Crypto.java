@@ -65,7 +65,6 @@ import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import com.arcadsoftware.crypt.internal.Activator;
 import com.arcadsoftware.crypt.internal.Whirlpool;
 
 /**
@@ -258,22 +257,12 @@ public final class Crypto {
 							hn = h;
 						}
 					} catch (UnknownHostException e) {}
-					if ("true".equalsIgnoreCase(System.getProperty("com.arcadsoftware.masterkey.trace"))) { //$NON-NLS-1$ //$NON-NLS-2$
-						System.out.println("osn=" + osn); //$NON-NLS-1$
-						System.out.println("hn=" + hn); //$NON-NLS-1$
-						System.out.println("jh=" + jh); //$NON-NLS-1$
-					}
 					dmkc = new char[osn.length() + RANDOMSTRING7.length() + hn.length() + RANDOMSTRING3.length() + jh.length()];
 					System.arraycopy(osn.toCharArray(), 0, dmkc, 0, osn.length());
 					System.arraycopy(RANDOMSTRING7.toCharArray(), 0, dmkc, osn.length(), RANDOMSTRING7.length());
 					System.arraycopy(hn.toCharArray(), 0, dmkc, osn.length() + RANDOMSTRING7.length(), hn.length());
 					System.arraycopy(RANDOMSTRING3.toCharArray(), 0, dmkc, osn.length() + RANDOMSTRING7.length() + hn.length(), RANDOMSTRING3.length());
 					System.arraycopy(jh.toCharArray(), 0, dmkc, osn.length() + RANDOMSTRING7.length() + hn.length() + RANDOMSTRING3.length(), jh.length());
-					if ("true".equalsIgnoreCase(System.getProperty("com.arcadsoftware.masterkey.trace"))) { //$NON-NLS-1$ //$NON-NLS-2$
-						System.out.println("Default master key is:\ncom.arcadsoftware.masterkey=" + new String(dmkc));
-					}
-					// Will record this key in the config.ini file (if the context of execution is an OSGi platform.
-					Activator.temp = Arrays.copyOf(dmkc, dmkc.length);
 				}
 			}
 		}
