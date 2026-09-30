@@ -42,10 +42,10 @@ if [ ! -f "$JAVA_CMD" ]; then
   JAVA_CMD=java
 fi
 
-tooljar="$current/com.arcadsoftware.tool.cli-2026.9.1.jar"
+tooljar="$current/com.arcadsoftware.tool.cli-2026.9.2.jar"
 
 if [ ! -f "$tooljar" ]; then
-  tooljar="$current/com.arcadsoftware.tool.cli_2026.9.1.jar"
+  tooljar="$current/com.arcadsoftware.tool.cli_2026.9.2.jar"
 fi
 
 # Check that target executable exists
