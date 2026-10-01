@@ -3,6 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: AFS Cryptographic Utilities
 Bundle-SymbolicName: com.arcadsoftware.crypt
 Bundle-Version: 1.11.0.qualifier
+Eclipse-BundleShape: jar
 Bundle-Vendor: ARCAD Software
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Import-Package: javax.crypto,
