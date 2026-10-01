@@ -3,6 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Metadata Entities SQL Mapper for PostgreSQL
 Bundle-SymbolicName: com.arcadsoftware.metadata.mapper.sql.postgresql
 Bundle-Version: 2.1.0.qualifier
+Eclipse-BundleShape: jar
 Bundle-Vendor: ARCAD Software
 Fragment-Host: com.arcadsoftware.metadata.mapper.sql;bundle-version="[2.1.0,3.0.0)"
 Automatic-Module-Name: com.arcadsoftware.metadata.mapper.sql.postgresql

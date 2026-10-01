@@ -3,6 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: AFS Groovy Script Security
 Bundle-SymbolicName: com.arcadsoftware.groovy.security
 Bundle-Version: 1.4.1.qualifier
+Eclipse-BundleShape: jar
 Bundle-Vendor: ARCAD Software
 Automatic-Module-Name: com.arcadsoftware.groovy.security
 Bundle-RequiredExecutionEnvironment: JavaSE-17
