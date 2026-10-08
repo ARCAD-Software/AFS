@@ -18,6 +18,8 @@ import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.security.KeyStore;
 import java.util.Arrays;
+import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -31,6 +33,7 @@ import org.restlet.util.Series;
 
 import com.arcadsoftware.crypt.ConfiguredProxy;
 import com.arcadsoftware.crypt.ConfiguredSSLContext;
+import com.arcadsoftware.crypt.ConfiguredSSLContextException;
 import com.arcadsoftware.crypt.Crypto;
 import com.arcadsoftware.osgi.ILoggedPlugin;
 import com.arcadsoftware.rest.internal.Messages;
@@ -42,10 +45,23 @@ import com.arcadsoftware.rest.internal.Messages;
  */
 public class RestConnectionParameters implements Cloneable, Serializable {
 
+	/**
+	 * Default HTTP Server URL.
+	 */
+	public static final String SERVER_URL = "server.url";
+
+	// Legacy properties name...
+	private static final String PROXY_PASSWORD = "proxyPassword";
+	private static final String PROXY_LOGIN = "proxyLogin";
+	private static final String PROXY_PORT = "proxyPort";
+	private static final String PROXY_HOST = "proxyHost";
+	private static final String IGNORE_HOST_NAME = "ignoreHostName";
+
 	private static final long serialVersionUID = 3L;
 	
 	private final ILoggedPlugin activator;
 	private final HashMap<String, String> parameters;
+	private String defaultServerURL;
 	private boolean ignoreHostName;
 	private String proxyhost;
 	private int proxyport;
@@ -55,50 +71,125 @@ public class RestConnectionParameters implements Cloneable, Serializable {
 	/**
 	 * Create a parameter set from a properties object.
 	 * 
-	 * @param properties
+	 * @param activator only used for logging, may be null.
+	 * @param properties 
 	 */
 	public RestConnectionParameters(ILoggedPlugin activator, Map<String, Object> properties) {
 		this(activator);
-		Object o = properties.get("ignoreHostName"); //$NON-NLS-1$
-		ignoreHostName = (o != null) && "true".equalsIgnoreCase(o.toString()); //$NON-NLS-1$
-		// Manage proxy parameter using the Apache HTTPClient extention parameters AND default ConfiguredProxy properties.
-		proxyhost = (String) properties.get("proxyHost"); //$NON-NLS-1$
-		if (proxyhost == null) {
-			proxyhost = (String) properties.get(ConfiguredProxy.PROP_PROXY_HOSTNAME);
+		if (properties != null) {
+			Object o = properties.get(IGNORE_HOST_NAME);
+			ignoreHostName = (o != null) && "true".equalsIgnoreCase(o.toString()); //$NON-NLS-1$
+			defaultServerURL = (String) properties.get(SERVER_URL);
+			// Manage proxy parameter using the Apache HTTPClient extention parameters AND default ConfiguredProxy properties.
+			proxyhost = (String) properties.get(PROXY_HOST);
+			if (proxyhost == null) {
+				proxyhost = (String) properties.get(ConfiguredProxy.PROP_PROXY_HOSTNAME);
+			}
+			o = properties.get(PROXY_PORT);
+			if (o == null) {
+				o = properties.get(ConfiguredProxy.PROP_PROXY_PORT);
+			}
+			if (o != null) {
+				try {
+					proxyport = Integer.parseInt(o.toString());
+				} catch (NumberFormatException e) {}
+			}
+			proxylogin = (String) properties.get(PROXY_LOGIN);
+			if (proxylogin == null) {
+				proxylogin = (String) properties.get(ConfiguredProxy.PROP_PROXY_LOGIN);
+			}
+			o = properties.get(PROXY_PASSWORD);
+			if (o == null) {
+				o = properties.get(ConfiguredProxy.PROP_PROXY_PASSWORD);
+			}
+			if (o != null) {
+				proxypwd = Crypto.decrypt(o.toString());
+			}
+			for (Entry<String, Object> p: properties.entrySet()) {
+				if ((p.getValue() != null) && //
+						!IGNORE_HOST_NAME.equalsIgnoreCase(p.getKey()) && //
+						!SERVER_URL.equalsIgnoreCase(p.getKey())) {
+					if (ConfiguredProxy.PROP_PROXY_HOSTNAME.equalsIgnoreCase(p.getKey())) {
+						parameters.put(PROXY_HOST, p.getValue().toString()); //$NON-NLS-1$
+					} else if (ConfiguredProxy.PROP_PROXY_LOGIN.equalsIgnoreCase(p.getKey())) {
+						parameters.put(PROXY_LOGIN, p.getValue().toString()); //$NON-NLS-1$
+					} else if (ConfiguredProxy.PROP_PROXY_PORT.equalsIgnoreCase(p.getKey())) {
+						parameters.put(PROXY_PORT, p.getValue().toString()); //$NON-NLS-1$
+					} else if (ConfiguredProxy.PROP_PROXY_PASSWORD.equalsIgnoreCase(p.getKey())) {
+						parameters.put(PROXY_PASSWORD, new String(Crypto.decrypt(p.getValue().toString()))); //$NON-NLS-1$
+					} else {
+						parameters.put(p.getKey(), p.getValue().toString());
+					}
+				}
+			}
 		}
-		o = properties.get("proxyPort"); //$NON-NLS-1$
-		if (o == null) {
-			o = properties.get(ConfiguredProxy.PROP_PROXY_PORT);
-		}
-		if (o != null) {
+	}
+	/**
+	 * Create a parameter set from a properties object.
+	 * 
+	 * @param activator only used for logging, may be null.
+	 * @param prefix a property prefix used for filtering the propertis keys. May be null.
+	 * @param properties 
+	 */
+	public RestConnectionParameters(ILoggedPlugin activator, String prefix, Dictionary<String, Object> properties) {
+		this(activator);
+		if (properties != null) {
+			if (prefix == null) {
+				prefix = "";
+			}
+			Object o = properties.get(prefix + IGNORE_HOST_NAME); //$NON-NLS-1$
+			ignoreHostName = (o != null) && "true".equalsIgnoreCase(o.toString()); //$NON-NLS-1$
+			defaultServerURL = (String) properties.get(prefix + SERVER_URL);
+			// Manage proxy parameter using the Apache HTTPClient extention parameters AND default ConfiguredProxy properties.
+			proxyhost = (String) properties.get(prefix + PROXY_HOST); //$NON-NLS-1$
+			if (proxyhost == null) {
+				proxyhost = (String) properties.get(prefix + ConfiguredProxy.PROP_PROXY_HOSTNAME);
+			}
+			o = properties.get(prefix + PROXY_PORT); //$NON-NLS-1$
+			if (o == null) {
+				o = properties.get(prefix + ConfiguredProxy.PROP_PROXY_PORT);
+			}
+			if (o != null) {
+				try {
+					proxyport = Integer.parseInt(o.toString());
+				} catch (NumberFormatException e) {}
+			}
+			proxylogin = (String) properties.get(prefix + PROXY_LOGIN); //$NON-NLS-1$
+			if (proxylogin == null) {
+				proxylogin = (String) properties.get(prefix + ConfiguredProxy.PROP_PROXY_LOGIN);
+			}
+			o = properties.get(prefix + PROXY_PASSWORD); //$NON-NLS-1$
+			if (o == null) {
+				o = properties.get(prefix + ConfiguredProxy.PROP_PROXY_PASSWORD);
+			}
+			if (o != null) {
+				proxypwd = Crypto.decrypt(o.toString());
+			}
 			try {
-				proxyport = Integer.parseInt(o.toString());
-			} catch (NumberFormatException e) {}
-		}
-		proxylogin = (String) properties.get("proxyLogin"); //$NON-NLS-1$
-		if (proxylogin == null) {
-			proxylogin = (String) properties.get(ConfiguredProxy.PROP_PROXY_LOGIN);
-		}
-		o = properties.get("proxyPassword"); //$NON-NLS-1$
-		if (o == null) {
-			o = properties.get(ConfiguredProxy.PROP_PROXY_PASSWORD);
-		}
-		if (o != null) {
-			proxypwd = Crypto.decrypt(o.toString());
-		}
-		for (Entry<String, Object> p: properties.entrySet()) {
-			if ((p.getValue() != null) && //
-					!"ignoreHostName".equalsIgnoreCase(p.getKey())) { //$NON-NLS-1$
-				if (ConfiguredProxy.PROP_PROXY_HOSTNAME.equalsIgnoreCase(p.getKey())) {
-					parameters.put("proxyHost", p.getValue().toString()); //$NON-NLS-1$
-				} else if (ConfiguredProxy.PROP_PROXY_LOGIN.equalsIgnoreCase(p.getKey())) {
-					parameters.put("proxyLogin", p.getValue().toString()); //$NON-NLS-1$
-				} else if (ConfiguredProxy.PROP_PROXY_PORT.equalsIgnoreCase(p.getKey())) {
-					parameters.put("proxyPort", p.getValue().toString()); //$NON-NLS-1$
-				} else if (ConfiguredProxy.PROP_PROXY_PASSWORD.equalsIgnoreCase(p.getKey())) {
-					parameters.put("proxyPassword", new String(Crypto.decrypt(p.getValue().toString()))); //$NON-NLS-1$
-				} else {
-					parameters.put(p.getKey(), p.getValue().toString());
+				setConfiguredSSLContext(new ConfiguredSSLContext(prefix, properties));
+			} catch (ConfiguredSSLContextException e) {
+				if (activator != null) {
+					activator.error(e);
+				}				
+			}
+			Enumeration<String> keys = properties.keys();
+			while (keys.hasMoreElements()) {
+				String key = keys.nextElement();
+				o = properties.get(key);
+				if ((o != null) && //
+						!key.equalsIgnoreCase(prefix + IGNORE_HOST_NAME)) { //$NON-NLS-1$
+					String value = o.toString();
+					if (key.equalsIgnoreCase(prefix + ConfiguredProxy.PROP_PROXY_HOSTNAME)) {
+						parameters.put(PROXY_HOST, value); //$NON-NLS-1$
+					} else if (key.equalsIgnoreCase(prefix + ConfiguredProxy.PROP_PROXY_LOGIN)) {
+						parameters.put(PROXY_LOGIN, value); //$NON-NLS-1$
+					} else if (key.equalsIgnoreCase(prefix + ConfiguredProxy.PROP_PROXY_PORT)) {
+						parameters.put(PROXY_PORT, value); //$NON-NLS-1$
+					} else if (key.equalsIgnoreCase(prefix + ConfiguredProxy.PROP_PROXY_PASSWORD)) {
+						parameters.put(PROXY_PASSWORD, new String(Crypto.decrypt(value))); //$NON-NLS-1$
+					} else if (key.startsWith(prefix) && !key.startsWith(prefix + ConfiguredSSLContext.PREFIX_SSL_PROPERTY)){
+						parameters.put(key.substring(prefix.length()), value);
+					}
 				}
 			}
 		}
@@ -111,6 +202,7 @@ public class RestConnectionParameters implements Cloneable, Serializable {
 		super();
 		this.activator = activator;
 		parameters = new HashMap<String, String>();
+		defaultServerURL = null;
 		if (isIBMJVM()) {
 			setDefaultIBMJVMParameters();
 		}
@@ -123,8 +215,8 @@ public class RestConnectionParameters implements Cloneable, Serializable {
 	
 	private void setDefaultIBMJVMParameters() {
 		// Set mandatory hardcoded parameters for connection with a JVM in an IBMi environment
-		setKeyManagerAlgorithm(System.getProperty("ssl.KeyManagerFactory.algorithm", "PKIX")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		setTrustManagerAlgorithm(System.getProperty("ssl.TrustManagerFactory.algorithm", "PKIX"));
+		setKeyManagerAlgorithm(System.getProperty("ssl.KeyManagerFactory.algorithm", "PKIX")); //$NON-NLS-1$ //$NON-NLS-2$
+		setTrustManagerAlgorithm(System.getProperty("ssl.TrustManagerFactory.algorithm", "PKIX")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Override
@@ -135,6 +227,7 @@ public class RestConnectionParameters implements Cloneable, Serializable {
 		result.proxyhost = proxyhost;
 		result.proxylogin = proxylogin;
 		result.proxyport = proxyport;
+		result.defaultServerURL = defaultServerURL;
 		if (proxypwd != null) {
 			result.proxypwd = Arrays.copyOf(proxypwd, proxypwd.length);
 		}
@@ -451,20 +544,20 @@ public class RestConnectionParameters implements Cloneable, Serializable {
 		this.proxyhost = proxyhost;
 		// Note that these parameters require the NIO Connector !!!
 		if (proxyhost != null) {
-			parameters.put("proxyHost", proxyhost); //$NON-NLS-1$
+			parameters.put(PROXY_HOST, proxyhost); //$NON-NLS-1$
 			if (proxyport > 0) {
-				parameters.put("proxyPort", Integer.toString(proxyport)); //$NON-NLS-1$
+				parameters.put(PROXY_PORT, Integer.toString(proxyport)); //$NON-NLS-1$
 				this.proxyport = proxyport;
 			} else if (isUseTLS()) {
-				parameters.put("proxyPort", "3129"); //$NON-NLS-1$ //$NON-NLS-2$
+				parameters.put(PROXY_PORT, "3129"); //$NON-NLS-1$ //$NON-NLS-2$
 				this.proxyport = 3129;
 			} else {
-				parameters.put("proxyPort", "3128"); //$NON-NLS-1$ //$NON-NLS-2$
+				parameters.put(PROXY_PORT, "3128"); //$NON-NLS-1$ //$NON-NLS-2$
 				this.proxyport = 3128;
 			}
 		} else {
-			parameters.remove("proxyHost"); //$NON-NLS-1$
-			parameters.remove("proxyPort"); //$NON-NLS-1$
+			parameters.remove(PROXY_HOST); //$NON-NLS-1$
+			parameters.remove(PROXY_PORT); //$NON-NLS-1$
 		}
 	}
 
@@ -476,22 +569,22 @@ public class RestConnectionParameters implements Cloneable, Serializable {
 	public void setProxy(ConfiguredProxy cProxy) {
 		if ((cProxy != null) && (cProxy.getProxy() != null)) {
 			proxyhost = ((InetSocketAddress) cProxy.getProxy().address()).getHostString();
-			parameters.put("proxyHost", proxyhost); //$NON-NLS-1$
+			parameters.put(PROXY_HOST, proxyhost); //$NON-NLS-1$
 			proxyport = ((InetSocketAddress) cProxy.getProxy().address()).getPort();
-			parameters.put("proxyPort", Integer.toString(proxyport)); //$NON-NLS-1$
+			parameters.put(PROXY_PORT, Integer.toString(proxyport)); //$NON-NLS-1$
 			proxylogin = cProxy.getLogin();
-			parameters.put("proxyLogin", proxylogin); //$NON-NLS-1$
+			parameters.put(PROXY_LOGIN, proxylogin); //$NON-NLS-1$
 			proxypwd = cProxy.getPassword();
-			parameters.put("proxyPassword", new String(proxypwd)); //$NON-NLS-1$
+			parameters.put(PROXY_PASSWORD, new String(proxypwd)); //$NON-NLS-1$
 		} else {
 			proxyhost = null;
-			parameters.remove("proxyHost"); //$NON-NLS-1$
+			parameters.remove(PROXY_HOST); //$NON-NLS-1$
 			proxyport = 0;
-			parameters.remove("proxyPort"); //$NON-NLS-1$
+			parameters.remove(PROXY_PORT); //$NON-NLS-1$
 			proxylogin = null;
-			parameters.remove("proxyLogin"); //$NON-NLS-1$
+			parameters.remove(PROXY_LOGIN); //$NON-NLS-1$
 			proxypwd = null;
-			parameters.remove("proxyPassword"); //$NON-NLS-1$
+			parameters.remove(PROXY_PASSWORD); //$NON-NLS-1$
 		}			
 	}
 	
@@ -642,4 +735,20 @@ public class RestConnectionParameters implements Cloneable, Serializable {
 		return (proxyhost != null) && !proxyhost.isEmpty();
 	}
 	
+	/**
+	 * Get the configured default server address, if any.
+	 * 
+	 * @return null if no default server address is defined.
+	 */
+	public String getDefaultServerURL() {
+		return defaultServerURL;
+	}
+
+	/**
+	 * Define the default server URL.
+	 * @param httpURL
+	 */
+	public void setDefaultServerURL(String httpURL) {
+		
+	}
 }

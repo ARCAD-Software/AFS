@@ -22,6 +22,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Dictionary;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.Map;
@@ -99,6 +100,8 @@ public class WebServiceAccess {
 	// System Property used to force the usage of GET body for parameters
 	private static final int DEFAULTQUERYLIMIT;
 	private static final Representation EMPTYPARAM;
+	// HTTP Header used to store the API KEY.
+	private static final String APIKEY_HEADER = "X-API-KEY"; //$NON-NLS-1$
 	
 	static {
         // Define a default "empty" form representation (non empty form are require with PUT/POST method by some Proxy and firewall.
@@ -121,6 +124,7 @@ public class WebServiceAccess {
 	private char[] password;
 	private boolean useSSO;
 	private String token;
+	private String apiKey;
 	private volatile XStreamCompact xs;
 	private int queryLimit = DEFAULTQUERYLIMIT;
 	private boolean json;
@@ -130,7 +134,27 @@ public class WebServiceAccess {
 	 * 
 	 */
 	public WebServiceAccess() {
-		this(null, null);
+		this(null);
+	}
+	
+	/**
+	 * Create a new WSA object with the given parameters, note that any future modification of the parameters will be not taken into account by this WSA object.
+	 * 
+	 * @param activator may be null.
+	 * @param properties may be null.
+	 */
+	public WebServiceAccess(final ILoggedPlugin activator, Map<String, Object> properties) {
+		this(activator, new RestConnectionParameters(activator, properties));
+	}
+	
+	/**
+	 * Create a new WSA object with the given parameters, note that any future modification of the parameters will be not taken into account by this WSA object.
+	 * 
+	 * @param activator may be null.
+	 * @param properties may be null.
+	 */
+	public WebServiceAccess(final ILoggedPlugin activator, String prefix, Dictionary<String, Object> properties) {
+		this(activator, new RestConnectionParameters(activator, prefix, properties));
 	}
 	
 	/**
@@ -146,6 +170,10 @@ public class WebServiceAccess {
 			this.parameters = new RestConnectionParameters(activator);
 		} else {
 			this.parameters = parameters.clone();
+			String dsu = parameters.getDefaultServerURL();
+			if (dsu != null) {
+				defaultServeraddress = dsu;
+			}
 		}
 	}
 	
@@ -155,7 +183,7 @@ public class WebServiceAccess {
 	 * @param activator Activator instance used to log debug informations.
 	 */
 	public WebServiceAccess(final ILoggedPlugin activator) {
-		this(activator, null);
+		this(activator, (RestConnectionParameters) null);
 	}
 
 	/**
@@ -180,7 +208,7 @@ public class WebServiceAccess {
 	 */
 	@Deprecated
 	public WebServiceAccess(final ILoggedPlugin activator, File truststore, char[] truststorepass, File keystore, char[] keystorepass, char[] keypass, boolean ignoreHostName) {
-		this(activator, null);
+		this(activator);
 		if (truststore != null) {
 			parameters.setTrustStore(truststore, truststorepass);
 		}
@@ -211,7 +239,7 @@ public class WebServiceAccess {
 	 */
 	@Deprecated
 	public WebServiceAccess(final ILoggedPlugin activator, String truststore, String truststorepass, String keystore, String keystorepass, boolean ignoreHostName) {
-		this(activator, null);
+		this(activator);
 		if (truststore != null) {
 			if (truststorepass != null) {
 				parameters.setTrustStore(new File(truststore), truststorepass.toCharArray());
@@ -590,18 +618,11 @@ public class WebServiceAccess {
 	public String getLogin() {
 		return login;
 	}
-	
-	/**
-	 * Get the current OAuth Token (useful for refreshing it).
-	 * 
-	 * @return if null other authentication method will be used.
-	 */
-	public String getToken() {
-		return token;
-	}
 
 	/**
 	 * Set the current OAuth authorization token.
+	 * 
+	 * <p>
 	 * If null other authentication method will be used.
 	 * 
 	 * @param token
@@ -610,6 +631,17 @@ public class WebServiceAccess {
 		this.token = token;
 	}
 
+	/**
+	 * Set the API-Key used by this interface.
+	 * 
+	 * <p>
+	 * If null other authentication method will be used.
+	 * 
+	 * @param apiKey
+	 */
+	public void setAPIKey(String apiKey) {
+		this.apiKey = apiKey;
+	}
 	
 	/**
 	 * Prepare a secured request to the server.
@@ -623,7 +655,10 @@ public class WebServiceAccess {
 	 */
 	protected Request preprocess(Request request) {
 		if (useSSO) {
+			// FIXME Reuse the token for next calls... (define ta valitity duration for this token... < 10 hours !)
 			request.setChallengeResponse(new NegotiateAuthenticationHelper(activator, getServerAddress()).createChallengeResponse());
+		} else if (apiKey != null) {
+			request.getHeaders().add(APIKEY_HEADER, apiKey);
 		} else if (token != null) {
 			ChallengeResponse oauth = new ChallengeResponse(ChallengeScheme.HTTP_OAUTH_BEARER);
 			oauth.setRawValue(token);
@@ -1728,6 +1763,8 @@ public class WebServiceAccess {
 				form.add(entry.getKey(), ISODateFormater.toString((Date) o));
 			} else if (o instanceof Calendar) {
 				form.add(entry.getKey(), ISODateFormater.toString((Calendar) o));
+			} else if (json) {
+				form.add(entry.getKey(), new JsonStreamCompact().toXML(o));
 			} else {
 				if (xs == null) {
 					synchronized (this) {

@@ -111,14 +111,21 @@ public class NegotiateAuthenticationHelper {
 		// Setup "parameters" for service token
 		GSSName peerName = manager.createName(serviceName, null);
 		GSSContext secContext = manager.createContext(peerName, oid, null, GSSContext.DEFAULT_LIFETIME);
-		secContext.requestMutualAuth(false);
-		secContext.requestCredDeleg(true);
-		// Create token
-		byte[] inToken = new byte[0];
-		byte[] outToken = secContext.initSecContext(inToken, 0, inToken.length);
-		// Cleanup
-		secContext.dispose();
+		byte[] outToken = null;
+		try {
+			secContext.requestMutualAuth(false);
+			secContext.requestCredDeleg(true);
+			// Create token
+			byte[] inToken = new byte[0];
+			outToken = secContext.initSecContext(inToken, 0, inToken.length);
+		} finally {
+			// Cleanup
+			secContext.dispose();
+		}
 		// Encode result
+		if (outToken == null) {
+			return null;
+		}
 		return Base64.getEncoder().encodeToString(outToken);
 	}
 

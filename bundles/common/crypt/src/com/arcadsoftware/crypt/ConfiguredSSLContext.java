@@ -71,13 +71,18 @@ import com.arcadsoftware.crypt.internal.WrapperSSLContext;
 public class ConfiguredSSLContext {
 
 	/**
+	 * Prefix value used for all SSL/TLS properties.
+	 */
+	public static final String PREFIX_SSL_PROPERTY = "ssl.";
+
+	/**
 	 * Define the Java Security Provider to use in this configuration.
 	 * <p>
 	 * May be null, the JVM default Security Provider is used in this case.
 	 * <p>
 	 * <b>Value Type:</b> String
 	 */
-	public static final String PROP_SSL_PROVIDER = "ssl.provider"; //$NON-NLS-1$
+	public static final String PROP_SSL_PROVIDER = PREFIX_SSL_PROPERTY + "provider"; //$NON-NLS-1$
 
 	/**
 	 * Define the preferred SSL protocol to be used.
@@ -86,7 +91,7 @@ public class ConfiguredSSLContext {
 	 * <p>
 	 * <b>Value Type:</b> String
 	 */
-	public static final String PROP_SSL_PREFEREDPROTOCOL = "ssl.prefered.protocol"; //$NON-NLS-1$
+	public static final String PROP_SSL_PREFEREDPROTOCOL = PREFIX_SSL_PROPERTY + "prefered.protocol"; //$NON-NLS-1$
 
 	/**
 	 * If true the Protocol used will be StartTLS (if available by the implementation.
@@ -95,7 +100,7 @@ public class ConfiguredSSLContext {
 	 * 
 	 * @see #isStartTLS()
 	 */
-	public static final String PROP_SSL_START = "ssl.start"; //$NON-NLS-1$
+	public static final String PROP_SSL_START = PREFIX_SSL_PROPERTY + "start"; //$NON-NLS-1$
 
 	/**
 	 * Define the Secured Random algorithm implementation to use during the TLS connection.
@@ -104,7 +109,7 @@ public class ConfiguredSSLContext {
 	 * <p>
 	 * <b>Value Type:</b> String
 	 */
-	public static final String PROP_SECURERANDOM = "ssl.random"; //$NON-NLS-1$
+	public static final String PROP_SECURERANDOM = PREFIX_SSL_PROPERTY + "random"; //$NON-NLS-1$
 
 	/**
 	 * Define a local file system path to a Trusted certificate Store.
@@ -116,7 +121,7 @@ public class ConfiguredSSLContext {
 	 * 
 	 * @see #PROP_KEYSTORE_PATH
 	 */
-	public static final String PROP_TRUSTSTORE_PATH = "ssl.truststore.path"; //$NON-NLS-1$
+	public static final String PROP_TRUSTSTORE_PATH = PREFIX_SSL_PROPERTY + "truststore.path"; //$NON-NLS-1$
 
 	/**
 	 * Define the optional password used to load the Trusted Certificate Store.
@@ -125,7 +130,7 @@ public class ConfiguredSSLContext {
 	 * 
 	 * @see #PROP_TRUSTSTORE_PATH
 	 */
-	public static final String PROP_TRUSTSTORE_PWD = "ssl.truststore.pwd"; //$NON-NLS-1$
+	public static final String PROP_TRUSTSTORE_PWD = PREFIX_SSL_PROPERTY + "truststore.pwd"; //$NON-NLS-1$
 
 	/**
 	 * Define the Store type used by the Trusted Certificate Store.
@@ -134,7 +139,7 @@ public class ConfiguredSSLContext {
 	 * <p>
 	 * <b>Value Type:</b> String
 	 */
-	public static final String PROP_TRUSTSTORE_TYPE = "ssl.truststore.type"; //$NON-NLS-1$
+	public static final String PROP_TRUSTSTORE_TYPE = PREFIX_SSL_PROPERTY + "truststore.type"; //$NON-NLS-1$
 
 	/**
 	 * The algorithm used by the Certificate contained into the Trusted Certificate Store.
@@ -143,7 +148,7 @@ public class ConfiguredSSLContext {
 	 * <p>
 	 * <b>Value Type:</b> String
 	 */
-	public static final String PROP_TRUSTSTORE_ALGO = "ssl.truststore.algorithm"; //$NON-NLS-1$
+	public static final String PROP_TRUSTSTORE_ALGO = PREFIX_SSL_PROPERTY + "truststore.algorithm"; //$NON-NLS-1$
 
 	/**
 	 * Define a local file system path to a Keys Store.
@@ -155,14 +160,14 @@ public class ConfiguredSSLContext {
 	 * 
 	 * @see #PROP_TRUSTSTORE_PATH
 	 */
-	public static final String PROP_KEYSTORE_PATH = "ssl.keystore.path"; //$NON-NLS-1$
+	public static final String PROP_KEYSTORE_PATH = PREFIX_SSL_PROPERTY + "keystore.path"; //$NON-NLS-1$
 
 	/**
 	 * Define the optional password used to load the Key Store.
 	 * <p>
 	 * <b>Value Type:</b> String
 	 */
-	public static final String PROP_KEYSTORE_PWD = "ssl.keystore.pwd"; //$NON-NLS-1$
+	public static final String PROP_KEYSTORE_PWD = PREFIX_SSL_PROPERTY + "keystore.pwd"; //$NON-NLS-1$
 
 	/**
 	 * Define the Store type used by the Keys Store.
@@ -171,7 +176,7 @@ public class ConfiguredSSLContext {
 	 * <p>
 	 * <b>Value Type:</b> String
 	 */
-	public static final String PROP_KEYSTORE_TYPE = "ssl.keystore.type"; //$NON-NLS-1$
+	public static final String PROP_KEYSTORE_TYPE = PREFIX_SSL_PROPERTY + "keystore.type"; //$NON-NLS-1$
 
 	/**
 	 * The algorithm used by the Certificated contained into the Key Store.
@@ -180,7 +185,7 @@ public class ConfiguredSSLContext {
 	 * <p>
 	 * <b>Value Type:</b> String
 	 */
-	public static final String PROP_KEYSTORE_ALGO = "ssl.keystore.algorithm"; //$NON-NLS-1$
+	public static final String PROP_KEYSTORE_ALGO = PREFIX_SSL_PROPERTY + "keystore.algorithm"; //$NON-NLS-1$
 
 	/**
 	 * The password used to access the keys contained into the Keys Store.
@@ -191,14 +196,14 @@ public class ConfiguredSSLContext {
 	 * 
 	 * @see #PROP_KEYSTORE_PWD
 	 */
-	public static final String PROP_KEYSTORE_KEYPWD = "ssl.keystore.keypwd"; //$NON-NLS-1$
+	public static final String PROP_KEYSTORE_KEYPWD = PREFIX_SSL_PROPERTY + "keystore.keypwd"; //$NON-NLS-1$
 
 	/**
 	 * Define a list, white space separated, of name of disabled cipher suites.
 	 * <p>
 	 * <b>Value Type:</b> String
 	 */
-	public static final String PROP_DISABLEDCIPHERSUITES = "ssl.ciphersuites.disabled"; //$NON-NLS-1$
+	public static final String PROP_DISABLEDCIPHERSUITES = PREFIX_SSL_PROPERTY + "ciphersuites.disabled"; //$NON-NLS-1$
 
 	/**
 	 * Define a list, white space separated, of name of disabled protocols.
@@ -206,7 +211,7 @@ public class ConfiguredSSLContext {
 	 * <p>
 	 * <b>Value Type:</b> String
 	 */
-	public static final String PROP_DISABLEDPROTOCOLS = "ssl.protocols.disabled"; //$NON-NLS-1$
+	public static final String PROP_DISABLEDPROTOCOLS = PREFIX_SSL_PROPERTY + "protocols.disabled"; //$NON-NLS-1$
 
 	/**
 	 * Define a list, white space separated, of name of explicitly enabled cipher suites.
@@ -214,7 +219,7 @@ public class ConfiguredSSLContext {
 	 * <p>
 	 * <b>Value Type:</b> String
 	 */
-	public static final String PROP_ENABLEDCIPHERSUITES = "ssl.ciphersuites.enabled"; //$NON-NLS-1$
+	public static final String PROP_ENABLEDCIPHERSUITES = PREFIX_SSL_PROPERTY + "ciphersuites.enabled"; //$NON-NLS-1$
 
 	/**
 	 * Define a list, white space separated, of name of explicitly enabled protocols.
@@ -222,7 +227,7 @@ public class ConfiguredSSLContext {
 	 * <p>
 	 * <b>Value Type:</b> String
 	 */
-	public static final String PROP_ENABLEDPROTOCOLS = "ssl.protocols.enabled"; //$NON-NLS-1$
+	public static final String PROP_ENABLEDPROTOCOLS = PREFIX_SSL_PROPERTY + "protocols.enabled"; //$NON-NLS-1$
 
 	/**
 	 * Define that the SSL Server will request client authentication. This option is only useful in the server mode. The
@@ -241,7 +246,7 @@ public class ConfiguredSSLContext {
 	 * <p>
 	 * <b>Value Type:</b> Boolean
 	 */
-	public static final String PROP_WANTCLIENTAUTH = "ssl.clientauth.want"; //$NON-NLS-1$
+	public static final String PROP_WANTCLIENTAUTH = PREFIX_SSL_PROPERTY + "clientauth.want"; //$NON-NLS-1$
 
 	/**
 	 * Define that the SSL Server will require client authentication. This option is only useful in the server mode. The
@@ -260,7 +265,7 @@ public class ConfiguredSSLContext {
 	 * <p>
 	 * <b>Value Type:</b> Boolean
 	 */
-	public static final String PROP_NEEDCLIENTAUTH = "ssl.clientauth.need"; //$NON-NLS-1$
+	public static final String PROP_NEEDCLIENTAUTH = PREFIX_SSL_PROPERTY + "clientauth.need"; //$NON-NLS-1$
 
 	/**
 	 * Configures the SSL engine to use client (or server) mode when handshaking. This method must be called before any
@@ -270,7 +275,7 @@ public class ConfiguredSSLContext {
 	 * <p>
 	 * <b>Value Type:</b> String
 	 */
-	public static final String PROP_USECLIENTMODE = "ssl.client.mode"; //$NON-NLS-1$
+	public static final String PROP_USECLIENTMODE = PREFIX_SSL_PROPERTY + "client.mode"; //$NON-NLS-1$
 
 	/**
 	 * Define if HTTPS connection should verify the URL hostname against the used certificate. Default value is true.
@@ -278,7 +283,7 @@ public class ConfiguredSSLContext {
 	 * <p>
 	 * <b>Value Type:</b> Boolean
 	 */
-	public static final String PROP_VERIFYHOSTNAME = "ssl.hostname.verification"; //$NON-NLS-1$
+	public static final String PROP_VERIFYHOSTNAME = PREFIX_SSL_PROPERTY + "hostname.verification"; //$NON-NLS-1$
 
 	// Used to set some default values.
 	private static final String DEFAULT_STOREALGO;
@@ -327,17 +332,54 @@ public class ConfiguredSSLContext {
 	 * @throws ConfiguredSSLContextException
 	 */
 	public ConfiguredSSLContext(String prefix, Dictionary<String, Object> props) throws ConfiguredSSLContextException {
-		super();
-		properties = new HashMap<String, Object>();
+		this(getProperties(prefix, props));
+	}
+	
+	private static HashMap<String, Object> getProperties(String prefix, Dictionary<String, Object> props) {
+		if (prefix == null) {
+			prefix = ""; //$NON-NLS-1$
+		}
+		HashMap<String, Object> properties = new HashMap<>();
 		if (props != null) {
 			Enumeration<String> keys = props.keys();
 			while (keys.hasMoreElements()) {
 				String k = keys.nextElement();
-				if (k.startsWith(prefix + "ssl.")) { //$NON-NLS-1$
+				if (k.startsWith(prefix + PREFIX_SSL_PROPERTY)) {
 					properties.put(k.substring(prefix.length()), props.get(k));
 				}
 			}
 		}
+		return properties;
+	}
+	
+	/**
+	 * Create a new TLS configuration.
+	 * 
+	 * @param props
+	 * @throws ConfiguredSSLContextException
+	 */
+	public ConfiguredSSLContext(String prefix, Map<String, Object> props) throws ConfiguredSSLContextException {
+		this(getProperties(prefix, props));
+	}
+	
+	private static HashMap<String, Object> getProperties(String prefix, Map<String, Object> props) {
+		if (prefix == null) {
+			prefix = ""; //$NON-NLS-1$
+		}
+		HashMap<String, Object> properties = new HashMap<>();
+		if (props != null) {
+			for (Entry<String, Object> e: props.entrySet()) {
+				if (e.getKey().startsWith(prefix + PREFIX_SSL_PROPERTY)) {
+					properties.put(e.getKey().substring(prefix.length()), e.getValue());
+				}
+			}
+		}
+		return properties;
+	}
+
+	private ConfiguredSSLContext(HashMap<String, Object> props) throws ConfiguredSSLContextException {
+		super();
+		properties = props;
 		if (Security.getProperty(BouncyCastleProvider.PROVIDER_NAME) == null) {
 			Security.addProvider(new BouncyCastleProvider());
 		}
@@ -414,12 +456,16 @@ public class ConfiguredSSLContext {
 		if (ksPwd == null) {
 			throw new ConfiguredSSLContextException("No password configured for Keys Store, using unprotected Keys Store is not allowed.");
 		}
+		String type = getProp(props, PROP_TRUSTSTORE_TYPE, ""); //$NON-NLS-1$
+		if (type.isBlank()) {
+			type = guessStoreType(ksFileName);
+		}
 		try {
 			KeyStore ks;
 			if (provider == null) {
-				ks = KeyStore.getInstance(getProp(props, PROP_KEYSTORE_TYPE, "JKS")); //$NON-NLS-1$
+				ks = KeyStore.getInstance(type);
 			} else {
-				ks = KeyStore.getInstance(getProp(props, PROP_KEYSTORE_TYPE, "JKS"), provider); //$NON-NLS-1$
+				ks = KeyStore.getInstance(type, provider);
 			}
 			try (FileInputStream fis = new FileInputStream(ksFile)) {
 				ks.load(fis, ksPwd);
@@ -458,12 +504,16 @@ public class ConfiguredSSLContext {
 			throw new ConfiguredSSLContextException(
 					"No password configured for Trusted certificates Store, using unprotected Keys Store is not allowed.");
 		}
+		String type = getProp(props, PROP_TRUSTSTORE_TYPE, ""); //$NON-NLS-1$
+		if (type.isBlank()) {
+			type = guessStoreType(tsFileName);
+		}
 		try {
 			KeyStore ts;
 			if (provider == null) {
-				ts = KeyStore.getInstance(getProp(props, PROP_TRUSTSTORE_TYPE, "JKS")); //$NON-NLS-1$
+				ts = KeyStore.getInstance(type); //$NON-NLS-1$
 			} else {
-				ts = KeyStore.getInstance(getProp(props, PROP_TRUSTSTORE_TYPE, "JKS"), provider); //$NON-NLS-1$
+				ts = KeyStore.getInstance(type, provider); //$NON-NLS-1$
 			}
 			try (FileInputStream fis = new FileInputStream(tsFile)) {
 				ts.load(fis, tsPwd);
@@ -485,6 +535,37 @@ public class ConfiguredSSLContext {
 		} catch (KeyStoreException | NoSuchProviderException | NoSuchAlgorithmException e) {
 			throw new ConfiguredSSLContextException(e);
 		}
+	}
+
+	private String guessStoreType(String fileName) {
+		if (fileName != null) {
+			int slash = Math.max(fileName.lastIndexOf('/'), fileName.lastIndexOf('\\'));
+			int dot = fileName.lastIndexOf('.');
+			if (dot > slash && dot < fileName.length() - 1) {
+				String ext = fileName.substring(dot + 1).toLowerCase();
+				switch (ext) {
+				case "jks":
+					return "JKS";
+				case "p12":
+				case "pfx":
+				case "pkcs12":
+					return "PKCS12";
+				case "jceks":
+					return "JCEKS";
+				case "bks":
+					return "BKS";   // Bouncy Castle provider required
+				case "uber":
+					return "UBER";  // Bouncy Castle provider required
+				case "bcfks":
+					return "BCFKS"; // Bouncy Castle FIPS provider required
+				default:
+					break;
+			    }
+			}
+		}
+		// this is the legacy response type:
+		return "JKS"; //$NON-NLS-1$
+		//return java.security.KeyStore.getDefaultType();
 	}
 
 	private SecureRandom getSecureRandom(Map<String, Object> props, String provider)
