@@ -12,7 +12,6 @@
 	<artifactId>com.arcadsoftware.afs.update</artifactId>
 	<packaging>eclipse-repository</packaging>
 
-	
 	<profiles>
 		<profile>
 			<id>flat-repo</id>
@@ -41,4 +40,5 @@
 				</plugins>
 			</build>
 		</profile>
-	</profiles></project>
+	</profiles>
+</project>
