@@ -315,7 +315,7 @@ public class FileSystemTracker extends TimerTask {
 	private void checkDirectory(File dir, String baseDirName, HashMap<String, FileMark> current) {
 		if (dir.isDirectory()) {
 			for (String name: dir.list()) {
-				File file = new File(dir,name);
+				File file = new File(dir, name);
 				String localName = baseDirName + name;
 				if (file.isDirectory()) {
 					if (!(".".equals(name) || "..".equals(name))) { //$NON-NLS-1$ //$NON-NLS-2$
