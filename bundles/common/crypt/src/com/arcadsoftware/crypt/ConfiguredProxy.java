@@ -129,6 +129,9 @@ public class ConfiguredProxy {
 	 */
 	public ConfiguredProxy(String prefix, Type type, Dictionary<String, Object> props) {
 		super();
+		if (prefix == null) {
+			prefix = ""; //$NON-NLS-1$
+		}
 		InetSocketAddress a = getAddress(prefix, props);
 		if ((type != Type.DIRECT) && (a != null)) {
 			proxy = new Proxy(type, a);
