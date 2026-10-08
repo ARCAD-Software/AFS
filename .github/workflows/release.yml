@@ -17,27 +17,34 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up JDK 17 and 8
-      uses: actions/setup-java@v3
+    - uses: actions/checkout@v5
+      
+    - name: Set up JDK 17 and 21
+      uses: actions/setup-java@v5
       with:
         distribution: 'temurin'
+        server-id: github
+        server-username: GITHUB_ACTOR
+        server-password: GITHUB_TOKEN
         java-version: |
-          8
           17
+          21
         # Below option needs to match the ID of the manifest BREE in order to pick the correct Java version for the build
         # Check pom.xml for more information about toolchains
         mvn-toolchain-id: |
-          JavaSE-1.8
           JavaSE-17
+          JavaSE-21
           
     - name: Load keystore
       run: |
         echo "${{ secrets.CODESIGN_KEYSTORE }}" > $RUNNER_TEMP/codesign.p12.asc
         gpg -d --passphrase ${{ secrets.CODESIGN_KEYSTORE_PASSPHRASE }} --batch $RUNNER_TEMP/codesign.p12.asc > $RUNNER_TEMP/codesign.p12
-        
+      
+    - name: Get Maven current version
+      run: mvn -v
+      
     - name: Run Kotlin script
       run: kotlinc -script build/clearpackages.main.kts ${{ secrets.GITHUB_TOKEN }}
       
