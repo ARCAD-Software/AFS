@@ -16,8 +16,8 @@
 		<maven.version>3.6.3</maven.version>
 		<maven.deloy.version>3.2.0</maven.deloy.version>
 		<maven.build.helper.version>3.6.2</maven.build.helper.version>
-		<tycho.version>5.0.4</tycho.version>
-		<tycho.extra.version>5.0.4</tycho.extra.version>
+		<tycho.version>4.0.13</tycho.version>
+		<tycho.extra.version>4.0.13</tycho.extra.version>
 		<keystore></keystore>
 		<tycho.scmUrl>scm:git:https://github.com/ARCAD-Software/AFS.git</tycho.scmUrl>
 		<jetty.version>12.0.39</jetty.version>
