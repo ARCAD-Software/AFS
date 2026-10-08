@@ -18,30 +18,36 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v5
        
-    - name: Set up JDK 17 and 8
-      uses: actions/setup-java@v3
+    - name: Set up JDK 17 and 21
+      uses: actions/setup-java@v5
       with:
+        server-id: github
+        server-username: GITHUB_ACTOR
+        server-password: GITHUB_TOKEN
         distribution: 'temurin'
         java-version: |
-          8
           17
+          21
         # Below option needs to match the ID of the manifest BREE in order to pick the correct Java version for the build
         # Check pom.xml for more information about toolchains
         mvn-toolchain-id: |
-          JavaSE-1.8
           JavaSE-17
-
+          JavaSE-21
+          
     - name: Load keystore
       run: |
         echo "${{ secrets.CODESIGN_KEYSTORE }}" > $RUNNER_TEMP/codesign.p12.asc
         gpg -d --passphrase ${{ secrets.CODESIGN_KEYSTORE_PASSPHRASE }} --batch $RUNNER_TEMP/codesign.p12.asc > $RUNNER_TEMP/codesign.p12
+
+    - name: Get Maven current version
+      run: mvn -v
            
     - name: Build with Maven
-      run: mvn -B package -Pflat-repo -Dkeystore=$RUNNER_TEMP/codesign.p12
+      run: mvn -B package -Pflat-repo -Dkeystore=$RUNNER_TEMP/codesign.p12 -DforceContextQualifier=$(date -u +%Y%m%d%H%M)
       env: 
         KEY_PASSWORD: ${{ secrets.CODESIGN_KEY_PASSWORD }}
         KEYSTORE_PASSWORD: ${{ secrets.CODESIGN_KEYSTORE_PASSWORD }}
@@ -53,5 +59,4 @@ jobs:
         automatic_release_tag: "prerelease-${{ github.ref_name }}"
         prerelease: true
         title: "Development Build ${{ github.ref_name }}"
-        files: |
-          releng/update/target/flat-repository/*
+        files: releng/update/target/flat-repository/*
