@@ -27,7 +27,8 @@ Import-Package: javax.crypto,
  org.bouncycastle.operator.bc;version="[1.84.0,2.0.0)",
  org.bouncycastle.operator.jcajce;version="[1.84.0,2.0.0)",
  org.bouncycastle.x509;version="[1.84.0,2.0.0)",
- org.osgi.framework;version="[1.8.0,2.0.0)"
+ org.osgi.framework;version="[1.8.0,2.0.0)",
+ org.slf4j;version="[2.0.0,3.0.0)"
 Export-Package: com.arcadsoftware.crypt;version="1.4.0"
 Bundle-ClassPath: .
 Automatic-Module-Name: com.arcadsoftware.crypt
