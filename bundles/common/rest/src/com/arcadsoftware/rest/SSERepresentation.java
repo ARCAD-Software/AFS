@@ -169,6 +169,11 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 			while (working.get() > WORKING_STOP) {
 				Event event = queue.poll();
 				if (event == null) {
+					if (working.get() == WORKING_STOPPING) {
+						working.set(WORKING_STOP);
+						logger.debug("SSERepresentation ending pending..."); //$NON-NLS-1$
+						break;
+					}
 					// Wait a little...
 					try {
 						Thread.sleep(LOOP_DELAY);
@@ -219,12 +224,6 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 						working.set(WORKING_STOP);
 						break;
 					}
-				}
-				event = queue.poll();
-				if ((event == null) && (working.get() == WORKING_STOPPING)) {
-					working.set(WORKING_STOP);
-					logger.debug("SSERepresentation ending pending..."); //$NON-NLS-1$
-					break;
 				}
 			}
 		} catch (Exception e) {
