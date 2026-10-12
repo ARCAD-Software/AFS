@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.arcadsoftware</groupId>
+		<artifactId>com.arcadsoftware.afs.repack</artifactId>
+		<version>2026.10.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>com.arcadsoftware.jetty</artifactId>
+	<packaging>eclipse-plugin</packaging>
+	<version>12.0.40-SNAPSHOT</version>
+
+	<properties>
+		<jetty.version>12.0.40</jetty.version>
+	</properties>
+
+	<dependencies>
+		<!-- HTTP1.1 Jetty base Server and Client -->
+		<dependency>
+		    <groupId>org.eclipse.jetty</groupId>
+		    <artifactId>jetty-server</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty</groupId>
+		    <artifactId>jetty-http</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty</groupId>
+		    <artifactId>jetty-io</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty</groupId>
+		    <artifactId>jetty-util</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty</groupId>
+		    <artifactId>jetty-client</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		
+		<!-- (Optional) Remote monitoring of Jetty Server... -->
+		<dependency>
+		    <groupId>org.eclipse.jetty</groupId>
+		    <artifactId>jetty-jmx</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		
+		<!-- JETTY ALPN negotiation between HTTP1.1 HTTP/2 and HTTP/3 -->
+		<dependency>
+		    <groupId>org.eclipse.jetty</groupId>
+		    <artifactId>jetty-alpn-client</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty</groupId>
+		    <artifactId>jetty-alpn-java-client</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty</groupId>
+		    <artifactId>jetty-alpn-server</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty</groupId>
+		    <artifactId>jetty-alpn-java-server</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		
+		<!-- Jetty HTTP/2 Server and client (support HTTP) -->
+		<dependency>
+		    <groupId>org.eclipse.jetty.http2</groupId>
+		    <artifactId>jetty-http2-server</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.http2</groupId>
+		    <artifactId>jetty-http2-common</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.http2</groupId>
+		    <artifactId>jetty-http2-hpack</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.http2</groupId>
+		    <artifactId>jetty-http2-client-transport</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.http2</groupId>
+		    <artifactId>jetty-http2-client</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		
+		<!-- Jetty HTTP/3 Server and Client (HTTPS only) -->
+		<dependency>
+		    <groupId>org.eclipse.jetty.http3</groupId>
+		    <artifactId>jetty-http3-server</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.http3</groupId>
+		    <artifactId>jetty-http3-common</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.http3</groupId>
+		    <artifactId>jetty-http3-qpack</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.http3</groupId>
+		    <artifactId>jetty-http3-client-transport</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.http3</groupId>
+		    <artifactId>jetty-http3-client</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.eclipse.jetty.quic</groupId>
+		    <artifactId>jetty-quic-server</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.quic</groupId>
+		    <artifactId>jetty-quic-common</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.quic</groupId>
+		    <artifactId>jetty-quic-client</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.quic</groupId>
+		    <artifactId>jetty-quic-quiche-common</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.jetty.quic</groupId>
+		    <artifactId>jetty-quic-quiche-jna</artifactId>
+		    <version>${jetty.version}</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.mortbay.jetty.quiche</groupId>
+		    <artifactId>jetty-quiche-native</artifactId>
+		    <version>0.24.5</version>
+		</dependency>
+		<dependency>
+		    <groupId>net.java.dev.jna</groupId>
+		    <artifactId>jna-jpms</artifactId>
+		    <version>5.19.1</version>
+		</dependency>
+		<dependency>
+		    <groupId>net.java.dev.jna</groupId>
+		    <artifactId>jna-platform-jpms</artifactId>
+		    <version>5.19.1</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-jetty-into-lib</id>
+						<!-- initialize runs before Tycho builds the bundle class path, so the
+						     jars named in Bundle-ClassPath are on disk by then. -->
+						<phase>initialize</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.basedir}/lib</outputDirectory>
+							<!-- Bundle-ClassPath names the jars without their version, so a
+							     version bump does not touch the MANIFEST. -->
+							<stripVersion>true</stripVersion>
+							<excludeTransitive>true</excludeTransitive>
+							<!-- Without this filter the dependencies inherited from the root pom -->
+							<includeGroupIds>org.eclipse.jetty,org.eclipse.jetty.http2,org.eclipse.jetty.http3,org.eclipse.jetty.quic,org.mortbay.jetty.quiche,net.java.dev.jna</includeGroupIds>
+							<overWriteIfNewer>true</overWriteIfNewer>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

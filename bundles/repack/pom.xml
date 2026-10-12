@@ -33,6 +33,7 @@
 	</build>
 
 	<modules>
+		<module>jetty</module>
 		<module>xstream</module>
 		<module>org.restlet</module>
 	</modules>
