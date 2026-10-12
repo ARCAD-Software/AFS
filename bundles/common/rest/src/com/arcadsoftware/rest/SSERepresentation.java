@@ -475,6 +475,7 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 								} else {
 									rtemp.add(e);
 								}
+								e = queue.poll();
 							}
 							if (found) {
 								replay.addAll(rtemp);
@@ -492,7 +493,9 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 				// Clear the not sent messages
 				if (replay != null) {
 					synchronized (this) {
-						if (replay != null) {
+						if (replay == null) {
+							queue.clear();
+						} else {
 							Event e = queue.poll();
 							while (e != null) {
 								replay.add(e);
@@ -501,8 +504,6 @@ public class SSERepresentation extends OutputRepresentation implements Cloneable
 									replay.poll();
 								}
 							}
-						} else {
-							queue.clear();
 						}
 					}
 				} else {
