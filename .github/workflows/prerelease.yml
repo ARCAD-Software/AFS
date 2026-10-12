@@ -25,6 +25,9 @@ jobs:
     - name: Set up JDK 17 and 21
       uses: actions/setup-java@v5
       with:
+        server-id: github
+        server-username: GITHUB_ACTOR
+        server_password: GITHUB_TOKEN
         distribution: 'temurin'
         java-version: |
           17
@@ -53,5 +56,4 @@ jobs:
         automatic_release_tag: "prerelease-${{ github.ref_name }}"
         prerelease: true
         title: "Development Build ${{ github.ref_name }}"
-        files: |
-          releng/update/target/flat-repository/*
+        files: releng/update/target/flat-repository/*

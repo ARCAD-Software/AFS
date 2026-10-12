@@ -24,6 +24,9 @@ jobs:
       uses: actions/setup-java@v5
       with:
         distribution: 'temurin'
+        server-id: github
+        server-username: GITHUB_ACTOR
+        server_password: GITHUB_TOKEN
         java-version: |
           17
           21
