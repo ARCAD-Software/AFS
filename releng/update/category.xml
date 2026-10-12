@@ -6,7 +6,46 @@
    <feature id="com.arcadsoftware.afs.server.osgi" version="0.0.0">
       <category name="base"/>
    </feature>
+   <bundle id="com.arcadsoftware.beanmap"/>
+   <bundle id="com.arcadsoftware.cleanup"/>
+   <bundle id="com.arcadsoftware.cm.simple"/>
+   <bundle id="com.arcadsoftware.crypt.xml"/>
+   <bundle id="com.arcadsoftware.crypt"/>
+   <bundle id="com.arcadsoftware.database.sql.h2"/>
+   <bundle id="com.arcadsoftware.database.sql.postgresql"/>
+   <bundle id="com.arcadsoftware.database.sql"/>
+   <bundle id="com.arcadsoftware.email"/>
+   <bundle id="com.arcadsoftware.groovy.security"/>
+   <bundle id="com.arcadsoftware.metadata.binary"/>
+   <bundle id="com.arcadsoftware.metadata.mapper.sql.postgresql"/>
+   <bundle id="com.arcadsoftware.metadata.mapper.sql"/>
+   <bundle id="com.arcadsoftware.metadata.registry.xml"/>
+   <bundle id="com.arcadsoftware.metadata.rest"/>
+   <bundle id="com.arcadsoftware.metadata.rights"/>
+   <bundle id="com.arcadsoftware.metadata.server.user"/>
+   <bundle id="com.arcadsoftware.metadata"/>
+   <bundle id="com.arcadsoftware.osgi"/>
+   <bundle id="com.arcadsoftware.rest"/>
+   <bundle id="com.arcadsoftware.server.binaries"/>
+   <bundle id="com.arcadsoftware.server.messages"/>
+   <bundle id="com.arcadsoftware.server.properties"/>
+   <bundle id="com.arcadsoftware.server.restful.connection.config"/>
+   <bundle id="com.arcadsoftware.server.restful.connection.ldap"/>
+   <bundle id="com.arcadsoftware.server.restful.connection.local"/>
+   <bundle id="com.arcadsoftware.server.restful.connection"/>
+   <bundle id="com.arcadsoftware.server.restful.console"/>
+   <bundle id="com.arcadsoftware.server.restful.layouts"/>
+   <bundle id="com.arcadsoftware.server.restful.log"/>
+   <bundle id="com.arcadsoftware.server.restful"/>
+   <bundle id="com.arcadsoftware.server.scheduler.impl"/>
+   <bundle id="com.arcadsoftware.server.scheduler"/>
+   <bundle id="com.arcadsoftware.server.ssh"/>
+   <bundle id="com.arcadsoftware.server.web"/>
+   <bundle id="com.arcadsoftware.ssh"/>
+   <bundle id="com.arcadsoftware.jetty"/>
    <bundle id="com.arcadsoftware.tool.cli"/>
+   <bundle id="org.restlet"/>
+   <bundle id="xstream"/>
    <category-def name="base" label="ARCAD Foundation Services features">
       <description>
          These features are the different modules of ARCAD Foundation Services (Server, CLI, RCP).
