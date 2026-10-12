@@ -13,9 +13,11 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>17</maven.compiler.source>
 		<maven.compiler.target>17</maven.compiler.target>
-		<maven.version>3.6.3</maven.version>
+		<maven.toolchains.version>3.3.0</maven.toolchains.version>
+		<maven.jarsigner.version>3.1.0</maven.jarsigner.version>
+		<maven.dependency.version>3.11.0</maven.dependency.version>
 		<maven.deloy.version>3.2.0</maven.deloy.version>
-		<maven.build.helper.version>3.6.2</maven.build.helper.version>
+		<build.helper.version>3.6.2</build.helper.version>
 		<tycho.version>5.0.3</tycho.version>
 		<tycho.extra.version>5.0.3</tycho.extra.version>
 		<keystore></keystore>
@@ -28,7 +30,7 @@
 		<dependency>
 			<groupId>org.apache.sshd</groupId>
 			<artifactId>sshd-osgi</artifactId>
-			<version>2.18.0</version>
+			<version>2.20.0</version>
 		</dependency>
 
 		<!-- Cryptography libraries -->
@@ -62,7 +64,7 @@
 		<dependency>
 		    <groupId>jakarta.xml.bind</groupId>
 		    <artifactId>jakarta.xml.bind-api</artifactId>
-		    <version>4.0.2</version>
+		    <version>4.0.5</version>
 		</dependency>
 		<dependency>
 		    <groupId>org.apache.santuario</groupId>
@@ -72,7 +74,7 @@
 		<dependency>
 		    <groupId>commons-codec</groupId>
 		    <artifactId>commons-codec</artifactId>
-		    <version>1.19.0</version>
+		    <version>1.22.1</version>
 		</dependency>
 
 		<!-- Restlet -->
@@ -169,7 +171,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-toolchains-plugin</artifactId>
-				<version>${maven.version}</version>
+				<version>${maven.toolchains.version}</version>
 				<executions>
 					<execution>
 						<goals>
@@ -214,7 +216,7 @@
 			<plugin>
 			    <groupId>org.apache.maven.plugins</groupId>
 			    <artifactId>maven-jarsigner-plugin</artifactId>
-			    <version>${maven.version}</version>
+			    <version>${maven.jarsigner.version}</version>
 		        <configuration>
 		        	<keystore>${keystore}</keystore>
 	                <storepass>${env.KEYSTORE_PASSWORD}</storepass>
@@ -259,7 +261,7 @@
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>build-helper-maven-plugin</artifactId>
-					<version>${maven.build.helper.version}</version>
+					<version>${build.helper.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.eclipse.tycho</groupId>
