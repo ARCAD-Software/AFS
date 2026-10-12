@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-17"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-alpn-client.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-alpn-java-client.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-alpn-java-server.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-alpn-server.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-client.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-http.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-http2.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-http2-client-transport.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-http2-common.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-http2-hpack.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-http2-server.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-http3-client.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-http3-client-transport.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-http3-common.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-http3-qpack.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-http3-server.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-io.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-quic-client.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-quic-common.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-quiche-native.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-quic-quiche-common.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-quic-quiche-jna.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-quic-server.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-server.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jetty-util.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jna-jpms.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jna-platform-jpms.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
