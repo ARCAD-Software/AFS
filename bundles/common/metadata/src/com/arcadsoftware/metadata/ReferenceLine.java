@@ -260,7 +260,7 @@ public class ReferenceLine extends ArrayList<Element> implements Comparable<Refe
      */
 	public ReferenceLine(Element... elements) {
 		super(elements.length);
-		for(Element element:elements) {
+		for (Element element:elements) {
 			add(element);
 		}
 		if (elements.length == 1) {
@@ -847,6 +847,11 @@ public class ReferenceLine extends ArrayList<Element> implements Comparable<Refe
 		return result.toString();
 	}
 
+	/**
+	 * Return the code line build from all the attributes preceding the first link code.
+	 * 
+	 * @return
+	 */
 	public String getPreLinkCodes() {
 		StringBuilder sb = new StringBuilder();
 		for (Element element: this) {
@@ -861,6 +866,11 @@ public class ReferenceLine extends ArrayList<Element> implements Comparable<Refe
 		return sb.toString();
 	}
 
+	/**
+	 * Return the code line build from all the attributes following the last link code.
+	 * 
+	 * @return
+	 */
 	public String getPostLinkCodes() {
 		StringBuilder sb = new StringBuilder();
 		for (int i = size() - 1; i >= 0; i--) {
