@@ -46,7 +46,7 @@
 			<metadata />
 		</attribute>
 	</entity>
-	<update-entity version="3" type="user">
+	<update-entity version="3" type="user" domain="userdb">
 		<link type="ldapauth" code="ldapauths">
 			<metadata>
 				<reverseLink>user</reverseLink>
