@@ -30,7 +30,6 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: 17
-         
     - run: npm install @cjbarth/github-release-notes@4.1.0 -g
       shell: bash
     - run: |
