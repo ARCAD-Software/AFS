@@ -202,8 +202,6 @@ public class XmlCriteriaStream extends XStreamCompact {
 		xs.alias("deleted", DeletedCriteria.class); //$NON-NLS-1$
 		xs.useAttributeFor(DeletedCriteria.class, "attribute"); //$NON-NLS-1$
 		// New criteria of version 1.0.2
-		xs.alias("isIn", IdInListCriteria.class); //$NON-NLS-1$
-		xs.alias("isin", IdInListCriteria.class); //$NON-NLS-1$
 		xs.alias("isIn", InListCriteria.class); //$NON-NLS-1$
 		xs.alias("isin", InListCriteria.class); //$NON-NLS-1$
 		xs.registerConverter(new InListCriteriaConverter());

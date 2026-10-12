@@ -223,7 +223,7 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 	 */
 	public static final String METADATA_COMBOLINK = "combo"; //$NON-NLS-1$
 
-	// Some other MetaDate can be defined by other bundles.
+	// Some other MetaData can be defined by other bundles.
 	// You could have a look to the MapperSQLService.
 
 	/**
