@@ -33,8 +33,8 @@ jobs:
         # Check pom.xml for more information about toolchains
         mvn-toolchain-id: |
           JavaSE-17
-		  JavaSE-21
-
+          JavaSE-21
+          
     - name: Load keystore
       run: |
         echo "${{ secrets.CODESIGN_KEYSTORE }}" > $RUNNER_TEMP/codesign.p12.asc

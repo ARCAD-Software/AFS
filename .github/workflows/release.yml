@@ -30,8 +30,8 @@ jobs:
         # Below option needs to match the ID of the manifest BREE in order to pick the correct Java version for the build
         # Check pom.xml for more information about toolchains
         mvn-toolchain-id: |
-          JavaSE-1.8
           JavaSE-17
+          JavaSE-21
           
     - name: Load keystore
       run: |
