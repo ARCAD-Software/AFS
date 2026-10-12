@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.arcadsoftware</groupId>
+		<artifactId>com.arcadsoftware.afs.repack</artifactId>
+		<version>2026.10.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>org.restlet</artifactId>
+	<packaging>eclipse-plugin</packaging>
+	<version>2.6.1-SNAPSHOT</version>
+
+	<properties>
+		<restlet.version>2.6.1</restlet.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+		    <groupId>org.restlet</groupId>
+		    <artifactId>org.restlet</artifactId>
+		    <version>${restlet.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.restlet</groupId>
+		    <artifactId>org.restlet.ext.jetty</artifactId>
+		    <version>${restlet.version}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+			    <version>${maven.dependency.version}</version>
+				<executions>
+					<execution>
+						<id>copy-restlet-into-lib</id>
+						<!-- initialize runs before Tycho builds the bundle class path, so the
+						     jars named in Bundle-ClassPath are on disk by then. -->
+						<phase>initialize</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.basedir}/libs</outputDirectory>
+							<!-- Bundle-ClassPath names the jars without their version, so a
+							     version bump does not touch the MANIFEST. -->
+							<stripVersion>true</stripVersion>
+							<excludeTransitive>true</excludeTransitive>
+							<!-- Without this filter the dependencies inherited from the root pom -->
+							<includeGroupIds>org.eclipse.jetty,org.eclipse.jetty.http2,org.eclipse.jetty.http3,org.eclipse.jetty.quic,org.mortbay.jetty.quiche,net.java.dev.jna</includeGroupIds>
+							<overWriteIfNewer>true</overWriteIfNewer>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>
