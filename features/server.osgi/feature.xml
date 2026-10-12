@@ -466,4 +466,8 @@ version(s), and exceptions or additional permissions here}.&quot;
          id="com.arcadsoftware.metadata.server.user.usergroup"
          version="0.0.0"/>
 
+   <plugin
+         id="com.arcadsoftware.jetty"
+         version="0.0.0"/>
+
 </feature>
