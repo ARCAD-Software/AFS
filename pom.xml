@@ -88,7 +88,7 @@
 		<dependency> <!-- https://mvnrepository.com/artifact/com.unboundid/unboundid-ldapsdk -->
 			<groupId>com.unboundid</groupId>
 			<artifactId>unboundid-ldapsdk</artifactId>
-			<version>7.0.4</version>
+			<version>7.0.5</version>
 		</dependency>
 
 		<!-- Java Mail -->
@@ -129,7 +129,7 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>42.7.13</version>
+			<version>42.7.14</version>
 		</dependency>
 
 		<dependency>
