@@ -34,14 +34,12 @@ public class RestletServiceTrackerCustomizer implements ServiceTrackerCustomizer
 
 	public Restlet addingService(ServiceReference<Restlet> reference) {
 		Object path = reference.getProperty(IBranch.URI);
-		if (path instanceof String) {
+		if (path instanceof String spath) {
 			Restlet service = activator.getContext().getService(reference);
 			if (service != null) {
-				application.getRouter().attach((String) path, service, Template.MODE_EQUALS);
-				if (service.getContext() == null) {
-					service.setContext(application.getContext());
-				}
-				return (Restlet) service;
+				application.getRouter().attach(spath, service, Template.MODE_EQUALS);
+				service.setContext(application.getContext());
+				return service;
 			}
 		}
 		return null;

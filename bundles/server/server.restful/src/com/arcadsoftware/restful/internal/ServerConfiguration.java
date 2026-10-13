@@ -82,6 +82,7 @@ public class ServerConfiguration implements ManagedService {
 		if ((properties == null) || initConfiguration(properties)) {
 			return;
 		}
+		activator.debug("REST Properties loading...");
 		final String brandingBundleName = getProperty(properties, PROP_BRANDING_BUNDLE, null);
 		final Bundle brandingBundle;
 		if (brandingBundleName != null) {
@@ -111,7 +112,7 @@ public class ServerConfiguration implements ManagedService {
 								break;
 							}
 						}
-						// Wait a little more...
+						// Wait a little more... up to 5 seconds
 						if ((bb == null) && (i < 10)) {
 							try {
 								Thread.sleep(500);
