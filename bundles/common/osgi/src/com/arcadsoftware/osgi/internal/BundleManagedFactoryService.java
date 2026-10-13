@@ -14,21 +14,13 @@
 package com.arcadsoftware.osgi.internal;
 
 import java.util.Dictionary;
-import java.util.HashMap;
-import java.util.Map;
 
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.cm.ManagedServiceFactory;
-import org.osgi.service.event.Event;
-import org.osgi.service.event.EventAdmin;
 
-import com.arcadsoftware.osgi.AbstractConfiguredActivator;
 import com.arcadsoftware.osgi.AbstractConfiguredFactoryActivator;
 
 /*
- *
  * @see AbstractConfiguredActivator
  */
 public class BundleManagedFactoryService implements ManagedServiceFactory {
@@ -36,8 +28,6 @@ public class BundleManagedFactoryService implements ManagedServiceFactory {
 	public static final String CONFIGURATIONUPDATED_TOPIC = "com/arcadsoftware/configuration/updated"; //$NON-NLS-1$ 
 	
 	private AbstractConfiguredFactoryActivator activator;
-	
-	//private final Map<String, ServiceRegistration<?>> registrations = new HashMap<String, ServiceRegistration<?>>();
 	
 	/**
 	 * @param abstractConfiguredActivator
@@ -57,23 +47,16 @@ public class BundleManagedFactoryService implements ManagedServiceFactory {
 	public void updated(String pid, Dictionary<String, ?> properties) throws ConfigurationException {
 		deleted(pid);
 		
-		synchronized (activator) {
+		synchronized (this) {
 			activator.updatedConfiguration(pid, (Dictionary<String, Object>) properties);
 		}
 	}
 
 	@Override
 	public void deleted(String pid) {
-		
-		synchronized (activator) {
+		synchronized (this) {
 			activator.deleted(pid);
 		}
-		
-		/*ServiceRegistration<?> registration = registrations.remove(pid);
-
-        if (registration != null) {
-        	activator.unregister(registration);
-        }*/
 	}
 
 }

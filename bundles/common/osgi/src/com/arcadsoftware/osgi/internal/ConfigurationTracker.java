@@ -64,7 +64,7 @@ public class ConfigurationTracker extends ServiceTracker<ConfigurationAdmin, Con
 				properties = new Hashtable<String, Object>();
 			}
 			boolean changed = false;
-			synchronized (activator) {
+			synchronized (this) {
 				changed = activator.initializeConfiguration(properties);
 			}
 			if (changed) {
@@ -93,7 +93,7 @@ public class ConfigurationTracker extends ServiceTracker<ConfigurationAdmin, Con
 					properties = new Hashtable<String, Object>();
 				}
 				boolean changed = false;
-				synchronized (activator) {
+				synchronized (this) {
 					changed = activator.finalizeConfiguration(properties);
 				}
 				if (changed) {
@@ -125,6 +125,7 @@ public class ConfigurationTracker extends ServiceTracker<ConfigurationAdmin, Con
 		}
 		ConfigurationAdmin configAdmin = getService();
 		if (configAdmin == null) {
+			// Should be synchronized ?
 			activator.updatedConfiguration(properties);
 			return false;
 		}
