@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Jetty Server repackaging
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-SymbolicName: com.arcadsoftware.jetty
-Bundle-Version: 12.0.40.qualifier
+Bundle-Version: 12.0.40
 Eclipse-BundleShape: jar
 Export-Package: org.eclipse.jetty.alpn.client;version="12.0.40";uses:="javax.net.ssl,org.eclipse.jetty.io",
  org.eclipse.jetty.alpn.java.client;version="12.0.40";uses:="javax.net.ssl,org.eclipse.jetty.io,org.eclipse.jetty.io.ssl",
