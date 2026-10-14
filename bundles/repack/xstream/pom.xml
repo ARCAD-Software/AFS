@@ -4,12 +4,12 @@
 	<parent>
 		<groupId>com.arcadsoftware</groupId>
 		<artifactId>com.arcadsoftware.afs.repack</artifactId>
-		<version>2026.9.3</version>
+		<version>2026.9.4-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>xstream</artifactId>
 	<packaging>eclipse-plugin</packaging>
-	<version>1.4.2102</version>
+	<version>1.4.2102-SNAPSHOT</version>
 
 	<dependencies>
 		<dependency>
