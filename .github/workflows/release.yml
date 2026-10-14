@@ -41,7 +41,10 @@ jobs:
       run: |
         echo "${{ secrets.CODESIGN_KEYSTORE }}" > $RUNNER_TEMP/codesign.p12.asc
         gpg -d --passphrase ${{ secrets.CODESIGN_KEYSTORE_PASSPHRASE }} --batch $RUNNER_TEMP/codesign.p12.asc > $RUNNER_TEMP/codesign.p12
-        
+      
+    - name: Get Maven current version
+      run: mvn -v
+      
     - name: Run Kotlin script
       run: kotlinc -script build/clearpackages.main.kts ${{ secrets.GITHUB_TOKEN }}
       
