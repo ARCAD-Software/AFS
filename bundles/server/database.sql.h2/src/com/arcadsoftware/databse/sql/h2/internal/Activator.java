@@ -47,7 +47,7 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 	static {
 		// Allow to use JDBC URL this local path, just like in H2 version 1.3
 		System.setProperty("h2.implicitRelativePath", "true");
-		// See http://www.h2database.com/javadoc/org/h2/api/ErrorCode.html#c90011
+		// See http://www.h2database.com/javadoc/org/h2/api/ErrorCode.html#URL_RELATIVE_TO_CWD
 		//xxx ajouter alias !!!
 		
 	}
@@ -166,6 +166,7 @@ public class Activator extends AbstractConfiguredActivator implements CommandPro
 				} catch (SQLException e) {
 					tcpServer = null;
 					error(Messages.Activator_DBServerError, e);
+					debug("Parameters: " + params.toString());
 				}
 			}
 		}
