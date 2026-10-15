@@ -7,11 +7,6 @@
 	-->
 	<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="false" type="InstallableUnit">
 		<repository location="https://download.eclipse.org/eclipse/updates/4.34/"/>
-		<unit id="org.objectweb.asm" version="0.0.0"/>
-		<unit id="org.objectweb.asm.commons" version="0.0.0"/>
-		<unit id="org.objectweb.asm.tree" version="0.0.0"/>
-		<unit id="org.objectweb.asm.tree.analysis" version="0.0.0"/>
-		<unit id="org.objectweb.asm.util" version="0.0.0"/>
 		<unit id="org.apache.felix.gogo.command" version="0.0.0"/>
 		<unit id="org.apache.felix.gogo.runtime" version="0.0.0"/>
 		<unit id="org.apache.felix.gogo.shell" version="0.0.0"/>
@@ -153,6 +148,35 @@
 		<repository location="https://github.com/ARCAD-Software/h2database-light/releases/download/2.5.252.1/"/>
 		<unit id="com.h2database.light" version="0.0.0"/>
 		<unit id="org.locationtech.jts.jts-core" version="0.0.0"/>
+	</location>
+	<location includeDependencyDepth="infinite" includeDependencyScopes="import" includeSource="true" missingManifest="generate" type="Maven">
+		<dependencies>
+			<dependency>
+				<groupId>org.ow2.asm</groupId>
+				<artifactId>asm</artifactId>
+				<version>9.11</version>
+			</dependency>
+			<dependency>
+			    <groupId>org.ow2.asm</groupId>
+			    <artifactId>asm-tree</artifactId>
+			    <version>9.11</version>
+			</dependency>
+			<dependency>
+			    <groupId>org.ow2.asm</groupId>
+			    <artifactId>asm-commons</artifactId>
+			    <version>9.11</version>
+			</dependency>
+			<dependency>
+			    <groupId>org.ow2.asm</groupId>
+			    <artifactId>asm-util</artifactId>
+			    <version>9.11</version>
+			</dependency>
+			<dependency>
+			    <groupId>org.ow2.asm</groupId>
+			    <artifactId>asm-analysis</artifactId>
+			    <version>9.11</version>
+			</dependency>
+		</dependencies>
 	</location>
 </locations>
 </target>
