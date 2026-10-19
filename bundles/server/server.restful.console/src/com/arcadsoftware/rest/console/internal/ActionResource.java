@@ -109,7 +109,12 @@ public class ActionResource extends UserLinkedResource {
 		if (isXSD(variant)) {
 			return new FileRepresentation(activator.getBundleFile("schemas/form.xsd"), MediaType.APPLICATION_W3C_SCHEMA); //$NON-NLS-1$
 		}
-		List<ConsoleField> result = section.performAction(action, language, getRequestForm());
+		List<ConsoleField> result;
+		if (section instanceof ISecuredConsoleSection sectionSecured) {
+			result = sectionSecured.performAction(action, getUser(), language, getRequestForm());
+		} else {
+			result = section.performAction(action, language, getRequestForm());
+		}
 		broadcastUserAction();
 		if (result == null) {
 			setStatus(Status.SUCCESS_NO_CONTENT, activator.localize("info.success", language)); //$NON-NLS-1$
