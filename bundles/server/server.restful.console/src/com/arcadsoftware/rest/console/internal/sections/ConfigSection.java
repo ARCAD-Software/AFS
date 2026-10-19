@@ -76,7 +76,7 @@ public class ConfigSection extends Section implements IActivableConsoleNode, ISe
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<ConsoleField> performAction(String actionId, Language language, Form params) {
+	public List<ConsoleField> performAction(String actionId, IConnectionUserBean currentUser, Language language, Form params) {
 		ConfigurationAdmin ca = getActivator().getConfigurationAdmin();
 		if (ca == null) {
 			throw new ResourceException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE, getActivator().localize("error.noconfservice", language)); //$NON-NLS-1$

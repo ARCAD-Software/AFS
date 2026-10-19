@@ -59,7 +59,7 @@ public class SectionResource extends UserLinkedResource {
 			setExisting(false);
 			return;
 		}
-		if ((section == null) || ((section instanceof IActivableConsoleNode) && !((IActivableConsoleNode)section).isActivated())) {
+		if ((section == null) || ((section instanceof IActivableConsoleNode) && !((IActivableConsoleNode) section).isActivated())) {
 			file = activator.getBundleFile("/files/" + name); //$NON-NLS-1$
 			if ((file == null) || !file.isFile()) {
 				setExisting(false);
