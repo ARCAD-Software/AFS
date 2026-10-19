@@ -38,7 +38,9 @@ public class RestletServiceTrackerCustomizer implements ServiceTrackerCustomizer
 			Restlet service = activator.getContext().getService(reference);
 			if (service != null) {
 				application.getRouter().attach(spath, service, Template.MODE_EQUALS);
-				service.setContext(application.getContext());
+				if (service.getContext() == null) {
+					service.setContext(application.getContext());
+				}
 				return service;
 			}
 		}
