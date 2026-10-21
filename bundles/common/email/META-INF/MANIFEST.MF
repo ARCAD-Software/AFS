@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AFS Email API
 Bundle-SymbolicName: com.arcadsoftware.email
-Bundle-Version: 1.5.0
+Bundle-Version: 1.5.0.qualifier
 Bundle-Activator: com.arcadsoftware.email.internal.Activator
 Bundle-Vendor: ARCAD Software
 Bundle-RequiredExecutionEnvironment: JavaSE-17
