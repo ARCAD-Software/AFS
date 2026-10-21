@@ -140,7 +140,7 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 			}
 		}
 		if (result instanceof List<?>) {
-			BeanMapList list = new BeanMapList(((List<?>) result).size());
+			final BeanMapList list = new BeanMapList(((List<?>) result).size());
 			for (Object o: (List<?>) result) {
 				if (o instanceof BeanMap) {
 					list.add((BeanMap) o);
@@ -195,19 +195,19 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	 */
 	static public BeanMapList loadFromJSon(String json) {
 		try {
-			JSONObject o = new JSONObject(json);
-			Iterator<?> itt = o.keys();
+			final JSONObject o = new JSONObject(json);
+			final Iterator<?> itt = o.keys();
 			if (!itt.hasNext()) {
 				return null;
 			}
-			String listKey = (String) itt.next();
-			JSONObject list = o.getJSONObject(listKey);
+			final String listKey = (String) itt.next();
+			final JSONObject list = o.getJSONObject(listKey);
 			int count = 10;
 			try {
 				count = list.getInt("count"); //$NON-NLS-1$
 			} catch (JSONException e) {}
-			BeanMapList result = new BeanMapList(count);
-			JSONArray items = list.getJSONArray("items"); //$NON-NLS-1$
+			final BeanMapList result = new BeanMapList(count);
+			final JSONArray items = list.getJSONArray("items"); //$NON-NLS-1$
 			for (int i = 0; i < items.length(); i++) {
 				result.add(BeanMapFromJSON.parse(new BeanMap(), items.getJSONObject(i)));
 			}
@@ -231,7 +231,7 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 			return "[]"; //$NON-NLS-1$
 		}
 		try {
-			JSONArray result = new JSONArray();
+			final JSONArray result = new JSONArray();
 			for (BeanMap b: list) {
 				if (b != null) {
 					result.put(b.toJSonObject(false, nulls));
@@ -342,7 +342,7 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	 */
 	public int findIndex(int id) {
 		for (int i = size() - 1; i >= 0; i--) {
-			BeanMap bm = get(i);
+			final BeanMap bm = get(i);
 			if ((bm != null) && (bm.getId() == id)) {
 				return i;
 			}
@@ -360,12 +360,11 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	 * @return
 	 */
 	public BeanMap find(int id, String type) {
-		if (type == null) {
-			return null;
-		}
-		for (BeanMap bm : this) {
-			if ((bm != null) && (bm.getId() == id) && (type.equals(bm.getType()))) {
-				return bm;
+		if (type != null) {
+			for (BeanMap bm : this) {
+				if ((bm != null) && (bm.getId() == id) && (type.equals(bm.getType()))) {
+					return bm;
+				}
 			}
 		}
 		return null;
@@ -379,7 +378,7 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	 * @return a sub list, can be empty, but never null.
 	 */
 	public BeanMapList find(String type) {
-		BeanMapList result = new BeanMapList(1);
+		final BeanMapList result = new BeanMapList(1);
 		if (type == null) {
 			return result;
 		}
@@ -398,7 +397,7 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	 * @return
 	 */
 	public BeanMapList findMUID(int uid) {
-		BeanMapList result = new BeanMapList(1);
+		final BeanMapList result = new BeanMapList(1);
 		if (uid <= 0)  {
 			for (BeanMap bm : this) {
 				if ((bm != null) && (bm.getMUID() < 0)) {
@@ -438,7 +437,7 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	 * @return a set of type, may be empty if BeanMap have no type, but must not be null.
 	 */
 	public Set<String> getTypes() {
-		HashSet<String> result = new HashSet<String>(size() / 10);
+		final HashSet<String> result = new HashSet<String>(size() / 10);
 		for (BeanMap bm : this) {
 			if (bm != null) {
 				String type = bm.getType();
@@ -541,7 +540,7 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	 * @return
 	 */
 	public Object findValue(int id, String attribute) {
-		BeanMap result = find(id);
+		final BeanMap result = find(id);
 		if (result != null) {
 			return result.get(attribute);
 		}
@@ -556,7 +555,7 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	 * @return
 	 */
 	public BeanMap find(String[] keys, BeanMap source) {
-		for(BeanMap b:this) {
+		for (BeanMap b: this) {
 			boolean match = true;
 			for(String key:keys) {
 				Object v = source.get(key);
@@ -586,8 +585,8 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	 * @see #find(String[], BeanMap)
 	 */
 	public BeanMap remove(String[] keys, BeanMap source) {
-		for(int i = size() - 1; i >= 0; i--) {
-			BeanMap b = get(i);
+		for (int i = size() - 1; i >= 0; i--) {
+			final BeanMap b = get(i);
 			boolean match = true;
 			for(String key:keys) {
 				Object v = source.get(key);
@@ -658,7 +657,7 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	 * @return A BeanMap, null if none.
 	 */
 	public BeanMap removeFirst(String attribute, Object value) {
-		Iterator<BeanMap> itt = iterator();
+		final Iterator<BeanMap> itt = iterator();
 		if (value == null) {
 			while (itt.hasNext()) {
 				BeanMap bm = itt.next();
@@ -735,7 +734,7 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	 * @return never return null.
 	 */
 	public List<BeanMap> get(String type) {
-		ArrayList<BeanMap> result = new ArrayList<BeanMap>(size());
+		final ArrayList<BeanMap> result = new ArrayList<BeanMap>(size());
 		if (type == null) {
 			for(BeanMap b: this) {
 				if (b.getType() == null) {
@@ -762,7 +761,7 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	 * @return a non null BeanMapList.
 	 */
 	public BeanMapList get(String attribute, Object value) {
-		BeanMapList result = new BeanMapList(size());
+		final BeanMapList result = new BeanMapList(size());
 		if (value == null) {
 			for (BeanMap bm : this) {
 				if ((bm != null) && (bm.get(attribute) == null)) {
@@ -815,10 +814,10 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	 * @return a List of <code>T</code> Objects.
 	 */
 	public <T> ArrayList<T> getValues(String attribute, Class<T> clazz) {
-		ArrayList<T> result = new ArrayList<T>();
+		final ArrayList<T> result = new ArrayList<T>();
 		for (BeanMap bm : this) {
 			if (bm != null) {
-				T o = bm.get(attribute, clazz);
+				final T o = bm.get(attribute, clazz);
 				if (o != null) {
 					result.add(o);
 				}
@@ -841,10 +840,10 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	 * @return a List of <code>T</code> Objects.
 	 */
 	public <T> ArrayList<T> getValues(String attribute, Class<T> clazz, int limit) {
-		ArrayList<T> result = new ArrayList<T>();
+		final ArrayList<T> result = new ArrayList<T>();
 		for (BeanMap bm : this) {
 			if (bm != null) {
-				T o = bm.get(attribute, clazz);
+				final T o = bm.get(attribute, clazz);
 				if (o != null) {
 					result.add(o);
 					if (result.size() >= limit) {
@@ -863,7 +862,7 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder("Size="); //$NON-NLS-1$
+		final StringBuilder sb = new StringBuilder("Size="); //$NON-NLS-1$
 		sb.append(size());
 		sb.append(' ');
 		sb.append(super.toString());
@@ -871,7 +870,7 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	}
 
 	public String prettyPrint() {
-		StringBuilder sb = new StringBuilder("BeanMap List (Size="); //$NON-NLS-1$
+		final StringBuilder sb = new StringBuilder("BeanMap List (Size="); //$NON-NLS-1$
 		sb.append(size());
 		sb.append(") [\n"); //$NON-NLS-1$
 		for(BeanMap b: this) {
@@ -902,8 +901,8 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 		if (list == null) {
 			list = new ArrayList<T>();
 		}
-		BeanInfo beanInfo = Introspector.getBeanInfo(clazz, Object.class);
-       	HashMap<String,PropertyDescriptor> propertiesMap = new HashMap<String, PropertyDescriptor>();
+		final BeanInfo beanInfo = Introspector.getBeanInfo(clazz, Object.class);
+       	final HashMap<String,PropertyDescriptor> propertiesMap = new HashMap<String, PropertyDescriptor>();
        	for (PropertyDescriptor property: beanInfo.getPropertyDescriptors()) {
        		propertiesMap.put(property.getName(), property);
        	}
@@ -928,7 +927,7 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
         }
         for (BeanMap bm: this) {
         	try {
-        		Object o = constructor.newInstance(constructorParameters);
+        		final Object o = constructor.newInstance(constructorParameters);
         		if (clazz.isInstance(o)) {
         			list.add(bm.toBean(clazz.cast(o), propertiesMap));
         		}
@@ -964,8 +963,8 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	}
 	
 	protected JSONObject toJSonObject(boolean root, boolean nulls) throws JSONException {
-		JSONObject result = new JSONObject();
-		JSONObject bean;
+		final JSONObject result = new JSONObject();
+		final JSONObject bean;
 		if (root) {
 			bean = new JSONObject();
 			result.put("list", bean); //$NON-NLS-1$
@@ -983,7 +982,7 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 				a.put(b.toJSonObject(false, nulls));
 			}
 		}
-		bean.put("items", a);
+		bean.put("items", a); //$NON-NLS-1$
 		return result;
 	}
 
@@ -993,7 +992,7 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 			result.put("muid", muid); //$NON-NLS-1$
 		}
 		if (date != null) {
-			result.put("date", ISODateFormater.toString(date));
+			result.put("date", ISODateFormater.toString(date)); //$NON-NLS-1$
 		}
 	}
 	
@@ -1004,8 +1003,8 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	 * @see #clone()
 	 */
 	public BeanMapList cloneBeanMaps() {
-		BeanMapList result = new BeanMapList(size());
-		for (BeanMap bean:this) {
+		final BeanMapList result = new BeanMapList(size());
+		for (BeanMap bean: this) {
 			if (bean != null) {
 				result.add((BeanMap)bean.clone());
 			}
@@ -1019,7 +1018,7 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	 * @param newKey
 	 */
 	public void replaceKey(String oldKey, String newKey) {
-		for(BeanMap b: this) {
+		for (BeanMap b: this) {
 			b.replace(oldKey, newKey);
 		}
 	}
@@ -1032,10 +1031,10 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	 * @return
 	 */
 	public Object getString(String key, char separator) {
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		boolean first = true;
-		for(BeanMap b: this) {
-			String s = b.getString(key);
+		for (BeanMap b: this) {
+			final String s = b.getString(key);
 			if (s != null) {
 				if (first) {
 					first = false;
@@ -1055,7 +1054,7 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	 * @param value
 	 */
 	public void putAll(String key, Object value) {
-		for(BeanMap bean: this) {
+		for (BeanMap bean: this) {
 			if (bean != null) {
 				bean.put(key, value);
 			}
@@ -1097,15 +1096,16 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 		if (up) {
 			comparator = new Comparator<BeanMap>() {
 				@Override
-				public int compare(BeanMap o1, BeanMap o2) {
-					Date d1 = o1.getDate();
-					Date d2 = o2.getDate();
+				public int compare(final BeanMap o1, final BeanMap o2) {
+					final Date d1 = o1.getDate();
+					final Date d2 = o2.getDate();
 					if (d1 == null) {
 						if (d2 == null) {
 							return 0;
 						}
 						return -1;
-					} else if (d2 == null) {
+					}
+					if (d2 == null) {
 						return 1;
 					}
 					return d1.compareTo(d2);
@@ -1114,15 +1114,16 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 		} else {
 			comparator = new Comparator<BeanMap>() {
 				@Override
-				public int compare(BeanMap o2, BeanMap o1) {
-					Date d1 = o1.getDate();
-					Date d2 = o2.getDate();
+				public int compare(final BeanMap o2, final BeanMap o1) {
+					final Date d1 = o1.getDate();
+					final Date d2 = o2.getDate();
 					if (d1 == null) {
 						if (d2 == null) {
 							return 0;
 						}
 						return -1;
-					} else if (d2 == null) {
+					}
+					if (d2 == null) {
 						return 1;
 					}
 					return d1.compareTo(d2);
