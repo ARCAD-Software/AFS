@@ -67,7 +67,7 @@ public class EntityParentResource extends UserLinkedResource {
 			}
 		}
 		if (isJSON(variant)) {
-			return new JSONRepresentation(new JsonMetaDataStream().toXML(result), language);
+			return new JSONRepresentation(new JsonMetaDataStream().writeEntities(result, true), language);
 		}
 		return new XMLRepresentation(new XmlMetaDataStream().toXML(result), language);
 	}
