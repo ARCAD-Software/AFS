@@ -1,10 +1,10 @@
-# AFS-OS release version 2026.3.8.
+# AFS-OS release version 2026.3.9.
 
-Release date Wed Oct 14 19:04:10 CEST 2026.
+Release date Wed Oct 21 10:11:36 CEST 2026.
 
-Link to the update site of [Version 2026.3.8](https://github.com/ARCAD-Software/AFS/releases/download/2026.3.8/).
+Link to the update site of [Version 2026.3.9](https://github.com/ARCAD-Software/AFS/releases/download/2026.3.9/).
 
-2 Bundles modified in this release.
+0 Bundles modified in this release.
 
 
 
@@ -48,8 +48,8 @@ Bundle Symbolic Name | Modification | Version
 [com.arcadsoftware.email](bundles/common/email) | Not changed | 1.5.0
 [com.arcadsoftware.groovy.security](bundles/common/groovy.security) | Not changed | 1.3.0
 [com.arcadsoftware.metadata](bundles/common/metadata) | Not changed | 2.2.4
-[com.arcadsoftware.osgi](bundles/common/osgi) | **Upgraded** from version 1.11.2 | **1.11.3**
-[com.arcadsoftware.rest](bundles/common/rest) | **Upgraded** from version 3.4.5 | **3.4.6**
+[com.arcadsoftware.osgi](bundles/common/osgi) | Not changed | 1.11.3
+[com.arcadsoftware.rest](bundles/common/rest) | Not changed | 3.4.6
 [com.arcadsoftware.ssh](bundles/common/ssh) | Not changed | 2.0.0
 
 
@@ -109,7 +109,7 @@ Bundle Symbolic Name | Modification | Version
 
 Bundle Symbolic Name | Modification | Version
 -------------------- | ------------ | -------
-[com.arcadsoftware.tool.cli](bundles/tools/tool.cli) | Not changed | 2026.3.7
+[com.arcadsoftware.tool.cli](bundles/tools/tool.cli) | Not changed | 2026.3.8
 
 
 
