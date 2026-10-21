@@ -1984,7 +1984,14 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 			} else if (e.getValue() instanceof Collection v) {
 				bean.put(e.getKey(), toJSONArray(v, nulls));
 			} else {
-				bean.put(e.getKey(), e.getValue().toString());
+				String v = e.getValue().toString();
+				if ("true".equalsIgnoreCase(v)) { //$NON-NLS-1$
+					bean.put(e.getKey(), true);
+				} else if ("false".equalsIgnoreCase(v)) { //$NON-NLS-1$
+					bean.put(e.getKey(), false);
+				} else {
+					bean.put(e.getKey(), v);
+				}
 			}
 		}
 		return result;

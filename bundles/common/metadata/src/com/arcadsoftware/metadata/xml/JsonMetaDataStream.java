@@ -147,7 +147,7 @@ public class JsonMetaDataStream extends JsonCriteriaStream {
 			attributes.put(a);
 		}
 		if (attributes.length() > 0) {
-			result.put("attibutes", attributes); //$NON-NLS-1$
+			result.put("attributes", attributes); //$NON-NLS-1$
 		}
 		JSONArray tests = new JSONArray();
 		for (MetaDataTest test: entity.getTests().values()) {
@@ -228,7 +228,14 @@ public class JsonMetaDataStream extends JsonCriteriaStream {
 			} else if (e.getValue() instanceof Collection v) {
 				result.put(e.getKey(), writeCollection(v));
 			} else if (e.getValue() != null) {
-				result.put(e.getKey(), e.getValue().toString());
+				String v = e.getValue().toString();
+				if ("true".equalsIgnoreCase(v)) {
+					result.put(e.getKey(), true);
+				} else if ("false".equalsIgnoreCase(v)) {
+					result.put(e.getKey(), false);
+				} else {
+					result.put(e.getKey(), v);
+				}
 			}
 		}
 		return result;
