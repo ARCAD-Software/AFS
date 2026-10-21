@@ -77,7 +77,7 @@ public class XmlConsoleStream extends XStreamCompact {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public List<Category> getCategories(String xml) {
-		return (List)fromXML(xml);
+		return (List) fromXML(xml);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -85,7 +85,7 @@ public class XmlConsoleStream extends XStreamCompact {
 		if ((xml == null) || (xml.length() == 0)) {
 			return null;
 		}
-		return (List)fromXML(xml);
+		return (List) fromXML(xml);
 	}
 
 }
