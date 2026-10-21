@@ -33,8 +33,7 @@ import com.thoughtworks.xstream.mapper.Mapper;
  * This class extend <code>XStream</code> class. by adding specific mappings.
  * 
  * <p>
- * This implementation is <b>not</b> threadsafe (an instance of XStreamCompact can not be shared between different
- * threads
+ * This implementation is threadsafe <strong>if and only if</strong> the configuration (i.e. aliases, converters...) is not changed before calling toXML or fromXML methods.
  * 
  * <p>
  * You can provide specific mapping by override the <code>InitializeBase</code> method.

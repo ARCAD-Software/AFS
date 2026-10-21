@@ -76,7 +76,7 @@ public class EntityItemResource extends UserLinkedResource {
 		Language language = getClientPreferedLanguage();
 		// Translate the entity...
 		if (isJSON(variant)) {
-			return new JSONRepresentation(new JsonMetaDataStream().toXML(entity.clone(language)), language, entity.getDate());
+			return new JSONRepresentation(new JsonMetaDataStream().writeEntity(entity.clone(language), true), language, entity.getDate());
 		}
 		return new XMLRepresentation(new XmlMetaDataStream().toXML(entity.clone(language)), language, entity.getDate());
 	}

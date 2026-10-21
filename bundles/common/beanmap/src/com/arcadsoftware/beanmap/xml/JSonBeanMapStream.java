@@ -40,6 +40,7 @@ import com.thoughtworks.xstream.converters.basic.DateConverter;
  * <b>This serializer can not transform JSON into BeanMap.</b>
  * 
  * @author ARCAD Software
+ * @deprecated Use the methods toJSON() from the BeanMap And the BeanMapList classes. 
  */
 public class JSonBeanMapStream extends JsonStreamCompact {
 

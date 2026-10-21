@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.codehaus.jettison.json.JSONObject;
 import org.restlet.Client;
 import org.restlet.Context;
 import org.restlet.Request;
@@ -1764,7 +1766,49 @@ public class WebServiceAccess {
 			} else if (o instanceof Calendar) {
 				form.add(entry.getKey(), ISODateFormater.toString((Calendar) o));
 			} else if (json) {
-				form.add(entry.getKey(), new JsonStreamCompact().toXML(o));
+				if ((o instanceof JSONObject) || "jsonobject".equalsIgnoreCase(o.getClass().getSimpleName())) { //$NON-NLS-1$
+					form.add(entry.getKey(), o.toString());
+				} else {
+					java.lang.reflect.Method m = null;
+			        for (Class<?> c = o.getClass(); (c != null) && (c != Object.class); c = c.getSuperclass()) {
+			            try {
+			                m = c.getDeclaredMethod("toJSON"); //$NON-NLS-1$
+			                if ((m != null) && m.trySetAccessible()) {
+			                    break;
+			                }
+			            } catch (NoSuchMethodException e) {
+				            try {
+				                m = c.getDeclaredMethod("toJson"); //$NON-NLS-1$
+				                if ((m != null) && m.trySetAccessible()) {
+				                    break;
+				                }
+				            } catch (NoSuchMethodException ee) {}
+			            }
+		                m = null;
+			        }
+			        boolean worked = false;
+			        if (m != null) {
+			        	try {
+			        		Object result = m.invoke(o);
+			        		if (result instanceof String s) {
+								form.add(entry.getKey(), s);
+								worked = true;
+			        		}
+			        	} catch (Exception e) {}
+			        }
+					if (!worked) {
+						try {
+							Field[] fields = o.getClass().getFields();
+							String[] names = new String[fields.length];
+							for (int i = 0; i < names.length; i++) {
+								names[i] = fields[i].getName();
+							}
+							form.add(entry.getKey(), new JSONObject(o, names).toString());
+						} catch (Exception e) {
+							form.add(entry.getKey(), o.toString());
+						}
+					}
+				}
 			} else {
 				if (xs == null) {
 					synchronized (this) {

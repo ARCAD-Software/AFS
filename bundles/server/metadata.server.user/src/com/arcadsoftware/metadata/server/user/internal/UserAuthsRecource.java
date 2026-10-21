@@ -25,7 +25,6 @@ import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
 
 import com.arcadsoftware.beanmap.BeanMapList;
-import com.arcadsoftware.beanmap.xml.JSonBeanMapStream;
 import com.arcadsoftware.beanmap.xml.XmlBeanMapStream;
 import com.arcadsoftware.metadata.MetaDataEntity;
 import com.arcadsoftware.metadata.criteria.AndCriteria;
@@ -84,7 +83,7 @@ public class UserAuthsRecource extends UserLinkedIdentifiedResource {
 			result.addAll(e.dataSelection(e.getAllAttributes(), deleted, new AndCriteria(uid, e.getRightList()),false, null, getUser(), 0, -1));
 		}
 		if (isJSON(variant)) {
-			return new JSONRepresentation(new JSonBeanMapStream().toXML(result), getClientPreferedLanguage());
+			return new JSONRepresentation(result.toJSon(), getClientPreferedLanguage());
 		}
 		return new XMLRepresentation(new XmlBeanMapStream().toXML(result), getClientPreferedLanguage());
 	}
