@@ -22,6 +22,8 @@ import com.thoughtworks.xstream.XStreamException;
  */
 public class ErrorMessageBean implements Cloneable {
 	
+	private static final XStreamCompact XS = new XStreamCompact();
+	
 	/**
 	 * Retrieve an error message from an xml fragment.
 	 * 
@@ -30,7 +32,7 @@ public class ErrorMessageBean implements Cloneable {
 	 */
 	public static ErrorMessageBean deserialize(String xml) {
 		try {
-			return (ErrorMessageBean)new XStreamCompact().fromXML(xml);
+			return (ErrorMessageBean) XS.fromXML(xml);
 		} catch (XStreamException e) {
 			return new ErrorMessageBean(new Date(), "",xml); //$NON-NLS-1$
 		}
@@ -124,7 +126,7 @@ public class ErrorMessageBean implements Cloneable {
 	 * @return an xml fragment representation of this error message.
 	 */
 	public String serialize() {
-		return new XStreamCompact().toXML(this);
+		return XS.toXML(this);
 	}
 
 	@Override

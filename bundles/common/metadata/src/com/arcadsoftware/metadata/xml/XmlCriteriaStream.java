@@ -69,6 +69,10 @@ import com.arcadsoftware.rest.XStreamCompact;
 
 /**
  * XStream serializer specialized to Criteria.
+ * 
+ * <p>
+ * This implementation is threadsafe <strong>if and only if</strong> the configuration is not changed before calling toXML or fromXML methods.
+ * 
  */
 public class XmlCriteriaStream extends XStreamCompact {
 	

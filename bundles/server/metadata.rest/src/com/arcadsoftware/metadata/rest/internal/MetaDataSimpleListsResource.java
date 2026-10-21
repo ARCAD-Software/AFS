@@ -29,7 +29,7 @@ import org.restlet.resource.ResourceException;
 
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
-import com.arcadsoftware.beanmap.xml.JSonBeanMapStream;
+import com.arcadsoftware.beanmap.rest.BeanMapParentResource;
 import com.arcadsoftware.beanmap.xml.XmlBeanMapStream;
 import com.arcadsoftware.metadata.MetaDataAttribute;
 import com.arcadsoftware.metadata.MetaDataEntity;
@@ -184,7 +184,15 @@ public class MetaDataSimpleListsResource extends UserLinkedResource {
 	}
 
 	protected Representation getJSONRepresentation(Object object, Language language) {
-		return new JSONRepresentation(new JSonBeanMapStream().toXML(object), language);
+		final String json;
+		if (object instanceof BeanMap b) {
+			json = b.toJSon();
+		} else if (object instanceof BeanMapList l) {
+			json = l.toJSon();
+		} else {
+			json = BeanMapParentResource.JSONMapper.toXML(object);
+		}
+		return new JSONRepresentation(json, language);
 	}
 
 	private Representation getXSDFileRepresentation() {

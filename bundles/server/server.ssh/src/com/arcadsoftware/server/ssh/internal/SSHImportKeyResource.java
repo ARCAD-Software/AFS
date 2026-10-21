@@ -20,8 +20,6 @@ import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
 
 import com.arcadsoftware.beanmap.BeanMap;
-import com.arcadsoftware.beanmap.xml.JSonBeanMapStream;
-import com.arcadsoftware.beanmap.xml.XmlBeanMapStream;
 import com.arcadsoftware.crypt.Crypto;
 import com.arcadsoftware.rest.JSONRepresentation;
 import com.arcadsoftware.rest.UserLinkedResource;
@@ -76,8 +74,8 @@ public class SSHImportKeyResource extends UserLinkedResource {
 			upload.setMessage(causes.toString().trim());
 		}
 		if (isJSON(variant)) {
-			return new JSONRepresentation(new JSonBeanMapStream().toXML(upload.getBeanmap()), getClientPreferedLanguage());
+			return new JSONRepresentation(upload.getBeanmap().toJSon(), getClientPreferedLanguage());
 		}
-		return new XMLRepresentation(new XmlBeanMapStream().toXML(upload.getBeanmap()), getClientPreferedLanguage());
+		return new XMLRepresentation(upload.getBeanmap().toXML(), getClientPreferedLanguage());
 	}
 }

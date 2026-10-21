@@ -27,7 +27,6 @@ import org.restlet.resource.ResourceException;
 
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
-import com.arcadsoftware.beanmap.xml.JSonBeanMapStream;
 import com.arcadsoftware.beanmap.xml.XmlBeanMapStream;
 import com.arcadsoftware.metadata.MetaDataAttribute;
 import com.arcadsoftware.metadata.MetaDataEntity;
@@ -94,7 +93,7 @@ public class LDAPImportResource extends LDAPUserLinkedResource {
 	protected Representation get(Variant variant) throws ResourceException {
 		BeanMapList list = selectableLDAPUsers();
 		if (isJSON(variant)) {
-			return new JSONRepresentation(new JSonBeanMapStream().toXML(Activator.TYPE_USER, list), getClientPreferedLanguage());
+			return new JSONRepresentation(list.toJSon(), getClientPreferedLanguage());
 		}
 		return new XMLRepresentation(new XmlBeanMapStream().toXML(Activator.TYPE_USER, list), getClientPreferedLanguage());
 	}

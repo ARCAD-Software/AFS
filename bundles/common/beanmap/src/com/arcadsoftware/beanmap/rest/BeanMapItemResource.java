@@ -25,7 +25,6 @@ import org.restlet.resource.ResourceException;
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
 import com.arcadsoftware.beanmap.xml.HTMLSimpleFormater;
-import com.arcadsoftware.beanmap.xml.JSonBeanMapStream;
 import com.arcadsoftware.beanmap.xml.XmlBeanMapStream;
 import com.arcadsoftware.rest.JSONRepresentation;
 import com.arcadsoftware.rest.UserLinkedIdentifiedResource;
@@ -142,7 +141,15 @@ public abstract class BeanMapItemResource extends UserLinkedIdentifiedResource {
 	}
 
 	protected Representation getJSONRepresentation(Object object, Language language) {
-		return new JSONRepresentation(new JSonBeanMapStream().toXML(object), language);
+		final String json;
+		if (object instanceof BeanMap b) {
+			json = b.toJSon();
+		} else if (object instanceof BeanMapList l) {
+			json = l.toJSon();
+		} else {
+			json = BeanMapParentResource.JSONMapper.toXML(object);
+		}
+		return new JSONRepresentation(json, language);
 	}
 
 	protected Representation getHTMLRepresentation(Object object, boolean simple, Language language) {

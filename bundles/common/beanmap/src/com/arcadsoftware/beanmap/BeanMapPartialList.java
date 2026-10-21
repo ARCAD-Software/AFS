@@ -15,6 +15,9 @@ package com.arcadsoftware.beanmap;
 
 import java.util.Collection;
 
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+
 /**
  * A BeanMapList used to exchange partial result set.
  * 
@@ -178,4 +181,12 @@ public class BeanMapPartialList extends BeanMapList {
 	public void decrementTotal(int increment) {
 		total -= increment;
 	}
+
+	@Override
+	protected void toJSonObject(JSONObject result) throws JSONException {
+		super.toJSonObject(result);
+		result.put("rank", rank);
+		result.put("total", total);
+	}
+
 }

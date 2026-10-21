@@ -38,8 +38,8 @@ import org.eclipse.core.runtime.IAdaptable;
 
 import com.arcadsoftware.beanmap.internal.BeanMapFromJSON;
 import com.arcadsoftware.beanmap.internal.BeanMapIterator;
-import com.arcadsoftware.beanmap.xml.JSonBeanMapStream;
 import com.arcadsoftware.beanmap.xml.XmlBeanMapStream;
+import com.arcadsoftware.osgi.ISODateFormater;
 
 /**
  * Default container associated with BeanMap.
@@ -217,6 +217,34 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 		}
 	}
 
+	/**
+	 * Return a JSON representation of the given list of BeanMap.
+	 * 
+	 * <p>
+	 * Note that this serialization is diferent from the {@link #toJSon()} methods, it will return an JSON array.
+	 * @param list 
+	 * @param nulls True if null values must be inserted in the result.
+	 * @return a String representation of a JSON Array of all the BeanMap included in the list.
+	 */
+	static public String toJSON(Collection<BeanMap> list, boolean nulls) {
+		if (list == null) {
+			return "[]"; //$NON-NLS-1$
+		}
+		try {
+			JSONArray result = new JSONArray();
+			for (BeanMap b: list) {
+				if (b != null) {
+					result.put(b.toJSonObject(false, nulls));
+				} else if (nulls) {
+					result.put((Object) null);
+				}
+			}
+			return result.toString();
+		} catch (JSONException e) {
+			return null;
+		}
+	}
+	
 	/**
 	 * Construct an empty list with an initial capacity of 12.
 	 */
@@ -924,7 +952,49 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	 * @return
 	 */
 	public String toJSon() {
-		return new JSonBeanMapStream().toXML(this);
+		return toJSon(true, true);
+	}
+	
+	public String toJSon(boolean root, boolean nulls) {
+		try {
+			return toJSonObject(true, false).toString();
+		} catch (JSONException e) {
+			return null;
+		}
+	}
+	
+	protected JSONObject toJSonObject(boolean root, boolean nulls) throws JSONException {
+		JSONObject result = new JSONObject();
+		JSONObject bean;
+		if (root) {
+			bean = new JSONObject();
+			result.put("list", bean); //$NON-NLS-1$
+		} else {
+			bean = result;
+		}
+		toJSonObject(bean);
+		JSONArray a = new JSONArray();
+		for (BeanMap b: this) {
+			if (b == null) {
+				if (nulls) {
+					a.put((Object) null);
+				}
+			} else {
+				a.put(b.toJSonObject(false, nulls));
+			}
+		}
+		bean.put("items", a);
+		return result;
+	}
+
+	protected void toJSonObject(JSONObject result) throws JSONException {
+		result.put("count", size()); //$NON-NLS-1$
+		if (muid > 0) {
+			result.put("muid", muid); //$NON-NLS-1$
+		}
+		if (date != null) {
+			result.put("date", ISODateFormater.toString(date));
+		}
 	}
 	
 	/**

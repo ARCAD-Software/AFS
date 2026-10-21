@@ -25,6 +25,7 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -36,6 +37,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.eclipse.core.runtime.IAdaptable;
@@ -44,7 +46,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.arcadsoftware.beanmap.internal.BeanMapFromJSON;
-import com.arcadsoftware.beanmap.xml.JSonBeanMapStream;
 import com.arcadsoftware.beanmap.xml.XmlBeanMapStream;
 import com.arcadsoftware.osgi.ISODateFormater;
 import com.thoughtworks.xstream.converters.ConversionException;
@@ -1414,9 +1415,10 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 	 * Serialize the BeanMap to an JSON fragment string.
 	 * 
 	 * @return the JSON string
+	 * @deprecated use the method {@link #toJSon()}
 	 */
 	public String saveAsJSON() {
-		return new JSonBeanMapStream(getClass().getClassLoader(), true, true, false).toXML(this);
+		return toJSon();
 	}
 
 	/**
@@ -1931,7 +1933,109 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 	 * @return
 	 */
 	public String toJSon() {
-		return new JSonBeanMapStream().toXML(this);
+		return toJSon(true);
+	}
+	
+	public String toJSon(boolean root) {
+		try {
+			return toJSonObject(true, false).toString();
+		} catch (JSONException e) {
+			return null;
+		}
+	}
+	
+	protected JSONObject toJSonObject(boolean root, boolean nulls) throws JSONException {
+		JSONObject result = new JSONObject();
+		JSONObject bean;
+		if (root && (type != null) && !type.isBlank()) {
+			bean = new JSONObject();
+			result.put(type.replace(BeanMapList.SLASH_TYPE, BeanMapList.SLASH_TAG), bean);
+		} else {
+			if (type != null) {
+				result.put("type", type); //$NON-NLS-1$
+			}
+			bean = result;
+		}
+		bean.put("id", id); //$NON-NLS-1$
+		if (date != null) {
+			bean.put("date", ISODateFormater.toString(date)); //$NON-NLS-1$
+		}
+		if (muid > 0) {
+			bean.put("muid", muid); //$NON-NLS-1$
+		}
+		if (deleted) {
+			bean.put("deleted", true); //$NON-NLS-1$
+		}
+		for (Entry<String, Object> e: entrySet()) {
+			if (e.getValue() == null) {
+				if (nulls) {
+					bean.put(e.getKey(), (Object) null);
+				}
+			} else if (e.getValue() instanceof Date v) {
+				bean.put(e.getKey(), ISODateFormater.toString(v));
+			} else if (e.getValue() instanceof Calendar v) {
+				bean.put(e.getKey(), ISODateFormater.toString(v));
+			} else if (isSimpleValue(e.getValue())) {
+				bean.put(e.getKey(), e.getValue());
+			} else if (e.getValue() instanceof BeanMap v) {
+				bean.put(e.getKey(), v.toJSonObject(false, nulls));
+			} else if (e.getValue() instanceof BeanMapList v) {
+				bean.put(e.getKey(), v.toJSonObject(false, nulls));
+			} else if (e.getValue() instanceof Collection v) {
+				bean.put(e.getKey(), toJSONArray(v, nulls));
+			} else {
+				bean.put(e.getKey(), e.getValue().toString());
+			}
+		}
+		return result;
+	}
+	
+	private JSONArray toJSONArray(Collection<?> list, boolean nulls) throws JSONException {
+		JSONArray a = new JSONArray();
+		for (Object o: list) {
+			if (o == null) {
+				if (nulls) {
+					a.put((Object) null);
+				}
+			} else if (o instanceof Date v) {
+				a.put(ISODateFormater.toString(v));
+			} else if (o instanceof Calendar v) {
+				a.put(ISODateFormater.toString(v));
+			} else if (isSimpleValue(o)) {
+				a.put(o);
+			} else if (o instanceof BeanMap v) {
+				a.put(v.toJSonObject(false, nulls));
+			} else if (o instanceof BeanMapList v) {
+				a.put(v.toJSonObject(false, nulls));
+			} else if (o instanceof Collection v) {
+				a.put(toJSONArray(v, nulls));
+			} else {
+				a.put(o.toString());
+			}
+		}
+		return a;
+	}
+
+	/**
+	 * Return true is this key is associated to a "simple" type value.
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public boolean isSimpleType(String key) {
+		return isSimpleValue(get(key));
+	}
+	
+	private boolean isSimpleValue(Object v) {
+		return (v instanceof Integer) ||
+				(v instanceof Boolean) ||
+				(v instanceof Long) ||
+				(v instanceof Date) ||
+				(v instanceof Calendar) ||
+				(v instanceof Instant) ||
+				(v instanceof String) ||
+				(v instanceof Double) ||
+				(v instanceof Float);
 	}
 	
 	/**

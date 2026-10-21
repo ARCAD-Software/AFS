@@ -23,14 +23,37 @@ import org.restlet.resource.ResourceException;
 
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
+import com.arcadsoftware.beanmap.BeanMapPartialList;
+import com.arcadsoftware.beanmap.internal.xml.BeanMapConverter;
+import com.arcadsoftware.beanmap.internal.xml.BeanMapListConverter;
 import com.arcadsoftware.beanmap.xml.HTMLSimpleFormater;
-import com.arcadsoftware.beanmap.xml.JSonBeanMapStream;
 import com.arcadsoftware.beanmap.xml.XmlBeanMapStream;
 import com.arcadsoftware.rest.JSONRepresentation;
+import com.arcadsoftware.rest.JsonStreamCompact;
 import com.arcadsoftware.rest.UserLinkedResource;
 import com.arcadsoftware.rest.XMLRepresentation;
+import com.thoughtworks.xstream.converters.basic.DateConverter;
 
 public abstract class BeanMapParentResource extends UserLinkedResource {
+
+	public static final JsonStreamCompact JSONMapper = new JsonStreamCompact();
+
+	static {
+		// Convert date to ISO format by default... (but accept other format as well).
+		JSONMapper.registerConverter(new DateConverter("yyyy-MM-dd'T'HH:mm:ss.S", new String[] { //$NON-NLS-1$ 
+				"yyyy-MM-dd HH:mm:ss.S z", //$NON-NLS-1$
+				"yyyy-MM-dd HH:mm:ss.S a", //$NON-NLS-1$
+				"yyyy-MM-dd HH:mm:ssz", //$NON-NLS-1$ 
+				"yyyy-MM-dd HH:mm:ss z", //$NON-NLS-1$
+				"yyyy-MM-dd HH:mm:ssa", //$NON-NLS-1$
+				"EEE MMM dd HH:mm:ss zzz yyyy" })); //$NON-NLS-1$;
+		BeanMapConverter beanMapConverter = new BeanMapConverter(JSONMapper.getMapper(), true, false);
+		JSONMapper.registerConverter(new BeanMapListConverter(beanMapConverter, JSONMapper.getMapper(), true, false));
+		JSONMapper.registerConverter(beanMapConverter);
+		JSONMapper.alias(JsonStreamCompact.TAG_BEAN, BeanMap.class);
+		JSONMapper.alias(JsonStreamCompact.TAG_LIST, BeanMapList.class);
+		JSONMapper.alias(JsonStreamCompact.TAG_LIST, BeanMapPartialList.class);
+	}
 
 	private String type;
 	
@@ -117,7 +140,15 @@ public abstract class BeanMapParentResource extends UserLinkedResource {
 	}
 
 	protected Representation getJSONRepresentation(Object object, Language language) {
-		return new JSONRepresentation(new JSonBeanMapStream().toXML(object), language);
+		final String json;
+		if (object instanceof BeanMap b) {
+			json = b.toJSon();
+		} else if (object instanceof BeanMapList l) {
+			json = l.toJSon();
+		} else {
+			json = JSONMapper.toXML(object);
+		}
+		return new JSONRepresentation(json, language);
 	}
 
 	protected Representation getHTMLRepresentation(Object object, boolean simple, Language language) {

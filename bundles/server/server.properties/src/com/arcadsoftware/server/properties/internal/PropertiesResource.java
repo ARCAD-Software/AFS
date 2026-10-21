@@ -17,7 +17,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.Map.Entry;
 
+import org.codehaus.jettison.json.JSONObject;
 import org.restlet.data.CharacterSet;
 import org.restlet.data.Language;
 import org.restlet.data.MediaType;
@@ -28,7 +30,6 @@ import org.restlet.resource.ResourceException;
 import org.restlet.representation.Variant;
 
 import com.arcadsoftware.rest.JSONRepresentation;
-import com.arcadsoftware.rest.JsonStreamCompact;
 import com.arcadsoftware.rest.OSGiResource;
 
 public class PropertiesResource extends OSGiResource {
@@ -64,7 +65,15 @@ public class PropertiesResource extends OSGiResource {
 			return new PropertiesRepresentation(pd.properties, domainname, pd.date, language);
 		}
 		if (isJSON(variant)) {
-			return new JSONRepresentation(new JsonStreamCompact().toXML(pd.properties), language, pd.date);
+			JSONObject j = new JSONObject();
+			if (pd.properties != null) {
+				for (Entry<Object, Object> e: pd.properties.entrySet()) {
+					try {
+						j.put(e.getKey().toString(), e.getValue().toString());
+					} catch (Exception e1) {}
+				}
+			}
+			return new JSONRepresentation(j.toString(), language, pd.date);
 		}
 		if (isXML(variant)) {
 			try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {

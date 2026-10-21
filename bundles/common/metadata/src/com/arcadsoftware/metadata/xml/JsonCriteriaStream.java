@@ -99,7 +99,7 @@ public class JsonCriteriaStream  {
 		}
 	}
 	
-	private JSONObject convert(ISearchCriteria criteria) throws JSONException {
+	protected JSONObject convert(ISearchCriteria criteria) throws JSONException {
 		JSONObject result = new JSONObject();
 		if (criteria instanceof OrCriteria) {
 			result.put("or", convert(((OrCriteria) criteria).getCriterias())); //$NON-NLS-1$
@@ -418,7 +418,7 @@ public class JsonCriteriaStream  {
 		return result;
 	}
 
-	private JSONArray convert(ArrayList<ISearchCriteria> criterias) throws JSONException {
+	protected JSONArray convert(ArrayList<ISearchCriteria> criterias) throws JSONException {
 		JSONArray result = new JSONArray();
 		for (ISearchCriteria criteria: criterias) {
 			result.put(convert(criteria));
@@ -445,7 +445,7 @@ public class JsonCriteriaStream  {
 		}
 	}
 
-	private ISearchCriteria convert(JSONObject o) throws JSONException {
+	protected ISearchCriteria convert(JSONObject o) throws JSONException {
 		if (o.length() == 0) {
 			return null;
 		}
@@ -969,7 +969,7 @@ public class JsonCriteriaStream  {
 		return criteria;
 	}
 
-	private Date getDate(Object o) {
+	protected Date getDate(Object o) {
 		if (o instanceof Date) {
 			return (Date) o;
 		}
@@ -983,7 +983,7 @@ public class JsonCriteriaStream  {
 		}
 	}
 
-	private int getInteger(Object o) {
+	protected int getInteger(Object o) {
 		if (o instanceof Integer) {
 			return ((Integer) o).intValue();
 		}
@@ -993,7 +993,7 @@ public class JsonCriteriaStream  {
 		return 0;
 	}
 
-	private boolean getBoolean(Object o) {
+	protected boolean getBoolean(Object o) {
 		if (o instanceof Boolean) {
 			return (Boolean) o;
 		}
@@ -1006,7 +1006,7 @@ public class JsonCriteriaStream  {
 				"1".equals(s); //$NON-NLS-1$
 	}
 	
-	private ArrayList<ISearchCriteria> convert(JSONArray a) throws JSONException {
+	protected ArrayList<ISearchCriteria> convert(JSONArray a) throws JSONException {
 		int l = a.length();
 		ArrayList<ISearchCriteria> result = new ArrayList<ISearchCriteria>(l);
 		for (int i = 0; i < l; i++) { 

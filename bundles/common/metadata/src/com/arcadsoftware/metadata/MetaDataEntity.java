@@ -64,7 +64,7 @@ import com.arcadsoftware.rest.connection.IConnectionUserBean;
  * <li>The ControlTest that are JavaScript programs used to verify the consistency of the data.
  * </ul>
  */
-public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITypedBean, Comparable<MetaDataEntity> {
+public class MetaDataEntity implements Serializable, Cloneable, IDatedBean, ITypedBean, Comparable<MetaDataEntity> {
 
 	private static final long serialVersionUID = -2129638450698377277L;
 
@@ -296,7 +296,7 @@ public class MetaDataEntity  implements Serializable, Cloneable, IDatedBean, ITy
 		return activator.getEntities();
 	}
 
-	private static XmlCriteriaStream xscriteria = new XmlCriteriaStream();
+	private static final XmlCriteriaStream xscriteria = new XmlCriteriaStream();
 	
 	private static ISearchCriteria getCriteria(String criteria) {
 		if ((criteria == null) || (criteria.length() == 0)) {
