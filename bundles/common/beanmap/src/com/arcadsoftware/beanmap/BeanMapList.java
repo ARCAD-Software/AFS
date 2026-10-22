@@ -956,7 +956,7 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	
 	public String toJSon(boolean root, boolean nulls) {
 		try {
-			return toJSonObject(true, false).toString();
+			return toJSonObject(root, nulls).toString();
 		} catch (JSONException e) {
 			return null;
 		}

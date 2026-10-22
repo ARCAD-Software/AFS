@@ -37,13 +37,11 @@ import com.arcadsoftware.osgi.ISODateFormater;
 
 /**
  * JSon Streamer specialized to the serialization of MetaData objects.
- * 
  * <p>
  * This class can be used to serialize BeanMaps too.
- * 
  * <p>
  * <b>This serialized can not transform JSON into Entity classe.</b>
- * 
+ *
  * @author ARCAD Software
  */
 public class JsonMetaDataStream extends JsonCriteriaStream {
@@ -60,13 +58,13 @@ public class JsonMetaDataStream extends JsonCriteriaStream {
 		}
 		try {
 			return convert(entity, documentation).toString();
-		} catch (JSONException e) {
+		} catch (final JSONException e) {
 			return null;
 		}
 	}
-	
+
 	private JSONObject convert(MetaDataEntity entity, boolean documentation) throws JSONException {
-		JSONObject result = new JSONObject();
+		final JSONObject result = new JSONObject();
 		if (entity instanceof UpdateMetaDataEntity) {
 			result.put(TAG_UPDATEENTITY, true);
 		}
@@ -118,9 +116,9 @@ public class JsonMetaDataStream extends JsonCriteriaStream {
 		if (rights.length() > 0) {
 			result.put("rights", rights); //$NON-NLS-1$
 		}
-		JSONArray attributes = new JSONArray();
-		for (MetaDataAttribute att: entity.getAttributes().values()) {
-			JSONObject a = new JSONObject();
+		final JSONArray attributes = new JSONArray();
+		for (final MetaDataAttribute att : entity.getAttributes().values()) {
+			final JSONObject a = new JSONObject();
 			fillElement(a, att, documentation);
 			if (att.getLength() != 0) {
 				a.put("length", att.getLength()); //$NON-NLS-1$
@@ -147,11 +145,12 @@ public class JsonMetaDataStream extends JsonCriteriaStream {
 			attributes.put(a);
 		}
 		if (attributes.length() > 0) {
-			result.put("attributes", attributes); //$NON-NLS-1$
+			//FIXME Old mapper store attributes in an "attribute" field...
+			result.put("attribute", attributes); //$NON-NLS-1$
 		}
-		JSONArray tests = new JSONArray();
-		for (MetaDataTest test: entity.getTests().values()) {
-			JSONObject t = new JSONObject();
+		final JSONArray tests = new JSONArray();
+		for (final MetaDataTest test : entity.getTests().values()) {
+			final JSONObject t = new JSONObject();
 			if (test.getCode() != null) {
 				t.put("code", test.getCode()); //$NON-NLS-1$
 			}
@@ -164,11 +163,12 @@ public class JsonMetaDataStream extends JsonCriteriaStream {
 			tests.put(t);
 		}
 		if (tests.length() > 0) {
-			result.put("tests", tests); //$NON-NLS-1$
+			//FIXME Old mapper store tests in an "test" field...
+			result.put("test", tests); //$NON-NLS-1$
 		}
-		JSONArray links = new JSONArray();
-		for (MetaDataLink ln: entity.getLinks().values()) {
-			JSONObject l = new JSONObject();
+		final JSONArray links = new JSONArray();
+		for (final MetaDataLink ln : entity.getLinks().values()) {
+			final JSONObject l = new JSONObject();
 			fillElement(l, ln, documentation);
 			rights = new JSONObject();
 			if (ln.getRightCreate(false) != null) {
@@ -183,7 +183,8 @@ public class JsonMetaDataStream extends JsonCriteriaStream {
 			links.put(l);
 		}
 		if (links.length() > 0) {
-			result.put("links", links); //$NON-NLS-1$
+			//FIXME Old mapper store links in an "link" field...
+			result.put("link", links); //$NON-NLS-1$
 		}
 		return result;
 	}
@@ -215,23 +216,23 @@ public class JsonMetaDataStream extends JsonCriteriaStream {
 	}
 
 	private JSONObject writeMetadata(BeanMap metadata) throws JSONException {
-		JSONObject result = new JSONObject();
-		for (Entry<String, Object> e: metadata.entrySet()) {
-			if (e.getValue() instanceof Date v) {
+		final JSONObject result = new JSONObject();
+		for (final Entry<String, Object> e : metadata.entrySet()) {
+			if (e.getValue() instanceof final Date v) {
 				result.put(e.getKey(), ISODateFormater.toString(v));
-			} else if (e.getValue() instanceof Calendar v) {
+			} else if (e.getValue() instanceof final Calendar v) {
 				result.put(e.getKey(), ISODateFormater.toString(v));
 			} else if (isSimpleValue(e.getValue())) {
 				result.put(e.getKey(), e.getValue());
-			} else if (e.getValue() instanceof BeanMap v) {
+			} else if (e.getValue() instanceof final BeanMap v) {
 				result.put(e.getKey(), writeMetadata(v));
-			} else if (e.getValue() instanceof Collection v) {
+			} else if (e.getValue() instanceof final Collection v) {
 				result.put(e.getKey(), writeCollection(v));
 			} else if (e.getValue() != null) {
-				String v = e.getValue().toString();
-				if ("true".equalsIgnoreCase(v)) {
+				final String v = e.getValue().toString();
+				if ("true".equalsIgnoreCase(v)) { //$NON-NLS-1$
 					result.put(e.getKey(), true);
-				} else if ("false".equalsIgnoreCase(v)) {
+				} else if ("false".equalsIgnoreCase(v)) { //$NON-NLS-1$
 					result.put(e.getKey(), false);
 				} else {
 					result.put(e.getKey(), v);
@@ -240,19 +241,19 @@ public class JsonMetaDataStream extends JsonCriteriaStream {
 		}
 		return result;
 	}
-	
+
 	private JSONArray writeCollection(Collection<?> list) throws JSONException {
-		JSONArray result = new JSONArray();
-		for (Object o: list) {
-			if (o instanceof Date v) {
+		final JSONArray result = new JSONArray();
+		for (final Object o : list) {
+			if (o instanceof final Date v) {
 				result.put(ISODateFormater.toString(v));
-			} else if (o instanceof Calendar v) {
+			} else if (o instanceof final Calendar v) {
 				result.put(ISODateFormater.toString(v));
 			} else if (isSimpleValue(o)) {
 				result.put(o);
-			} else if (o instanceof BeanMap v) {
+			} else if (o instanceof final BeanMap v) {
 				result.put(writeMetadata(v));
-			} else if (o instanceof Collection v) {
+			} else if (o instanceof final Collection v) {
 				result.put(writeCollection(v));
 			} else if (o != null) {
 				result.put(o.toString());
@@ -285,7 +286,7 @@ public class JsonMetaDataStream extends JsonCriteriaStream {
 			if (e.has("version")) { //$NON-NLS-1$
 				version = e.getInt("version"); //$NON-NLS-1$
 			}
-			if (e.getBoolean(TAG_UPDATEENTITY)) {
+			if (e.has(TAG_UPDATEENTITY) && e.getBoolean(TAG_UPDATEENTITY)) {
 				result = new UpdateMetaDataEntity(type, version);
 			} else {
 				result = new MetaDataEntity(type, version);
@@ -312,7 +313,7 @@ public class JsonMetaDataStream extends JsonCriteriaStream {
 				result.setMetadata(readMetadata(e.getJSONObject("metadata"))); //$NON-NLS-1$
 			}
 			if (e.has("rights")) { //$NON-NLS-1$
-				JSONObject rights = e.getJSONObject("rights"); //$NON-NLS-1$
+				final JSONObject rights = e.getJSONObject("rights"); //$NON-NLS-1$
 				if (rights.has("create")) { //$NON-NLS-1$
 					result.setCreate(convert(rights.getJSONObject("create"))); //$NON-NLS-1$
 				}
@@ -330,85 +331,99 @@ public class JsonMetaDataStream extends JsonCriteriaStream {
 				}
 			}
 			if (e.has("attributes")) { //$NON-NLS-1$
-				JSONArray array = e.getJSONArray("attributes"); //$NON-NLS-1$
-				for (int i = 0; i < array.length(); i++) {
-					JSONObject j = array.getJSONObject(i);
-					if (j.has("type")) { //$NON-NLS-1$
-						type = j.getString("type"); //$NON-NLS-1$
-					} else {
-						type = ""; //$NON-NLS-1$
-					}
-					MetaDataAttribute a = new MetaDataAttribute(result, type);
-					fillElement(a, j);
-					if (j.has("length")) { //$NON-NLS-1$
-						a.setLength(j.getInt("length")); //$NON-NLS-1$
-					}
-					if (j.has("precision")) { //$NON-NLS-1$
-						a.setPrecision(j.getInt("precision")); //$NON-NLS-1$
-					}
-					if (j.has("listable") && j.getBoolean("listable")) { //$NON-NLS-1$ //$NON-NLS-2$
-						a.setListable(true);
-					}
-					if (j.has("mandatory") && j.getBoolean("mandatory")) { //$NON-NLS-1$ //$NON-NLS-2$
-						a.setMandatory(true);
-					}
-					if (j.has("rights")) { //$NON-NLS-1$
-						JSONObject rights = j.getJSONObject("rights"); //$NON-NLS-1$
-						if (rights.has("update")) { //$NON-NLS-1$
-							a.setUpdate(convert(rights.getJSONObject("update"))); //$NON-NLS-1$
-						}
-						if (rights.has("read")) { //$NON-NLS-1$
-							a.setRead(convert(rights.getJSONObject("read"))); //$NON-NLS-1$
-						}
-					}
-					result.addAttribute(a);
-				}
+				readAttributes(result, e.getJSONArray("attributes")); //$NON-NLS-1$
+			} else if (e.has("attribute")) { //$NON-NLS-1$
+				readAttributes(result, e.getJSONArray("attribute")); //$NON-NLS-1$
 			}
 			if (e.has("tests")) { //$NON-NLS-1$
-				JSONArray array = e.getJSONArray("tests"); //$NON-NLS-1$
-				for (int i = 0; i < array.length(); i++) {
-					JSONObject j = array.getJSONObject(i);
-					String code = ""; //$NON-NLS-1$
-					if (j.has("code")) { //$NON-NLS-1$
-						code = j.getString("code"); //$NON-NLS-1$
-					}
-					String event = null;
-					if (j.has("event")) { //$NON-NLS-1$
-						event = j.getString("event"); //$NON-NLS-1$
-					}
-					String test = null;
-					if (j.has("test")) { //$NON-NLS-1$
-						test = j.getString("test"); //$NON-NLS-1$
-					}
-					result.addTest(new MetaDataTest(result, code, event, test));
-				}
+				readTests(result, e.getJSONArray("tests")); //$NON-NLS-1$
+			} else if (e.has("test")) { //$NON-NLS-1$
+				readTests(result, e.getJSONArray("test")); //$NON-NLS-1$
 			}
 			if (e.has("links")) { //$NON-NLS-1$
-				JSONArray array = e.getJSONArray("links"); //$NON-NLS-1$
-				for (int i = 0; i < array.length(); i++) {
-					JSONObject j = array.getJSONObject(i);
-					if (j.has("type")) { //$NON-NLS-1$
-						type = j.getString("type"); //$NON-NLS-1$
-					} else {
-						type = ""; //$NON-NLS-1$
-					}
-					MetaDataLink l = new MetaDataLink(result);
-					fillElement(l, j);
-					if (j.has("rights")) { //$NON-NLS-1$
-						JSONObject rights = j.getJSONObject("rights"); //$NON-NLS-1$
-						if (rights.has("create")) { //$NON-NLS-1$
-							l.setCreate(convert(rights.getJSONObject("create"))); //$NON-NLS-1$
-						}
-						if (rights.has("list")) { //$NON-NLS-1$
-							l.setList(convert(rights.getJSONObject("list"))); //$NON-NLS-1$
-						}
-					}
-					result.addLink(l);
-				}
+				readLinks(result, e.getJSONArray("links")); //$NON-NLS-1$
+			} else if (e.has("link")) { //$NON-NLS-1$
+				readLinks(result, e.getJSONArray("link")); //$NON-NLS-1$
 			}
 			return result;
-		} catch (JSONException e) {
+		} catch (final JSONException e) {
 			return null;
+		}
+	}
+
+	private void readLinks(MetaDataEntity result, JSONArray array) throws JSONException {
+		for (int i = 0; i < array.length(); i++) {
+			final JSONObject j = array.getJSONObject(i);
+			final MetaDataLink l = new MetaDataLink(result);
+			if (j.has("type")) { //$NON-NLS-1$
+				l.setType(j.getString("type")); //$NON-NLS-1$
+			}
+			fillElement(l, j);
+			if (j.has("rights")) { //$NON-NLS-1$
+				final JSONObject rights = j.getJSONObject("rights"); //$NON-NLS-1$
+				if (rights.has("create")) { //$NON-NLS-1$
+					l.setCreate(convert(rights.getJSONObject("create"))); //$NON-NLS-1$
+				}
+				if (rights.has("list")) { //$NON-NLS-1$
+					l.setList(convert(rights.getJSONObject("list"))); //$NON-NLS-1$
+				}
+			}
+			result.addLink(l);
+		}
+	}
+
+	private void readTests(MetaDataEntity result, JSONArray array) throws JSONException {
+		for (int i = 0; i < array.length(); i++) {
+			final JSONObject j = array.getJSONObject(i);
+			String code = ""; //$NON-NLS-1$
+			if (j.has("code")) { //$NON-NLS-1$
+				code = j.getString("code"); //$NON-NLS-1$
+			}
+			String event = null;
+			if (j.has("event")) { //$NON-NLS-1$
+				event = j.getString("event"); //$NON-NLS-1$
+			}
+			String test = null;
+			if (j.has("test")) { //$NON-NLS-1$
+				test = j.getString("test"); //$NON-NLS-1$
+			}
+			result.addTest(new MetaDataTest(result, code, event, test));
+		}
+	}
+
+	private void readAttributes(MetaDataEntity result, JSONArray array) throws JSONException {
+		for (int i = 0; i < array.length(); i++) {
+			final JSONObject j = array.getJSONObject(i);
+			final String type;
+			if (j.has("type")) { //$NON-NLS-1$
+				type = j.getString("type"); //$NON-NLS-1$
+			} else {
+				type = ""; //$NON-NLS-1$
+			}
+			final MetaDataAttribute a = new MetaDataAttribute(result, type);
+			fillElement(a, j);
+			if (j.has("length")) { //$NON-NLS-1$
+				a.setLength(j.getInt("length")); //$NON-NLS-1$
+			}
+			if (j.has("precision")) { //$NON-NLS-1$
+				a.setPrecision(j.getInt("precision")); //$NON-NLS-1$
+			}
+			if (j.has("listable") && j.getBoolean("listable")) { //$NON-NLS-1$ //$NON-NLS-2$
+				a.setListable(true);
+			}
+			if (j.has("mandatory") && j.getBoolean("mandatory")) { //$NON-NLS-1$ //$NON-NLS-2$
+				a.setMandatory(true);
+			}
+			if (j.has("rights")) { //$NON-NLS-1$
+				final JSONObject rights = j.getJSONObject("rights"); //$NON-NLS-1$
+				if (rights.has("update")) { //$NON-NLS-1$
+					a.setUpdate(convert(rights.getJSONObject("update"))); //$NON-NLS-1$
+				}
+				if (rights.has("read")) { //$NON-NLS-1$
+					a.setRead(convert(rights.getJSONObject("read"))); //$NON-NLS-1$
+				}
+			}
+			result.addAttribute(a);
 		}
 	}
 
@@ -437,10 +452,10 @@ public class JsonMetaDataStream extends JsonCriteriaStream {
 	}
 
 	private BeanMap readMetadata(JSONObject json) throws JSONException {
-		BeanMap result = new BeanMap();
-		Iterator<?> itt = json.keys();
+		final BeanMap result = new BeanMap();
+		final Iterator<?> itt = json.keys();
 		while (itt.hasNext()) {
-			String k = (String) itt.next();
+			final String k = (String) itt.next();
 			if ("id".equals(k)) {
 				result.forceId(json.getInt(k));
 			} else if ("type".equals(k)) {
@@ -450,17 +465,17 @@ public class JsonMetaDataStream extends JsonCriteriaStream {
 			} else if ("date".equals(k)) {
 				try {
 					result.setDate(ISODateFormater.toDate(json.getString(k)));
-				} catch (ParseException e) {
+				} catch (final ParseException e) {
 					throw new JSONException("Not an ISO date: " + json.getString(k));
 				}
 			} else if (json.isNull(k)) {
 				result.put(k, null);
 			} else {
-				Object x = json.get(k);
-				if (x instanceof JSONObject j) {
+				final Object x = json.get(k);
+				if (x instanceof final JSONObject j) {
 					result.put(k, readMetadata(j));
-				} else if (x instanceof JSONArray a) {
-					BeanMapList list = new BeanMapList();
+				} else if (x instanceof final JSONArray a) {
+					final BeanMapList list = new BeanMapList();
 					for (int i = 0; i < a.length(); i++) {
 						list.add(readMetadata(a.getJSONObject(i)));
 					}
@@ -477,14 +492,15 @@ public class JsonMetaDataStream extends JsonCriteriaStream {
 		if (list == null) {
 			return null;
 		}
-		JSONArray array = new JSONArray();
+		final JSONArray array = new JSONArray();
 		try {
-			for (MetaDataEntity e: list) {
+			for (final MetaDataEntity e : list) {
 				if (e != null) {
 					array.put(convert(e, description));
 				}
 			}
-		} catch (JSONException e) {}
+		} catch (final JSONException e) {
+		}
 		return array.toString();
 	}
 
