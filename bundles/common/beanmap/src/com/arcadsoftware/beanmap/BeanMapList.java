@@ -234,7 +234,7 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 			final JSONArray result = new JSONArray();
 			for (BeanMap b: list) {
 				if (b != null) {
-					result.put(b.toJSonObject(false, nulls));
+					result.put(b.toJSonObject(false, nulls, false));
 				} else if (nulls) {
 					result.put((Object) null);
 				}
@@ -956,13 +956,13 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	
 	public String toJSon(boolean root, boolean nulls) {
 		try {
-			return toJSonObject(root, nulls).toString();
+			return toJSonObject(root, nulls, false).toString();
 		} catch (JSONException e) {
 			return null;
 		}
 	}
 	
-	protected JSONObject toJSonObject(boolean root, boolean nulls) throws JSONException {
+	protected JSONObject toJSonObject(boolean root, boolean nulls, boolean complex) throws JSONException {
 		final JSONObject result = new JSONObject();
 		final JSONObject bean;
 		if (root) {
@@ -979,7 +979,7 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 					a.put((Object) null);
 				}
 			} else {
-				a.put(b.toJSonObject(false, nulls));
+				a.put(b.toJSonObject(false, nulls, complex));
 			}
 		}
 		bean.put("items", a); //$NON-NLS-1$
