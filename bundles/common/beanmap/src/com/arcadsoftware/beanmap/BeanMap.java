@@ -1933,18 +1933,18 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 	 * @return
 	 */
 	public String toJSon() {
-		return toJSon(true, true);
+		return toJSon(true, true, false);
 	}
 	
-	public String toJSon(boolean root, boolean nulls) {
+	public String toJSon(boolean root, boolean nulls, boolean complex) {
 		try {
-			return toJSonObject(root, nulls).toString();
+			return toJSonObject(root, nulls, complex).toString();
 		} catch (JSONException e) {
 			return null;
 		}
 	}
 	
-	protected JSONObject toJSonObject(boolean root, boolean nulls) throws JSONException {
+	protected JSONObject toJSonObject(boolean root, boolean nulls, boolean complex) throws JSONException {
 		JSONObject result = new JSONObject();
 		JSONObject bean;
 		if (root && (type != null) && !type.isBlank()) {
@@ -1967,38 +1967,67 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 			bean.put("deleted", true); //$NON-NLS-1$
 		}
 		for (Entry<String, Object> e: entrySet()) {
-			final String k = e.getKey().replace('.', '_');
+			final String k;
+			JSONObject b = bean;
+			if (e.getKey().indexOf('.') >= 0) {
+				if (complex) {
+					String[] ss = e.getKey().split("\\.");
+					for (int i = 0; i < ss.length - 1; i++) {
+						if (b.has(ss[i])) {
+							Object o = b.get(ss[i]);
+							if (o instanceof JSONObject sb) {
+								b = sb;
+							} else {
+								JSONObject sb = new JSONObject();
+								sb.put("id", o);
+								b.put(ss[i], sb);
+								b = sb;
+							}
+						} else {
+							JSONObject sb = new JSONObject();
+							b.put(ss[i], sb);
+							b = sb;
+						}
+					}
+					k = ss[ss.length -1];
+				} else {
+					k = e.getKey().replace('.', '_');
+				}
+			} else {
+				k = e.getKey();
+			}
 			if (e.getValue() == null) {
 				if (nulls) {
-					bean.put(k, (Object) null);
+					b.put(k, (Object) null);
 				}
 			} else if (e.getValue() instanceof Date v) {
-				bean.put(k, ISODateFormater.toString(v));
+				b.put(k, ISODateFormater.toString(v));
 			} else if (e.getValue() instanceof Calendar v) {
-				bean.put(k, ISODateFormater.toString(v));
+				b.put(k, ISODateFormater.toString(v));
 			} else if (isSimpleValue(e.getValue())) {
-				bean.put(k, e.getValue());
+				b.put(k, e.getValue());
 			} else if (e.getValue() instanceof BeanMap v) {
-				bean.put(k, v.toJSonObject(false, nulls));
+				b.put(k, v.toJSonObject(false, nulls, complex));
 			} else if (e.getValue() instanceof BeanMapList v) {
-				bean.put(k, v.toJSonObject(false, nulls));
+				b.put(k, v.toJSonObject(false, nulls, complex));
 			} else if (e.getValue() instanceof Collection v) {
-				bean.put(k, toJSONArray(v, nulls));
+				b.put(k, toJSONArray(v, nulls, complex));
 			} else {
 				String v = e.getValue().toString();
 				if ("true".equalsIgnoreCase(v)) { //$NON-NLS-1$
-					bean.put(k, true);
+					b.put(k, true);
 				} else if ("false".equalsIgnoreCase(v)) { //$NON-NLS-1$
-					bean.put(k, false);
+					b.put(k, false);
 				} else {
-					bean.put(k, v);
+					// TODO Log !!!
+					b.put(k, v);
 				}
 			}
 		}
 		return result;
 	}
 	
-	private JSONArray toJSONArray(Collection<?> list, boolean nulls) throws JSONException {
+	private JSONArray toJSONArray(Collection<?> list, boolean nulls, boolean complex) throws JSONException {
 		JSONArray a = new JSONArray();
 		for (Object o: list) {
 			if (o == null) {
@@ -2012,11 +2041,11 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 			} else if (isSimpleValue(o)) {
 				a.put(o);
 			} else if (o instanceof BeanMap v) {
-				a.put(v.toJSonObject(false, nulls));
+				a.put(v.toJSonObject(false, nulls, complex));
 			} else if (o instanceof BeanMapList v) {
-				a.put(v.toJSonObject(false, nulls));
+				a.put(v.toJSonObject(false, nulls, complex));
 			} else if (o instanceof Collection v) {
-				a.put(toJSONArray(v, nulls));
+				a.put(toJSONArray(v, nulls, complex));
 			} else {
 				a.put(o.toString());
 			}
