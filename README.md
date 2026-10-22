@@ -1,10 +1,10 @@
-# AFS-OS release version 2026.9.5.
+# AFS-OS release version 2026.9.6.
 
-Release date Wed Oct 21 17:08:07 CEST 2026.
+Release date Thu Oct 22 10:35:48 CEST 2026.
 
-Link to the update site of [Version 2026.9.5](https://github.com/ARCAD-Software/AFS/releases/download/2026.9.5/).
+Link to the update site of [Version 2026.9.6](https://github.com/ARCAD-Software/AFS/releases/download/2026.9.6/).
 
-2 Bundles modified in this release.
+3 Bundles modified in this release.
 
 
 
@@ -40,16 +40,16 @@ Bundle Symbolic Name | Modification | Version
 
 Bundle Symbolic Name | Modification | Version
 -------------------- | ------------ | -------
-[com.arcadsoftware.beanmap](bundles/common/beanmap) | **Upgraded** from version 2.3.1 | **2.3.2**
+[com.arcadsoftware.beanmap](bundles/common/beanmap) | **Upgraded** from version 2.3.2 | **2.3.3**
 [com.arcadsoftware.cleanup](bundles/common/cleanup) | Not changed | 1.5.2
 [com.arcadsoftware.cm.simple](bundles/common/cm.simple) | Not changed | 1.9.2
 [com.arcadsoftware.crypt](bundles/common/crypt) | Not changed | 1.11.1
 [com.arcadsoftware.crypt.xml](bundles/common/crypt.xml) | Not changed | 1.4.1
 [com.arcadsoftware.email](bundles/common/email) | Not changed | 1.5.2
 [com.arcadsoftware.groovy.security](bundles/common/groovy.security) | Not changed | 1.4.2
-[com.arcadsoftware.metadata](bundles/common/metadata) | **Upgraded** from version 2.2.6 | **2.2.7**
+[com.arcadsoftware.metadata](bundles/common/metadata) | **Upgraded** from version 2.2.7 | **2.2.8**
 [com.arcadsoftware.osgi](bundles/common/osgi) | Not changed | 1.12.2
-[com.arcadsoftware.rest](bundles/common/rest) | Not changed | 3.5.3
+[com.arcadsoftware.rest](bundles/common/rest) | **Upgraded** from version 3.5.3 | **3.5.4**
 [com.arcadsoftware.ssh](bundles/common/ssh) | Not changed | 2.0.1
 
 
@@ -110,7 +110,7 @@ Bundle Symbolic Name | Modification | Version
 
 Bundle Symbolic Name | Modification | Version
 -------------------- | ------------ | -------
-[com.arcadsoftware.tool.cli](bundles/tools/tool.cli) | Not changed | 2026.9.4
+[com.arcadsoftware.tool.cli](bundles/tools/tool.cli) | Not changed | 2026.9.5
 
 
 
