@@ -43,19 +43,19 @@ public final class BeanMapFromJSON {
 					throw new JSONException("Not an ISO date: " + o.getString(k));
 				}
 			} else if (o.isNull(k)) {
-				bean.put(k, null);
+				bean.put(k.replace('_', '.'), null);
 			} else {
 				Object x = o.get(k);
 				if (x instanceof JSONObject) {
-					bean.put(k, parse(new BeanMap(k), (JSONObject) x));
+					bean.put(k.replace('_', '.'), parse(new BeanMap(k), (JSONObject) x));
 				} else if (x instanceof JSONArray) {
 					BeanMapList list = new BeanMapList();
 					for (int i = 0; i < ((JSONArray) x).length(); i++) {
 						list.add(parse(new BeanMap(), ((JSONArray) x).getJSONObject(i)));
 					}
-					bean.put(k, list);
+					bean.put(k.replace('_', '.'), list);
 				} else {
-					bean.put(k, x);
+					bean.put(k.replace('_', '.'), x);
 				}
 			}
 		}
