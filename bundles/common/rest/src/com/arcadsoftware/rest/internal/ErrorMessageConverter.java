@@ -31,7 +31,7 @@ public class ErrorMessageConverter implements Converter {
 	}
 	 
 	public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
-		ErrorMessageBean msg = (ErrorMessageBean)source;
+		ErrorMessageBean msg = (ErrorMessageBean) source;
 		writer.addAttribute("date", ISODateFormater.toString(msg.getDate())); //$NON-NLS-1$
 		writer.addAttribute("name", msg.getName()); //$NON-NLS-1$
 		if (msg.getHref() != null) {
