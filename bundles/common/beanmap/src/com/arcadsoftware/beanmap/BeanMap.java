@@ -1967,30 +1967,31 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 			bean.put("deleted", true); //$NON-NLS-1$
 		}
 		for (Entry<String, Object> e: entrySet()) {
+			final String k = e.getKey().replace('.', '_');
 			if (e.getValue() == null) {
 				if (nulls) {
-					bean.put(e.getKey(), (Object) null);
+					bean.put(k, (Object) null);
 				}
 			} else if (e.getValue() instanceof Date v) {
-				bean.put(e.getKey(), ISODateFormater.toString(v));
+				bean.put(k, ISODateFormater.toString(v));
 			} else if (e.getValue() instanceof Calendar v) {
-				bean.put(e.getKey(), ISODateFormater.toString(v));
+				bean.put(k, ISODateFormater.toString(v));
 			} else if (isSimpleValue(e.getValue())) {
-				bean.put(e.getKey(), e.getValue());
+				bean.put(k, e.getValue());
 			} else if (e.getValue() instanceof BeanMap v) {
-				bean.put(e.getKey(), v.toJSonObject(false, nulls));
+				bean.put(k, v.toJSonObject(false, nulls));
 			} else if (e.getValue() instanceof BeanMapList v) {
-				bean.put(e.getKey(), v.toJSonObject(false, nulls));
+				bean.put(k, v.toJSonObject(false, nulls));
 			} else if (e.getValue() instanceof Collection v) {
-				bean.put(e.getKey(), toJSONArray(v, nulls));
+				bean.put(k, toJSONArray(v, nulls));
 			} else {
 				String v = e.getValue().toString();
 				if ("true".equalsIgnoreCase(v)) { //$NON-NLS-1$
-					bean.put(e.getKey(), true);
+					bean.put(k, true);
 				} else if ("false".equalsIgnoreCase(v)) { //$NON-NLS-1$
-					bean.put(e.getKey(), false);
+					bean.put(k, false);
 				} else {
-					bean.put(e.getKey(), v);
+					bean.put(k, v);
 				}
 			}
 		}
