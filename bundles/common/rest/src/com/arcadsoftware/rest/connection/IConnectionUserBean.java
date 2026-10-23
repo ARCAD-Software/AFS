@@ -53,7 +53,7 @@ public interface IConnectionUserBean {
 	/**
 	 * If any, return the identification modes corresponding to this class.
 	 * @param clazz
-	 * @return
+	 * @return never return null.
 	 */
 	public List<IConnectionCredential> getCredential(Class<? extends IConnectionCredential> clazz);
 	

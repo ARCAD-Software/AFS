@@ -23,6 +23,7 @@ import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.restlet.representation.FileRepresentation;
 import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
 
@@ -68,7 +69,7 @@ public class SectionResource extends UserLinkedResource {
 			setLastModification(new Date(activator.getContext().getBundle().getLastModified()));
 		}
 		getAllowedMethods().add(Method.GET);
-		addVariants(MediaType.TEXT_XML, MediaType.APPLICATION_W3C_SCHEMA);
+		addVariants(MediaType.TEXT_XML, MediaType.APPLICATION_W3C_SCHEMA, MediaType.APPLICATION_XHTML, MediaType.TEXT_HTML);
 	}
 
 	@Override
@@ -81,6 +82,11 @@ public class SectionResource extends UserLinkedResource {
 		}
 		List<ConsoleField> result = section.getForm(language);
 		if (result == null) {
+			if (isHTML(variant)) {
+				return new StringRepresentation(HtmlFormRenderer.renderSuccess(
+			            section.getLabel(language), activator.localize("info.success", language),
+			            getReference().getPath(), language, activator.localize("info.back", language)), MediaType.TEXT_HTML, language);
+			}
 			setStatus(Status.SUCCESS_NO_CONTENT);
 			return null;
 		}
@@ -89,6 +95,10 @@ public class SectionResource extends UserLinkedResource {
 		}
 		if (isJSON(variant)) {
 			return new JSONRepresentation(ActionResource.js.toXML(result),language);
+		}
+		if (isHTML(variant)) {
+		    return new StringRepresentation(HtmlFormRenderer.render(result, section.getLabel(language), getReference().getPath(), language, 
+		    		activator.localize("info.back", language)), variant.getMediaType(), language);
 		}
 		return null;
 	}

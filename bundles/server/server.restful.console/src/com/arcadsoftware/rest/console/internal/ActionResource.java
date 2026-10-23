@@ -28,6 +28,7 @@ import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.restlet.representation.FileRepresentation;
 import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
 
@@ -91,7 +92,7 @@ public class ActionResource extends UserLinkedResource {
 		getAllowedMethods().add(Method.GET);
 		getAllowedMethods().add(Method.POST);
 		getAllowedMethods().add(Method.PUT);
-		addVariants(MediaType.TEXT_XML, MediaType.APPLICATION_W3C_SCHEMA);
+		addVariants(MediaType.TEXT_XML, MediaType.APPLICATION_W3C_SCHEMA, MediaType.APPLICATION_XHTML, MediaType.TEXT_HTML);
 	}
 
 	@Override
@@ -117,6 +118,11 @@ public class ActionResource extends UserLinkedResource {
 		}
 		broadcastUserAction();
 		if (result == null) {
+			if (isHTML(variant)) {
+				return new StringRepresentation(HtmlFormRenderer.renderSuccess(
+			            section.getLabel(language), activator.localize("info.success", language),
+			            getReference().getParentRef().getPath(), language, activator.localize("info.back", language)), MediaType.TEXT_HTML, language);
+			}
 			setStatus(Status.SUCCESS_NO_CONTENT, activator.localize("info.success", language)); //$NON-NLS-1$
 			return null;
 		}
@@ -125,6 +131,10 @@ public class ActionResource extends UserLinkedResource {
 		}
 		if (isJSON(variant)) {
 			return new JSONRepresentation(js.toXML(result),language);
+		}
+		if (isHTML(variant)) {
+		    return new StringRepresentation(HtmlFormRenderer.render(result, section.getLabel(language), getReference().getParentRef().getPath(), language, 
+		    		activator.localize("info.back", language)), variant.getMediaType(), language);
 		}
 		return null;
 	}
