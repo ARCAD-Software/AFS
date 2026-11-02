@@ -18,6 +18,7 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
@@ -1996,37 +1997,66 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 			} else {
 				k = e.getKey();
 			}
-			if (e.getValue() == null) {
+			Object o = e.getValue(); 
+			if (o == null) {
 				if (nulls) {
-					b.put(k, (Object) null);
+					b.put(k, o);
 				}
-			} else if (e.getValue() instanceof Date v) {
-				b.put(k, ISODateFormater.toString(v));
-			} else if (e.getValue() instanceof Calendar v) {
-				b.put(k, ISODateFormater.toString(v));
-			} else if (isSimpleValue(e.getValue())) {
-				b.put(k, e.getValue());
-			} else if (e.getValue() instanceof BeanMap v) {
-				b.put(k, v.toJSonObject(false, nulls, complex));
-			} else if (e.getValue() instanceof BeanMapList v) {
-				b.put(k, v.toJSonObject(false, nulls, complex));
-			} else if (e.getValue() instanceof Collection v) {
-				b.put(k, toJSONArray(v, nulls, complex));
 			} else {
-				String v = e.getValue().toString();
-				if ("true".equalsIgnoreCase(v)) { //$NON-NLS-1$
-					b.put(k, true);
-				} else if ("false".equalsIgnoreCase(v)) { //$NON-NLS-1$
-					b.put(k, false);
-				} else {
-					// TODO Log !!!
-					b.put(k, v);
-				}
-			}
+				b.put(k, toJSONValue(o, nulls, complex));
+			}	
 		}
 		return result;
 	}
 	
+	private Object toJSONValue(Object value, boolean nulls, boolean complex) throws JSONException {
+		if (value instanceof Date v) {
+			return ISODateFormater.toString(v);
+		}
+		if (value instanceof Calendar v) {
+			return ISODateFormater.toString(v);
+		}
+		if (isSimpleValue(value)) {
+			return value;
+		} 
+		if (value instanceof BeanMap v) {
+			return v.toJSonObject(false, nulls, complex);
+		}
+		if (value instanceof BeanMapList v) {
+			return v.toJSonObject(false, nulls, complex);
+		}
+		if (value instanceof Collection v) {
+			return toJSONArray(v, nulls, complex);
+		}
+		if (value instanceof Map) {
+			return value;
+		}
+		if (value.getClass().isArray()) {
+			int ln = Array.getLength(value);
+			JSONArray result = new JSONArray(ln);
+			for (int i = 0; i < ln; i++) {
+                Object o = Array.get(value, i);
+                if (o == null) {
+                	if (nulls) {
+                		result.put(o);
+                	}
+                } else {
+                	result.put(toJSONValue(o, nulls, complex));
+                }
+			}
+			return result;
+		}
+		String v = value.toString();
+		if ("true".equalsIgnoreCase(v)) { //$NON-NLS-1$
+			return Boolean.TRUE;
+		}
+		if ("false".equalsIgnoreCase(v)) { //$NON-NLS-1$
+			return Boolean.FALSE;
+		}
+		// TODO Log ?!!!
+		return v;
+	}
+
 	private JSONArray toJSONArray(Collection<?> list, boolean nulls, boolean complex) throws JSONException {
 		JSONArray a = new JSONArray();
 		for (Object o: list) {
