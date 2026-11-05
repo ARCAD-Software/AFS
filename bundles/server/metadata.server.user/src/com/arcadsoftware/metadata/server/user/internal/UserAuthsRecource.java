@@ -85,7 +85,7 @@ public class UserAuthsRecource extends UserLinkedIdentifiedResource {
 		if (isJSON(variant)) {
 			return new JSONRepresentation(result.toJSon(), getClientPreferedLanguage());
 		}
-		return new XMLRepresentation(new XmlBeanMapStream().toXML(result), getClientPreferedLanguage());
+		return new XMLRepresentation(XmlBeanMapStream.getInstance().toXML(result), getClientPreferedLanguage());
 	}
 
 }

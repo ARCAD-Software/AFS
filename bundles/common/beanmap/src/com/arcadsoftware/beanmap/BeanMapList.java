@@ -122,11 +122,7 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	static public BeanMapList loadFromXml(String type, String xml) {
 		Object result = null;
 		try {
-			if (type != null) {
-				result = new XmlBeanMapStream().fromXML(type, xml);
-			} else {
-				result = new XmlBeanMapStream().fromXML(xml);
-			}
+			result = XmlBeanMapStream.getInstance().fromXML(type, xml);
 		} catch (Exception e) {
 			return null;
 		}
@@ -942,7 +938,7 @@ public class BeanMapList extends ArrayList<BeanMap> implements IDatedBean, Clone
 	 * @return
 	 */
 	public String toXML() {
-		return new XmlBeanMapStream().toXML(this);
+		return XmlBeanMapStream.getInstance().toXML(this);
 	}
 	
 	/**

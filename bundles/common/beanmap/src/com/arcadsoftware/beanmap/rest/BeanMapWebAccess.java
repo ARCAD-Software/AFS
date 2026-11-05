@@ -55,7 +55,7 @@ public class BeanMapWebAccess {
 	 */
 	public BeanMapWebAccess() {
 		super();
-		xs = new XmlBeanMapStream(BeanMapWebAccess.class.getClassLoader());
+		xs = XmlBeanMapStream.getInstance();
 	}
 
 	/**
