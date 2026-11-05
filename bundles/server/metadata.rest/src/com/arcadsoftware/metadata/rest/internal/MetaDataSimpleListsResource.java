@@ -180,7 +180,7 @@ public class MetaDataSimpleListsResource extends UserLinkedResource {
 	}
 
 	protected Representation getXMLRepresentation(Object object, Language language) {
-		return new XMLRepresentation(new XmlBeanMapStream().toXML(object), language);
+		return new XMLRepresentation(XmlBeanMapStream.getInstance().toXML(object), language);
 	}
 
 	protected Representation getJSONRepresentation(Object object, Language language) {

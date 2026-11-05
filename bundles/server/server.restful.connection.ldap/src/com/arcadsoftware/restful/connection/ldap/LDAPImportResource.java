@@ -95,7 +95,7 @@ public class LDAPImportResource extends LDAPUserLinkedResource {
 		if (isJSON(variant)) {
 			return new JSONRepresentation(list.toJSon(), getClientPreferedLanguage());
 		}
-		return new XMLRepresentation(new XmlBeanMapStream().toXML(Activator.TYPE_USER, list), getClientPreferedLanguage());
+		return new XMLRepresentation(XmlBeanMapStream.getInstance().toXML(Activator.TYPE_USER, list), getClientPreferedLanguage());
 	}
 	
 	private BeanMapList selectableLDAPUsers() throws ResourceException {

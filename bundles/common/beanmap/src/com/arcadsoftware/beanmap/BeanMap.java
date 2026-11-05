@@ -92,13 +92,9 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 	 * @return null if the XML fragment does not conform to the expected format.
 	 */
 	static public BeanMap loadFromXml(String type, String xml) {
-		XmlBeanMapStream xs = new XmlBeanMapStream();
-		if (type != null) {
-			xs.alias(type, BeanMap.class);
-		}
 		Object result = null;
 		try {
-			result = xs.fromXML(xml);
+			result = XmlBeanMapStream.getInstance().fromXML(type, xml);
 		} catch (Exception e) {
 			return null;
 		}
@@ -1395,8 +1391,7 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 	 * @return the object deserialized from the XML fragment, this object can be the BeanMap itself.
 	 */
 	public Object update(String xml) {
-		XmlBeanMapStream xs = new XmlBeanMapStream(this);
-		return xs.fromXML(xml);
+		return new XmlBeanMapStream(this).fromXML(xml);
 	}
 
 	/**
@@ -1407,7 +1402,7 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 	 * @return thE XML string
 	 */
 	public String saveAsXml() {
-		return new XmlBeanMapStream(getClass().getClassLoader()).toXML(this);
+		return XmlBeanMapStream.getInstance().toXML(this);
 	}
 
 	/**
@@ -1925,7 +1920,7 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 	 * @return
 	 */
 	public String toXML() {
-		return new XmlBeanMapStream().toXML(this);
+		return XmlBeanMapStream.getInstance().toXML(this);
 	}
 	
 	/**
@@ -1957,7 +1952,9 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 			}
 			bean = result;
 		}
-		bean.put("id", id); //$NON-NLS-1$
+		if (id != 0) {
+			bean.put("id", id); //$NON-NLS-1$
+		}
 		if (date != null) {
 			bean.put("date", ISODateFormater.toString(date)); //$NON-NLS-1$
 		}
@@ -2010,6 +2007,9 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 	}
 	
 	private Object toJSONValue(Object value, boolean nulls, boolean complex) throws JSONException {
+		if (value instanceof JSONObject v) {
+			return v;
+		}
 		if (value instanceof Date v) {
 			return ISODateFormater.toString(v);
 		}

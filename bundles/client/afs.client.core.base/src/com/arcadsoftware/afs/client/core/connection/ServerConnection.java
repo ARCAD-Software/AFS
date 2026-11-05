@@ -318,7 +318,7 @@ public class ServerConnection {
 			boolean localtranslate) {
 		if (server != null) {
 			final DataAccess da = new DataAccess(server.getUrl(), login, password.toCharArray());
-			da.getWebServicesAccess().setXStream(new XmlBeanMapStream());
+			da.getWebServicesAccess().setXStream(XmlBeanMapStream.getInstance());
 			setProxy(da.getWebServicesAccess());
 			try {
 				callCurrentUser(da, managerUser, localtranslate);
@@ -427,7 +427,7 @@ public class ServerConnection {
 				webServiceAccess.setDefaultServeraddress(server.getUrl());
 				setProxy(webServiceAccess);
 				final DataAccess da = new DataAccess(webServiceAccess);
-				da.getWebServicesAccess().setXStream(new XmlBeanMapStream());
+				da.getWebServicesAccess().setXStream(XmlBeanMapStream.getInstance());
 				try {
 					callCurrentUser(da, managerUser, localtranslate);
 					// [ML] login and password was not stored here...
