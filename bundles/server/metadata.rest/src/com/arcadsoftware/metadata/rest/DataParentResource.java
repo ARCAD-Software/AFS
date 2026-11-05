@@ -277,7 +277,7 @@ public class DataParentResource extends UserLinkedResource {
 				}
 			}
 		}
-		XMLRepresentation rep = new XMLRepresentation(new XmlBeanMapStream().toXML(object), language);
+		XMLRepresentation rep = new XMLRepresentation(XmlBeanMapStream.getInstance().toXML(object), language);
 		if (lm != null) {
 			rep.setModificationDate(lm);
 		}

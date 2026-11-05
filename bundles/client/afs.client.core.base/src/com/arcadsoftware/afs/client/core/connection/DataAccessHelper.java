@@ -56,7 +56,7 @@ public class DataAccessHelper {
 	}
 
 	private void resetXStream() {
-		dataAccess.getWebServicesAccess().setXStream(new XmlBeanMapStream());
+		dataAccess.getWebServicesAccess().setXStream(XmlBeanMapStream.getInstance());
 	}
 
 	public MetaDataEntity getEntity(String type) {

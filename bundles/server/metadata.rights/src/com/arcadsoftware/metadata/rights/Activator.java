@@ -81,7 +81,6 @@ public class Activator extends AbstractActivator implements BundleListener, ICon
 
 	private final HashMap<Integer, BeanMap> rights = new HashMap<Integer, BeanMap>();;
 	private final HashMap<Integer, BeanMap> rightscategories = new HashMap<Integer, BeanMap>();
-	private final XmlBeanMapStream xs = new XmlBeanMapStream();
 	private volatile ReferenceLine rightName;
 
 	@Override
@@ -140,7 +139,7 @@ public class Activator extends AbstractActivator implements BundleListener, ICon
 				 bundle.getSymbolicName().startsWith("com.dropssoftware."))) { //$NON-NLS-1$
 			BeanMapList newRights = new BeanMapList();
 			try (FileInputStream fis = new FileInputStream(file)) {
-				Object o = xs.fromXML(fis);
+				Object o = XmlBeanMapStream.getInstance().fromXML(fis);
 				if (o instanceof BeanMap) {
 					if (addRight((BeanMap) o)) {
 						newRights.add((BeanMap) o);

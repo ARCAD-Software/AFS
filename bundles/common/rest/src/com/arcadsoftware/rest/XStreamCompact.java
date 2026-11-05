@@ -51,7 +51,7 @@ public class XStreamCompact extends XStream {
 	public static final String TAG_TYPE = "type"; //$NON-NLS-1$
 	public static final String TAG_ID = "id"; //$NON-NLS-1$
 	public static final String TAG_DATE = "date"; //$NON-NLS-1$
-
+	
 	/**
 	 * List all the reserved keyword that can not be used as attributes names.
 	 * 
@@ -62,6 +62,8 @@ public class XStreamCompact extends XStream {
 			TAG_BEAN, TAG_LIST, TAG_ID, TAG_TYPE, "uri", //$NON-NLS-1$
 			"href"}; //$NON-NLS-1$
 	}
+
+	private final HierarchicalStreamDriver driver;
 	
 	/**
 	 * Default Constructor. 
@@ -108,6 +110,7 @@ public class XStreamCompact extends XStream {
 				compactDriver, 
 				new ClassLoaderReference(new OSGiXStreamClassLoader(classLoader)), 
 				(Mapper) null);
+		driver = compactDriver;
 		initializeSecurity();
 	}
 
@@ -141,6 +144,7 @@ public class XStreamCompact extends XStream {
 				// FIXME Modification de XStrem 1.4.9 à tester !!!
 			}
 		});
+		this.driver = driver;
 		initializeSecurity();
 	}
 
@@ -216,4 +220,7 @@ public class XStreamCompact extends XStream {
 		return super.fromXML(file);
 	}	
 	
+	public HierarchicalStreamDriver getDriver() {
+		return driver;
+	}
 }
