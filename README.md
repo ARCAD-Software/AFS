@@ -1,10 +1,10 @@
 # AFS-OS release version 2026.3.10.
 
-Release date Tue Nov 10 08:00:51 CET 2026.
+Release date Tue Nov 10 08:36:11 CET 2026.
 
 Link to the update site of [Version 2026.3.10](https://github.com/ARCAD-Software/AFS/releases/download/2026.3.10/).
 
-10 Bundles modified in this release.
+12 Bundles modified in this release.
 
 
 
@@ -83,7 +83,7 @@ Bundle Symbolic Name | Modification | Version
 [com.arcadsoftware.server.properties](bundles/server/server.properties) | **Upgraded** from version 1.4.0 | **1.4.3**
 [com.arcadsoftware.server.restful](bundles/server/server.restful) | Not changed | 4.0.0
 [com.arcadsoftware.server.restful.connection](bundles/server/server.restful.connection) | Not changed | 2.4.1
-[com.arcadsoftware.server.restful.connection.config](bundles/server/server.restful.connection.config) | Not changed | 1.5.1
+[com.arcadsoftware.server.restful.connection.config](bundles/server/server.restful.connection.config) | **Upgraded** from version 1.5.1 | **1.5.3**
 [com.arcadsoftware.server.restful.connection.ldap](bundles/server/server.restful.connection.ldap) | **Upgraded** from version 2.6.0 | **2.6.3**
 [com.arcadsoftware.server.restful.connection.local](bundles/server/server.restful.connection.local) | Not changed | 2.2.2
 [com.arcadsoftware.server.restful.console](bundles/server/server.restful.console) | Not changed | 1.6.0
@@ -109,7 +109,7 @@ Bundle Symbolic Name | Modification | Version
 
 Bundle Symbolic Name | Modification | Version
 -------------------- | ------------ | -------
-[com.arcadsoftware.tool.cli](bundles/tools/tool.cli) | Not changed | 2026.3.9
+[com.arcadsoftware.tool.cli](bundles/tools/tool.cli) | **Upgraded** from version 2026.3.9 | **2026.3.10**
 
 
 
