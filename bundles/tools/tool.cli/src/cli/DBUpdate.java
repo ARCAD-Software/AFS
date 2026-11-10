@@ -21,13 +21,14 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.Map.Entry;
 
 import com.arcadsoftware.crypt.Crypto;
@@ -320,7 +321,7 @@ public final class DBUpdate extends DataSourceCommand {
 					e.printStackTrace();
 				}
 			}
-			Set<String> dbs = getDBCodeList(connection);
+			List<String> dbs = getDBCodeList(connection);
 			if (dbs.isEmpty()) {
 				printError("The Database is not installed or must be updated according to the previous database upgrade process.");
 				printError("Check the application server configuration.");
@@ -381,28 +382,32 @@ public final class DBUpdate extends DataSourceCommand {
 		}
 	}
 
-	private void addNewDBFiles(Connection connection, File upgradeDir, Set<String> dbs, String dbtype) throws Exception {
-		Set<String> dbmodules = new HashSet<String>();
+	private void addNewDBFiles(Connection connection, File upgradeDir, List<String> dbs, String dbtype) throws Exception {
+		ArrayList<String> dbmodules = new ArrayList<>();
 		for (File f: upgradeDir.listFiles()) {
 			int i = f.getName().indexOf("_V0"); //$NON-NLS-1$
 			if (i > 0) {
 				String s = f.getName().substring(0, i);
-				if (!dbs.contains(s)) {
+				if (!dbs.contains(s) && !dbmodules.contains(s)) {
 					dbmodules.add(s);
 				}
 			}
 		}
-		for (String module: dbmodules) {
-			File sql = new File(upgradeDir, module + "_V0.sql"); //$NON-NLS-1$
-			if (sql.isFile()) {
-				runscript(connection, sql, true);
+		if (!dbmodules.isEmpty()) {
+			Collections.sort(dbmodules);
+			for (String module: dbmodules) {
+				File sql = new File(upgradeDir, module + "_V0.sql"); //$NON-NLS-1$
+				if (sql.isFile()) {
+					runscript(connection, sql, true);
+				}
+				sql = new File(upgradeDir, module + "_V0_" + dbtype + ".sql"); //$NON-NLS-1$ //$NON-NLS-2$
+				if (sql.isFile()) {
+					runscript(connection, sql, true);
+				}
+				dbs.add(module);
 			}
-			sql = new File(upgradeDir, module + "_V0_" + dbtype + ".sql"); //$NON-NLS-1$ //$NON-NLS-2$
-			if (sql.isFile()) {
-				runscript(connection, sql, true);
-			}
-			dbs.add(module);
-		}
+			Collections.sort(dbs);
+		}		
 	}
 
 	private boolean upgradeDBComponent(Connection connection, File upgradeDir, String db, String dbtype) throws Exception {

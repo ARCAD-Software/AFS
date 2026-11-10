@@ -24,14 +24,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.Set;
 
 import org.h2.tools.Server;
 import org.h2.util.ScriptReader;
@@ -368,7 +369,7 @@ public abstract class DataSourceCommand extends Command {
 	 * @param connection
 	 * @return
 	 */
-	protected Set<String> getDBCodeList(Connection connection) {
+	protected List<String> getDBCodeList(Connection connection) {
 		HashSet<String> result = new HashSet<String>(2);
 		try (Statement st = connection.createStatement()) {
 			try (ResultSet rs = st.executeQuery("SELECT DISTINCT DBV_CODE FROM ARCADDBV")) { //$NON-NLS-1$
@@ -381,7 +382,9 @@ public abstract class DataSourceCommand extends Command {
 				e.printStackTrace();
 			}
 		}
-		return result;
+		ArrayList<String> r = new ArrayList<>(result);
+		Collections.sort(r);
+		return r;
 	}
 	
 	/**
