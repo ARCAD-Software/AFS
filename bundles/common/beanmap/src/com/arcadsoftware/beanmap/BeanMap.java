@@ -1941,13 +1941,13 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 	}
 	
 	protected JSONObject toJSonObject(boolean root, boolean nulls, boolean complex) throws JSONException {
-		JSONObject result = new JSONObject();
-		JSONObject bean;
+		final JSONObject result = new JSONObject();
+		final JSONObject bean;
 		if (root && (type != null) && !type.isBlank()) {
 			bean = new JSONObject();
 			result.put(type.replace(BeanMapList.SLASH_TYPE, BeanMapList.SLASH_TAG), bean);
 		} else {
-			if (type != null) {
+			if ((type != null) || nulls) {
 				result.put("type", type); //$NON-NLS-1$
 			}
 			bean = result;
@@ -1969,7 +1969,7 @@ public final class BeanMap implements Map<String, Object>, IBeanMap, IIdentified
 			JSONObject b = bean;
 			if (e.getKey().indexOf('.') >= 0) {
 				if (complex) {
-					String[] ss = e.getKey().split("\\.");
+					String[] ss = e.getKey().split("\\."); //$NON-NLS-1$
 					for (int i = 0; i < ss.length - 1; i++) {
 						if (b.has(ss[i])) {
 							Object o = b.get(ss[i]);
