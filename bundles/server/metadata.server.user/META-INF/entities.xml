@@ -40,12 +40,16 @@
 			<read>
 				<or>
 					<hasright attribute="." right="30" />
+					<hasright attribute="." right="31" />
+					<hasright attribute="." right="32" />
 					<currentuser attribute="." />
 				</or>
 			</read>
 			<list>
 				<or>
 					<hasright attribute="." right="30" />
+					<hasright attribute="." right="31" />
+					<hasright attribute="." right="32" />
 					<currentuser attribute="." />
 				</or>
 			</list>
