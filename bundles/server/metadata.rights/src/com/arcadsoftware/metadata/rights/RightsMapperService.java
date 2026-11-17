@@ -19,6 +19,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import org.restlet.data.Language;
+
 import com.arcadsoftware.beanmap.BeanMap;
 import com.arcadsoftware.beanmap.BeanMapList;
 import com.arcadsoftware.beanmap.BeanMapPartialList;
@@ -33,6 +35,7 @@ import com.arcadsoftware.metadata.criteria.CriteriaContextBasic;
 import com.arcadsoftware.metadata.criteria.EqualCriteria;
 import com.arcadsoftware.metadata.criteria.ISearchCriteria;
 import com.arcadsoftware.metadata.criteria.LinkCriteria;
+import com.arcadsoftware.rest.ITranslationService;
 import com.arcadsoftware.rest.connection.IConnectionUserBean;
 
 /**
@@ -336,11 +339,19 @@ public class RightsMapperService extends AbstractMapperService<CriteriaContextBa
 	}
 
 	public void rights() {
+		ITranslationService ts = activator.getService(ITranslationService.class);
 		System.out.println("Currently defined Access Rights:"); //$NON-NLS-1$
 		ArrayList<BeanMap> rights = new ArrayList<>(activator.getRights());
 		Collections.sort(rights);
 		for (BeanMap b: rights) {
-			System.out.println(b.getId() + " - " + b.getString(Activator.RIGHT_CODE) + " [" + b.getString(Activator.RIGHT_CATEGORY) + ']'); //$NON-NLS-1$ //$NON-NLS-2$
+			String code = b.getString(Activator.RIGHT_CODE);
+			System.out.print(b.getId() + " - " + code + " [" + b.getString(Activator.RIGHT_CATEGORY) + ']'); //$NON-NLS-1$ //$NON-NLS-2$
+			if ((ts != null) && (code != null) && !code.isEmpty()) {
+				System.out.println(": " + ts.translate("data", "right.name." + code, Language.ENGLISH)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				
+			} else {
+				System.out.println();
+			}
 		}
 	}
 	
