@@ -74,6 +74,24 @@ public class BinResource extends OSGiResource {
 	}
 
 	/**
+	 * Check the file name against the white and black lists of the configuration.
+	 *
+	 * <p>If the file is refused the response status is set accordingly. The lists are not
+	 * disclosed to the client.
+	 *
+	 * @param name the name of the uploaded file, without path.
+	 * @return true if the file can be stored.
+	 */
+	private boolean isUploadAllowed(String name) {
+		if (Activator.getInstance().getUploadFilter().isAllowed(name)) {
+			return true;
+		}
+		Activator.getInstance().warn("Upload refused for {}/{}: the file name '{}' is rejected by the whiteList/blackList configuration.", category, id, name);
+		setStatus(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE, "This type of file is not allowed on this server.");
+		return false;
+	}
+
+	/**
 	 * Accepts and processes a representation posted to the resource.
 	 */
 	@Override
@@ -89,8 +107,6 @@ public class BinResource extends OSGiResource {
 		}
 		// TODO Apply this method to all Mediatypes not only the binary one !!!
 		if (MediaType.APPLICATION_OCTET_STREAM.equals(entity.getMediaType(), true)) {
-			// Delete any existing file.
-			Activator.getInstance().removeFiles(category, id);
 			String name = null;
 			if (entity.getDisposition() != null) {
 				name = entity.getDisposition().getFilename();
@@ -104,6 +120,12 @@ public class BinResource extends OSGiResource {
 			if ((name.indexOf('/') > -1) || (name.indexOf('\\') > -1)) {
 				name = new File(name).getName();
 			}
+			// Refuse the file before deleting the existing one, a rejected upload must not remove it.
+			if (!isUploadAllowed(name)) {
+				return null;
+			}
+			// Delete any existing file.
+			Activator.getInstance().removeFiles(category, id);
 			file = new File(Activator.getInstance().getSubDir(category, id), Integer.toString(id) + '_' + name);
 			// Test a directory path trasversal attack...
 			try {
@@ -182,15 +204,19 @@ public class BinResource extends OSGiResource {
 						.build());
 				for (Part part : mprep.getParts()) {
 					if (part.getName().equals("file")) { //$NON-NLS-1$
-						// Delete any existing file.
-						Activator.getInstance().removeFiles(category, id);
-						// Create new one.
 						String name = part.getFileName();
 						if (name == null) {
 							name = ""; //$NON-NLS-1$
 						} else if ((name.indexOf('/') > -1) || (name.indexOf('\\') > -1)) {
 							name = new File(name).getName();
 						}
+						// Refuse the file before deleting the existing one, a rejected upload must not remove it.
+						if (!isUploadAllowed(name)) {
+							return null;
+						}
+						// Delete any existing file.
+						Activator.getInstance().removeFiles(category, id);
+						// Create new one.
 						file = new File(Activator.getInstance().getSubDir(category, id), Integer.toString(id) + '_' + name);
 						// Test a directory path trasversal attack...
 						try {
