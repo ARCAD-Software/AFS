@@ -51,6 +51,8 @@ public class Activator extends AbstractConfiguredActivator {
 	private static final String CONF_KEYSERVER = "server.address"; //$NON-NLS-1$
 	private static final String CONF_KEYMAXSIZE = "maxFileSize"; //$NON-NLS-1$
 	private static final int CONF_KEYMAXSIZE_DEFAULT = 10240000; 
+	private static final String CONF_KEYWHITELIST = "whiteList"; //$NON-NLS-1$
+	private static final String CONF_KEYBLACKLIST = "blackList"; //$NON-NLS-1$
 	private static final String DEFAULTPATH = "./files/bin"; //$NON-NLS-1$
 
 	private static Activator instance;
@@ -68,6 +70,7 @@ public class Activator extends AbstractConfiguredActivator {
 	private ServiceTracker eventTracker;
 	private BinariesTranferService binTransfer;
 	private int maxFileSize = CONF_KEYMAXSIZE_DEFAULT; //10 Mo
+	private volatile UploadFilter uploadFilter = UploadFilter.ACCEPT_ALL;
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
@@ -169,6 +172,13 @@ public class Activator extends AbstractConfiguredActivator {
 						error(Messages.Activator_Error_invalid_configuration, e);
 					}
 				}
+			}
+			// The lists are always read, so removing them from the configuration disables the filter.
+			final String whiteList = parseStringParameter(properties.get(CONF_KEYWHITELIST), null);
+			final String blackList = parseStringParameter(properties.get(CONF_KEYBLACKLIST), null);
+			uploadFilter = UploadFilter.parse(whiteList, blackList);
+			if ((whiteList != null) || (blackList != null)) {
+				info("Binaries upload filter: whiteList=[{}], blackList=[{}].", whiteList, blackList);
 			}
 		}
 	}
@@ -423,6 +433,13 @@ public class Activator extends AbstractConfiguredActivator {
 
 	private void setMaxFileSize(int maxFileSize) {
 		this.maxFileSize = maxFileSize;
+	}
+
+	/**
+	 * @return the filter applied to the name of the uploaded files, never null.
+	 */
+	UploadFilter getUploadFilter() {
+		return uploadFilter;
 	}
 	
 }
