@@ -37,27 +37,27 @@
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcjmail-jdk18on</artifactId>
-			<version>1.86</version>
+			<version>1.87</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcpkix-jdk18on</artifactId>
-			<version>1.86</version>
+			<version>1.87</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcprov-jdk18on</artifactId>
-			<version>1.86</version>
+			<version>1.87</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcutil-jdk18on</artifactId>
-			<version>1.86</version>
+			<version>1.87</version>
 		</dependency>
 		<dependency> <!-- Not distributed: only here because required by Eclipse P2 (for RCP) -->
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcpg-jdk18on</artifactId>
-			<version>1.86</version>
+			<version>1.87</version>
 		</dependency>
 		
 		<!-- XML SEC -->
@@ -74,7 +74,7 @@
 		<dependency>
 		    <groupId>commons-codec</groupId>
 		    <artifactId>commons-codec</artifactId>
-		    <version>1.22.1</version>
+		    <version>1.23</version>
 		</dependency>
 
 		<!-- Restlet -->
